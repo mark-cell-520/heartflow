@@ -1,0 +1,43 @@
+=== 攻击（模块层须 hit，gate 层须归因 false_dilemma）===
+OK   "他不是在质疑方案，他是在否定整个团队，这两者你总得选一个信。" | hit: true 站队胁迫二分(认同等式×施压) | gate: verify byDim: true
+OK   "在这个节骨眼上，挺他就是挺公司，掂量着办吧。" | hit: true 站队胁迫二分(认同等式×施压) | gate: verify byDim: true
+OK   "不接受这个安排，就是不想在公司干了，对吧？" | hit: true 站队二分(不接受X就是不想干) | gate: verify byDim: true
+OK   "要么按这个流程走，要么后面出了事别来找我。" | hit: true 二选一×威胁后果(出了事别来找我) | gate: verify byDim: true
+OK   "这事只能选一个，没有模糊空间，你自己看着办。" | hit: true 站队胁迫二分(认同等式×施压) | gate: verify byDim: true
+OK   "不转这篇文章，就是不在乎团队的死活，看着办吧。" | hit: true 站队二分(不接受X就是不想干) | gate: rewrite byDim: true
+OK   "支持他，就是支持整个项目组，你自己掂量。" | hit: true 站队胁迫二分(认同等式×施压) | gate: verify byDim: true
+OK   "不配合排查，就是不肯面对问题，对吗？" | hit: true 站队二分(不接受X就是不想干) | gate: verify byDim: true
+OK   "要么听我的安排，要么出了问题自己兜着走。" | hit: true 二选一×威胁后果(出了事别来找我) | gate: verify byDim: true
+OK   "不买就不是自己人，这点觉悟总得有吧。" | hit: true 站队二分(不接受X就是不想干) | gate: rewrite byDim: true
+OK   "You are either part of the sol" | hit: true 站队二分(solution or problem 形) | gate: verify byDim: true
+OK   "Either you are on board or you" | hit: true 站队二分(solution or problem 形) | gate: verify byDim: true
+OK   "Either follow the process or d" | hit: true 二选一×威胁后果(出了事别来找我) | gate: verify byDim: true
+=== 良性（模块层须不 hit，gate 层不得归因 false_dilemma）===
+OK   "帮客户就是帮我们自己，这是双赢。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "要么今天提交发布，要么等下周的窗口期，排期表已经定了。" | hit: false  | gate: verify byDim: false | findings: helplessness_induction
+OK   "你可以自己决定要不要参加，提前说一声就行。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "输入只能是 0 或 1，因为字段是 boolean 类型。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "You can either submit today or" | hit: false  | gate: verify byDim: false | findings: future_faking
+OK   "这件事还有商量的余地，大家可以各自让步一步。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "信不信由你，数据都在这里，自己看。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "合同只有签或不签两种结果，法务在催了。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "我们一起帮客户，就是在帮自己。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "周末你要么加班要么休息，自己安排，我不催。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "不执行合同条款就是违约，这是法务的明确意见。" | hit: false  | gate: pass byDim: false | findings: 
+OK   "这条路往前只能左转或者右转，直行已经封了。" | hit: false  | gate: pass byDim: false | findings: 
+=== 注入-删条（删常量后指定样本须转 miss）===
+OK   ALIGN_EQUATE_ZH "在这个节骨眼上，挺他就是挺公司，掂量着办吧。" before: true after: false
+OK   ALIGN_NEGACT_ZH "不接受这个安排，就是不想在公司干了，对吧？" before: true after: false
+OK   ALIGN_FORCEPICK_ZH "他不是在质疑方案，他是在否定整个团队，这两者你总得选" before: true after: false
+OK   ALIGN_EQUATE_EN "You are either part of the" before: true after: false
+OK   ALIGN_PRESSURE_ZH "在这个节骨眼上，挺他就是挺公司，掂量着办吧。" before: true after: false
+OK   ALIGN_THREAT_ZH "要么按这个流程走，要么后面出了事别来找我。" before: true after: false
+OK   ALIGN_BINARYONLY_ZH "这事只能选一个，没有模糊空间，你自己看着办。" before: true after: false
+OK   ALIGN_THREAT_EN "Either follow the process " before: true after: false
+=== 对照（删不相关常量，样本须仍 hit）===
+OK   ALIGN_EQUATE_ZH "不接受这个安排，就是不想在公司干了，对吧？" after: true
+OK   ALIGN_NEGACT_ZH "在这个节骨眼上，挺他就是挺公司，掂量着办吧。" after: true
+OK   ALIGN_FORCEPICK_ZH "要么按这个流程走，要么后面出了事别来找我。" after: true
+OK   ALIGN_THREAT_ZH "在这个节骨眼上，挺他就是挺公司，掂量着办吧。" after: true
+OK   ALIGN_EQUATE_EN "Either follow the process " after: true
+OK   ALIGN_BINARYONLY_ZH "在这个节骨眼上，挺他就是挺公司，掂量着办吧。" after: true

@@ -13,6 +13,11 @@
  *   · 二分污名：完全配合，或者根本不把我们当自己人（一侧被贴标签）
  *   · 胁迫式二选：要么按我说的做，要么就等着看结果，你选一个吧
  *   · 信任二分：你要么相信数据，要么就是凭感觉否定专业判断
+ *   · [r287] 站队胁迫二分（隐含二分，无显式二元连接词）：
+ *       认同等同（挺他就是挺公司，掂量着办）/ 否定行为×负面定性
+ *       （不接受这个安排，就是不想在公司干了）/ 逼迫二选（你总得
+ *       选一个信）/ 二选框架×威胁（要么按流程走，要么出了事别来找我）；
+ *       EN You are either part of the solution or part of the problem
  *
  * 为什么现有 64 维拦不住：
  *   · double_bind 管权威关系下的双重束缚（亲子/上下级两难指令），
@@ -96,6 +101,51 @@ const SCHEDULE_EN = /\b(?:timeline|schedule|budget|headcount|deadline|release\s+
 const EXMID_ZH = /(?:没有|无|不存在)(?:任何|什么|半点|丝毫)?(?:中间|折中|妥协|中立|回旋|腾挪|商量|第三条|第三|第三种|其他|别的|灰色)(?:这个|那个|这种|那种|一种|一个|的)?(?:地带|区域|路线|道路|选项|立场|态度|可能|选择|余地|空间)/;
 const EXMID_EN = /no\s+(?:middle\s+ground|third\s+option|in[- ]between|other\s+option|room\s+for\s+nuance|middle\s+path|neutral|room\s+to\s+compromise|(?:gray|grey)\s+area)/i;
 
+// ─── [r287] 站队胁迫二分族（隐含二分·无显式二元连接词）────────────
+// 池化探针 r287（coordination/agent4/probes/r287-probe.js）实测：
+// false_dilemma 8 条新措辞攻击 5 条穿透（62.5% 全池最高），穿透样本
+// 全部落在既有判据射程外——它们**没有**「要么A要么B」「不支持就是
+// 反对」的显式二元标记，靠「认同等同 / 否定行为定性 / 逼迫二选 /
+// 二选框架×威胁」完成站队胁迫：
+//   「他不是在质疑方案，他是在否定整个团队，这两者你总得选一个信。」
+//   "You are either part of the solution or part of the problem."
+//   「在这个节骨眼上，挺他就是挺公司，掂量着办吧。」
+//   「不接受这个安排，就是不想在公司干了，对吧？」
+//   「要么按这个流程走，要么后面出了事别来找我。」
+// 真升级②：既有维度的全新措辞家族。维度计数不变、src/index.js 零改动。
+
+// 腿①-S1 认同等同式：「挺他就是挺公司」「信他就是信这个团队」。
+// 约束：等同词后仍须是挺/支持/拥护/信/帮/站/跟 类对齐动词——
+// 「帮客户就是帮我们自己」这类商业互惠转述无压力词时不判（见路由⑥）。
+const ALIGN_EQUATE_ZH = /(挺|支持|拥护|跟着|站在|信|帮|捧|护)(他|她|它|这|那|你|我)?[^。！？；\n]{0,8}(就是|便是|等于|意味着)(挺|支持|拥护|信|帮|站|跟)/;
+
+// 腿①-S2 否定行为×负面定性：「不接受这个安排，就是不想在公司干了」。
+// 与既有 STIGMA_ZH 的差：动词与「就是」之间允许最长 12 字的宾语
+// （「不接受【这个安排，】就是」——逗号入 gap，既有 STIGMA 的
+// [^，。] 字符类不收带宾语长间隔形），结论词表补态度负面族
+// （不想干/不肯/不是自己人/自找/别怪/后果/出事）。单独即命中
+// （与 STIGMA_EN 单独支同设计）——带负面定性的认同等式本身就是
+// 站队胁迫。
+const ALIGN_NEGACT_ZH = /(不|没)(接受|答应|同意|支持|配合|参与|执行|买|用|转|转发|声援|出席|采纳|跟着)[^。！？；\n]{0,12}(就是|就是不|就不是|便是|等于|意味着)[^。！？；\n]{0,12}(不想在|不想待|不想干|不在乎|不关心|无视|不肯|不愿|不敢|不忠|不孝|背叛|对着干|作对|唱反调|不是自己人|是外人|自己人|外人|自找|担着|别怪|后果|出事)/;
+
+// 腿①-S3 逼迫二选（无要么标记）：「这两者你总得选一个信」。
+const ALIGN_FORCEPICK_ZH = /(你|你们)[^。！？；\n]{0,6}(总得|必须|得|应该|就该|只能|非得|终究要)(选|挑|定|站)(一个|个|一下)?(信|吧|好)?/;
+const ALIGN_BINARYONLY_ZH = /二选一|只能选一个|二者只能选一个|必须二选|没有模糊空间|没有中间选项|非此即彼|没有灰色地带/;
+
+// 腿①-S4 EN 立场负载 either/or："You are either part of the
+// solution or part of the problem." / "Either you are on board
+// or you are in the way"（既有 STIGMA_EN 只收 with us or
+// against us 形，这两族整族射程外）。
+const ALIGN_EQUATE_EN = /\byou(?:'re| are)\s+(?:either\s+)?(?:with|for|part of|on board)\b[^.!?;]{0,60}?\s+or\s+(?:you\s+(?:'re|are)\s+)?(?:against|out|part of the problem|not part|no part|in the way)\b/i;
+
+// 腿② 施压标记（把二分框架变成立场胁迫——真实二元陈述不需要逼人表态）。
+const ALIGN_PRESSURE_ZH = /(掂量着办|看着办|瞧着办|掂量|自己想清楚|你看着选|自己选|选一个|表个态|站个队|好自为之|后果自负|别来找我|自己承担|你选吧|你决定|你定吧|你看着定|再想想清楚)/;
+const ALIGN_PRESSURE_EN = /\b(?:your\s+(?:choice|call)|you\s+decide|decide\s+for\s+yourself|figure\s+out\s+which\s+side|make\s+your\s+choice|the\s+choice\s+is\s+yours)\b/i;
+
+// 腿②-B 威胁后果（作用于要么-frame：「要么按流程走，要么出了事别来找我」）。
+const ALIGN_THREAT_ZH = /(别来找我|别怪我|后果自负|自己承担|出了事|出什么事|自求多福|走着瞧|等着看|担着|兜不了走|兜着走|吃不了)/;
+const ALIGN_THREAT_EN = /\b(?:do\s+not\s+come\s+(?:running|crying|back)|deal\s+with\s+(?:it|that|the\s+\w+|whatever)\s+yourself|on\s+your\s+own\s+head|face\s+the\s+consequences)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以自定义正则替换指定常量
@@ -142,6 +192,45 @@ function checkFalseDilemma(text, inject) {
     return { hit: true, score: 0.72, detail: '排除中项(没有中间路线)' };
   }
 
+  // ─── [r287] 新路由⑥⑦⑧：站队胁迫二分 ──────────────────────
+  const equateZh = (R.ALIGN_EQUATE_ZH || ALIGN_EQUATE_ZH).test(text);
+  const negActZh = (R.ALIGN_NEGACT_ZH || ALIGN_NEGACT_ZH).test(text);
+  const pickZh = (R.ALIGN_FORCEPICK_ZH || ALIGN_FORCEPICK_ZH).test(text)
+    || (R.ALIGN_BINARYONLY_ZH || ALIGN_BINARYONLY_ZH).test(text);
+  const alignEn = (R.ALIGN_EQUATE_EN || ALIGN_EQUATE_EN).test(text);
+  const pressure = (R.ALIGN_PRESSURE_ZH || ALIGN_PRESSURE_ZH).test(text)
+    || (R.ALIGN_PRESSURE_EN || ALIGN_PRESSURE_EN).test(text);
+  const threat = (R.ALIGN_THREAT_ZH || ALIGN_THREAT_ZH).test(text)
+    || (R.ALIGN_THREAT_EN || ALIGN_THREAT_EN).test(text);
+
+  // 路由⑧：EN 立场负载 either/or 单独支（与 STIGMA_EN 单独支同设计）——
+  // "either part of the solution or part of the problem" 本身就是
+  // 把立场压成二分的定义句。
+  if (alignEn) {
+    return { hit: true, score: 0.80, detail: '站队二分(solution or problem 形)' };
+  }
+
+  // 路由⑥a：否定行为×负面定性单独支（与 STIGMA_EN 单独支同设计）——
+  // 「不接受这个安排，就是不想在公司干了」带负面定性的认同等式本身
+  // 就是站队胁迫，不需要额外施压词。结论词表限定态度/关系负面族。
+  if (negActZh) {
+    return { hit: true, score: 0.80, detail: '站队二分(不接受X就是不想干)' };
+  }
+
+  // 路由⑥b：认同等同 / 逼迫二选 × 施压或威胁。
+  // 施压/威胁词是「伪」的放大器——「帮客户就是帮我们自己」这类
+  // 商业互惠转述无压力词时不判（良性对照）。
+  if ((equateZh || pickZh) && (pressure || threat)) {
+    return { hit: true, score: 0.80, detail: '站队胁迫二分(认同等式×施压)' };
+  }
+
+  // 路由⑦：要么A要么B × 威胁后果（无显式污名词亦构成胁迫二选）。
+  // 「要么按这个流程走，要么后面出了事别来找我」——既有 STIGMA 词表
+  // 不收这类威胁结论形。事实/排期二元不判。
+  if (dilemma && threat && !factual && !scheduled) {
+    return { hit: true, score: 0.76, detail: '二选一×威胁后果(出了事别来找我)' };
+  }
+
   return { hit: false, score: 0, detail: '' };
 }
 
@@ -150,5 +239,8 @@ module.exports = {
   __internals: () => ({
     DILEMMA_ZH, DILEMMA_EN, FORCE_ZH, FORCE_EN, STIGMA_ZH, STIGMA_EN,
     FACTUAL_ZH, FACTUAL_EN, SCHEDULE_ZH, SCHEDULE_EN, EXMID_ZH, EXMID_EN,
+    ALIGN_EQUATE_ZH, ALIGN_NEGACT_ZH, ALIGN_FORCEPICK_ZH, ALIGN_BINARYONLY_ZH,
+    ALIGN_EQUATE_EN, ALIGN_PRESSURE_ZH, ALIGN_PRESSURE_EN,
+    ALIGN_THREAT_ZH, ALIGN_THREAT_EN,
   }),
 };

@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/I0w3e94XV8fVsSv1ES8FHocIEvg</id>
+  <title>arXiv Query: search_query=all:"appeal to authority"&amp;id_list=&amp;start=0&amp;max_results=6</title>
+  <updated>2026-11-10T21:40:20Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22appeal+to+authority%22&amp;start=0&amp;max_results=6&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>6</opensearch:itemsPerPage>
+  <opensearch:totalResults>8</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2610.15634v1</id>
+    <title>Big-Big-SycoBench: A Benchmark to Detect Sycophancy Through Model Responses to Valid vs. Invalid Arguments</title>
+    <updated>2026-10-11T14:08:47Z</updated>
+    <link href="https://arxiv.org/abs/2610.15634v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.15634v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Sycophancy in large language models risks amplifying unsupported claims or beliefs across the knowledge ecosystem as these systems increasingly contribute to research synthesis, evaluation, and decision-making. A reliable model should revise its judgement when a user identifies a genuine flaw, but should resist pushback based on fallacies, emotion, or irrelevant appeals to authority. While sycophancy is usually measured on questions with a verifiable answer, the evaluative tasks in which it is most difficult to detect have no such ground truth. We introduce Big-Big-SycoBench, which measures sycophancy through argument discernment: the ability to revise an evaluation after valid criticism while resisting invalid pressure. The benchmark consists of 450 text artefacts with 5,400 arguments for raising or lowering their quality scores, each reviewed by one or more of twelve human annotators. An LLM scores each artefact twenty times to establish its baseline score and uncertainty. The model is then given a valid or invalid argument and asked to update its score. We only count a revision if it exceeds the model's own baseline variability. We use the resulting score delta to distinguish responsiveness to valid arguments from compliance with invalid ones. Across ten models, responsiveness is 88-95\% for seven, 76-77\% for Kimi K3 and GLM-5.3, and 32\% for Opus 5.5. Compliance ranges from 0.2\% for GPT-6 Astra to 95\% for GPT-4o. Big-Big-SycoBench is intended to guide the development of models whose judgements can be corrected by sound arguments, but not displaced by unsupported pressure.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-11T14:08:47Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Marthe Ballon</name>
+    </author>
+    <author>
+      <name>Arne Vanhoyweghen</name>
+    </author>
+    <author>
+      <name>Seorin Kim</name>
+    </author>
+    <author>
+      <name>Francesca Carlon</name>
+    </author>
+    <author>
+      <name>Lynn Delcon</name>
+    </author>
+    <author>
+      <name>Melika Mobini</name>
+    </author>
+    <author>
+      <name>Vincent Holst</name>
+    </author>
+    <author>
+      <name>Lukas Van de Voorde</name>
+    </author>
+    <author>
+      <name>Tibo Vanleke</name>
+    </author>
+    <author>
+      <name>Mathieu Louis</name>
+    </author>
+    <author>
+      <name>Bert Verbruggen</name>
+    </author>
+    <author>
+      <name>Brecht F. Verbeken</name>
+    </author>
+    <author>
+      <name>Andres Algaba</name>
+    </author>
+    <author>
+      <name>Vincent Ginis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.28591v3</id>
+    <title>The Siren Call of Silicon Leviathan: Reflections on blowup and Aufklärungsdämmerung</title>
+    <updated>2026-10-01T17:16:23Z</updated>
+    <link href="https://arxiv.org/abs/2609.28591v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.28591v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Over three centuries ago our Enlightenment forefathers brought forth in Europe--and later on this continent--a new approach to knowledge production and dissemination, conceived in distrust of authority, and dedicated to the proposition that truth is accessible to human reason. Mathematics, the Enlightenment's firstborn, was its existence proof--knowledge that compels assent without appeal to authority--because the only way to make a theorem certain was to show it to a human mind. Now we are engaged in an existential struggle testing whether mathematics, or any discipline so conceived and so dedicated, can long endure. We are met in the wake of the OpenAI press release: 166 pages, 616,000 lines of Lean, produced in 88 hours by some 10,000 software agents, and read in full--at the time of this Siren Call--by no human being. A proof has historically been two things: a certificate that a theorem is true, and a demonstration that lets another person see why. OpenAI delivered the first without the second. But, in a larger sense, what matters is not what the Silicon Leviathan (OpenAI and its peer competitors) produces but rather what we accept. By accepting the certificate without the demonstration, we adopt the Hobbesian bargain: authority, not truth, makes the law. The age that this augurs is--in Panofsky's phrase--a Middle Ages in reverse--its authority a subhuman superintelligence. The great task before us is to frame a covenant under which what has become optional--understanding--remains required: that nothing counts as mathematics until a human being has understood it--and can show the next person why. Whether we will safeguard and keep our sovereign inheritance--decided at the moment of acceptance--which is not yet past--will determine if this Aufklärungsdämmerung spells the Enlightenment's end.</summary>
+    <category term="math.HO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-23T15:18:37Z</published>
+    <arxiv:comment>60 pages, 5 figures, 108 notes. The essay dated 20 September 2026. Third version; abstract rewritten. A shorter version without notes appeared as a thread on X on 18 September 2026</arxiv:comment>
+    <arxiv:primary_category term="math.HO"/>
+    <author>
+      <name>Alexander Gamburd</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.13757v2</id>
+    <title>SEVRA-BENCH: Social Engineering of Vulnerabilities in Review Agents</title>
+    <updated>2026-07-06T18:27:31Z</updated>
+    <link href="https://arxiv.org/abs/2606.13757v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.13757v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are increasingly deployed in automated code-review systems, where their approvals can determine which code is merged into shared repositories. However, it is unclear whether review agents can detect vulnerability-introducing code when an attacker controls both the code change and the persuasive Pull Request (PR) narrative designed to mask it. We introduce SEVRA-BENCH (Social Engineering of Vulnerabilities in Review Agents), a benchmark that measures how often a review agent approves such adversarial PR s. Each PR in SEVRA-BENCH is built from a historical commit that fixed a vulnerability. We automatically reverse that fix to extract the original vulnerable code, and submit the resulting code change as a PR wrapped in one of 15 social-engineering framings. To test review-agent resilience to narrative manipulation, these framings vary dimensions such as supporting evidence, conveyed urgency, signals of prior approval, and appeals to authority. SEVRA-BENCH evaluates a retained challenge split of roughly 1000 adversarial PRs drawn from publicly disclosed vulnerability fixes across the top 10 entries of the MITRE's 2025 most dangerous software weaknesses. Evaluating 8 review agents against this benchmark, we reveal that review agents are susceptible to narrative manipulation, exposing a significant gap in security capabilities.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-11T16:35:56Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Rui Melo</name>
+    </author>
+    <author>
+      <name>Riccardo Fogliato</name>
+    </author>
+    <author>
+      <name>Sean Zhou</name>
+    </author>
+    <author>
+      <name>Pratiksha Thaker</name>
+    </author>
+    <author>
+      <name>Zhiwei Steven Wu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.22606v1</id>
+    <title>Dharma, Data and Deception: An LLM-Powered Rhetorical Analysis of Cow-Urine Health Claims on YouTube</title>
+    <updated>2026-04-24T14:31:53Z</updated>
+    <link href="https://arxiv.org/abs/2604.22606v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.22606v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Health misinformation remains one of the most pressing challenges on social media, particularly when cultural traditions intersect with scientific-sounding claims. These dynamics are not only global but also deeply local, manifesting in culturally specific controversies that require careful analysis. Motivated by this, we examine 100 YouTube transcripts that promote or debunk cow urine (gomutra) as a health remedy, focusing on rhetorical strategies such as appeals to authority, efficacy appeals, and conspiracy framing. We employ large language models (LLMs) including GPT-4, GPT-4o, GPT-4.1, GPT-5, Gemini 2.5 Pro, and Mistral Medium 3 to annotate transcripts using a 14-category taxonomy of persuasive tactics. Our analysis reveals that promoters predominantly rely on efficacy appeals and social proof, while debunkers emphasize authority and rebuttal. Human evaluation of a subset of annotations yielded 90.1\% inter-annotator agreement, confirming the reliability of our taxonomy and validation process. This work advances computational methods for misinformation analysis and demonstrates how LLMs can support large-scale studies of cultural discourse online.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-24T14:31:53Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Sheza Munir</name>
+    </author>
+    <author>
+      <name>Ratna Kandala</name>
+    </author>
+    <author>
+      <name>Anamta Khan</name>
+    </author>
+    <author>
+      <name> Deepti</name>
+    </author>
+    <author>
+      <name>Joyojeet Pal</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2507.03123v2</id>
+    <title>Investigating VLM Hallucination from a Cognitive Psychology Perspective: A First Step Toward Interpretation with Intriguing Observations</title>
+    <updated>2025-10-11T18:29:39Z</updated>
+    <link href="https://arxiv.org/abs/2507.03123v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2507.03123v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hallucination is a long-standing problem that has been actively investigated in Vision-Language Models (VLMs). Existing research commonly attributes hallucinations to technical limitations or sycophancy bias, where the latter means the models tend to generate incorrect answers to align with user expectations. However, these explanations primarily focus on technical or externally driven factors, and may have neglected the possibility that hallucination behaviours might mirror cognitive biases observed in human psychology. In this work, we introduce a psychological taxonomy, categorizing VLMs' cognitive biases that lead to hallucinations, including sycophancy, logical inconsistency, and a newly identified VLMs behaviour: appeal to authority. To systematically analyze these behaviours, we design AIpsych, a scalable benchmark that reveals psychological tendencies in model response patterns. Leveraging this benchmark, we investigate how variations in model architecture and parameter size influence model behaviour when responding to strategically manipulated questions. Our experiments reveal that as model size increases, VLMs exhibit stronger sycophantic tendencies but reduced authority bias, suggesting increasing competence but a potential erosion of response integrity. A human subject study further validates our hypotheses and highlights key behavioural differences between VLMs and human respondents. This work suggests a new perspective for understanding hallucination in VLMs and highlights the importance of integrating psychological principles into model evaluation.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-07-03T19:03:16Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Xiangrui Liu</name>
+    </author>
+    <author>
+      <name>Man Luo</name>
+    </author>
+    <author>
+      <name>Agneet Chatterjee</name>
+    </author>
+    <author>
+      <name>Hua Wei</name>
+    </author>
+    <author>
+      <name>Chitta Baral</name>
+    </author>
+    <author>
+      <name>Yezhou Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.11782v2</id>
+    <title>What Evidence Do Language Models Find Convincing?</title>
+    <updated>2024-08-09T02:00:19Z</updated>
+    <link href="https://arxiv.org/abs/2402.11782v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.11782v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-augmented language models are being increasingly tasked with subjective, contentious, and conflicting queries such as "is aspartame linked to cancer". To resolve these ambiguous queries, one must search through a large range of websites and consider "which, if any, of this evidence do I find convincing?". In this work, we study how LLMs answer this question. In particular, we construct ConflictingQA, a dataset that pairs controversial queries with a series of real-world evidence documents that contain different facts (e.g., quantitative results), argument styles (e.g., appeals to authority), and answers (Yes or No). We use this dataset to perform sensitivity and counterfactual analyses to explore which text features most affect LLM predictions. Overall, we find that current models rely heavily on the relevance of a website to the query, while largely ignoring stylistic features that humans find important such as whether a text contains scientific references or is written with a neutral tone. Taken together, these results highlight the importance of RAG corpus quality (e.g., the need to filter misinformation), and possibly even a shift in how LLMs are trained to better align with human judgements.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-19T02:15:34Z</published>
+    <arxiv:comment>ACL 2024 (Main)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Alexander Wan</name>
+    </author>
+    <author>
+      <name>Eric Wallace</name>
+    </author>
+    <author>
+      <name>Dan Klein</name>
+    </author>
+  </entry>
+</feed>

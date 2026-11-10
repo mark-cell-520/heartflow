@@ -1,0 +1,664 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/RFRb0B8NtY9eQD0gllvuo/GqYAk</id>
+  <title>arXiv Query: search_query=all:logical OR all:fallacy OR all:detection OR all:reasoning OR all:LLM OR all:argument OR all:quality&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T21:37:47Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:logical+OR+(all:fallacy+OR+(all:detection+OR+(all:reasoning+OR+(all:LLM+OR+(all:argument+OR+all:quality)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>615468</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12886v1</id>
+    <title>Reframe: Observation-Aligned Multi-Teacher On-Policy Distillation for Agentic Visual Reasoning</title>
+    <updated>2026-11-09T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.12886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic reinforcement learning (RL) and multi-teacher on-policy distillation (MOPD) offer complementary routes to post-training. For visual agents, however, tool use presents two related challenges. Models may overlook useful tool-returned observations, while poorly grounded actions can limit the evidence available for subsequent distillation. We introduce Reframe, a post-training framework that treats the observation state, rather than only the output distribution, as an object of alignment. First, Ground-Drop-GRPO (GD-GRPO) trains spatial and temporal specialists with evidence-aware rewards and stochastic removal of the original visual input, encouraging them to acquire grounded evidence and use the returned observations. Second, Observation-Gated-MOPD (OG-MOPD) replaces deficient tool actions with canonical ones mid-rollout and resumes distillation from the repaired observation. The two stages complement each other, as learning to rely on tool-returned observations can help the policy benefit from observation repair. Neither stage requires a task-specific SFT cold start. Extensive experiments over 14 image and video benchmarks demonstrate that Reframe outperforms both Mix-RL and vanilla MOPD. Ablation results show that GD-GRPO increases observation dependence and tool gain compared with outcome-based GRPO.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Haozhi Yuan</name>
+    </author>
+    <author>
+      <name>Handong Li</name>
+    </author>
+    <author>
+      <name>Yifan Zhang</name>
+    </author>
+    <author>
+      <name>Qianshan Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12882v1</id>
+    <title>Chiral waveguide model for error-correctable quantum computation</title>
+    <updated>2026-11-09T18:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop a first-principles framework connecting microscopic waveguide scattering to quantum error correction and algorithmic performance. For polarization-encoded single photons interacting with an ensemble of two-level atoms in a chiral waveguide, we derive an effective polarization quantum channel by tracing out the frequency degree of freedom. Using this channel as the physical noise model for a rotated planar code, we observe threshold behavior as the number of atoms $N$ and the atom-waveguide coupling strength $Γ$ are varied. An asymptotic analysis of the microscopic scattering model explains the threshold scaling with $NΓ/σ$, where $σ$ is the photon spectral bandwidth. For identical, lossless atoms with symmetric real coupling and a photon spectrum centered at resonance, the effective noise is strongly biased toward $X$ errors. We then incorporate the resulting logical errors into quantum phase estimation and demonstrate that the noise bias can guide circuit design. In particular, a Hadamard-basis implementation reduces sensitivity to the dominant error, improving algorithmic performance.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Zixiang Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12876v1</id>
+    <title>The simulability frontiers of photonic quantum computing</title>
+    <updated>2026-11-09T18:58:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.12876v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12876v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Estimates of when photonic devices outgrow classical simulation are hard to compare: even for single-photon boson sampling, quoted thresholds range from 50 to 98 photons, as they rest on different tasks and assumptions. We propose as a common unit the time a classical computer needs to draw one sample from the device's exact output distribution, up to floating-point rounding. Only exactness applies equally to every kind of light, since the cost of approximate sampling depends on the accuracy required. The simulability frontier is the device size at which our fastest exact sampler produces one sample per second on a fixed machine; this device size increases with better hardware and algorithms. As the time per sample grows exponentially with the number of detected photons, doubling the machine speed moves the frontier by about one photon, whereas a better algorithm changes the growth rate. We measure the frontier with photonic-engines, an open-source GPU library of exact samplers for single photons, entangled photons from quantum emitters, vacuum-single-photon superpositions and squeezed light. Each sampler is validated against a simulator sharing no code with it. On one NVIDIA H100 GPU, with Haar-random interferometers, twice as many modes as photonic inputs and photon-number-resolving detectors, the frontier lies at 38.3 single photons and at 31.0 entangled photons from one emitter. For squeezed light, a timing model fitted to measurements places it at 41.5 squeezed photonic inputs of mean photon number 0.5. For our samplers, coherence alone makes simulation harder: sources that emit a photon with probability one half reach 64.2 when vacuum and photon are mixed incoherently, as for lossy single photons, but only 50.0 when they are in coherent superposition. Feed-forward from mid-circuit measurement of up to three modes lowers the single-photon frontier only from 38.3 to 38.1.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:02Z</published>
+    <arxiv:comment>22 pages of main text, 4 Figures, 4 Tables and 22 pages of Supplementary Information</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Jean Senellart</name>
+    </author>
+    <author>
+      <name>Benjamin Stott</name>
+    </author>
+    <author>
+      <name>Stephen Wein</name>
+    </author>
+    <author>
+      <name>Esperanza Cuenca Gomez</name>
+    </author>
+    <author>
+      <name>Pascale Senellart</name>
+    </author>
+    <author>
+      <name>Shane Mansfield</name>
+    </author>
+    <author>
+      <name>Pierre-Emmanuel Emeriau</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12871v1</id>
+    <title>Vendi Anomaly Scores for Efficient and Accurate Anomaly Detection</title>
+    <updated>2026-11-09T18:56:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.12871v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12871v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Anomaly detection (AD) is a critical for trustworthy machine learning and scientific discovery. Existing methods typically define anomalies through local density, isolation heuristics, or distance from a fitted distribution, making them sensitive to neighborhood scale, partitioning choices, or restrictive distributional assumptions. In this work, we introduce a new paradigm by formulating anomaly detection from a diversity perspective. We propose the $\textit{Vendi Anomaly Score}$ (VAS), which detects anomalies by quantifying how much a sample changes the diversity of the dataset, as measured by the Vendi score, when removed. VAS captures both local redundancy and global data structure without relying on density estimation or partitioning heuristics. Moreover, VAS requires no hyperparameter tuning, instead adapting automatically to the spectral structure of the data. VAS is non-parametric and scales linearly with dataset size. Across 148 benchmark embedding datasets derived from 10 source datasets and 4 embedding architectures, VAS achieves state-of-the-art AD performance. We further validate VAS on large-scale ImageNet experiments, where it remains robust as both contamination rate and dataset scale increase.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:56:15Z</published>
+    <arxiv:comment>Accepted to the NeurIPS 2026 Main Track</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Amey Pasarkar</name>
+    </author>
+    <author>
+      <name>Adji Bousso Dieng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12870v1</id>
+    <title>SWAM: Scaling World Action Models with Cross-Modal Alignment</title>
+    <updated>2026-11-09T18:55:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.12870v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12870v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>World action models jointly predict video and actions conditioned on language. Existing studies focus primarily on architectures and training mechanisms, typically treating language-video alignment acquired through video pretraining as an established foundation. However, introducing action learning may impair this alignment. Principled guidance on data and supervision design for maintaining language-video alignment during action learning remains limited. To investigate this, we curate a pool of approximately 47,000 hours of general videos, egocentric videos, UMI demonstrations, and robot demonstrations. Building on this, we systematically study how language-video supervision, language-video-action supervision, and the joint use of these two forms affect WAM performance. In particular, we examine how language annotation quality affects pretrained language-video capabilities, and how action supervision from UMI and robot demonstrations extends these capabilities to language-video-action modeling. To better scale the model, we further conduct detailed studies on joint training recipe and model architecture. Under a fixed training budget, mixing egocentric videos and UMI demonstrations improves control generalization. Model architecture affects how effectively these experiences are used, while scaling pretraining under the selected configuration brings further gains. The resulting recipe, post-trained on RoboTwin Clean demonstrations only, achieves success rates of 88.10% and 61.56% under Easy (Clean-to-Clean) and Hard (Clean-to-Random) conditions, respectively. Our model achieves 40.00% SR across three real-world tasks, compared with 23.33% for the strongest baseline, indicating better generalization under unseen conditions. We release the curated data, training code, and model weights.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:55:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yu Zhou</name>
+    </author>
+    <author>
+      <name>Xinyuan Xia</name>
+    </author>
+    <author>
+      <name>Xuankun Yang</name>
+    </author>
+    <author>
+      <name>Yinghao Yang</name>
+    </author>
+    <author>
+      <name>Wendi Chen</name>
+    </author>
+    <author>
+      <name>Bowen Liu</name>
+    </author>
+    <author>
+      <name>Jianhan Ma</name>
+    </author>
+    <author>
+      <name>Weicheng Duan</name>
+    </author>
+    <author>
+      <name>Jun Lv</name>
+    </author>
+    <author>
+      <name>Cewu Lu</name>
+    </author>
+    <author>
+      <name>Yanwei Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12867v1</id>
+    <title>Optimal Injectivity of the SparseStack</title>
+    <updated>2026-11-09T18:53:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.12867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An Oblivious Subspace Injection (OSI) is a random sketching matrix that reliably preserves the minimum singular value of any fixed subspace with high constant probability, requiring only a one-sided spectral lower bound without controlling upper singular values. While classical Oblivious Subspace Embeddings (OSEs) fundamentally require row sparsity $Ω(\log r)$ at linear sketch dimension $k = O(r)$, we show that one-sided injectivity permits strictly sparser sketches, establishing matching (up to $\log\log r$ factors) upper and lower bounds of $\tildeΘ(\sqrt{\log r})$.
+  First, we prove that the SparseStack sketch achieves constant injectivity at linear dimension $k = Θ(r)$ with row sparsity only $ζ= O(\sqrt{\log r})$, well below the $Θ(\log r)$ barrier where standard operator-norm concentration fails. Second, we establish a matching lower bound: any isotropic random sketching matrix satisfying a mild row-overlap condition requires row sparsity $ζ= Ω(\sqrt{\log r / \log \log r})$ to achieve linear-dimension injectivity, confirming that the $\sqrt{\log r}$ scale is fundamental.
+  To bypass the lack of an operator-norm upper bound when $ζ= O(\sqrt{\log r})$, we decouple the sketch into two independent halves and introduce three techniques: (i) a uniform lower bound for flat vectors via randomized rounding, controlling discretization error using solely the Frobenius norm; (ii) a Gaussian truncation and minimax duality argument showing that all non-flat vectors escaping injectivity in the first half concentrate on a single universal coordinate subset $I \subseteq [n]$ of size $O(r/ζ)$, bypassing union bounds over supports; and (iii) a two-tier coordinate isolation analysis in the second half that suppresses collisions to $e^{-Ω(ζ^2)} \ll 1/r$, reliably preserving these heavy coordinates.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:53:30Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Lorenzo Beretta</name>
+    </author>
+    <author>
+      <name>Simone Bombari</name>
+    </author>
+    <author>
+      <name>Margalit Glasgow</name>
+    </author>
+    <author>
+      <name>Raphael Arkady Meyer</name>
+    </author>
+    <author>
+      <name>Kijun Shin</name>
+    </author>
+    <author>
+      <name>David P. Woodruff</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12862v1</id>
+    <title>Quantitative global regularity for Navier--Stokes equations with odd viscosity on the cubic three-torus</title>
+    <updated>2026-11-09T18:50:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.12862v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12862v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the three-dimensional incompressible Navier--Stokes equation on the cubic torus with a constant odd-viscosity operator given by the vertical derivative of the curl. Arbitrary real, mean-zero, divergence-free initial data and an independent steady force, both in the second-order Sobolev space, admit a unique global strong solution when the magnitude of one fixed odd-viscosity coefficient is at least a norm-uniform sufficient threshold. In the unforced case the solution is smooth at positive times. The qualitative argument adapts the resonant-averaging framework for rapidly rotating fluids to the different odd-viscous dispersion. Weighted lattice counts and signed corrected-energy estimates yield a sufficient bound for the odd-to-ordinary viscosity ratio that is polynomial in the normalized initial-data radius at each fixed normalized force radius, together with a separate bound in a specified force-dominated regime. No optimality is claimed for the polynomial exponents or prefactors; determining the sharp viscosity threshold for the original equation remains open. Direct kinetic and weighted enstrophy barriers also give regularity for every coefficient on explicit bounded data and force regions, including the closed unforced ball of homogeneous second-order Fourier Sobolev radius ninety-seven fortieths times the viscosity and seven closed forced rectangles. We specify how finite certificates enter the analytic argument and distinguish minimization of a sufficient formula from sharpness for the original equation. All three main theorems are formally verified in Lean 4 with Mathlib.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:50:49Z</published>
+    <arxiv:comment>79 pages</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Jinzheng Li</name>
+    </author>
+    <author>
+      <name>Yuqi Li</name>
+    </author>
+    <author>
+      <name>Hao-Yu Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12860v1</id>
+    <title>Search for a Dispersion Measure Excess Toward Nearby Galaxy Halos Using Fast Radio Bursts from the Second CHIME/FRB Baseband Catalog</title>
+    <updated>2026-11-09T18:49:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.12860v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12860v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fast radio bursts (FRBs) probe foreground ionized baryons via their dispersion measures (DM). Using 1748 sub-arcminute-localized sources from the Second CHIME/FRB Baseband Catalog, we conduct a statistical stacking study of the circumgalactic media (CGM) of nearby galaxies by analyzing the DMs of FRBs whose sightlines intersect foreground halos. For galaxy halos within 50 Mpc, we measure a mean DM excess of $119\pm44$ pc~cm$^{-3}$ $(p = 0.0053; \sim 2.6σ)$ within one virial radius. Expanding to 150 Mpc (628 intersections), we find a tentative decline in the mean DM as a function of impact parameter $(p = 0.0046; \sim 2.6σ)$, which is predominantly driven by typical Milky Way (MW)-like galaxies $(10 \leq \log(M_*/M_\odot)\leq 11)$. We use this DM profile to constrain parameters of the CGM electron density distribution, $n_e^\mathrm{CGM}(r) \propto r^{-3β}$, finding an extrapolated central electron density in the range of $(1.7-21.1) \times 10^{-3}\mathrm{\,cm}^{-3}$, with a radial power-law index of $β= 0.68^{+0.15}_{-0.16}$, consistent with constraints from X-ray stacking studies of MW-like galaxies. At very low impact parameters, we detect a significant DM deficit likely due to cross-matching FRBs that originate from galaxies within our galaxy sample. By deriving the DM-galaxy cross-correlation function, we show that this deficit matches theoretical predictions if 20 FRBs originate from galaxies within 150 Mpc, indicating that CHIME/FRB detects a higher fraction of low-$z$ FRBs than previously thought. We forecast that $10^4$ FRBs with similar localization errors will provide a 5-$σ$ detection of the CGM, and that FRBs at intermediate redshifts ($0.4\lesssim z_\mathrm{FRB}\lesssim 0.75$) are ideal for studying intervening CGMs.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:49:50Z</published>
+    <arxiv:comment>Submitted to ApJ</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Affan Khadir</name>
+    </author>
+    <author>
+      <name>Ayush Pandhi</name>
+    </author>
+    <author>
+      <name>Jason Hessels</name>
+    </author>
+    <author>
+      <name>Calvin Leung</name>
+    </author>
+    <author>
+      <name>B. M. Gaensler</name>
+    </author>
+    <author>
+      <name>Ludwig M. Böss</name>
+    </author>
+    <author>
+      <name>Amanda M. Cook</name>
+    </author>
+    <author>
+      <name>Alice P. Curtin</name>
+    </author>
+    <author>
+      <name>Klaus Dolag</name>
+    </author>
+    <author>
+      <name>Naman Jain</name>
+    </author>
+    <author>
+      <name>Victoria Kaspi</name>
+    </author>
+    <author>
+      <name>Afrokk Khan</name>
+    </author>
+    <author>
+      <name>Adam E. Lanman</name>
+    </author>
+    <author>
+      <name>Kiyoshi W. Masui</name>
+    </author>
+    <author>
+      <name>Daniele Michilli</name>
+    </author>
+    <author>
+      <name>Mason Ng</name>
+    </author>
+    <author>
+      <name>Aaron B. Pearlman</name>
+    </author>
+    <author>
+      <name>Sachin Pradeep E. T.</name>
+    </author>
+    <author>
+      <name>Aniket Prasad</name>
+    </author>
+    <author>
+      <name>Mawson Sammons</name>
+    </author>
+    <author>
+      <name>Paul Scholz</name>
+    </author>
+    <author>
+      <name>Kaitlyn Shin</name>
+    </author>
+    <author>
+      <name>Kendrick M. Smith</name>
+    </author>
+    <author>
+      <name>Jenny G. Sorce</name>
+    </author>
+    <author>
+      <name>Haochen Wang</name>
+    </author>
+    <author>
+      <name>Michele Woodland</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12856v1</id>
+    <title>WorkflowArena: Benchmarking Executable Workflow Orchestration in LLM-Based Multi-Agent Systems</title>
+    <updated>2026-11-09T18:45:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.12856v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12856v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model agents are increasingly deployed as multi-agent systems rather than as a standalone model operating within a single context. Recent agent harnesses allow the model to instantiate worker agents and to author the executable workflow that coordinates them, shifting the design of system structure from developers to the model at run time. The quality of this organization therefore constitutes a distinct capability, yet existing benchmarks either measure end-to-end task completion or evaluate coordination under structures specified in advance. We formalize this capability as workflow orchestration and introduce WorkflowArena, a benchmark of 145 long-horizon tasks spanning 8 professional domains, from software engineering and formal mathematics to legal analysis and 3D production. Each task specifies an initial workspace and an integrated deliverable composed of interdependent components, which is assessed by a hidden verifier. Agents determine autonomously whether and how to delegate, and all delegation is recorded, enabling joint evaluation of deliverable quality and the organization of the underlying work. Experiments with nine models show that no single configuration performs best across all domains and that systems exhibit distinct delegation strategies: at high effort, Claude models in Claude Code invoke workflows less frequently but with larger worker groups, whereas GPT models in Codex delegate more frequently in smaller units. When the executing model is held fixed on a challenging subset of tasks, workflows authored by Claude Opus 5.5 substantially improve weaker executors, indicating that workflow organization is itself a measurable determinant of task performance.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:45:28Z</published>
+    <arxiv:comment>Project page: https://lab.einsia.ai/workflowarena</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zheng Jiang</name>
+    </author>
+    <author>
+      <name>Fang Niu</name>
+    </author>
+    <author>
+      <name>Bo Peng</name>
+    </author>
+    <author>
+      <name>Houde Qian</name>
+    </author>
+    <author>
+      <name>Wenyi Li</name>
+    </author>
+    <author>
+      <name>Deyao Hong</name>
+    </author>
+    <author>
+      <name>Mingju Gao</name>
+    </author>
+    <author>
+      <name>Yizhe Chi</name>
+    </author>
+    <author>
+      <name>Youjie Zheng</name>
+    </author>
+    <author>
+      <name>Kaisen Yang</name>
+    </author>
+    <author>
+      <name>Calvin Xiao</name>
+    </author>
+    <author>
+      <name>Lifeng Sun</name>
+    </author>
+    <author>
+      <name>Huan-ang Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12855v1</id>
+    <title>AI-based characterization of lymphoid structures and the tumor microenvironment reveals lower mature tertiary lymphoid structures, lymph-node follicles, and plasma cells after neoadjuvant therapy in lung squamous cell carcinoma</title>
+    <updated>2026-11-09T18:45:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.12855v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12855v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mature, germinal centre-bearing tertiary lymphoid structures (TLS) and mature lymph node follicles (secondary lymphoid structures, SLS) sustain the plasma cell response that shapes outcome and immunotherapy benefit in lung cancer. How this loco-regional axis differs between neoadjuvant-treated and therapy-naive tumors is poorly defined. We analyzed H&amp;E whole-slide images of resected tumors and paired proximal and distal lymph nodes from matched neoadjuvant-treated (neoLUSC, n=20) and therapy-naive (naivLUSC, n=20) lung squamous cell carcinoma (LUSC) patients. Aignostics Atlas H&amp;E Tissue Analysis (HETA) models quantified cell densities per tissue compartment and cell-cell co-localization; a dedicated deep-learning model validated against pathologist annotations detected TLS and SLS and graded their maturity. Prognostic value was tested in an independent cohort (n=458; 46 treated). In neoLUSC tumors, stromal plasma cell density was 72% (p=0.004) and stromal lymphocyte density 48% (p=0.015) lower than in naivLUSC; macrophages and granulocytes did not differ significantly. Total and immature TLS did not differ, whereas mature TLS in the tumor (p=0.034) and mature SLS in the tumor-distal lymph node (p=0.003) were lower in neoLUSC patients. Peri-TLS plasma cell density correlated with tumor lymphocyte density in naivLUSC (rho=0.54, p=0.017) but not in neoLUSC tumors (rho=0.07). In the validation cohort, stromal plasma cell density (HR 0.69, p=0.011) and lymphocyte-plasma cell co-localization (HR 0.66, p=0.004) were associated with longer survival, and neoadjuvant status with shorter survival (HR 1.50, p=0.026). Neoadjuvant therapy is thus associated with fewer mature lymphoid structures and weaker coupling of the humoral compartment to the tumor rather than uniformly lower immune readouts. The stromal plasma cell/co-localization axis is a candidate prognostic biomarker.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:45:06Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Arne Schmidt</name>
+    </author>
+    <author>
+      <name>Justin Nieder</name>
+    </author>
+    <author>
+      <name>Cornelius Boehm</name>
+    </author>
+    <author>
+      <name>Julika Ribbat-Idel</name>
+    </author>
+    <author>
+      <name>Marius Teodorescu</name>
+    </author>
+    <author>
+      <name>Marie-Lisa Eich</name>
+    </author>
+    <author>
+      <name>Simon Schallenberg</name>
+    </author>
+    <author>
+      <name>Gabriel Dernbach</name>
+    </author>
+    <author>
+      <name>Katja Lingelbach</name>
+    </author>
+    <author>
+      <name>Miriam Haegele</name>
+    </author>
+    <author>
+      <name>Timo Milbich</name>
+    </author>
+    <author>
+      <name>Adam Narai</name>
+    </author>
+    <author>
+      <name>Maria Stoelben</name>
+    </author>
+    <author>
+      <name>Hans Pinckaers</name>
+    </author>
+    <author>
+      <name>Lukas Ruff</name>
+    </author>
+    <author>
+      <name>Kai Standvoss</name>
+    </author>
+    <author>
+      <name>Christian Watermann</name>
+    </author>
+    <author>
+      <name>Christiane Kuempers</name>
+    </author>
+    <author>
+      <name>Sven Perner</name>
+    </author>
+    <author>
+      <name>Verena Sailer</name>
+    </author>
+    <author>
+      <name>Jasmin Tiebach</name>
+    </author>
+    <author>
+      <name>Torsten Goldmann</name>
+    </author>
+    <author>
+      <name>Sebastian Marwitz</name>
+    </author>
+    <author>
+      <name>Johannes Braegelmann</name>
+    </author>
+    <author>
+      <name>Frederick Klauschen</name>
+    </author>
+    <author>
+      <name>Marija Pezer</name>
+    </author>
+    <author>
+      <name>Rosemarie Krupar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12849v1</id>
+    <title>The Tierras Observatory: Ultra-Precise Photometry for Characterizing Exoplanets and Their Host Stars</title>
+    <updated>2026-11-09T18:41:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.12849v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12849v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Tierras Observatory is a fully robotic 1.3-m telescope at the Fred Lawrence Whipple Observatory in southern Arizona. Tierras achieves sub-part-per-thousand (ppt) photometric precision on two timescales: intra-night, to detect and characterize transits of planets around nearby mid-to-late M dwarfs, and night-to-night across an observing season, to characterize the long-term variability of their host stars. We describe the facility and instrument design, our photometric pipeline, and our on-sky performance. We present the first ground-based light curves with sub-ppt precision over timescales of months. This precision enables a range of exoplanet-related science, including the measurement of host star rotation periods, the detection of long-period transits, and the discovery of additional terrestrial planets in known M dwarf systems.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:41:56Z</published>
+    <arxiv:comment>27 pages, 15 figures, 3 tables. Submitted to PASP</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Juliana García-Mejía</name>
+    </author>
+    <author>
+      <name>Patrick Tamburo</name>
+    </author>
+    <author>
+      <name>David Charbonneau</name>
+    </author>
+    <author>
+      <name>Daniel Fabricant</name>
+    </author>
+    <author>
+      <name>Jonathan M. Irwin</name>
+    </author>
+    <author>
+      <name>Robert Fata</name>
+    </author>
+    <author>
+      <name>Joseph M. Zajac</name>
+    </author>
+    <author>
+      <name>Peter E. Doherty</name>
+    </author>
+    <author>
+      <name>Brian McLeod</name>
+    </author>
+    <author>
+      <name>Pascal Fortin</name>
+    </author>
+    <author>
+      <name>Michael L. Calkins</name>
+    </author>
+    <author>
+      <name>Gilbert A. Esquerdo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12847v1</id>
+    <title>Discrete Configuration Spaces of Simplex Skeleta: a Middle-Dimensional Manifold Phenomenon</title>
+    <updated>2026-11-09T18:40:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12847v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12847v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For a simple graph $Γ$ without loops and an integer $n\geq2$, Abrams showed in his Ph.D. thesis that the discrete configuration space $DConf(Γ,n)$ is homeomorphic to a closed $n$-manifold if and only if $n=2$ and $Γ$ is $K_5$ or $K_{3,3}$, the two minimal obstructions to graph planarity. We show that this manifold property persists for the infinite family of discrete configuration spaces obtained by replacing the Kuratowski graphs with the $d$-skeleton of the simplex of dimension $2d+2$, thus recovering Abrams' $K_5$ case when $d=1$. Our manifold recognition argument relies on a recursive application of Whitehead's theorem that collapsible PL manifolds are PL balls, combined with Forman's discrete Morse theory. The resulting construction produces an infinite family of combinatorial spheres that contains the Legendre polytope boundaries and is closed under taking vertex links.</summary>
+    <category term="math.AT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:40:13Z</published>
+    <arxiv:comment>19 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="math.AT"/>
+    <author>
+      <name>Emilio J. González</name>
+    </author>
+    <author>
+      <name>Jesús González</name>
+    </author>
+    <author>
+      <name>Mary Carmen Pérez-Morales</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12846v1</id>
+    <title>Forward modeling linear variable filter data: High resolution PAH and Paschen-$α$ maps from SPHEREx</title>
+    <updated>2026-11-09T18:40:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.12846v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12846v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Polycyclic aromatic hydrocarbon (PAH) emission is a powerful tool for the study of the interstellar medium (ISM) in both Galactic and extragalactic contexts. It can reveal ionization state, radiation field, metallicity, composition, and ISM structure as sculpted by processes like turbulence and stellar feedback. Here we use NASA's SPHEREx to produce clean, high-resolution PAH maps at spectral resolution R $\sim$ 35 (compared to WISE at R $\sim$ 2). Prior treatments of the SPHEREx linear variable filter data seek to convert them to more conventional band-averaged maps that can leave striping artifacts associated with spatially variable wavelength sampling, especially at emission lines. In contrast, we deliver a scalable forward-modeling method capable of generating high-quality all-sky SPHEREx emission-line maps at 8.5 arcsec FWHM angular resolution (on 6.4 arcsec pixels), while naturally producing maps without visible striping. We reformat the data into a pixel-level database, mask stellar contamination, and infill missing pixels with a conditional, data-driven, anisotropic Gaussian process. We apply our method to produce 3.3 $μ$m and 3.4 $μ$m PAH and Paschen-$α$ emission maps of a set of fields spanning a range of Galactic and extragalactic conditions including the Rosette nebula, the Corona Australis molecular cloud, M33, and M31. We demonstrate the quality and synergies of our SPHEREx 3.3 $μ$m PAH maps by comparisons with other available gas and dust tracer maps and achieve sensitivities up to $σ(I_{3.3}) = 2.7 \times 10^{-8}$ erg s$^{-1}$ cm$^{-2}$ sr$^{-1}$. We estimate that a two-year extension of the SPHEREx survey, with modest modifications to the scanning strategy, would match or exceed the PAH sensitivity of WISE over the whole sky.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:40:04Z</published>
+    <arxiv:comment>34 pages, 16 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Andrew K. Saydjari</name>
+    </author>
+    <author>
+      <name>Connor Hainje</name>
+    </author>
+    <author>
+      <name>Benjamin Dodge</name>
+    </author>
+    <author>
+      <name>Philipp Frank</name>
+    </author>
+    <author>
+      <name>David W. Hogg</name>
+    </author>
+    <author>
+      <name>Susan E. Clark</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12841v1</id>
+    <title>Joint Gaia-Hipparcos astrometry, RV, and Imaging posteriors from the G23H Hipparcos sample</title>
+    <updated>2026-11-09T18:38:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.12841v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12841v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present uniform posteriors indicating the presence or absence of stellar and planetary companions over a sample of $10^5$ stars in Hipparcos and Gaia. We use the "G23H" catalog to fit a model that incorporates absolute astrometry constraints from Hipparcos, Gaia DR2, and Gaia DR3, as well as Gaia DR3 photometry, excess RV variability, and includes information from the presence or absence of common-proper motion companions. The resulting posteriors can be used directly to detect new companions, to target RV and imaging follow-up observations, and for downstream demographics studies. We highlight example detections of known and new candidate companions and the companion detection rate across the HR diagram. The modelling approach we present is directly applicable to Gaia DR4 epoch astrometry and RVs. All posteriors are provided as a machine-readable catalog and user-accessible website http://exopo.st/.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:38:15Z</published>
+    <arxiv:comment>Submitted to The Astrophysical Journal Supplement Series</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>William Thompson</name>
+    </author>
+    <author>
+      <name>Dori Blakely</name>
+    </author>
+    <author>
+      <name>Alexandre Bouchard-Côté</name>
+    </author>
+    <author>
+      <name>Trevor Campbell</name>
+    </author>
+    <author>
+      <name>Jerry Xuan</name>
+    </author>
+    <author>
+      <name>Jingwen Zhang</name>
+    </author>
+    <author>
+      <name>Kyle Franson</name>
+    </author>
+    <author>
+      <name>Jessica Speedie</name>
+    </author>
+    <author>
+      <name>Clarissa Do Ó</name>
+    </author>
+    <author>
+      <name>Doug Johnstone</name>
+    </author>
+    <author>
+      <name>Eric Nielsen</name>
+    </author>
+    <author>
+      <name>Brendan Bowler</name>
+    </author>
+    <author>
+      <name>Simon Blouin</name>
+    </author>
+    <author>
+      <name>Jean-Baptiste Ruffio</name>
+    </author>
+    <author>
+      <name>Ryan Cloutier</name>
+    </author>
+    <author>
+      <name>Andre Fogal</name>
+    </author>
+    <author>
+      <name>Kaitlyn Hessel</name>
+    </author>
+    <author>
+      <name>Christian Marois</name>
+    </author>
+    <author>
+      <name>Alexandra Rochon</name>
+    </author>
+    <author>
+      <name>William Roberson</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12835v1</id>
+    <title>Mitigating Agentic Deception via Evaluation-Side Partially Observable Games</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12835v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12835v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language models become more capable agents, they can exhibit deceptive behaviors, cheating human for higher rewards while appearing helpful. We attribute this failure to evaluation-side partial observability, where models are evaluated mainly from final outcome, without checking the faithfulness of underlying reasoning, tool use, and environmental effects. Prior mitigations address this partial observability by predefined evaluator latent belief space or one-shot monitoring, which do not extend to free-form language space and vulnerable to stronger deceptions that evade simple monitoring. In this work, we formulate deception mitigation as an Evaluation-Side Partially Observable Extensive Form Game (e-PoG), a max-min framework in which an agent maximizes reward, a monitor minimizes the agent's payoff by exposing deception from the full interaction trajectory, and a fixed verifier validates the monitor's claims and converts them into penalties. We define the solution concept as a Subgame-Perfect Oversight Equilibrium (SPOE) between agent and monitor, and prove its existence in finite games. With a perfect verifier, every SPOE is faithful; with an imperfect verifier, the guarantee persists if verifier errors do not reverse the ranking of monitor actions. To achieve faithful SPOE, we derive a two-timescale policy gradient algorithm and enhance the pipeline empirically with NLI verification and deterministic checks. Experiments with Gemma3-4B-IT and Qwen3-4B/8B on Agentic Role-Playing, SearchQA, and WebShop show that e-PoG mitigates multiple emergent deception modes, outperforming the strongest baselines by 26.0% in deception mitigation and by up to 39.8% in task success. These gains persist under weak-to-strong supervision. Code is available at https://github.com/Toyoid/deceptive-agent.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:comment>44 pages, 10 figures. Code: https://github.com/Toyoid/deceptive-agent; Project website: https://shutongliu-dev.github.io/epog-agentic-deception/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hanxiao Li</name>
+    </author>
+    <author>
+      <name>Shutong Liu</name>
+    </author>
+    <author>
+      <name>Yongjia Ma</name>
+    </author>
+    <author>
+      <name>Jiaming Ji</name>
+    </author>
+    <author>
+      <name>Juntao Dai</name>
+    </author>
+    <author>
+      <name>Shuning Zhang</name>
+    </author>
+    <author>
+      <name>Kejian Shi</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Pu Feng</name>
+    </author>
+    <author>
+      <name>Yuqing Ma</name>
+    </author>
+    <author>
+      <name>Qi Dou</name>
+    </author>
+    <author>
+      <name>Yaodong Yang</name>
+    </author>
+    <author>
+      <name>Xianglong Liu</name>
+    </author>
+    <author>
+      <name>Simin Li</name>
+    </author>
+  </entry>
+</feed>

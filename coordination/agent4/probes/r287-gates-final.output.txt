@@ -1,0 +1,6 @@
+[hf4 2026-11-10T22:14:07Z] VERSION=6.8.168
+[hf4 2026-11-10T22:14:07Z] PASS  bin/verify.js  —  passed=16 failed=0
+[hf4 2026-11-10T22:14:07Z] PASS  scripts/guard-abilities.js  —  能力检查 20/20 全通过；判别维度 243 个
+[hf4 2026-11-10T22:14:07Z] FAIL  test/doc-numbers-accuracy.test.js  —  exit=1 243,"staticCheckFns":50,"block":11,"rewrite":19,"verify":210,"mcpTools":185,"handlers":187,"routes":1316,"tests":20923,"testFailed":138,"testCountAt":"2026-11-1
+[hf4 2026-11-10T22:14:07Z] PASS  scripts/bidirectional-guard.js  —  召回=52/52 误拦=302/326
+[hf4 2026-11-10T22:14:07Z] 门禁存在 FAIL——停下报告，不 commit

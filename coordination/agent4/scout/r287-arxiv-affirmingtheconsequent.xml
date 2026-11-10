@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/0dYvZZdX//EurV7qdHg5n/r9bI8</id>
+  <title>arXiv Query: search_query=all:"affirming the consequent"&amp;id_list=&amp;start=0&amp;max_results=6</title>
+  <updated>2026-11-10T21:40:28Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22affirming+the+consequent%22&amp;start=0&amp;max_results=6&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>6</opensearch:itemsPerPage>
+  <opensearch:totalResults>5</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2502.07828v1</id>
+    <title>Some things to know about achieving artificial general intelligence</title>
+    <updated>2025-02-10T20:10:26Z</updated>
+    <link href="https://arxiv.org/abs/2502.07828v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2502.07828v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Current and foreseeable GenAI models are not capable of achieving artificial general intelligence because they are burdened with anthropogenic debt. They depend heavily on human input to provide well-structured problems, architecture, and training data. They cast every problem as a language pattern learning problem and are thus not capable of the kind of autonomy needed to achieve artificial general intelligence. Current models succeed at their tasks because people solve most of the problems to which these models are directed, leaving only simple computations for the model to perform, such as gradient descent. Another barrier is the need to recognize that there are multiple kinds of problems, some of which cannot be solved by available computational methods (for example, "insight problems"). Current methods for evaluating models (benchmarks and tests) are not adequate to identify the generality of the solutions, because it is impossible to infer the means by which a problem was solved from the fact of its solution. A test could be passed, for example, by a test-specific or a test-general method. It is a logical fallacy (affirming the consequent) to infer a method of solution from the observation of success.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-02-10T20:10:26Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Herbert Roitblat</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2311.04412v2</id>
+    <title>Human Conditional Reasoning in Answer Set Programming</title>
+    <updated>2023-12-30T02:57:14Z</updated>
+    <link href="https://arxiv.org/abs/2311.04412v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2311.04412v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Given a conditional sentence "P=&gt;Q" (if P then Q) and respective facts, four different types of inferences are observed in human reasoning. Affirming the antecedent (AA) (or modus ponens) reasons Q from P; affirming the consequent (AC) reasons P from Q; denying the antecedent (DA) reasons -Q from -P; and denying the consequent (DC) (or modus tollens) reasons -P from -Q. Among them, AA and DC are logically valid, while AC and DA are logically invalid and often called logical fallacies. Nevertheless, humans often perform AC or DA as pragmatic inference in daily life. In this paper, we realize AC, DA and DC inferences in answer set programming. Eight different types of completion are introduced and their semantics are given by answer sets. We investigate formal properties and characterize human reasoning tasks in cognitive psychology. Those completions are also applied to commonsense reasoning in AI.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-11-08T00:54:06Z</published>
+    <arxiv:comment>34 pages. Shorter version: in Proceedings of the 21st International Workshop on Non-Monotonic Reasoning (NMR-2023)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <arxiv:journal_ref>Theory and Practice of Logic Programming, vol.24(1), January 2024, pp. 157-192</arxiv:journal_ref>
+    <author>
+      <name>Chiaki Sakama</name>
+    </author>
+    <arxiv:doi>10.1017/S1471068423000376</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1017/S1471068423000376" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2304.14352v2</id>
+    <title>Epistemic reflections on AI answering our questions: overwatch, erudite, logician, interlocutor</title>
+    <updated>2026-04-30T09:26:47Z</updated>
+    <link href="https://arxiv.org/abs/2304.14352v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2304.14352v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Currently, there is a trend for the wider public to rely on LLMs for financial or legal consultation, medical and mental support (Chatterji et al., 2025), often accepting the advice provided without necessarily seeking logical verification or empirical validation. While one might be fortunate enough to encounter a model with a particularly solid 'ground truth' or with auxiliary logic-symbolic reasoning capabilities, it remains a somewhat uncertain endeavour. Output is simply taken at face value, without further question. Yet, careless reliance on AI to answer our questions and to judge our output is a violation of Grice's Maxim of Quality as well as a violation of Lemoine's legal Maxim of Innocence. A low-sensitivity plagiarism scanner may produce a Type II error by failing to detect difference (the null hypothesis wrongly maintained). The fallacy of affirming the consequent occurs when the failure to detect difference is then interpreted as evidence of equivalence or demonstration of AI authorship. If the test is specified so that 'AI-generated' is effectively treated as the default H0, then a finding of 'no difference from AI' is taken as support for that null. Such a mis-specified test results in students being treated as guilty (AI/plagiarism) unless suspects can generate sufficient detectable difference from AI output, which yields false accusations under a fair null hypothesis (that the student wrote the work). To avoid LLMs becoming a sorcerer's apprentice, knowledge is required about which inference systems are or should become integrated for an LLM to become a trustworthy sparring partner. We end on a wider perspective where the formalisation of the observer effect shows that uncertainty, classification, and interpretation are already shaped by the human or artificial agency's belief system, affective state, and tolerance for ambiguity, rather than at the stage of LLM output.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-04-23T08:26:42Z</published>
+    <arxiv:comment>22 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Johan F. Hoorn</name>
+    </author>
+    <author>
+      <name>Ella-Jenna Oosterglorenwoud</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1603.04845v1</id>
+    <title>The Illusory Appeal of Decoherence in the Everettian Picture: Affirming the Consequent</title>
+    <updated>2016-03-15T07:00:43Z</updated>
+    <link href="https://arxiv.org/abs/1603.04845v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1603.04845v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The idea that decoherence in a unitary-only quantum theory suffices to explain emergence of classical phenomena has been shown in the peer-reviewed literature to be seriously flawed due to circularity. However, claims continue to be made that this approach, also known as "Quantum Darwinism," is the correct way to understand classical emergence. This Letter reviews the basic problem and points out an additional logical flaw in the argument. It is concluded that the "Quantum Darwinism" program fails.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.hist-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2016-03-15T07:00:43Z</published>
+    <arxiv:comment>This is an adapted brief excerpt from the introductory chapter to Quantum Structural Studies, eds R. E. Kastner, J. Jeknic-Dugic, and G. Jaroszkiewicz (forthcoming from World Scientific). Comments welcome</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>R. E. Kastner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/0807.3004v1</id>
+    <title>Neutrinos and BBN (and the CMB)</title>
+    <updated>2008-07-18T16:54:29Z</updated>
+    <link href="https://arxiv.org/abs/0807.3004v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/0807.3004v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  During Big Bang Nucleosynthesis (BBN), in the first 20 minutes of the evolution of the Universe, the light nuclides, D, 3He, 4He, and 7Li were synthesized in astrophysically interesting abundances. The Cosmic Microwave Background Radiation (CMB) observed at present was last scattered some 400 thousand years later. BBN and the CMB (supplemented by more recent Large Scale Structure data), provide complementary probes of the early evolution of the Universe and enable constraints on the high temperature/energy physical processes in it. In this overview the predictions and observations of two physical quantities, the baryon density parameter and the expansion rate parameter, are compared to see if there is agreement between theory and observation at these two widely separated epochs. After answering this question in the affirmative, the consequences of this concordance for physics beyond the standard models of particle physics and cosmology is discussed.</summary>
+    <category term="astro-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2008-07-18T16:54:29Z</published>
+    <arxiv:comment>An overview of recent constraints on the baryon density parameter and the effective number of neutrinos to be published in the proceedings of the NO-VE IV International Workshop on: Neutrino Oscillations in Venice</arxiv:comment>
+    <arxiv:primary_category term="astro-ph"/>
+    <author>
+      <name>Gary Steigman</name>
+    </author>
+  </entry>
+</feed>

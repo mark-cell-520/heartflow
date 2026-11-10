@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/xWQm743RWcTPi2c1FzP2DBAaudA</id>
+  <title>arXiv Query: search_query=all:"hasty generalization"&amp;id_list=&amp;start=0&amp;max_results=6</title>
+  <updated>2026-11-10T21:39:41Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22hasty+generalization%22&amp;start=0&amp;max_results=6&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>6</opensearch:itemsPerPage>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2607.25991v1</id>
+    <title>Phantom Evidence: How and Why Generative AI Manufactures False Positives in Science</title>
+    <updated>2026-07-28T17:07:12Z</updated>
+    <link href="https://arxiv.org/abs/2607.25991v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.25991v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Four centuries ago Francis Bacon warned against the anticipations of nature, hasty generalization that wins assent on a few facts, and set against it the table of absence: checking that a property fails to appear where it should not. The demand was that looking convincing should not, on its own, count as evidence. Science has professed that demand ever since, while in practice letting persuasiveness do the work of evidence. It could be let to do so because making something persuasive was itself hard. Generative AI removes that difficulty, and an old error returns on a scale and at a speed it never had before. We locate the problem not in evidence growing weaker but in how surprise is counted. An observer marvels at a convincing output as a single point hit among a vast range of possibilities, yet what a system can actually reach is a small part of that range. The gap between the breadth imagined and the narrowness actually reached is what we call phantom evidence, and we formalize it as one quantity that also absorbs the trial and error and the data leakage a research process adds. Three things follow. Higher resolution and greater fluency add no evidence. The evidence a single result can carry has a ceiling that neither polishing the output nor letting a generative system grade itself can exceed. And the fraction of published findings that are true falls back to what it was before anything was observed. The prescription lies in the same place: genuinely widen what a system can reach, and measure whether convincing outputs still appear when the target is absent -- Bacon's table of absence, restated in the language of probability. In a world where the persuasive has become cheap, the credibility of science rests not on more convincing outputs but on procedures that show they could not have arisen by chance.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-28T17:07:12Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Yukiyasu Kamitani</name>
+    </author>
+    <author>
+      <name>Ken Shirakawa</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2502.04689v4</id>
+    <title>Improving Language Models with Intentional Analysis</title>
+    <updated>2026-04-16T17:03:43Z</updated>
+    <link href="https://arxiv.org/abs/2502.04689v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2502.04689v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Intent, a critical cognitive notion and mental state, is ubiquitous in human communication and problem-solving. Accurately understanding the underlying intent behind questions is imperative to reasoning towards correct answers. However, this significant concept has been largely disregarded in the rapid development of language models (LMs). To unleash the potential of intent and instill it into LMs, this paper introduces Intentional Analysis (IA), which explicitly invokes intent-aware analysis and reasoning during the problem-solving process. Comprehensive experiments across diverse benchmarks, model types, and configurations demonstrate the effectiveness, robustness, and generalizability of IA. Notably, IA consistently improves task performance even on SOTA proprietary models like GPT-5 and Claude-Opus-4.6. Moreover, IA not only outperforms Chain-of-Thought (CoT) across various experimental settings, but it can also synergistically work with CoT reasoning. Further qualitative analysis and case studies reveal that the benefits of IA stem from addressing several weaknesses in baseline methods, such as intent misunderstanding, hasty generalization, and mental laziness. Case studies also provide insights into the mechanisms underlying IA and clarify how it differs from CoT in mitigating these weaknesses. This study sheds light on a promising direction for the development of future LLMs with intentional analysis.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-02-07T06:30:33Z</published>
+    <arxiv:comment>Code at https://github.com/YuweiYin/IA</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yuwei Yin</name>
+    </author>
+    <author>
+      <name>Giuseppe Carenini</name>
+    </author>
+  </entry>
+</feed>

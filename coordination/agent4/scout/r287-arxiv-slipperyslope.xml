@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/RCFUBO/TfeLe3kp6CtM3KrGDKGU</id>
+  <title>arXiv Query: search_query=all:"slippery slope"&amp;id_list=&amp;start=0&amp;max_results=6</title>
+  <updated>2026-11-10T21:39:24Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22slippery+slope%22&amp;start=0&amp;max_results=6&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>6</opensearch:itemsPerPage>
+  <opensearch:totalResults>13</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2609.39277v1</id>
+    <title>A Tilted Bowl Is Not a Slippery Slope: Compressing Looped Models</title>
+    <updated>2026-09-30T08:28:48Z</updated>
+    <link href="https://arxiv.org/abs/2609.39277v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.39277v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Looped models reason by applying the same block of weights many times, so compressing that block saves memory traffic on every loop. Compressed looped models, however, often collapse, and the collapse is usually blamed on rounding error that accumulates from loop to loop. In this work we test that account on more than 30 models from five families and find, to our surprise, that it holds only for loops that never settle. When a loop settles, a fixed rounding error does not accumulate. It moves the point where the loop settles, much as tilting a bowl moves where a ball comes to rest, and the answer is lost only when the shift is larger than the readout tolerates. This picture lets us predict which models fail from a single label-free measurement, and it tells us why failed models recover: their loops still settle, so a few final loops with 8-bit weights bring the answer back. Motivated by these findings, we build a controller that stops when the model's halting head fires and then finishes with 8-bit loops. On Sudoku-Extreme and Maze-Hard it beats fixed-depth inference by up to 15 points under a third of the weight traffic.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-30T08:28:48Z</published>
+    <arxiv:comment>Preprint; in review</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Steven Kolawole</name>
+    </author>
+    <author>
+      <name>Pearse Jim</name>
+    </author>
+    <author>
+      <name>Opegbemi M. Busoye</name>
+    </author>
+    <author>
+      <name>Glory Bagai</name>
+    </author>
+    <author>
+      <name>Virginia Smith</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.04452v1</id>
+    <title>Superwind and navigation of least time on Riemannian manifolds</title>
+    <updated>2026-07-05T18:30:29Z</updated>
+    <link href="https://arxiv.org/abs/2607.04452v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.04452v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this work, minimum-time navigation on Riemannian manifolds is analyzed by means of Finsler geometry. The introduced notion of a superwind being anisotropic, reducible, and unknown a priori encompasses a wind in the spirit of Zermelo's navigation, and a gravitational wind in the sense of a slippery slope model, including Matsumoto's navigation on a mountain slope as the particular cases. The considered generalization also deploys a non-uniform slope, where the counterbalance to the transverse impact of superwind causing a lateral drift varies over space. This requires in particular an extension of the existing theory of general $(α, β)$-metrics, which is presented in our study. The solution of the navigation problem is given by a new Finsler metric and the time-minimizing geodesics, which are determined. Moreover, the thorough analysis establishes the necessary and sufficient conditions for strong convexity under which the resultant velocity defines a Finsler metric. For completeness, a variety of comprehensive and comparative examples are explored in dimension two.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-05T18:30:29Z</published>
+    <arxiv:comment>36 pages, 14 figures</arxiv:comment>
+    <arxiv:primary_category term="math.DG"/>
+    <author>
+      <name>Nicoleta Aldea</name>
+    </author>
+    <author>
+      <name>Piotr Kopacz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.29090v1</id>
+    <title>"It's OK Because...": The Wild West of Student Rationalization of AI Use in Academic Writing</title>
+    <updated>2026-05-27T20:44:18Z</updated>
+    <link href="https://arxiv.org/abs/2605.29090v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.29090v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative AI challenges academic integrity not only by enabling students to delegate substantial portions of their academic work, but also by blurring the ethical boundaries by which students distinguish acceptable assistance from misconduct. Drawing on semi-structured interviews (n=20), AI chat logs, and course documents (syllabi, submitted assignments), we investigated how students themselves make moral sense of AI use in academic writing. Our analysis results in a range of novel findings: First, there are at least five distinct sites of AI-use conceptualization, ranging from faculty's intended AI policy, to students' actual AI use. Second, students use over 20 distinct rationalizations to justify AI use, such as that copying AI-generated text is victimless; that any AI text reflecting their own beliefs or their own style is their own writing; or that they are learning more by using AI -- even extensively -- than otherwise. We present a taxonomy of these rationalizations, and show how some of them are employed to justify conscious violations of course policies. Third, student rationalizations occur in both an ad hoc and post hoc manner, and they are not necessarily self-consistent. These and other findings suggest that modern AI presents a steep, ethical, slippery slope which students conceptually slide down, landing far outside the pedagogical goals and expectations of instructors. We discuss implications for educational design and AI policy.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-27T20:44:18Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Jiyoon Kim</name>
+    </author>
+    <author>
+      <name>Kentaro Toyama</name>
+    </author>
+    <author>
+      <name>Sangmi Kim</name>
+    </author>
+    <author>
+      <name>John M. Carroll</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2506.06720v1</id>
+    <title>A general model for time-minimizing navigation on a mountain slope under gravity</title>
+    <updated>2025-06-07T09:02:56Z</updated>
+    <link href="https://arxiv.org/abs/2506.06720v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2506.06720v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this work, we solve the generalized Matsumoto's slope-of-a-mountain problem by means of Riemann-Finsler geometry, making close links with the Zermelo navigation problem. The time-minimizing navigation under gravity is analyzed in the general model of a slippery mountain slope being a Riemannian manifold. Both the transverse and longitudinal gravity-additives with respect to the direction of motion are admitted to vary simultaneously in the full ranges, showing the impact of cross- and along-traction on the slippery slope. By the anisotropic deformation of the background Riemannian metric and rigid translation with the use of the rescaled gravitational wind, we obtain the purely geometric solution for optimal navigation, which is given by a new Finsler metric belonging to the class of general $(α, β)$-metrics. The related strong convexity conditions are established and time geodesics are described. Moreover, the evolution of time fronts and the behavior of time-minimizing trajectories in relation to various gravity effects on the slippery slope, gravitational wind force and direction of motion are thoroughly discussed and visualized by several two-dimensional examples.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-06-07T09:02:56Z</published>
+    <arxiv:comment>43 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="math.DG"/>
+    <arxiv:journal_ref>Journal of Geometric Analysis 35, 282 (2025)</arxiv:journal_ref>
+    <author>
+      <name>Nicoleta Aldea</name>
+    </author>
+    <author>
+      <name>Piotr Kopacz</name>
+    </author>
+    <arxiv:doi>10.1007/s12220-025-02065-6</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s12220-025-02065-6" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2504.09833v2</id>
+    <title>PPF: Pre-training and Preservative Fine-tuning of Humanoid Locomotion via Model-Assumption-based Regularization</title>
+    <updated>2025-09-02T19:36:04Z</updated>
+    <link href="https://arxiv.org/abs/2504.09833v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2504.09833v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Humanoid locomotion is a challenging task due to its inherent complexity and high-dimensional dynamics, as well as the need to adapt to diverse and unpredictable environments. In this work, we introduce a novel learning framework for effectively training a humanoid locomotion policy that imitates the behavior of a model-based controller while extending its capabilities to handle more complex locomotion tasks, such as more challenging terrain and higher velocity commands. Our framework consists of three key components: pre-training through imitation of the model-based controller, fine-tuning via reinforcement learning, and model-assumption-based regularization (MAR) during fine-tuning. In particular, MAR aligns the policy with actions from the model-based controller only in states where the model assumption holds to prevent catastrophic forgetting. We evaluate the proposed framework through comprehensive simulation tests and hardware experiments on a full-size humanoid robot, Digit, demonstrating a forward speed of 1.5 m/s and robust locomotion across diverse terrains, including slippery, sloped, uneven, and sandy terrains.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-04-14T03:02:02Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <arxiv:journal_ref>IEEE Robotics and Automation Letters ( Volume: 10, Issue: 11, November 2025)</arxiv:journal_ref>
+    <author>
+      <name>Hyunyoung Jung</name>
+    </author>
+    <author>
+      <name>Zhaoyuan Gu</name>
+    </author>
+    <author>
+      <name>Ye Zhao</name>
+    </author>
+    <author>
+      <name>Hae-Won Park</name>
+    </author>
+    <author>
+      <name>Sehoon Ha</name>
+    </author>
+    <arxiv:doi>10.1109/LRA.2025.3608637</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1109/LRA.2025.3608637" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2412.05592v1</id>
+    <title>From Flexibility to Manipulation: The Slippery Slope of XAI Evaluation</title>
+    <updated>2024-12-07T09:14:46Z</updated>
+    <link href="https://arxiv.org/abs/2412.05592v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2412.05592v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The lack of ground truth explanation labels is a fundamental challenge for quantitative evaluation in explainable artificial intelligence (XAI). This challenge becomes especially problematic when evaluation methods have numerous hyperparameters that must be specified by the user, as there is no ground truth to determine an optimal hyperparameter selection. It is typically not feasible to do an exhaustive search of hyperparameters so researchers typically make a normative choice based on similar studies in the literature, which provides great flexibility for the user. In this work, we illustrate how this flexibility can be exploited to manipulate the evaluation outcome. We frame this manipulation as an adversarial attack on the evaluation where seemingly innocent changes in hyperparameter setting significantly influence the evaluation outcome. We demonstrate the effectiveness of our manipulation across several datasets with large changes in evaluation outcomes across several explanation methods and models. Lastly, we propose a mitigation strategy based on ranking across hyperparameters that aims to provide robustness towards such manipulation. This work highlights the difficulty of conducting reliable XAI evaluation and emphasizes the importance of a holistic and transparent approach to evaluation in XAI.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-12-07T09:14:46Z</published>
+    <arxiv:comment>Published in ECCV 2024 Workshop on Explainable Computer Vision: Where are We and Where are We Going? Shorter non-archival version also appeared in the NeurIPS 2024 Interpretable AI workshop. Code is available at \url{https://github.com/Wickstrom/quantitative-xai-manipulation}</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Kristoffer Wickstrøm</name>
+    </author>
+    <author>
+      <name>Marina Marie-Claire Höhne</name>
+    </author>
+    <author>
+      <name>Anna Hedström</name>
+    </author>
+  </entry>
+</feed>

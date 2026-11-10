@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/n0KSXhh06jgOVhd6kqsIB4k6zOo</id>
+  <title>arXiv Query: search_query=all:"false dilemma"&amp;id_list=&amp;start=0&amp;max_results=6</title>
+  <updated>2026-11-10T21:39:32Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22false+dilemma%22&amp;start=0&amp;max_results=6&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>6</opensearch:itemsPerPage>
+  <opensearch:totalResults>3</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2608.26361v2</id>
+    <title>Misunderstanding Convivial Solipsism: the Necessity of a Perspectival Logic</title>
+    <updated>2026-08-30T19:22:43Z</updated>
+    <link href="https://arxiv.org/abs/2608.26361v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.26361v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Convivial Solipsism is easily misunderstood. Because it denies the absoluteness of observed events while preserving the universality of quantum mechanics, it invites objections that are often formulated in a classical, non-perspectival language. Such objections appear powerful only because they smuggle back into the discussion the very assumptions that Convivial Solipsism rejects. This article reconstructs a family of misunderstandings that arise in discussions of Convivial Solipsism, especially in connection with Wigner's friend and extended Wigner's friend scenarios. The aim is not merely defensive. The objections are useful because they identify the conceptual discipline required by any interpretation that takes non-absolute facts seriously. The central claim is that observational facts must be indexed to perspectives. A statement such as "the friend saw outcome A" is not a complete factual statement within Convivial Solipsism. It must be reformulated as "from the friend's perspective, the friend saw outcome A" or "from Wigner's perspective, the friend reported outcome B." The mistake consists in removing these indices and then treating the resulting expressions as if they belonged to a single global factual domain. This leads to apparent contradictions and to false dilemmas concerning consciousness, communication, other minds, and intersubjectivity. When that is taken into account, it appears that Convivial Solipsism is not a retreat into psychological solipsism, but a discipline of perspectival discourse. It is also shown that perspectival logic stands to classical logic as the quantum calculus of probability stands to Kolmogorovian probability theory.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-26T19:44:21Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Herve Zwirn</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/0804.0486v1</id>
+    <title>The False Dilemma: Bayesian vs. Frequentist</title>
+    <updated>2008-04-03T07:31:13Z</updated>
+    <link href="https://arxiv.org/abs/0804.0486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/0804.0486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  There are two main opposing schools of statistical reasoning, Frequentist and Bayesian approaches. Until recent days, the frequentist or classical approach has dominated the scientific research, but Bayesianism has reappeared with a strong impulse that is starting to change the situation. Recently the controversy about the primacy of one of the two approaches seems to be unfinished at a philosophical level, but scientific practices are giving an increasingly important position to the Bayesian approach. This paper eludes philosophical debate to focus on the pragmatic point of view of scientists' day-to-day practices, in which Bayesian methodology is very useful. Several facts and operational values are described as the core-set for understanding the change.</summary>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2008-04-03T07:31:13Z</published>
+    <arxiv:comment>Submitted to the Electronic Journal of Statistics (http://www.i-journals.org/ejs/) by the Institute of Mathematical Statistics (http://www.imstat.org)</arxiv:comment>
+    <arxiv:primary_category term="math.ST"/>
+    <author>
+      <name>Jordi Vallverdú</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/quant-ph/0703035v2</id>
+    <title>Objective probability and quantum fuzziness</title>
+    <updated>2009-02-04T03:04:49Z</updated>
+    <link href="https://arxiv.org/abs/quant-ph/0703035v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/quant-ph/0703035v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  This paper offers a critique of the Bayesian interpretation of quantum mechanics with particular focus on a paper by Caves, Fuchs, and Schack containing a critique of the "objective preparations view" or OPV. It also aims to carry the discussion beyond the hardened positions of Bayesians and proponents of the OPV. Several claims made by Caves et al. are rebutted, including the claim that different pure states may legitimately be assigned to the same system at the same time, and the claim that the quantum nature of a preparation device cannot legitimately be ignored. Both Bayesians and proponents of the OPV regard the time dependence of a quantum state as the continuous dependence on time of an evolving state of some kind. This leads to a false dilemma: quantum states are either objective states of nature or subjective states of belief. In reality they are neither. The present paper views the aforesaid dependence as a dependence on the time of the measurement to whose possible outcomes the quantum state serves to assign probabilities. This makes it possible to recognize the full implications of the only testable feature of the theory, viz., the probabilities it assigns to measurement outcomes...</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2007-03-05T08:34:10Z</published>
+    <arxiv:comment>21 pages, no graphics, inspired by "Subjective probability and quantum certainty" (quant-ph/0608190 v2)</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Found. Phys. 39/2 (2009) 137-155</arxiv:journal_ref>
+    <author>
+      <name>Ulrich Mohrhoff</name>
+    </author>
+    <arxiv:doi>10.1007/s10701-008-9266-5</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s10701-008-9266-5" title="doi"/>
+  </entry>
+</feed>

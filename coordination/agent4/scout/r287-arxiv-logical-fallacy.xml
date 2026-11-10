@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/DgtPIQvNRG7GUIPO0C+YN8RIW+M</id>
+  <title>arXiv Query: search_query=all:"logical fallacy"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-10T21:38:24Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22logical+fallacy%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>70</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2607.11266v1</id>
+    <title>Valid $\ne$ Necessary: Diagnosing Latent Inefficiency in Chain-of-Thought</title>
+    <updated>2026-07-13T08:50:26Z</updated>
+    <link href="https://arxiv.org/abs/2607.11266v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.11266v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chain-of-Thought (CoT) prompting has significantly advanced the reasoning capabilities of Large Language Models (LLMs), yet it often incurs substantial computational costs due to over-reasoning: the generation of redundant, verbose, or irrelevant steps. While existing reasoning step evaluators effectively detect logical fallacies and factual errors, our analysis reveals a critical blind spot: they fail to penalize valid but inefficient reasoning steps that inflate token usage without contributing to the solution. To systematically diagnose this limitation, we introduce RIV-GSM8K, a diagnostic benchmark injected with five distinct types of inefficiencies, including circular reasoning and excessive decomposition. Diagnostic experiments reveal that state-of-the-art evaluators struggle to distinguish these inefficiencies from necessary reasoning. To address this gap, we propose CAID (Context-Aware Information Density), a training-free metric grounded in information theory that identifies low-utility steps. To validate the metric's practical utility, we apply it within PACE, a post-hoc compression strategy. Additional control experiments show that the gains of PACE are not explained by trivial pruning: compared with random step removal and PRM-based compression baselines, it preserves accuracy at substantially higher compression rates. Empirical results on GSM8K, StrategyQA, and ARC-Challenge demonstrate that PACE reduces token consumption by 31-53% while maintaining accuracy, confirming that CAID successfully distills informational froth from reasoning chains without compromising deductive validity.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-13T08:50:26Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Daeyeop Lee</name>
+    </author>
+    <author>
+      <name>Hwanjo Yu</name>
+    </author>
+    <arxiv:doi>10.18653/v1/2026.findings-acl.1942</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/v1/2026.findings-acl.1942" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.31039v1</id>
+    <title>Truth or Sophistry? LoFa: A Benchmark for LLM Robustness Against Logical Fallacies</title>
+    <updated>2026-06-30T02:17:45Z</updated>
+    <link href="https://arxiv.org/abs/2606.31039v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.31039v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models (LLMs) exhibit strong semantic capabilities, yet their resilience to manipulative linguistic patterns such as logical fallacies remains underexplored. Prior work has primarily examined whether LLMs can identify or classify fallacies, leaving their robustness against fallacious persuasion insufficiently studied. To address this gap, we introduce LoFa (Logical Fallacy), a comprehensive benchmark for evaluating LLM robustness against fallacies. LoFa is constructed through a multi-agent pipeline that pairs factual questions with fallacious arguments, and is accompanied by a multi-round debate framework for assessing model resilience under sustained adversarial persuasion. To disentangle fallacy robustness from a model's inherent knowledge limitations, we further propose Logical Fallacy Resistance at k (LFR@k), a metric that quantifies resistance to fallacious attacks. Experiments show that LLMs exhibit varying levels of robustness across different fallacy types, revealing distinct vulnerability profiles among models.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-30T02:17:45Z</published>
+    <arxiv:comment>Accepted to ACL 2026 Main. 33 pages (9 pages main text)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xudong Shen</name>
+    </author>
+    <author>
+      <name>Li Yuan</name>
+    </author>
+    <author>
+      <name>Ye Chen</name>
+    </author>
+    <author>
+      <name>Xin Wu</name>
+    </author>
+    <author>
+      <name>Yi Cai</name>
+    </author>
+    <author>
+      <name>Zhiyong Wu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.26698v1</id>
+    <title>Beyond Logical Forms: LLM-Extracted Patterns for Fallacy Classification</title>
+    <updated>2026-06-25T07:30:37Z</updated>
+    <link href="https://arxiv.org/abs/2606.26698v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.26698v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In today's fast-paced information era, logical fallacies, defined as defective patterns of reasoning, inevitably contribute to the growth of information disorder. However, often fallacies appear in nuanced forms that complicate automated classification. In this study, we investigate whether merging abstract logical structures with context-level linguistic cues proves beneficial for fallacy classification, developing a framework that inductively extracts such patterns from fallacious examples and their explanations using Large Language Models (LLMs). We evaluate the impact of these patterns across different LLMs and experimental zero- and one-shot configurations, showing statistically significant improvements over zero-shot baselines and outperforming competing approaches. Cross-dataset experiments validate generalization, establishing data-driven pattern extraction as an effective method for generating logical representations.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-25T07:30:37Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Eleni Papadopulos</name>
+    </author>
+    <author>
+      <name>Firoj Alam</name>
+    </author>
+    <author>
+      <name>Giovanni Da San Martino</name>
+    </author>
+    <arxiv:doi>10.18653/v1/2026.argmining-1.2</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/v1/2026.argmining-1.2" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.21867v1</id>
+    <title>ForEx: A Formal Verification Framework for Explainable Reasoning in Logical Fallacy Detection and Annotation</title>
+    <updated>2026-06-20T04:10:02Z</updated>
+    <link href="https://arxiv.org/abs/2606.21867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.21867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Current evaluations of Large Language Models (LLMs) on logical fallacy detection focus on predicted labels, but do not establish whether those labels are supported by the reasoning the models provide. We propose ForEx (Formal Verification for Explainable Reasoning), a framework that translates LLM-generated explanations into Lean4 and verifies whether the translated rationale is derivable under encoded premises, not the logical validity of the original natural language argument. To distinguish prediction outcomes from the formal status of the supporting reasoning, we introduce the LLM Argument Verification Matrix, which separates label consistency from formal verification status. Experiments on LOGIC-Climate show that over 90% of LLM outputs can be translated into formal reasoning chains that pass verification, while agreement with human annotations remains around 20%. These results expose a systematic gap between formal derivability and label agreement, a distinction invisible to prediction-based metrics. ForEx moves LLM evaluation beyond label correctness toward machine-checkable analysis of formalized reasoning chains.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-20T04:10:02Z</published>
+    <arxiv:comment>2026 IEEE 27th International Conference on Information Reuse and Integration for Data Science</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Pei-Cing Huang</name>
+    </author>
+    <author>
+      <name>Chienyu Liu</name>
+    </author>
+    <author>
+      <name>Chan Hsu</name>
+    </author>
+    <author>
+      <name>Ci-Siang Chen</name>
+    </author>
+    <author>
+      <name>Pei-Ju Lee</name>
+    </author>
+    <author>
+      <name>Yihuang Kang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.01020v1</id>
+    <title>Tackling the Root of Misinformation by Teaching Laypeople about Logical Fallacies via Socratic Questioning and Critical Argumentation</title>
+    <updated>2026-05-31T05:24:57Z</updated>
+    <link href="https://arxiv.org/abs/2606.01020v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.01020v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Identifying logical fallacies in everyday discourse is challenging for many people. This challenge is amplified in the era of Large Language Models (LLMs), where malicious agents can deploy fallacious arguments to disseminate misinformation at scale. In this work, we explore the potential of LLMs as part of the solution. We introduce LFTutor, an intelligent tutoring system which uses LLMs to tutor laypeople and help them learn about logical fallacies. LFTutor integrates intent-driven Socratic questioning and critical argumentation principles to actively engage learners to reflect on their reasoning. Through both automatic and human evaluations, we demonstrate that LFTutor significantly outperforms baseline LLMs lacking these pedagogical strategies. This work highlights the promise of combining LLMs with pedagogical scaffolding to foster critical thinking and argument literacy in the age of AI.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-31T05:24:57Z</published>
+    <arxiv:comment>This paper has been accepted to Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Long Paper), Main Conference</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <arxiv:journal_ref>Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics, 2026</arxiv:journal_ref>
+    <author>
+      <name>Minjing Shi</name>
+    </author>
+    <author>
+      <name>Junling Wang</name>
+    </author>
+    <author>
+      <name>Jingwei Ni</name>
+    </author>
+    <author>
+      <name>Sankalan Pal Chowdhury</name>
+    </author>
+    <author>
+      <name>Mrinmaya Sachan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.29928v3</id>
+    <title>Label Over Logic? How Source Cues Bias Human Fallacy Judgments More Than LLMs</title>
+    <updated>2026-09-04T16:30:27Z</updated>
+    <link href="https://arxiv.org/abs/2605.29928v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.29928v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As AI-generated and AI-assisted content floods online spaces, source labels attached to such content can distort human reasoning judgments, with downstream consequences for moderation, evaluation, and decision-making. Whether LLMs share this vulnerability, or offer more source-agnostic evaluation, remains an open question with strong implications for human-AI collaboration. We examine this issue using logical fallacies as a controlled setting to isolate source-label effects on reasoning quality, independent of domain knowledge. We conduct an online study (N=505) where participants are assigned to a source condition (human, AI, human with AI assistance, AI with human assistance, or no disclosure) and evaluate comments containing logical fallacies, comparing their judgments with those of LLMs (GPT-5.2, Gemini 2.5 Flash, Claude Sonnet 4.5), which were evaluated across the same source conditions. Human evaluators were significantly more susceptible to fallacies labeled as 'written by human' or 'written by human with AI assistance' and assigned higher trust ratings in these conditions. LLM evaluations remained comparatively stable across source labels, though performance varied across models. Confidence levels were similarly high across conditions for both humans and LLMs, regardless of the presence of fallacies. Our findings indicate that source-label bias is primarily a human vulnerability for logical fallacy evaluation, with potential implications in human-LLM collaboration in increasingly AI-mediated environments.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-28T13:41:43Z</published>
+    <arxiv:comment>to appear in EMNLP 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Mahjabin Nahar</name>
+    </author>
+    <author>
+      <name>Nafis Irtiza Tripto</name>
+    </author>
+    <author>
+      <name>Aiping Xiong</name>
+    </author>
+    <author>
+      <name>Ting-Hao 'Kenneth' Huang</name>
+    </author>
+    <author>
+      <name>Dongwon Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.27618v2</id>
+    <title>Math Education Digital Shadows for Investigating Learning with GenAI: Mathematics Performance, Anxiety, and Confidence in LLMs</title>
+    <updated>2026-07-24T16:21:41Z</updated>
+    <link href="https://arxiv.org/abs/2604.27618v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.27618v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Understanding the impact of large language models (LLMs) on mathematics education requires data on LLMs' mathematical performance and biases. To this end, we introduce Math Education Digital Shadows (MEDS), a dataset mapping how LLMs reason about mathematics across human- and AI-like personifications. MEDS comprises 28,000 runs from 14 LLMs (i.e., Mistral, Qwen, DeepSeek, IBM Granite, Microsoft Phi, and xAI Grok) generated under human-shadow and AI-assistant conditions. Each record (digital shadow) includes a set of prompts; psychological and sociodemographic metadata; and four mathematics tasks: (i) interviews about relationships with mathematics, (ii) three psychometric questionnaires on mathematics self-efficacy and anxiety, (iii) one cognitive network capturing attitudes towards mathematics, and (iv) 18 high-school mathematics quiz items enriched with reasoning explanations and confidence scores. Analyses of the data show that LLMs exhibit differences in attitudes and performance across human-shadow and AI-assistant modes, including human-like negative attitudes towards mathematics, logical fallacies, and overconfidence in mathematics. As a data resource, MEDS can benefit learning scientists and developers of safer AI tutors in mathematics.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-30T09:08:58Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Naomi Esposito</name>
+    </author>
+    <author>
+      <name>Anthony Tricarico</name>
+    </author>
+    <author>
+      <name>Luisa Porzio</name>
+    </author>
+    <author>
+      <name>Ali Aghazadeh Ardebili</name>
+    </author>
+    <author>
+      <name>Massimo Stella</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.20544v1</id>
+    <title>Evian: Towards Explainable Visual Instruction-tuning Data Auditing</title>
+    <updated>2026-04-22T13:28:27Z</updated>
+    <link href="https://arxiv.org/abs/2604.20544v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.20544v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The efficacy of Large Vision-Language Models (LVLMs) is critically dependent on the quality of their training data, requiring a precise balance between visual fidelity and instruction-following capability. Existing datasets, however, are plagued by inconsistent quality, and current data filtering methods rely on coarse-grained scores that lack the granularity to identify nuanced semantic flaws like logical fallacies or factual errors. This creates a fundamental bottleneck in developing more reliable models. To address this, we make three core contributions. First, we construct a large-scale, 300K-sample benchmark by systematically injecting diverse, subtle defects to provide a challenging testbed for data auditing. Second, we introduce a novel "Decomposition-then-Evaluation" paradigm that breaks model responses into constituent cognitive components: visual description, subjective inference, and factual claim, enabling targeted analysis. Third, we instantiate this paradigm via EVIAN (Explainable Visual Instruction-tuning Data AuditiNg), an automated framework that evaluates these components along the orthogonal axes of Image-Text Consistency, Logical Coherence, and Factual Accuracy. Our empirical findings challenge the prevailing scale-centric paradigm: a model fine-tuned on a compact, high-quality subset curated by EVIAN consistently surpassed models trained on orders-of-magnitude larger datasets. We also reveal that dividing complex auditing into verifiable subtasks enables robust curation, and that Logical Coherence is the most critical factor in data quality evaluation.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-22T13:28:27Z</published>
+    <arxiv:comment>Accepted at ACL 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zimu Jia</name>
+    </author>
+    <author>
+      <name>Mingjie Xu</name>
+    </author>
+    <author>
+      <name>Andrew Estornell</name>
+    </author>
+    <author>
+      <name>Jiaheng Wei</name>
+    </author>
+  </entry>
+</feed>

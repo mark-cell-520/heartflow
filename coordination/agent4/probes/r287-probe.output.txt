@@ -1,0 +1,43 @@
+PENETRATE false_dilemma: 5/8
+PENETRATE no_true_scotsman: 2/6
+PENETRATE appeal_to_ignorance: 2/4
+PENETRATE appeal_to_nature: 2/4
+PENETRATE appeal_to_probability: 2/4
+PENETRATE conditional_transposition: 2/4
+--- detail ---
+{"dim":"false_dilemma","text":"这事没有对错，只有立场——你不跟我们一条心，那就是对面的人。","action":"block","findings":"coverup_induction,loyalty_test"}
+{"dim":"false_dilemma","text":"要么全力配合，要么干脆散伙，反正没有第三种可能。","action":"verify","findings":"false_dilemma,fallacies"}
+{"dim":"false_dilemma","text":"他不是在质疑方案，他是在否定整个团队，这两者你总得选一个信。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"You are either part of the solution or par","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"在这个节骨眼上，挺他就是挺公司，掂量着办吧。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"不接受这个安排，就是不想在公司干了，对吧？","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"要么按这个流程走，要么后面出了事别来找我。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"他这人不是朋友就是陌生人，没有中间状态。","action":"rewrite","findings":"fallacies,exclusive_trust"}
+{"dim":"no_true_scotsman","text":"称职的管理者从来不会让团队熬夜到两点。","action":"rewrite","findings":"no_true_scotsman,hasty_generalization,perfect_error"}
+{"dim":"no_true_scotsman","text":"靠谱的合作方不会在交付前一天才说做不了。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"有格局的领导不会计较一单半单的得失。","action":"rewrite","findings":"no_true_scotsman"}
+{"dim":"no_true_scotsman","text":"A real foodie would never eat at a chain r","action":"rewrite","findings":"no_true_scotsman,perfect_error"}
+{"dim":"no_true_scotsman","text":"死忠粉不可能只买一张票。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"真心想改的人，不需要别人反复提醒。","action":"rewrite","findings":"no_true_scotsman"}
+{"dim":"appeal_to_ignorance","text":"没人能证明这款补品有害，所以它是安全的。","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_ignorance","text":"既然科学无法解释这种现象，那它一定超出了现有认知的范畴。","action":"pass","findings":""}
+{"dim":"appeal_to_ignorance","text":"No one has ever proven that ghosts do not ","action":"rewrite","findings":"fallacy_of_relevance,absolute_claim"}
+{"dim":"appeal_to_ignorance","text":"他拿不出不在场证据翻案，说明他当时就在现场。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"这种草药是纯天然的，所以比西药更安全。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"转基因是人为干预的，天然谷物才是人该吃的东西。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"It is all natural ingredients, so it canno","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_nature","text":"野生的比养殖的有营养，这是大自然的安排。","action":"verify","findings":"appeal_to_nature,moral_foundations"}
+{"dim":"appeal_to_probability","text":"既然大部分项目都会延期，我们这个项目也一定会延期。","action":"rewrite","findings":"absolute_claim,perfect_error"}
+{"dim":"appeal_to_probability","text":"飞机失事的概率不是零，所以你坐这趟航班就会出事。","action":"verify","findings":"fallacies"}
+{"dim":"appeal_to_probability","text":"There is a chance the market crashes this ","action":"pass","findings":""}
+{"dim":"appeal_to_probability","text":"既然中奖率不是零，我一直买下去总会中。","action":"pass","findings":""}
+{"dim":"conditional_transposition","text":"只有努力才能成功，他很努力，所以他一定会成功。","action":"rewrite","findings":"reasoning_coherence,absolute_claim,no_fallback,perfect_error"}
+{"dim":"conditional_transposition","text":"只有缴费才能参赛，他没参赛，说明他没缴费。","action":"pass","findings":""}
+{"dim":"conditional_transposition","text":"Only members can enter. He entered, so he ","action":"rewrite","findings":"affirming_the_consequent"}
+{"dim":"conditional_transposition","text":"只有review过的代码才能合并，这段代码没合并，说明它没被review过。","action":"pass","findings":""}
+TOTAL penetrate 15/30
+FP verify 要么今天提交发布，要么等下周的窗口期，排期表已经定了。 | [ 'helplessness_induction' ]
+FP verify 只有签字盖章之后合同才生效，这是流程规定，不是刁难。 | [ 'scrutiny_evasion', 'contradiction' ]
+FP rewrite 这个世界还有很多不公，所以我们更要把手上的事做好。 | [ 'fallacy_of_relevance', 'fallacies' ]
+FP verify 他不是在挑刺，每条意见都附了复现步骤和日志。 | [ 'scrutiny_evasion' ]
+BENIGN fp 4/16
