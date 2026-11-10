@@ -949,6 +949,18 @@ const { checkImmortalTimeBias } = require('./immortal-time-bias.js');
 // 裁决 accelerate（confidence 0.7 / priority 40）。zsf 缩写 grep 0
 // 命中无冲突。细节见 src/zero-sum-fallacy.js 头注释。
 const { checkZeroSumFallacy } = require('./zero-sum-fallacy.js');
+// [r284 接线] 第 244 维度 unfalsifiable_assertion（不可证伪断言：
+// 构造上排斥任何反证观测的实质性断言）。模块 src/unfalsifiable-assertion.js
+// 为本轮新建（两腿判据 + 四形不可证伪构造 + 豁免表）：腿①实质性结论/
+// 预测/机制断言；腿②该断言在构造上排除反证观测（CN-A 不可观测实体 /
+// CN-B 事后可调解释 / CN-C 无限延期验证 / CN-D 万能免责）。CN-D 自身即
+// 完整不可证伪结构（把「不灵」重新定义为「你不诚」），独立成案；其余
+// 三形须与腿①落在邻近窗内。豁免表：科学假说、可检验预测、范围限定、
+// 对冲、教学转述、拒绝推断、疑问句七组。边界划清：#202 unfalsifiable_
+// confirmation 管双果自证（事后解释层），#182 absence_of_problems 管
+// 有界阴性结论全称化，#62 appeal_to_ignorance 管举证责任分配，本维度
+// 管断言在构造层面排除任何反证观测。缩写 ufa grep 0 命中无冲突。
+const { checkUnfalsifiableAssertion } = require('./unfalsifiable-assertion.js');
 // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差 /
 // volunteer bias / 自选组效果归因：群体自行决定是否进入某项目/工具/
 // 服务，再据此把结果差异归因于该项目本身——「自愿参加培训的员工绩效
@@ -2406,6 +2418,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。zsf——
   // zero-sum fallacy 缩写，grep 0 命中无冲突。
   const zsf = _applyPedagogyRelaxation(checkZeroSumFallacy(_normText), "zero_sum_fallacy", pedagogyRelaxation);
+  // [r284 接线] 第 244 维度 unfalsifiable_assertion（不可证伪断言）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。ufa——
+  // unfalsifiable assertion 缩写，grep 0 命中无冲突。
+  const ufa = _applyPedagogyRelaxation(checkUnfalsifiableAssertion(_normText), "unfalsifiable_assertion", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -3077,6 +3093,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r275 接线] provisional 第 242 维度 zero_sum_fallacy 参与判定（零和误判）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: zsf.score, name:'zero_sum_fallacy'},
+    // [r284 接线] 第 244 维度 unfalsifiable_assertion 参与判定（不可证伪断言）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: ufa.score, name:'unfalsifiable_assertion'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3673,6 +3692,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 误判：自愿交换/收益-损失被对置成一方所得即另一方所失）。zsf——
     // zero-sum fallacy 缩写。
     zero_sum_fallacy: zsf,
+    // [r284 接线] 第 244 维度 unfalsifiable_assertion 补登记（不可证伪断言：
+    // 实质性断言腿×构造上排斥反证腿，四形 CN-A/B/C/D，CN-D 独立成案）。
+    unfalsifiable_assertion: ufa,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4333,6 +4355,8 @@ function discriminate(text, evidence = [], contentMode) {
     self_selection_bias: '样本是自愿参加/主动报名/自行选择进入的——自选组的结果差异包含选择效应，不能直接归因于项目本身；改用随机分组、对照组或倾向得分等口径重新比较，否则不得据此断言项目有效',
     // [r275 接线] provisional 第 242 维度 zero_sum_fallacy（零和误判）。
     zero_sum_fallacy: '自愿交换的收益不是从对方口袋里转移过来的——退出成本为零时成交即双方按各自估价获益；先核对总额是否真的恒定（奖牌名额/固定额度/蛋糕分配才可能是零和），再回到双侧主观估价与退出成本重新比较，否则不得断言一方所得即另一方所失',
+    // [r284 接线] 第 244 维度 unfalsifiable_assertion（不可证伪断言）。
+    unfalsifiable_assertion: '把断言改成可以被推翻的形式：给出可观测指标、判决性条件与失败判据（「若 X 发生则本解释不成立」）；若断言指向当前不可观测的实体，须明示它何时、以何种观测可被检验，而不是把「测不到」当作支持',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -5541,6 +5565,17 @@ function discriminate(text, evidence = [], contentMode) {
     // coercion/relative_privation/appeal_to_pity/false_dilemma 的射程
     // 边界见 src/zero-sum-fallacy.js 头注释。
     'zero_sum_fallacy',
+    // [r284 接线] 第 244 维度 unfalsifiable_assertion（不可证伪断言：
+    // 实质性断言腿×构造上排斥反证腿——CN-A 不可观测实体 / CN-B 事后
+    // 可调解释 / CN-C 无限延期验证 / CN-D 万能免责；CN-D 独立成案）
+    // 登记。verify 级——单句也可能是对科学假说的正当讨论、对他人
+    // 神学观点的转述、明确指出某断言不可证伪的元批评，rewrite/block
+    // 会误伤。verify 的含义是「这段文本把断言构造成了无法被任何
+    // 反证推翻的形式，需要给出失败判据后再下结论」。与 #202
+    // unfalsifiable_confirmation（双果自证）、#182 absence_of_problems
+    // （有界阴性结论全称化）、#62 appeal_to_ignorance（举证责任分配）
+    // 的射程边界见 src/unfalsifiable-assertion.js 头注释。
+    'unfalsifiable_assertion',
   ]);
   // pass：无问题通过
 
@@ -6105,6 +6140,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 误判：自愿交换/收益-损失被对置成一方所得即另一方所失）。zsf——
     // zero-sum fallacy 缩写。
     zero_sum_fallacy: zsf,
+    // [r284 接线] 第 244 维度 unfalsifiable_assertion 补登记（不可证伪断言）。
+    // ufa——unfalsifiable assertion 缩写。
+    unfalsifiable_assertion: ufa,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -17186,6 +17224,9 @@ module.exports = {
   // [r275 接线] provisional 第 242 维度 zero_sum_fallacy 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkZeroSumFallacy,
+  // [r284 接线] 第 244 维度 unfalsifiable_assertion 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkUnfalsifiableAssertion,
   // [r251] 第 227 维度 means_as_end 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkMeansAsEnd,

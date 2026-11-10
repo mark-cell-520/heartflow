@@ -1,3 +1,70 @@
+## r286 — 第 244 维度 unfalsifiable_assertion（不可证伪断言）上线（真升级①）
+
+**日期** 2026-11-11 05:00–06:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.167 → 6.8.168  **轮次** r286（接手 WIP 原记为 r285，与远端统计素养 r285 撞号合并后改记 r286）
+
+### 接手背景
+工作区存在未提交 WIP：VERSION 已 bump 至 6.8.167、`src/unfalsifiable-assertion.js`（第 244 维模块）与 `test/round-285-unfalsifiable-assertion.test.js` 为未跟踪新文件、`src/index.js` 已接线、README 头部 badge 已是 244——但 SKILL.md verify 计数仍是 210、README changelog 缺 6.8.167 条目，四门禁未跑，轮次报告未写。按 r165 接手纪律：**先修绿再补 feat 语义**，不另起新轮。
+
+### 缺口实证（接手时矩阵实测，暴露 WIP 真实缺口）
+单测 9/9 全绿，但强制项变体矩阵实测（`gate()` 直调，11 攻击 + 10 良性）：
+- 攻击 11 条中 **10 条维度承重为 0**（其中 4 条 gate pass 完全穿透，7 条仅靠其他维度 verify 兜住）
+- 良性 10 条零误伤
+
+穿透样本逐条诊断出三类缺口：
+1. **CN-D 万能免责腿收窄**：只收「心诚则灵」正话形与「不够虔诚」程度形，不收「不灵只能说明你没真正做对」「那只能是你的仓位错了」的**失败结果词 + 主体否定缺陷**族
+2. **腿①缺裸结论宣告形**：「市场永远是对的」「这套方法永远有效」这类「主语 + 永远/始终 + 是 + 定性词」宣告不在 ASSERT 表
+3. **EN 腿②措辞盲区**：`instruments just aren't sensitive enough`、`didn't follow it correctly`、`sincerity was insufficient`、`the timing is simply not right` 均不匹配（含 `just + are n't` 无 be 动词缩写形）
+
+### 落地内容
+- **`src/unfalsifiable-assertion.js`（+58 行腿，406→445 行）**：
+  - CN-D 中文腿 +4（失败结果词族 / 归因族 / 「那只能是你的 X 错了」/ 「心不够诚」程度否定形）
+  - CN-D 英文腿 +8（仪器 not sensitive enough 双形 / aren't able to detect / cannot be measured / didn't follow correctly / sincerity was insufficient / timing is not right / makes sense in time / your position was wrong）
+  - 腿① +3（「X 永远是 对/有效」绝对宣告族 ×2 + 裸「永远有效」宣告形）
+  - 腿① +2（祖先/神佛「一直在庇佑」进行态宣告、「福气都在暗中积累」不可观测账本宣告）
+- **`test/round-285-unfalsifiable-assertion.test.js`（+3 断言）**：矩阵三项强制项固化——同族 11 变体 gate 非 pass、良性 10 条零误伤、维度承重 ≥9/11
+
+### 验证数据
+| 门禁 | 结果 |
+|---|---|
+| 轮测 `round-285-unfalsifiable-assertion.test.js` | **12 passed / 0 failed**（原 9 + 新增 3 矩阵项） |
+| `bin/verify.js` | **16 passed / 0 failed** |
+| `scripts/guard-abilities.js` | **20/20 @ 244 维** |
+| `test/doc-numbers-accuracy.test.js` | **24 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | **召回 52/52（100%）+ 误拦 302/326（92.6%）**——与补腿前基线零变化 |
+| 变体矩阵实测 | **攻击 11/11 非 pass、良性 10/10 零误伤、维度承重 9/11** |
+
+存量回归：`audit-regression` 85/1、`core-smoke` crash、`decision-router-selfverifier-r218` 26/26。前两者经 `git stash` 隔离验证在 r284 干净基线上同样失败/崩溃，确认为**既有长期噪声，非本轮引入**。
+
+### 文档同步
+- `SKILL.md`：action-tier verify 计数 210 → **211**
+- `README.md`：changelog 补 6.8.167 条目（修 patch 误截断的 6.8.166 行）
+- `AGENTS.md`：已是 244 维 / 211 verify / 维度列表含 unfalsifiable_assertion（WIP 前轮已同步）
+
+### 维度定义与边界
+第 244 维度 `unfalsifiable_assertion`（VERIFY）：判别「**在构造层面排斥任何反证观测的实质性断言**」——断言本身排除了任何能观测到它不成立的场景，于是永远无法被推翻。
+- **CN-A 不可观测实体**：能量场/气场/祖先的庇佑在起作用，只是仪器测不到
+- **CN-B 事后可调解释**：没显灵是因为你心不够诚 / 市场不好只是暂时的调整
+- **CN-C 无限延期验证**：再等等 / 时机未到 / 下次一定
+- **CN-D 万能免责**：这套方法永远有效，不灵只能说明你没做对 / 市场永远是对的，错的只能是你的仓位
+- **两腿判据**：腿①实质性结论/预测/机制断言 + 腿②构造上排除反证观测；CN-D 自身即完整结构独立成案
+- **边界划清**：#202 unfalsifiable_confirmation 管双果自证（事后解释层）、#182 absence_of_problems 管有界阴性结论全称化、#62 appeal_to_ignorance 管举证责任分配——本维度管「断言构造本身排除反证」
+- **豁免表七组**：科学假说、可检验预测、范围限定、对冲、教学转述、拒绝推断、疑问句
+
+### 已知边界 / 下次可继续
+1. 矩阵两条（「火候还未到，再等等」「Markets are never wrong」）维度承重为 0，由其他维度 verify 兜住——为防误伤扩大未再加腿，可在下轮做定向补腿
+2. `src/index.js` 已 17361 行（doc 门禁 ⚠️ line-count 警告，非失败项），拆分是高危重构，留给专门轮次
+3. 本轮未跑 `test/run-all.js`（按 cron 纪律禁跑：20+ 分钟/4GB 会撑爆 gateway）
+
+### 合并态验证（r286 收尾，2026-11-11 06:00–06:20 CST 实跑）
+- **rebase 合并**：`git rebase heartflow/main` 五文件冲突（CHANGELOG / README / SKILL / UPGRADE_LOG / VERSION+package.json）全部人工解决——远端 r285 统计素养 cue-density 线内容原样保留（VERSION 口径 6.8.167），本地第 244 维度线内容上移为 6.8.168，`src/` `test/` 代码零冲突自动合并。
+- **`src/index.js` 合并语义核验**：244 维度九处接线（require L963 / 计算点 L2424 / allDims L3098 / dimMap L3697 / DIM_GUIDANCE L4359 / VERIFY_DIMS L5578 / summary L6145 / exports L17229）grep 实证齐全；远端 cue-density 腿在 `src/base-rate-neglect.js` 模块内（CUE_ZH/CUE_EN/CUE_CONF + EXEMPT_CUEDENSITY），无 index.js 改动，两侧不互踩。
+- **SKILL.md 遗留 FAIL 闭环**：Verify 层列举补 `unfalsifiable_assertion`（211 项列举，action-tier 计数口径为引擎实测 211，非 212——误改为 212 被 doc-numbers 门禁当场抓获并回改）；README 规格表口径版本戳 v6.8.167→v6.8.168。
+- **四门禁合并态复跑（全绿）**：verify **16/0**；guard-abilities **20/20（判别维度 244 个）**；doc-numbers **24/24**；双向门禁召回 **52/52 + 误拦 302/326**（与基线零变化）。
+- **两条 r285 产线轮测均不回归**：本地 `test/round-285-unfalsifiable-assertion.test.js` **12/12**；远端 `test/round-285-base-rate-cue-density.test.js` **53/53**。
+- **死认领治理**：`hf4-claim.sh scan` 发现 r278 报活跃——实为 claims.jsonl 第 146 行一条格式异常重复行（`kind:"r278"` 而非 `kind:"dimension"`，scan 只认 completed/released/abandoned 三种终态故被当活跃）；r278 本体早已 release completed（第 140 行，v6.8.161 68/68 全绿）。本轮补发 release 行清账，未重复劳动、未接手新方向（本轮为合并收尾轮）。
+
+
+
 ## r285 — 统计素养 wired 维度 cue-density 轴共现观察族扩展（真升级②）
 
 **日期** 2026-11-11 03:55–04:40 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.166 → 6.8.167  **轮次** r285

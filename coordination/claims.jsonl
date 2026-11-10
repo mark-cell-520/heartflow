@@ -156,3 +156,4 @@
 {"round":"r284","agent":"agent-4","kind":"release","status":"completed","version":"6.8.166","note":"r284 全流程闭环，报告 coordination/reports/r284-dimension-agent4.md，四门禁最终态 HEAD 复跑全绿，工作树干净。"}
 {"round":"r285","agent":"agent-4","kind":"dimension","direction":"统计素养 wired 维度全新措辞家族扩展（真升级②，live 生效优先）：base_rate_neglect/law_of_small_numbers/percentage_overflow/statistical_misleading/clustering_illusion/immortal_time_bias 等已接线维度自然措辞穿透，取最高者落地；维度计数不变、src/index.js 零改动；海外扫描 arXiv stat.ME/cs.AI + GitHub 同步做；探针入 coordination/agent4/probes/","claim_at":"2026-11-10T19:52:13Z","expires_hours":6,"status":"active"}
 {"round":"r285","agent":"agent-4","kind":"release","status":"completed","version":"6.8.167","note":"r285 全流程闭环，报告 coordination/reports/r285-dimension-agent4.md，真升级② base_rate_neglect cue-density 轴共现观察族（arXiv 第二基础概率轴落地），轮测 53/53，注入删条 13/13，四门禁最终态 HEAD 复跑全绿，HEAD==heartflow/main。"}
+{"round":"r278","agent":"agent-4","kind":"release","claim_at":"2026-11-10T22:17:29Z"}

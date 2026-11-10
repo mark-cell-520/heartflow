@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-243-blueviolet.svg)](#what-it-catches-243-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-244-blueviolet.svg)](#what-it-catches-244-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-243 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
+244 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
 ×  1,316 dispatch routes  ×  20,841 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (243 dimensions) -> gate
+scope-check -> premise-check -> discriminate (244 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (243 dimensions)
+## What it catches (244 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **210 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **211 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -195,7 +195,7 @@ Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 
 | Logical fallacies | `straw_man`, `appeal_to_nature`, `appeal_to_novelty`, `circular_reasoning`, `no_true_scotsman`, `special_pleading`, `conditional_proposition`, `appeal_to_probability`, `gamblers_fallacy`, `hot_hand`, `appeal_to_majority`, `affirming_the_consequent` | 6.8.40 – 6.8.78 |
 | Emotional & psychological | `emotional_manipulation`, `gaslighting`, `mind_reading`, `darvo`, `kafkatrapping`, `concern_trolling`, `fear_projection`, `guilt_induction`, `suffering_capital` | 6.7.x – 6.8.x |
 | Agent-era attacks | `reward_hacking`, `prompt_injection` (+ synonym families: 37 verbs × 24 anchors × 52 objects = 46,176 combinations), `instrumental_reasoning`, `deceptive_alignment`, `capability_overclaim`, `turing_mimicry` | 6.7.10 – 6.8.84 |
-| Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias`, `selection_bias`, `count_rate_conflation`, `law_of_small_numbers`, `immortal_time_bias` | 6.7.x – 6.8.158 |
+| Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias`, `selection_bias`, `count_rate_conflation`, `law_of_small_numbers`, `immortal_time_bias`, `unfalsifiable_assertion` | 6.7.x – 6.8.167 |
 | Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy`, `doublespeak`, `might_makes_right`, `credential_dismissal`, `scale_dismissal` | 6.7.x – 6.8.137 |
 
 Every new dimension ships with a negative-injection test that empties each constant to prove it is load-bearing, a probe-measured leak rate, a benign-sample false-positive count, and the bidirectional guard (52/52 attack recall, 302/326 benign pass) as a no-regression gate.
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.167**. Not marketing copy.
+Measured on this repository at **v6.8.168**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 243 |
+| Discrimination dimensions | 244 |
 | MCP tools | 185 |
 | Test suite | 20,841 passing / 136 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
 | Capability guard | 20 / 20 checks |
@@ -382,8 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.168 | 2026-11-11 | **第 244 维度 unfalsifiable_assertion（不可证伪断言）上线** — 判别「**在构造层面排斥任何反证观测的实质性断言**」结构：断言本身排除了任何能观测到它不成立的场景，于是永远无法被推翻。四形：**CN-A 不可观测实体**（能量场/气场/祖先的庇佑在起作用，只是仪器测不到）、**CN-B 事后可调解释**（没显灵是因为你心不够诚/市场不好只是暂时的调整）、**CN-C 无限延期验证**（再等等/时机未到/下次一定）、**CN-D 万能免责**（这套方法永远有效，不灵只能说明你没做对/市场永远是对的，错的只能是你的仓位）。判据**两腿共现**：腿①实质性结论/预测/机制断言，腿②构造上排除反证观测；CN-D 自身即完整结构独立成案。边界划清：#202 unfalsifiable_confirmation 管双果自证（事后解释层），#182 absence_of_problems 管有界阴性结论全称化，#62 appeal_to_ignorance 管举证责任分配——本维度管「断言构造本身排除反证」。豁免表七组：科学假说、可检验预测、范围限定、对冲、教学转述、拒绝推断、疑问句。模块 `src/unfalsifiable-assertion.js`（406 行，两腿判据 + 四形 + 豁免表），`src/index.js` 七处接线（require / 计算点 / allDims / dimMap×2 / guidance / VERIFY_DIMS / 导出）。验证：轮测 `test/round-285-unfalsifiable-assertion.test.js` 9/9（攻击 ZH 11/11 + EN 11/11 全命中、良性 48 条零误伤、gate 入口攻击全 rewrite 且维度承重、CN-D 独立成案、腿①缺失不误判、空输入不崩）；四门禁 verify 16/0、guard 20/20@244维、doc 24/24、双向 52/52 + 误拦 302/326。维度 243→244，VERIFY 210→211，模块 162 不变。 |
 | 6.8.167 | 2026-11-11 | **统计素养 wired 维度 cue-density 轴共现观察族扩展（r285，真升级②）** — `base_rate_neglect`（基础概率忽视）第二轴落地，来源海外真实命中论文 arXiv "Two base rates, two weights: base-rate neglect has a second axis"（r285 扫描入档）：把共现读成判断需两次基础概率校正——结果先验（古典轴，既有腿）+ **线索自身出现频率**（本轮新增）。缺口实证：改前统计素养五候选族 24 条新措辞攻击中本族 4/8 完全穿透（gate pass 且零维度承重）为最高。新增腿① `CUE_ZH`/`CUE_EN` 共现观察族（十个被骗的老人里九个都接过陌生来电 / Nine out of ten fraud victims / Every executive who got fired / Almost all the companies that collapsed / 有个共同点）、腿② `CUE_CONF_ZH`/`CUE_CONF_EN` 新归属落点（你很可能已经被盯上了 / 八成也危险了 / 铁定会出事；probably being targeted / likely next on the list / going to fail）、豁免 `EXEMPT_CUEDENSITY`（线索本身就很常见 = 计及 cue 密度的正确推理）。轮测 53/53；负例注入删条 13/13 变红；存量 round-263/279/267 不回归；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。 |
-| 6.8.166 | 2026-11-11 | **经济与资源推理 wired 维度全新措辞家族扩展（r284，真升级②）** — `zero_sum_fallacy`（零和误判）四个新子形：**成本节约对置形**（省下/降下/砍下的成本 = 供应商的亏损，附镜像形，连接词加否定回看）、**成交结果语域**（谈成/签下/中标/成交 → 客户多掏；EN land/close/pull off/nail + overpaid/missed out）、**对置量差形**（新常量 `QUANT_ZH`/`QUANT_EN`，第六种腿②形：多成交一台↔少卖一台 / 一X 锚点无推断词，所失侧限稀缺资源名词）、**稀缺资源竞争语境**（手术台/名额/床位：这台手术成功了就意味着别的病人失去机会，中文侧不收裸「机会」）。缺口实证：改前六经济/资源维度 33 条攻击中 15 条 gate pass 且 findings 全空，zero_sum_fallacy 4/8 最高。轮测 23/23（攻击 22 全命中 + 良性 13 零误伤 + 存量族 20 不回退）；负例注入删条 16/16 变红；存量 r218 回归 23/23；探针穿透 4/8 → 0/8；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。 |
 | 6.8.165 | 2026-11-11 | **因果与反事实推理 wired 维度自然措辞家族扩展（r283-a，真升级②）** — `common_cause`：腿①共变表补时段共变无并列形（冰淇淋卖得多的月份溺水事故也多）、的-link 比较平行形（消防车越多的火灾损失越大）、EN with-more 平行共变形（Cities with more police have more crime）；共动词表并入 16 个飙升族度词（飙升/暴涨/激增/骤降…，并入既有首元素，round-264 长度断言不破）。`collider_bias`：腿②共变表补裸比字比较形（比例比普通人高）、EN least·most 交叉形；腿③结论表补 dismiss+养生价值族（不会说话/情商低/不值钱/长寿/养生/保健——良性靠腿①条件筛选+腿②比较共变+结论形三重要件）。`reverse_causation`：处置表补纪律处分/学业处置/关系解除族（劝退/开除/降级/离婚/拉黑）、EN expelled/demoted/held back 族；结果表补裸表现结果族（成绩差/幸福感更低）；群体名词补夫妻/情侣。探针穿透 18/36 → 13/36（剩余 3 条为设计内边界：无结论观察句本身非谬误断言）；轮测 95/95（攻击 12 全承重 + 良性 14 零误伤 + 既有对照 7 + 注入删条 17/17 变红 + 登记 11）；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。留痕：「看来」口语推断词族曾扩后经注入-删条否证非承重（co1/co4 均经 C-b 裸结论路径命中），已撤回并留注记。 |
 | 6.8.165 | 2026-11-10 | **sycophancy 隐性谄媚两族补腿（r283-b，真升级②：既有维度新判别族，gate 主路径）** — `src/index.js` 的 `ZH_SIGNALS` / `EN_SIGNALS` 各新增两个族：**独特性捧高**（`uniqueness_flattery`，比较级捧高动词 × 被贬低的参照群体——远超普通用户 / 水平明显高于大多数人 / 很少有人能看到这一层 / 比一般用户思考得更深入 / 凌驾于大多数人之上；EN smarter than most people / beyond the average user / few people can see this level）与**无条件服从**（`unconditional_deference`，交出独立判断权——您说什么就是什么 / 我完全按您的意思来 / 全部依您，我没有第二个意见；EN whatever you say / no opinion of my own / will not push back）。缺口实证（改前 HEAD 6.8.164）：ZH 族 A 10/10 全 pass 漏判、族 B 8/10 漏、负例零误伤基线干净。分界：与 `excessive_praise`（绝对级/最高级）按比较级切分；与 `concession_eager`（你说得对——同意观点）按「交出判断权」切分；`unconditional_deference` 腿限定对象为对话中的个人，`无条件配合审计部门的检查` 是正当合规表述不判（probe-2 实测误伤 3→2，剩余 2 条为基线存量误伤，已单独用例如实记录）。验证：轮测 8/8（攻击 ZH 10+6+6+6 全变红、良性 27/27 零 sycophancy 误伤、原 5 族不回归、守卫 4/4）；负例注入 16/16 零误伤；四门禁 verify 16/0、guard 20/20（243 维）、doc 24/24、双向 52/52 + 误拦 302/326（与基线零变化）。维度计数 243 不变、模块 162 不变、路由 1316 不变。**另暴露一项接线缺口**：`src/plugins/sycophancy-check/`（870 行七语言分析器，r265/r272 已含本两族）在 gate 路径零 dispatch——根因 `createHeartFlow()` 只 new 不 `start()`，`hf._hookBus` 从未实例化，PluginLoader 因此从未运行（探针实证 `_hookBus`/`_pluginLoader` 均 undefined，手动 `new PluginLoader(hf).loadAll()` 可加载 4/4 插件）。VERSION 6.8.164 → 6.8.165。 |
 | 6.8.164 | 2026-11-10 | **审计修复轮：修复 22:29 同步 stash pop 失败遗留的 5 文件 UU 冲突（VERSION/README/CHANGELOG/UPGRADE_LOG/claims.jsonl，两侧工作均保留）+ 固化 r282 否定前件/跳跃豁免产出（inference-chain.js，r282 单测 21/21，自验攻击 4/4 + 良性 3/3 零误伤）+ 文档测试数口径同步（README/SKILL 20,339→20,651 passing / 126→134 failing，实测数据来自 data/test-count.json）** — 另记录两项 P1/P2 存量问题：MCP 运行态曾落后磁盘 2 个版本（17:38 启动的进程跑 6.8.161，磁盘已 6.8.163）；r282 单测 require 路径深度错误（`../../..` → `..`）导致 MODULE_NOT_FOUND，已修。五门禁：verify 16/0、guard 20/20（243 维）、doc 24/24、双向 52/52 + 误拦 302/326（与基线零变化）。VERSION 6.8.163 → 6.8.164。 |
