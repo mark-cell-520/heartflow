@@ -1,0 +1,429 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/S7iF4GQFfmzUx9y2xGgwuF9zXnE</id>
+  <title>arXiv Query: search_query=all:selection OR all:bias OR all:sampling OR all:fallacy OR all:detection OR all:dataset&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T00:50:05Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:selection+OR+(all:bias+OR+(all:sampling+OR+(all:fallacy+OR+(all:detection+OR+all:dataset))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>817158</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09894v1</id>
+    <title>Video-Coder: Reinforcing Agentic Coding for Video Generation</title>
+    <updated>2026-11-06T18:59:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.09894v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09894v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent years have witnessed remarkable progress in video generation in terms of visual quality and temporal consistency. However, generating videos with precise spatial structure, coherent motion dynamics, and controllable scene composition remains challenging. In this paper, we introduce Video-Coder, the first attempt to train a code-driven video generation agent, which autonomously writes and executes code to construct a dynamic 3D scene (Draft Video) that provides structure and motion signals to downstream video generators. To support this paradigm, we design a dedicated data pipeline and curate two high-quality datasets, Video-Coder-SFT-6k and Video-Coder-RL-2k, which contain diverse prompts and ground-truth reference videos. We further develop the Video- Coder Harness, a unified interactive environment integrating code execution, 3D scene rendering, and execution feedback for agent training and inference. We then train Video-Coder with SFT fol- lowed by harness-native agentic reinforcement learning with dual reward feedback, which combines execution-based and video-based rewards. Additionally, we design an annealing training strategy that gradually reduces the execution reward over time, allowing the model to rely more on the video reward in the later training stages. Experiments show that Video-Coder achieves significant gains, improving Minimax-H3 by approximately 7 points on PhyGenBench and 24 points on VBench-2.0. We hope this work can serve as an open foundation for coding agents in video generation, and we fully open-source our data, models, and code</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:59:57Z</published>
+    <arxiv:comment>Project Page:https://cywang735.github.io/Video-Coder/ Code: https://github.com/CYWang735/Video-Coder</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Chaoyang Wang</name>
+    </author>
+    <author>
+      <name>Sicheng Gao</name>
+    </author>
+    <author>
+      <name>Junan Hu</name>
+    </author>
+    <author>
+      <name>Kunyang Li</name>
+    </author>
+    <author>
+      <name>Dongyang Chen</name>
+    </author>
+    <author>
+      <name>Yiyang Zhou</name>
+    </author>
+    <author>
+      <name>Huaxiu Yao</name>
+    </author>
+    <author>
+      <name>Yong Jae Lee</name>
+    </author>
+    <author>
+      <name>Radu Timofte</name>
+    </author>
+    <author>
+      <name>Yuzhang Shang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09889v1</id>
+    <title>SciCheck: A Framework for Verifying the Integrity of Deep Learning Training</title>
+    <updated>2026-11-06T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.09889v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09889v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deep learning training is difficult to verify within a scientific workflow: its architecture, hyperparameters, and procedure are rarely fixed until training has been attempted, and two honest runs never produce the same weights, so recomputation cannot serve as a check. We present SciCheck, a framework in which the scientist explores training configurations freely and posts a blueprint to a provenance ledger for each candidate they want verified, and a verifying scientist judges the resulting run in two layers: a statistical judge model that compares per-step gradient statistics against the verifier's own reference run, and a spot-check that re-executes randomly chosen training segments whose checkpoints are committed to the ledger one epoch at a time. On an MLP, a CNN, and an autoencoder at 100k-500k parameters, under gradient sign flipping, label poisoning, and fabricated runs, SciCheck reaches F1 of 0.966, 0.906, and 0.976 while rejecting 0-4.4% of honest runs. For the attacks we test, the spot-check accounts for most of this accuracy, and we characterize what each layer can detect. The effective-signal statistic falls as $(1-2s)^2$ under a sign flip of severity $s$, so gradient statistics alone catch strong enough sign flips, while fabricated runs that replay genuine statistics look no more anomalous than honest runs to any statistical detector we test. The spot-check catches fully fabricated segments with probability at least $1-(1-s)^k$ for $k$ sampled segments when the draws stay hidden until the run is committed, which roughly matches our measurements and lets a verifier choose $k$ for a target soundness. Verification costs 1.5-2.3x one retraining, mostly for the verifier's reference run; each submission's spot-check takes under 1.5 s, and per-epoch commitments reduce checkpoint storage 5-17x compared with keeping every checkpoint.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:38Z</published>
+    <arxiv:comment>10 pages, 3 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Alexander Nguyen</name>
+    </author>
+    <author>
+      <name>Dylan Gresham</name>
+    </author>
+    <author>
+      <name>Gaby G. Dagher</name>
+    </author>
+    <author>
+      <name>Min Long</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09882v1</id>
+    <title>FlowMoP: Stochastic Multi-Person Motion Prediction</title>
+    <updated>2026-11-06T18:56:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.09882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting the future motion of multiple people is inherently stochastic: the same observed history admits many plausible continuations depending on intent, coordination, and social context. Yet the dominant paradigm in multi-person 3D motion prediction remains deterministic, with existing methods producing a fixed number of outputs per agent. In contrast, we present a conditional flow matching framework that jointly generates diverse future motions for multiple agents, modeling both global trajectories and root-relative poses. A B-spline reparameterization compresses the generative state space while enforcing temporal smoothness, and a dual-stream transformer conditions each agent's predictions on observed neighbor motion for interaction-aware forecasting. Our method achieves state-of-the-art performance on CMU-Mocap (UMPM) and 3DPW, outperforming deterministic baselines on joint position error, pose error, and final displacement error despite producing a full predictive distribution. We additionally establish the first motion prediction baseline on WorldPose, a large-scale professional soccer dataset, where social conditioning demonstrably concentrates predictive uncertainty along interaction-constrained directions.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:56:41Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 22 pages, including references and appendix</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aadya Agrawal</name>
+    </author>
+    <author>
+      <name>Ho Kei Cheng</name>
+    </author>
+    <author>
+      <name>Alexander Schwing</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09880v1</id>
+    <title>ZeoBench: A Benchmark for Self-Supervised Learning on 3D Zeolite Representations</title>
+    <updated>2026-11-06T18:55:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09880v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09880v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zeolites are an important class of porous crystalline materials with broad applications in gas storage, separations, and catalysis. Although hundreds of thousands of experimentally realized and hypothetical zeolite structures are known, identifying materials optimized for a target application remains challenging because property labels are expensive to obtain and available only for limited structure-molecule pairs. While prior work has demonstrated that 3D neural representations can predict zeolite properties effectively, it remains unclear which representation-learning strategies are most effective in the low-data regime relevant to materials discovery. We present ZeoBench, a benchmark for self-supervised learning on dense 3D representations of all-silica zeolites, and evaluate the resulting features on six existing downstream adsorption-property prediction tasks, across a range of training set sizes. Our study compares self-supervised 3D pretraining on volumetric zeolite data, adaptations of image-pretrained 2D ConvNets and vision transformers to 3D via multiview and channel-inflation strategies, and 3D ConvNets pretrained on out-of-domain volumetric datasets, alongside hand-crafted descriptors and supervised baselines. Using our pretraining and evaluation framework, we find self-supervised 3D representations outperform existing methods and achieve state-of-the-art performance across both in-domain label regimes and for the unseen domain of metal organic frameworks. Learned representations consistently outperform hand-crafted descriptors, and convolutional architectures are generally more effective than vision transformers in this setting. These results establish ZeoBench as a practical benchmark for 3D representation learning in zeolites and provide guidance for data-limited adsorption property prediction.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:55:34Z</published>
+    <arxiv:comment>NeurIPS 2026 Datasets and Benchmarks Track</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aaron Sun</name>
+    </author>
+    <author>
+      <name>Yachan Liu</name>
+    </author>
+    <author>
+      <name>Ping Yang</name>
+    </author>
+    <author>
+      <name>Peng Bai</name>
+    </author>
+    <author>
+      <name>Subhransu Maji</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09877v1</id>
+    <title>Locating Contact on Tendon-Driven Continuum Robots From Tendon Measurements Alone via Constrained Moving Horizon Estimation</title>
+    <updated>2026-11-06T18:53:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tendon-driven continuum robots can reach through constrained spaces, but contact along their bodies is invisible to the sensors at their motors. We show that this is a structural limitation rather than a tuning problem: the map from contact forces to tendon measurements has a null space of dimension at least seven, so no estimator that leaves the contact support free can locate contact. When the obstacle geometry is known, however, non-penetration and complementarity make the contact force locally identifiable, and we prove that the resulting system with unknown contact inputs is locally exponentially strongly detectable. We present a constrained moving horizon estimator (MHE) that encodes these conditions and runs in real time as one quadratic program per sample, and we give a local, mode-wise robust stability result for it. In a finite- element benchmark of a two-section robot pressing and sliding on a wall, the estimator located contact to 0.9 mm and estimated contact force to 0.22 N, compared with 65 mm and 0.72 N for a tuned extended Kalman filter (EKF) with state projection. The estimator tolerated millimeter- level errors in the obstacle position and unmodeled wall friction, under which the projected EKF failed. Under randomized model mismatch over 40 trials, including unmodeled tendon friction, it remained better in force and location in every trial. Without contact, the MHE offered no advantage over the EKF, which confirms that its benefit comes from the contact constraints. This report extends a letter submitted to IEEE Control Systems Letters with complete proofs and additional experiments.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:10Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Haitham El-Hussieny</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09872v1</id>
+    <title>On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning</title>
+    <updated>2026-11-06T18:49:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.09872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time reinforcement learning (TTRL) adapts pretrained language models to unlabeled target-domain data using self-generated pseudo-labels, whose reliability remains poorly understood. We analyze majority-vote supervision for TTRL with online Direct Preference Optimization (DPO) and decompose its error into population-majority bias and prompt-dependent finite-rollout variation. Because population-majority bias is generally unidentifiable without external supervision, we focus on mitigating the downstream effects of finite-rollout variation. We propose \emph{Prompt-Conditional Distributionally Robust DPO (PC-Dr.DPO)}, which conditions within-prompt robust reweighting on observed vote reliability to make updates from sampling-sensitive prompts more conservative. We further introduce a cache-based mechanism to reduce self-supervised forgetting during online adaptation. Across six mathematical and knowledge-intensive reasoning benchmarks and five model backbones, PC-Dr.DPO matches or outperforms the strongest TTRL baseline in 24 of 30 settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:49:02Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Ru Wang</name>
+    </author>
+    <author>
+      <name>Yuanyuan Wang</name>
+    </author>
+    <author>
+      <name>Jiaxian Guo</name>
+    </author>
+    <author>
+      <name>Mingming Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09869v1</id>
+    <title>An Empirical Study on Clustering-based Quantum Approximate Optimization Algorithm for Regression Test Case Selection</title>
+    <updated>2026-11-06T18:48:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Regression testing assesses whether software components that have already been developed and tested continue to work correctly after modifications. Ideally, regression testing re-executes the entire test suite after each modification, but this is infeasible in real-world scenarios because of the computational burden; therefore, optimized approaches, such as Test Case Selection, have been developed. The state of the art in regression testing optimization includes both classical approaches, such as Additional Greedy and DIV-GA, and quantum approaches, such as SelectQA, BootQA, and IGDec-QAOA. However, while the former incur high computational costs, the latter are constrained by the physical limitations of currently available quantum machines.
+  This paper extends the evaluation of QAOA-TCS, our quantum approach for the test case selection problem. We thoroughly evaluate its performance, compare it with state-of-the-art classical and quantum approaches, and assess its robustness to quantum noise.
+  The results show that QAOA-TCS outperforms state-of-the-art multi-objective approaches in most cases and maintains stable performance even under high noise levels. In the single-objective formulation, QAOA-based methods perform comparably. In terms of efficiency, our previous method based on quantum annealing, namely SelectQA, is the most efficient for large problems in the multi-objective formulation, whereas QAOA-TCS offers the best trade-off between effectiveness and efficiency in the single-objective formulation when run on realistic noisy simulators. However, such analysis is constrained by the different computational environments used to run the algorithms.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:13Z</published>
+    <arxiv:comment>Manuscript under review at Empirical Software Engineering (EMSE)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Antonio Trovato</name>
+    </author>
+    <author>
+      <name>Martin Beseda</name>
+    </author>
+    <author>
+      <name>Dario Di Nucci</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09868v1</id>
+    <title>CodeQuant2: Enhanced Outlier Mitigation and Adaptive Clustering for Low-Precision LRMs</title>
+    <updated>2026-11-06T18:48:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.09868v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09868v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large reasoning models (LRMs) improve task performance by generating longer intermediate reasoning traces, but this substantially increases inference costs and makes low-precision quantization increasingly important. However, aggressively quantized models often perform poorly on reasoning tasks. We observe larger activation fluctuations during the first decoding steps of reasoning. Calibration that omits these early states may miss their activation fluctuations. To address these reasoning-specific quantization challenges, we propose \textbf{CodeQuant2}, a clustering-based LUT quantization framework for low-precision large reasoning models. CodeQuant2 mitigates activation outliers with rotation and scaling, uses clustering to represent non-uniform weight distributions, and adapts codebook sizes to the quantization difficulty of each layer. Guided by our observation of reasoning-time activation behavior, CodeQuant2 further improves calibration sample selection to better match actual decoding statistics. Combined with our customized LUT CUDA kernel, CodeQuant2 delivers substantial accuracy improvements on reasoning benchmarks while achieving up to $2.85\times$ speedup over BF16.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:04Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xingyu Liu</name>
+    </author>
+    <author>
+      <name>Xiangyang Yin</name>
+    </author>
+    <author>
+      <name>Tianhua Xia</name>
+    </author>
+    <author>
+      <name>Haiyu Wang</name>
+    </author>
+    <author>
+      <name>Sai Qian Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09864v1</id>
+    <title>Grasp-TAGS: Task-Aware Grasp Selection via Critic Distillation for Prehensile Loco-Manipulation</title>
+    <updated>2026-11-06T18:44:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.09864v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09864v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Loco-manipulation, which requires mobile manipulators to coordinate locomotion and manipulation over long horizons, is a key capability for large-object rearrangement in applications such as service robotics and warehouse automation. Despite recent progress, reliably executing these tasks remains challenging because performance depends on complex robot-object and object-environment interaction dynamics. Existing approaches address this challenge either through model-based methods, which often require accurate dynamics models, or through learning-based methods, which reduce this requirement but typically assume a fixed or predefined initial grasp. However, different geometrically stable grasps can lead to substantially different downstream manipulation performance. Therefore, we propose Grasp-TAGS, a task-aware grasp selection framework for goal-conditioned large-object rearrangement. We train a unified PPO-based reinforcement learning policy across multiple initial grasp configurations and distill the learned critic into a lightweight grasp utility network that ranks candidate grasps using only the candidate grasp configuration and goal information. At inference time, we select the grasp with the highest predicted downstream utility for the downstream policy to complete the task, before even making a contact. Experiments demonstrate that Grasp-TAGS improves rearrangement success over both fixed single-grasp policies and random grasp selection, achieving an average success rate of 89.84% compared with 79.87% for the best-performing single-grasp policies, an improvement of 9.97 percentage points. Grasp-TAGS also reduces final orientation errors across all evaluated objects. For more qualitative results, refer to the supplementary webpage: https://rpm-lab-umn.github.io/Grasp-TAGS-web-page/</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:44:33Z</published>
+    <arxiv:comment>10 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Xun Tu</name>
+    </author>
+    <author>
+      <name>Minghao Zou</name>
+    </author>
+    <author>
+      <name>Karthik Desingh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09863v1</id>
+    <title>Flow-Guided Target-Space Alignment via Path Consistency</title>
+    <updated>2026-11-06T18:44:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.09863v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09863v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many multimodal alignment problems require mapping a source modality into a fixed space defined by a target modality, where the target space is not merely an intermediate embedding but is used directly for downstream analysis. In this setting, successful alignment should preserve both the global structure of the target distribution and the instance-level correspondence observed in paired source--target training data. Existing objectives typically address only part of this goal: contrastive losses encourage relative similarity, distribution-matching losses improve marginal agreement, and pointwise regression fits each source sample to its paired target without explicitly modeling target-space path geometry. We propose FlowAlign, a flow-guided target-space alignment method that repurposes conditional flow matching as a training-time alignment signal rather than an inference-time transport model. FlowAlign uses the learned flow field to guide the alignment of source-side representations with the fixed target space, encouraging them to preserve paired correspondence while remaining compatible with the global target-space structure. We further provide theoretical analysis showing how FlowAlign helps improve paired correspondence by controlling endpoint accuracy and capturing local target-space geometry. Experiments on synthetic data, paired single-cell multiome benchmarks, and image--text alignment demonstrate that FlowAlign improves instance level correspondence while preserving target-space structure across different modality settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:44:08Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ruizhi Yuan</name>
+    </author>
+    <author>
+      <name>Zeqiu Yu</name>
+    </author>
+    <author>
+      <name>Wei Gao</name>
+    </author>
+    <author>
+      <name>Wei Chen</name>
+    </author>
+    <author>
+      <name>Xiwei Tang</name>
+    </author>
+    <author>
+      <name>Lu Tang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09860v1</id>
+    <title>Geometric Pairwise Classification of Affine Constraints over Ellipsoidal Regions</title>
+    <updated>2026-11-06T18:42:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09860v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09860v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper presents a deterministic geometric procedure for analysing affine constraints over fixed ellipsoidal regions, motivated by chance-constrained set approximation. Analytical tests classify inequalities as always violated, never violated, or cutting. Pairwise tests determine whether two inequalities can be strictly violated at a common point, yielding a compatibility matrix. The tests follow from quadratic optimisation and the Karush--Kuhn--Tucker conditions, with explicit treatment of tangencies, parallel normals, and degenerate inequalities. The formulation applies in arbitrary finite dimensions and provides geometric information for subsequent bounds on simultaneous sampled violations and safe-region approximation.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:42:13Z</published>
+    <arxiv:comment>6 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Igor M. L. Pataro</name>
+    </author>
+    <author>
+      <name>Martina Mammarella</name>
+    </author>
+    <author>
+      <name>Fabrizio Dabbene</name>
+    </author>
+    <author>
+      <name>Teodoro Alamo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09856v1</id>
+    <title>Lessons from double-plane lenses for galaxy profiles, the Hubble tension, and the mass-sheet degeneracy</title>
+    <updated>2026-11-06T18:40:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.09856v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09856v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Double-plane lenses, like single-plane lenses, are subject to the mass-sheet degeneracy, a fundamental limit to our knowledge of the deflector mass profiles from lensing. However, with a prior on the relative expansion history, unlike in the single-plane case, this degeneracy can be constrained with the modelling of lens images, without the need for time delays, velocity dispersion measurements or a prior on the Hubble constant $H_0$. We show that double-plane lenses are sensitive to a specific combination of the mass-sheet components of the two lens planes. Using literature values of the cosmological scaling factor from the double-plane lenses J0946 and AGEL0353, a measurement from the point-source images of J1721 (the ``Einstein zig-zag'' lens), and a reference value of $Ω_\mathrm{m}$, we show the constraints that can be placed on the mass-sheet component of each of these systems. We show that the additional information brought by images of a second source can improve measurements of $H_0$ from individual time-delay lenses by up to $\sim50\%$, depending on certain key assumptions. Using forecasted Euclid and LSST double-plane lens samples, we show that these samples will enable strong constraints on the population of mass sheets in lens galaxies. Such population constraints will have implications for a range of strong-lensing science applications, in particular in constraining $H_0$, dark energy, and the dark matter profiles of galaxies.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:40:15Z</published>
+    <arxiv:comment>19+5 pages, 18 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Daniel P. Johnson</name>
+    </author>
+    <author>
+      <name>Martin Millon</name>
+    </author>
+    <author>
+      <name>Pierre Fleury</name>
+    </author>
+    <author>
+      <name>Giacomo Queirolo</name>
+    </author>
+    <author>
+      <name>Tian Li</name>
+    </author>
+    <author>
+      <name>Wolfgang J. R. Enzi</name>
+    </author>
+    <author>
+      <name>Daniel J. Ballard</name>
+    </author>
+    <author>
+      <name>Duncan Bowden</name>
+    </author>
+    <author>
+      <name>Thomas E. Collett</name>
+    </author>
+    <author>
+      <name>Daniel Gilman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09851v1</id>
+    <title>Health-System-Wide Mapping of Demographic Information in Routine Clinical Histopathology</title>
+    <updated>2026-11-06T18:34:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.09851v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09851v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The extent to which demographic-associated information is detectable across organs and disease states in routine clinical histopathology remains unclear. Here, we analyzed 1.3 million hematoxylin and eosin whole-slide images from 257,322 patients across 25 organs, using pathology foundation-model representations and multiple-instance learning to systematically map information associated with sex, age group, and self-reported race. Across 69 organ-demographic combinations, demographic attributes were broadly recoverable, with pan-organ mean AUROCs of 0.828 for sex, 0.733 for age group, and 0.662 for self-reported race, and substantial variation across organs. Demographic-class balancing produced relatively small changes in performance, while evaluation within diagnosis-text clusters showed modest attenuation. Under training with diagnosis-based grouping, demographic-associated signals remained detectable across multiple organs, including sex in gastric tissue (AUROC 0.865), age group in breast (0.816), and self-reported race in skin (0.728). Literature-guided analysis of these settings generated candidate histomorphological and contextual explanations for further investigation. Together, these findings provide a systematic map of demographic-associated information in routine histopathology, informing investigations of its sources, assessments of potential shortcut learning, and the development of more interpretable computational pathology models.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:34:51Z</published>
+    <arxiv:comment>35 pages, 4 main figures, 2 supplementary figures, and 10 supplementary tables. Interactive Results Atlas and Hypothesis Explorer accompany the manuscript</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Shengjia Chen</name>
+    </author>
+    <author>
+      <name>Ruchika Verma</name>
+    </author>
+    <author>
+      <name>Kevin Clare</name>
+    </author>
+    <author>
+      <name>Paula Restrepo</name>
+    </author>
+    <author>
+      <name>Jannes Jegminat</name>
+    </author>
+    <author>
+      <name>Eugenia Alleva</name>
+    </author>
+    <author>
+      <name>Kuan-lin Huang</name>
+    </author>
+    <author>
+      <name>Aryeh Stock</name>
+    </author>
+    <author>
+      <name>Brandon Veremis</name>
+    </author>
+    <author>
+      <name>Thomas Fuchs</name>
+    </author>
+    <author>
+      <name>Gabriele Campanella</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09850v1</id>
+    <title>Classical control of quantum-state relaxation in confined molecular hydrogen</title>
+    <updated>2026-11-06T18:34:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.09850v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09850v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum-state conversion between the ortho and para nuclear-spin states of H$_2$ is forbidden in the isolated molecule but these states can become connected through interactions with a surrounding environment. How that same environment governs the dynamics of the newly connected states remains poorly understood. Here, we investigate this problem using H$_2$ confined in crystalline molecular solids, where the host environment selectively enables conversion between a pair of otherwise disconnected ortho-H$_2$ and para-H$_2$ states. Rotationally resolved infrared spectroscopy directly determines the state-specific conversion dynamics in crystalline CO$_2$ and N$_2$O at 10 K, revealing that increasing H$_2$ concentration suppresses nuclear-spin conversion by nearly an order of magnitude, reaching complete suppression by 20% H$_2$ loading. Molecular dynamics and Monte Carlo simulations identify two complementary origins of this concentration dependence: changes in the thermally populated phonon modes available to mediate relaxation, and strain-driven H$_2$ clustering that progressively removes molecules from the host crystal field responsible for enabling conversion. The resulting picture connects a classical collective response of the host to microscopic quantum-state dynamics: H$_2$ loading generates strain that reorganizes the local molecular environment, thereby modifying both the phonon bath and the molecular coupling to that bath. These results establish a multiscale mechanism by which condensed-phase environments can govern the connectivity and dynamics of an effective two-level system.</summary>
+    <category term="physics.chem-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:34:06Z</published>
+    <arxiv:primary_category term="physics.chem-ph"/>
+    <author>
+      <name>Nathan McLane</name>
+    </author>
+    <author>
+      <name>Richard C. Remsing</name>
+    </author>
+    <author>
+      <name>Leah G. Dodson</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09843v1</id>
+    <title>Fifty-Two Shades of Pig: What the UCR Archive Really Asks Classifiers to Do</title>
+    <updated>2026-11-06T18:28:12Z</updated>
+    <link href="https://arxiv.org/abs/2611.09843v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09843v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The pigs were bleeding. That was the point of the experiment: could airway pressure reveal hemorrhage before it became critical? In the UCR Time Series Classification Archive, the de facto benchmark for Time Series Classification (TSC), the same recordings ask a different question: "which of 52 pigs produced this trace?". The dataset PigAirwayPressure is not an outlier. Although the archive is the standard benchmark, whether its tasks resemble the problems TSC is meant to solve has rarely been examined. We find that several datasets are repurposed from their original task, built from toy setups, or have flawed test splits. We further question how representative the archive's ordered non-temporal sequences (e.g. spectra, shape outlines) are of real TSC, and the potential downsides from the decomposition of multivariate problems. Our findings call for more careful interpretation of archive-wide scores and greater attention to deployment-relevant evaluation. The audit is at https://github.com/automl/ucr-provenance-audit.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:28:12Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Omar Swelam</name>
+    </author>
+    <author>
+      <name>Jaris Küken</name>
+    </author>
+    <author>
+      <name>Shi Bin Hoo</name>
+    </author>
+    <author>
+      <name>Frank Hutter</name>
+    </author>
+    <author>
+      <name>Lennart Purucker</name>
+    </author>
+  </entry>
+</feed>

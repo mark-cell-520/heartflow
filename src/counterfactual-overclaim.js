@@ -56,10 +56,13 @@ const RE = {
   // 锚点窄收：刻意不收「之前/先前/此前」——「如果之前的数据有误，现在
   // 一定要回头修正」的「一定」是义务情态而非确定性断言，宽锚会把义务句
   // 扫进谬误族（基线误拦纪律）。
-  CF_CN_A_RE: /(?:如果|若|要是|假如|倘若|倘使|若是|设若|要不是|若非)[^。，？！；\n]{0,12}(?:当初|当时|那时|那年|当年|早年|一开始|最开始|早些时候|早点|最初|早先)/,
+  // [r275 新增族] 口语过去锚（那晚/那天/那阵子/彼时/那当口/早年间）——
+  // 「那晚要是听了劝」「如果那天多留一手」此前双腿判据均不覆盖。
+  CF_CN_A_RE: /(?:如果|若|要是|假如|倘若|倘使|若是|设若|要不是|若非)[^。，？！；\n]{0,12}(?:当初|当时|那时|那年|当年|早年|一开始|最开始|早些时候|早点|最初|早先|那晚|那天|那阵子|彼时|那当口|早年间)/,
 
   // CN-B：过去时点锚先行 → [≤8字] → 连接词/否定动作（「当初要是」「那时如果没」）
-  CF_CN_B_RE: /(?:当初|当时|那时|那年|当年|早年|一开始|最开始|早些时候|早点|最初|早先)[^。，？！；\n]{0,8}(?:如果|若|要是|假如|倘若|若是|没有|没|不)/,
+  // [r275 新增族] 口语过去锚同步扩展（同 CN-A 口径）
+  CF_CN_B_RE: /(?:当初|当时|那时|那年|当年|早年|一开始|最开始|早些时候|早点|最初|早先|那晚|那天|那阵子|彼时|那当口|早年间)[^。，？！；\n]{0,8}(?:如果|若|要是|假如|倘若|若是|没有|没|不)/,
 
   // EN-A：if + 主语 + had（if we had invested…）
   CF_EN_A_RE: /\bif\s+(?:we|i|you|they|he|she)\s+had\b/i,
@@ -71,8 +74,13 @@ const RE = {
   CF_EN_C_RE: /\bif\s+only\s+(?:we|i|you|they)\s+had\b/i,
 
   // 腿② CERT 确定性断言（不含早就/就不会/would have——conditional_proposition 射程）
-  CERT_ZH_RE: /(?:一定|肯定|必然|势必|必定|注定|毫无疑问|毋庸置疑|不容置疑|必将)/,
-  CERT_EN_RE: /\b(?:certainly|definitely|bound\s+to|undoubtedly|without\s+a\s+doubt|no\s+doubt|surely)\b/i,
+  // [r275 新增族] 口语强确定词（铁定/准能/板上钉钉/百分百）——「今天铁定是
+  // 另一番局面」「今天准能全身而退」；刻意不收「绝对」（义务警告形
+  // 「不装风控系统绝对会崩」易误伤，按基线误拦纪律让位）。
+  CERT_ZH_RE: /(?:一定|肯定|必然|势必|必定|注定|毫无疑问|毋庸置疑|不容置疑|必将|必将会|铁定|铁板钉钉|板上钉钉|一准|准能|保管|百分百)/,
+  // [r275 新增族] EN 口语强确定词（guaranteed/certain to/for sure/destined to）
+  // ——「success was guaranteed」「failure was certain to come」
+  CERT_EN_RE: /\b(?:certainly|definitely|bound\s+to|undoubtedly|without\s+a\s+doubt|no\s+doubt|surely|guaranteed(?:\s+to)?|certain(?:\s+to)?|for\s+sure|destined\s+to|sure\s+to)\b/i,
 
   // 豁免常量（可被负例注入置空）
   // 对冲：承认结果不可知（「也许」「谁也说不准」「no one can say」）
@@ -104,10 +112,21 @@ function splitSentences(text) {
 
 // ─── 主检测 ──────────────────────────────────────────────────
 
-function checkCounterfactualOverclaim(text) {
+function checkCounterfactualOverclaim(text, inject) {
   if (typeof text !== 'string' || text.length === 0) {
     return { hit: false, score: 0, count: 0, matches: [], details: '' };
   }
+  // [r275 存量测试性缺口修复] inject 覆盖钩子（与 r272 conjunction-fallacy
+  // 同形态）：此前 RE 是启动时烧死的模块级常量，负例注入完全无法触达，
+  // 本模块新族（口语过去锚/口语强确定词）无删条验证通道。默认行为零变化。
+  const R = inject || {};
+  const CF_CN_A_RE = R.CF_CN_A_RE || RE.CF_CN_A_RE;
+  const CF_CN_B_RE = R.CF_CN_B_RE || RE.CF_CN_B_RE;
+  const CF_EN_A_RE = R.CF_EN_A_RE || RE.CF_EN_A_RE;
+  const CF_EN_B_RE = R.CF_EN_B_RE || RE.CF_EN_B_RE;
+  const CF_EN_C_RE = R.CF_EN_C_RE || RE.CF_EN_C_RE;
+  const CERT_ZH_RE_ = R.CERT_ZH_RE || RE.CERT_ZH_RE;
+  const CERT_EN_RE_ = R.CERT_EN_RE || RE.CERT_EN_RE;
   // 整篇豁免：对冲/拒绝推断/概念转述/结论侧否定不是运用该谬误
   if (RE.HEDGE_ZH_RE.test(text) || RE.HEDGE_EN_RE.test(text)
     || RE.NEGFLIP_ZH_RE.test(text) || RE.NEGFLIP_EN_RE.test(text)
@@ -123,15 +142,15 @@ function checkCounterfactualOverclaim(text) {
     // 疑问句豁免（逐句）
     if (/[?？]/.test(sent)) continue;
 
-    const cfA = RE.CF_CN_A_RE.test(sent);
-    const cfB = RE.CF_CN_B_RE.test(sent);
-    const enA = RE.CF_EN_A_RE.test(sent);
-    const enB = RE.CF_EN_B_RE.test(sent);
-    const enC = RE.CF_EN_C_RE.test(sent);
+    const cfA = CF_CN_A_RE.test(sent);
+    const cfB = CF_CN_B_RE.test(sent);
+    const enA = CF_EN_A_RE.test(sent);
+    const enB = CF_EN_B_RE.test(sent);
+    const enC = CF_EN_C_RE.test(sent);
     if (!(cfA || cfB || enA || enB || enC)) continue;
 
-    const certZh = RE.CERT_ZH_RE.test(sent);
-    const certEn = RE.CERT_EN_RE.test(sent);
+    const certZh = CERT_ZH_RE_.test(sent);
+    const certEn = CERT_EN_RE_.test(sent);
     if (!(certZh || certEn)) continue;
 
     matches.push({

@@ -1,0 +1,364 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/DI7AtDZtHA8iYEeMRTem/zuYSmw</id>
+  <title>arXiv Query: search_query=all:reverse OR all:causation OR all:direction OR all:of OR all:causality OR all:statistical&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T00:50:03Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:reverse+OR+(all:causation+OR+(all:direction+OR+(all:of+OR+(all:causality+OR+all:statistical))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>541245</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09889v1</id>
+    <title>SciCheck: A Framework for Verifying the Integrity of Deep Learning Training</title>
+    <updated>2026-11-06T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.09889v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09889v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deep learning training is difficult to verify within a scientific workflow: its architecture, hyperparameters, and procedure are rarely fixed until training has been attempted, and two honest runs never produce the same weights, so recomputation cannot serve as a check. We present SciCheck, a framework in which the scientist explores training configurations freely and posts a blueprint to a provenance ledger for each candidate they want verified, and a verifying scientist judges the resulting run in two layers: a statistical judge model that compares per-step gradient statistics against the verifier's own reference run, and a spot-check that re-executes randomly chosen training segments whose checkpoints are committed to the ledger one epoch at a time. On an MLP, a CNN, and an autoencoder at 100k-500k parameters, under gradient sign flipping, label poisoning, and fabricated runs, SciCheck reaches F1 of 0.966, 0.906, and 0.976 while rejecting 0-4.4% of honest runs. For the attacks we test, the spot-check accounts for most of this accuracy, and we characterize what each layer can detect. The effective-signal statistic falls as $(1-2s)^2$ under a sign flip of severity $s$, so gradient statistics alone catch strong enough sign flips, while fabricated runs that replay genuine statistics look no more anomalous than honest runs to any statistical detector we test. The spot-check catches fully fabricated segments with probability at least $1-(1-s)^k$ for $k$ sampled segments when the draws stay hidden until the run is committed, which roughly matches our measurements and lets a verifier choose $k$ for a target soundness. Verification costs 1.5-2.3x one retraining, mostly for the verifier's reference run; each submission's spot-check takes under 1.5 s, and per-epoch commitments reduce checkpoint storage 5-17x compared with keeping every checkpoint.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:38Z</published>
+    <arxiv:comment>10 pages, 3 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Alexander Nguyen</name>
+    </author>
+    <author>
+      <name>Dylan Gresham</name>
+    </author>
+    <author>
+      <name>Gaby G. Dagher</name>
+    </author>
+    <author>
+      <name>Min Long</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09886v1</id>
+    <title>Directed systems of A-spaces and weak cores</title>
+    <updated>2026-11-06T18:58:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.09886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove that for any regular CW-complex $X$ there exists a quotient map $X\to Y$ that is a weak homotopy equivalence and which is minimal with that property, meaning that any quotient $Y\to Z$ that is a weak equivalence, must be a homeomorphism. The space $Y$ we obtain is an Alexandroff space: a space in which arbitrary intersections of open sets are open. The weak core $Y$ of $X$ is not unique in general. We study homotopy invariants preserved by filtered colimits of Alexandroff spaces. This can be seen as an analogous to Stong's theory of cores of finite topological spaces.</summary>
+    <category term="math.AT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:06Z</published>
+    <arxiv:comment>21 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="math.AT"/>
+    <author>
+      <name>Jonathan Ariel Barmak</name>
+    </author>
+    <author>
+      <name>Juan Galotto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09884v1</id>
+    <title>VLT and Keck recovery and characterisation of 2025 SC$_{79}$: linking 'Ayló'chaxnim and Atira asteroids</title>
+    <updated>2026-11-06T18:57:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09884v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09884v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Asteroids near the boundary between the Atira and 'Ayló'chaxnim classes can trace dynamical links between the two populations, but their small solar elongations make recovery and physical characterisation difficult. We recover 2025 SC$_{79}$, measure its optical colours, and investigate its likely source region and transitions between these populations. We combine Keck/LRIS astrometry and VLT/FORS2 four-filter photometry with Bus-DeMeo taxonomic comparisons, published source-model probabilities, and integrations of 10,000 clones drawn from the covariance of JPL solution #2 and followed for 5 Myr in each direction. The SDSS-equivalent colours are $g-r=0.8254_{-0.1339}^{+0.2136}$, $r-i=0.1764_{-0.0540}^{+0.0523}$ and $i-z=-0.4975_{-0.1162}^{+0.1055}$ mag. The V-type class mean gives the closest colour match. At the V-type median albedo $p_V=0.362$, $H=18.83\pm0.15$ mag implies a diameter of $0.379^{+0.027}_{-0.025}$ km. The source model assigns a combined probability of 95.4% to delivery channels associated with the inner Main Belt. The ensemble-mean 'Ayló'chaxnim/Atira residence fractions are 30.2%/69.8% over the preceding 100 kyr and 3.6%/96.0% over the following 100 kyr; the remaining 0.4% of future ensemble time follows collision removal. Clones spend an average of 231 kyr in the 'Ayló'chaxnim class over the preceding 500 kyr and 120 kyr over the following 500 kyr. In the 5-Myr forward integrations, 14.56% of clones collide with Venus, 3.77% with Mercury and 0.22% with Earth. The V-like colours and source-model probabilities favour an origin in the inner Main Belt for 2025 SC$_{79}$. Its clones move between the 'Ayló'chaxnim and Atira populations.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:57:13Z</published>
+    <arxiv:comment>10 pages, 7 figures, 4 tables, including appendices. Submitted to A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Bryce T. Bolin</name>
+    </author>
+    <author>
+      <name>Leo Y. Alcorn</name>
+    </author>
+    <author>
+      <name>Davide Farnocchia</name>
+    </author>
+    <author>
+      <name>Marco Delbo</name>
+    </author>
+    <author>
+      <name>Martina Baratella</name>
+    </author>
+    <author>
+      <name>Henri M. J. Boffin</name>
+    </author>
+    <author>
+      <name>Max Brodheim</name>
+    </author>
+    <author>
+      <name>Alexa Gordon</name>
+    </author>
+    <author>
+      <name>Lordrick Kahinga</name>
+    </author>
+    <author>
+      <name>Michael Lundquist</name>
+    </author>
+    <author>
+      <name>Rita Morris</name>
+    </author>
+    <author>
+      <name>J. Xavier Prochaska</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09882v1</id>
+    <title>FlowMoP: Stochastic Multi-Person Motion Prediction</title>
+    <updated>2026-11-06T18:56:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.09882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting the future motion of multiple people is inherently stochastic: the same observed history admits many plausible continuations depending on intent, coordination, and social context. Yet the dominant paradigm in multi-person 3D motion prediction remains deterministic, with existing methods producing a fixed number of outputs per agent. In contrast, we present a conditional flow matching framework that jointly generates diverse future motions for multiple agents, modeling both global trajectories and root-relative poses. A B-spline reparameterization compresses the generative state space while enforcing temporal smoothness, and a dual-stream transformer conditions each agent's predictions on observed neighbor motion for interaction-aware forecasting. Our method achieves state-of-the-art performance on CMU-Mocap (UMPM) and 3DPW, outperforming deterministic baselines on joint position error, pose error, and final displacement error despite producing a full predictive distribution. We additionally establish the first motion prediction baseline on WorldPose, a large-scale professional soccer dataset, where social conditioning demonstrably concentrates predictive uncertainty along interaction-constrained directions.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:56:41Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 22 pages, including references and appendix</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aadya Agrawal</name>
+    </author>
+    <author>
+      <name>Ho Kei Cheng</name>
+    </author>
+    <author>
+      <name>Alexander Schwing</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09881v1</id>
+    <title>Unraveling square and kagome lattice frustrated magnetism by scalable tensor networks</title>
+    <updated>2026-11-06T18:56:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.09881v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09881v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We extend the scalability of variational infinite two-dimensional tensor network methods with application to investigate frustrated magnetism of the square-lattice $J_1$-$J_2$ model and kagome-lattice Heisenberg model. In the sign-problem-free limit of the square-lattice model, we achieve high ground-state energy precision comparable to quantum Monte Carlo methods. With no obstruction beyond this limit, our method obtains direct estimates of order parameters. For the square-lattice $J_1$-$J_2$ model, we determine isotropic plaquette order in the valence-bond solid region. For the model near $J_2/J_1=0.5$, and the kagome lattice Heisenberg model, our data indicate linear-dispersion gapless states. To probe the candidate spin-liquid nature of the highly frustrated cases, we go beyond inferring the absence of symmetry-breaking orders and analyze susceptibilities that characterize gapless spin liquids. By estimating scaling dimensions, our data indicate a stable gapless spin liquid on the kagome lattice, and competing scenarios for the intermediate regime of the square-lattice model. Our developments include parallelization and randomized low-rank methods and largely expand the frontier of high-precision variational numerics for quantum phases of matter.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:56:33Z</published>
+    <arxiv:comment>5+3+12 pages</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>Xing-Yu Zhang</name>
+    </author>
+    <author>
+      <name>Jutho Haegeman</name>
+    </author>
+    <author>
+      <name>Yuchi He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09872v1</id>
+    <title>On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning</title>
+    <updated>2026-11-06T18:49:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.09872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time reinforcement learning (TTRL) adapts pretrained language models to unlabeled target-domain data using self-generated pseudo-labels, whose reliability remains poorly understood. We analyze majority-vote supervision for TTRL with online Direct Preference Optimization (DPO) and decompose its error into population-majority bias and prompt-dependent finite-rollout variation. Because population-majority bias is generally unidentifiable without external supervision, we focus on mitigating the downstream effects of finite-rollout variation. We propose \emph{Prompt-Conditional Distributionally Robust DPO (PC-Dr.DPO)}, which conditions within-prompt robust reweighting on observed vote reliability to make updates from sampling-sensitive prompts more conservative. We further introduce a cache-based mechanism to reduce self-supervised forgetting during online adaptation. Across six mathematical and knowledge-intensive reasoning benchmarks and five model backbones, PC-Dr.DPO matches or outperforms the strongest TTRL baseline in 24 of 30 settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:49:02Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Ru Wang</name>
+    </author>
+    <author>
+      <name>Yuanyuan Wang</name>
+    </author>
+    <author>
+      <name>Jiaxian Guo</name>
+    </author>
+    <author>
+      <name>Mingming Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09868v1</id>
+    <title>CodeQuant2: Enhanced Outlier Mitigation and Adaptive Clustering for Low-Precision LRMs</title>
+    <updated>2026-11-06T18:48:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.09868v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09868v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large reasoning models (LRMs) improve task performance by generating longer intermediate reasoning traces, but this substantially increases inference costs and makes low-precision quantization increasingly important. However, aggressively quantized models often perform poorly on reasoning tasks. We observe larger activation fluctuations during the first decoding steps of reasoning. Calibration that omits these early states may miss their activation fluctuations. To address these reasoning-specific quantization challenges, we propose \textbf{CodeQuant2}, a clustering-based LUT quantization framework for low-precision large reasoning models. CodeQuant2 mitigates activation outliers with rotation and scaling, uses clustering to represent non-uniform weight distributions, and adapts codebook sizes to the quantization difficulty of each layer. Guided by our observation of reasoning-time activation behavior, CodeQuant2 further improves calibration sample selection to better match actual decoding statistics. Combined with our customized LUT CUDA kernel, CodeQuant2 delivers substantial accuracy improvements on reasoning benchmarks while achieving up to $2.85\times$ speedup over BF16.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:04Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xingyu Liu</name>
+    </author>
+    <author>
+      <name>Xiangyang Yin</name>
+    </author>
+    <author>
+      <name>Tianhua Xia</name>
+    </author>
+    <author>
+      <name>Haiyu Wang</name>
+    </author>
+    <author>
+      <name>Sai Qian Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09865v1</id>
+    <title>Emergence and polymer physics of the center-vortex network: Confronting SU(4) lattice Yang-Mills theory</title>
+    <updated>2026-11-06T18:45:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.09865v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09865v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The geometric organization and statistical properties of center-vortex networks provide a window into the infrared dynamics underlying confinement in Yang-Mills theory. Motivated by this connection, we investigate new consequences of a previously proposed confinement mechanism based on physically equivalent elementary Cartan fluxes. We show that, in the percolating phase, these fluxes dynamically reorganize into center-charge sectors whose dominant vortex tensions satisfy a Casimir scaling law, similar to that observed for confining string tensions. We then confront this result with the first nontrivial Yang-Mills case: the doubly charged vortex chains recently observed in SU(4) lattice simulations. To extract the parameters needed to connect the lattice ensemble with the effective description, we characterize how center-vortex chains grow and bend in SU(3) and SU(4) using polymer-inspired techniques not previously applied to center vortices. We find good quantitative agreement for the SU(4) doubly charged sector, providing further evidence for the proposed mechanism.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:45:23Z</published>
+    <arxiv:comment>40 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Luis E. Oxman</name>
+    </author>
+    <author>
+      <name>Jackson A. Mickley</name>
+    </author>
+    <author>
+      <name>Derek B. Leinweber</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09855v1</id>
+    <title>Raman anyon-Hubbard model in a 1D Bose lattice gas</title>
+    <updated>2026-11-06T18:38:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.09855v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09855v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The anyon-Hubbard model is the paradigmatic lattice model of one-dimensional (1D) anyons, in which chiral interactions make bosons equivalent to particles with fractional statistics. Its continuum limit, the chiral BF theory, emerges as the low-energy description of a Raman-coupled Bose gas with imbalanced interactions. Here, we show that loading such a gas into a 1D optical lattice realizes the lattice counterpart of this theory, which we name the Raman anyon-Hubbard model. The Raman-dressed bosons acquire density-dependent Peierls phases when tunneling through occupied sites. For a small statistical phase, the model reduces to the anyon-Hubbard model, while beyond this limit it defines a distinct lattice anyon model with unbounded rather than periodic statistical interactions. Numerically, we show that the dressed gas displays the defining properties of 1D anyons, namely a density-dependent asymmetry of the ground-state momentum distribution, interaction-induced asymmetric transport and chiral bound states. Remarkably, these features are readily accessible with Raman-coupled $^{39}$K atoms, opening up the experimental exploration of 1D anyons beyond the few-particle regime.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:38:32Z</published>
+    <arxiv:comment>10 pages + appendix, 5 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Josep Cabedo</name>
+    </author>
+    <author>
+      <name>Claudio Iacovelli</name>
+    </author>
+    <author>
+      <name>Leticia Tarruell</name>
+    </author>
+    <author>
+      <name>Alessio Celi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09844v1</id>
+    <title>Local fluctuations, majorization, and nontransitivity in cube tilings of $\mathbb{Z}^d$</title>
+    <updated>2026-11-06T18:28:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.09844v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09844v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let $\mathcal{P}$ be a partition of $\mathbb{Z}^d$ into translates of the discrete unit cube $\{0,1\}^d$. For a uniformly chosen $\varepsilon\in\{0,1\}^d$, we count the cubes of $\mathcal{P}$ entirely contained in the observation window $[0,3]^d+\varepsilon$. The resulting score has mean $(3/2)^d$ for every partition, while its distribution reflects the geometry of the tiling. Comparing two such scores, with the shifts chosen independently, defines a game in which the larger score wins. In dimension $d=4$, we construct a geometric realization of the Steinhaus--Trybuła paradox: three periodic partitions form a cycle in which each beats the next with probability strictly greater than $1/2$. We describe local configurations by finite cube tiling codes and prove that every resulting list of counts is majorized by that of the simple code $C_d=\{0,2\}^d$. Nevertheless, every non-simple code differing from $C_d$ in only two coordinate directions beats it, with a sharp lower bound on the winning margin. We also show that the ratio of wins to losses of $C_d$ has limit superior at most $1$ as the dimension tends to infinity, uniformly over opposing codes. For $4\mathbb{Z}^d$-periodic tilings, changing the window size can repeatedly reverse the winner, but the winning margin eventually stabilizes separately for side lengths $4m+1$ and $4m+3$.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:28:31Z</published>
+    <arxiv:comment>30 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Andrzej P. Kisielewicz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09839v1</id>
+    <title>Gibbsian Entropy for General Wigner Distributions</title>
+    <updated>2026-11-06T18:25:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.09839v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09839v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose a definition of non-equilibrium Gibbsian entropy applicable to general quantum systems, computable from Wigner functions, for both Gaussian and non-Gaussian states. We show that while the Wigner function is a quasi-probability distribution, fundamental results linking observables in repeated observations to the function, such as the law of large numbers, the central limit theorem and, crucially, the relation between the entropy and the cumulant generating function continue to apply. This ideas are the core of the large deviation theory, which allow to formulate a positive-definite definition of entropy based on our ignorance of the underlying state structure after repeated measurements of cumulants. This new definition is a parallel to the Gibbs entropy formulation, but it can also be used in out-of-equilibrium regimes. Some important properties of this entropy are discussed. In addition we derive some information theory quantities such as relative entropy, conditional entropy, mutual information and Rényi entropy. We then compare the results with Wehrl entropy for the 1D harmonic oscillator, for pure and mixed states. We conclude the the work discussing potential applications of this new formalism, ranging from quantum correlations beyond entanglement to thermalization in closed quantum systems.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:25:35Z</published>
+    <arxiv:comment>19 pages, 2 figures. Comments are welcome!</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Gabriel Rabelo-Soares</name>
+    </author>
+    <author>
+      <name>Yevgeniy Kovchegov</name>
+    </author>
+    <author>
+      <name>Giorgio Torrieri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09829v1</id>
+    <title>Odd Loops: What Structures Can Produce a Parity-Violating Inflationary Trispectrum?</title>
+    <updated>2026-11-06T18:16:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.09829v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09829v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Non-Gaussian perturbations generated during inflation can often be described perturbatively via integrals of kernels acting on Gaussian fields. In this work, we investigate, in a model-independent manner, whether these kernels can produce parity-violating (PV) contributions to the trispectrum, and which Wick's theorem contraction configurations of the Gaussian fields lead to them. In detail, we evaluate all possible contraction configurations arising from the third- and second-order density perturbations. We find that, for the third-order perturbations, only one configuration can support PV contributions, as it retains three independent wave-vectors. In contrast, none of the four second-order perturbation contraction configurations can produce a PV contribution under statistical isotropy. These results offer a first step toward deriving kernels from inflationary models capable of generating a PV trispectrum. Such kernels could then be used to perform PV searches with current and upcoming galaxy redshift surveys such as DESI, Roman, SPHEREx, and Euclid, and photometric efforts such as LSST. Our results also offer a guide for exploration of PV with CMB data-sets such as Planck.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:16:06Z</published>
+    <arxiv:comment>13 pages, 2 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>William Ortolá Leonard</name>
+    </author>
+    <author>
+      <name>Zachary Slepian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09817v1</id>
+    <title>Machine learning for lattice QCD</title>
+    <updated>2026-11-06T18:05:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.09817v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09817v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning (ML) methods have been explored as a means of optimizing lattice field theory calculations, with increasing interest in recent years. This chapter gives an introduction and summary to the use of ML methods to optimize lattice field theory without introducing any uncontrolled approximations. We focus on those directions which are clearly established as of late 2025, marking the 50th anniversary of the beginning of the study of lattice gauge theory. This chapter is a contribution to the online book ``Lattice QCD at 50 years,'' (LQCD@50), edited by Tanmoy Bhattacharya, Maarten Golterman, Rajan Gupta, Laurent Lellouch, and Steve Sharpe.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:05:06Z</published>
+    <arxiv:comment>47 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Gurtej Kanwar</name>
+    </author>
+    <author>
+      <name>Scott Lawrence</name>
+    </author>
+    <author>
+      <name>Alessandro Nada</name>
+    </author>
+    <author>
+      <name>Phiala Shanahan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09814v1</id>
+    <title>Arrival-time problem in the quantum information era - observation of a Zeno crossover in monitored arrival-time distributions</title>
+    <updated>2026-11-06T18:01:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.09814v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09814v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When does a quantum particle arrive at a detector? The temporal distributions of itinerant quantum particles have been debated since the birth of quantum mechanics. Here we study the arrival-time problem in periodically monitored spin chains and quantum circuits. The arrival dynamics exhibits two regimes, the quantum Zeno and the low-monitoring regime, separated by an optimal monitoring period set by the single-particle bandwidth. In support of the theory, on superconducting quantum hardware, we measure arrival-time distributions for single and multiple interacting particles in one- and two-dimensional circuits. The measured distributions resolve both regimes and agree closely with quantum-trajectory theory. The crossover persists in interacting many-particle systems: the optimal monitoring point is preserved while many-body interference reshapes the distributions. Zeno suppression likewise persists in two-dimensional geometry. Together, these results show that the two regimes are a generic feature of monitored propagation rather than a single-particle effect. To our knowledge, our work constitutes the first experimental measurement of arrival-time distributions in a monitored quantum transport setting, addressing one of the longest-standing problems in quantum mechanics.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:01:07Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Yousef Mafi</name>
+    </author>
+    <author>
+      <name>K. G. S. H. Gunawardana</name>
+    </author>
+    <author>
+      <name>Kim Pöyhönen</name>
+    </author>
+    <author>
+      <name>Teemu Ojanen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09811v1</id>
+    <title>Spectral Rigidity of Stochastic Operators with Heavy Tailed Perturbations</title>
+    <updated>2026-11-06T17:59:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.09811v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09811v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we provide a new set of tools for establishing the number rigidity of point processes which are particularly well suited for the spectral processes of stochastic operators. These tools allow one to prove the number rigidity of a wide class of stochastic operators that had been previously inaccessible to the standard methods in the area, such as the variance of linear statistics, which require being able to precisely analyze correlations between individual points. We propose an alternative mechanism which uses a pathwise comparison between the growth rate of the unperturbed eigenvalues and the cumulative random noise which allows one to convert the probabilistic problem into a more tractable perturbation theory problem. This new approach allows us to prove the rigidity of previously inaccessible operators including those with heavy tailed perturbations or complex correlation structures. As a demonstration, we use these tools to prove the number rigidity of new classes of stochastic Schrödinger and Sturm-Liouville Operators which are resistant to analysis using the standard rigidity toolkit.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T17:59:46Z</published>
+    <arxiv:comment>12 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Youssef Djellouli</name>
+    </author>
+  </entry>
+</feed>

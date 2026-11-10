@@ -108,7 +108,11 @@
 // 动作（止痛药的肝损伤是直接药理效应，不属本族；加息/降息方向在现实
 // 争论中双向都被主张，不收录）。
 const RESP_ZH = [
-  /住院|就医|看病|看医生|上医院|挂诊|吃药|服药|打针|输液|做手术|动手术|化疗|透析|吃安眠药|吃止痛药|吃抗抑郁药|看心理医生|心理咨询|心理治疗|接受治疗|报警|报案|投诉|维权|申诉|上诉|打官司|起诉|补习|补课|辅导班|请家教|复读|考研|约谈|诫勉|隔离|封控|封城|封锁|静态管理|戴口罩|头盔|戴头盔|装监控|安装监控|装防盗窗|装防盗门|买保险|投保|体检|筛查|裁员|裁撤|下岗|辞退|封号|禁言|下架|整顿|整改|检修|返工|止损|割肉|平仓|抢救|救援|灭火|装护栏|立规矩|定规章/,
+  /住院|就医|看病|看医生|上医院|挂诊|吃药|服药|打针|输液|做手术|动手术|化疗|透析|吃安眠药|吃止痛药|吃抗抑郁药|看心理医生|心理咨询|心理治疗|接受治疗|报警|报案|投诉|维权|申诉|上诉|打官司|起诉|补习|补课|辅导班|请家教|复读|考研|约谈|诫勉|隔离|封控|封城|封锁|静态管理|戴口罩|头盔|戴头盔|装监控|安装监控|装防盗窗|装防盗门|买保险|投保|体检|筛查|裁员|裁撤|下岗|辞退|封号|禁言|下架|整顿|整改|检修|返工|止损|割肉|平仓|抢救|救援|灭火|装护栏|立规矩|定规章|助听器|拄拐|轮椅|假肢|护膝|护腰|护腕|支具|矫姿器|背背佳|[Oo][Kk]镜|角膜塑形镜|离焦镜|近视手术|激光手术|正畸|整牙|箍牙|种牙|根管|针灸|推拿|拔罐|艾灸|理疗|康复训练|戒毒|戒毒所|强制戒毒|戒断|戒酒|美沙酮|写检查|记过|处分|停课|请家长|补考|重修|补作业|查征信|拉征信|调流水|报险|理赔|核保|索赔|反诈|防骗教育|安全教育|延保|质保|召回|返厂|风控|反欺诈/,
+  // [r275 新增族·并入上方 r174 首族元素内] 医疗辅具/戒断治疗/纪律处分/征信风控/
+  // 反诈宣传类应对行为（其「后果」恰是触发它的处境——后果筛出行为人）。
+  // 裸词形态：助听器/拄拐/OK镜/戒毒/补考/查征信/反诈/风控/延保 去前后缀仍命中。
+  // 按 round-266 登记纪律并入既有元素（RESP_ZH 恒 2 条），不新增数组元素。
   // [r266 新增族] 风险焦虑/信息恐慌触发的应对行为（其"后果"恰是触发它的处境）
   // 自查：不收疫苗族——疫苗相关因果话语在公共讨论中高度极化，边际覆盖增益
   // 小于误伤面，按 r161 口径让位给人工审查（gate verify 由其他维度兜）。
@@ -122,7 +126,7 @@ const RESP_ZH = [
 // （无「的」约束的「公司裁员」式巧合邻近会造成误配——「裁员之后公司
 // 效益好转」因此不判）。
 const GROUP_DE_ZH = [
-  /的(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人)|(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人)的/,
+  /的(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人|车主|船主|货主|买家|患者家属|家长群|业主群)|(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人|车主|船主|货主|买家|患者家属)的/,
 ];
 
 // ─── 腿① R-a 差异/相关标记（中文）────────────────────────────────────
@@ -145,7 +149,7 @@ const RESULT_ZH = [
 
 // ─── 英文侧腿① ───────────────────────────────────────────────────────
 const RESP_EN = [
-  /\b(?:hospitali[sz]ed?|hospitali[sz]ation|in\s+hospital|hospital\s+care|admitted|admission|seeing\s+a\s+doctor|doctor'?s\s+visits?|taking\s+(?:sleeping\s+)?pills?|medication|therapy|psychological\s+(?:treatment|help|counseling)|counseling|sessions?|calling\s+the\s+police|police\s+reports?|reporting|complaints?|lawsuits?|suing|tutoring|cram\s+school|private\s+lessons?|wearing\s+(?:a\s+)?(?:mask|helmets?|seatbelts?)|security\s+cameras?|alarms?|insurance|layoffs?|downsizing|being\s+(?:fired|banned|blocked|suspended)|quarantine|lockdown|screenings?|antidepressants?|painkillers?)\b/i,
+  /\b(?:hospitali[sz]ed?|hospitali[sz]ation|in\s+hospital|hospital\s+care|admitted|admission|seeing\s+a\s+doctor|doctor'?s\s+visits?|taking\s+(?:sleeping\s+)?pills?|medication|therapy|psychological\s+(?:treatment|help|counseling)|counseling|sessions?|calling\s+the\s+police|police\s+reports?|reporting|complaints?|lawsuits?|suing|tutoring|cram\s+school|private\s+lessons?|wearing\s+(?:a\s+)?(?:mask|helmets?|seatbelts?)|security\s+cameras?|alarms?|insurance|layoffs?|downsizing|being\s+(?:fired|banned|blocked|suspended)|quarantine|lockdown|screenings?|antidepressants?|painkillers?|hearing\s+aids?|crutches|knee\s+supports?|wheelchairs?|prosthetics|drug\s+rehab|rehab|anti-fraud(?:\s+apps?)?|fraud[- ]prevention(?:\s+(?:education|programs?|campaigns?))?|safety\s+education|extended\s+warrant\w+|credit\s+checks?|background\s+checks?|claims?)\b/i,
   // [r266 新增族] 风险焦虑/财产防护触发的应对行为（同 ZH 侧囤货族）
   /\b(?:doorbell\s+cameras?|ring\s+cameras?|vitamin\s+supplements?|security\s+guards?|panic\s+buying|stockpiling|hoarding|air\s+purifiers?|water\s+filters?|pepper\s+spray|self-?defense\s+(?:classes?|training))\b/i,
 ];

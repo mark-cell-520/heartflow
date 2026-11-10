@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/Aloub/wLmbW1E+vjZTf5HljGhGs</id>
+  <title>arXiv Query: search_query=all:causal OR all:reasoning OR all:counterfactual OR all:overclaim OR all:fallacy OR all:LLM OR all:benchmark&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T00:49:58Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:causal+OR+(all:reasoning+OR+(all:counterfactual+OR+(all:overclaim+OR+(all:fallacy+OR+(all:LLM+OR+all:benchmark)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>333467</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09892v1</id>
+    <title>On Agentic Manipulation Policies</title>
+    <updated>2026-11-06T18:59:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09892v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09892v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent work on robot manipulation has focused on specialist policies trained on demonstrations. We show that generalist AI models can control manipulators more reliably than specialist policies such as vision-language-action models (VLAs) and world-action models (WAMs). We systematically analyze agentic manipulation policies (AMPs), in which a generalist AI model commands the manipulator directly, adapting its actions as the task unfolds. We present AMP1, a reference harness that runs unchanged across single-arm, bimanual, and mobile manipulation. AMP1 achieves state-of-the-art results on the RoboLab-120 and CaP-Gym benchmarks, with no demonstrations or task-specific training. On RoboLab-120, AMP1 reaches an 85.6\% success rate zero-shot, compared to 49.2\% and 42.9\% for leading VLA and WAM policies. The agent succeeds zero-shot in 104 of 108 real-world trials spanning twelve tasks and three robot instances, reducing failure rates by 20x and 15x relative to strong VLA and WAM baselines. The basic harness supplies no grasping, pushing, or placing skills; the agent develops its own strategies, such as searching for hidden objects, using objects as tools, and calibrating its cameras. With the addition of a persistent memory store, the agent can also learn from experience: an augmented harness with a memory representation that is carried across episodes lowers the failure rate on RoboDojo bimanual manipulation tasks by 4.6x relative to zero-shot deployment. Our analysis suggests that AMPs are substantially more general and robust than specialist manipulation policies, providing a promising foundation for robot manipulation.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:59:34Z</published>
+    <arxiv:comment>Videos and code available at: https://apple-aiml-research.github.io/ml-amp/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Chen Chen</name>
+    </author>
+    <author>
+      <name>Omid Bagherieh</name>
+    </author>
+    <author>
+      <name>Naveen Nikamanth Appiah Balaji</name>
+    </author>
+    <author>
+      <name>Jesse T. Gonzalez</name>
+    </author>
+    <author>
+      <name>Negin Heravi</name>
+    </author>
+    <author>
+      <name>Fahad Islam</name>
+    </author>
+    <author>
+      <name>Xueting Li</name>
+    </author>
+    <author>
+      <name>Jean-Baptiste Regli</name>
+    </author>
+    <author>
+      <name>Kejia Ren</name>
+    </author>
+    <author>
+      <name>Petr Švec</name>
+    </author>
+    <author>
+      <name>David J. Yoon</name>
+    </author>
+    <author>
+      <name>Matthias Müller</name>
+    </author>
+    <author>
+      <name>Vladlen Koltun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09891v1</id>
+    <title>CPU-ARC: Agentic Reasoning Caching for on-CPU Reasoning Reuse</title>
+    <updated>2026-11-06T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.09891v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09891v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models reinvent the wheel all the time. They conflate task-solving with the execution of the solutions, which forces them to solve every problem from scratch. We show that once a task has been reasoned through, the application of its solution to a new problem instance can be done very efficiently and with little involvement from language models. We introduce agentic reasoning caching, a method for constructing robust CPU-executable agentic reasoning caches (ARCs) from LLM reasoning traces. ARCs show on-par performance with frontier LLMs across a range of difficult mathematical and scientific tasks, are fully explainable, continually trainable, robust to input perturbations, and 16-291x cheaper to invoke than the source model.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:50Z</published>
+    <arxiv:comment>Tech report. 28 pages, 9 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peter Belcak</name>
+    </author>
+    <author>
+      <name>Greg Heinrich</name>
+    </author>
+    <author>
+      <name>Saurav Muralidharan</name>
+    </author>
+    <author>
+      <name>Shizhe Diao</name>
+    </author>
+    <author>
+      <name>Pavlo Molchanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09880v1</id>
+    <title>ZeoBench: A Benchmark for Self-Supervised Learning on 3D Zeolite Representations</title>
+    <updated>2026-11-06T18:55:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09880v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09880v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zeolites are an important class of porous crystalline materials with broad applications in gas storage, separations, and catalysis. Although hundreds of thousands of experimentally realized and hypothetical zeolite structures are known, identifying materials optimized for a target application remains challenging because property labels are expensive to obtain and available only for limited structure-molecule pairs. While prior work has demonstrated that 3D neural representations can predict zeolite properties effectively, it remains unclear which representation-learning strategies are most effective in the low-data regime relevant to materials discovery. We present ZeoBench, a benchmark for self-supervised learning on dense 3D representations of all-silica zeolites, and evaluate the resulting features on six existing downstream adsorption-property prediction tasks, across a range of training set sizes. Our study compares self-supervised 3D pretraining on volumetric zeolite data, adaptations of image-pretrained 2D ConvNets and vision transformers to 3D via multiview and channel-inflation strategies, and 3D ConvNets pretrained on out-of-domain volumetric datasets, alongside hand-crafted descriptors and supervised baselines. Using our pretraining and evaluation framework, we find self-supervised 3D representations outperform existing methods and achieve state-of-the-art performance across both in-domain label regimes and for the unseen domain of metal organic frameworks. Learned representations consistently outperform hand-crafted descriptors, and convolutional architectures are generally more effective than vision transformers in this setting. These results establish ZeoBench as a practical benchmark for 3D representation learning in zeolites and provide guidance for data-limited adsorption property prediction.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:55:34Z</published>
+    <arxiv:comment>NeurIPS 2026 Datasets and Benchmarks Track</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aaron Sun</name>
+    </author>
+    <author>
+      <name>Yachan Liu</name>
+    </author>
+    <author>
+      <name>Ping Yang</name>
+    </author>
+    <author>
+      <name>Peng Bai</name>
+    </author>
+    <author>
+      <name>Subhransu Maji</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09877v1</id>
+    <title>Locating Contact on Tendon-Driven Continuum Robots From Tendon Measurements Alone via Constrained Moving Horizon Estimation</title>
+    <updated>2026-11-06T18:53:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tendon-driven continuum robots can reach through constrained spaces, but contact along their bodies is invisible to the sensors at their motors. We show that this is a structural limitation rather than a tuning problem: the map from contact forces to tendon measurements has a null space of dimension at least seven, so no estimator that leaves the contact support free can locate contact. When the obstacle geometry is known, however, non-penetration and complementarity make the contact force locally identifiable, and we prove that the resulting system with unknown contact inputs is locally exponentially strongly detectable. We present a constrained moving horizon estimator (MHE) that encodes these conditions and runs in real time as one quadratic program per sample, and we give a local, mode-wise robust stability result for it. In a finite- element benchmark of a two-section robot pressing and sliding on a wall, the estimator located contact to 0.9 mm and estimated contact force to 0.22 N, compared with 65 mm and 0.72 N for a tuned extended Kalman filter (EKF) with state projection. The estimator tolerated millimeter- level errors in the obstacle position and unmodeled wall friction, under which the projected EKF failed. Under randomized model mismatch over 40 trials, including unmodeled tendon friction, it remained better in force and location in every trial. Without contact, the MHE offered no advantage over the EKF, which confirms that its benefit comes from the contact constraints. This report extends a letter submitted to IEEE Control Systems Letters with complete proofs and additional experiments.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:10Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Haitham El-Hussieny</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09872v1</id>
+    <title>On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning</title>
+    <updated>2026-11-06T18:49:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.09872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time reinforcement learning (TTRL) adapts pretrained language models to unlabeled target-domain data using self-generated pseudo-labels, whose reliability remains poorly understood. We analyze majority-vote supervision for TTRL with online Direct Preference Optimization (DPO) and decompose its error into population-majority bias and prompt-dependent finite-rollout variation. Because population-majority bias is generally unidentifiable without external supervision, we focus on mitigating the downstream effects of finite-rollout variation. We propose \emph{Prompt-Conditional Distributionally Robust DPO (PC-Dr.DPO)}, which conditions within-prompt robust reweighting on observed vote reliability to make updates from sampling-sensitive prompts more conservative. We further introduce a cache-based mechanism to reduce self-supervised forgetting during online adaptation. Across six mathematical and knowledge-intensive reasoning benchmarks and five model backbones, PC-Dr.DPO matches or outperforms the strongest TTRL baseline in 24 of 30 settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:49:02Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Ru Wang</name>
+    </author>
+    <author>
+      <name>Yuanyuan Wang</name>
+    </author>
+    <author>
+      <name>Jiaxian Guo</name>
+    </author>
+    <author>
+      <name>Mingming Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09868v1</id>
+    <title>CodeQuant2: Enhanced Outlier Mitigation and Adaptive Clustering for Low-Precision LRMs</title>
+    <updated>2026-11-06T18:48:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.09868v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09868v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large reasoning models (LRMs) improve task performance by generating longer intermediate reasoning traces, but this substantially increases inference costs and makes low-precision quantization increasingly important. However, aggressively quantized models often perform poorly on reasoning tasks. We observe larger activation fluctuations during the first decoding steps of reasoning. Calibration that omits these early states may miss their activation fluctuations. To address these reasoning-specific quantization challenges, we propose \textbf{CodeQuant2}, a clustering-based LUT quantization framework for low-precision large reasoning models. CodeQuant2 mitigates activation outliers with rotation and scaling, uses clustering to represent non-uniform weight distributions, and adapts codebook sizes to the quantization difficulty of each layer. Guided by our observation of reasoning-time activation behavior, CodeQuant2 further improves calibration sample selection to better match actual decoding statistics. Combined with our customized LUT CUDA kernel, CodeQuant2 delivers substantial accuracy improvements on reasoning benchmarks while achieving up to $2.85\times$ speedup over BF16.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:04Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xingyu Liu</name>
+    </author>
+    <author>
+      <name>Xiangyang Yin</name>
+    </author>
+    <author>
+      <name>Tianhua Xia</name>
+    </author>
+    <author>
+      <name>Haiyu Wang</name>
+    </author>
+    <author>
+      <name>Sai Qian Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09866v1</id>
+    <title>GRAC: Graph-Based Retrieval-Augmented Captioning for Surgical Scene Description</title>
+    <updated>2026-11-06T18:47:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.09866v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09866v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Purpose: Surgical operative reports support procedural documentation, surgical training, performance assessment, and workflow review. However, extracting meaningful information often requires extensive manual review and clinical expertise. Automated surgical scene descriptions could reduce this burden by leveraging recurring surgical activities and prior knowledge.
+  Methods: We propose GRAC (Graph-Based Retrieval-Augmented Captioning), a framework that represents surgical scenes as graphs capturing relationships among instruments, actions, and anatomical structures. Given an input scene graph, GRAC learns to retrieve relevant graph-caption pairs from training data. It compares instrument-tissue interactions between retrieved examples and the input scene, using comparison features to condition retrieved-caption representations during generation.
+  Results: On the EndoVis-18 benchmark, GRAC achieved a CIDEr-D of 5.88, compared with 4.23 for SGT and 3.36 for the strongest conventional Transformer baseline. Exact instrument-action-target triplet-set accuracy reached 52.6%, compared with 32.7% for SGT and 26.2% for the strongest conventional baseline. These results demonstrate improvements in language quality and factual agreement. On TORS, GRAC achieved a CIDEr-D of 5.06, compared with 3.80 for the strongest baseline.
+  Conclusion: GRAC demonstrates that combining structured surgical scene representations with retrieved examples improves surgical scene captioning and produces more contextually meaningful descriptions.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:47:23Z</published>
+    <arxiv:comment>20 Pages and 4 Figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rochak Dhakal</name>
+    </author>
+    <author>
+      <name>Chen Zhao</name>
+    </author>
+    <author>
+      <name>Soup Cobb</name>
+    </author>
+    <author>
+      <name>Xin Qian</name>
+    </author>
+    <author>
+      <name>Xiaofeng Yang</name>
+    </author>
+    <author>
+      <name>Weihua Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09863v1</id>
+    <title>Flow-Guided Target-Space Alignment via Path Consistency</title>
+    <updated>2026-11-06T18:44:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.09863v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09863v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many multimodal alignment problems require mapping a source modality into a fixed space defined by a target modality, where the target space is not merely an intermediate embedding but is used directly for downstream analysis. In this setting, successful alignment should preserve both the global structure of the target distribution and the instance-level correspondence observed in paired source--target training data. Existing objectives typically address only part of this goal: contrastive losses encourage relative similarity, distribution-matching losses improve marginal agreement, and pointwise regression fits each source sample to its paired target without explicitly modeling target-space path geometry. We propose FlowAlign, a flow-guided target-space alignment method that repurposes conditional flow matching as a training-time alignment signal rather than an inference-time transport model. FlowAlign uses the learned flow field to guide the alignment of source-side representations with the fixed target space, encouraging them to preserve paired correspondence while remaining compatible with the global target-space structure. We further provide theoretical analysis showing how FlowAlign helps improve paired correspondence by controlling endpoint accuracy and capturing local target-space geometry. Experiments on synthetic data, paired single-cell multiome benchmarks, and image--text alignment demonstrate that FlowAlign improves instance level correspondence while preserving target-space structure across different modality settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:44:08Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ruizhi Yuan</name>
+    </author>
+    <author>
+      <name>Zeqiu Yu</name>
+    </author>
+    <author>
+      <name>Wei Gao</name>
+    </author>
+    <author>
+      <name>Wei Chen</name>
+    </author>
+    <author>
+      <name>Xiwei Tang</name>
+    </author>
+    <author>
+      <name>Lu Tang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09848v1</id>
+    <title>How far does a hash-only sender go? A pre-registered map of sender memory versus bits for short text messages</title>
+    <updated>2026-11-06T18:31:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.09848v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09848v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Can a sender that only computes hashes, with a language model only at the receiver, transmit short human text more cheaply than a classical sender trained on the same domain? We answer with one pre-registered run on 1,000 English user utterances from Taskmaster-1. The primary endpoint is the cost per message to deliver 100% of the messages (hash bits, plus a 2-byte negative acknowledgement and the raw text when the first attempt fails), paired against an in-domain PPM order-1 sender. The hash-only sender delivered 857 of 1,000 messages on the first attempt and cost 192.8 bits per message, 18.4 bits more than PPM order 1 (95% bootstrap interval 10.9 to 26.3); by the pre-registered rule it spends more and is not equivalent within one byte. As secondary results we map measured sender memory against bits. The hash-only sender (8,190 B on a host build, keyed BLAKE2b tag included, as in every method) was the cheapest point in bits from 8,190 B up to, but excluding, PPM order 1 at 24,844 B, 45 to 46 bits below smaz2 and Unishox2; from PPM order 1 upwards, in-domain senders spend fewer bits, except order 2 pruned to 16 KiB. In airtime it loses to PPM order 1 on all five links priced, to Unishox2 on four, and to raw text with a tag on two, because each failure costs an acknowledgement frame and a fallback frame. A wider receiver search recovers half of the failures and makes the cost 7.7 bits lower than PPM order 1, at about three minutes of receiver time per failure, and still loses in airtime on four of five links. We report the measurement as a delimitation, with every deviation of the run.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:31:24Z</published>
+    <arxiv:comment>10 pages, 1 figure, 2 tables. Code, data and per-message results: https://github.com/msamoilenko/hash-sender-llm-receiver</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Marcelo Samoilenko</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09846v1</id>
+    <title>Ensemble Methodology for Reference-Free Confidence Estimation in LLM-based Code Summarization</title>
+    <updated>2026-11-06T18:29:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.09846v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09846v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper describes an approach and use case to estimate the correctness of LLM-generated COBOL summaries without access to human-authored references. The core intuition is that inter-model agreement on semantics is informative about truth, and that an LLM-as-judge can provide higher-fidelity pairwise assessments than traditional string- or embedding-based metrics. We operationalise this intuition with (i) controlled summary generation from diverse models; (ii) a LLM evaluator that compares pairs of summaries and emits structured judgments; and (iii) a calibrated aggregation rule that combines supportive evidence while penalising only corroborated contradictions.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:29:48Z</published>
+    <arxiv:comment>9 pages, 3 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Marco Colombo</name>
+    </author>
+    <author>
+      <name>Balaji A Jayaram</name>
+    </author>
+    <author>
+      <name>Sowmyakumari Selvaraj</name>
+    </author>
+    <author>
+      <name>Sumit Tokkar</name>
+    </author>
+    <author>
+      <name>Animesh Kumar</name>
+    </author>
+    <author>
+      <name>Aravinda Prasad Sistla</name>
+    </author>
+    <author>
+      <name>Ravishankar Shetty</name>
+    </author>
+    <author>
+      <name>Rigel Gjomemo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09843v1</id>
+    <title>Fifty-Two Shades of Pig: What the UCR Archive Really Asks Classifiers to Do</title>
+    <updated>2026-11-06T18:28:12Z</updated>
+    <link href="https://arxiv.org/abs/2611.09843v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09843v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The pigs were bleeding. That was the point of the experiment: could airway pressure reveal hemorrhage before it became critical? In the UCR Time Series Classification Archive, the de facto benchmark for Time Series Classification (TSC), the same recordings ask a different question: "which of 52 pigs produced this trace?". The dataset PigAirwayPressure is not an outlier. Although the archive is the standard benchmark, whether its tasks resemble the problems TSC is meant to solve has rarely been examined. We find that several datasets are repurposed from their original task, built from toy setups, or have flawed test splits. We further question how representative the archive's ordered non-temporal sequences (e.g. spectra, shape outlines) are of real TSC, and the potential downsides from the decomposition of multivariate problems. Our findings call for more careful interpretation of archive-wide scores and greater attention to deployment-relevant evaluation. The audit is at https://github.com/automl/ucr-provenance-audit.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:28:12Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Omar Swelam</name>
+    </author>
+    <author>
+      <name>Jaris Küken</name>
+    </author>
+    <author>
+      <name>Shi Bin Hoo</name>
+    </author>
+    <author>
+      <name>Frank Hutter</name>
+    </author>
+    <author>
+      <name>Lennart Purucker</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09840v1</id>
+    <title>GroundWork: Bridging Human and LLM Reasoning Through a Structured Argumentation Model</title>
+    <updated>2026-11-06T18:25:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.09840v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09840v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are increasingly integrated into workflows that require reasoning over text documents, yet interaction remains largely conversational. This leaves argumentative structure implicit or embedded in text, making it difficult to maintain, compare, and revise arguments as analyses evolve. We present GroundWork, a mixed-initiative system that makes argument structure a shared, editable state for humans and LLMs. GroundWork operationalizes the Toulmin model of argumentation as a typed graph with explicit operations for human and LLM edits. It exposes this structure through coordinated corpus views and an editable workbench for constructing, comparing, testing, and tracing source-grounded arguments. We evaluate GroundWork through an expert study with four participants spanning consulting, product development, law, and immunology, and three use-case scenarios in intelligence, law, and medicine. Our findings show that GroundWork makes source-grounded arguments inspectable, comparable, and revisable as shared human-LLM state.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:25:43Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Sjoerd Vink</name>
+    </author>
+    <author>
+      <name>Byungmoo Kim</name>
+    </author>
+    <author>
+      <name>Michael Behrisch</name>
+    </author>
+    <author>
+      <name>Adam Coscia</name>
+    </author>
+    <author>
+      <name>Remco Chang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09828v1</id>
+    <title>Designing Effective Monitor-Based Interventions for Mitigating Reward Hacking During RL</title>
+    <updated>2026-11-06T18:14:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.09828v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09828v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning (RL) rewards are notoriously difficult to design and control, often leading to the model learning unintended behaviors such as reward hacking. One potential solution is to monitor for reward hacking and penalize it when detected; however, training against a monitor could lead to evasive behavior, and our general understanding of how to apply monitors effectively during training is limited. To study how best to use monitors to mitigate reward hacking, we introduce and open source three realistic environments where Qwen3-4B reward hacks: a coding environment hackable via test overwriting, a medical chat environment hackable via sycophancy, and a biography generation environment hackable via hallucination. We first focus on the coding environment, where we find that: (1) models can learn to evade highly accurate monitors by exploiting systemic flaws in probes and LLM judges; (2) monitors that leak more learning signal during RL suppress reward hacking but are more often evaded; and (3) including easier problems in training can decrease reward hacking. We apply our findings to build better reward hacking monitors for the medical chat and biography generation environments that improve upon naive baselines to reduce reward hacking rates across seeds to before-training levels in some interventions. Our results demonstrate that our takeaways translate to new settings and that better monitor intervention designs are possible.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:14:52Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aria Wong</name>
+    </author>
+    <author>
+      <name>Joshua Engels</name>
+    </author>
+    <author>
+      <name>Neel Nanda</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09825v1</id>
+    <title>BitDecoding-FP4: Native FP4 KV Cache Decoding via Algorithm-System Co-Design</title>
+    <updated>2026-11-06T18:13:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.09825v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09825v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The key-value (KV) cache dominates memory capacity and bandwidth in long-context LLM serving. While 4-bit microscaling formats (NVFP4, MXFP4) shrink the cache and run attention on FP4 Tensor Cores, a fundamental gap remains between algorithmic quantization and system-aware acceleration: existing FP4 KV systems use vanilla quantization that causes severe accuracy drops, whereas accuracy-oriented 4-bit algorithms rely on vector codebooks whose lookup overhead degrades decoding throughput. We present BitDecoding-FP4, an algorithm--system co-design for accurate and efficient native FP4 KV decoding. We mitigate three error sources: Dual-Residual Query Quantization splits queries into two FP4 tensors, cutting query logit error from 60% to 1%; Underflow-Aware Probability Scaling prevents E4M3 scales from rounding long-context probabilities to zero; and Outlier-Aware Key Quantization combines static smoothing, Hadamard rotation, and scale search to suppress key outliers under token-wise scaling. At the system level, we remove the softmax bottleneck via transposed softmax with fused probability quantization and stacked query MMA on paged KV caches. Across dense and MoE models with GQA and MLA, BitDecoding-FP4 stays within 0.5 points of BF16 KV accuracy with NVFP4 (1 point with MXFP4), and tracks BF16 KV in RL training rollouts. In end-to-end serving on NVIDIA B300 with Qwen3-4B and Qwen3-30B-A3B, it delivers 2.4-3.0$\times$ higher peak serving throughput than BF16 KV. The implementation is available at https://github.com/OpenBitSys/BitDecoding-FP4.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PF" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:13:54Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Dayou Du</name>
+    </author>
+    <author>
+      <name>Woon Yee Ng</name>
+    </author>
+    <author>
+      <name>Guangming Sheng</name>
+    </author>
+    <author>
+      <name>Nick Lau</name>
+    </author>
+    <author>
+      <name>Jianyi Cheng</name>
+    </author>
+    <author>
+      <name>Luo Mai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09816v1</id>
+    <title>BEV3SR: Evidence-Aware 3D Spatial Reasoning from Video</title>
+    <updated>2026-11-06T18:02:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.09816v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09816v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>3D spatial reasoning from video remains challenging for VLMs because videos provide sequential, view-local observations rather than persistent metric scene records. Many questions must be answered in a query-specified perspective rather than the observed camera viewpoint, and prompting with a fixed set of RGB views may miss sparse or occluded visual cues. To address these gaps, we introduce BEV3SR, a training-free and backbone-agnostic framework for RGB-D videos with camera parameters. BEV3SR turns video observations into queryable metric bird's-eye-view (BEV) scene memory and formalizes each query into an evidence-aware spatial task. The Spatial Task Formalizer specifies the query's reference frame, spatial constraints, objective, and evidence requirement. The evidence requirement determines the appropriate reasoning pathway. A query treated as requiring geometric evidence is handled by the Geometric Reasoner, which deterministically computes the answer using the metric BEV records in the query-specified reference frame. Otherwise, a query treated as requiring visual evidence is passed to the Visual Evidence Aligner, which uses BEV-indexed object records and their associated supporting views to retrieve object-consistent and scene-context RGB frames for VLM grounding. Within a standard 16-frame budget, BEV3SR consistently improves different VLM backbones across multiple 3D scene QA benchmarks, delivering large gains on spatially intensive questions and significant improvements on open-ended scene QA. These results demonstrate that BEV3SR offers an effective, efficient, and interpretable framework for explicit 3D spatial reasoning from video.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:02:49Z</published>
+    <arxiv:comment>WACV camera ready</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Fan Zhu</name>
+    </author>
+    <author>
+      <name>Rui Yu</name>
+    </author>
+  </entry>
+</feed>

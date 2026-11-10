@@ -131,6 +131,14 @@ const OUTCOMES_EN = [
   /\bif\s+[\w\s'"]{1,30},?\s+(?:my|our|the)\s+[\w\s'"]{1,24}\s+(?:is|are|will\s+be|was)?\s*(?:proven|vindicated|validated|confirmed|right|correct)[\w\s'"]{0,24}[;,]?\s+if\s+(?:not|it\s+fails|it\s+doesn'?t|otherwise)\b/i,
   /\b(?:works?|succeeds?|comes?\s+true|pans?\s+out)\s+or\s+(?:it\s+)?(?:doesn'?t|don'?t|fails?|won'?t)\b/i,
   /\bnothing\s+(?:that\s+happens\s+)?(?:could|can|would)\s+(?:disprove|disprove|refute|falsify)\b/i,
+  // [r275 新增族] either X or it doesn't 口语互斥对（「Either the model fits or
+  // it doesn't — both outcomes confirm my theory」）——既有 either way 只收
+  // 短语形，不收 either+分句形。doesn['\u2019]?t 兼容弯引号 U+2019。
+  /\beither\s+[\w\s'"]{1,30}\s+or\s+(?:it\s+)?(?:doesn['\u2019]?t|don['']?t|isn['']?t|fails?|won['']?t|not)\b/i,
+  // [r275 新增族] if X …; if it fails 双条件分句形（「If the plan works, it
+  // proves my instincts; if it fails, the market just wasn't ready」）——既有
+  // if X…if not 形要求 my/the 主语在条件段内，本族条件段是裸计划名
+  /\bif\s+[\w\s'"]{1,30},?[\w\s'"]{0,40}[;.…]?\s+if\s+(?:it\s+|things\s+|the\s+\w+\s+)?(?:fails?|doesn['\u2019]?t|don['']?t|won['']?t|isn['']?t|not)\b/i,
 ];
 
 // ─── 腿② CONFIRM 同一自证结论（中文）────────────────────────────────
@@ -149,6 +157,12 @@ const CONFIRM_ZH = [
   /(?:恰恰|正好|正|再次|又|永远|始终)[^。！？!?]{0,2}(?:说明|证明|意味着)[^。！？!?]{0,8}(?:我|我们|本人)/,
   // 不可推翻宣告 + 所以/因此 + 成立/正确（「任何结果都不能推翻我的理论，所以它永远成立」）
   /(?:所以|因此|因而|可见|故而)[^。！？!?]{0,14}(?:我|我们)?(?:的)?(?:理论|观点|学说|预言|判断|方法|模型|体系|框架)?[^。！？!?]{0,8}(?:永远|终究|始终|一定|必然)[^。！？!?]{0,4}(?:成立|正确|有效|立于不败)/,
+  // [r275 新增族] 口语自证归因（赢/涨/灵 是我眼光准、功力深；「涨了是我眼光准，
+  // 跌了是市场还没睡醒」「应验了说明我功力深，没应验说明你诚意不足」）——
+  // 无推断动词的自证形：结果词 + 是 + 我/教主 + 能力名词 + 强褒义形容词
+  /(?:是|说明|证明|意味着|可见|足见|表明)?(?:我|咱|本人)(?:的)?(?:眼光|眼力|直觉|判断|功力|修为|天赋|本事|水平|层次|境界|造诣|嗅觉)(?:很|真|特别|就是|向来|一直)?(?:准|高|深|强|到位|不凡|超凡|独到|毒辣|老到)/,
+  // [r275 新增族] 英明/高明型自证归因（「成了是教主英明，败了是信徒心不诚」）
+  /(?:是|说明|证明|意味着|可见|足见)?(?:我|咱|本人|教主|大师|老师|前辈|上师)(?:很|真|实在|果然|向来)?(?:英明|高明|圣明|神武|料事如神|先见之明|算无遗策|明察秋毫)/,
 ];
 
 // ─── 腿② CONFIRM 同一自证结论（英文）────────────────────────────────
@@ -161,6 +175,12 @@ const CONFIRM_EN = [
   /\beither\s+way\s*,?\s*(?:it|this|that|I)\s*(?:proves?|confirms?|shows?|means?|vindicates?)/i,
   /\b(?:proves?|confirms?|shows?|vindicates?)\s+(?:that\s+)?(?:my|our)\s+(?:theory|model|prediction|analysis|method|claim)\s+(?:is|was)\s+(?:right|correct|true|valid)\s+(?:either\s+way|no\s+matter\s+what)/i,
   /\bno\s+outcome\s+(?:could|can|would)\s+(?:disprove|refute|falsify)\s+(?:it|this|my|our)\b/i,
+  // [r275 新增族] 口语直觉/判断自证（proves my instincts / validates my judgment
+  // call / proves my gut）——腿②无 right/correct 结尾的口语形
+  /\b(?:proves?|confirms?|validates?|vindicates?|shows?|backs?)\s+(?:that\s+)?(?:my|our)\s+(?:instincts?|gut|hunch|judg(?:e)?ments?|calls?|reads?|decisions?|take|sense|nose|eye)\b/i,
+  // [r275 新增族] 裸自证确认（both outcomes confirm my theory / either way
+  // validates the model）——无 right 结尾，腿① either/whether 仍须共现
+  /\b(?:proves?|confirms?|validates?|vindicates?|backs?)\s+(?:that\s+)?(?:my|our)\s+(?:theory|model|framework|approach|method|analysis|prediction|thesis|system|call)\b(?!\s+(?:is|was|stands|gets)\s+(?:proven|vindicated|validated|confirmed|right|correct|true|unfalsifiable))/i,
 ];
 
 // ─── 豁免一：概念/批判转述（讨论这个概念本身不是运用它）──────────────
