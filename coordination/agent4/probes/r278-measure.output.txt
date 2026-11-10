@@ -1,0 +1,12 @@
+dims = 243
+{"ts":"2026-11-10T07:18:39.198Z","module":"lazy_cache","event":"_lazyCache 达到 100 个模块"}
+[FormulaSearch] 完成，85 个文件，1286 条公式
+{"ts":"2026-11-10T07:18:39.213Z","module":"init","event":"Formula Engine 注册成功（懒加载）"}
+{"ts":"2026-11-10T07:18:39.213Z","module":"init","event":"Cognitive Index 模块加载成功"}
+{"ts":"2026-11-10T07:18:39.214Z","module":"init","event":"WorldTreeBridge 加载成功","routes":"worldtree.search, worldtree.store, worldtree.query, worldtree.status"}
+{"ts":"2026-11-10T07:18:39.214Z","module":"init","event":"SelfBenchmark 加载成功（外部锚定未实装：内评 0.7 折 + verified:false 防自欺）"}
+{"ts":"2026-11-10T07:18:39.214Z","module":"init","event":"WorldLandscape 加载成功"}
+{"ts":"2026-11-10T07:18:39.214Z","module":"init","event":"MacroStrategyInference 加载成功"}
+{"ts":"2026-11-10T07:18:39.217Z","module":"init","event":"KnowledgeSubsystem 加载成功","domains":14,"routes":"knowledgeSubsystem.*, worldKnowledge.*"}
+modules = 162
+routes = 1316

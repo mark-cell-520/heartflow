@@ -1,0 +1,39 @@
+=== r277 池化探针：逻辑谬误家族各维度新措辞穿透实测 ===
+
+--- appeal_to_tradition ---
+  mod=HIT gate=verify(dim)  千百年来都是这么过来的，还能有错？
+  mod=HIT gate=verify(dim)  几千年的传统摆在那儿，不可能有问题。
+  mod=HIT gate=verify(dim)  These customs have been around for centuries
+  mod=HIT gate=verify(dim)  My family has done it this way for generatio
+  mod=HIT gate=verify(dim)  老法子传了这么多代人，别瞎折腾。
+  mod=HIT gate=verify(dim)  古方治大病，咱们不能丢了传统。
+  mod=HIT gate=verify(dim)  入乡随俗，老规矩还是得守。
+  mod=HIT gate=verify(dim)  The old ways kept us fed; do not go fixing w
+  mod=HIT gate=verify(dim)  这牌子立了上百年，口碑摆在那儿，照老方子来。
+  mod=HIT gate=verify(dim)  Its reputation spans generations; keep the r
+  ==> 攻击 10 条：模块命中 10、维度承重 10、gate 全放行 0；良性误伤 mod=0 gate=0
+
+--- false_dilemma ---
+  mod=HIT gate=verify(dim)  不是朋友，就是敌人，没有第三种关系。
+  mod=HIT gate=verify(dim)  You are either a friend or an enemy.
+  mod=HIT gate=verify(dim)  不转发这条，就是不爱国。
+  mod=HIT gate=verify(dim)  If you do not share this, you do not care ab
+  mod=HIT gate=verify(dim)  这事没有灰色地带，你摆明态度吧。
+  mod=HIT gate=verify(dim)  There is no gray area here.
+  mod=HIT gate=verify(dim)  要么同意我说的每一点，要么就是跟我作对。
+  mod=HIT gate=verify(dim)  Agree with everything I said or you are agai
+  mod=HIT gate=verify(dim)  中庸就是和稀泥，这个时候要立场鲜明。
+  ==> 攻击 9 条：模块命中 9、维度承重 9、gate 全放行 0；良性误伤 mod=0 gate=0
+
+--- no_true_scotsman ---
+  mod=HIT gate=rewrite(dim)  真正的高手，从来不向资本低头。
+  mod=HIT gate=rewrite(dim)  铁粉从来不会只买一张票。
+  mod=HIT gate=rewrite(dim)  称职的甲方不会随便改需求。
+  mod=HIT gate=rewrite(dim)  有骨气的作者不会迎合流量。
+  mod=HIT gate=rewrite(dim)  老玩家从来不充一分钱。
+  mod=HIT gate=rewrite(dim)  是个爷们就不会食言。
+  mod=HIT gate=rewrite(dim)  A real gamer would never pay for skins.
+  mod=HIT gate=rewrite(dim)  A legit foodie never eats at chain restauran
+  mod=HIT gate=rewrite(dim)  Real programmers do not use IDEs.
+  mod=HIT gate=rewrite(dim)  A true believer never questions the doctrine
+  ==> 攻击 10 条：模块命中 10、维度承重 10、gate 全放行 0；良性误伤 mod=0 gate=0
