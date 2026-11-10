@@ -1,0 +1,477 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/BrtUgOI5+EeToVj4WRuRyXPKIJ4</id>
+  <title>arXiv Query: search_query=all:statistical OR all:literacy OR all:base OR all:rate OR all:neglect OR all:small OR all:numbers OR all:reasoning&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T08:37:16Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:literacy+OR+(all:base+OR+(all:rate+OR+(all:neglect+OR+(all:small+OR+(all:numbers+OR+all:reasoning))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1647293</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12888v1</id>
+    <title>Dephasing-Induced Melting of Crystalline Spectral Form Factors</title>
+    <updated>2026-11-09T18:59:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.12888v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12888v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Long-range spectral order can be probed using spectral form factors, where it manifests itself as sharp Bragg peaks at integer multiples of the Heisenberg time in nearly crystalline spectra. We examine how energy dephasing in open systems affects this spectral order and how to control it. We find that Bragg peaks fade algebraically with revival order and dephasing strength, $K_{\rm Bragg}(p)\propto(γp)^{-1/2}$, within an extensive intermediate regime, and persist up to the lifetime of nearest-neighbor coherences despite an extreme decoherence rate. Our results establish the spectral form factor as a probe of spectral order in open quantum systems and identify temporal correlations in spectral fluctuations as a means of controlling it.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:57Z</published>
+    <arxiv:comment>5 pages, 4 figures + Supplemental material</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Preethi Gopalakrishnan</name>
+    </author>
+    <author>
+      <name>Adolfo del Campo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12886v1</id>
+    <title>Reframe: Observation-Aligned Multi-Teacher On-Policy Distillation for Agentic Visual Reasoning</title>
+    <updated>2026-11-09T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.12886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic reinforcement learning (RL) and multi-teacher on-policy distillation (MOPD) offer complementary routes to post-training. For visual agents, however, tool use presents two related challenges. Models may overlook useful tool-returned observations, while poorly grounded actions can limit the evidence available for subsequent distillation. We introduce Reframe, a post-training framework that treats the observation state, rather than only the output distribution, as an object of alignment. First, Ground-Drop-GRPO (GD-GRPO) trains spatial and temporal specialists with evidence-aware rewards and stochastic removal of the original visual input, encouraging them to acquire grounded evidence and use the returned observations. Second, Observation-Gated-MOPD (OG-MOPD) replaces deficient tool actions with canonical ones mid-rollout and resumes distillation from the repaired observation. The two stages complement each other, as learning to rely on tool-returned observations can help the policy benefit from observation repair. Neither stage requires a task-specific SFT cold start. Extensive experiments over 14 image and video benchmarks demonstrate that Reframe outperforms both Mix-RL and vanilla MOPD. Ablation results show that GD-GRPO increases observation dependence and tool gain compared with outcome-based GRPO.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Haozhi Yuan</name>
+    </author>
+    <author>
+      <name>Handong Li</name>
+    </author>
+    <author>
+      <name>Yifan Zhang</name>
+    </author>
+    <author>
+      <name>Qianshan Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12885v1</id>
+    <title>World In-Context Learning for Agentic Robot Manipulation</title>
+    <updated>2026-11-09T18:59:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.12885v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12885v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Trained action policies write manipulation skill into network weights, tying what is learned to the distribution it is learned from. In-context learning (ICL) avoids this coupling but has not matched trained policies, because a demonstration recorded in another scene carries no feedback from the world the robot currently faces. We observe that what an agent learns in context is semantic, recording task steps and object roles rather than visual appearance, so experience gathered in one world transfers to another. Based on this insight, we propose World In-Context Learning (WICL), a paradigm in which a frozen model starts from a demonstration, rehearses the task in a world such as a simulator, and writes the feedback into its context rather than its weights. We build RoboScript, a modular infrastructure that implements WICL for agentic manipulation. From a single demonstration, RoboScript learns each task through rehearsal in simulation, freezes the learned knowledge as a Task Memory, and deploys the frozen memory on new scenes with data isolation that ensures every deployment input is available on a real robot. On all 50 tasks of RoboTwin 2.0, RoboScript reaches 83.4% mean success across clean and randomized settings with one demonstration per task and no gradient updates, exceeding the strongest trained action policy by over 20 points. The method generalizes across visual distributions, improves through reflection, scales with the foundation model, and transfers to a physical dual-arm robot through cross-embodiment memory adaptation. With a world in the loop, a robot can learn a manipulation task in its context as well as it learns one in its weights. All code is available at https://github.com/ArcheOne-AI/RoboScript</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:45Z</published>
+    <arxiv:comment>Project Page: https://ArcheOne-AI.github.io/RoboScript</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Heng Fang</name>
+    </author>
+    <author>
+      <name>Zehui Guo</name>
+    </author>
+    <author>
+      <name>Yuehan Zhang</name>
+    </author>
+    <author>
+      <name>Mingyang Du</name>
+    </author>
+    <author>
+      <name>Dingkang Liang</name>
+    </author>
+    <author>
+      <name>Xiang Bai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12884v1</id>
+    <title>Guiding Data Allocation for Robust Subpopulation Generalization</title>
+    <updated>2026-11-09T18:59:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.12884v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12884v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning models often achieve high average accuracy in the training data while performing poorly on test data due to subpopulation shift. A common data-centric solution is to enforce balanced subgroup proportions, but full balance can be costly, infeasible, and not always necessary. In this work, we study whether balanced training data is the unique optimal configuration for robust subpopulation generalization. We extend a Gaussian feature-model framework to theoretically characterize the performance landscape across general training subgroup distributions. We show that multiple configurations, including substantially imbalanced ones, can perform comparably to the balanced one. We further derive gradient-based directions for adjusting subgroup proportions to improve adjusted accuracy and worst-group accuracy more efficiently. These findings suggest that strategically allocating data offers a more flexible and principled path to robust performance than simple balancing. The code is available at https://github.com/zhaoyingpan/subpop-data-allocation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:40Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zhaoying Pan</name>
+    </author>
+    <author>
+      <name>Yipei Wang</name>
+    </author>
+    <author>
+      <name>Shenyu Lu</name>
+    </author>
+    <author>
+      <name>Xiaoqian Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12883v1</id>
+    <title>Beyond Modality Preference: Controlling Multimodal Arbitration under Modality Conflict in MLLMs</title>
+    <updated>2026-11-09T18:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12883v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12883v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multimodal large language models (MLLMs) integrate information across modalities, but become unreliable when those modalities disagree. Under conflicting inputs, MLLMs may favor modalities that are not the most reliable for the task, thus motivating inference-time control of modality arbitration. We identify a small set of attention heads, termed arbitration heads, that causally influence whether predictions follow visual or textual evidence. Building on this, we introduce a lightweight, training-free intervention that biases these heads toward a designated trusted modality at inference time. The identified heads are stable across calibration set sizes and generalize across settings, and steering them enables effective bidirectional control of modality reliance across diverse benchmarks. Our findings identify an effective control mechanism to align MLLM predictions with task-specified modality priorities. The code is available at https://github.com/zhaoyingpan/modality-arbitration.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:36Z</published>
+    <arxiv:comment>WACV 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zhaoying Pan</name>
+    </author>
+    <author>
+      <name>Shenyu Lu</name>
+    </author>
+    <author>
+      <name>Jun Hui Wong</name>
+    </author>
+    <author>
+      <name>Junyi Chai</name>
+    </author>
+    <author>
+      <name>Xiaoqian Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12882v1</id>
+    <title>Chiral waveguide model for error-correctable quantum computation</title>
+    <updated>2026-11-09T18:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop a first-principles framework connecting microscopic waveguide scattering to quantum error correction and algorithmic performance. For polarization-encoded single photons interacting with an ensemble of two-level atoms in a chiral waveguide, we derive an effective polarization quantum channel by tracing out the frequency degree of freedom. Using this channel as the physical noise model for a rotated planar code, we observe threshold behavior as the number of atoms $N$ and the atom-waveguide coupling strength $Γ$ are varied. An asymptotic analysis of the microscopic scattering model explains the threshold scaling with $NΓ/σ$, where $σ$ is the photon spectral bandwidth. For identical, lossless atoms with symmetric real coupling and a photon spectrum centered at resonance, the effective noise is strongly biased toward $X$ errors. We then incorporate the resulting logical errors into quantum phase estimation and demonstrate that the noise bias can guide circuit design. In particular, a Hadamard-basis implementation reduces sensitivity to the dominant error, improving algorithmic performance.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Zixiang Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12881v1</id>
+    <title>The Brown Dwarf Desert is a Mass-Ratio Desert: Astrometric Demographics of 63,254 Stars</title>
+    <updated>2026-11-09T18:59:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.12881v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12881v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Brown dwarfs are rare as close companions to stars compared to planets and stellar companions, a paucity known as the brown dwarf desert. Whether the desert sits at a fixed companion mass or a fixed companion-to-star mass-ratio $q$ has been difficult to test, because microlensing, radial velocities, and direct imaging have sampled comparatively narrow slices of stellar mass and separation. Here we apply a novel joint-modelling method to Hipparcos and Gaia DR2/DR3 astrometry from 63,254 stars to complete this picture with a sample 1-2 orders of magnitude larger than those of previous wide-orbit demographic studies. For the first time, we present a single survey that measures occurrence rates of both planetary and stellar companions on 3--94 yr orbits ($\sim$2--20\,au) across host masses from M dwarfs to B stars. We find that the desert is a mass-ratio feature: companions are strongly depleted at $q\approx2\%$ independent of stellar mass from M to B stars, and a desert at fixed companion mass is excluded. Furthermore, we find a positive trend in occurrence with metallicity below the mass-ratio desert, but a negative trend above. The desert therefore separates two distinct populations, plausibly two formation channels, that each scale with stellar mass: the lightest stellar-like companions of K stars ($\sim13 \, M_{jup}$) are less massive than the heaviest planet-like companions of B stars ($\sim27, M_{jup}$), which continue well beyond the deuterium-burning limit. Mass-ratio, not mass, is therefore the physically meaningful boundary between planets and their stellar-like counterparts.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:28Z</published>
+    <arxiv:comment>Submitted to ApJL</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>William Thompson</name>
+    </author>
+    <author>
+      <name>Alexandre Bouchard-Côté</name>
+    </author>
+    <author>
+      <name>Dori Blakely</name>
+    </author>
+    <author>
+      <name>Trevor Campbell</name>
+    </author>
+    <author>
+      <name>Jessica Speedie</name>
+    </author>
+    <author>
+      <name>Judah Van Zandt</name>
+    </author>
+    <author>
+      <name>Kyle Franson</name>
+    </author>
+    <author>
+      <name>Jerry Xuan</name>
+    </author>
+    <author>
+      <name>Doug Johnstone</name>
+    </author>
+    <author>
+      <name>Emma Turtleboom</name>
+    </author>
+    <author>
+      <name>Jingwen Zhang</name>
+    </author>
+    <author>
+      <name>Clarissa Do Ó</name>
+    </author>
+    <author>
+      <name>Brendan Bowler</name>
+    </author>
+    <author>
+      <name>Jean-Baptiste Ruffio</name>
+    </author>
+    <author>
+      <name>Eric Nielsen</name>
+    </author>
+    <author>
+      <name>Ryan Cloutier</name>
+    </author>
+    <author>
+      <name>Andre Fogal</name>
+    </author>
+    <author>
+      <name>Kaitlyn Hessel</name>
+    </author>
+    <author>
+      <name>Christian Marois</name>
+    </author>
+    <author>
+      <name>Alexandra Rochon</name>
+    </author>
+    <author>
+      <name>William Roberson</name>
+    </author>
+    <author>
+      <name>Simon Blouin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12878v1</id>
+    <title>Adaptive Quantization Preserves Fast Rates for TD Learning over Rate-Limited Channels</title>
+    <updated>2026-11-09T18:58:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.12878v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12878v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Motivated by reinforcement learning subject to communication constraints, we study a policy evaluation problem with linear function approximation over a rate-limited channel. In our setup, an agent interacting with an unknown environment (modeled as a Markov Decision Process) transmits quantized estimates of a temporal-difference (TD) learning update direction to a server over a finite-capacity channel. Our goal is to investigate to what extent one can preserve the statistical convergence rates achievable when the channel has infinite capacity. To that end, we propose a new algorithm called Batched Adaptively Quantized TD (BAQ-TD), which uses batching to reduce the variance of the transmitted information, and adaptive quantization to encode innovations. We prove a high-probability finite-time error bound for BAQ-TD, and show that, above a certain finite channel capacity, BAQ-TD preserves the convergence rate of unquantized TD up to logarithmic factors. Specifically, for a $d$-dimensional value function parameter, we establish that transmitting a total of $\mathcal{O}(d \log(T))$ bits over a horizon of length $T$ suffices to achieve the order-optimal rate of $\tilde{\mathcal{O}}(1/T)$, marking an exponential improvement in communication-complexity over prior work.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:41Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Sreejeet Maity</name>
+    </author>
+    <author>
+      <name>Aritra Mitra</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12877v1</id>
+    <title>A regularization-independent Information Criterion for correlated data</title>
+    <updated>2026-11-09T18:58:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.12877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We generalize the Akaike Information Criterion (AIC) to allow model and data subset selection when regularized fits are performed on correlated data. While the standard generalization to regularized fits is inherently dependent on the type of regularization applied to the data covariance matrix, our definition, the RIAIC, is, on average, regularization-independent. The regularization-independence is achieved by defining the new Information Criterion as an estimator of the model-dependent contribution to the correlated Kullback--Leibler divergence. The Bayesian extension is derived as well. We test the new criterion on lattice QCD data by performing regularized fits and show that it reproduces the selection properties of the standard correlated AIC, with fluctuations which are compatible with the expected statistical uncertainties. These results enable the application of subset and model selection techniques to cases where regularizations are applied to the covariance matrix of the fitted dataset.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:14Z</published>
+    <arxiv:comment>27 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Davide Laudicina</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12875v1</id>
+    <title>Click3R: Interactive Stereo 3D Reconstruction with Sparse Correspondence Clicks</title>
+    <updated>2026-11-09T18:58:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.12875v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12875v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Despite impressive progress, existing feed-forward large 3D reconstruction models produce a single, irrevocable prediction. When these models fail, there is no mechanism to correct their mistakes. To address this limitation, we introduce Click3R, a framework for interactive geometric correction of feed-forward models using sparse human correspondence clicks. Given an image pair and a small set of cross-view point correspondences provided by a user, Click3R injects geometric constraints into the 3D reconstruction networks through a lightweight point correspondence adapter, enabling the model to resolve ambiguities in challenging scenarios such as repetitive textures, symmetric structures, large viewpoint changes, or textureless regions. To evaluate interactive reconstruction, we curate a challenging benchmark specifically designed to expose failure modes of existing feed-forward 3D reconstruction methods. Experiments show that Click3R reduces reconstruction error with as few as a single correspondence click, improving performance on both standard and our curated benchmarks. Our results highlight that sparse human interaction provides an effective and practical mechanism for correcting geometric reconstruction errors.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:02Z</published>
+    <arxiv:comment>NeurIPS 2026. Project page: https://uva-computer-vision-lab.github.io/click3r/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hao Gu</name>
+    </author>
+    <author>
+      <name>Jin Yao</name>
+    </author>
+    <author>
+      <name>Zezhou Cheng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12876v1</id>
+    <title>The simulability frontiers of photonic quantum computing</title>
+    <updated>2026-11-09T18:58:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.12876v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12876v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Estimates of when photonic devices outgrow classical simulation are hard to compare: even for single-photon boson sampling, quoted thresholds range from 50 to 98 photons, as they rest on different tasks and assumptions. We propose as a common unit the time a classical computer needs to draw one sample from the device's exact output distribution, up to floating-point rounding. Only exactness applies equally to every kind of light, since the cost of approximate sampling depends on the accuracy required. The simulability frontier is the device size at which our fastest exact sampler produces one sample per second on a fixed machine; this device size increases with better hardware and algorithms. As the time per sample grows exponentially with the number of detected photons, doubling the machine speed moves the frontier by about one photon, whereas a better algorithm changes the growth rate. We measure the frontier with photonic-engines, an open-source GPU library of exact samplers for single photons, entangled photons from quantum emitters, vacuum-single-photon superpositions and squeezed light. Each sampler is validated against a simulator sharing no code with it. On one NVIDIA H100 GPU, with Haar-random interferometers, twice as many modes as photonic inputs and photon-number-resolving detectors, the frontier lies at 38.3 single photons and at 31.0 entangled photons from one emitter. For squeezed light, a timing model fitted to measurements places it at 41.5 squeezed photonic inputs of mean photon number 0.5. For our samplers, coherence alone makes simulation harder: sources that emit a photon with probability one half reach 64.2 when vacuum and photon are mixed incoherently, as for lossy single photons, but only 50.0 when they are in coherent superposition. Feed-forward from mid-circuit measurement of up to three modes lowers the single-photon frontier only from 38.3 to 38.1.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:02Z</published>
+    <arxiv:comment>22 pages of main text, 4 Figures, 4 Tables and 22 pages of Supplementary Information</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Jean Senellart</name>
+    </author>
+    <author>
+      <name>Benjamin Stott</name>
+    </author>
+    <author>
+      <name>Stephen Wein</name>
+    </author>
+    <author>
+      <name>Esperanza Cuenca Gomez</name>
+    </author>
+    <author>
+      <name>Pascale Senellart</name>
+    </author>
+    <author>
+      <name>Shane Mansfield</name>
+    </author>
+    <author>
+      <name>Pierre-Emmanuel Emeriau</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12873v1</id>
+    <title>Tetragonal-to-orthorhombic distortion in CeRh$_{2}$As$_{2}$</title>
+    <updated>2026-11-09T18:57:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.12873v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12873v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>CeRh$_{2}$As$_{2}$ is best known for its two superconducting phases, which are observed when a magnetic field is applied along the $c$ axis of its tetragonal unit cell. The emergence of superconductivity, with $T_{c} \approx 0.31$K, is preceded by an ordered state (phase I), with an ordering temperature $T_{0} \approx 0.46$K. The precise nature of the order parameter in phase I is still unknown, although evidence of dipolar ordering was found. To investigate a possible symmetry breaking at $T_{\textrm{0}}$, we conducted longitudinal thermal-expansion measurements along the crystallographic [100], [010], [110], and [1$\overline{1}$0] directions on a single-crystalline sample cut into an octagonal shape. Our results demonstrate the breaking of the fourfold in-plane symmetry below $T_{\textrm{0}}$, evidencing a small tetragonal-to-orthorhombic distortion (orthorhombicity $δ\sim 10^{-7}$). The breaking of the tetragonal symmetry at $T_{\textrm{0}}$ might imply that the superconducting order parameter that develops within phase I cannot be multi-component. More generally, the distortion places restrictions on the possible order parameters for phase I.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:57:10Z</published>
+    <arxiv:comment>8 pages 5 figures in the main paper, 4 pages, 4 figues in the supplemental material</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>P. Khanenko</name>
+      <arxiv:affiliation>Hochfeld-Magnetlabor Dresden</arxiv:affiliation>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>M. Pfeiffer</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Solid State and Materials Physics, Technical University Dresden, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>K. Semeniuk</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Quantum Materials and Technologies, Karlsruhe Institute of Technology, Karlsruhe, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>E. Hassinger</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Quantum Materials and Technologies, Karlsruhe Institute of Technology, Karlsruhe, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>P. Thalmeier</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>J. Wosnitza</name>
+      <arxiv:affiliation>Hochfeld-Magnetlabor Dresden</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Solid State and Materials Physics, Technical University Dresden, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>A. M. León</name>
+      <arxiv:affiliation>Departamento de Física, Facultad de Ciencias, Universidad de Chile, Santiago, Chile</arxiv:affiliation>
+    </author>
+    <author>
+      <name>G. Zwicknagl</name>
+      <arxiv:affiliation>Institute for Mathematical Physics, Technische Universität Braunschweig, Braunschweig, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>C. Geibel</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>S. Khim</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>M. Brando</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12872v1</id>
+    <title>HiVe-Mem: Interleaving Horizontal Memory Expansion and Vertical Evidence Composition for Multimodal Agents</title>
+    <updated>2026-11-09T18:57:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.12872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As multimodal agents accumulate increasingly long interaction histories, effectively retrieving and utilizing past information becomes critical for long-term interaction. Existing memory systems typically rely on semantic retrieval over compressed memories and expose predefined representations, which may miss relevant memories and overlook heterogeneous evidence needs across queries. We introduce \textbf{\hivemem}, a multimodal memory framework that interleaves \textbf{\textsc{H}}or\textbf{\textsc{i}}zontal Memory Expansion with \textbf{\textsc{Ve}}rtical Evidence Composition. For horizontal memory expansion, \hivemem organizes memory episodes into a relational graph using textual and visual anchors, expanding semantically retrieved seeds with related neighbors to recover complementary information. For vertical evidence composition, each retrieved memory retains multiple evidence forms, including compact summaries, captions, grounded visual views, raw images, and interaction history. A lightweight trainable selector independently composes an evidence subset for each retrieved memory, enabling query-adaptive utilization of heterogeneous multimodal information. This two-dimensional design jointly broadens memory coverage and adapts the evidence contributed by individual memories. Experiments across three multimodal memory benchmarks show that \hivemem consistently improves task performance across base models while reducing token consumption by about 90\% compared with the most efficient competing multimodal baselines.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:57:00Z</published>
+    <arxiv:comment>Code is available at https://github.com/ViktorAxelsen/HiVe-Mem</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Haozhen Zhang</name>
+    </author>
+    <author>
+      <name>Bohan Liu</name>
+    </author>
+    <author>
+      <name>Jianzhu Bao</name>
+    </author>
+    <author>
+      <name>Qingyuan Liu</name>
+    </author>
+    <author>
+      <name>Haodong Yue</name>
+    </author>
+    <author>
+      <name>Xiao Li</name>
+    </author>
+    <author>
+      <name>Zi Pong Lim</name>
+    </author>
+    <author>
+      <name>Wenya Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12871v1</id>
+    <title>Vendi Anomaly Scores for Efficient and Accurate Anomaly Detection</title>
+    <updated>2026-11-09T18:56:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.12871v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12871v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Anomaly detection (AD) is a critical for trustworthy machine learning and scientific discovery. Existing methods typically define anomalies through local density, isolation heuristics, or distance from a fitted distribution, making them sensitive to neighborhood scale, partitioning choices, or restrictive distributional assumptions. In this work, we introduce a new paradigm by formulating anomaly detection from a diversity perspective. We propose the $\textit{Vendi Anomaly Score}$ (VAS), which detects anomalies by quantifying how much a sample changes the diversity of the dataset, as measured by the Vendi score, when removed. VAS captures both local redundancy and global data structure without relying on density estimation or partitioning heuristics. Moreover, VAS requires no hyperparameter tuning, instead adapting automatically to the spectral structure of the data. VAS is non-parametric and scales linearly with dataset size. Across 148 benchmark embedding datasets derived from 10 source datasets and 4 embedding architectures, VAS achieves state-of-the-art AD performance. We further validate VAS on large-scale ImageNet experiments, where it remains robust as both contamination rate and dataset scale increase.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:56:15Z</published>
+    <arxiv:comment>Accepted to the NeurIPS 2026 Main Track</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Amey Pasarkar</name>
+    </author>
+    <author>
+      <name>Adji Bousso Dieng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12870v1</id>
+    <title>SWAM: Scaling World Action Models with Cross-Modal Alignment</title>
+    <updated>2026-11-09T18:55:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.12870v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12870v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>World action models jointly predict video and actions conditioned on language. Existing studies focus primarily on architectures and training mechanisms, typically treating language-video alignment acquired through video pretraining as an established foundation. However, introducing action learning may impair this alignment. Principled guidance on data and supervision design for maintaining language-video alignment during action learning remains limited. To investigate this, we curate a pool of approximately 47,000 hours of general videos, egocentric videos, UMI demonstrations, and robot demonstrations. Building on this, we systematically study how language-video supervision, language-video-action supervision, and the joint use of these two forms affect WAM performance. In particular, we examine how language annotation quality affects pretrained language-video capabilities, and how action supervision from UMI and robot demonstrations extends these capabilities to language-video-action modeling. To better scale the model, we further conduct detailed studies on joint training recipe and model architecture. Under a fixed training budget, mixing egocentric videos and UMI demonstrations improves control generalization. Model architecture affects how effectively these experiences are used, while scaling pretraining under the selected configuration brings further gains. The resulting recipe, post-trained on RoboTwin Clean demonstrations only, achieves success rates of 88.10% and 61.56% under Easy (Clean-to-Clean) and Hard (Clean-to-Random) conditions, respectively. Our model achieves 40.00% SR across three real-world tasks, compared with 23.33% for the strongest baseline, indicating better generalization under unseen conditions. We release the curated data, training code, and model weights.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:55:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yu Zhou</name>
+    </author>
+    <author>
+      <name>Xinyuan Xia</name>
+    </author>
+    <author>
+      <name>Xuankun Yang</name>
+    </author>
+    <author>
+      <name>Yinghao Yang</name>
+    </author>
+    <author>
+      <name>Wendi Chen</name>
+    </author>
+    <author>
+      <name>Bowen Liu</name>
+    </author>
+    <author>
+      <name>Jianhan Ma</name>
+    </author>
+    <author>
+      <name>Weicheng Duan</name>
+    </author>
+    <author>
+      <name>Jun Lv</name>
+    </author>
+    <author>
+      <name>Cewu Lu</name>
+    </author>
+    <author>
+      <name>Yanwei Li</name>
+    </author>
+  </entry>
+</feed>
