@@ -1,6 +1,6 @@
-[hf4 2026-11-10T09:59:12Z] VERSION=6.8.162
-[hf4 2026-11-10T09:59:12Z] PASS  bin/verify.js  —  passed=16 failed=0
-[hf4 2026-11-10T09:59:12Z] PASS  scripts/guard-abilities.js  —  能力检查 20/20 全通过；判别维度 243 个
-[hf4 2026-11-10T09:59:12Z] PASS  test/doc-numbers-accuracy.test.js  —  通过=24 失败=0
-[hf4 2026-11-10T09:59:12Z] PASS  scripts/bidirectional-guard.js  —  召回=52/52 误拦=302/326
-[hf4 2026-11-10T09:59:12Z] 四门禁全绿
+[hf4 2026-11-10T10:14:14Z] VERSION=6.8.162
+[hf4 2026-11-10T10:14:14Z] PASS  bin/verify.js  —  passed=16 failed=0
+[hf4 2026-11-10T10:14:14Z] PASS  scripts/guard-abilities.js  —  能力检查 20/20 全通过；判别维度 243 个
+[hf4 2026-11-10T10:14:14Z] PASS  test/doc-numbers-accuracy.test.js  —  通过=24 失败=0
+[hf4 2026-11-10T10:14:14Z] PASS  scripts/bidirectional-guard.js  —  召回=52/52 误拦=302/326
+[hf4 2026-11-10T10:14:14Z] 四门禁全绿
