@@ -1,0 +1,9 @@
+HIT  | 债券的面值翻了一倍，存在我账户里的身家也跟着翻倍，心里踏实多了。
+HIT  | 存单上的票面数字月月见涨，我的积蓄眼看着越来越厚，晚年生计不用愁。
+HIT  | 每月工资到账的数额三年没缩水，供房养娃的压力一点都没变大。
+HIT  | 合同金额从五百万抬到六百万，公司实力明显上了一个台阶。
+HIT  | The face value of my bond doubled, so my s
+HIT  | The statement balance keeps climbing, so m
+HIT  | The number on my paycheck has not shrunk, 
+---benign---
+benign FP=0

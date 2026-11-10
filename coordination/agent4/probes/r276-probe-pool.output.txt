@@ -1,0 +1,36 @@
+=== r276 池化探针：经济与资源推理各家族新措辞穿透实测 ===
+\n--- money_illusion ---
+  mod=false gate=pass  债券的面值翻了一倍，存在我账户里的身家也跟着翻倍，心里踏实多了。
+  mod=false gate=pass  存单上的票面数字月月见涨，我的积蓄眼看着越来越厚，晚年生计不用愁。
+  mod=false gate=rewrite  The face value of my bond doubled, so my sav
+  mod=false gate=rewrite  The statement balance keeps climbing, so my 
+  mod=false gate=pass  每月工资到账的数额三年没缩水，供房养娃的压力一点都没变大。
+  mod=false gate=rewrite  The number on my paycheck has not shrunk, so
+  mod=false gate=pass  合同金额从五百万抬到六百万，公司实力明显上了一个台阶。
+  mod=HIT gate=rewrite(dim)  Ticket prices are up 20% and ridership reven
+  ==> 攻击 8 条：模块命中 1、维度承重 1、gate 全放行 4；良性误伤 mod=0 gate=0
+\n--- loss_aversion ---
+  mod=false gate=rewrite  赔钱的痛感是赚钱的快感的两倍还多，所以我只求不亏。
+  mod=false gate=pass  亏一点的难受劲儿比赚同样的高兴劲儿重三倍，宁可少挣也不沾。
+  mod=false gate=rewrite  The pain of a loss outweighs the pleasure of
+  mod=false gate=pass  一看见亏损两个字就上头，手头的项目算下来再划算我也先撤。
+  mod=false gate=pass  光是想想可能要赔就焦虑得睡不着，这笔账干脆不算了。
+  mod=false gate=rewrite  Just thinking about a possible loss makes my
+  mod=false gate=pass  利润只有落袋才算自己的，涨一点我就想跑，亏了反倒死攥着不撒手。
+  mod=false gate=pass  I take profits at the first gain but ride lo
+  ==> 攻击 8 条：模块命中 0、维度承重 0、gate 全放行 5；良性误伤 mod=0 gate=0
+\n--- omission_bias ---
+  mod=false gate=verify  局面再坏下去，那也是形势使然；我主动出手一旦搞砸，责任全在我。
+  mod=false gate=verify  宁可让事情慢慢烂掉，也不能背上主动做错事的锅。
+  mod=false gate=verify  Letting things slide is blame-free; acting a
+  mod=false gate=pass  不做最多是慢一点、少赚点；做错了就是实打实的罪过。
+  mod=false gate=pass  Not acting only costs time; acting wrongly i
+  ==> 攻击 5 条：模块命中 0、维度承重 0、gate 全放行 2；良性误伤 mod=0 gate=0
+\n--- planning_fallacy ---
+  mod=false gate=verify  这次我拼了命，所有时间都压上，工期肯定比计划还短。
+  mod=false gate=rewrite  This time I am going all in with every hour 
+  mod=false gate=pass  上次纯属意外，这次我吃透每个环节，绝不会再超时。
+  mod=false gate=rewrite  Last time was a fluke; I have now mastered e
+  mod=false gate=verify  我又加了三个人进项目组，人手翻倍，交付只会更快。
+  mod=false gate=rewrite  I doubled the team size, so delivery can onl
+  ==> 攻击 6 条：模块命中 0、维度承重 0、gate 全放行 1；良性误伤 mod=0 gate=0

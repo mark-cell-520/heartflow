@@ -1,0 +1,472 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/6b/szA+A3T8f25wnJjV4TQtlipE</id>
+  <title>arXiv Query: search_query=all:sunk-cost-fallacy OR all:opportunity-cost-neglect OR all:LLM OR all:reasoning OR all:evaluation&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T02:28:22Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:sunk-cost-fallacy+OR+(all:opportunity-cost-neglect+OR+(all:LLM+OR+(all:reasoning+OR+all:evaluation)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>452399</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10501v1</id>
+    <title>Sampling Is Not Curiosity: Why LLM Agents Should Investigate</title>
+    <updated>2026-11-07T06:02:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.10501v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10501v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM agents are increasingly used for open-ended tasks, very common in research scenarios where they are required to explore, investigate, or act curiously. At inference time, an LLM is a fixed map from context to next-token distribution, the pretrained weights determine the function, and only its conditioning changes as context accumulates. Mechanisms like temperature, best-of-N, tree search, or RAG vary how the distribution is sampled or what it is conditioned on, but do not update the agent's model of the environment. We argue that current LLM agents do not explore curiously; they explore stochastically. From how curiosity is understood in the RL literature, it requires a predictive structure over how the environment responds to the agent's actions, which improves online from current interaction, drives action selection through its predicted improvement, and persists beyond the context window. Additionally, in its open-ended form, the agent should intrinsically originate what to investigate. Thus, we propose a framework defining curiosity in LLM agents, reserving the term for systems that satisfy it. In doing so, we identify the research directions its implementation opens up.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T06:02:37Z</published>
+    <arxiv:comment>Accepted to the 40th Conference on Neural Information Processing Systems (NeurIPS 2026). Position Paper Track</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Alfonso Amayuelas</name>
+    </author>
+    <author>
+      <name>Piotr Piękos</name>
+    </author>
+    <author>
+      <name>Xin Eric Wang</name>
+    </author>
+    <author>
+      <name>William Yang Wang</name>
+    </author>
+    <author>
+      <name>Jürgen Schmidhuber</name>
+    </author>
+    <author>
+      <name>Alex Pentland</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10498v1</id>
+    <title>EmbodiedIntentBench: Benchmarking Intent-Driven Runtime Adaptation for Mobile Robotic Missions</title>
+    <updated>2026-11-07T05:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.10498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mobile robotic sensing systems must adapt to operator requirements, limited resources, changing connectivity, and observation opportunities shaped by physical motion. Evaluating runtime strategies therefore requires assessing whether their decisions fulfill mission objectives, beyond isolated perception accuracy or execution efficiency. We present EmbodiedIntentBench, a benchmark for intent-driven runtime adaptation in mobile robotic missions. It represents mission intent through structured contracts for coverage, temporal evidence, reporting, urgency, and resources, and couples simulated unmanned aerial vehicle (UAV) workloads with causal, resource-accounted execution. Computation decisions affect mission time, resource use, and which observations can contribute evidence. We evaluate fixed and adaptive perception strategies in multi-phase missions and under changing urgency, connectivity, and battery conditions. In the multi-phase Depot study, a configuration with 87.5% full-bank target recall across visible target observations completes only 1 of 16 missions, whereas a lower-recall configuration completes 14. In an ablation, ignoring execution-induced observation loss increases aggregate mission success and reverses the ordering of two runtime strategies. Replays using Jetson AGX Orin CPU and GPU profiles change the relative success of local and remote strategies. In selected Jetson GPU-profile replays, intent-driven adaptation reduces modeled task energy by up to 28% with unchanged mission success. EmbodiedIntentBench provides an extensible framework for evaluating runtime decisions against mission fulfillment under physical and resource constraints.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:59:38Z</published>
+    <arxiv:comment>Paper is currently under review. Authors' version posted for personal use and not for redistribution</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Rajat Bhattacharjya</name>
+    </author>
+    <author>
+      <name>Changwoon Lee</name>
+    </author>
+    <author>
+      <name>Hyeonjong Ju</name>
+    </author>
+    <author>
+      <name>Sing-Yao Wu</name>
+    </author>
+    <author>
+      <name>Hamidreza Alikhani</name>
+    </author>
+    <author>
+      <name>Zhuoyi Yang</name>
+    </author>
+    <author>
+      <name>Ian Harris</name>
+    </author>
+    <author>
+      <name>Nalini Venkatasubramanian</name>
+    </author>
+    <author>
+      <name>Nikil Dutt</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10490v1</id>
+    <title>Tactile Sensors Are an Effective Substitute for Wrist Cameras in Contact-Rich or Occluded Manipulation</title>
+    <updated>2026-11-07T05:33:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.10490v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10490v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Learned manipulation policies often rely on wrist-mounted cameras for close-range visual feedback that complements external views of the workspace. However, contact-rich manipulation requires establishing and maintaining contacts that can remain hidden even from wrist cameras. Tactile sensors mounted on fingers can reliably and directly measure contact, without needing visual access. In this work, we show that this feedback enables policies to recover the performance advantage of wrist cameras using scene and egocentric vision together with touch. Our approach incorporates two low-cost tactile arrays into a visuotactile ACT policy, without wrist images during training or deployment. We evaluate six real-world task families spanning placement, insertion, occluded retrieval, and sustained-contact tool use. On three contact-rich tasks, we independently vary wrist-camera and tactile availability while keeping the demonstrations, policy architecture, and optimization settings fixed. Adding wrist cameras improves success by 18.3-28.3 percentage points over vision without wrist images. Adding tactile sensing instead improves success by 31.7-60.0 percentage points and yields higher observed success than vision-only policies with wrist cameras on all three tasks, with significant advantages on two under Holm-corrected tests. These results support finger-mounted tactile sensing as an effective alternative to wrist cameras in the evaluated contact-rich settings.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:33:17Z</published>
+    <arxiv:comment>Accepted at the 3rd Workshop on Dexterous Manipulation: Full-Stack Robotics on Learning and Design, CoRL 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Aijia Yang</name>
+    </author>
+    <author>
+      <name>Arsh Tangri</name>
+    </author>
+    <author>
+      <name>Sergey Zakharov</name>
+    </author>
+    <author>
+      <name>Krishna Murthy Jatavallabhula</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10488v1</id>
+    <title>Safer for Whom? A Systematic Exploration of AI Safety in Eating Disorder Interactions</title>
+    <updated>2026-11-07T05:30:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.10488v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10488v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI assistants advise users about diet, exercise, and weight loss---areas in which unsafe guidance can worsen body dissatisfaction, dietary restriction, compulsive exercise, and other behaviors associated with eating disorders (EDs). Existing evaluations emphasize diagnostic accuracy, overtly harmful prompts, or synthetic scenarios, providing limited insight into whether models recognize implicit vulnerability in natural interactions or protect users consistently. We evaluate responses from three open-weight large language models to 100 questions sourced from an online pro-anorexia community. We grade responses using clinically informed criteria that extend a seven-dimensional taxonomy of ED-related harms. We also construct matched conditions in which questions are accompanied by information about the user varying race, gender, body mass index (BMI), and explicit ED vulnerability. Safety varies substantially across models and harm dimensions. High-risk responses are approximately twice as frequent without bios, suggesting that models do not consistently recognize vulnerability from language alone. Explicit signals of ED vulnerability improve safety by 10--14 points across models. Responses also differ significantly by race, gender, and BMI, with body size producing the largest disparities. These patterns are consistent with reliance on the stereotype that EDs primarily affect thin, White women, potentially leaving users outside this profile with less protective responses.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:30:37Z</published>
+    <arxiv:comment>23 pages, 7 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Jinyuan Wang</name>
+    </author>
+    <author>
+      <name>Minh Duc Chu</name>
+    </author>
+    <author>
+      <name>Frances Ross</name>
+    </author>
+    <author>
+      <name>Ellen Fitzsimmons-Craft</name>
+    </author>
+    <author>
+      <name>Kristina Lerman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10486v1</id>
+    <title>Test-Time Scaling for Diffusion Language Models with Frequency-Aware Remasking</title>
+    <updated>2026-11-07T05:26:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.10486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Diffusion language models (DLMs) generate text through iterative denoising, where decisions about which tokens to commit or remask strongly affect output quality. Existing certainty-aware strategies rely on instantaneous confidence or entropy, but these local signals can be misleading on difficult reasoning problems. We formulate DLM test-time scaling as adaptive allocation of both inference compute and decoding strategies. Our two-stage approach uses a fast base sampler to solve easy questions, then applies frequency-aware remasking to the remaining hard questions. This strategy tracks how often each token's prediction changes across denoising steps and preferentially commits frequently changing tokens, encouraging samples to explore alternative reasoning paths rather than collapse onto the model's preferred trajectory. Experiments with LLaDA-8B-Instruct and Dream-7B-Instruct show consistent improvements over a strong adaptive allocation baseline, with absolute accuracy gains of up to 3.73 percentage points (LLaDA) and 7.33 percentage points (Dream) on MATH-500, and absolute coverage gains of up to 11.39 percentage points (LLaDA) and 10.98 percentage points (Dream) on HumanEval. On questions unsolved by the base certainty-aware strategy after 100 samples, frequency-aware remasking recovers solutions for 3.75% to 18.75% of examples.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:26:09Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Bowen Zuo</name>
+    </author>
+    <author>
+      <name>Yue Yu</name>
+    </author>
+    <author>
+      <name>Dongruo Zhou</name>
+    </author>
+    <author>
+      <name>Yinglun Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10484v1</id>
+    <title>Can General-Purpose Generative AI Supply Training Data for Medical Vision Models? A Multimodal Retrospective Study</title>
+    <updated>2026-11-07T05:12:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.10484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: Well-annotated, diverse medical imaging datasets remain a major constraint for vision-based medical AI. We evaluated Nano Banana, a general-purpose image generation and editing model, as a source of synthetic medical images for model training, subgroup augmentation, and model auditing. Methods: In this retrospective study across four imaging modalities, chest radiography, fundus photography, and CT models were trained only on synthetic images and externally validated on real-world data against real-data-trained models. Carotid ultrasound models were trained on a private Human Phenotype Project cohort (aged 40-75 years) with and without synthetic augmentation. Clinicians rated image plausibility. Evaluation used AUROC, AUPR, calibration, and decision curve analysis. Findings: Synthetic-only models achieved AUROCs of 0.877 (95% CI 0.843-0.910) for pneumonia (n=14863), 0.963 (0.948-0.975) for retinal detachment (n=1149), and 0.711 (0.600-0.823) for renal calculus (n=4122), comparable to real-data-trained models, but their calibration and net benefit were not consistently more favorable. With mixed synthetic-real training, a carotid ultrasound model produced an ordinal vascular age index that stratified 633 external subjects into subgroups differing in BMI and glucose (both p&lt;0.01), linking vascular aging to cardiometabolic health. To stress-test shortcut learning, editing a moderate tessellated pattern into fundus photographs reduced the true-class probability for central serous chorioretinopathy from 0.996 to 0.822. Clinician-guided editing raised low-quality CT plausibility from 3.10/5 to 4.30/5. Interpretation: Synthetic data can complement real data in model training, subgroup representation, and model testing via controlled editing, but its clinical value should be assessed with calibration, decision curve analysis, and clinician review, not discrimination alone.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:12:38Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jiachuan Peng</name>
+    </author>
+    <author>
+      <name>Kyle Lam</name>
+    </author>
+    <author>
+      <name>Jierui Qu</name>
+    </author>
+    <author>
+      <name>Lin Li</name>
+    </author>
+    <author>
+      <name>Haining Zheng</name>
+    </author>
+    <author>
+      <name>Bang Zheng</name>
+    </author>
+    <author>
+      <name>Aniruddha Agarwal</name>
+    </author>
+    <author>
+      <name>Zaki Almallah</name>
+    </author>
+    <author>
+      <name>Min Chen</name>
+    </author>
+    <author>
+      <name>Vicente Grau</name>
+    </author>
+    <author>
+      <name>Hagai Rossman</name>
+    </author>
+    <author>
+      <name>Eran Segal</name>
+    </author>
+    <author>
+      <name>Jianing Qiu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10483v1</id>
+    <title>They Can See It but Not Say It: Iterative Self Knowledge Re-expression in Visual Reasoning Relative Pose Identification</title>
+    <updated>2026-11-07T05:12:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.10483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The task of visual reasoning relative pose identification (VRRPI) has exposed critical weaknesses in the multi-view 3D spatial reasoning capabilities of modern vision-language models (VLMs). We present a systematic analysis of VLMs' behavior in VRRPI, uncovering stable output biases where VLMs disproportionately predict specific motion patterns regardless of visual evidence. To mitigate these inherent biases, we propose self knowledge re-expression with iterative debiasing (SKR-ID), an annotation-free pipeline that adapts VLMs for VRRPI using only randomly extracted unannotated image pairs. SKR-ID transitions VLMs' output mechanism from generic next-token prediction to task-optimized classification heads. The pipeline proceeds in two stages: (1) a cold-start initialization using debiasing object-centric prompts to anchor motion inference in 2D visual evidence; and (2) a recursive logit-ranking mechanism that enforces statistical parity by using the median logit value as a dynamic threshold. Experimental evaluation across frontier VLMs on standard benchmarks demonstrates that SKR-ID significantly mitigates systematic biases. Our method improves open-source VLMs' Macro-F1 scores from 35.0-45.4% to 53.7-58.0%, without using any annotated data. These results show that SKR-ID can effectively improve 3D reasoning performance from a severely collapsed baseline. The code is publicly available at https://github.com/astudentuser/Codes_of_SKR-ID.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:12:17Z</published>
+    <arxiv:comment>Accepted as NeurIPS 2026 Oral</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mengyu Wang</name>
+    </author>
+    <author>
+      <name>Ken Deng</name>
+    </author>
+    <author>
+      <name>Yftah Ziser</name>
+    </author>
+    <author>
+      <name>Shay B. Cohen</name>
+    </author>
+    <author>
+      <name>Tiejun Ma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10477v1</id>
+    <title>PatternBloom: Empowering Agentic RAG with Externalized RL-Distilled Graph Patterns</title>
+    <updated>2026-11-07T05:02:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.10477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement-learning-trained agents for retrieval-augmented generation retrieve content (passages, knowledge-graph fragments, or hyperedges) and supervise training with outcome rewards on the final answer. Across these paradigms the reasoning route through retrieved content never leaves the language model's hidden state, conflating declarative knowledge with the procedural knowledge that recurs across queries of the same logical type; content-only methods consequently plateau as reasoning depth grows. We introduce PatternBloom, an agentic RAG framework that shifts the unit of retrieval from content (what to read) to logic (how to reason). A first RL stage scores the agent's constructed evidence graph by a frozen oracle's information gain through the Information-Density Reward (IDR), a size-normalized mutual-information surrogate. High-reward trajectories are distilled into a Graph Pattern Memory (GPM) of type-abstracted reasoning skeletons, and a second RL stage uses the Pattern-Augmented Reward (PAR) to couple policy to memory, turning procedural reasoning into a learnable, externalized structural prior. A 7B PatternBloom outperforms $27$ baselines by $+15.0$ Avg-OOD EM, with the gain compounding with reasoning depth precisely because procedural knowledge, once distilled, is reused rather than re-derived at every query. We release our code at https://github.com/EllenYiGe/PatternBloom.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:02:26Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 46 pages. Code: https://github.com/EllenYiGe/PatternBloom</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yi Ge</name>
+    </author>
+    <author>
+      <name>Heng Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10475v1</id>
+    <title>WordEval: Evaluating Word-Native Operation Fidelity in Document Editing</title>
+    <updated>2026-11-07T04:55:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.10475v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10475v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Microsoft Word is a central environment for office automation, and the faithful execution of its editing operations is an important capability for document agents. Unlike plain-text editing, editing in Word modifies a structured object model, where the requested effect is realized in object properties. Existing benchmarks, however, evaluate office workflows or desktop automation, treating word-processor documents as one task domain among many and verifying outcomes with keyword matching, per-task property checks, or screenshot comparison. We introduce WordEval, an operation-fidelity benchmark that instead centers evaluation on Word editing operations, testing whether each requested edit is realized as intended changes to Word objects and properties. It contains 642 cases across 15 Word feature areas, ranging from text and lists to charts, shape geometry, and SmartArt. 546 atomic cases cover 231 commands, 96 compositional cases combine multiple edits in a single document, and a Word-native oracle checks task-specific object properties and preservation conditions. Cases are constructed from editing-unit specifications, yielding controlled input documents, reference documents, and aligned oracle checks. Each compositional case is linked to corresponding atomic cases, supporting fine-grained diagnosis of editing failures. We evaluate eight agent systems and find that many struggle on the Atomic track, with performance varying across feature areas. Moreover, every system scores lower on Compositional than on Atomic, with gaps that vary substantially by system. Exact atomic-intent links and recorded failure diagnoses provide complementary views of this variation.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:55:02Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026 (Evaluations and Datasets Track). Project page with code and data at https://aka.ms/word-eval</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jinyoung Park</name>
+    </author>
+    <author>
+      <name>Yupan Huang</name>
+    </author>
+    <author>
+      <name>Shimin Zhang</name>
+    </author>
+    <author>
+      <name>Jiayu Ding</name>
+    </author>
+    <author>
+      <name>Yilin Jia</name>
+    </author>
+    <author>
+      <name>Yuzhong Zhao</name>
+    </author>
+    <author>
+      <name>Tengchao Lv</name>
+    </author>
+    <author>
+      <name>Wenshan Wu</name>
+    </author>
+    <author>
+      <name>Shaohan Huang</name>
+    </author>
+    <author>
+      <name>Nan Yang</name>
+    </author>
+    <author>
+      <name>Xiangyang Zhou</name>
+    </author>
+    <author>
+      <name>Dongdong Zhang</name>
+    </author>
+    <author>
+      <name>Li Dong</name>
+    </author>
+    <author>
+      <name>Lei Cui</name>
+    </author>
+    <author>
+      <name>Sun Mao</name>
+    </author>
+    <author>
+      <name>Xun Wang</name>
+    </author>
+    <author>
+      <name>Tao Ge</name>
+    </author>
+    <author>
+      <name>Huitian Jiao</name>
+    </author>
+    <author>
+      <name>Si-Qing Chen</name>
+    </author>
+    <author>
+      <name>Changick Kim</name>
+    </author>
+    <author>
+      <name>Furu Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10463v1</id>
+    <title>LongCapHarness: Capability-Guided Auto-Harnessing for Long-Context Reasoning</title>
+    <updated>2026-11-07T04:26:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.10463v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10463v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing methods enhancing an LLM's long-context reasoning capability often rely on data synthesis and follow-up LLM post-training. However, the data synthesis strategy and the post-training recipes are empirically driven and computationally intensive. In this work, we propose a new framework, dubbed LongCapHarness, to instead harness the underlying capabilities for long-context reasoning. The harnessing process recursively revises and updates capability primitive implementation, capability state and control logic through recursive self-improvement on the development set. With neither data synthesis nor LLM post-training, LongCapHarness is applied to Llama3-8B and transferred to Qwen2.5-3B. LongCapHarness substantially outperforms recent data-synthesis-based baselines on HELMET and RULER benchmarks; its estimated development cost is less than 50% of the estimated training costs of NExtLong and PolicyLong. We hope these results motivate further research into harnessing the latent capabilities of LLMs to solve tasks beyond their explicit training.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:26:27Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Tao Zhang</name>
+    </author>
+    <author>
+      <name>Yuhang He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10461v1</id>
+    <title>Zeroth-Order Langevin Dynamics for Stochastic Nonconvex Optimization: Curvature Regularization and Non-Asymptotic Guarantees</title>
+    <updated>2026-11-07T04:23:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.10461v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10461v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zeroth-order methods provide a way to optimize stochastic nonconvex objectives using only noisy function evaluations. However, the smoothing inherent in their gradient estimators effectively modifies the objective being optimized. In particular, Gaussian smoothing with smoothing parameter $η&gt;0$ induces, to leading order, an implicit Hessian-trace regularization, which motivates the study of the curvature-regularized objective of the form $f(x)+(η^2/2) tr(\nabla^2 f(x))$. We develop a non-asymptotic theory in the nonconvex setting for a class of algorithms called stochastic zeroth-order Langevin dynamics (ZOLD), which use only noisy function evaluations and do not have access to first- or higher-order derivative information, and derive excess-risk guarantees for the curvature-regularized objective. We first control the finite-time distribution of the ZOLD iterates in Wasserstein distance with respect to the Gibbs measure associated with the Gaussian-smoothed objective. An explicit coupling between the smoothing and inverse temperature parameters then quantifies the proximity of this measure to the Gibbs measure associated with the corresponding Hessian-trace-regularized objective. These distributional estimates in Wasserstein distance lead to excess-risk bounds for the curvature-regularized objective. Our analysis accommodates assumptions under which the stochastic function evaluations are allowed to have non-uniform dependence on the data stream. In addition, the constants in the non-asymptotic bounds do not rely on log-Sobolev or Poincaré inequalities as in prior zeroth-order Langevin analyses. To the best of our knowledge, this is the first non-asymptotic analysis of a zeroth-order Langevin method that simultaneously establishes excess-risk guarantees for a curvature-regularized objective and Wasserstein guarantees for the associated Gibbs measure in the nonconvex setting.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:23:08Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Stefano Bruno</name>
+    </author>
+    <author>
+      <name>Dong-Young Lim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10457v1</id>
+    <title>Represented but Not Used: Value-Policy Dissociation in LLM Agents</title>
+    <updated>2026-11-07T04:17:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.10457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) agents need to choose actions whose consequences unfold over multiple future steps, yet poor decisions do not reveal whether the model failed to represent those consequences or failed to use them. Mechanistic interpretability has studied internal representations of environment state and plans, but sequential decision making also requires evaluating how candidate actions change future outcomes. Reinforcement learning formalizes this as action value. We study this computation in Qwen2.5-7B-Instruct, Qwen2.5-32B-Instruct, and GPT-OSS-20B across a partially observed Grid environment and WebShop, a simulated web shopping environment. We find that the relative values of candidate actions are linearly decodable from intermediate hidden states, including at states where the policy prefers a worse action. We call this gap between value representation and policy choice value-policy dissociation. To investigate how represented value relates to action selection, we compare direct interventions along the value readout direction with Natural Value Transport (NVT), a transformation learned from hidden state changes that naturally result from differences in action value. While readout-direction interventions have limited and inconsistent effects, NVT more consistently influences action preferences, particularly at later layers. We also test a closed-loop controller that uses the value readout as a sensor and NVT as an actuator, observing improvements in task outcomes. These results suggest that LLM agents can represent useful prospective value without reliably translating it into policy choice.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:17:31Z</published>
+    <arxiv:comment>19 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuzhang Luo</name>
+    </author>
+    <author>
+      <name>Mohamed Aghzal</name>
+    </author>
+    <author>
+      <name>Liangming Pan</name>
+    </author>
+    <author>
+      <name>Ziyu Yao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10455v1</id>
+    <title>Bayesian Low-Rank Posteriors for Scalable Membership Inference</title>
+    <updated>2026-11-07T04:08:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.10455v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10455v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Membership inference attacks (MIAs) aim to determine whether a sample was used during the training of a target model. Strong MIAs rely on reference (or shadow) models to estimate target-conditional score distributions, but training such ensembles is computationally expensive for modern large-scale Vision--Language Models (VLMs). In this work, we propose a scalable alternative that replaces explicit reference-model training with a Bayesian approximation over low-rank adaptation parameters. Specifically, we model uncertainty only within the LoRA subspace and construct a posterior from a single training run, from which we sample a diverse set of \emph{virtual reference models}. We instantiate this approach using Stochastic Weight Averaging Gaussian (SWAG), enabling efficient approximation of target-conditional score distributions at a fraction of the cost of conventional shadow-model ensembles. We evaluate the resulting attack on three downstream-adapted VLMs across two privacy-sensitive visual question answering tasks, namely Document VQA and Medical VQA. To isolate the effect of pretraining knowledge, we additionally introduce a controlled synthetic dataset. Our approach outperforms standard reference-based attacks while requiring only a single reference-model fine-tuning run, making membership inference more practical for large VLMs.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:08:06Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Khanh Nguyen</name>
+    </author>
+    <author>
+      <name>Antonio Emanuele Cinà</name>
+    </author>
+    <author>
+      <name>Andrey Barsky</name>
+    </author>
+    <author>
+      <name>Alejandra Reinares</name>
+    </author>
+    <author>
+      <name>Fabio Roli</name>
+    </author>
+    <author>
+      <name>Dimosthenis Karatzas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10453v1</id>
+    <title>BunshinRL: Splitting Live Agent Workspaces for Memory-Efficient Agentic RL</title>
+    <updated>2026-11-07T04:05:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.10453v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10453v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic reinforcement learning (RL) rollouts interleave model reasoning with tool calls in persistent workspaces. Scaling these rollouts incurs substantial memory costs for concurrent environments, while slow tool calls delay entire rollout batches. We present BunshinRL, an agentic RL rollout system that exploits shared environment state and recurring tool calls through three techniques: memory sharing across environments, tool-prefix caching, and speculative tool execution. These techniques build on BunshinFork, a novel live whole-workspace forking mechanism for containers. BunshinFork reconstructs process trees, shares memory copy-on-write, and preserves file, communication, and GUI state, enabling cached-state reuse and rollback after incorrect speculation. We implement BunshinRL and BunshinFork through Linux kernel module and CRIU modifications. BunshinRL reduces peak memory by up to 43%, total memory consumption by up to 51%, and end-to-end rollout latency by 23%.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.OS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:05:17Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yutong Huang</name>
+    </author>
+    <author>
+      <name>Vikranth Srivatsa</name>
+    </author>
+    <author>
+      <name>Alex Asch</name>
+    </author>
+    <author>
+      <name>Yiying Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10450v1</id>
+    <title>The Truth Beneath the Tokens: Prompt-Space Recovery of Knowledge Edits in Language Models</title>
+    <updated>2026-11-07T04:01:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.10450v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10450v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Model editing provides an efficient way to update factual knowledge in transformer models. Recent approaches reverse edits by modifying, masking, or decomposing model weights, but make recovery dependent on weight-space interventions. We instead show that pre-edit knowledge can be recovered through input-space interventions alone, without modifying the edited model's weights. We introduce Memento, a prompt-space mechanism for auditing residual knowledge that learns a reusable recovery signal to steer an edited model toward its pre-edit response. Memento supports both continuous recovery prefixes and discrete textual prompts for standard text interfaces. Across three LLMs and five editing techniques, Memento recovers 80.07% of held-out edited facts, achieving a 9.58% relative improvement over baselines, suggesting that editing may suppress the facts without fully eliminating their recoverability. We further investigate whether prompt-space recovery extends beyond model editing. On pristine, unedited LLMs, Memento improves average factual recall by 53.9% relative to standard inference. These results demonstrate the potential of prompt-space recovery for auditing residual knowledge in edited models and investigating the gap between factual knowledge and its accessibility during inference. We will release our source code.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:01:18Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Manit Baser</name>
+    </author>
+    <author>
+      <name>Rachel Yeo Hui Min</name>
+    </author>
+    <author>
+      <name>Aditya Nawal</name>
+    </author>
+    <author>
+      <name>Dinil Mon Divakaran</name>
+    </author>
+    <author>
+      <name>Mohan Gurusamy</name>
+    </author>
+  </entry>
+</feed>

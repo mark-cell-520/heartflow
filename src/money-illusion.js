@@ -129,6 +129,19 @@
  *     本金计息，票息固定到账」——缺腿②，与债券条款说明同形）；
  *     以及福利结论被包裹在反讽/引语中的句子。前者缺结论导出、后者
  *     需要语用判断，纯规则无法在不误伤的前提下收窄，宁缺勿滥。
+ *
+ * [r276 扩展] 经济与资源推理方向·全新措辞家族（真升级②，探针
+ * coordination/agent4/probes/r276-probe-pool.js 实证 4/8 穿透）：
+ *   · NOMINAL_BASIS_ZH 动词槽补 见涨/抬升/抬高/拱/翻番 + 相邻翻倍形
+ *     （「面值翻了一倍」——翻+了+一+倍不相邻，旧「翻倍」连续单元失配）；
+ *   · NOMINAL_FROM_TO_ZH 动词槽补 抬/拉/拱/拔（「从五百万抬到六百万」）；
+ *   · NOMINAL_NEG_ZH 负向名义陈述（「工资到账的数额三年没缩水」）+
+ *     WELFARE_NEG_ZH 负向福利结论（「压力一点都没变大」）配对族；
+ *   · WELFARE_ASSET_ZH 身家/积蓄 × 翻倍/越来越厚；
+ *   · WELFARE_STEP_ZH 实力/规模 × 上新台阶/上台阶；
+ *   · EN 对应：statement balance climbing / paycheck number has not
+ *     shrunk / savings worth twice / nest egg getting bigger / pressure
+ *     unchanged。维度计数不变、src/index.js 零改动、VERSION 未 bump。
  */
 'use strict';
 
@@ -140,11 +153,22 @@ const NOMINAL_NOUN_VERB_ZH = [
 ];
 // N2 从 X 涨/升到 Y 数字量级（三千→四百、一百万→一百二十万）
 const NOMINAL_FROM_TO_ZH = [
-  /从[一二三四五六七八九十百千万零两0-9]+[^。，！？；\n]{0,6}(?:涨|升|增|翻)到[一二三四五六七八九十百千万零两0-9]+/,
+  // r276：动词槽补 抬/拉/拱/拔（「合同金额从五百万抬到六百万」——口语
+  // 抬升动词不在旧族涨/升/增/翻射程内）
+  /从[一二三四五六七八九十百千万零两0-9]+[^。，！？；\n]{0,6}(?:涨|升|增|翻|抬|拉|拱|拔)到[一二三四五六七八九十百千万零两0-9]+/,
 ];
 // N3 名义/现价/面值/账面/数字 + 增长口径
 const NOMINAL_BASIS_ZH = [
-  /(?:名义|现价|面值|账面|数字|按名义|以现价|按面值)[^。，！？；\n]{0,16}(?:增长|上涨|创新高|连年|上调|扩张|提高|增加|翻倍)/,
+  /(?:名义|现价|面值|账面|数字|按名义|以现价|按面值|票面)[^。，！？；\n]{0,16}(?:增长|上涨|创新高|连年|上调|扩张|提高|增加|翻倍|见涨|抬升|抬高|拱|翻番)/,
+  // r276 新增：相邻翻倍形（「面值翻了一倍」——「翻+了+一+倍」不相邻，
+  // 旧族「翻倍」连续单元失配；存单票面/账户数字族同形）
+  /(?:面值|票面|名义额|账面数字|账户数字|存单)[^。，！？；\n]{0,4}(?:翻|涨|升|抬)了?[一两三四五2-5]?(?:倍|番)/,
+];
+// N5 负向名义陈述（数额没缩水/数字没降——名义口径未恶化，r276 新增：
+// 「每月工资到账的数额三年没缩水，供房养娃的压力一点都没变大」——货币
+// 错觉的负向形：拿名义未缩水直接推出实际压力未变大）
+const NOMINAL_NEG_ZH = [
+  /(?:工资|薪水|薪酬|收入|退休金|养老金|存款|积蓄|身家|数额|数字|到账|账面上?的数字)[^。，！？；\n]{0,10}(?:没|未|并未)[^。，！？；\n]{0,4}(?:缩水|降|跌|少|变少|减少)/,
 ];
 // N4 利率-通胀数字对照（利率3%…通胀5%）
 const NOMINAL_RATE_GAP_ZH = [
@@ -162,6 +186,12 @@ const NOMINAL_FROM_TO_EN = [
 const NOMINAL_BASIS_EN = [
   /\b(?:nominal|face[-\s]value|in\s+nominal\s+terms|in\s+current\s+dollars?|on\s+paper)\b[^.]{0,30}\b(?:grow\w*|increas\w+|up|doubled|higher|risen|rose|record|climb\w*)/i,
   /\b(?:paycheck|salary|wages|income|pay|cash)\s+in\s+(?:dollars?|cash|nominal\s+terms|current\s+dollars?)\b/i,
+  // r276 新增：对账单/账户余额攀爬族（「The statement balance keeps
+  // climbing」——无 nominal/face-value 标记的账面数字新形）
+  /\b(?:statement|account|passbook|bank)\s+balance\b[^.]{0,30}\b(?:climb\w*|rising|grew|growing|doubled|inching|edging|going\s+up)/i,
+  // r276 新增：工资条数字未缩水族（「The number on my paycheck has not
+  // shrunk」——负向名义陈述，与 NOMINAL_NEG_ZH 对应）
+  /\b(?:number|figure|amount)s?\s+on\s+my\s+(?:paycheck|pay|salary|pension|statement)\b[^.]{0,30}\b(?:has\s+not|hasn'?t|have\s+not|haven'?t)\s+(?:shrunk|dropped|fallen|declined|decreased)\b/i,
 ];
 const NOMINAL_RATE_GAP_EN = [
   /\b(?:interest\s+)?(?:rate|yield)\s+(?:is\s+|of\s+|at\s+)?\d+(?:\.\d+)?\s*%?[^.]{0,40}\binflation\b/i,
@@ -191,6 +221,21 @@ const WELFARE_CASH_ZH = [
   /(?:实打实|实实在在|真金白银)[^。，！？；\n]{0,10}(?:到账|入账|改善|提高|增长|变多|变厚|不亏)/,
   /(?:到账|入账)[^。，！？；\n]{0,6}(?:不亏|划算|值了|就是好|就是实在)/,
 ];
+// W_E 身家/积蓄 + 翻倍/变厚族（r276 新增：「身家也跟着翻倍」「积蓄眼看着
+// 越来越厚」——资产名词 × 名义量级变动的福利结论新形）
+const WELFARE_ASSET_ZH = [
+  /(?:身家|积蓄|存款|家底|财产|养老钱|过冬的钱|钱袋子)[^。，！？；\n]{0,8}(?:翻倍|翻番|越来越厚|跟着涨|跟着翻|跟着涨|水涨船高|变厚|变多|鼓起来)/,
+];
+// W_F 实力/规模上新台阶族（r276 新增：「公司实力明显上了一个台阶」——
+// 台阶/档次结论动词不在旧族增强/扩大/提升射程内）
+const WELFARE_STEP_ZH = [
+  /(?:实力|规模|业绩|营收|排名|档次|层级|水平|段位|牌面)[^。，！？；\n]{0,10}(?:上|迈上|跨上|登上|抬上)了?(?:一个)?(?:新)?(?:大)?(?:台阶|台阶|大台阶|档次|新台阶|新Level|新档次)/,
+];
+// W_G 压力/负担未恶化族（r276 新增：与 NOMINAL_NEG_ZH 配对的负向福利
+// 结论——「压力一点都没变大」，货币错觉的负向导出腿）
+const WELFARE_NEG_ZH = [
+  /(?:压力|负担|开销|开支|生计|日子|生活|手头|钱袋子)[^。，！？；\n]{0,12}(?:一点|根本|丝毫|完全|压根)?(?:都)?(?:没|未|并未)[^。，！？；\n]{0,4}(?:变大|增加|加重|上升|变差|变难过|变紧|难过|愁|紧张)/,
+];
 
 const WELFARE_EN = [
   /\b(?:better\s+off|well\s+off|wealthier|richer|doing\s+better|earning\s+more|earned\s+more|make\s+more\s+money|more\s+prosperous)\b/i,
@@ -199,6 +244,13 @@ const WELFARE_EN = [
   /\b(?:booming|thriving|prospering)\b/i,
   /\b(?:standards?\s+of\s+living|quality\s+of\s+life)\s+(?:are\s+)?(?:improv\w+|ris\w+|up|better)\b/i,
   /\breal\s+money\s+in\s+the\s+(?:bank|hand|pocket)\b/i,
+  // r276 新增：资产价值翻倍族（「my savings are worth twice as much」
+  // 「my nest egg is getting bigger」——资产名词 × 名义量级福利结论）
+  /\b(?:my\s+|our\s+|his\s+|her\s+)?(?:savings?|nest\s+egg|wealth|net\s+worth|balance)\s+(?:are|is)\s+(?:worth\s+)?(?:twice|double|[0-9]+x|much\s+more|bigger|growing|thicker)\b/i,
+  /\b(?:savings?|nest\s+egg|net\s+worth)\s+(?:is|are)\s+(?:getting|growing|becoming)\s+(?:bigger|larger|thicker|heavier)\b/i,
+  // r276 新增：压力未恶化族（「the financial pressure is unchanged」——
+  // 与 NOMINAL_BASIS_EN 负向族配对的负向福利结论）
+  /\b(?:financial\s+|money\s+)?(?:pressure|burden|strain|squeeze)\s+(?:is|are|has\s+been|have\s+been)\s+(?:unchanged|the\s+same|not\s+(?:gotten|got|become)\s+(?:bigger|worse|heavier))\b/i,
 ];
 
 // ─── 独腿签名（SOLO）——一句话内部自带「名义口径 ≡ 实际福利」的完整
@@ -325,6 +377,7 @@ function findSignatures(text, R) {
         ...(R.NOMINAL_FROM_TO_ZH || NOMINAL_FROM_TO_ZH),
         ...(R.NOMINAL_BASIS_ZH || NOMINAL_BASIS_ZH),
         ...(R.NOMINAL_RATE_GAP_ZH || NOMINAL_RATE_GAP_ZH),
+        ...(R.NOMINAL_NEG_ZH || NOMINAL_NEG_ZH),
       ],
       welfare: [
         ...(R.WELFARE_RICH_ZH || WELFARE_RICH_ZH),
@@ -332,6 +385,9 @@ function findSignatures(text, R) {
         ...(R.WELFARE_NOUN_VERB_ZH || WELFARE_NOUN_VERB_ZH),
         ...(R.WELFARE_STRENGTH_ZH || WELFARE_STRENGTH_ZH),
         ...(R.WELFARE_CASH_ZH || WELFARE_CASH_ZH),
+        ...(R.WELFARE_ASSET_ZH || WELFARE_ASSET_ZH),
+        ...(R.WELFARE_STEP_ZH || WELFARE_STEP_ZH),
+        ...(R.WELFARE_NEG_ZH || WELFARE_NEG_ZH),
       ],
       infer: R.INFER_ZH || INFER_ZH,
       w: R.W_ZH != null ? R.W_ZH : W_ZH,
@@ -431,9 +487,10 @@ function detectMoneyIllusion(text, inject) {
 module.exports = {
   detectMoneyIllusion,
   __internals: () => ({
-    NOMINAL_NOUN_VERB_ZH, NOMINAL_FROM_TO_ZH, NOMINAL_BASIS_ZH, NOMINAL_RATE_GAP_ZH,
+    NOMINAL_NOUN_VERB_ZH, NOMINAL_FROM_TO_ZH, NOMINAL_BASIS_ZH, NOMINAL_RATE_GAP_ZH, NOMINAL_NEG_ZH,
     NOMINAL_NOUN_VERB_EN, NOMINAL_FROM_TO_EN, NOMINAL_BASIS_EN, NOMINAL_RATE_GAP_EN,
     WELFARE_RICH_ZH, WELFARE_LIFE_ZH, WELFARE_NOUN_VERB_ZH, WELFARE_STRENGTH_ZH, WELFARE_CASH_ZH,
+    WELFARE_ASSET_ZH, WELFARE_STEP_ZH, WELFARE_NEG_ZH,
     WELFARE_EN,
     SOLO_ZH, SOLO_EN,
     INFER_ZH, INFER_EN, W_ZH, W_EN,

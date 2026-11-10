@@ -1,0 +1,399 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/3gjStov+eo7Zs0u6OZ2NZ7/DU74</id>
+  <title>arXiv Query: search_query=all:economic OR all:reasoning OR all:resource OR all:constraint OR all:decision OR all:fallacies OR all:opportunity OR all:cost OR all:sunk OR all:cost OR all:scarcity OR all:behavioral OR all:economics&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T02:27:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:economic+OR+(all:reasoning+OR+(all:resource+OR+(all:constraint+OR+(all:decision+OR+(all:fallacies+OR+(all:opportunity+OR+(all:cost+OR+(all:sunk+OR+(all:cost+OR+(all:scarcity+OR+(all:behavioral+OR+all:economics)))))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>745027</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10500v1</id>
+    <title>On the estimation of linear-optical amplitudes and probabilities with entangled input state</title>
+    <updated>2026-11-07T06:02:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.10500v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10500v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Most proposed applications of boson samplers, including photonic machine-learning models, do not use the samples themselves but estimates of output probabilities, marginals or overlaps, obtained to additive precision from a finite number of shots. For product inputs such as single photons, these quantities can already be estimated classically with Gurvits's algorithm and its generalisations. We ask whether entangled inputs change this picture. For any $n$-photon input that is a matrix-product state of bond dimension $χ$, with one photon per site and $L$ modes per site, we give an unbiased estimator of any output amplitude of an $m$-mode interferometer, whose mean-square error after $N$ draws is at most $\|ψ\|^2/N$ whatever the interferometer, the output pattern and the entanglement of the state. Each draw costs $O(nLχ^2+nL^3+mn)$ operations after $O(nLχ^3)$ preprocessing, and an additive error $\varepsilon$ with probability at least $1-δ$ requires $O(\|ψ\|^2\varepsilon^{-2}\log(1/δ))$ draws, with memory of the order of the input size. The main application is to light emitted sequentially by quantum emitters, such as spin-based sources of photonic cluster states, for which $χ$ is bounded by the dimension of the source's retained quantum memory: one spin gives $χ=2$ at any length, and a memory of $k$ qubits, held in emitters or in photons stored in a delay line, gives $χ\le2^k$, so the cost stays polynomial as long as $k=O(\log n)$. The same sampler also estimates traced-memory probabilities, overlaps and individual marginal probabilities. All guarantees are additive: the estimator gives neither relative estimates of exponentially small probabilities nor a sampler of the output distribution.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T06:02:11Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Jean Senellart</name>
+    </author>
+    <author>
+      <name>Pierre-Emmanuel Emeriau</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10498v1</id>
+    <title>EmbodiedIntentBench: Benchmarking Intent-Driven Runtime Adaptation for Mobile Robotic Missions</title>
+    <updated>2026-11-07T05:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.10498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mobile robotic sensing systems must adapt to operator requirements, limited resources, changing connectivity, and observation opportunities shaped by physical motion. Evaluating runtime strategies therefore requires assessing whether their decisions fulfill mission objectives, beyond isolated perception accuracy or execution efficiency. We present EmbodiedIntentBench, a benchmark for intent-driven runtime adaptation in mobile robotic missions. It represents mission intent through structured contracts for coverage, temporal evidence, reporting, urgency, and resources, and couples simulated unmanned aerial vehicle (UAV) workloads with causal, resource-accounted execution. Computation decisions affect mission time, resource use, and which observations can contribute evidence. We evaluate fixed and adaptive perception strategies in multi-phase missions and under changing urgency, connectivity, and battery conditions. In the multi-phase Depot study, a configuration with 87.5% full-bank target recall across visible target observations completes only 1 of 16 missions, whereas a lower-recall configuration completes 14. In an ablation, ignoring execution-induced observation loss increases aggregate mission success and reverses the ordering of two runtime strategies. Replays using Jetson AGX Orin CPU and GPU profiles change the relative success of local and remote strategies. In selected Jetson GPU-profile replays, intent-driven adaptation reduces modeled task energy by up to 28% with unchanged mission success. EmbodiedIntentBench provides an extensible framework for evaluating runtime decisions against mission fulfillment under physical and resource constraints.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:59:38Z</published>
+    <arxiv:comment>Paper is currently under review. Authors' version posted for personal use and not for redistribution</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Rajat Bhattacharjya</name>
+    </author>
+    <author>
+      <name>Changwoon Lee</name>
+    </author>
+    <author>
+      <name>Hyeonjong Ju</name>
+    </author>
+    <author>
+      <name>Sing-Yao Wu</name>
+    </author>
+    <author>
+      <name>Hamidreza Alikhani</name>
+    </author>
+    <author>
+      <name>Zhuoyi Yang</name>
+    </author>
+    <author>
+      <name>Ian Harris</name>
+    </author>
+    <author>
+      <name>Nalini Venkatasubramanian</name>
+    </author>
+    <author>
+      <name>Nikil Dutt</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10491v1</id>
+    <title>A Trajectory-Aware Domain-Decomposed Multispace Reduced Basis Preconditioner for Parametric Helmholtz Problems</title>
+    <updated>2026-11-07T05:35:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.10491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Repeated solutions of parametric Helmholtz problems arise in multi-query applications such as sensitivity analysis and uncertainty quantification. Classical preconditioned iterative solvers do not automatically reuse low-dimensional structures across parameters. Multispace reduced basis (MSRB) preconditioners can exploit such structures by constructing iteration-specific reduced order models (ROMs) from training data, but storing global iteration-dependent bases incurs substantial memory costs. Building on trajectory-aware MSRB training, we develop a domain-decomposed MSRB (DD-MSRB) preconditioner for parametric Helmholtz systems truncated by perfectly matched layers (PMLs). Within flexible GMRES, each reduced space is trained on inverse-action snapshots along the Krylov trajectories generated by the ROM-based preconditioners applied in preceding iterations. To reduce storage, problem-adapted spatial partitions exploit heterogeneous local snapshot compressibility across the physical interior and the PML. Local basis dimensions in each subdomain are determined greedily under a global snapshot-error budget to balance approximation accuracy and storage. The resulting hybrid solver applies DD-MSRB preconditioning during the initial iterations to capture dominant cross-parameter modes and then switches, when necessary, to a shifted-Laplacian preconditioner to reduce error components poorly represented by the reduced spaces. Numerical experiments on two-dimensional half-space propagation, elliptic-obstacle scattering, and three-dimensional waveguides demonstrate significant acceleration over the shifted-Laplacian baseline and substantial memory savings relative to global MSRB. For the largest waveguide system, with 11.0 million unknowns, DD-MSRB reduces deployed ROM storage by 44.9% and mean online solve time by 30.2% compared with global MSRB.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:35:11Z</published>
+    <arxiv:comment>24 pages, 14 figures</arxiv:comment>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>An Ping</name>
+    </author>
+    <author>
+      <name>Zhichao Peng</name>
+    </author>
+    <author>
+      <name>Pengliang Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10490v1</id>
+    <title>Tactile Sensors Are an Effective Substitute for Wrist Cameras in Contact-Rich or Occluded Manipulation</title>
+    <updated>2026-11-07T05:33:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.10490v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10490v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Learned manipulation policies often rely on wrist-mounted cameras for close-range visual feedback that complements external views of the workspace. However, contact-rich manipulation requires establishing and maintaining contacts that can remain hidden even from wrist cameras. Tactile sensors mounted on fingers can reliably and directly measure contact, without needing visual access. In this work, we show that this feedback enables policies to recover the performance advantage of wrist cameras using scene and egocentric vision together with touch. Our approach incorporates two low-cost tactile arrays into a visuotactile ACT policy, without wrist images during training or deployment. We evaluate six real-world task families spanning placement, insertion, occluded retrieval, and sustained-contact tool use. On three contact-rich tasks, we independently vary wrist-camera and tactile availability while keeping the demonstrations, policy architecture, and optimization settings fixed. Adding wrist cameras improves success by 18.3-28.3 percentage points over vision without wrist images. Adding tactile sensing instead improves success by 31.7-60.0 percentage points and yields higher observed success than vision-only policies with wrist cameras on all three tasks, with significant advantages on two under Holm-corrected tests. These results support finger-mounted tactile sensing as an effective alternative to wrist cameras in the evaluated contact-rich settings.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:33:17Z</published>
+    <arxiv:comment>Accepted at the 3rd Workshop on Dexterous Manipulation: Full-Stack Robotics on Learning and Design, CoRL 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Aijia Yang</name>
+    </author>
+    <author>
+      <name>Arsh Tangri</name>
+    </author>
+    <author>
+      <name>Sergey Zakharov</name>
+    </author>
+    <author>
+      <name>Krishna Murthy Jatavallabhula</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10488v1</id>
+    <title>Safer for Whom? A Systematic Exploration of AI Safety in Eating Disorder Interactions</title>
+    <updated>2026-11-07T05:30:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.10488v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10488v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI assistants advise users about diet, exercise, and weight loss---areas in which unsafe guidance can worsen body dissatisfaction, dietary restriction, compulsive exercise, and other behaviors associated with eating disorders (EDs). Existing evaluations emphasize diagnostic accuracy, overtly harmful prompts, or synthetic scenarios, providing limited insight into whether models recognize implicit vulnerability in natural interactions or protect users consistently. We evaluate responses from three open-weight large language models to 100 questions sourced from an online pro-anorexia community. We grade responses using clinically informed criteria that extend a seven-dimensional taxonomy of ED-related harms. We also construct matched conditions in which questions are accompanied by information about the user varying race, gender, body mass index (BMI), and explicit ED vulnerability. Safety varies substantially across models and harm dimensions. High-risk responses are approximately twice as frequent without bios, suggesting that models do not consistently recognize vulnerability from language alone. Explicit signals of ED vulnerability improve safety by 10--14 points across models. Responses also differ significantly by race, gender, and BMI, with body size producing the largest disparities. These patterns are consistent with reliance on the stereotype that EDs primarily affect thin, White women, potentially leaving users outside this profile with less protective responses.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:30:37Z</published>
+    <arxiv:comment>23 pages, 7 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Jinyuan Wang</name>
+    </author>
+    <author>
+      <name>Minh Duc Chu</name>
+    </author>
+    <author>
+      <name>Frances Ross</name>
+    </author>
+    <author>
+      <name>Ellen Fitzsimmons-Craft</name>
+    </author>
+    <author>
+      <name>Kristina Lerman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10487v1</id>
+    <title>GEAR: A GPU-Accelerated Global Solver for Bounded Continuous Nonlinear Programs via Linear Bound Propagation</title>
+    <updated>2026-11-07T05:29:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.10487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a novel GPU-accelerated global solver for constrained nonlinear programming (NLP) inspired by the efficient linear bound propagation framework in neural network (NN) verification. Existing work on NN verification, a problem that can be cast as feasibility detection for a nonlinear objective, demonstrated orders-of-magnitude speedups with the linear bound propagation-based framework when compared to traditional solvers. Extending this paradigm to global nonlinear programming requires addressing many challenges: a global constrained NLP solver must effectively exploit all, possibly unstructured, nonlinear constraints to improve the objective, whereas NN verification typically handles simple input box constraints over a well-structured NN and does not directly optimize an objective function. We address these challenges by fully exploiting the linear bounds produced by bound propagation: these linear bounds can be viewed as relaxations of nonlinear constraints and used to provide lower bounds, check infeasibility, and guide the search for a primal solution. In addition, we propose tighter linear relaxations for bilinear, quotient, and other commonly used nonlinear functions in NLP problems, and a projected augmented Lagrangian method tightly coupled to our dual solving procedure to produce primal solutions. Our method solves 421 of 505 bounded and continuous NLP problems in the GAMS and MINLPLib benchmarks under a 180-second limit, more than each of the six global solvers we compare with, including Gurobi and BARON (commercial), and SCIP (open-source). Sixteen of these problems are certified by none of the six global solvers; all of them contain exponential, logarithmic, or trigonometric terms, which are often challenging for traditional approaches. Project webpage is at https://verified-intelligence.github.io/GEAR.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:29:20Z</published>
+    <arxiv:comment>Accepted by NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Duo Zhou</name>
+    </author>
+    <author>
+      <name>Hesun Chen</name>
+    </author>
+    <author>
+      <name>Xiangru Zhong</name>
+    </author>
+    <author>
+      <name>Grani A. Hanasusanto</name>
+    </author>
+    <author>
+      <name>Huan Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10486v1</id>
+    <title>Test-Time Scaling for Diffusion Language Models with Frequency-Aware Remasking</title>
+    <updated>2026-11-07T05:26:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.10486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Diffusion language models (DLMs) generate text through iterative denoising, where decisions about which tokens to commit or remask strongly affect output quality. Existing certainty-aware strategies rely on instantaneous confidence or entropy, but these local signals can be misleading on difficult reasoning problems. We formulate DLM test-time scaling as adaptive allocation of both inference compute and decoding strategies. Our two-stage approach uses a fast base sampler to solve easy questions, then applies frequency-aware remasking to the remaining hard questions. This strategy tracks how often each token's prediction changes across denoising steps and preferentially commits frequently changing tokens, encouraging samples to explore alternative reasoning paths rather than collapse onto the model's preferred trajectory. Experiments with LLaDA-8B-Instruct and Dream-7B-Instruct show consistent improvements over a strong adaptive allocation baseline, with absolute accuracy gains of up to 3.73 percentage points (LLaDA) and 7.33 percentage points (Dream) on MATH-500, and absolute coverage gains of up to 11.39 percentage points (LLaDA) and 10.98 percentage points (Dream) on HumanEval. On questions unsolved by the base certainty-aware strategy after 100 samples, frequency-aware remasking recovers solutions for 3.75% to 18.75% of examples.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:26:09Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Bowen Zuo</name>
+    </author>
+    <author>
+      <name>Yue Yu</name>
+    </author>
+    <author>
+      <name>Dongruo Zhou</name>
+    </author>
+    <author>
+      <name>Yinglun Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10484v1</id>
+    <title>Can General-Purpose Generative AI Supply Training Data for Medical Vision Models? A Multimodal Retrospective Study</title>
+    <updated>2026-11-07T05:12:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.10484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: Well-annotated, diverse medical imaging datasets remain a major constraint for vision-based medical AI. We evaluated Nano Banana, a general-purpose image generation and editing model, as a source of synthetic medical images for model training, subgroup augmentation, and model auditing. Methods: In this retrospective study across four imaging modalities, chest radiography, fundus photography, and CT models were trained only on synthetic images and externally validated on real-world data against real-data-trained models. Carotid ultrasound models were trained on a private Human Phenotype Project cohort (aged 40-75 years) with and without synthetic augmentation. Clinicians rated image plausibility. Evaluation used AUROC, AUPR, calibration, and decision curve analysis. Findings: Synthetic-only models achieved AUROCs of 0.877 (95% CI 0.843-0.910) for pneumonia (n=14863), 0.963 (0.948-0.975) for retinal detachment (n=1149), and 0.711 (0.600-0.823) for renal calculus (n=4122), comparable to real-data-trained models, but their calibration and net benefit were not consistently more favorable. With mixed synthetic-real training, a carotid ultrasound model produced an ordinal vascular age index that stratified 633 external subjects into subgroups differing in BMI and glucose (both p&lt;0.01), linking vascular aging to cardiometabolic health. To stress-test shortcut learning, editing a moderate tessellated pattern into fundus photographs reduced the true-class probability for central serous chorioretinopathy from 0.996 to 0.822. Clinician-guided editing raised low-quality CT plausibility from 3.10/5 to 4.30/5. Interpretation: Synthetic data can complement real data in model training, subgroup representation, and model testing via controlled editing, but its clinical value should be assessed with calibration, decision curve analysis, and clinician review, not discrimination alone.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:12:38Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jiachuan Peng</name>
+    </author>
+    <author>
+      <name>Kyle Lam</name>
+    </author>
+    <author>
+      <name>Jierui Qu</name>
+    </author>
+    <author>
+      <name>Lin Li</name>
+    </author>
+    <author>
+      <name>Haining Zheng</name>
+    </author>
+    <author>
+      <name>Bang Zheng</name>
+    </author>
+    <author>
+      <name>Aniruddha Agarwal</name>
+    </author>
+    <author>
+      <name>Zaki Almallah</name>
+    </author>
+    <author>
+      <name>Min Chen</name>
+    </author>
+    <author>
+      <name>Vicente Grau</name>
+    </author>
+    <author>
+      <name>Hagai Rossman</name>
+    </author>
+    <author>
+      <name>Eran Segal</name>
+    </author>
+    <author>
+      <name>Jianing Qiu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10483v1</id>
+    <title>They Can See It but Not Say It: Iterative Self Knowledge Re-expression in Visual Reasoning Relative Pose Identification</title>
+    <updated>2026-11-07T05:12:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.10483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The task of visual reasoning relative pose identification (VRRPI) has exposed critical weaknesses in the multi-view 3D spatial reasoning capabilities of modern vision-language models (VLMs). We present a systematic analysis of VLMs' behavior in VRRPI, uncovering stable output biases where VLMs disproportionately predict specific motion patterns regardless of visual evidence. To mitigate these inherent biases, we propose self knowledge re-expression with iterative debiasing (SKR-ID), an annotation-free pipeline that adapts VLMs for VRRPI using only randomly extracted unannotated image pairs. SKR-ID transitions VLMs' output mechanism from generic next-token prediction to task-optimized classification heads. The pipeline proceeds in two stages: (1) a cold-start initialization using debiasing object-centric prompts to anchor motion inference in 2D visual evidence; and (2) a recursive logit-ranking mechanism that enforces statistical parity by using the median logit value as a dynamic threshold. Experimental evaluation across frontier VLMs on standard benchmarks demonstrates that SKR-ID significantly mitigates systematic biases. Our method improves open-source VLMs' Macro-F1 scores from 35.0-45.4% to 53.7-58.0%, without using any annotated data. These results show that SKR-ID can effectively improve 3D reasoning performance from a severely collapsed baseline. The code is publicly available at https://github.com/astudentuser/Codes_of_SKR-ID.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:12:17Z</published>
+    <arxiv:comment>Accepted as NeurIPS 2026 Oral</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mengyu Wang</name>
+    </author>
+    <author>
+      <name>Ken Deng</name>
+    </author>
+    <author>
+      <name>Yftah Ziser</name>
+    </author>
+    <author>
+      <name>Shay B. Cohen</name>
+    </author>
+    <author>
+      <name>Tiejun Ma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10481v1</id>
+    <title>A trace costs one quantifier: the exact complexity of perfect play in nonlocal games</title>
+    <updated>2026-11-07T05:07:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.10481v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10481v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Given a finite nonlocal game, can the players win with certainty? We prove that the existence of a perfect normal spatial strategy is $Σ^0_2$-complete, even when restricted to games of value one, so it cannot be decided even with an oracle for the halting problem. This is strictly harder than perfect play in the finite-dimensional and commuting-operator models, which are $Σ^0_1$-complete and $Π^0_1$-complete. Within the commuting model, the existence of a perfect normal strategy with a finite or semifinite von Neumann host is $Σ^0_2$-complete, whereas for every fixed type $\mathrm{III}_λ$ subtype it has the same $Π^0_1$-complete language as unrestricted commuting play. A trace thus costs one existential number quantifier: the hardness constructions force every perfect strategy to choose a finite clock period or a finite tree depth. Spatial $Σ^0_2$-completeness also holds when finite entanglement entropy is required, and both forms are formally verified in Lean. For every computable $0&lt;α&lt;1$, perfect spatial play with $\mathrm{Tr}\,h^α&lt;\infty$ for the reduced density $h$ is $Σ^0_2$-complete as well; these conditions form a strict ladder between finite rank and finite entropy. We also prove $Σ^0_2$-completeness for one-shot zero-error communication with normal entanglement, and construct a finite channel with zero-error codes of a given size each of which needs infinite entanglement entropy.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:07:46Z</published>
+    <arxiv:comment>106 pages, 1 figure. Archived with programs and Lean sources at doi:10.5281/zenodo.23962889. Theorem A is formalized in Lean 4 with no hypotheses: https://github.com/Apsiape/perfect-play-arithmetical-hierarchy</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Seth Douglas</name>
+    </author>
+    <author>
+      <name>Nidhal Mghirbi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10479v1</id>
+    <title>Non-Relativistic Supersymmetric Gauge Theories and Soliton Solutions</title>
+    <updated>2026-11-07T05:06:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.10479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper investigates non-relativistic supersymmetric gauge theories obtained through null reduction, with particular focus on supersymmetric Abelian Higgs models and their soliton solutions. Starting from four-dimensional $\mathcal{N} = 1$ relativistic supersymmetric theories, we apply null reduction to derive Galilean-invariant non-relativistic theories in $2 + 1$ dimensions while preserving gauge symmetry and supersymmetry. The resulting symmetry structure is shown to correspond to the Bargmann extension of the super-Galilean algebra. We first analyze the massive supersymmetric Abelian Higgs model and show that, although it possesses nontrivial vacuum configurations, the mass term obstructs the existence of nontrivial BPS vortex solutions. We then study the massless supersymmetric Abelian Higgs model with multiple charged scalar fields, for which the BPS equations admit vortex-type soliton solutions under suitable charge and winding number conditions. The vacuum moduli space is identified as a weighted projective space, leading naturally to both integer and fractional vortex configurations. By imposing radial symmetry, we derive the corresponding vortex equations and examine their solutions analytically and numerically. Finally, we relate the vacuum structure of the model to the Ginzburg-Landau theory of superconductivity, highlighting how familiar superconducting behavior can emerge from a symmetry-preserving non-relativistic supersymmetric framework.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:06:42Z</published>
+    <arxiv:comment>37 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Yoonbai Kim</name>
+    </author>
+    <author>
+      <name>O-Kab Kwon</name>
+    </author>
+    <author>
+      <name>D. D. Tolla</name>
+    </author>
+    <author>
+      <name>Hanwool Song</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10477v1</id>
+    <title>PatternBloom: Empowering Agentic RAG with Externalized RL-Distilled Graph Patterns</title>
+    <updated>2026-11-07T05:02:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.10477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement-learning-trained agents for retrieval-augmented generation retrieve content (passages, knowledge-graph fragments, or hyperedges) and supervise training with outcome rewards on the final answer. Across these paradigms the reasoning route through retrieved content never leaves the language model's hidden state, conflating declarative knowledge with the procedural knowledge that recurs across queries of the same logical type; content-only methods consequently plateau as reasoning depth grows. We introduce PatternBloom, an agentic RAG framework that shifts the unit of retrieval from content (what to read) to logic (how to reason). A first RL stage scores the agent's constructed evidence graph by a frozen oracle's information gain through the Information-Density Reward (IDR), a size-normalized mutual-information surrogate. High-reward trajectories are distilled into a Graph Pattern Memory (GPM) of type-abstracted reasoning skeletons, and a second RL stage uses the Pattern-Augmented Reward (PAR) to couple policy to memory, turning procedural reasoning into a learnable, externalized structural prior. A 7B PatternBloom outperforms $27$ baselines by $+15.0$ Avg-OOD EM, with the gain compounding with reasoning depth precisely because procedural knowledge, once distilled, is reused rather than re-derived at every query. We release our code at https://github.com/EllenYiGe/PatternBloom.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T05:02:26Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 46 pages. Code: https://github.com/EllenYiGe/PatternBloom</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yi Ge</name>
+    </author>
+    <author>
+      <name>Heng Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10470v1</id>
+    <title>Wideband AR-HCF Transmission Under Variable Network Traffic: A System-Level Analysis</title>
+    <updated>2026-11-07T04:38:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.10470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Dynamic traffic changes spectral occupancy in wideband optical links, perturbing surviving channels in single-mode fiber (SMF) through nonlinear interference (NLI), inter-channel stimulated Raman scattering, and amplifier loading. This motivates amplified-spontaneous-emission (ASE) idlers to maintain full occupancy. We test whether spectral filling remains necessary in antiresonant hollow-core fiber (AR-HCF) using a span-by-span model of a 96-channel, 9.6-THz extended-C+L link over 960 km. The model jointly tracks signal, ASE, and NLI, including amplifier pigtails, line-resolved CO2 absorption, intermodal interference, amplifier control, and load transients. At equal launch power, reducing occupancy from 100% to 20% changes surviving-channel generalized signal-to-noise ratio (GSNR) by just 0.0016 dB in AR-HCF versus 1.52 dB in SMF. At the AR-HCF throughput-optimal launch of +12.3 dBm/channel, the GSNR shift rises to 0.24 dB, nearly all from NLI in short solid-glass amplifier pigtails, chiefly the output pigtail. These pigtails hold the optimum 8.9 dB below the amplifier ceiling, but removing them yields only about 1% more throughput at that launch due to transceiver, intermodal-interference, and gas-absorption limits. Line-resolved gas modeling distinguishes several decibels of CO2 attenuation, largely offset by per-span equalization, from narrow absorption notches not recoverable by flat gain. Constant-gain control permits a 23% amplifier energy saving by tracking load, whereas constant-output control saves none. An 85% channel drop causes an 8.8-dB uncontrolled gain excursion, reduced to 0.6 dB with an assumed 500-Hz loop. Thus, AR-HCF shifts the constraints on elastic wideband transmission from fiber nonlinearities to amplifier-site components, gas absorption, and control dynamics.</summary>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:38:47Z</published>
+    <arxiv:primary_category term="physics.optics"/>
+    <author>
+      <name>Md Ghulam Saber</name>
+    </author>
+    <author>
+      <name>Zhiping Jiang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10468v1</id>
+    <title>Dynamic State Estimation from Sparse PMUs via Physics-Informed Graph Neural Operators</title>
+    <updated>2026-11-07T04:37:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.10468v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10468v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper proposes a physics-informed graph neural operator for power system dynamic state estimation. From a sparse, intermittent measurement window at a few generator buses, the operator estimates the rotor-angle and speed trajectories of all machines, unmeasured ones included, in one forward pass. A graph-attention encoder processes the measurements, and the swing equations are imposed as a hard constraint or as a soft one with a learned correction that absorbs model errors. It is trained on simulated measurements, without state labels. With several phasor measurement units, masked training hides one from the input but keeps it in the loss. On four transmission systems, simulations show that the operator is the most accurate estimator that neither optimizes per scenario nor uses state labels, except on the smallest system at large model errors, where tuned Kalman smoothers are better. Networks trained on simulated states are more accurate on the two smallest systems but not on the 118-bus system, where the operator is faster and more accurate than hard-constrained moving-horizon estimation. Under model errors, it matches or outperforms an optimization-based benchmark at a fraction of its cost. The results hold for a detailed machine model with exact parameters seen only through voltage phasors.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:37:16Z</published>
+    <arxiv:comment>10 pages, 10 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Huy Hoang Le</name>
+    </author>
+    <author>
+      <name>Haoguang Wang</name>
+    </author>
+    <author>
+      <name>Christian Moya</name>
+    </author>
+    <author>
+      <name>Marcos Netto</name>
+    </author>
+    <author>
+      <name>Guang Lin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10463v1</id>
+    <title>LongCapHarness: Capability-Guided Auto-Harnessing for Long-Context Reasoning</title>
+    <updated>2026-11-07T04:26:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.10463v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10463v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing methods enhancing an LLM's long-context reasoning capability often rely on data synthesis and follow-up LLM post-training. However, the data synthesis strategy and the post-training recipes are empirically driven and computationally intensive. In this work, we propose a new framework, dubbed LongCapHarness, to instead harness the underlying capabilities for long-context reasoning. The harnessing process recursively revises and updates capability primitive implementation, capability state and control logic through recursive self-improvement on the development set. With neither data synthesis nor LLM post-training, LongCapHarness is applied to Llama3-8B and transferred to Qwen2.5-3B. LongCapHarness substantially outperforms recent data-synthesis-based baselines on HELMET and RULER benchmarks; its estimated development cost is less than 50% of the estimated training costs of NExtLong and PolicyLong. We hope these results motivate further research into harnessing the latent capabilities of LLMs to solve tasks beyond their explicit training.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T04:26:27Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Tao Zhang</name>
+    </author>
+    <author>
+      <name>Yuhang He</name>
+    </author>
+  </entry>
+</feed>
