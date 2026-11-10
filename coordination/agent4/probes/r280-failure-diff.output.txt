@@ -1,0 +1,8 @@
+r280  : 测试结果: 4 通过, 0 失败, 共 4 个 失败文件数 92
+基线  : 测试结果: 10 通过, 0 失败, 共 10 个 失败文件数 92
+
+== r280 新增失败（1）==
+  + round-280-time-probability-families.test.js
+
+== 基失败 r280 消失（1）==
+  - round-605-consciousness-self-dispatch.test.js

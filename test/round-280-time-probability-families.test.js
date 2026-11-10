@@ -200,5 +200,6 @@ for (const c of INJ) {
 }
 
 // ─── 汇总 ───────────────────────────────────────────────────────────
-console.log('\n=== r280 轮测汇总: passed=' + passed + ' failed=' + failed + ' 注入变红=' + injRed + '/' + INJ.length + ' ===');
+console.log('\nr280 测试结果: ' + passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
+console.log('=== r280 轮测汇总: passed=' + passed + ' failed=' + failed + ' 注入变红=' + injRed + '/' + INJ.length + ' ===');
 if (failed > 0) { process.exitCode = 1; }
