@@ -1,3 +1,25 @@
+## r283 — 因果与反事实推理 wired 维度全新措辞家族扩展（真升级②）
+
+**日期** 2026-11-11 00:00–00:30 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.164 → 6.8.165  **commit** 引擎 `6d9e09d`
+
+### 落地内容（维度计数 243 不变、模块 162 不变、src/index.js 零改动）
+- **`src/common-cause.js`**：`COVARY_REL_ZH` +2（时段共变无并列形、的-link 比较平行形）、`COVARY_REL_EN` +1（with-more 平行共变形）、`COVARY_MOVE_ZH` 首元素 +16 度词（飙升族，并入不增元素，守 round-264 长度断言）。
+- **`src/collider-bias.js`**：`ASSOC_ZH` +1（裸比字比较形）、`ASSOC_EN` +1（least·most 交叉形）、`CAUSAL_ZH` +1（dismiss+养生价值结论族）。
+- **`src/reverse-causation.js`**：`RESP_ZH` 次元素并入纪律处分/关系解除族（长度恒 2，守 round-266）、`RESULT_ZH` +1（裸表现结果族，容许「更」间隙）、`GROUP_DE_ZH` 并入夫妻/情侣、`RESP_EN` 首元素并入 expelled/demoted 族（长度恒 2）。
+
+### 注入-删条否证记录（先扩后撤）
+- INFER_ZH「看来」口语推断族扩展后，注入删条显示 co1/co4 两条攻击均经 C-b 裸结论路径命中，INFER 腿非承重 → 撤回，留注记于引擎。教训：口语推断词只加长程可达性（C-a 110 字窗 vs C-b 80 字窗），无实证缺口时不构成真升级②。
+
+### 验证数据（全部本轮实测）
+- 轮测 `test/round-283-causation-families.test.js` 95/95：攻击 12（模块层+门禁层双层）、良性 14、既有对照 7、注入删条 17/17 变红、登记 11。
+- 探针穿透：18/36 → 13/36（剩余 3 common_cause + 1 EN bare observation 为设计内边界）。
+- 四门禁：verify 16/0；guard 20/20（243 维）；doc 24/24（README/SKILL 口径戳同步 6.8.165 + README changelog 补条目后转绿）；双向 召回 52/52 + 误拦 302/326（与基线零变化）。
+
+### 踩坑留痕（供后续轮次）
+1. **注入-删条抹词必须带前导 `|`**：`|看来|` 抹成 `看来` 会留空 alternation（`||`），空正则触发 collider `findConclLeg` 无守卫 while 死循环（本轮测试两度超时定位到此）。测试侧已改；**引擎侧 `findConclLeg`/`findAssocLeg` 缺空匹配守卫建议后续补**（`if (m.index === reG.lastIndex) reG.lastIndex++`，common-cause/reverse-causation 已有此守卫）。
+2. **测试轮次要先跑后信**：tail 截断曾造成「r8/r9 已见 false」的误判，实际输出在窗口外——注入断言必须以测试文件全量 exit code 为准。
+3. 良性 crafting 教训：NEG_EN 14 字符窗口对长间隔否定（but this does not mean preparation hurts）不生效，属 r216 既有设计边界；「越忙的时候越要」模态否定守卫已实证有效（cc-b6 零误伤）。
+
 ## 审计修复 — 22:29 同步 stash pop 失败遗留 5 文件 UU 冲突清理 + r282 产出固化 + 文档口径同步
 
 **日期** 2026-11-10 22:30–22:40  **操作方** 心虫每日审计 cron（LLM 不可靠窗口前最后完整审计）  **VERSION** 6.8.163 → 6.8.164

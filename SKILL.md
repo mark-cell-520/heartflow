@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.164"
+version: "6.8.165"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
@@ -77,7 +77,7 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.164. Nothing here is copied
+Every number below was measured on this repository at v6.8.165. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
