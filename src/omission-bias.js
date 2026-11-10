@@ -111,6 +111,23 @@
  *     改写为同义口语且无任何动作动词锚点的句子（「他在场，但
  *     仅仅是'在'」——需要语用判断，纯规则无法在不误伤的前提下
  *     收窄，宁缺勿滥）。
+ *
+ * [r276 扩展] 经济与资源推理方向·全新措辞家族（真升级②，探针
+ * coordination/agent4/probes/r276-probe-pool.js 实证 2/5 穿透）：
+ *   · OMIT_DETERIORATE_ZH 放任恶化族（「宁可让事情慢慢烂掉」「任由
+ *     局面继续坏下去」——让/任由/任凭/听任/放任 + 慢慢/继续 + 烂/坏/
+ *     垮 + 下去/掉，旧 O3 动词只有 发生/恶化/发展/泛滥/失控）；
+ *   · EXCUL_CIRCUMSTANCE_ZH 形势使然族（「那也是形势使然」「纯属大势
+ *     所趋」——客观归因豁免不作为一侧）；
+ *   · EXCUL_POT_ZH 背锅族（「也不能背上主动做错事的锅」——拒绝背锅
+ *     的规避形，旧 X3 只收「大可不必担责」劝免形）；
+ *   · SOLO_ZH S5 主动出手一旦搞砸 → 责任全在我（行动即被责融合断言，
+ *     SOLO_EN E4 的中文对应族）；S6 不做最多是…（不作为代价最小化）；
+ *     S7 做错了就是…罪过（作为即罪过）；
+ *   · EN 对应：OMIT_SLIDE_EN letting things slide/rot/fester、
+ *     EXCUL_BLAMEFREE_EN blame-free / free of blame、SOLO_EN E5 not
+ *     acting only costs time / E6 acting wrongly is a real sin。
+ *   维度计数不变、src/index.js 零改动、VERSION 未 bump。
  */
 'use strict';
 
@@ -121,6 +138,11 @@ const OMIT_NOTHING_ZH = /(?:什么|啥)[^。，！？；\n]{0,2}(?:都|也)?[^�
 const OMIT_NOT_VERB_ZH = /(?:没有|没|未曾|从未)[^。，！？；\n]{0,6}(?:动手|出手|伸手|介入|干预|插手|阻止|制止|阻拦|施救|营救|搭救|施以援手|行动|作为|出面|报警|上报|报告|提醒|跟进|处理|参与|表态|吭声|作声|害人|伤人|采取任何)/;
 // O3 不作为名词族（不作为/袖手旁观/见死不救/坐视不理…）
 const OMIT_NOUN_ZH = /(?:不作为|不干预|不阻止|不施救|不行动|不介入|不插手|不出手|不动手|袖手旁观|冷眼旁观|置身事外|坐视(?:不理|不管|不救)|视而不见|听之任之|任其(?:发生|恶化|发展|泛滥)|见死不救|见危不救|保持中立|保持沉默|作壁上观)/;
+// O3b 放任恶化新形（r276 新增：「宁可让事情慢慢烂掉」「任由局面继续坏
+// 下去」——让/任由/任凭/听任/放任 + 慢慢/继续 + 坏/恶/烂/糟/滑/垮/荒/
+// 废 + 下去/掉/恶化；旧 O3 动词只有 发生/恶化/发展/泛滥/失控，口语
+// 「烂掉/坏下去/垮掉」整族失配）
+const OMIT_DETERIORATE_ZH = /(?:任由|任其|任凭|听任|放任|放任自流|让)[^。，！？；\n]{0,10}(?:慢慢|继续|一直|不断|持续|眼睁睁)[^。，！？；\n]{0,4}(?:坏|恶|烂|糟|滑|垮|荒|废|糜|腐|沉)(?:下去|掉|恶化|滑坡)|(?:任由|任其|任凭|听任|放任)[^。，！？；\n]{0,6}(?:坏|恶|烂|糟|滑|垮|荒|废|糜)(?:下去|掉)/;
 // O4 让步轻描族（只是/不过是/顶多算是 + 看着/旁观/在旁边/没…）
 const OMIT_CONCESSIVE_ZH = /(?:只是|只不过是|不过是|也就是|顶多算是)[^。，！？；\n]{0,8}(?:看着|旁观|在旁边|没有|没|未曾|未)/;
 
@@ -128,9 +150,10 @@ const OMIT_ZH_GROUPS = [
   ['OMIT_NOTHING_ZH', [OMIT_NOTHING_ZH]],
   ['OMIT_NOT_VERB_ZH', [OMIT_NOT_VERB_ZH]],
   ['OMIT_NOUN_ZH', [OMIT_NOUN_ZH]],
+  ['OMIT_DETERIORATE_ZH', [OMIT_DETERIORATE_ZH]],
   ['OMIT_CONCESSIVE_ZH', [OMIT_CONCESSIVE_ZH]],
 ];
-const OMIT_ZH = [OMIT_NOTHING_ZH, OMIT_NOT_VERB_ZH, OMIT_NOUN_ZH, OMIT_CONCESSIVE_ZH];
+const OMIT_ZH = [OMIT_NOTHING_ZH, OMIT_NOT_VERB_ZH, OMIT_NOUN_ZH, OMIT_CONCESSIVE_ZH, OMIT_DETERIORATE_ZH];
 
 // E1 did not / didn't + 动作动词（do / act / intervene / lift a finger…）。
 // 副词槽（?:\w+ly\s+)? 承「did not ACTIVELY harm anyone」——r260 构造期
@@ -141,13 +164,21 @@ const OMIT_FAILED_EN = /\b(?:failed|failing|failure|refused|declined|neglected)\
 // E3 stood by / looked on / inaction / omission / not acting / doing
 //    nothing / letting someone die 名词族
 const OMIT_STOODBY_EN = /\b(?:stood|standing|stand)\s+(?:by|idly\s+by|aside|on\s+the\s+sidelines)\b|\blooked\s+(?:on|the\s+other\s+way|away)\b|\bwatched\s+(?:it\s+)?(?:happen|unfold|play\s+out)\b|\bsat\s+on\s+(?:their|his|her)\s+hands\b|\bremained\s+(?:passive|silent|inactive)\b|\bstayed\s+(?:out\s+of\s+it|silent|away)\b|\binaction\b|\bomission\b|\bbystander\b|\bnot\s+acting\b|\bnon-?intervention\b|\bnon-?interference\b|\bdoing\s+nothing\b|\bletting\s+(?:it|him|her|them|someone|anyone|people|others)\s+(?:happen|die|suffer|drown|bleed|struggle)\b|\bleft\s+(?:it|him|her|them)\s+to\s+(?:die|suffer|rot)\b/i;
+// E3b r276：letting things slide/rot/fester 放任恶化族（「Letting things
+// slide is blame-free」——旧 E3 只收 letting someone die/suffer 类，
+// 放任恶化的口语形整族穿透）
+const OMIT_SLIDE_EN = /\bletting\s+(?:things?|it|them|the\s+situation|matters?)\s+(?:slide|rot|fester|deteriorate|get\s+worse|go\s+to\s+hell|fall\s+apart)\b|\bleft\s+(?:things?|it|them|the\s+situation)\s+to\s+(?:rot|fester|deteriorate)\b/i;
 
 const OMIT_EN_GROUPS = [
   ['OMIT_DIDNOT_EN', [OMIT_DIDNOT_EN]],
   ['OMIT_FAILED_EN', [OMIT_FAILED_EN]],
   ['OMIT_STOODBY_EN', [OMIT_STOODBY_EN]],
+  // r276 新增：letting things slide/rot/fester 放任恶化族（「Letting
+  // things slide is blame-free」——旧 E3 只收 letting someone die/
+  // suffer 类，放任恶化的口语形整族穿透）
+  ['OMIT_SLIDE_EN', [OMIT_SLIDE_EN]],
 ];
-const OMIT_EN = [OMIT_DIDNOT_EN, OMIT_FAILED_EN, OMIT_STOODBY_EN];
+const OMIT_EN = [OMIT_DIDNOT_EN, OMIT_FAILED_EN, OMIT_STOODBY_EN, OMIT_SLIDE_EN];
 
 // ─── 腿② EXCULP 豁免/不对称断言 ─────────────────────────────────
 // X1 不能怪/怎能怪/不应该被追责族（否定前缀族：r260 构造期实测
@@ -165,6 +196,14 @@ const EXCUL_NOWRONG_ZH = /(?:没|没有|并无|毫无)(?:做错|错|过错|罪�
 const EXCUL_ASYMM_ZH = /(?:比|相比|比起)[^。！？；\n]{0,14}(?:轻|小|少|低|说得轻)|(?:不如|不及|比不上)[^。！？；\n]{0,12}(?:严重|重|厉害|过分|可恶|该罚|该骂)|(?:轻|小|低)得多|(?:相比|比照)[^。！？；\n]{0,14}(?:只是|顶多|不过是|充其量)/;
 // X5 毕竟/说到底/至少 + 没有（让步式豁免）
 const EXCUL_CONCESSIVE_ZH = /(?:毕竟|说到底|说破了|其实|实质上|充其量)[^。，！？；\n]{0,8}(?:没有|没|未曾|从未|只是|不过是)|(?:至少|好歹|起码)[^。，！？；\n]{0,10}(?:没有|没|未曾|从未)/;
+// X6 形势使然族（r276 新增：「那也是形势使然」「纯属大势所趋」——把恶化
+// 归因于客观形势以豁免不作为一侧；旧 X1-X5 只收责任归属/无罪/不对称
+// 比较/让步，客观归因族整族穿透）
+const EXCUL_CIRCUMSTANCE_ZH = /(?:也是|纯属|实属|那是|算是|属于|归于|归咎于|源自)(?:形势|大势|环境|客观|时代|局势|市场|洪流)(?:使然|所迫|的必然|所致|的问题|裹挟)|(?:非战之罪|怪不得谁|怨不得谁|非任何人之过|不怪任何人|谁也怪不了)/;
+// X7 背锅族（r276 新增：「也不能背上主动做错事的锅」——不能/不愿 +
+// 背/扛 + 锅/黑锅/骂名/责任；旧 X3 只收「大可不必担责」的劝免形，
+// 拒绝背锅的规避形整族穿透）
+const EXCUL_POT_ZH = /(?:不能|不愿|不想|不要|也别|不肯|拒绝|懒得)[^。，！？；\n]{0,6}(?:背|扛|担)(?:上|起|个|那个|这口)?[^。，！？；\n]{0,8}(?:锅|黑锅|骂名|罪名|责任|过错|罪过)/;
 
 const EXCULP_ZH_GROUPS = [
   ['EXCUL_NOBLAME_ZH', [EXCUL_NOBLAME_ZH]],
@@ -172,8 +211,10 @@ const EXCULP_ZH_GROUPS = [
   ['EXCUL_NOWRONG_ZH', [EXCUL_NOWRONG_ZH]],
   ['EXCUL_ASYMM_ZH', [EXCUL_ASYMM_ZH]],
   ['EXCUL_CONCESSIVE_ZH', [EXCUL_CONCESSIVE_ZH]],
+  ['EXCUL_CIRCUMSTANCE_ZH', [EXCUL_CIRCUMSTANCE_ZH]],
+  ['EXCUL_POT_ZH', [EXCUL_POT_ZH]],
 ];
-const EXCULP_ZH = [EXCUL_NOBLAME_ZH, EXCUL_RESP_ZH, EXCUL_NOWRONG_ZH, EXCUL_ASYMM_ZH, EXCUL_CONCESSIVE_ZH];
+const EXCULP_ZH = [EXCUL_NOBLAME_ZH, EXCUL_RESP_ZH, EXCUL_NOWRONG_ZH, EXCUL_ASYMM_ZH, EXCUL_CONCESSIVE_ZH, EXCUL_CIRCUMSTANCE_ZH, EXCUL_POT_ZH];
 
 // XE1 cannot blame / not to blame / how can you blame / cannot be held against 族
 const EXCUL_NOBLAME_EN = /\b(?:can|could)\s*(?:not|n['’]?t)\s+blame\b|\b(?:no\s+one|nobody)\s+(?:can\s+)?blame\b|\bnot\s+to\s+blame\b|\bhardly\s+to\s+blame\b|\bstop\s+blaming\b|\bhow\s+(?:can|could)\s+(?:you|we|anyone|they|he|she)\s+blame\b|\b(?:cannot|can\s+not|can['’]?t)\s+be\s+held\s+against\b/i;
@@ -187,6 +228,10 @@ const EXCUL_ASYMM_EN = /\b(?:less|far\s+less|much\s+less|not\s+nearly\s+as)\s+(?
 // r260 构造期实测漏「not」支时 "we did not interfere" 整族失配（n['’]?t
 // 只覆盖 didn't，覆盖不了 did not 的完整拼写）。
 const EXCUL_CONCESSIVE_EN = /\b(?:after\s+all|at\s+the\s+end\s+of\s+the\s+day|when\s+all\s+is\s+said\s+and\s+done)\s*,?\s*(?:we|he|she|they|you|i|no\s+one)\s+(?:did|do|does)\s*(?:not|n['’]?t)\b|\b(?:at\s+least|at\s+any\s+rate)\s+(?:we|he|she|they|you|i|no\s+one)\s+(?:did|do|does)\s*(?:not|n['’]?t)\b/i;
+// XE6 blame-free / free of blame 族（r276 新增：「Letting things slide is
+// blame-free」——旧 XE3 只收 not blameworthy/blameless 的静态形容词形，
+// blame-free 合成词形整族穿透）
+const EXCUL_BLAMEFREE_EN = /\bblame[-\s]free\b|\bfree\s+of\s+(?:blame|responsibility|guilt)\b|\bcan\s+rest\s+easy\b/i;
 
 const EXCULP_EN_GROUPS = [
   ['EXCUL_NOBLAME_EN', [EXCUL_NOBLAME_EN]],
@@ -194,8 +239,9 @@ const EXCULP_EN_GROUPS = [
   ['EXCUL_NOWRONG_EN', [EXCUL_NOWRONG_EN]],
   ['EXCUL_ASYMM_EN', [EXCUL_ASYMM_EN]],
   ['EXCUL_CONCESSIVE_EN', [EXCUL_CONCESSIVE_EN]],
+  ['EXCUL_BLAMEFREE_EN', [EXCUL_BLAMEFREE_EN]],
 ];
-const EXCULP_EN = [EXCUL_NOBLAME_EN, EXCUL_RESP_EN, EXCUL_NOWRONG_EN, EXCUL_ASYMM_EN, EXCUL_CONCESSIVE_EN];
+const EXCULP_EN = [EXCUL_NOBLAME_EN, EXCUL_RESP_EN, EXCUL_NOWRONG_EN, EXCUL_ASYMM_EN, EXCUL_CONCESSIVE_EN, EXCUL_BLAMEFREE_EN];
 
 // ─── 独腿签名（SOLO）——融合式「不作为即无责」，一句话内部自带完整
 // 结构，单独成支（同 r251 loss_aversion / r255 planning_fallacy /
@@ -213,6 +259,17 @@ const SOLO_ZH = [
   // 因果链：不作为免除犯错风险，据此推出不作为更优。与 S3 的
   // 比较断言互补（S3 要求「比」字，因果链没有）。
   /(?:不采取行动|不行动|不动|不做|什么都不做|袖手旁观|旁观|不作为|按兵不动|观望|先观望|看着不管|放任|坐视|先不动|缓一缓|等一等)[^。！？；\n]{0,10}(?:就不会|就不会|免得|省得|避免|杜绝)[^。！？；\n]{0,8}(?:犯错|出错|担责|背锅|惹麻烦|踩坑|担风险|有风险)[^。！？；\n]{0,14}(?:所以|因此|可见|因而|于是|故而)[^。！？；\n]{0,8}(?:不做|不动|观望|按兵不动|不作为|先看看|等着|缓一缓)[^。！？；\n]{0,6}(?:最|更|才|总)?(?:稳妥|安全|保险|聪明|明智|好|稳)/,
+  // S5 r276：主动出手一旦搞砸 → 责任全在我（行动即被责的融合断言，
+  // SOLO_EN E4「acting gets you blamed」的中文对应族——旧 SOLO_ZH 只收
+  // 不作为侧的融合形，行动侧责任归集的融合形整族穿透）
+  /(?:主动)?(?:出手|动手|行动|介入|干预|插手|出面|管|参与)[^。！？；\n]{0,12}(?:一旦|要是|如果|倘若|万一|若)[^。！？；\n]{0,12}(?:搞砸|失败|出错|弄糟|办砸|翻车|出岔子)[^。！？；\n]{0,16}(?:责任|过错|锅|罪过|锅子)(?:就)?(?:全|都|算|落|归)?(?:在|算在|归)[^。！？；\n]{0,4}(?:我|我们|他|她|你|自己|我个人)/,
+  // S6 r276：不做最多是…（不作为代价最小化的融合断言：「不做最多是
+  // 慢一点、少赚点」——旧 S3/S4 只收比较/因果链形，代价最小化的
+  // 融合断言整族穿透）
+  /(?:不做|不动|不行动|不作为|不插手|不介入|不参与|不闻不问|不搭理)[^。！？；\n]{0,6}(?:最多|大不了|无非|充其量|不过是|也就|至多)[^。！？；\n]{0,12}(?:慢|少|亏|耽误|错过|拖|挨批|被说|挨骂)/,
+  // S7 r276：做错了就是…罪过（作为即罪过的融合断言，与 S5 互补：
+  // 「做错了就是实打实的罪过」——旧族只收责任归集句式）
+  /(?:做错|搞砸|出错|弄坏|办砸|动手|行动|介入|插手|参与)[^。！？；\n]{0,10}(?:就是|等于|乃是|算是|可是)[^。！？；\n]{0,8}(?:实打实|实实在在|真真正|板上钉钉|弥天)?(?:的)?(?:罪过|过错|罪恶|大错|责任|锅|骂名)/,
 ];
 const SOLO_EN = [
   // E1 inaction/omission/standing by + is not a crime / blameless
@@ -225,6 +282,13 @@ const SOLO_EN = [
   // E4 acting gets you blamed（r269 新增族：「When in doubt, hold back —
   // acting is what gets you blamed.」行动→被责的比较断言）。
   /\b(?:acting|stepping in|intervening|doing something|getting involved|speaking up|reporting it|saying something)\b[^.]{0,40}\b(?:is|gets|means)\s+(?:what\s+)?(?:you\s+|people\s+|them\s+|someone\s+)?(?:blamed|punished|held responsible|criticized|penalized)\b/i,
+  // E5 r276：not acting only costs…（不作为代价最小化：「Not acting only
+  // costs time」——旧 E3 只收 safer than 比较形，代价最小化形整族穿透）
+  /\b(?:not\s+acting|inaction|doing\s+nothing|omission|staying\s+out|holding\s+back)\b[^.]{0,40}\b(?:only|merely|just)\s+(?:costs?|means?|amounts?\s+to)\s+(?:time|delay|slowness|a\s+bit|money|patience)\b/i,
+  // E6 r276：acting wrongly is a real sin/crime/fault（作为即罪过：
+  // 「acting wrongly is a real sin」——旧 E4 只收 gets you blamed 形，
+  // 罪过名词形整族穿透）
+  /\b(?:acting|stepping\s+in|intervening|doing\s+something|getting\s+involved)\s+(?:wrongly|badly|poorly)\s+(?:is|means)\s+(?:a\s+)?(?:real\s+)?(?:sin|crime|fault|wrong|offense|blunder)\b/i,
 ];
 
 const SOLO_ZH_GROUPS = [['SOLO_ZH', SOLO_ZH]];
@@ -494,9 +558,13 @@ module.exports = {
   detectOmissionBias,
   __internals: () => ({
     OMIT_NOTHING_ZH, OMIT_NOT_VERB_ZH, OMIT_NOUN_ZH, OMIT_CONCESSIVE_ZH, OMIT_ZH,
-    OMIT_DIDNOT_EN, OMIT_FAILED_EN, OMIT_STOODBY_EN, OMIT_EN,
+    OMIT_DETERIORATE_ZH,
+    OMIT_DIDNOT_EN, OMIT_FAILED_EN, OMIT_STOEDBY_EN, OMIT_EN,
+    OMIT_SLIDE_EN,
     EXCUL_NOBLAME_ZH, EXCUL_RESP_ZH, EXCUL_NOWRONG_ZH, EXCUL_ASYMM_ZH, EXCUL_CONCESSIVE_ZH, EXCULP_ZH,
+    EXCUL_CIRCUMSTANCE_ZH, EXCUL_POT_ZH,
     EXCUL_NOBLAME_EN, EXCUL_RESP_EN, EXCUL_NOWRONG_EN, EXCUL_ASYMM_EN, EXCUL_CONCESSIVE_EN, EXCULP_EN,
+    EXCUL_BLAMEFREE_EN,
     SOLO_ZH, SOLO_EN,
     SOLO_SAFER_NEG_ZH, SOLO_SAFER_NEG_EN,
     OMIT_ZH_GROUPS, OMIT_EN_GROUPS, EXCULP_ZH_GROUPS, EXCULP_EN_GROUPS,

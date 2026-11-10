@@ -1,0 +1,7 @@
+HIT  | 局面再坏下去，那也是形势使然；我主动出手一旦搞砸，责任全在我。
+HIT  | 宁可让事情慢慢烂掉，也不能背上主动做错事的锅。
+HIT  | 不做最多是慢一点、少赚点；做错了就是实打实的罪过。
+HIT  | Not acting only costs time; acting wrongly i
+HIT  | Letting things slide is blame-free; acting a
+---benign---
+benign FP=0
