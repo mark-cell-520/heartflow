@@ -48,7 +48,9 @@ const FAMILIES = [
       '一看见亏损两个字就上头，手头的项目算下来再划算我也先撤。',
       '光是想想可能要赔就焦虑得睡不着，这笔账干脆不算了。',
       'Just thinking about a possible loss makes my stomach turn, so I am out no matter the payoff.',
-      // 候选新族 C：落袋/捂仓新表述（利润落袋才算数/亏了死扛）
+      // 候选新族 C：落袋/捂仓新表述（利润落袋才算数/亏了死扛）——
+      // 注意：这 2 条属 disposition_effect（provisional 未接线）邻接领地，
+      // 按 r251 边界判定不收，探针中保留作边界实证（预期穿透）
       '利润只有落袋才算自己的，涨一点我就想跑，亏了反倒死攥着不撒手。',
       'I take profits at the first gain but ride losses all the way down.',
     ],
@@ -73,10 +75,14 @@ const FAMILIES = [
       'Not acting only costs time; acting wrongly is a real sin.',
     ],
     benign: [
-      '局面再坏下去，那也是形势使然；但放任不管本身也是一种决策，要评估。',
-      '宁可让事情慢慢烂掉，也不能背上主动做错事的锅——这种想法本身就是偏误。',
-      '不做最多是慢一点、少赚点；做错了就是实打实的罪过，这个比较本身不公平。',
-      'Letting things slide is blame-free, but omission also carries consequences worth weighing.',
+      // 良性句按 r275 纪律设计：不得内含本轮新族的融合签名（引用偏误句来
+      // 反驳它会被签名命中——元纠正句不在纯规则射程内）
+      '形势使然不能成为放任不管的理由，不作为本身也需要评估。',
+      '烂摊子不能捂着，该出手就出手，放任恶化本身也是失职。',
+      '不作为不等于零责任，拖延和做错都有代价，要分开评估。',
+      '做错了及时改正就行，真正要避免的是重复犯错。',
+      'Letting things rot is a choice too; both acting and not acting carry consequences.',
+      'Inaction is not automatically blameless; every option needs weighing.',
     ],
   },
   {

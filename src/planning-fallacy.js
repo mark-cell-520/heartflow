@@ -204,6 +204,9 @@ const WILL_EFFORT_EN = [
   // 与 determination 情绪词，doubled/added N people 整族穿透）
   /\b(?:doubled|tripled|quadrupled|doubling|tripling)\s+(?:the\s+)?(?:team|headcount|staffing|manpower|crew|resources?)\b/i,
   /\b(?:added|adding|added\s+on|throw(?:ing)?)\s+(?:\d+|three|four|five|ten|more)\s+(?:more\s+)?(?:people|engineers|developers|staff|hands)\b/i,
+  // r276 新增：all in 全力以赴族（「going all in with every hour」——
+  // 旧族 all[- ]hands 不覆盖 all in 形）
+  /\b(?:going\s+)?all[-\s]in\b/i,
 ];
 const WILL_INTENSITY_EN = [
   /\b(?:definitely|certainly|surely|absolutely|for sure|no doubt|guaranteed|we will (?:definitely|certainly|surely))\b/i,
@@ -260,6 +263,9 @@ const EST_DURATION_EN = [
   // r276 新增：can only get faster（「delivery can only get faster」——
   // 比较形结论无数字锚，与 EST_DURATION_ZH E1b 对应）
   /\b(?:delivery|deliver|ship|finish|launch|schedule|timeline)\b[^.]{0,30}\b(?:can\s+only|will\s+only|should\s+only|would\s+only)\s+(?:get|be|go|come)\s+(?:faster|quicker|sooner|earlier)\b/i,
+  // r276 新增：ahead of schedule / ahead of time（「we will finish ahead
+  // of schedule」——提前结论无数字锚）
+  /\b(?:we|i|they|it)\s+(?:will|'?ll|can|should|would)\s+(?:definitely\s+|certainly\s+)?(?:finish|deliver|ship|complete|launch)\s+ahead\s+of\s+(?:schedule|time|the\s+deadline)\b/i,
 ];
 const EST_PROMISE_EN = [
   /\b(?:we'?(?:ll| will)|we can|we should|we'?re going to)\s+(?:definitely|certainly|surely|easily|absolutely)\s+(?:make|hit|meet|ship|deliver|finish|launch|complete)\b/i,
