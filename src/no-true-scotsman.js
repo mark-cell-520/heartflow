@@ -34,17 +34,37 @@
 // ─── 腿① AUTH：authenticity 短语 ─────────────────────────────
 
 // 中文角色名词（社会身份/角色类别，非抽象名词）
-const ROLE_NOUNS_CN = '人|者|粉丝|专家|朋友|兄弟|男人|女人|父亲|母亲|爸爸|妈妈|父母|孩子|男生|女生|领导|学生|设计师|艺术家|球员|歌手|演员|工程师|程序员|医生|律师|老师|作家|球迷|爱好者|消费者|员工|同事|伙伴|伴侣|爱人|管理者|负责人|专业人士|技术人员|同行|内行|大佬|极客';
+// [r277] 扩 44 个新角色名词（高手/铁粉/甲方/爷们/作者/老玩家族 + 互联网
+// 世代职业身份族）——旧词表停在传统职业面，「真正的高手从来不…」这类
+// 口语身份族整族射程外（探针 6/10 穿透的主因）。
+const ROLE_NOUNS_CN = '人|者|粉丝|专家|朋友|兄弟|男人|女人|父亲|母亲|爸爸|妈妈|父母|孩子|男生|女生|领导|学生|设计师|艺术家|球员|歌手|演员|工程师|程序员|医生|律师|老师|作家|球迷|爱好者|消费者|员工|同事|伙伴|伴侣|爱人|管理者|负责人|专业人士|技术人员|同行|内行|大佬|极客|高手|老手|行家|铁粉|甲方|乙方|爷们|汉子|作者|读者|玩家|观众|网友|博主|创业者|老板|新人|学霸|闺蜜|哥们|队友|邻居|家长|老人|年轻人|买家|卖家|用户|选手|主播|网红|写手|画手|科学家|研究员|分析师|记者|志愿者|受害者|幸存者|知情人|自己人|过来人|明白人|局内人';
 
 // 英文角色名词
-const ROLE_NOUNS_EN = 'fan|fans|expert|experts|friend|friends|partner|partners|leader|leaders|manager|artist|artists|designer|designers|professional|professionals|parent|parents|mother|father|player|players|engineer|developer|colleague|colleagues|christian|muslim|scotsman|scot|patriot|man|woman|boy|girl|musician|believer|member|artist';
+// [r277] 扩 60+ 新角色名词（gamer/foodie/programmer 互联网世代身份 +
+// 政治立场/宗教/家庭角色/零工经济职业）——旧词表同样停在传统职业面。
+const ROLE_NOUNS_EN = 'fan|fans|expert|experts|friend|friends|partner|partners|leader|leaders|manager|artist|artists|designer|designers|professional|professionals|parent|parents|mother|father|player|players|engineer|developer|colleague|colleagues|christian|muslim|scotsman|scot|patriot|man|woman|boy|girl|musician|believer|member|gamer|gamers|foodie|foodies|programmer|programmers|coder|coders|hacker|hackers|streamer|streamers|creator|creators|influencer|influencers|vlogger|podcaster|writer|writers|author|authors|coach|coaches|athlete|athletes|soldier|soldiers|veteran|veterans|citizen|citizens|taxpayer|taxpayers|voter|voters|neighbor|neighbors|dad|dads|mom|moms|husband|husbands|wife|wives|spouse|spouses|boyfriend|boyfriends|girlfriend|girlfriends|boss|bosses|worker|workers|employee|employees|intern|interns|volunteer|volunteers|activist|activists|journalist|journalists|teacher|teachers|student|students|scholar|scholars|scientist|scientists|researcher|researchers|analyst|analysts|nurse|nurses|doctor|doctors|chef|chefs|driver|drivers|pilot|pilots|farmer|farmers|nationalist|nationalists|conservative|conservatives|liberal|liberals|socialist|socialists|capitalist|capitalists|vegan|vegans|atheist|atheists|theist|theists|republican|republicans|democrat|democrats|communist|communists|fascist|fascists|stan|stans';
 
 // CN-1：authenticity 标记 × 角色名词（标记与角色之间允许修饰语）
 //   「真正爱你的男人」「真正有格局的领导」「合格的妈妈」「称职的父亲」
+// [r277] 标记表补 有骨气/硬气/像样/够格/有底气/有情怀/有态度/服众/
+// 够意思（「有骨气的作者不会迎合流量」此前整族射程外）。
 const AUTH_CN_ROLE_RE = new RegExp(
-  '(真正|真心|合格|称职|敬业|忠诚|孝顺|靠谱|懂事|有格局|吃得苦|想学好|想改|上进|有良心|有自尊)' +
+  '(真正|真心|合格|称职|敬业|忠诚|孝顺|靠谱|懂事|有格局|吃得苦|想学好|想改|上进|有良心|有自尊|有骨气|硬气|像样|够格|有底气|有情怀|有态度|服众|够意思)' +
   '[^，。；！？\\n]{0,10}(' + ROLE_NOUNS_CN + ')'
 );
+
+// [r277] CN-6：铁粉/真爱粉/死忠/骨灰级（饭圈 authenticity 名词独腿签名）
+//   「铁粉从来不会只买一张票」——标记×角色结构不收裸 authenticity
+//   名词，旧判据整族射程外。
+const AUTH_CN_STAN_RE = /铁粉|真爱粉|死忠|骨灰级|老粉|铁杆/;
+
+// [r277] CN-7：老+资历身份（老玩家/老手/老客/老江湖——「老玩家从来不
+// 充一分钱」：老字前缀本身即 authenticity 标记）
+const AUTH_CN_VETERAN_RE = /老(?:玩家|手|客|炮|江湖|油条)/;
+
+// [r277] CN-8：是个爷们/算条汉子（性别角色 authenticity 裸形——「是个
+// 爷们就不会食言」无「真正」类标记，CN-1 射程外）
+const AUTH_CN_MAN_RE = /(?:是个|算个|算条|称得上个?)(?:爷们|汉子|男人|女人|人物)/;
 
 // CN-2：真爱/真心 独立 authenticity 标记（关系语境，无需角色名词共现）
 //   「真爱一个人就不会计较得失」「真心想改的人」
@@ -65,8 +85,10 @@ const AUTH_CN_TRUE_SHORT_RE = new RegExp('真(兄弟|朋友|粉丝|爱|心)');
 
 // EN-1：authenticity 标记 × 角色名词（允许一个形容词间隔）
 //   「a true fan」「No real expert」「a truly loving partner」
+// [r277] 标记表补 legit/authentic/bona fide/ardent/devoted/dedicated/
+// committed/die-hard/hardcore（"A legit foodie never…" 此前射程外）。
 const AUTH_EN_ROLE_RE = new RegExp(
-  '\\b(true|truly|real|really|genuine|genuinely|proper|properly|legitimate)\\s+(\\w+\\s+)?(' + ROLE_NOUNS_EN + ')\\b',
+  '\\b(true|truly|real|really|genuine|genuinely|proper|properly|legitimate|legit|authentic|bona fide|ardent|devoted|dedicated|committed|die[- ]hard|hardcore)\\s+(\\w+\\s+)?(' + ROLE_NOUNS_EN + ')\\b',
   'i'
 );
 
@@ -85,8 +107,11 @@ const EXCLUSION_CN_RE = new RegExp(
 );
 
 // EN：否定行为谓词 + 类别否认
+// [r277] 扩 do not/don't/does not/doesn't/did not/didn't（"Real
+// programmers do not use IDEs."——旧表只收 would never/never/isn't a
+// real 等强否定形，一般现在时否定整族射程外）。
 const EXCLUSION_EN_RE = new RegExp(
-  '\\b(would never|would not|wouldn\'?t|never|isn\'?t a real|couldn\'?t be a|can\'?t be a|not a true|no real)\\b',
+  "\\b(would never|would not|wouldn['’]?t|never|isn['’]?t a real|couldn['’]?t be a|can['’]?t be a|not a true|no real|do not|don['’]?t|does not|doesn['’]?t|did not|didn['’]?t)\\b",
   'i'
 );
 
@@ -136,10 +161,24 @@ const FIRST_PERSON_DENIAL_RE = /我(?:们)?(?:也)?(?:不会|绝不会|从来不
 
 // ─── 主检测 ──────────────────────────────────────────────────
 
-function checkNoTrueScotsman(text) {
+function checkNoTrueScotsman(text, inject) {
   if (typeof text !== 'string' || text.length === 0) {
     return { hit: false, score: 0, count: 0, matches: [], details: '' };
   }
+  // [r277] 负例脚本注入通道：替换指定常量后逐支删除断言守卫变红
+  const R = inject || {};
+  const authCnRoleRe = R.AUTH_CN_ROLE_RE || AUTH_CN_ROLE_RE;
+  const authCnLoveRe = R.AUTH_CN_LOVE_RE || AUTH_CN_LOVE_RE;
+  const authCnWhoeverRe = R.AUTH_CN_WHOEVER_RE || AUTH_CN_WHOEVER_RE;
+  const authCnVirtueRe = R.AUTH_CN_VIRTUE_RE || AUTH_CN_VIRTUE_RE;
+  const authCnTrueShortRe = R.AUTH_CN_TRUE_SHORT_RE || AUTH_CN_TRUE_SHORT_RE;
+  const authCnStanRe = R.AUTH_CN_STAN_RE || AUTH_CN_STAN_RE;
+  const authCnVeteranRe = R.AUTH_CN_VETERAN_RE || AUTH_CN_VETERAN_RE;
+  const authCnManRe = R.AUTH_CN_MAN_RE || AUTH_CN_MAN_RE;
+  const authEnRoleRe = R.AUTH_EN_ROLE_RE || AUTH_EN_ROLE_RE;
+  const authEnDenialRe = R.AUTH_EN_DENIAL_RE || AUTH_EN_DENIAL_RE;
+  const exclusionCnRe = R.EXCLUSION_CN_RE || EXCLUSION_CN_RE;
+  const exclusionEnRe = R.EXCLUSION_EN_RE || EXCLUSION_EN_RE;
   // 豁免：任一豁免形命中即整篇不判（元话语/定义先行不是运用该谬误）
   if (META_NOUN_RE.test(text)) {
     return { hit: false, score: 0, count: 0, matches: [], details: '' };
@@ -154,14 +193,16 @@ function checkNoTrueScotsman(text) {
   const matches = [];
 
   for (const sent of sentences) {
-    const authHit = AUTH_CN_ROLE_RE.test(sent) || AUTH_CN_LOVE_RE.test(sent)
-      || AUTH_CN_WHOEVER_RE.test(sent) || AUTH_CN_VIRTUE_RE.test(sent)
-      || AUTH_CN_TRUE_SHORT_RE.test(sent)
-      || AUTH_EN_ROLE_RE.test(sent) || AUTH_EN_DENIAL_RE.test(sent);
+    const authHit = authCnRoleRe.test(sent) || authCnLoveRe.test(sent)
+      || authCnWhoeverRe.test(sent) || authCnVirtueRe.test(sent)
+      || authCnTrueShortRe.test(sent)
+      || authCnStanRe.test(sent) || authCnVeteranRe.test(sent)
+      || authCnManRe.test(sent)
+      || authEnRoleRe.test(sent) || authEnDenialRe.test(sent);
     if (!authHit) continue;
 
-    const exclusionMatches = sent.match(new RegExp(EXCLUSION_CN_RE, 'g')) || [];
-    const exclusionEnMatches = sent.match(new RegExp(EXCLUSION_EN_RE, 'g')) || [];
+    const exclusionMatches = sent.match(new RegExp(exclusionCnRe, 'g')) || [];
+    const exclusionEnMatches = sent.match(new RegExp(exclusionEnRe, 'g')) || [];
     const exclusionCount = exclusionMatches.length + exclusionEnMatches.length;
     // [v6.8.85] 第一人称自述否认：exclusion 命中全部落在「我不会…」之后
     // 不计驱逐反例（说话者否认自己的强制行为 ≠ 对第三方下定义）。
@@ -203,6 +244,9 @@ module.exports = {
     AUTH_CN_WHOEVER_RE,
     AUTH_CN_VIRTUE_RE,
     AUTH_CN_TRUE_SHORT_RE,
+    AUTH_CN_STAN_RE,
+    AUTH_CN_VETERAN_RE,
+    AUTH_CN_MAN_RE,
     AUTH_EN_ROLE_RE,
     AUTH_EN_DENIAL_RE,
     EXCLUSION_CN_RE,
