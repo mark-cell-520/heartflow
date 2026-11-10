@@ -128,6 +128,24 @@
  *     十足」——缺腿②，与动员口号同形）；以及工期结论被包裹在反讽/
  *     引语中的句子。前者缺结论导出、后者需要语用判断，纯规则无法在
  *     不误伤的前提下收窄，宁缺勿滥。
+ *
+ * [r276 扩展] 经济与资源推理方向·全新措辞家族（真升级②，探针
+ * coordination/agent4/probes/r276-probe-pool.js 实证 1/6 穿透）：
+ *   · WILL_REJECT_REF_ZH W3b 意外 dismissal 族（「上次纯属意外」「以往
+ *     纯属偶然」——把参照类失手归为个例；旧族只有 也都/都/照样 +
+ *     赶出来类）；
+ *   · WILL_DISMISS_ZH W4b 掌握族（「这次我吃透每个环节」——自陈掌握
+ *     度轻描难度）；
+ *   · EST_PROMISE_ZH E3b 绝不会再 + 失手词族（「绝不会再超时」「绝对
+ *     不会再延期」——绝不会/不会再强度形不在旧 肯定/一定 射程内）；
+ *   · WILL_EFFORT_ZH 资源加码族（「人手翻倍」「又加了三个人」）；
+ *   · EST_DURATION_ZH E1b 工期比较结论族（「工期肯定比计划还短」「交付
+ *     只会更快」——无数字锚的比较结论）；
+ *   · EN 对应：WILL_REJECT_REF_EN fluke/one-off/anomaly dismissal、
+ *     EST_PROMISE_EN no more overruns、WILL_EFFORT_EN doubled the
+ *     team / added three more engineers、EST_DURATION_EN delivery
+ *     can only get faster。
+ *   维度计数不变、src/index.js 零改动、VERSION 未 bump。
  */
 'use strict';
 
@@ -136,6 +154,11 @@
 const WILL_EFFORT_ZH = [
   /(?:加把劲|加把力气|加油干|拼一下|拼了|拼一把|咬咬牙|连轴转|加班加点|加加班|赶工|赶赶|突击|冲刺|硬上|堆人|人海战术|齐心协力|万众一心|努努力|努力赶|奋力|全力赶|拼命赶|加班赶|熬夜赶|通宵赶|熬熬夜|起早贪黑)[^。，！？；\n]{0,8}/,
   /(?:决心|士气|斗志|干劲|热情|信念|意志力|主观能动性)[^。，！？；\n]{0,8}(?:足|大|高|强|在|足得很|满满)/,
+  // r276 新增：资源加码族（「人手翻倍」「又加了三个人」——投入承诺的
+  // 资源量化形；旧族只收 堆人/人海战术 类动词与决心/士气情绪词，
+  // 资源翻倍/加码/扩充的量化承诺整族穿透）
+  /(?:人手|人力|资源|团队|班组|人手)(?:翻倍|加倍|翻番|扩充|扩张|加码|拉满|顶满|拉满)/,
+  /(?:又|再|额外)(?:加|增|添|抽调|调)了?[一二三四五六七八九十两\d]+(?:个)?(?:人|名|人手|工程师|开发|人手)/,
 ];
 // W2 意愿强度副词族（肯定/一定 + 能/来得及…）
 const WILL_INTENSITY_ZH = [
@@ -152,12 +175,20 @@ const WILL_REJECT_REF_ZH = [
   // 修饰词补「历史/历来/过往/隔壁/邻组」，失手动词补「超预算/超期/延误/
   // 跳票/没按期/推迟」，转折补「只是」。
   /(?:类似|同类|过去|以前|以往|历史|历来|过往|隔壁|邻组|旁边|别的|其他|从前)[^。！？；\n]{0,8}(?:项目|任务|团队|公司|人家|案例|工程|小组|部门)[^。！？；\n]{0,10}(?:都|全部|全|大多|总是|通常|往往|基本)?(?:延期|延迟|晚了|超时|超期|失败|超支|超预算|拖了|拖沓|烂尾|没做成|没按期|推迟|延误|跳票)[^。！？；\n]{0,16}(?:但|但是|可是|不过|然而|只是)[^。！？；\n]{0,8}(?:我们|咱们|这次|咱|此)/,
+  // W3b r276：意外 dismissal 族（「上次纯属意外」「以往纯属偶然」——
+  // 把参照类失手归为个例以拒绝其分布信息；旧族动词只有 也都/不也/
+  // 都/照样 + 赶出来类，意外/偶然/运气/特例 dismissal 整族穿透）
+  /(?:上次|之前|以往|过去|先前|前面|那一回|那回|此前|早先)[^。，！？；\n]{0,8}(?:纯属|纯是|纯|就是|只是|算|纯纯|纯纯粹粹)(?:意外|偶然|运气|个案|特例|特殊情况|小概率|意外事件|巧合|寸了|赶上了|点子背|运气差)/,
 ];
 // W4 难度轻描淡写族（能有多难 / 想得太复杂 / 师傅说简单）
 const WILL_DISMISS_ZH = [
   /(?:能有多难|有多难|算什么|有多复杂|还不简单|不甚简单|轻而易举|小菜一碟|不是个事|小事一桩|轻松搞定)/,
   /(?:想得|说得|听得|看得|搞得)太(?:复杂|难|严重|夸张)/,
   /(?:师傅|老板|领导|客户|专家|网上|教程|文档|书上|百度)[^。，！？；\n]{0,4}(?:说|讲|表示|写)[^。，！？；\n]{0,2}(?:简单|轻松|容易|快|不难)/,
+  // W4b r276：掌握族（「这次我吃透每个环节」——吃透/摸透/门儿清 +
+  // 环节/细节/流程；旧族只收「能有多难」轻描形与「某人说简单」传闻
+  // 形，自陈掌握度形整族穿透）
+  /(?:吃透|摸透|钻研透|门儿清|了如指掌|熟稔|吃得透|想得透)[^。，！？；\n]{0,8}(?:每个|各个|所有|一切|每一)?(?:环节|细节|流程|步骤|技术点|难点|坑|问题)/,
 ];
 // W5 参照类模仿族（别人三个月我们也三个月）。间隔类允许逗号——r255
 // 实证：排除逗号会让「别人两个月交付了，我们也能」整族不匹配。
@@ -168,6 +199,11 @@ const WILL_MIMIC_ZH = [
 const WILL_EFFORT_EN = [
   /\b(?:with (?:enough )?(?:effort|determination|willpower|hustle|grit|drive)|push(?:ing)? harder|work harder|grind(?:ing)? (?:it )?out|all[- ]hands|crunch(?: time)?|sheer (?:determination|willpower)|if we just|we just need to|everyone just needs to)\b/i,
   /\b(?:determination|morale|willpower|commitment|drive|enthusiasm)\s+(?:is|will be|alone is)\s+(?:enough|all we need)\b/i,
+  // r276 新增：资源加码族（「I doubled the team size」「added three more
+  // engineers」——投入承诺的资源量化形；旧族只收 with enough effort 类
+  // 与 determination 情绪词，doubled/added N people 整族穿透）
+  /\b(?:doubled|tripled|quadrupled|doubling|tripling)\s+(?:the\s+)?(?:team|headcount|staffing|manpower|crew|resources?)\b/i,
+  /\b(?:added|adding|added\s+on|throw(?:ing)?)\s+(?:\d+|three|four|five|ten|more)\s+(?:more\s+)?(?:people|engineers|developers|staff|hands)\b/i,
 ];
 const WILL_INTENSITY_EN = [
   /\b(?:definitely|certainly|surely|absolutely|for sure|no doubt|guaranteed|we will (?:definitely|certainly|surely))\b/i,
@@ -175,6 +211,10 @@ const WILL_INTENSITY_EN = [
 const WILL_REJECT_REF_EN = [
   /\b(?:ignore|forget|discount|disregard|don'?t (?:listen to|trust|believe)|never mind|pay no attention to|set aside)\b[^.]{0,40}\b(?:history|historical|past|data|estimates?|consultants?|advisors?|base rates?|benchmarks?|similar (?:projects|tasks)|track record)\b/i,
   /\b(?:similar|comparable|past|previous)\s+(?:projects?|tasks?|teams?|launches?|efforts?)\s+(?:ran late|were late|took longer|failed|overran|run late|run over|ran over|blew|missed|slipped)\b[^.]{0,40}\b(?:but|yet)\s+(?:we|this time|we'?re|our)\b/i,
+  // r276 新增：fluke dismissal（「Last time was a fluke」「that run was
+  // a one-off」——把参照类失手归为个例；旧族只收 ignore/discount 祈使
+  // 形与 ran late+but 转折形，fluke/one-off/anomaly dismissal 整族穿透）
+  /\b(?:last\s+time|the\s+last\s+one|previous(?:ly)?|that\s+time|the\s+previous\s+(?:run|attempt|launch|project))\s+(?:was\s+)?(?:a\s+)?(?:fluke|one[-\s]off|anomaly|outlier|accident|coincidence|bad\s+luck|aberration)\b/i,
 ];
 const WILL_DISMISS_EN = [
   /\b(?:how hard can|it (?:can'?t|cannot) be that hard|piece of cake|no big deal|not rocket science|easier than (?:they|people|everyone) (?:think|said)|simpler than (?:they|people) (?:think|said)|we overthought it|not that complicated|straightforward)\b/i,
@@ -189,6 +229,10 @@ const WILL_MIMIC_EN = [
 const EST_DURATION_ZH = [
   /(?:\d+|[一二三四五六七八九十两半]+)\s*(?:个)?(?:月|周|天|小时|分钟|季度|年|半年)[^。，！？；\n]{0,8}(?:就能|足以|足够|肯定|一定|绝对|保底|搞定|完成|交付|上线|弄完|谈完|写完|重建|迁完|迁移完|来得及|赶出来|做出来|弄好|做完|完事|拿下|谈成)/,
   /(?:两周|一周|三天|两天|一天|一个月|两个月|三个月|半年|一年)[^。，！？；\n]{0,4}(?:就能|足以|足够|肯定|一定|绝对|搞定|完成|上线|交付|弄完|谈完|迁完|拿下)/,
+  // E1b r276：工期比较结论族（「工期肯定比计划还短」「交付只会更快」——
+  // 比较形结论无数字锚；旧族要求 数字+时间单位 或 强度词+结论动词，
+  // 比计划短/只会更快的比较结论整族穿透）
+  /(?:工期|进度|交付|上线|完成时间|交期|排期)[^。，！？；\n]{0,10}(?:只会|肯定|一定|势必|保准|保证|必定)[^。，！？；\n]{0,10}(?:更|还|只会更)?(?:短|快|早|提前)/,
 ];
 // E2 成本/规模结论族
 const EST_COST_ZH = [
@@ -202,6 +246,10 @@ const EST_PROMISE_ZH = [
   /(?:年底|年末|月底|周末|季度末|季度末前)[^。，！？；\n]{0,6}(?:前)?[^。，！？；\n]{0,6}(?:肯定|一定|绝对|势必|铁定|妥妥的)/,
   /(?:肯定|一定|绝对|势必|铁定|妥妥的)[^。，！？；\n]{0,6}(?:年底|年末|月底|季度末)[^。，！？；\n]{0,8}(?:交付|上线|完成|搞定|弄完|谈成|拿下)/,
   /(?:包在|交给)[^。，！？；\n]{0,4}(?:身上|我们|咱)[^。，！？；\n]{0,4}(?:放心|错不了|没问题)/,
+  // E3b r276：绝不会再 + 失手词族（「绝不会再超时」「不会再延期」——
+  // 强度词旧表只有 肯定/一定/绝对/势必/铁定类，「绝不会/不会再」+
+  // 超时/延期/超支/跳票 的排期承诺形整族穿透）
+  /(?:绝不会|不会再|绝不会再|不会再犯|保准不再|肯定不再|决不再)[^。，！？；\n]{0,6}(?:超时|超期|延期|延迟|延误|超支|超预算|跳票|烂尾|晚点|掉链子|爽约)/,
 ];
 
 const EST_DURATION_EN = [
@@ -209,11 +257,18 @@ const EST_DURATION_EN = [
   /\b(?:ship|deliver|launch|finish|complete|rewrite|migrate|roll out|win|capture|conquer|dominate|take over|release)\b[^.]{0,25}\b(?:in|within|under)\s+(?:\d+|a|an|one|two|three|four|five|six|a few|a couple of)\s+(?:days?|weeks?|months?)\b/i,
   /\b(?:\d+|one|two|three|a few|a)\s+(?:days?|weeks?|months?)\s*,\s*(?:done|finished|complete[ds]?|shipped|wrapped)\b/i,
   /\b(?:a|one)[ -]day job\b/i,
+  // r276 新增：can only get faster（「delivery can only get faster」——
+  // 比较形结论无数字锚，与 EST_DURATION_ZH E1b 对应）
+  /\b(?:delivery|deliver|ship|finish|launch|schedule|timeline)\b[^.]{0,30}\b(?:can\s+only|will\s+only|should\s+only|would\s+only)\s+(?:get|be|go|come)\s+(?:faster|quicker|sooner|earlier)\b/i,
 ];
 const EST_PROMISE_EN = [
   /\b(?:we'?(?:ll| will)|we can|we should|we'?re going to)\s+(?:definitely|certainly|surely|easily|absolutely)\s+(?:make|hit|meet|ship|deliver|finish|launch|complete)\b/i,
   /\b(?:make|hit|meet)\s+(?:the\s+)?(?:deadline|date|launch|target|timeline)\s+(?:for sure|easily|no problem|guaranteed)\b/i,
   /\b(?:deliver|ship|finish|launch|complete)\b[^.]{0,25}\bby (?:the\s+)?(?:year[ -]end|end of (?:the\s+)?year|Q[1-4]|the deadline|next (?:week|month))\b/i,
+  // r276 新增：no more overruns/late（「so no more overruns」「we won't
+  // slip again」——旧族只收 definitely/certainly 强度形，绝不会再 +
+  // 失手名词的排期承诺形整族穿透）
+  /\b(?:no\s+more|never\s+again|won'?t\s+happen\s+again|not\s+happening\s+again|won'?t\s+slip\s+again)\s+(?:overruns?|delays?|late|slippage|misses|overruns)\b/i,
 ];
 
 // ─── 独腿签名（SOLO）——一句话内部自带「意愿×工期」完整结构，无需

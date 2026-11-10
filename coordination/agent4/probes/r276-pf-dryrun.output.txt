@@ -1,0 +1,7 @@
+HIT  | 上次纯属意外，这次我吃透每个环节，绝不会再超时。
+HIT  | 这次我拼了命，所有时间都压上，工期肯定比计划还短。
+HIT  | Last time was a fluke; I have now mastered e
+HIT  | 我又加了三个人进项目组，人手翻倍，交付只会更快。
+HIT  | 以往纯属偶然，这次流程我摸透了，绝对不会再延期。
+---benign---
+benign FP=0
