@@ -1,5 +1,5 @@
 'use strict';
-// round-277  逻辑谬误家族 wired 维度全新措辞家族扩展（真升级②，live 生效）
+// round-278  逻辑谬误家族 wired 维度全新措辞家族扩展（真升级②，live 生效）
 //
 // 覆盖（探针实测穿透率：appeal_to_tradition 10/10、false_dilemma 9/9、
 // no_true_scotsman 10/10；良性 22 条零误伤）：
@@ -35,7 +35,7 @@ function ok(cond, label) {
   else { failed++; console.log('  ❌ ' + label); }
 }
 
-// ─── 攻击矩阵（与 r277 探针池同口径同样本）────────────────────────
+// ─── 攻击矩阵（与 r278 探针池同口径同样本）────────────────────────
 const ATTACKS = [
   // A appeal_to_tradition（ZH）
   ['appeal_to_tradition', '千百年来都是这么过来的，还能有错？'],
@@ -119,11 +119,11 @@ console.log('== 登记纪律 ==');
 const A = atMod.__internals(), F = fdMod.__internals(), N = ntsMod.__internals;
 ok(Object.keys(A.TRAD_ZH_BRANCHES).some(k => k === 't10_time_span')
   && Object.keys(A.TRAD_ZH_BRANCHES).some(k => k === 't11_brand_age'),
-  'TRAD_ZH_BRANCHES 含 r277 新支 t10/t11');
+  'TRAD_ZH_BRANCHES 含 r278 新支 t10/t11');
 ok(Object.keys(A.CONCL_ZH_BRANCHES).some(k => k === 'c9_obey_old')
   && Object.keys(A.CONCL_EN_BRANCHES).some(k => k === 'c8_how_wrong'),
-  'CONCL 分支表含 r277 新支 c9/c8');
-ok(N.ROLE_NOUNS_CN.split('|').length >= 90, 'ROLE_NOUNS_CN 角色名词扩容（实测 ' + N.ROLE_NOUNS_CN.split('|').length + '，r277 前 43）');
+  'CONCL 分支表含 r278 新支 c9/c8');
+ok(N.ROLE_NOUNS_CN.split('|').length >= 90, 'ROLE_NOUNS_CN 角色名词扩容（实测 ' + N.ROLE_NOUNS_CN.split('|').length + '，r278 前 43）');
 ok(N.ROLE_NOUNS_EN.split('|').length > 100, 'ROLE_NOUNS_EN 角色名词扩容（实测 ' + N.ROLE_NOUNS_EN.split('|').length + '）');
 ok(!!N.AUTH_CN_STAN_RE && !!N.AUTH_CN_VETERAN_RE && !!N.AUTH_CN_MAN_RE,
   'AUTH_CN 三个新独腿签名已接线（stan/veteran/man）');
@@ -150,7 +150,7 @@ const CB_EN = (kill) => Object.assign({}, A.CONCL_EN_BRANCHES, { [kill]: NEVER }
 const E3_OLD = new RegExp(
   A.SUPP_EN_BRANCHES.e3_dont_fix.source.replace('(?:go )?fix(?:ing)?', 'fix'), 'i');
 
-// B：旧版常量（r277 前形态，按本轮补丁前源码复原）
+// B：旧版常量（r278 前形态，按本轮补丁前源码复原）
 const ROLE_NOUNS_CN_OLD = '人|者|粉丝|专家|朋友|兄弟|男人|女人|父亲|母亲|爸爸|妈妈|父母|孩子|男生|女生|领导|学生|设计师|艺术家|球员|歌手|演员|工程师|程序员|医生|律师|老师|作家|球迷|爱好者|消费者|员工|同事|伙伴|伴侣|爱人|管理者|负责人|专业人士|技术人员|同行|内行|大佬|极客';
 const ROLE_NOUNS_EN_OLD = 'fan|fans|expert|experts|friend|friends|partner|partners|leader|leaders|manager|artist|artists|designer|designers|professional|professionals|parent|parents|mother|father|player|players|engineer|developer|colleague|colleagues|christian|muslim|scotsman|scot|patriot|man|woman|boy|girl|musician|believer|member|artist';
 const AUTH_CN_ROLE_OLD = new RegExp(
@@ -233,7 +233,7 @@ for (const c of INJ) {
   if (before && !after) injRed++;
 }
 
-console.log('\nround-277-wired-family-extensions: ' + passed + ' passed / ' + failed
+console.log('\nround-278-wired-family-extensions: ' + passed + ' passed / ' + failed
   + ' failed（注入 ' + INJ.length + ' 个：' + injRed + ' 个变红，' + (INJ.length - injRed) + ' 个未变红）');
 console.log('cleanup: none (pure in-memory checks)');
 if (failed > 0) process.exit(1);
