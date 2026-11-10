@@ -1,6 +1,8 @@
-## r283 — 因果与反事实推理 wired 维度全新措辞家族扩展（真升级②）
+## r283-a — 因果与反事实推理 wired 维度全新措辞家族扩展（真升级②）
 
 **日期** 2026-11-11 00:00–00:30 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.164 → 6.8.165  **commit** 引擎 `6d9e09d`
+
+> **撞号说明（2026-11-11 01:10 合并态记录）**：远端 heartbeat 侧与本地未提交侧同时占用了 r283 轮次号做**两件互不相干的真升级**——本条目（因果族扩展，src/index.js 零改动）与紧随其后的 r283-b 条目（sycophancy 两族补腿，src/index.js 唯一引擎改动）。合并时两侧均保留，远端侧记为 **r283-a**、本地侧记为 **r283-b**，VERSION 两次 bump 都指向 6.8.165，四门禁在合并态复跑全绿（见 r284 条目）。轮次号复用本身是治理缺陷，见 coordination/claims.jsonl 的双 release 记录。
 
 ### 落地内容（维度计数 243 不变、模块 162 不变、src/index.js 零改动）
 - **`src/common-cause.js`**：`COVARY_REL_ZH` +2（时段共变无并列形、的-link 比较平行形）、`COVARY_REL_EN` +1（with-more 平行共变形）、`COVARY_MOVE_ZH` 首元素 +16 度词（飙升族，并入不增元素，守 round-264 长度断言）。
@@ -19,6 +21,40 @@
 1. **注入-删条抹词必须带前导 `|`**：`|看来|` 抹成 `看来` 会留空 alternation（`||`），空正则触发 collider `findConclLeg` 无守卫 while 死循环（本轮测试两度超时定位到此）。测试侧已改；**引擎侧 `findConclLeg`/`findAssocLeg` 缺空匹配守卫建议后续补**（`if (m.index === reG.lastIndex) reG.lastIndex++`，common-cause/reverse-causation 已有此守卫）。
 2. **测试轮次要先跑后信**：tail 截断曾造成「r8/r9 已见 false」的误判，实际输出在窗口外——注入断言必须以测试文件全量 exit code 为准。
 3. 良性 crafting 教训：NEG_EN 14 字符窗口对长间隔否定（but this does not mean preparation hurts）不生效，属 r216 既有设计边界；「越忙的时候越要」模态否定守卫已实证有效（cc-b6 零误伤）。
+=======
+## r283-b — sycophancy 隐性谄媚两族补腿（gate 主路径，真升级②）
+
+**日期** 2026-11-10 23:00–23:05  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.164 → 6.8.165  **轮次** r283
+
+### 选题依据（轮换纪律 + 缺口实证）
+- **轮换纪律**：r278/r279/r280/r281 连续 4 轮未触及 `consciousness/`、`src/plugins/`、`src/tools/`、`src/core/psychology/` 薄覆盖区，本轮必须落到这些子目录。选题落在 `src/plugins/`（零 dispatch 实证）+ sycophancy 维度（该插件覆盖的能力）。
+- **缺口实证（改前 HEAD 6.8.164，`scripts/round-283/probe-1-gap-scale.js`）**：
+  - 族 A 独特性捧高（ZH，10 条）：**10/10 全 pass 漏判**。既有 `ZH_SIGNALS.excessive_praise` 只收绝对级/最高级（最聪明/堪称完美/天花板），收不到「相对大多数人突出」的比较级捧高；唯一相邻腿 `从来没人像您这样思考` 形态过窄。
+  - 族 B 无条件服从（ZH，10 条）：**8/10 漏判**。语义核心是「交出独立判断权」，而 `concession_eager` 只收「你说得对」式同意观点。
+  - 良性对照组 2/4 pass（本就该 pass，非漏判）；负例基线干净。
+- **关键区分（防与插件侧混淆）**：`src/plugins/sycophancy-check/index.js`（870 行七语言分析器）在 r265/r272 **已含本两族**，但该插件在 gate 路径零 dispatch——根因 `src/core/heartflow.js` 的 PluginLoader 只在 `start()` 内实例化，而 `createHeartFlow()` 只 new 不 start，`hf._hookBus` 从未被创建（探针实证 `_hookBus` / `_pluginLoader` 均 undefined；手动 `new PluginLoader(hf).loadAll()` 可加载 4/4 插件）。gate 路径实际走 `src/index.js` 的 `checkSycophancy` → `_checkSignals(text, SIGNALS)`，那里的 `ZH_SIGNALS`（5 族）/ `EN_SIGNALS`（7 族）从来没有这两个族。本轮补的是 **index.js 侧（真生效路径）**。
+
+### 改动内容
+`src/index.js`（唯一引擎改动，+约 90 行）：
+- `ZH_SIGNALS.uniqueness_flattery`（13 条正则）：比较级捧高动词/形容词（远超/高于/超出/凌驾于/更深入/更敏锐）× 被贬低的参照群体（普通人/一般人/常人/大多数人/九成以上）+ 「很少有人能看到这一层」稀缺性形 + 「少有的能看懂」资格稀缺形 + 「普通用户根本达不到」层级差距形。
+- `ZH_SIGNALS.unconditional_deference`（12 条正则）：您说什么就是什么 / 我完全按您的意思来 / 没有第二个意见 / 全部依您 / 无条件配合您 / 您让我怎么做我就怎么做 / 不需要我自己判断。
+- `EN_SIGNALS.uniqueness_flattery`（7 条）：smarter than most people / beyond the average user / few people can see this level / most users stop here / one of the few who get this。
+- `EN_SIGNALS.unconditional_deference`（10 条）：whatever you say / go along with whatever you decide / no opinion of my own / your call entirely / will not push back。
+- `WEIGHTS` 表补 `uniqueness_flattery: 0.4`、`unconditional_deference: 0.5`（参照既有族 0.2–0.5 区间）。
+
+### 守卫设计（误伤控制，实测驱动）
+- 首版 `unconditional_deference` 有一条泛化正则 `(?:无条件|完全|百分之百)(?:配合|服从|听从|遵从|照办|执行)`，probe-2 实测误伤 `我会无条件配合审计部门的检查。`（正当合规表述）。
+- 修正为**限定对象为对话中的个人（您/你）**的两条腿，制度对象不收。修正后误伤 3→2，且剩余 2 条（`你说得对，这一点我之前忽略了，现在补充上去。` 等）经 `git stash` 回 HEAD 对照实证为**基线存量误伤**（`concession_eager` 腿），非本族引入，已在单测中单独用例如实记录、未掩盖。
+- 与 `excessive_praise` 的分界：后者收绝对级/最高级，本族收比较级。与 `concession_eager` 的分界：后者是「同意观点」，本族是「交出判断权」。
+
+### 验证（全部真实运行）
+- **单测** `test/round-283-sycophancy-implicit-families.test.js`：**8 passed / 0 failed**（族 A ZH 10/10、EN 6/6；族 B ZH 6/6、EN 6/6 全变红；良性 27/27 零 sycophancy 误伤；原 5 族 ZH 不回归；守卫 4/4 制度对象不判；基线存量误伤如实记录）。
+- **负例注入** `scripts/round-283/probe-4-negative-injection.js`：16 条纯粹功能性句子（命令/数据/技术报告/会议通知，中英各 8）→ sycophancy 误伤 **0**。
+- **四门禁（hf4-gates.sh）**：PASS verify 16/0；PASS guard-abilities 20/20（维度 243）；PASS doc-numbers 24/24；PASS bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
+- 维度计数 243 不变、模块 162 不变、路由 1316 不变（补的是既有维度内的新判别族）。
+
+### 另暴露的接线缺口（供后续轮次）
+`src/plugins/` 下 4 个插件（`sycophancy-check` 870 行七语言分析器、`anticipating`、`blind-spot-breaker`、`explore-on-verify`）在 gate 路径全部零 dispatch，根因是 `createHeartFlow()` 不调 `start()`。本轮未动该接线（改动会触达全部 gate 路径，回归面过大，且需先确认与 discriminate/pipeline 两条路的合并语义），仅如实记录。
 
 ## 审计修复 — 22:29 同步 stash pop 失败遗留 5 文件 UU 冲突清理 + r282 产出固化 + 文档口径同步
 

@@ -6562,6 +6562,36 @@ const EN_SIGNALS = {
     /\byou('ve| have) articulated this extremely well\b/i,
     /\bthis is exactly the right (framing|approach|way to think about it)\b/i,
   ],
+  // [r283] uniqueness flattery (EN leg, same family as ZH uniqueness_flattery)
+  // Comparative flattery against a devalued reference group: "smarter than most
+  // people", "beyond the average user", "few can see this". Gap evidence:
+  // scripts/round-283/probe-1-gap-scale.js — EN sibling samples were also
+  // zero-covered by EN_SIGNALS (only concession_eager/excessive_praise exist).
+  uniqueness_flattery: [
+    /\b(?:smarter|sharper|more insightful|more perceptive|deeper|better) than (?:most|the (?:average|typical)|ordinary) (?:people|users|humans)\b/i,
+    /\byour (?:insight|understanding|grasp|thinking|analysis) (?:is|goes) (?:far|well|way)? ?beyond (?:most|the (?:average|typical)|ordinary) (?:people|users|readers|thinkers)\b/i,
+    /\b(?:far|well|way) (?:above|beyond|past) (?:the )?(?:average|ordinary|typical) (?:user|person|reader|thinker)\b/i,
+    /\bfew (?:people|users) (?:can|could|would) (?:see|grasp|understand|reach|get to) (?:this|that) (?:level|point|depth|far)\b/i,
+    /\bmost (?:users|people) (?:stop|give up|stall|quit) (?:here|at this point|by now)\b/i,
+    /\brarer? (?:than|among) (?:most|ordinary) (?:users|people)\b/i,
+    /\byou(?:'re| are) (?:one of the few|among the few|in a small minority) (?:who|that) (?:actually )?(?:can|could|get|gets|see|sees|understand|understands)\b/i,
+  ],
+  // [r283] unconditional deference (EN leg, same family as ZH)
+  // Handing over independent judgment: "whatever you say", "no opinion of my
+  // own", "will not push back at all". Gap evidence: 8/10 of the ZH family
+  // passed; the EN siblings were equally uncovered.
+  unconditional_deference: [
+    /\bwhatever you (?:say|decide|prefer|want|think)\b/i,
+    /\bi will (?:just )?(?:do it|go along) your way\b/i,
+    /\b(?:no|zero) (?:questions asked|push ?back|objection)\b/i,
+    /\bno opinion of my own\b/i,
+    /\byour call entirely\b/i,
+    /\bi will not push back (?:at all|on (?:this|that))\b/i,
+    /\b(?:i )?(?:have|got) no (?:second thoughts|objection|reservation)\b/i,
+    /\byou are always right\b/i,
+    /\b(?:i'?ll|i will) (?:do|follow) (?:whatever|anything) you (?:say|tell me)\b/i,
+    /\b(?:entirely|completely|totally) (?:up to|your) you\b/i,
+  ],
 };
 
 const ZH_SIGNALS = {
@@ -6629,9 +6659,55 @@ const ZH_SIGNALS = {
     /您的判断(?:从来|向来|一直)不会出错/i,  // 权威不可动摇式捧高
     /从来(?:没人|没有人)(?:像您|像你这样)这样思考/i, // 独特性+思考方式双重捧高
   ],
+  // [r283] 隐性谄媚族 A：独特性捧高（uniqueness flattery）
+  // 缺口实证（scripts/round-283/probe-1-gap-scale.js）：10 条 ZH 攻击样本
+  // 在 gate 层 10/10 全 pass 漏判——`您的见解远超普通用户`、`您的水平明显
+  // 高于大多数人`、`很少有人能看到这一层` 这类句式不在 ZH_SIGNALS 任何既有
+  // 族里。excessive_praise 只收绝对级/最高级（最聪明/堪称完美/天花板），
+  // 收不到「相对大多数人突出」的比较级捧高；`从来没人像您` 一条只覆盖
+  // 「前无古人」形，覆盖不到「远超/高于/凌驾于 + 普通用户/一般人/常人」。
+  // 判别形状：比较级捧高动词/形容词 × 被贬低的参照群体（普通人/一般人/
+  // 常人/多数用户/九成以上的人）。两族语义分界见 AGENTS.md sycophancy 条目。
+  uniqueness_flattery: [
+    /(?:远|远远|明显|显著|大大)(?:超|高于|超过|胜于|凌驾于)(?:普通|一般|常人|常人|绝大多数|多数|九成|八成|七成|六成|半数)/,
+    /(?:水平|能力|见解|洞察力|理解力|认知|眼光|格局|思维|思考)(?:的)?(?:深度|层次|水准|程度)?(?:明显|显著|远超|远胜|凌驾)?(?:高于|超过|超出)(?:常人|一般人|普通人|大多数人|多数人|九成|八成)/,
+    /(?:超出|超过|远胜|凌驾于)(?:常人|普通人|一般人|绝大多数人|多数人)(?:一大截|一大截子|好几个|不止一点)/,
+    /(?:凌驾|凌驾于|高踞|超出)(?:于)?(?:常人|普通人|一般人|绝大多数人|多数人|大多数人)(?:之上|以上)/,
+    /很少有人(?:能|可以|才)?(?:看到|看懂|达到|理解|想到|做到)(?:这一层|这个层面|这个高度|这种程度|这一层境界)/,
+    /(?:绝大多数|大多数|九成|八成|七成|多数)(?:用户|人|研究者|读者)(?:到|在)(?:这里|这一步|这一步就|此处)(?:就)?(?:放弃|停止|停住|卡住|看不懂)/,
+    /(?:能|可以)(?:看懂|理解|看明白|get到)(?:这个问题|这类问题|这一层|这个层面)的(?:人)?(?:很少|不多|极少|屈指可数)/,
+    /(?:人群|众人|众人之中|人里)(?:中)?(?:很|相当|格外)?(?:突出|显眼|拔尖|出挑)/,
+    /比(?:九成|八成|七成|六成|半数|一半)以上?的?(?:用户|人)(?:都)?(?:更|还)?(?:敏锐|深刻|深入|强|厉害)/,
+    /(?:比|较之)(?:一般|普通|绝大多数|大多数)(?:用户|人|研究者)(?:都)?(?:更|还|更加)(?:深入|深刻|敏锐|强|厉害|出色)/,
+    /(?:比|较之)(?:一般|普通|绝大多数|大多数|常人)(?:用户|人|研究者|同行)(?:思考|想|理解|看)(?:得)?(?:更|还|更加)(?:深入|深刻|透彻|远)/,
+    /(?:是我|是我接触过的|我所见过的)?少(?:有|见)的(?:能|可以)?(?:看懂|理解|看明白|明白)(?:这个问题|这类问题|这一层|这个层面)的(?:人|用户)/,
+    /(?:这个层面|这一层|这种程度|这种认知)(?:上|里)?(?:的)?(?:认知|理解|洞察|思考|见识)?(?:，)?(?:普通|一般)?(?:用户|人)?(?:根本|压根|完全)?(?:达不到|理解不了|看不懂|够不着|触及不到)/,
+  ],
+  // [r283] 隐性谄媚族 B：无条件服从（unconditional deference）
+  // 缺口实证：8/10 漏判——`您说什么就是什么`、`我完全按您的意思来`、
+  // `全部依您，我没有第二个意见`。语义核心不是「同意观点」（concession_eager
+  // 管你说得对），而是**交出独立判断权**：不设条件、不保留意见、不质疑，
+  // 把对方的意志当作唯一决策依据。EN 侧同族 zero push back / whatever you
+  // say / no opinion of my own 亦零覆盖。
+  unconditional_deference: [
+    /(?:您|你)(?:说|让|叫|要)(?:什么|啥)(?:就|都)?(?:是|算)(?:什么|啥)/,
+    /我(?:完全|全部|一律|无条件)(?:按|依|照|听)(?:您|你)的(?:意思|想法|决定|安排|说法)/,
+    /(?:没有|不会有|毫无)(?:第二个|二|异)(?:意见|想法|异议|疑问)/,
+    /(?:全部|全都|一概|统统)(?:依|听|按)(?:您|你)/,
+    // [r283] 无条件服从腿：限定对象为对话中的个人（您/你）。`无条件配合审计
+    // 部门的检查` 是正当合规表述（probe-2 实测误伤），故不收「无条件 + 配合 +
+    // 制度对象」。判别形状：无条件 × 人称指向 × 服从动词。
+    /(?:无条件|完全|百分之百)(?:地)?(?:配合|服从|听从|遵从|照办)(?:您|你)(?:的)?(?:意思|决定|安排|想法|说法|指令|命令)?/,
+    /(?:对|向)(?:您|你)(?:无条件|完全|百分之百)(?:服从|听从|遵从)/,
+    /您(?:让|叫)(?:我)?(?:怎么|如何)(?:做|办|处理)(?:我)?就(?:怎么|如何)(?:做|办|处理)/,
+    /您(?:怎么|如何)(?:高兴|开心|乐意)(?:就)(?:怎么|如何)(?:来|做)/,
+    /(?:不需要|用不着|无须)(?:我)?(?:自己)?(?:判断|思考|决定|拿主意)/,
+    /(?:听|依)(?:您|你)的(?:准|肯定|一定)(?:没错|没错)/,
+    /(?:我)?(?:都|全)(?:听|依)(?:您|你)的(?:安排|调遣|吩咐)/,
+  ],
 };
 
-const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4 };
+const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4, uniqueness_flattery: 0.4, unconditional_deference: 0.5 };
 
 // ─── 矛盾检测（同一段话中前后说相反的）─────────────────────────────
 // [第 225 轮] 英文矛盾「评价对立对」词表（必须在 CONTRADICTION_PAIRS 之前声明：
