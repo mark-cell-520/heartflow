@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/L7eF+RFuec0B/mvn8DSNzo6T80M</id>
+  <title>arXiv Query: search_query=all:"survivorship bias"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-10T19:52:47Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22survivorship+bias%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>39</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11516v1</id>
+    <title>Breaking survivorship bias in driving world models</title>
+    <updated>2026-11-08T17:45:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.11516v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11516v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>World models allow autonomous vehicles to imagine the consequences of candidate actions before execution, but their reliability depends on the futures represented in their training data. We identify a survivorship bias in driving world models: because the futures recorded in prevailing driving datasets almost always end safely, existing models often imagine benign outcomes even when a collision is imminent. We introduce a neutral world model (NWM) that learns both routine and safety-critical futures from a mixture of routine driving and real accident videos with a bounding-box-guided objective. The NWM more faithfully anticipates imminent collisions, while maintaining a low false collision rate and competitive generation quality in routine driving. We further use the model as an imagination engine for decision-making. Given multiple ego trajectories, the NWM predicts the future associated with each candidate, and a reward function evaluates these imagined outcomes before selecting an action. On challenging NAVSIM scenarios, this procedure selects the better trajectory more reliably than the baseline world model. Zero-shot experiments with real-world pedestrian dummy crossing data collected using an autonomous research vehicle further demonstrate transfer to unseen sensor observations. These results show that correcting survivorship bias enables world models to more faithfully reason about futures and support safety-critical decision-making in autonomous driving.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T17:45:00Z</published>
+    <arxiv:comment>Project Website: https://zihaosheng.github.io/NWM/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Zihao Sheng</name>
+    </author>
+    <author>
+      <name>Zilin Huang</name>
+    </author>
+    <author>
+      <name>Yuhao Luo</name>
+    </author>
+    <author>
+      <name>Zhengyang Wan</name>
+    </author>
+    <author>
+      <name>Boyue Wang</name>
+    </author>
+    <author>
+      <name>Soyoung Ahn</name>
+    </author>
+    <author>
+      <name>David A. Noyce</name>
+    </author>
+    <author>
+      <name>Sikai Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09528v1</id>
+    <title>StockASkill: A Local-First AgentSkill for Intelligent Stock Selection</title>
+    <updated>2026-11-06T14:39:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.09528v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09528v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantitative equity selection and portfolio construction in emerging and cross-border markets frequently suffer from computational bottlenecks, remote API fragility, survivorship bias, and rigid execution constraints such as discrete board lots and investor-mandated drawdown limits. In this paper, we present StockASkill, a local-first, full-data-driven AgentSkill engineered as a specialized Quant Co-Processor for autonomous AI agents and quantitative researchers. Tailored for agile portfolios (10^5 ~ 10^7 RMB) where discrete lot execution and capital protection are mandatory, StockASkill embeds a columnar DuckDB OLAP engine over 42.44 million historical price records and 186,432 financial disclosures spanning 26 years across China A-shares, Hong Kong, US equities, and ETFs. By eliminating ad-hoc network dependencies during analysis, StockASkill reduces cross-sectional screening latency across 5,400+ equities from over 25 seconds to sub-0.5 seconds (a 95%+ reduction). We formalize an end-to-end mathematical pipeline integrating a 7+1 factor alpha model, an SLSQP convex optimizer under smooth CVaR drawdown surrogates with exact path projection, dynamic 100-share board lot integer quantization, and an autonomous thesis lifecycle finite-state machine. Furthermore, we provide a zero-disk, strongly-typed JSON streaming interface designed for high-throughput LLM tool-calling. Open-sourced at https://github.com/axjing/stockaskill, comprehensive empirical benchmarks from 2018 to 2024 demonstrate that the architecture achieves annualized Sharpe ratios exceeding 1.48 and Calmar ratios up to 2.17, while reducing max drawdown by up to 85% relative to benchmark indices.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T14:39:25Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Xiangjing An</name>
+    </author>
+    <author>
+      <name>Zhibin Jiao</name>
+    </author>
+    <author>
+      <name>Aiting Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09923v1</id>
+    <title>Autonomy Is Absent, Not Eroded: An Observational Study of User Autonomy in Multi-Turn LLM Conversations</title>
+    <updated>2026-09-06T19:07:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.09923v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09923v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Does prolonged interaction with Large Language Models reduce users' observable autonomy during conversation? We test this degradation hypothesis by scoring user autonomy across 2,877 multi-turn conversations (46,952 turns) from WildChat and validating on 500 conversations from LMSYS-Chat-1M. Our core finding is a null result: population-level autonomy remains stable throughout conversations, only 4.7% of conversations show meaningful decline, and an apparent decrease at later turn positions is explained by survivorship bias. Instead, the dominant pattern is not erosion but absence: 80.8% of conversations exhibit zero or low autonomy throughout. When autonomy engagement occurs, it is self-reinforcing (persistence doubles from 40% to 85% over consecutive turns). These findings reframe the problem: the risk is not that LLMs progressively degrade users' observable autonomy, but that most users never engage in independent reasoning during the interaction.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-06T19:07:38Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Chaoran Chen</name>
+      <arxiv:affiliation>University of Notre Dame</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Isabel Barberá</name>
+      <arxiv:affiliation>Independent Researcher</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Yuhuai Wei</name>
+      <arxiv:affiliation>Independent Researcher</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.15562v1</id>
+    <title>Hard Rules, Soft Preferences: Bridging Reasoning, Learning, and Optimization for Personalized Packing Checklist Generation</title>
+    <updated>2026-07-17T02:11:00Z</updated>
+    <link href="https://arxiv.org/abs/2607.15562v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.15562v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Packing for air travel is recurring and error-prone: the checklist must be personal and context-aware, yet feasible under safety rules, item dependencies, and luggage limits. Existing packing assistants are template-driven and generic, or recommendation-driven but unconstrained, leaving users to manually patch regulatory and capacity violations. We propose a reasoning-guided learning framework with three stages: (1) a symbolic engine that generates a regulation-aware seed checklist with explicit dependency structure, (2) a two-stage preference learner that estimates inclusion and priority utilities from user add and remove actions while mitigating survivorship bias, and (3) a CP-SAT optimizer that selects a compact, compliant subset. The architecture instantiates a general pattern for constrained personalization, applicable wherever hard feasibility coexists with sparse preference signals. On 604 labeled trip scenarios, comprising 29K inclusion labels and 343K pairwise comparisons, the symbolic engine attains 99.7% recall and 0.96 rubric validity, compared with 0.78 to 0.81 for frontier LLMs. Gradient-boosted trees and LambdaMART reach an AUC-ROC of 0.943 and an NDCG@5 of 0.923. CP-SAT attains 100% constraint satisfaction, compared with 28% for greedy selection and 10% for random selection. Deployment in FlyEnJoy, a production iOS travel app, doubled checklist completions and reduced editing and completion time.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-17T02:11:00Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Himel Dev</name>
+    </author>
+    <author>
+      <name>Madhusudan Basak</name>
+    </author>
+    <author>
+      <name>Tanmoy Sen</name>
+    </author>
+    <author>
+      <name>Paromita Shome</name>
+    </author>
+    <author>
+      <name>Bashima Islam</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.10187v1</id>
+    <title>Knowledge-Conditioned, Single-Pass LLM Synthesis of Executable Unity Game Scenes: A Compiler Error Census across 26 Goal Playable Concepts</title>
+    <updated>2026-07-11T08:04:30Z</updated>
+    <link href="https://arxiv.org/abs/2607.10187v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.10187v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) write Unity C\# for game scenes. Yet nearly all demonstrations rest on an iterative repair loop that regenerates code until it compiles, conflating what the model writes with what the loop fixes. We remove the loop and evaluate a single pass, where the first draft is final. This isolates the model's parametric knowledge, the most stringent test of unaided generation. Models instantiate Goal Playable Concepts, playable counterparts of goal patterns, across 10,400 generations (four open-weight models, 7B--30B; two generation modes; four intermediate-representation (IR) conditioning levels; 26 goal patterns; 20 seeds). None compiled into a runnable scene, leaving no survivorship bias. To understand how the generated C\# scripts fail, we categorize the 99 error codes behind 90{,}673 compiler-error occurrences as Grounding (invented or misused Unity types and APIs) or Hygiene (structural defects needing no Unity knowledge). The split differs sharply by goal pattern (e.g., Stealth fails mostly on invented engine references; Capture on plain C\# structure). Larger models, stricter IRs, and different generation modes move the errors but never yield a compiling scene. The bottleneck is missing engine-specific knowledge. The census orders goal patterns by that demand, showing designers where single-pass generation breaks.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-11T08:04:30Z</published>
+    <arxiv:comment>Substantially reframed and extended version of arXiv:2603.07101, with new experiments, figures, and analysis</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hugh Xuechen Liu</name>
+    </author>
+    <author>
+      <name>Kıvanç Tatar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.15996v1</id>
+    <title>Comment on arXiv:2607.01233: Survivorship Bias in Published-Paper Baselines for Research-Idea Distributions</title>
+    <updated>2026-07-09T16:31:40Z</updated>
+    <link href="https://arxiv.org/abs/2609.15996v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.15996v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chen, Zhao, and Cohan introduce a valuable distributional evaluation of LLM-generated research ideas. This comment raises a narrower identification concern: their human baseline consists of published papers, whereas the LLM baseline consists of one-shot proposals. If bridge-like or synthesis-like ideas are relatively easy to generate but relatively unlikely to survive publication, then the published human baseline will understate their prevalence in the unseen human idea pool. The observed human--LLM gap may therefore be partly, or even largely, a consequence of survivorship bias.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-09T16:31:40Z</published>
+    <arxiv:comment>2 pages, 1 figure. Comment on arXiv:2607.01233</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Fredrik A. Dahl</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.07738v2</id>
+    <title>REFORGE: A Method for Benchmarking LLMs' Reverse Engineering Capabilities in Decompiled Binary Function Naming</title>
+    <updated>2026-07-24T13:29:41Z</updated>
+    <link href="https://arxiv.org/abs/2607.07738v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.07738v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are increasingly applied to reverse-engineering tasks, and recent threat-intelligence reporting shows them operating inside live offensive-security workflows. Claims about their capability, however, outpace our ability to measure it. Existing benchmarks for LLM-assisted binary analysis treat the construction of function-level ground truth as a solved pre-processing step and report accuracy without disclosing how many functions were reliably evaluable. We argue that the principal obstacle to fair evaluation is not model capability but the reliability of binary-to-source alignment under compiler optimization. This paper presents Reforge, a provenance-tracked pipeline that constructs function-level ground truth from C source through compilation, DWARF and syntactic extraction, alignment, and decompilation, and that operationalizes alignment uncertainty as an eight-gate confidence funnel with three-tier stratification. On a controlled micro-benchmark, high-confidence yield falls from 87.2% to 65.9% across optimization levels, and unpaired comparisons overstate optimization-induced performance decay through survivorship bias. A proof-of-concept evaluation of seven contemporary LLMs on function naming demonstrates the validity of the concept and generally motivates an uncertainty-aware benchmarking practice.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-07T23:17:03Z</published>
+    <arxiv:comment>10 pages, 5 figures; accepted for publication to the 23rd International Conference on Applied Computing 2026, Lisbon October 24-26,2026</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Nicolas Koller</name>
+    </author>
+    <author>
+      <name>Andreas U. Schmidt</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.06583v2</id>
+    <title>Trajectory Inference of Human Aging from Cross-Sectional DNA Methylation Data</title>
+    <updated>2026-11-09T12:47:49Z</updated>
+    <link href="https://arxiv.org/abs/2607.06583v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.06583v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DNA methylation (DNAm) serves as one of the most robust molecular biomarkers of biological aging. While conventional epigenetic clocks accurately predict chronological age from high-dimensional CpG profiles, they treat aging as a static regression task, meaning they can only output a single score rather than simulating how an entire profile continuously changes over time. To reconstruct these continuous dynamics, we frame lifelong human epigenetic aging as a trajectory inference problem across discrete age snapshots derived from widely available cross-sectional data. We introduce a two-stage computational pipeline: first, an age-regularized Variational Autoencoder (VAE) maps high-dimensional CpG profiles onto a chronologically ordered latent manifold while preserving a generative decoder bridge back to the original methylation space. Second, we model the continuous movement across this latent space via Regularized Unbalanced Optimal Transport (RUOT) that unifies deterministic drift, random diffusion, and non-conservative mass changes. By resolving this RUOT formulation using the DeepRUOT framework, our model fluidly accommodates population-level density shifts like survivorship bias and cellular attrition without requiring rigid biological priors. Evaluated on a large-scale, 80-year pan-tissue dataset, our model demonstrates robust distribution interpolation and uncovers a prominent late-life surge in the learned growth field that mathematically captures the variance expansion driven by stochastic epigenetic drift. Finally, by decoding continuous latent paths back to individual CpG sites, we reconstruct and empirically verify distinct biological aging archetypes, offering a rigorous, generative paradigm for simulating human molecular aging.</summary>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-04T19:02:23Z</published>
+    <arxiv:comment>16 pages, 7 figures</arxiv:comment>
+    <arxiv:primary_category term="q-bio.QM"/>
+    <author>
+      <name>Chandan Gupta</name>
+    </author>
+    <author>
+      <name>Syed Haider</name>
+    </author>
+    <author>
+      <name>Pietro Liò</name>
+    </author>
+  </entry>
+</feed>

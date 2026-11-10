@@ -92,6 +92,34 @@
  *     暴露史归属（肯定去过/铁定接触过/途经/来自 中高风险或确诊者）、
  *     铁定错不了口语收尾、九成/九成九 + 跑不了（r263 口语概率名词族漏
  *     九成 形）。
+ *
+ * [r285 扩展 · 真升级②：cue-density 轴共现观察族（第二基础概率）]
+ * 外部来源（真实命中）：arXiv "Two base rates, two weights: base-rate
+ * neglect has a second axis"（r285 海外扫描，原始文件
+ * coordination/agent4/scout/arxiv-r285-baserate.xml）——把共现读成
+ * 判断需要**两次**基础概率校正：校正结果本身的先验（古典轴，既有
+ * 腿覆盖）与**校正线索自身的出现频率**（cue-density 轴，本轮新增）。
+ * 线索满街都是（接陌生来电/收礼/坐后排）时，「队列里九个都有它」
+ * 对个体归属几乎零判别力。r285 池化探针实测：本族 8 条新措辞攻击
+ * **4 条完全穿透**（gate.action=pass 且零维度承重），良性 4 条零误伤。
+ * 穿透根因是腿①词表只有「阳性信号」词汇（检测阳性/标记/命中/画像），
+ * 而共现观察句（十个被骗的老人里九个都接过陌生来电）**不含任何
+ * 阳性信号词**，腿②归属词表也不含 盯上/危险/出事 等新落点：
+ *   · 腿①新族 CUE_ZH/CUE_EN：队列×比例共现（N个X里M个都/几乎都）、
+ *     全称共现（每个落马的官员都）、计数共现（十个有九个）、
+ *     共同点形（有个共同点：）；EN N out of ten victims / Every X who
+ *     got fired / Almost all the companies that collapsed / share a
+ *     common trait。
+ *   · 腿②新族 CUE_CONF_ZH/CUE_CONF_EN：新归属落点（盯上/找上/中招/
+ *     出事/完蛋/倒下/被骗/被坑/违约/失业/栽了/凉了/悬了）× 模态词
+ *     （可能/八成/九成/多半/大概率/铁定/肯定）；EN (are) probably
+ *     being targeted / likely next / probably going to fail。
+ *   · 豁免新增 EXEMPT_CUEDENSITY：线索自身普遍性语言在场（本身就
+ *     很常见/绝大多数人/人人都；common/ubiquitous/most people）——
+ *     陈述正在计及 cue 密度（论文第二轴的正解），不是运用谬误。
+ *   边界：本族落点是**个体归属**（你很可能被盯上），总体层面的共现
+ *   陈述（「九个都疲劳驾驶，所以疲劳驾驶是事故主因」）归 monocause/
+ *   common_cause；无 CONFIDENT 腿的纯观察句不判。
  */
 'use strict';
 
@@ -152,6 +180,36 @@ const SIGNAL_ZH = [
   // [r279 新增] AI/系统 识别你是族——旧腿「识别为」要求「为」字，「AI 识别
   //   你是通缉犯」整族穿透（r279 探针实测）。
   /(?:ai|AI|系统|算法|模型)?(?:识别|认出|标注)(?:你|您|他|她|它)?(?:是|为|成)[^。，！？!?]{0,8}(?:通缉|在逃|嫌疑|匹配|目标|高危|骗子|罪犯|老赖|诈骗|洗钱|违约)/,
+];
+
+// ─── [r285 新增] 腿① CUE 共现观察族（cue-density 轴，中英）────────────
+// 第二基础概率轴（arXiv "Two base rates, two weights"）：共现观察。
+// 队列（带结果标记的名词：被骗的/落马的/出事的…）× 高比例或全称共现。
+// 与既有 SIGNAL 腿的分界：这些句子**不含任何阳性信号词**（检测阳性/
+// 标记/命中/画像），观察的是「队列成员几乎都带某线索」；线索满街都是时
+// 该观察对个体归属零判别力。队列词表取**结果标记**形（已出事/已落马），
+// 不收裸人群名词，避免把正当统计陈述当线索。
+const CUE_ZH = [
+  // 队列 × 比例共现：「十个被骗的老人里九个都接过…」「出事的司机里九个都…」
+  /(?:被骗|落马|被抓|出事|倒闭|破产|倒下|中招|受害|确诊|感染|遇难|阵亡|辞退|开除|翻车|踩坑|暴雷|爆雷|失败|成功|幸存|回来)[^。，！？!?；;]{0,10}(?:里|之中|当中|中间|其中)[^。，！？!?]{0,8}(?:[一二两三四五六七八九十\d]+\s*[个名位条]|大多数|大部分|几乎|多半|大都|全都)[^。，！？!?]{0,4}都/,
+  // 队列 × 计数共现（无「里」）：「作弊被抓的学生十个有九个坐后排」
+  /(?:被骗|落马|被抓|出事|倒闭|破产|倒下|中招|受害|确诊|辞退|开除|翻车|踩坑)[^。，！？!?；;]{0,12}[一二两三四五六七八九十\d]+\s*[个名位条](?:里|之中|当中)?(?:有|当中)[一二两三四五六七八九十\d]+\s*[个名位条]/,
+  // 全称共现：「每个落马的官员都收过礼」（队列词须带结果标记）
+  /每个[^。，！？!?；;]{0,12}(?:落马|被抓|被骗|出事|倒闭|破产|倒下|中招|受害|确诊|辞退|开除|翻车|踩坑|暴雷)[^。，！？!?；;]{0,8}都/,
+  // 共同点形：「被骗的人有个共同点：轻信陌生人」
+  /(?:被骗|落马|被抓|出事|倒闭|破产|倒下|中招|受害|确诊|辞退|开除|翻车|踩坑)[^。，！？!?；;]{0,12}(?:有个|有着|全是|都是)?共同(?:点|特征|之处|特点)/,
+];
+
+// ─── [r285 新增] 腿① CUE 共现观察族（英文）────────────────────────────
+const CUE_EN = [
+  // N out of (every) ten + 结果队列名词：「Nine out of ten fraud victims」
+  /\b(?:nine|eight|seven|six|five|four|three|two|ten|\d+)\s+out\s+of\s+(?:every\s+)?(?:ten|four|five|six|seven|eight|nine|\d+)\s+[a-z\s]{0,32}?\s*(?:victims?|survivors?|executives?|companies|drivers?|students?|offenders?|convicts?|casualties?|soldiers?|patients?|defaulters?|dropouts?|founders?|startups?|employees?|managers?|traders?|gamblers?|investors?|fraudsters?|scammers?)/i,
+  // Every X who/that <结果>：「Every executive who got fired」
+  /\bevery\s+[a-z\s]{0,24}?\s+(?:who|that)\s+(?:got\s+|was\s+|were\s+|has\s+(?:been\s+)?)?(?:fired|laid\s+off|convicted|scammed|conned|defrauded|collapsed|failed|defaulted|folded|went\s+(?:out\s+of\s+business|under)|bankrupt|wrecked|ruined)/i,
+  // Almost/nearly/virtually all the X that/who <结果>
+  /\b(?:almost|nearly|virtually)\s+all\s+(?:the\s+)?[a-z\s]{0,32}?\s+(?:that|who)\s+(?:collapsed|failed|went\s+(?:out\s+of\s+business|under)|were\s+(?:fired|scammed|convicted|laid\s+off)|defaulted|folded|got\s+(?:scammed|conned|fired))/i,
+  // 共同点形（EN）：「victims share a common trait」
+  /(?:victims?|survivors?|offenders?|convicts?|casualties?)\s+(?:all\s+)?(?:have|share|had)\s+(?:a\s+|one\s+)?(?:common|shared)\s+(?:trait|feature|characteristic|thread|denominator)/i,
 ];
 
 // ─── 腿① SIGNAL 阳性信号/具体证据（英文）──────────────────────────
@@ -240,6 +298,21 @@ const CONFIDENT_ZH = [
   /(?:九成|九成九|九成五|几乎十成)[^。，！？!?]{0,4}(?:是|有|跑不了|没跑|老赖|骗子|罪犯|嫌疑人|间谍|高危|问题|中招|感染|确诊|违约|洗钱|诈骗)/,
 ];
 
+// ─── [r285 新增] 腿② CUE_CONF 新归属落点（cue-density 轴，中英）────────
+// 共现观察的落点是**个体安危/命运归属**（被盯上/出事/完蛋/栽了），
+// 既有归属词表（得/患/是/罪/骗子/高危…）不含这批口语落点。
+// 与既有腿的分界：既有腿收「模态词 + 状态归属词」，本族收「模态词 +
+// 安危结果动词」；概率名词（八成/九成/多半/大概率）已由 r263/r279
+// 腿覆盖「是/有/跑不了」等落点，本族只补**新落点**，不重复收录。
+const CUE_CONF_ZH = [
+  // 可能 × 新归属：「你很可能已经被盯上了」
+  /(?:很|极|颇|大)?可能[^。，！？!?]{0,6}(?:被)?(?:盯上|找上|坑上|骗走|卷走|中招|出事|完蛋|倒下|失败|违约|被骗|被坑|被割|暴雷|爆雷|开除|辞退|起诉|罚款|失业|凉了|悬了|找上门)/,
+  // 口语概率名词 × 新归属：「你八成也危险了」「九成要栽了」
+  /(?:八成|九成|九成九|多半|大概率|大几率|十有八九|八九不离十)[^。，！？!?]{0,6}(?:也|就|要|得)?(?:危险|悬了|够呛|要完|完了|出事|倒下|暴雷|爆雷|中招|被骗|被坑|违约|失业|开除|辞退|凉了|完蛋|栽了|盯上|找上)/,
+  // 高确信模态 × 新归属：「你铁定会出事」
+  /(?:铁定|肯定|一定|必然)[^。，！？!?]{0,6}(?:出事|完蛋|倒下|暴雷|爆雷|中招|被骗|被坑|违约|开除|辞退|失业|栽了|凉了|危险|盯上|找上)/,
+];
+
 // ─── 腿② CONFIDENT 高置信度后验结论（英文）────────────────────────
 const CONFIDENT_EN = [
   /(?:almost\s+)?certainly\s+(?:have|has|had|are|is|contracted|infected|a|the|guilty)/i,
@@ -271,6 +344,14 @@ const CONFIDENT_EN = [
   //   practically certain to be the match」。旧腿要 certainly/likely 后紧跟
   //   归属词，隔了 to be/of being 的形穿透。
   /\b(?:you|he|she|they)\s+(?:are|is)\s+(?:very\s+|quite\s+|almost\s+|practically\s+|most\s+)?(?:certain|likely)\s+(?:to\s+be|of\s+being)\s+(?:a\s+|the\s+)?(?:fraud|criminal|suspect|liar|thief|spy|traitor|guilty|match)\b/i,
+];
+
+// ─── [r285 新增] 腿② CUE_CONF 新归属落点（英文）────────────────────────
+const CUE_CONF_EN = [
+  // (are/is) probably/likely + being <结果>：「you are probably being targeted」
+  /\b(?:you|he|she|they)\s+(?:are|is|'re)\s+(?:probably|likely)\s+(?:being\s+)?(?:targeted|scammed|conned|defrauded|stalked|marked|watched|next|doomed|finished|going\s+to\s+(?:fail|default|collapse|be\s+(?:fired|scammed|conned|targeted|laid\s+off))|about\s+to\s+(?:fail|be\s+(?:fired|scammed|laid\s+off|conned)))/i,
+  // probably/likely next in line / on the list
+  /\b(?:probably|likely)\s+next\s+(?:in\s+line|on\s+the\s+list|to\s+(?:go|fail|be\s+(?:fired|scammed|laid\s+off|conned|targeted)))/i,
 ];
 
 // ─── 豁免一：基础概率语言在场（计及基础概率 = 在破除/分析谬误）───────
@@ -344,6 +425,20 @@ function anyHit(list, text) {
   return false;
 }
 
+// ─── [r285 新增] 豁免三：线索自身普遍性在场（计及 cue 密度 = 正确推理）──
+// 论文第二轴的正解：指出线索本身满街都是（接陌生来电的人太多了）。
+// 该语言在场说明陈述正在做 cue 密度校正，不是运用共现谬误。
+const EXEMPT_CUEDENSITY_ZH = [
+  /本身(?:就)?(?:很|极|极为|颇为|相当|十分)?(?:常见|普遍|多见|正常|普通|普遍存在)/,
+  /绝大多数人|人人都|随处可见|满地都是|大有人在|比比皆是/,
+];
+const EXEMPT_CUEDENSITY_EN = [
+  /\b(?:very\s+|extremely\s+|incredibly\s+|pretty\s+)?(?:commonplace|ubiquitous|widespread|everywhere)\b/i,
+  // 裸 common 排除与 CUE_EN 共现观察族「a common trait」的碰撞（负向前瞻）
+  /\bcommon\b(?!\s+(?:trait|feature|characteristic|thread|denominator|factor|pattern))/i,
+  /\bmost\s+people\b|\bnearly\s+everyone\b|\balmost\s+everyone\b/i,
+];
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -360,15 +455,25 @@ function checkBaseRateNeglect(text, inject) {
   const EB_E = R.EXEMPT_BASERATE_EN || EXEMPT_BASERATE_EN;
   const EN_Z = R.EXEMPT_NOOVERCLAIM_ZH || EXEMPT_NOOVERCLAIM_ZH;
   const EN_E = R.EXEMPT_NOOVERCLAIM_EN || EXEMPT_NOOVERCLAIM_EN;
+  // [r285] cue-density 轴：共现观察信号族 + 新归属落点置信族 + 普遍性豁免
+  const CUE_ZH_ = R.CUE_ZH || CUE_ZH;
+  const CUE_EN_ = R.CUE_EN || CUE_EN;
+  const CUE_CONF_ZH_ = R.CUE_CONF_ZH || CUE_CONF_ZH;
+  const CUE_CONF_EN_ = R.CUE_CONF_EN || CUE_CONF_EN;
+  const EC_Z = R.EXEMPT_CUEDENSITY_ZH || EXEMPT_CUEDENSITY_ZH;
+  const EC_E = R.EXEMPT_CUEDENSITY_EN || EXEMPT_CUEDENSITY_EN;
 
-  // 基础概率语言在场 / 待确认不妄断 → 不是运用它
+  // 基础概率语言在场 / 待确认不妄断 / 线索自身普遍性 → 不是运用它
   if (anyHit(EB_Z, text) || anyHit(EB_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(EN_Z, text) || anyHit(EN_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
+  if (anyHit(EC_Z, text) || anyHit(EC_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
-  const signal = anyHit(SIGNAL_ZH_, text) || anyHit(SIGNAL_EN_, text);
+  const signal = anyHit(SIGNAL_ZH_, text) || anyHit(SIGNAL_EN_, text)
+    || anyHit(CUE_ZH_, text) || anyHit(CUE_EN_, text);
   if (!signal) return { hit: false, score: 0, detail: '', count: 0 };
-  const confident = anyHit(CONFIDENT_ZH_, text) || anyHit(CONFIDENT_EN_, text);
+  const confident = anyHit(CONFIDENT_ZH_, text) || anyHit(CONFIDENT_EN_, text)
+    || anyHit(CUE_CONF_ZH_, text) || anyHit(CUE_CONF_EN_, text);
   if (!confident) return { hit: false, score: 0, detail: '', count: 0 };
 
   return {
@@ -387,5 +492,8 @@ module.exports = {
     SIGNAL_ZH, SIGNAL_EN, CONFIDENT_ZH, CONFIDENT_EN,
     EXEMPT_BASERATE_ZH, EXEMPT_BASERATE_EN,
     EXEMPT_NOOVERCLAIM_ZH, EXEMPT_NOOVERCLAIM_EN,
+    // [r285] cue-density 轴新族（负例注入用）
+    CUE_ZH, CUE_EN, CUE_CONF_ZH, CUE_CONF_EN,
+    EXEMPT_CUEDENSITY_ZH, EXEMPT_CUEDENSITY_EN,
   }),
 };

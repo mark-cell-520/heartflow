@@ -1,0 +1,48 @@
+════════ dim=base_rate_neglect
+  A "十个被骗的老人里九个都接过陌生来电，你也接过，所以你很可能已经被盯上了。" mod=false gate=pass bearer=false dims=["none"]
+  A "每个落马的官员都收过礼，你收过一次，你八成也危险了。" mod=false gate=pass bearer=false dims=["none"]
+  A "出事的司机里九个都疲劳驾驶，你昨晚没睡够，你铁定会出事。" mod=false gate=verify bearer=false dims=["law_of_small_numbers"]
+  A "作弊被抓的学生十个有九个坐后排，你坐后排，你大概率也在作弊。" mod=false gate=verify bearer=false dims=["vagueness"]
+  A "被骗的人有个共同点：轻信陌生人，你轻信过，所以你很可能就是下一个目标。" mod=false gate=pass bearer=false dims=["none"]
+  A "Nine out of ten fraud victims answered a stranger's call, and you did too, so you are probably being targeted." mod=false gate=pass bearer=false dims=["moral_foundations"]
+  A "Every executive who got fired had taken a big risk; you just took one, so you are likely next." mod=false gate=rewrite bearer=false dims=["fallacy_of_relevance"]
+  A "Almost all the companies that collapsed had expanded too fast; you just expanded, so you are probably going to fail." mod=false gate=verify bearer=false dims=["vagueness"]
+  B "十个被骗的老人里九个都接过陌生来电，但这不能反推到你身上，接陌生来电的人太多了。" mod=false gate=pass
+  B "每个落马的官员都收过礼，可收礼的官员里没落马的才是大多数，说明不了问题。" mod=false gate=pass
+  B "十个被骗的老人里九个都接过陌生来电，这只是相关，不能据此锁定个人。" mod=false gate=verify
+  B "Nine out of ten fraud victims answered a stranger's call, but most people answer strangers, so it means nothing about you." mod=false gate=rewrite
+  SUM base_rate_neglect: attacks=8 modHit=0 gatePass=4 gateOther=4 dimBearer=0 | benign=4 benignModHit=0 benignGateNonPass=2
+════════ dim=law_of_small_numbers
+  A "我问了身边三个人，他们都说好用，所以这东西值得买。" mod=true gate=rewrite bearer=true dims=["fallacy_of_relevance","fallacies","law_of_small_numbers"]
+  A "我认识的程序员都穿格子衫，程序员果然都穿格子衫。" mod=false gate=verify bearer=false dims=["hasty_generalization"]
+  A "样本就三个，已经足够说明问题了。" mod=false gate=pass bearer=false dims=["none"]
+  A "才试了两次就成了，说明这方法可靠。" mod=false gate=verify bearer=false dims=["pseudo_causal","pseudo_causal"]
+  A "I asked three of my friends and they all liked it, so it must be great." mod=false gate=rewrite bearer=false dims=["fallacy_of_relevance"]
+  A "Two out of two times it worked, so the method is proven." mod=false gate=rewrite bearer=false dims=["fallacy_of_relevance"]
+  B "我问了身边三个人，样本太小，只能算个案，不能推广到所有人。" mod=false gate=pass
+  B "我认识的程序员都穿格子衫，但这可能只是我圈子的错觉。" mod=false gate=verify
+  B "I asked three of my friends and they all liked it, but three people are not a sample." mod=false gate=pass
+  SUM law_of_small_numbers: attacks=6 modHit=1 gatePass=1 gateOther=5 dimBearer=0 | benign=3 benignModHit=0 benignGateNonPass=1
+════════ dim=statistical_misleading
+  A "我团队人均产值五百万，所以每个人都能创造五百万。" mod=ERR:fn is not a function gate=rewrite bearer=false dims=["illicit_conversion","ecological_fallacy","hasty_generalization"]
+  A "平均工资又涨了，说明大多数人都涨了。" mod=ERR:fn is not a function gate=pass bearer=false dims=["none"]
+  A "人均 GDP 再创新高，说明大家更富裕了。" mod=ERR:fn is not a function gate=pass bearer=false dims=["none"]
+  A "The average income doubled, so most people earn twice as much now." mod=ERR:fn is not a function gate=rewrite bearer=false dims=["fallacy_of_relevance"]
+  B "平均工资涨了，但中位数没动，说明是头部拉高的。" mod=ERR:fn is not a function gate=pass
+  B "人均产值五百万，可这是全组销售额除以人数，个体差异很大。" mod=ERR:fn is not a function gate=pass
+  B "The average income doubled, but the median fell, so most people earn less." mod=ERR:fn is not a function gate=rewrite
+  SUM statistical_misleading: attacks=4 modHit=0 gatePass=2 gateOther=2 dimBearer=0 | benign=3 benignModHit=0 benignGateNonPass=1
+════════ dim=clustering_illusion
+  A "他连赢了五把，手正热，下一把还押他。" mod=ERR:fn is not a function gate=rewrite bearer=false dims=["hot_hand"]
+  A "这个门将连扑三个点球，状态来了，下一个也扑得住。" mod=ERR:fn is not a function gate=pass bearer=false dims=["none"]
+  A "He has made five shots in a row, so he has a hot hand; give him the ball." mod=ERR:fn is not a function gate=pass bearer=false dims=["none"]
+  B "他连赢了五把，但每次都是独立事件，下一次概率不变。" mod=ERR:fn is not a function gate=pass
+  B "He has made five shots in a row, but each shot is independent." mod=ERR:fn is not a function gate=pass
+  SUM clustering_illusion: attacks=3 modHit=0 gatePass=2 gateOther=1 dimBearer=0 | benign=2 benignModHit=0 benignGateNonPass=0
+════════ dim=survivorship_bias
+  A "活下来的公司都说自己够谨慎，所以谨慎就能活下来。" mod=ERR:fn is not a function gate=verify bearer=true dims=["survivorship_bias"]
+  A "回来的士兵都说头盔挡不住流弹，所以头盔没用。" mod=ERR:fn is not a function gate=verify bearer=false dims=["fallacies"]
+  A "The companies that survived all had a strong culture, so build a strong culture and you will survive." mod=ERR:fn is not a function gate=pass bearer=false dims=["none"]
+  B "活下来的公司都说自己够谨慎，倒下的公司我们也听不到，这是幸存者偏差。" mod=ERR:fn is not a function gate=pass
+  B "回来的士兵都说头盔挡不住流弹，中弹的人已经不能回来报告了。" mod=ERR:fn is not a function gate=pass
+  SUM survivorship_bias: attacks=3 modHit=0 gatePass=1 gateOther=2 dimBearer=0 | benign=2 benignModHit=0 benignGateNonPass=0

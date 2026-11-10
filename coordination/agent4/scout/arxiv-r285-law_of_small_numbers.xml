@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/j75nN6bxX/E9Ba5sm5JrA0IQ9xw</id>
+  <title>arXiv Query: search_query=all:"law of small numbers"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-10T19:52:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22law+of+small+numbers%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>15</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2609.10840v1</id>
+    <title>Probabilistic representation and limit theorems for particle numbers of quasi-free states</title>
+    <updated>2026-09-09T21:20:53Z</updated>
+    <link href="https://arxiv.org/abs/2609.10840v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.10840v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the particle number distribution of locally interacting bosonic quasi- free states, which arise in various areas of mathematical physics. We show that the particle number decomposes into an infinite sum of independent geometrically distributed random variables, confirming predictions from the physics literature. This representation yields exponential tail bounds for the particle number, a law of small numbers together with a large deviation principle at logarithmic speed when the lattice spacing diverges, and a central limit theorem when it vanishes. As an application, we obtain a detailed description of the statistics of the quantum depletion in Bose--Einstein condensates, with the constants explicit in terms of the scattering length of the interaction potential.</summary>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-09T21:20:53Z</published>
+    <arxiv:primary_category term="math-ph"/>
+    <author>
+      <name>Fanch Coudreuse</name>
+    </author>
+    <author>
+      <name>Simone Rademacher</name>
+    </author>
+    <author>
+      <name>Oliver Tse</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.29660v1</id>
+    <title>The Stein-Chen method and a Law of Small Numbers in Riesz Spaces</title>
+    <updated>2026-05-28T09:22:48Z</updated>
+    <link href="https://arxiv.org/abs/2605.29660v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.29660v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Martingales, Markov processes and Laws of Large Numbers have been well studied in the Riesz space (vector lattice) setting. There has, however, been no attention given in the Riesz space setting to Laws of Small Numbers or to the so called Stein-Chen method. Here we adapt the Stein-Chen method to the Riesz space setting and hence give a conditional Laws of Small Numbers for Bernoulli processes in Riesz spaces. This requires extensive use of functional calculus and the associated f-algebra structure.</summary>
+    <category term="math.FA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-28T09:22:48Z</published>
+    <arxiv:primary_category term="math.FA"/>
+    <author>
+      <name>Wen-Chi Kuo</name>
+    </author>
+    <author>
+      <name>Nigel Musara</name>
+    </author>
+    <author>
+      <name>Bruce A. Watson</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2408.06048v1</id>
+    <title>Hungry Professors? Decision Biases Are Less Widespread than Previously Thought</title>
+    <updated>2024-08-12T10:49:14Z</updated>
+    <link href="https://arxiv.org/abs/2408.06048v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2408.06048v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In many situations people make sequences of similar, but unrelated decisions. Such decision sequences are prevalent in many important contexts including judicial judgments, loan approvals, college admissions, and athletic competitions. A growing literature claims that decisions in such sequences may be severely biased because decision outcomes seem to be systematically affected by the scheduling. In particular, it has been argued that mental depletion leads to harsher decisions before food breaks and that the ``law of small numbers'' induces decisions to be negatively auto-correlated (i.e. favorable decisions are followed by unfavorable ones and vice versa). These findings have attracted much academic and media attention and it has been suspected that they may only represent the ``tip of the iceberg''. However, voices of caution point out that existing studies may suffer from serious limitations, because the decision order is not randomly determined, other influencing factors are hard to exclude, or direct evidence for the underlying mechanisms is not available. We exploit a large-scale natural experiment in a context in which the previous literature would predict the presence of scheduling biases. Specifically, we investigate whether the grades of randomly scheduled oral exams in Law School depend on the position of the exam in the sequence. Our rich data enables us to filter-out student, professor, day, and course-specific features. Our results contradict the previous findings and suggest that caution is advised when generalizing from previous studies for policy advice.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-08-12T10:49:14Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Katja Bergonzoli</name>
+    </author>
+    <author>
+      <name>Laurent Bieri</name>
+    </author>
+    <author>
+      <name>Dominic Rohner</name>
+    </author>
+    <author>
+      <name>Christian Zehnder</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2011.04852v1</id>
+    <title>When Is the Conway-Maxwell-Poisson Distribution Infinitely Divisible?</title>
+    <updated>2020-11-10T01:16:44Z</updated>
+    <link href="https://arxiv.org/abs/2011.04852v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2011.04852v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An essential character for a distribution to play a central role in the limit theory is infinite divisibility. In this note, we prove that the Conway-Maxwell-Poisson (CMP) distribution is infinitely divisible iff it is the Poisson or geometric distribution. This explains that, despite its applications in a wide range of fields, there is no theoretical foundation for the CMP distribution to be a natural candidate for the law of small numbers.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-11-10T01:16:44Z</published>
+    <arxiv:comment>11 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <arxiv:journal_ref>Statistics &amp; Probability Letters, Elsevier, vol. 181, 2022</arxiv:journal_ref>
+    <author>
+      <name>Xi Geng</name>
+    </author>
+    <author>
+      <name>Aihua Xia</name>
+    </author>
+    <arxiv:doi>10.1016/j.spl.2021.109264</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.spl.2021.109264" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1906.10008v1</id>
+    <title>A large sample property in approximating the superposition of i.i.d. point processes</title>
+    <updated>2019-06-24T15:01:38Z</updated>
+    <link href="https://arxiv.org/abs/1906.10008v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1906.10008v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>One of the main differences between the central limit theorem and the Poisson law of small numbers is that the former possesses the large sample property (LSP), i.e., the error of normal approximation to the sum of $n$ independent identically distributed (i.i.d.) random variables is a decreasing function of $n$. Since 1980's, considerable effort has been devoted to recovering the LSP for the law of small numbers in discrete random variable approximation. In this paper, we aim to establish the LSP for the superposition of i.i.d. point processes.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-06-24T15:01:38Z</published>
+    <arxiv:comment>21 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Tianshu Cong</name>
+    </author>
+    <author>
+      <name>Aihua Xia</name>
+    </author>
+    <author>
+      <name>Fuxi Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1902.01265v1</id>
+    <title>Surprised by the Hot Hand Fallacy? A Truth in the Law of Small Numbers</title>
+    <updated>2019-02-04T15:53:56Z</updated>
+    <link href="https://arxiv.org/abs/1902.01265v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1902.01265v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove that a subtle but substantial bias exists in a common measure of the conditional dependence of present outcomes on streaks of past outcomes in sequential data. The magnitude of this streak selection bias generally decreases as the sequence gets longer, but increases in streak length, and remains substantial for a range of sequence lengths often used in empirical work. We observe that the canonical study in the influential hot hand fallacy literature, along with replications, are vulnerable to the bias. Upon correcting for the bias we find that the long-standing conclusions of the canonical study are reversed.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-02-04T15:53:56Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Econometrica, Vol. 86, No. 6 (November 2018), pp. 2019-2047</arxiv:journal_ref>
+    <author>
+      <name>Joshua B. Miller</name>
+    </author>
+    <author>
+      <name>Adam Sanjurjo</name>
+    </author>
+    <arxiv:doi>10.3982/ECTA14943</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.3982/ECTA14943" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1609.05570v3</id>
+    <title>Automated Proof (or Disproof) of Linear Recurrences Satisfied by Pisot Sequences</title>
+    <updated>2016-09-27T16:30:10Z</updated>
+    <link href="https://arxiv.org/abs/1609.05570v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1609.05570v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Pisot sequences (sequences $a_n$ with initial terms $a_0=x, a_1=y$, and defined for $n&gt;1$ by $a_n= \lfloor a_{n-1}^2/a_{n-2} + \frac{1}{2} \rfloor$) often satisfy linear recurrences with constant coefficients that are valid for all $n \geq 0$, but there are also cautionary examples where there is a linear recurrence that is valid for an initial range of values of $n$ but fails to be satisfied beyond that point, providing further illustrations of Richard Guy's celebrated "Strong Law of Small Numbers". In this paper we present a decision algorithm, fully implemented in an accompanying Maple program ({\tt Pisot.txt}), that first searches for a putative linear recurrence and then decides whether or not it holds for all values of $n$. We also explain why the failures happen (in some cases the `fake' linear recurrence may be valid for thousands of terms). We conclude by defining, and studying, higher-order analogs of Pisot sequences, and point out that similar phenomena occur there, albeit far less frequently. This article is dedicated to Richard K. Guy (b. Sept. 30, 1916) on his 100th birthday.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2016-09-19T00:06:27Z</published>
+    <arxiv:comment>10 pages, accompanied by a Maple package and six outputs files available from http://www.math.rutgers.edu/~zeilberg/mamarim/mamarimhtml/pisot.html Exclusively published in the authors' websites and this arxiv.org . [This version corrects a typo. The correct A078608 is replaced by the previous erroneous A-number.]</arxiv:comment>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Shalosh B. Ekhad</name>
+    </author>
+    <author>
+      <name>N. J. A. Sloane</name>
+    </author>
+    <author>
+      <name>Doron Zeilberger</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1504.05072v1</id>
+    <title>A unified approach to local limit theorems in Gaussian spaces and the law of small numbers</title>
+    <updated>2015-04-20T14:30:09Z</updated>
+    <link href="https://arxiv.org/abs/1504.05072v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1504.05072v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Through a reformulation of the local limit theorem and law of small numbers, which is obtained by working in the spaces naturally associated to the limiting distributions, we discover a general and abstract framework for the investigation of that type of limit theorems. From this new perspective, the convolution and scaling operators utilized in the classical results mentioned before will be identified with the Wick product and second quantization operators, respectively. And here is the advantage of our approach: definitions and most of the properties of Wick products and second quantization operators do not depend (mutatis mutandis) on the underlying probability measure. Then, with the help of Holder-Young-type inequalities for Gaussian and Poisson Wick products proved in previous papers, we show the L^1 convergence of the densities towards the desired limit. We remark that our approach extends without additional assumptions to infinite dimensional Gaussian spaces.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2015-04-20T14:30:09Z</published>
+    <arxiv:comment>11 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Alberto Lanconelli</name>
+    </author>
+  </entry>
+</feed>

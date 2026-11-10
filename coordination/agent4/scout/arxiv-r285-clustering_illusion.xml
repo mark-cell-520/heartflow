@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/FmlRN+A/rYgwixiLSW59kDqXDVM</id>
+  <title>arXiv Query: search_query=all:"clustering illusion"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-10T19:52:47Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22clustering+illusion%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2006.09874v1</id>
+    <title>Cluster Diffusing Shuffles</title>
+    <updated>2020-06-10T03:21:33Z</updated>
+    <link href="https://arxiv.org/abs/2006.09874v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2006.09874v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Unbiased shuffling algorithms, such as the Fisher-Yates shuffle, are often used for shuffle play in media players. These algorithms treat all items being shuffled equally regardless of how similar the items are to each other. While this may be desirable for many applications, this is problematic for shuffle play due to the clustering illusion, which is the tendency for humans to erroneously consider 'streaks' or 'clusters' that may arise from samplings of random distributions to be non-random. This thesis attempts to address this issue with a family of biased shuffling algorithms called cluster diffusing (CD) shuffles which are based on disordered hyperuniform systems such as the distribution of cone cells in chicken eyes, the energy levels of heavy atomic nuclei, the eigenvalue distributions of various types of random matrices, and many others which appear in a variety of biological, chemical, physical, and mathematical settings. These systems suppress density fluctuations at large length scales without appearing ordered like lattices, making them ideal for shuffle play. The CD shuffles range from a random matrix based shuffle which takes $O(n^3)$ time and $O(n^2)$ space to more efficient approximations which take $O(n)$ time and $O(n)$ space.</summary>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-06-10T03:21:33Z</published>
+    <arxiv:primary_category term="cs.SI"/>
+    <author>
+      <name>Kevin Su</name>
+    </author>
+  </entry>
+</feed>

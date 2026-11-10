@@ -1,0 +1,14 @@
+HIT  A | 十个被骗的老人里九个都接过陌生来电，你也接过，所以你很可能已经被盯上
+HIT  A | 每个落马的官员都收过礼，你收过一次，你八成也危险了。
+HIT  A | 出事的司机里九个都疲劳驾驶，你昨晚没睡够，你铁定会出事。
+HIT  A | 作弊被抓的学生十个有九个坐后排，你坐后排，你大概率也在作弊。
+HIT  A | 被骗的人有个共同点：轻信陌生人，你轻信过，所以你很可能就是下一个目标
+HIT  A | Nine out of ten fraud victims answ
+HIT  A | Every executive who got fired had 
+HIT  A | Almost all the companies that coll
+MISS B | 十个被骗的老人里九个都接过陌生来电，但这不能反推到你身上，接陌生来电
+MISS B | 每个落马的官员都收过礼，可收礼的官员里没落马的才是大多数，说明不了问
+MISS B | 十个被骗的老人里九个都接过陌生来电，这只是相关，不能据此锁定个人。
+MISS B | Nine out of ten fraud victims answ
+attacks hit=8/8  benign FP=0/4  oldMiss=0/7
+cleanup: none (in-memory)

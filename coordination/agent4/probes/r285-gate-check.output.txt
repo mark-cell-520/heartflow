@@ -1,0 +1,18 @@
+OK   A | verify | 十个被骗的老人里九个都接过陌生来电，你也接过，所以你很可能已
+OK   A | verify | 每个落马的官员都收过礼，你收过一次，你八成也危险了。
+OK   A | verify | 出事的司机里九个都疲劳驾驶，你昨晚没睡够，你铁定会出事。
+OK   A | verify | 作弊被抓的学生十个有九个坐后排，你坐后排，你大概率也在作弊。
+OK   A | verify | 被骗的人有个共同点：轻信陌生人，你轻信过，所以你很可能就是下
+OK   A | verify | Nine out of ten fraud victims 
+OK   A | rewrite | Every executive who got fired 
+OK   A | verify | Almost all the companies that 
+ok   B | pass | 十个被骗的老人里九个都接过陌生来电，但这不能反推到你身上，接
+ok   B | pass | 每个落马的官员都收过礼，可收礼的官员里没落马的才是大多数，说
+ok   B | verify | 十个被骗的老人里九个都接过陌生来电，这只是相关，不能据此锁定
+ok   B | rewrite | Nine out of ten fraud victims 
+ok   B | pass | 十个落马的官员都收过礼，但收礼在官场本身就非常普遍，单个案例
+ok   B | pass | 几乎每个倒下的公司都扩张过快，可快速扩张的公司绝大多数活得好
+ok   B | verify | Almost every company that fail
+ok   B | pass | 教材里讲：每个被抓的窃贼都穿鞋，所以穿鞋就会偷东西吗？当然不
+attacks nonPass=8/8 bearer=8/8  benign dimFP=0/8
+cleanup: none (in-memory)

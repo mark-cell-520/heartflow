@@ -1,0 +1,261 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/TU/z9+JrgvaJbmWNRb0BzSsUk2w</id>
+  <title>arXiv Query: search_query=all:"base rate neglect"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-10T19:52:40Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22base+rate+neglect%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>11</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2608.05658v4</id>
+    <title>Two base rates, two weights: base-rate neglect has a second axis</title>
+    <updated>2026-10-20T00:24:09Z</updated>
+    <link href="https://arxiv.org/abs/2608.05658v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.05658v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Base-rate neglect is usually treated as one mistake: giving the prior too little weight. Turning co-occurrences into a judgment takes two base-rate corrections, not one: weighting in the prior (how common the outcome is) and dividing out the cue's own frequency. Under-correcting the prior is classical base-rate neglect. Under-correcting the cue is the cue-density effect, long studied but not usually framed as base-rate neglect's cue-side analogue. We write both corrections as two weights in one Bayesian equation. The dual-factor heuristic, a leading model of covariation judgment, sits where both equal one-half. Response format fixes which weight a study can measure. A graded rating carries the cue-frequency weight directly. A forced choice between two outcomes cancels it, measuring a separate odds-space weight that agrees with it only at full correction. The cancellation is exact, so same-cue choice proportions carry no information about the cue-frequency weight, not even its direction. A choice between two cues keeps the term, and differing cue frequencies are necessary and sufficient for a softmax choice to depend on it. The same weight appears in six learning-and-memory models (in odds space for signal detection), some exactly, others as a limiting or constructed correspondence. When an experiment keeps only the four cells of a cue x outcome contingency table, each of the six model families projects onto one scalar coordinate, which alone cannot separate the accounts free to sit anywhere along it. On a suitable design the two weights are separately estimable: an experimenter can move either weight's regressor without moving the other's. The nested common-weight model excludes a two-coefficient separation by construction. This paper lays out the framework and the rating experiment that tests the separation. A companion paper fits the odds-space cue weight to a colour-flavour dataset.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-06T06:56:00Z</published>
+    <arxiv:comment>49 pages, 14 figures. v4: voice/clarity revision. Claim fixes: signal-detection face scoped to odds space, correlation-sign test corrected, prior-intrusion example, iff scoped to softmax, estimator bias within 0.03, lift not called causal strength, Prop. B1 restated, Sec. 6 and 7 readings. Prior art: dual-factor heuristic credited, yes/no scope stated. Code: https://osf.io/9qvbr/</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Adam Y. Shavit</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2512.00098v1</id>
+    <title>Guarding Against Malicious Biased Threats (GAMBiT): Experimental Design of Cognitive Sensors and Triggers with Behavioral Impact Analysis</title>
+    <updated>2025-11-27T02:18:03Z</updated>
+    <link href="https://arxiv.org/abs/2512.00098v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2512.00098v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper introduces GAMBiT (Guarding Against Malicious Biased Threats), a cognitive-informed cyber defense framework that leverages deviations from human rationality as a new defensive surface. Conventional cyber defenses assume rational, utility-maximizing attackers, yet real-world adversaries exhibit cognitive constraints and biases that shape their interactions with complex digital systems. GAMBiT embeds insights from cognitive science into cyber environments through cognitive triggers, which activate biases such as loss aversion, base-rate neglect, and sunk-cost fallacy, and through newly developed cognitive sensors that infer attackers' cognitive states from behavioral and network data. Three rounds of human-subject experiments (total n=61) in a simulated small business network demonstrate that these manipulations significantly disrupt attacker performance, reducing mission progress, diverting actions off the true attack path, and increasing detectability. These results demonstrate that cognitive biases can be systematically triggered to degrade the attacker's efficiency and enhance the defender's advantage. GAMBiT establishes a new paradigm in which the attacker's mind becomes part of the battlefield and cognitive manipulation becomes a proactive vector for cyber defense.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-27T02:18:03Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Brandon Beltz</name>
+    </author>
+    <author>
+      <name>Po-Yu Chen</name>
+    </author>
+    <author>
+      <name>James Doty</name>
+    </author>
+    <author>
+      <name>Yvonne Fonken</name>
+    </author>
+    <author>
+      <name>Nikolos Gurney</name>
+    </author>
+    <author>
+      <name>Hsiang-Wen Hsing</name>
+    </author>
+    <author>
+      <name>Sofia Hirschmann</name>
+    </author>
+    <author>
+      <name>Brett Israelsen</name>
+    </author>
+    <author>
+      <name>Nathan Lau</name>
+    </author>
+    <author>
+      <name>Mengyun Li</name>
+    </author>
+    <author>
+      <name>Stacy Marsella</name>
+    </author>
+    <author>
+      <name>Michael Murray</name>
+    </author>
+    <author>
+      <name>Jinwoo Oh</name>
+    </author>
+    <author>
+      <name>Amy Sliva</name>
+    </author>
+    <author>
+      <name>Kunal Srivastava</name>
+    </author>
+    <author>
+      <name>Stoney Trent</name>
+    </author>
+    <author>
+      <name>Peggy Wu</name>
+    </author>
+    <author>
+      <name>Ya-Ting Yang</name>
+    </author>
+    <author>
+      <name>Quanyan Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.14591v2</id>
+    <title>Biased Minds Meet Biased AI: How Class Imbalance Shapes Appropriate Reliance and Interacts with Human Base Rate Neglect</title>
+    <updated>2026-01-20T10:39:37Z</updated>
+    <link href="https://arxiv.org/abs/2511.14591v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.14591v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Humans increasingly interact with artificial intelligence (AI) in decision-making. However, both AI and humans are prone to biases. While AI and human biases have been studied extensively in isolation, this paper examines their complex interaction. Specifically, we examined how class imbalance as an AI bias affects people's ability to appropriately rely on an AI-based decision-support system, and how it interacts with base rate neglect as a human bias. In a within-subject online study (N= 46), participants classified three diseases using an AI-based decision-support system trained on either a balanced or unbalanced dataset. We found that class imbalance disrupted participants' calibration of AI reliance. Moreover, we observed mutually reinforcing effects between class imbalance and base rate neglect, offering evidence of a compound human-AI bias. Based on these findings, we advocate for an interactionist perspective and further research into the mutually reinforcing effects of biases in human-AI interaction.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-18T15:33:46Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Nick von Felten</name>
+    </author>
+    <author>
+      <name>Johannes Schöning</name>
+    </author>
+    <author>
+      <name>Klaus Opwis</name>
+    </author>
+    <author>
+      <name>Nicolas Scharowski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2509.05498v1</id>
+    <title>Bi-Level Game-Theoretic Planning of Cyber Deception for Cognitive Arbitrage</title>
+    <updated>2025-09-05T21:11:25Z</updated>
+    <link href="https://arxiv.org/abs/2509.05498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2509.05498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cognitive vulnerabilities shape human decision-making and arise primarily from two sources: (1) cognitive capabilities, which include disparities in knowledge, education, expertise, or access to information, and (2) cognitive biases, such as rational inattention, confirmation bias, and base rate neglect, which influence how individuals perceive and process information. Exploiting these vulnerabilities allows an entity with superior cognitive awareness to gain a strategic advantage, a concept referred to as cognitive arbitrage. This paper investigates how to exploit the cognitive vulnerabilities of Advanced Persistent Threat (APT) attackers and proposes cognition-aware defenses that leverage windows of superiority to counteract attacks. Specifically, the proposed bi-level cyber warfare game focuses on "strategic-level" design for defensive deception mechanisms, which then facilitates "operational-level" actions and tactical-level execution of Tactics, Techniques, and Procedures (TTPs). Game-theoretic reasoning and analysis play a significant role in the cross-echelon quantitative modeling and design of cognitive arbitrage strategies. Our numerical results demonstrate that although the defender's initial advantage diminishes over time, strategically timed and deployed deception techniques can turn a negative value for the attacker into a positive one during the planning phase, and achieve at least a 40% improvement in total rewards during execution. This demonstrates that the defender can amplify even small initial advantages, sustain a strategic edge over the attacker, and secure long-term objectives, such as protecting critical assets throughout the attacker's lifecycle.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-09-05T21:11:25Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Ya-Ting Yang</name>
+    </author>
+    <author>
+      <name>Quanyan Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2406.13490v1</id>
+    <title>The Surprising Benefits of Base Rate Neglect in Robust Aggregation</title>
+    <updated>2024-06-19T12:20:29Z</updated>
+    <link href="https://arxiv.org/abs/2406.13490v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2406.13490v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robust aggregation integrates predictions from multiple experts without knowledge of the experts' information structures. Prior work assumes experts are Bayesian, providing predictions as perfect posteriors based on their signals. However, real-world experts often deviate systematically from Bayesian reasoning. Our work considers experts who tend to ignore the base rate. We find that a certain degree of base rate neglect helps with robust forecast aggregation.
+  Specifically, we consider a forecast aggregation problem with two experts who each predict a binary world state after observing private signals. Unlike previous work, we model experts exhibiting base rate neglect, where they incorporate the base rate information to degree $λ\in[0,1]$, with $λ=0$ indicating complete ignorance and $λ=1$ perfect Bayesian updating. To evaluate aggregators' performance, we adopt Arieli et al. (2018)'s worst-case regret model, which measures the maximum regret across the set of considered information structures compared to an omniscient benchmark. Our results reveal the surprising V-shape of regret as a function of $λ$. That is, predictions with an intermediate incorporating degree of base rate $λ&lt;1$ can counter-intuitively lead to lower regret than perfect Bayesian posteriors with $λ=1$. We additionally propose a new aggregator with low regret robust to unknown $λ$. Finally, we conduct an empirical study to test the base rate neglect model and evaluate the performance of various aggregators.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-06-19T12:20:29Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yuqing Kong</name>
+    </author>
+    <author>
+      <name>Shu Wang</name>
+    </author>
+    <author>
+      <name>Ying Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2404.09297v5</id>
+    <title>Belief Bias Identification</title>
+    <updated>2026-10-18T16:57:25Z</updated>
+    <link href="https://arxiv.org/abs/2404.09297v5" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2404.09297v5" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper proposes a unified theoretical model to identify and test a comprehensive set of probabilistic updating biases within a single framework. The model achieves separate identification by focusing on the updating of belief distributions, rather than point beliefs alone. Estimating the model in a laboratory experiment reveals significant individual heterogeneity, with the hot-hand fallacy emerging as the most common bias and a key driver of biased inference. Accounting for additional distortions reveals associations across bias families and reduces the apparent prevalence of overinference and preference-based biases. At the population level, most biases average out, but base-rate neglect remains present.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-04-14T16:38:02Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Pedro Gonzalez-Fernandez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.07862v2</id>
+    <title>AI-Augmented Predictions: LLM Assistants Improve Human Forecasting Accuracy</title>
+    <updated>2024-08-22T13:57:30Z</updated>
+    <link href="https://arxiv.org/abs/2402.07862v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.07862v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) match and sometimes exceeding human performance in many domains. This study explores the potential of LLMs to augment human judgement in a forecasting task. We evaluate the effect on human forecasters of two LLM assistants: one designed to provide high-quality ("superforecasting") advice, and the other designed to be overconfident and base-rate neglecting, thus providing noisy forecasting advice. We compare participants using these assistants to a control group that received a less advanced model that did not provide numerical predictions or engaged in explicit discussion of predictions. Participants (N = 991) answered a set of six forecasting questions and had the option to consult their assigned LLM assistant throughout. Our preregistered analyses show that interacting with each of our frontier LLM assistants significantly enhances prediction accuracy by between 24 percent and 28 percent compared to the control group. Exploratory analyses showed a pronounced outlier effect in one forecasting item, without which we find that the superforecasting assistant increased accuracy by 41 percent, compared with 29 percent for the noisy assistant. We further examine whether LLM forecasting augmentation disproportionately benefits less skilled forecasters, degrades the wisdom-of-the-crowd by reducing prediction diversity, or varies in effectiveness with question difficulty. Our data do not consistently support these hypotheses. Our results suggest that access to a frontier LLM assistant, even a noisy one, can be a helpful decision aid in cognitively demanding tasks compared to a less powerful model that does not provide specific forecasting advice. However, the effects of outliers suggest that further research into the robustness of this pattern is needed.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-12T18:14:43Z</published>
+    <arxiv:comment>22 pages pages (main text comprised of 19 pages, appendix comprised of three pages). 10 visualizations in the main text (four figures, six tables), three additional figures in the appendix</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Philipp Schoenegger</name>
+    </author>
+    <author>
+      <name>Peter S. Park</name>
+    </author>
+    <author>
+      <name>Ezra Karger</name>
+    </author>
+    <author>
+      <name>Sean Trott</name>
+    </author>
+    <author>
+      <name>Philip E. Tetlock</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2209.08312v2</id>
+    <title>Base rate neglect in computer science education</title>
+    <updated>2022-10-23T07:14:36Z</updated>
+    <link href="https://arxiv.org/abs/2209.08312v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2209.08312v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning (ML) algorithms are gaining increased importance in many academic and industrial applications, and such algorithms are, accordingly, becoming common components in computer science curricula. Learning ML is challenging not only due to its complex mathematical and algorithmic aspects, but also due to a) the complexity of using correctly these algorithms in the context of real-life situations and b) the understanding of related social and ethical issues. Cognitive biases are phenomena of the human brain that may cause erroneous perceptions and irrational decision-making processes. As such, they have been researched thoroughly in the context of cognitive psychology and decision making; they do, however, have important implications for computer science education as well. One well-known cognitive bias, first described by Kahneman and Tversky, is the base rate neglect bias, according to which humans fail to consider the base rate of the underlying phenomena when evaluating conditional probabilities. In this paper, we explore the expression of the base rate neglect bias in ML education. Specifically, we show that about one third of students in an Introduction to ML course, from varied backgrounds (computer science students and teachers, data science, engineering, social science and digital humanities), fail to correctly evaluate ML algorithm performance due to the base rate neglect bias. This failure rate should alert educators and promote the development of new pedagogical methods for teaching ML algorithm performance.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-09-17T11:03:45Z</published>
+    <arxiv:comment>14 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Koby Mike</name>
+    </author>
+    <author>
+      <name>Orit Hazzan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2202.00125v1</id>
+    <title>Top Ten Behavioral Biases in Project Management: An Overview</title>
+    <updated>2022-01-24T18:33:21Z</updated>
+    <link href="https://arxiv.org/abs/2202.00125v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2202.00125v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Behavioral science has witnessed an explosion in the number of biases identified by behavioral scientists, to more than 200 at present. This article identifies the 10 most important behavioral biases for project management. First, we argue it is a mistake to equate behavioral bias with cognitive bias, as is common. Cognitive bias is half the story; political bias the other half. Second, we list the top 10 behavioral biases in project management: (1) strategic misrepresentation, (2) optimism bias, (3) uniqueness bias, (4) the planning fallacy, (5) overconfidence bias, (6) hindsight bias, (7) availability bias, (8) the base rate fallacy, (9) anchoring, and (10) escalation of commitment. Each bias is defined, and its impacts on project management are explained, with examples. Third, base rate neglect is identified as a primary reason that projects underperform. This is supported by presentation of the most comprehensive set of base rates that exist in project management scholarship, from 2,062 projects. Finally, recent findings of power law outcomes in project performance are identified as a possible first stage in discovering a general theory of project management, with more fundamental and more scientific explanations of project outcomes than found in conventional theory.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-01-24T18:33:21Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Project Management Journal 52(6), 2021</arxiv:journal_ref>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+    <arxiv:doi>10.1177/87569728211049046</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1177/87569728211049046" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1810.06710v1</id>
+    <title>Bringing Order to the Cognitive Fallacy Zoo</title>
+    <updated>2018-10-15T21:37:38Z</updated>
+    <link href="https://arxiv.org/abs/1810.06710v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1810.06710v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In the eyes of a rationalist like Descartes or Spinoza, human reasoning is flawless, marching toward uncovering ultimate truth. A few centuries later, however, culminating in the work of Kahneman and Tversky, human reasoning was portrayed as anything but flawless, filled with numerous misjudgments, biases, and cognitive fallacies. With further investigations, new cognitive fallacies continually emerged, leading to a state of affairs which can fairly be characterized as the cognitive fallacy zoo! In this largely methodological work, we formally present a principled way to bring order to this zoo. We introduce the idea of establishing implication relationships (IRs) between cognitive fallacies, formally characterizing how one fallacy implies another. IR is analogous to, and partly inspired by, the fundamental concept of reduction in computational complexity theory. We present several examples of IRs involving experimentally well-documented cognitive fallacies: base-rate neglect, availability bias, conjunction fallacy, decoy effect, framing effect, and Allais paradox. We conclude by discussing how our work: (i) allows for identifying those pivotal cognitive fallacies whose investigation would be the most rewarding research agenda, and importantly (ii) permits a systematized, guided research program on cognitive fallacies, motivating influential theoretical as well as experimental avenues of future research.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-10-15T21:37:38Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Ardavan S. Nobandegani</name>
+    </author>
+    <author>
+      <name>William Campoli</name>
+    </author>
+    <author>
+      <name>Thomas R. Shultz</name>
+    </author>
+  </entry>
+</feed>
