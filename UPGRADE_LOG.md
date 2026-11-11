@@ -1,3 +1,31 @@
+## r300 — 回归均值误归因（regression_to_the_mean 第 193 维度）「表扬/批评/奖惩反馈干预」新措辞家族（真升级②）
+
+**日期** 2026-11-12 06:0x–06:2x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r300（kind: dimension）
+
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。海外扫描三源如实空返/噪声（arXiv parse-fail、GitHub 0、S2 error），选题走仓库内探针实证。r300 认领后立即 push claim commit（撞号纪律）。
+
+### 缺口实证（scripts/round-300/probe-feedback-r300.js，v6.8.174 gate() 动手前）
+Kahneman 经典回归均值陷阱：把极端表现后的自然回归，归功/归罪于同期施加的表扬/批评/责骂/奖励/惩罚/换下场/警告等「行为反馈干预」。`He played terribly in the first half, so I criticized him hard; he then played great, which proves criticism works.` 类 14 条攻击中 **8 条 gate.action=pass 且零维度承重、checkRegressionToMean 直调 false（真零命中）**；8 条良性对照全部 pass。根因：存量 `INTERVENE` 表只收 吃药/换帅/报班/加仓 等物质/人事干预，不收 praise/criticize/scold/reward/punish/bench/warn 这类反馈动词；存量 `EXTREME` 表只收 最差/谷底/暴跌 等统计极端词，不收 考得差/poor form/played terribly 这类表现型极端。
+
+### 改了什么
+- `src/regression-to-the-mean.js`（既有已接线模块，第 193 维度，**src/index.js 零改动**）：新增 8 个常量 `FB_EXTREME_ZH/EN`（反馈语境极端基线，双向：低=受批评方、高=受表扬方）、`FB_REGRESSION_ZH/EN`（反馈语境回归变化，双向：升=低处回升、降=高处退步）、`FB_INTERVENE_ZH/EN`（反馈/行为干预动词）、`FB_ATTRIB_ZH/EN`（反馈语境功劳/功效归因）；新增**独立三腿路由 `feedbackZh`/`feedbackEn`**——FB_EXTREME × FB_REGRESSION 邻近（同一叙事窗）+ FB_INTERVENE 与 FB_ATTRIB 均靠近 极端或回归（干预与归因互为邻居即算同一次反馈叙述），叙事窗 ZH 40 / EN 120，与主判据 legsZh/legsEn 并行、命中即 hit。**不并入存量数组**（存量 EXTREME_LOW_ZH/INTERVENE_ZH/EFFECT_ZH/EXEMPT_NEG_ZH 等有 round-265 登记断言 length===N，追加会打破单测）。豁免（概念教学/实验证据/推理否定/对冲/疑问）在 checkRegressionToMean 入口统一先判，本族同享。`__internals` 导出 8 个新常量供负例注入。
+- `test/round-300-regression-feedback-family.test.js`（新增，**51/51**）：中英攻击 12（直接 hit + gate 非 pass 且 findings 含本维）、良性 8 零误伤、gate 良性无本维误伤、逐腿 in-memory 注入 8/8 变红（均带存量主判据对照）、存量 r195/r265 回归锚、登记断言（含存量数组长度不变）。
+- `scripts/round-300/{probe-gap-r300.js, probe-feedback-r300.js, r300-injection-delete.js}`（新增，动手前缺口探针 + 元素级注入-删条 **20/20** 变红）。
+- `UPGRADE_LOG.md`（r300 条目）、`README.md`/`SKILL.md`/`data/test-count.json`（机器记账 21,432 → 21,483 passing；AGENTS.md 已一致无需改）；报告 `coordination/reports/r300-dimension-agent4.md`（本地留档，`reports/` 自 r268 起被 gitignore 覆盖、不入链）。
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（判别维度 246）
+- node test/doc-numbers-accuracy.test.js — 24/0
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线**完全一致**，新族零新增误伤）
+- 全量 run-all.js — 21,483 通过 / 145 失败 / 21,628（基线 21,432/145/21,577，唯一 +51 即本轮新测试，失败数逐条持平）
+- 负例（元素级注入-删条）— 20/20 变红，0 个未变红
+
+### 与存量判据的关系 / 已知窄口
+- 新路由与主判据 legsZh/legsEn 完全并行、互不依赖：注入任一 FB 腿置空，存量主判据攻击（吃药/换帅/加仓 + 统计极端词）仍命中（注入脚本已带此对照）。
+- 两条相邻形（「把他换下场…球队就赢了」「作业马虎…严厉批评」）由既有 might_makes_right / post_hoc 承重（gate 已 rewrite），本维不重复抢功，故未纳入 12 条直判攻击集。
+- FB_INTERVENE 刻意只收 praise/blame/reward/punish/bench/warn 类明确反馈动词，不收 encouragement/pep talk（回归陷阱成立但 FP 面更大，留待后续轮次）。
+
 ## r299 — 反向因果（reverse_causation 第 172 维度）「应急响应调度框」第一响应者族补全（真升级②）
 
 **日期** 2026-11-12 04:2x–04:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r299（kind: dimension）

@@ -279,6 +279,75 @@ const EFFECT_EN = [
   /\b(?:immediately|instantly|promptly|right\s+away|shortly\s+after|bounced\s+right\s+back|came\s+right\s+back)\b/i,
 ];
 
+// ─── [r300 新族] 表扬/批评/奖惩「反馈干预」族（真升级②，独立路由）──────
+// Kahneman 经典回归均值陷阱：把极端表现后的自然回归，归功/归罪于同期施加的
+// 表扬/批评/责骂/奖励/惩罚/换下场/警告等「行为反馈干预」。存量 INTERVENE 表
+// 只收 吃药/换帅/报班/加仓 等物质/人事干预，不收 praise/criticize/scold/
+// reward/punish/bench/warn 这类反馈动词；存量 EXTREME 表只收 最差/谷底/
+// 暴跌 等统计极端词，不收 考得差/poor form/played terribly 这类表现型极端。
+// r300 池化探针（scripts/round-300/probe-feedback-r300.js，v6.8.174 实测）
+// 该族 8/14 攻击真零命中（gate=pass 且零维度承重）、良性 8/8 干净。
+// 本族为**独立三腿路由**（不并入存量数组——存量 EXTREME_LOW_ZH/INTERVENE_ZH/
+// EFFECT_ZH/EXEMPT_NEG_ZH 等有登记断言 length===N，追加会打破 round-265 单测），
+// 与主判据 legsZh/legsEn 并行，命中即 hit。豁免（概念教学/实验证据/推理否定/
+// 对冲/疑问）在 checkRegressionToMean 入口统一先判，本族同享。
+
+// 腿① FB_EXTREME 反馈语境极端基线（中文，双向：低=受批评方，高=受表扬方）
+const FB_EXTREME_ZH = [
+  // 成绩/表现/状态低
+  /考得差|考差了|考砸|没考好|没及格|不及格|成绩差|成绩下滑|成绩下降|挂科|考了低分|分数很低|考得糟糕/,
+  /表现差|表现很差|表现不佳|表现不好|发挥失常|发挥不好|屡屡失误|失误很多|失误频频|频频出错|频频失误|错误百出|漏洞百出|状态差|状态低迷|状态不好|不在状态|魂不守舍|心不在焉/,
+  // 成绩/表现高（表扬/奖励后退步方向）
+  /考了满分|拿了满分|得了满分|考了第一|拿了第一|考了高分|表现特别好|表现出色|发挥出色|表现极好|状态极佳|创了纪录|破了纪录|拿了奖|获了奖|发挥完美/,
+];
+// 腿① FB_EXTREME（英文，双向）
+const FB_EXTREME_EN = [
+  /played\s+(?:terribly|awfully|badly|poorly|horribly)|playing\s+(?:terribly|awfully|badly|poorly)/i,
+  /poor\s+form|off\s+(?:his|her|their)\s+game|rough\s+patch|in\s+a\s+slump|out\s+of\s+form/i,
+  /bad\s+grade|poor\s+grade|failed\s+the\s+(?:test|exam)|did\s+(?:badly|poorly)|awful\s+(?:serve|game|performance|quarter)/i,
+  /performance\s+(?:dipped|dropped|declined|slipped|sagged)|productivity\s+(?:dipped|dropped|declined)/i,
+  /record\s+(?:quarter|month|year|season)|best\s+(?:quarter|month|year)|top\s+of\s+(?:the|his|her)\s+class|straight\s+A'?s|perfect\s+score|great\s+report\s+card|excellent\s+performance/i,
+];
+// 腿② FB_REGRESSION 反馈语境回归变化（中文，双向：升=低处回升，降=高处退步）
+const FB_REGRESSION_ZH = [
+  /考好了|考好了不少|成绩上来了|成绩提了上来|提了上来|提上来了|进步了|进步很大|追上来了|赶上来了|赶了上来|认真了|认真起来|很少出错|不出错了|失误[就才也]?少了|错误[就才也]?少了|表现好起来|状态回来了|又发挥出来了|好转了|听话了|回升|提了上来|扳了回来/,
+  /退步了|退步很大|成绩下滑了|掉了下来|滑了下来|骄傲了|自满了|松懈了|放松了|翘尾巴|不思进取|下滑了|落后了|得意了|飘了|赢了下来|逆转了|翻盘了/,
+];
+// 腿② FB_REGRESSION（英文，双向）
+const FB_REGRESSION_EN = [
+  /played\s+(?:great|well|better)|aced\s+the\s+next|served\s+aces|did\s+(?:great|better|well)|won\s+the\s+next/i,
+  /studied\s+harder|got\s+better|improved|bounced\s+back|recovered|turned\s+it\s+around|picked\s+up/i,
+  /got\s+an?\s+[A-F]\b|received\s+an?\s+[A-F]\b|earned\s+an?\s+[A-F]\b/i,
+  /sales\s+(?:fell|dropped|declined)|performance\s+(?:fell|dropped|declined|slipped)|grades?\s+(?:fell|dropped|slipped)/i,
+  /did\s+(?:poorly|worse)|got\s+worse|slipped\s+back|fell\s+back/i,
+];
+// 腿③ FB_INTERVENE 反馈/行为干预动作（中文）
+const FB_INTERVENE_ZH = [
+  /责骂|骂了一顿|骂了他|骂了她|训斥|训了一顿|训了他|训了她|责备|指责|数落|苛责|狠批|批了一顿|批评了一顿|严厉批评|点名批评|当众批评|批评/,
+  /表扬|夸奖|夸了|称赞|赞许|赞扬|表彰|嘉奖|肯定了他|肯定了她/,
+  /奖励|奖赏|给了奖励|发了奖金|发奖金|发红包|给了奖金|物质奖励/,
+  /惩罚|处罚|罚了|罚他|罚她|禁赛|摁在板凳|按在替补|换下场|换他下场|警告|处分|记过|约谈|扣了奖金|扣奖金|取消了[^。！？!?]{0,6}(?:游戏|玩具|零花钱|资格|权利)/,
+];
+// 腿③ FB_INTERVENE（英文）
+const FB_INTERVENE_EN = [
+  /critici[sz]ed|scolded|yelled\s+at|chewed\s+(?:him|her|them)\s+out|reprimanded|berated|bawled\s+out/i,
+  /praised|complimented|lauded|commended|applauded|congratulated/i,
+  /rewarded|gave\s+(?:him|her|them)\s+a\s+(?:bonus|reward)|bonus|incentiv(?:e|ized)/i,
+  /punished|grounded|docked\s+(?:his|her|their)\s+pay|gave\s+(?:him|her|them)\s+a\s+warning|warning|benched|dropped\s+(?:him|her)|demoted|suspended/i,
+];
+// 腿③ FB_ATTRIB 反馈语境功劳/功效归因（中文）
+const FB_ATTRIB_ZH = [
+  /有用|有效|起作用|起了作用|管用|很灵|见效|立竿见影|奏效|有效果|有成效|是对的|走对了|很关键|是关键|果然/,
+  /能提高|会提高|提高了成绩|提升了成绩|提高了分|提升了效率/,
+  /骄傲|自满|松懈|翘尾巴|不思进取|得意忘形|浮躁|飘飘然/,
+];
+// 腿③ FB_ATTRIB（英文）
+const FB_ATTRIB_EN = [
+  /\bworks\b|\bworked\b|\bhelps\b|\bhelped\b|did\s+the\s+trick|made\s+the\s+difference|turned\s+(?:him|her|them)\s+around|paid\s+off|is\s+effective/i,
+  /backfires?|backfired|makes?\s+(?:him|her|them|people|kids|children|staff|employees)\s+(?:complacent|overconfident|lazy|arrogant|cocky|careless)/i,
+  /clearly\s+(?:works|helps|is\s+effective)|obviously\s+(?:works|helps|makes)/i,
+];
+
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────
 const EXEMPT_META_ZH = [
   /均值回归|回归均值|向均值回归|平均数的回归|自然回归|自然波动|大数定律|中心极限|样本量|极端值/,
@@ -394,6 +463,50 @@ function legsEn(text, R) {
   return false;
 }
 
+// ─── [r300 新族] 反馈干预族路由（与 legsZh/legsEn 并行，命中即 hit）─────
+// 三腿：FB_EXTREME × FB_REGRESSION 邻近（同一叙事窗），且 FB_INTERVENE 与
+// FB_ATTRIB 均靠近 极端或回归（干预与归因互为邻居即算同一次反馈叙述）。
+// 叙事窗与主判据一致（ZH 40 / EN 120）。
+function feedbackZh(text, R) {
+  const ext = positions(R.FB_EXTREME_ZH || FB_EXTREME_ZH, text);
+  const reg = positions(R.FB_REGRESSION_ZH || FB_REGRESSION_ZH, text);
+  if (ext.length === 0 || reg.length === 0) return false;
+  const interv = positions(R.FB_INTERVENE_ZH || FB_INTERVENE_ZH, text);
+  const attrib = positions(R.FB_ATTRIB_ZH || FB_ATTRIB_ZH, text);
+  if (interv.length === 0 || attrib.length === 0) return false;
+  const WIN = 40;
+  for (const e of ext) {
+    for (const r of reg) {
+      if (Math.abs(e - r) > WIN) continue;
+      const ivOk = interv.some(iv => Math.min(Math.abs(iv - e), Math.abs(iv - r)) <= WIN);
+      if (!ivOk) continue;
+      const atOk = attrib.some(a => Math.min(Math.abs(a - e), Math.abs(a - r)) <= WIN);
+      if (atOk) return true;
+    }
+  }
+  return false;
+}
+
+function feedbackEn(text, R) {
+  const ext = positions(R.FB_EXTREME_EN || FB_EXTREME_EN, text);
+  const reg = positions(R.FB_REGRESSION_EN || FB_REGRESSION_EN, text);
+  if (ext.length === 0 || reg.length === 0) return false;
+  const interv = positions(R.FB_INTERVENE_EN || FB_INTERVENE_EN, text);
+  const attrib = positions(R.FB_ATTRIB_EN || FB_ATTRIB_EN, text);
+  if (interv.length === 0 || attrib.length === 0) return false;
+  const WIN = 120;
+  for (const e of ext) {
+    for (const r of reg) {
+      if (Math.abs(e - r) > WIN) continue;
+      const ivOk = interv.some(iv => Math.min(Math.abs(iv - e), Math.abs(iv - r)) <= WIN);
+      if (!ivOk) continue;
+      const atOk = attrib.some(a => Math.min(Math.abs(a - e), Math.abs(a - r)) <= WIN);
+      if (atOk) return true;
+    }
+  }
+  return false;
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -412,20 +525,30 @@ function checkRegressionToMean(text, inject) {
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
   const hit = isZh ? legsZh(text, R) : legsEn(text, R);
-  if (!hit) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r300] 反馈干预族（表扬/批评/奖惩）独立路由，与主判据并行
+  const fbHit = isZh ? feedbackZh(text, R) : feedbackEn(text, R);
+  if (!hit && !fbHit) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 计分：基础 0.62 + 功劳归因形 0.06 + 显式干预动词形 0.04，封顶 0.85
+  // [r300] 归因/干预腿计入反馈族 FB_ATTRIB / FB_INTERVENE（反馈族命中时主表不承重）
   let score = 0.62;
-  if (anyHit(R.CREDIT_ZH || CREDIT_ZH, text) || anyHit(R.CREDIT_EN || CREDIT_EN, text)) score += 0.06;
-  if (anyHit(R.INTERVENE_ZH || INTERVENE_ZH, text) || anyHit(R.INTERVENE_EN || INTERVENE_EN, text)) score += 0.04;
+  const hasCredit = anyHit(R.CREDIT_ZH || CREDIT_ZH, text) || anyHit(R.CREDIT_EN || CREDIT_EN, text)
+    || anyHit(R.FB_ATTRIB_ZH || FB_ATTRIB_ZH, text) || anyHit(R.FB_ATTRIB_EN || FB_ATTRIB_EN, text);
+  const hasInterv = anyHit(R.INTERVENE_ZH || INTERVENE_ZH, text) || anyHit(R.INTERVENE_EN || INTERVENE_EN, text)
+    || anyHit(R.FB_INTERVENE_ZH || FB_INTERVENE_ZH, text) || anyHit(R.FB_INTERVENE_EN || FB_INTERVENE_EN, text);
+  if (hasCredit) score += 0.06;
+  if (hasInterv) score += 0.04;
   if (score > 0.85) score = 0.85;
 
-  return {
-    hit: true, score, count: 1,
-    detail: isZh
+  const detail = (fbHit && !hit)
+    ? (isZh
+      ? '回归均值×表扬/批评/奖惩反馈干预误归因(zh)'
+      : 'regression to the mean×praise/blame/reward feedback misattribution(en)')
+    : (isZh
       ? '回归均值误归因×极端基线后自然回归被当成干预功劳(zh)'
-      : 'regression to the mean×natural rebound credited to intervention(en)',
-  };
+      : 'regression to the mean×natural rebound credited to intervention(en)');
+
+  return { hit: true, score, count: 1, detail };
 }
 
 module.exports = {
@@ -436,5 +559,8 @@ module.exports = {
     INTERVENE_ZH, INTERVENE_EN, CREDIT_ZH, CREDIT_EN, EFFECT_ZH, EFFECT_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_EVID_ZH, EXEMPT_EVID_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
+    // [r300] 反馈干预族常量（负例注入承重目标）
+    FB_EXTREME_ZH, FB_EXTREME_EN, FB_REGRESSION_ZH, FB_REGRESSION_EN,
+    FB_INTERVENE_ZH, FB_INTERVENE_EN, FB_ATTRIB_ZH, FB_ATTRIB_EN,
   }),
 };
