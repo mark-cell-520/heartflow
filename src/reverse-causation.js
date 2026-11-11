@@ -180,6 +180,26 @@ const RESULT_EN = [
   /\b(?:thieves|burglars?|burglaries|muggers?|muggings?|break-?ins?|stolen\s+packages?|vandalism)\b/i,
 ];
 
+// ─── [r299 新增族] 应急响应调度框（因果倒置的「第一响应者」形）──────────
+// 收录口径：应急响应者/处置服务**按危机强度被调度**（危机越重，派出的
+// 响应者越多），把「危机筛出响应者」的选择效应误读成「响应者制造/加剧
+// 危机」——与 r174 首族（住院/报警/裁员 等后果应对行为）同属反向因果，
+// 但表面形态是「响应者→危机事件」的调度对，而非「行为+群体+差异」框，
+// 且危机名词（大火/事故/风暴）不在 RESULT 表、中文常用 越X越Y 无显式
+// 因果动词，故独立成框（主判据 B），既有路径零改动。裸名词形态。
+const RESPONDER_ZH = [
+  /消防员|消防队|消防车|救护车|急救车|急救中心|救生员|救生队|拖车|清障车|救援队|救援人员|抢险队|海岸警卫队|海警|危机热线|心理危机干预|排爆|拆弹|防暴警察|特警/,
+];
+const RESPONDER_EN = [
+  /\b(?:firefighters?|fire\s+crew|paramedics?|EMTs?|ambulances?|tow\s+trucks?|coast\s+guard|lifeguards?|rescue\s+(?:teams?|crews?|workers?|squads?)|search[- ]and[- ]rescue|first\s+responders?|hazmat\s+(?:teams?|crews?)|bomb\s+squad|crisis\s+(?:counselors?|hotlines?|teams?)|emergency\s+(?:crews?|responders?|teams?)|dispatchers?|relief\s+workers?)\b/i,
+];
+const CRISIS_ZH = [
+  /大火|火灾|火场|火情|火势|心梗|心脏骤停|猝死|事故|车祸|溺亡|溺水|落水|风暴|台风|地震|洪灾|洪水|灾害|灾情|塌方|滑坡|爆炸|泄漏|中毒|危难|险情|突发情况|紧急情况/,
+];
+const CRISIS_EN = [
+  /\b(?:fires?|wildfires?|cardiac\s+arrests?|heart\s+attacks?|crashes?|accidents?|overdoses?|drownings?|storms?|floods?|earthquakes?|disasters?|emergencies|collapses?|explosions?|blazes?)\b/i,
+];
+
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────
 const EXEMPT_META_ZH = [
   /因果倒置|反向因果|逆向因果|因果混淆|混淆变量|混杂因素|相关不等于因果|相关性不等于因果|辛普森悖论|辛普森悖误|内生性|选择效应|生态谬误|区群谬误|统计学|统计课|数学课|教材|课本|课堂|教案|论文里|文章里|科普|逻辑课|谬误|谬论|研究方法|课堂教学/,
@@ -279,6 +299,49 @@ function responseEn(text, R) {
   return false;
 }
 
+/** [r299 新增] 主判据 B：应急响应调度框（第一响应者被当成危机的原因）。
+ *  三条件共现：
+ *   ① RESPONDER 响应者名词在场；
+ *   ② CRISIS 危机名词在场；
+ *   ③ LINK 因果连接，两形任一：
+ *      - 显式因果动词，且方向为「响应者→动词→危机」（响应者在动词前
+ *        winBefore 窗内、危机在动词后 winAfter 窗内），动词前 winNeg 窗
+ *        内无否定词——排除「不是…的原因」「firefighters don't cause fires」
+ *        与「the fire was caused by arson, and firefighters put it out」
+ *        （响应者不在动词前）两类良性；
+ *      - 越X越Y 形（中文，全文「越」≥2）或 the more…the more 形（英文），
+ *        如「拖车越多，事故越多」。
+ *  复用 CAUSE_ZH/CAUSE_EN（因果动词表），不另立动词表。 */
+function responderDispatch(text, isZh, R) {
+  const RESPONDER = isZh ? (R.RESPONDER_ZH || RESPONDER_ZH) : (R.RESPONDER_EN || RESPONDER_EN);
+  const CRISIS = isZh ? (R.CRISIS_ZH || CRISIS_ZH) : (R.CRISIS_EN || CRISIS_EN);
+  const CAUSE = isZh ? (R.CAUSE_ZH || CAUSE_ZH) : (R.CAUSE_EN || CAUSE_EN);
+  if (!anyHit(RESPONDER, text)) return false;
+  if (!anyHit(CRISIS, text)) return false;
+  // 越X越Y / the more…the more 形（无显式因果动词）
+  if (isZh) {
+    if ((text.match(/越/g) || []).length >= 2) return true;
+  } else if (/\bthe\s+(?:more|worse|higher|greater)\b[^.]{0,50}\bthe\s+(?:more|worse|higher|greater)\b/i.test(text)) {
+    return true;
+  }
+  // 显式因果动词 + 方向（响应者在前、危机在后）+ 否定守卫
+  const winBefore = isZh ? 20 : 55;
+  const winAfter = isZh ? 14 : 45;
+  const negNear = isZh ? /不|没|未|并非|未必|无从|难以/ : /\b(?:not|never|no|cannot|can'?t|don'?t|doesn'?t|isn'?t|won'?t|hardly|without)\b/i;
+  for (const re of CAUSE) {
+    const g = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+    let m;
+    while ((m = g.exec(text)) !== null) {
+      const before = text.slice(Math.max(0, m.index - winBefore), m.index);
+      const after = text.slice(m.index + m[0].length, m.index + m[0].length + winAfter);
+      const pre = text.slice(Math.max(0, m.index - 12), m.index);
+      if (!negNear.test(pre) && anyHit(RESPONDER, before) && anyHit(CRISIS, after)) return true;
+      if (m.index === g.lastIndex) g.lastIndex++;
+    }
+  }
+  return false;
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -297,23 +360,35 @@ function checkReverseCausation(text, inject) {
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
 
-  // 腿① RESPONSE_CORR 反应型行为 × 相关/选择框
+  // 主判据 A：腿① 反应型行为框 × 腿② 因果归因
   const response = isZh ? responseZh(text, R) : responseEn(text, R);
-  if (!response) return { hit: false, score: 0, detail: '', count: 0 };
+  if (response) {
+    // 腿② CAUSE 因果归因：因果动词 × 负面结果（从因果动词起点起 18 字 /
+    // 45 字符窗——「是…的原因」形的结果名词在动词匹配内部）
+    const cause = isZh
+      ? nearFrom(R.CAUSE_ZH || CAUSE_ZH, R.RESULT_ZH || RESULT_ZH, text, 18)
+      : nearFrom(R.CAUSE_EN || CAUSE_EN, R.RESULT_EN || RESULT_EN, text, 45);
+    if (cause) {
+      return {
+        hit: true, score: 0.6, count: 1,
+        detail: isZh
+          ? '因果倒置×把后果的应对行为当成后果的原因(zh)'
+          : 'reverse causation×response-action-as-cause(en)',
+      };
+    }
+  }
 
-  // 腿② CAUSE 因果归因：因果动词 × 负面结果（从因果动词起点起 18 字 /
-  // 45 字符窗——「是…的原因」形的结果名词在动词匹配内部）
-  const cause = isZh
-    ? nearFrom(R.CAUSE_ZH || CAUSE_ZH, R.RESULT_ZH || RESULT_ZH, text, 18)
-    : nearFrom(R.CAUSE_EN || CAUSE_EN, R.RESULT_EN || RESULT_EN, text, 45);
-  if (!cause) return { hit: false, score: 0, detail: '', count: 0 };
+  // 主判据 B（r299 新增）：应急响应调度框（第一响应者被当成危机的原因）
+  if (responderDispatch(text, isZh, R)) {
+    return {
+      hit: true, score: 0.6, count: 1,
+      detail: isZh
+        ? '因果倒置×应急响应被当成危机的原因(zh)'
+        : 'reverse causation×first-responder-as-cause(en)',
+    };
+  }
 
-  return {
-    hit: true, score: 0.6, count: 1,
-    detail: isZh
-      ? '因果倒置×把后果的应对行为当成后果的原因(zh)'
-      : 'reverse causation×response-action-as-cause(en)',
-  };
+  return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
@@ -321,6 +396,7 @@ module.exports = {
   __internals: () => ({
     RESP_ZH, GROUP_DE_ZH, DIFF_ZH, YUE_ZH, CAUSE_ZH, RESULT_ZH,
     RESP_EN, GROUP_EN, DIFF_EN, CAUSE_EN, RESULT_EN,
+    RESPONDER_ZH, RESPONDER_EN, CRISIS_ZH, CRISIS_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_EVID_ZH, EXEMPT_EVID_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
   }),
