@@ -1,3 +1,33 @@
+## r299 — 反向因果（reverse_causation 第 172 维度）「应急响应调度框」第一响应者族补全（真升级②）
+
+**日期** 2026-11-12 04:2x–04:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r299（kind: dimension）
+
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。海外扫描三源如实空返/噪声（arXiv parse-fail、GitHub 0、S2 error），选题走仓库内探针实证。r299 认领后立即 push claim commit（撞号纪律）。
+
+### 缺口实证（scripts/round-299/probe-rc-r299.js，v6.8.174 gate() 动手前）
+第一响应者被按危机强度调度，却被当成制造/加剧危机的原因——`Firefighters are present at every big fire, so sending more firefighters makes fires bigger.` 类 10 条攻击中 **7 条 gate.action=pass 且 rc/cc 双零命中（真零命中）**；7 条良性对照全部 pass。根因：`RESP_EN`/`RESP_ZH` 未收第一响应者名词（firefighters/paramedics/tow trucks/ambulances/救生员…），且危机名词（大火/事故/风暴）不在 `RESULT` 表、中文常用 越X越Y 无显式因果动词，既有「反应型行为 + 群体 + 差异」主判据 A 整体套不上。
+
+### 改了什么
+- `src/reverse-causation.js`（既有已接线模块，第 172 维度，**src/index.js 零改动**）：新增 `RESPONDER_ZH`/`RESPONDER_EN`（第一响应者名词）+ `CRISIS_ZH`/`CRISIS_EN`（危机/负面事件名词）；新增**主判据 B `responderDispatch`**——响应者名词 × 危机名词 × 因果连接，因果连接两形任一：(a) 显式因果动词且方向为「响应者→动词→危机」（响应者在动词前窗、危机在动词后窗）+ 否定守卫（动词前 12 字内无否定词）；(b) 中文 越X越Y / 英文 the more…the more。复用 `CAUSE_ZH`/`CAUSE_EN`，不另立动词表。主判据 A 路径逐字保留（`if (response) { … if (cause) return hit }` 包一层，语义不变）。`__internals` 导出四个新常量供负例注入。
+- `test/round-299-first-responder-reverse-causation.test.js`（新增，46/46）：EN+ZH 攻击 11 条（rc 命中 + gate 非 pass）、良性 11 条零误伤、方向/否定守卫专项 4、存量 A 族回归锚 3、登记断言 2、in-memory 整组注入 4。
+- `scripts/round-299/r299-injection-delete.js`（新增，4/4 变红）：逐组删条（RESPONDER_ZH/CRISIS_ZH/RESPONDER_EN/CRISIS_EN 整组置空于临时副本），对应专署攻击翻零命中。
+- `scripts/round-299/{probe-gap-r299.js, probe-rc-r299.js}`（新增，动手前缺口探针）。
+- `UPGRADE_LOG.md`（r299 条目）、`README.md`/`SKILL.md`/`data/test-count.json`（机器记账 21,386 → 21,432 passing）；报告 `coordination/reports/r299-dimension-agent4.md`（本地留档，`reports/` 自 r268 起被 gitignore 覆盖、不入链）。
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（判别维度 246）
+- node test/doc-numbers-accuracy.test.js — 24/0
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（**与基线完全一致，新族零新增误伤**）
+- node test/round-299-first-responder-reverse-causation.test.js — 46/46
+- scripts/round-299/r299-injection-delete.js — 注入 4 个：4 个变红，0 个未变红
+- 存量回归：test/round-266-reverse-causation.test.js 25/25、test/round-283-causation-families.test.js 95/95 零回归
+- 全量 node test/run-all.js — 21,432 通过 / 145 失败 / 21,577（基线 21,386/145/21,531，唯一 +46 即本轮新测试，失败数逐条持平）
+
+### 已知未修项 / 边界
+1. 裸 `bring`（"ambulances bring more overdoses"）不在共享 `CAUSE_EN`（其用 `brings about`），本框不收——刻意不为一词污染共享动词表；改后该形仍 pass，属已知窄口。
+2. 主判据 B 是单族独立分支，未与主判据 A 共享腿② RESULT 表——危机 noun（大火/事故/风暴）本就不在 RESULT 表，强行并入会牵动 A 族既有命中面，故独立成框更安全。
+
 ## r298 — 研究者自由度（researcher_degrees_of_freedom 第 212 维度）「中性复数枚举形」多重比较/子群捕捞族补全（真升级②）
 
 **日期** 2026-11-12 02:17–03:2x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 src/index.js 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r298（kind: dimension）

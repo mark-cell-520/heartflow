@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 246 discrimination dimensions  ×  11-layer pipeline  ×  163 modules  ×  188 MCP tools
-×  1,323 dispatch routes  ×  21,386 passing tests  ×  2 npm dependencies
+×  1,323 dispatch routes  ×  21,432 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.174**. Not marketing copy.
 | Dispatch routes | 1,323 |
 | Discrimination dimensions | 246 |
 | MCP tools | 188 |
-| Test suite | 21,386 passing / 145 failing | `node test/run-all.js` (full run 2026-11-11 751.6s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293） |
+| Test suite | 21,432 passing / 145 failing | `node test/run-all.js` (full run 2026-11-11 751.6s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293） |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
