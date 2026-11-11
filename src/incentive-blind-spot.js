@@ -144,12 +144,12 @@ const POOL_EN = [
 const NODISTORT_ZH = [
   // ②-a (吸引|纳入|覆盖|包含|筛选|集中|涌入)×(混合词)×(人|人群|客户|投保人|借款人)
   /(?:吸引|招来|纳入|覆盖|包含|筛(?:选|出|进|入)?|集中|涌入|聚拢)[^。，！？；\n]{0,12}(?:各类|各种|不同|高中低|好坏|优劣|均衡|混合|相同|差不多|一样|相差不大|高中低档|风险)(?:风险|水平|资质|信用|风险水平|信用等级)?(?:的)?(?:人|人群|客户|用户|投保人|借款人|申请人|参与者|成员)/,
-  // ②-b (风险|投保|借款|客户|人群|结构)×(分布|结构|组合|构成|集中)×(没有|不会有|不构成|谈不上|相互抵消)×(影响|差别|问题|变化)
-  /(?:风险|投保|借款|客户|人群|申请人|参与者|池子|保险池|风险池|资金池)(?:分布|结构|组合|构成|集中|构成比例|占比)[^。，！？；\n]{0,8}(?:并?没有|不会有|不构成|谈不上|称不上|相互抵消|彼此抵消|互相抵消)(?:什么|任何|太大)?(?:影响|差别|区别|不同|问题|压力|变化)/,
+  // ②-b (风险|投保|借款|客户|人群|结构)×(分布|结构|组合|构成|集中)×(没有|不会有|不构成|谈不上|相互抵消|有|任何)×(影响|差别|问题|变化)
+  /(?:风险|投保|借款|客户|人群|申请人|参与者|池子|保险池|风险池|资金池)(?:分布|结构|组合|构成|集中|构成比例|占比)[^。，！？；\n]{0,8}(?:并?没有|不会有|不构成|谈不上|称不上|相互抵消|彼此抵消|互相抵消)(?:有)?(?:什么|任何|有何|太大)?(?:影响|差别|区别|不同|问题|压力|变化)/,
   // ②-c (自然|自动|必然|一定|当然|反正|总归)×(会)×(吸引|平衡|均衡|抵消|对冲)×(可选混合词)
   /(?:自然|自动|必然|一定会|一定|当然|反正|总归|终究)[^。，！？；\n]{0,4}(?:会|便|将)?(?:吸引|平衡|均衡|抵消|对冲|摊平|抹平)(?:各类|各种|不同|高中低|好坏|优劣|全部|所有)?/,
-  // ②-d (对|对于)×(保费|价格|成本|质量|市场|整体|赔付|保障|坏账|利率|收益|亏损|基金)×(没有|不会有|不构成|谈不上)×(影响|压力|差别|推高作用)
-  /(?:对|对于)?(?:保费|价格|成本|质量|市场|整体|赔付|保障|坏账|利率|收益|亏损|统筹基金|基金|资金池|风险池)(?:来说|而言)?(?:并?没有|不会有|不构成|谈不上|称不上)(?:什么|任何|太大)?(?:影响|压力|差别|区别|不同|推高作用|变化)/,
+  // ②-d (对|对于)?×(保费|价格|成本|质量|市场|整体|赔付|保障|坏账|利率|收益|亏损|基金)×(没有|不会有|不构成|谈不上|称不上)×(影响|压力|差别|推高作用)
+  /(?:对|对于)?(?:保费|价格|成本|质量|市场|整体|赔付|保障|坏账|利率|收益|亏损|统筹基金|基金|资金池|风险池)(?:来说|而言)?(?:并?没有|不会有|不构成|谈不上|称不上)(?:有)?(?:什么|任何|有何|太大)?(?:影响|压力|差别|区别|不同|推高作用|变化)/,
   // ②-e (说明|证明|意味着|表明|可见|反映出|所以|因此)×(没有影响|不影响|不改变|不会推高|不存在|不是问题|无需担心|自动平衡)
   /(?:说明|证明|意味着|表明|可见|反映出|足以证明|所以|因此|故而|换句话说)[^。，！？；\n]{0,14}(?:没有影响|不影响|不改变|不会推高|推不高|不存在|不是问题|无需担心|不必担心|不用担心|自动平衡|自然均衡|相互抵消|差不多|大同小异|无差别|没有差别)/,
   // ②-f 混合词前置形（把各类人群都纳入/各种信用等级的人都进来）
@@ -164,10 +164,12 @@ const NODISTORT_EN = [
   /\b(?:so|thus|therefore|hence|which means|meaning)\b[^.]{0,40}\b(?:premiums?|prices?|costs?|rates?|quality|losses?)\s+(?:stay|stays|remain|remains?|unchanged|stable|the same|flat|unaffected)\b/i,
   // ②-c (no|little|minimal|negligible)×(adverse selection|self-selection|selection effect/bias/distortion|risk concentration)
   /\b(?:no|little|minimal|negligible|limited)\s+(?:real\s+)?(?:adverse selection|self[- ]selection|selection (?:effect|bias|distortion)|risk concentration|cream[- ]skimming)\b/i,
-  // ②-d (does not|doesn't|will not|won't|no)×(affect|matter|change|impact|distort|differ)×(premiums|prices|costs|quality|rates|the pool|defaults|losses)
-  /\b(?:does not|doesn'?t|do not|don'?t|will not|won'?t|cannot|can'?t|has no|have no)\s+(?:\w+\s+){0,3}?(?:affect|change|impact|distort|alter|differ|vary)\b[^.]{0,40}\b(?:premiums?|prices?|costs?|rates?|quality|the pool|adverse selection|defaults?|losses?|interest rates?|approval rates?)\b/i,
+  // ②-d (does not|doesn't|will not|won't|has no|have no)×(affect|change|impact|distort|differ|vary|effect)×(premiums|prices|costs|quality|rates|the pool|defaults|losses)
+  /\b(?:does not|doesn'?t|do not|don'?t|will not|won'?t|cannot|can'?t|has no|have no)\s+(?:\w+\s+){0,3}?(?:affect|change|impact|distort|alter|differ|vary|effect)\b[^.]{0,40}\b(?:premiums?|prices?|costs?|rates?|quality|the pool|adverse selection|defaults?|losses?|interest rates?|approval rates?)\b/i,
   // ②-e (reach|serves|covers|caters to|lends to|includes)×(every|all|various|any|different|each)×(credit grade|risk level|borrower|risk profile)
   /\b(?:reach(?:es)?|serves?|covers?|caters?\s+to|lends?\s+to|includes?|accommodates?)\b[^.]{0,30}\b(?:every|all|various|any|different|each)\s+(?:credit grade|credit score|risk level|risk profile|borrower|risk class|type of borrower|kind of borrower)\b/i,
+  // ②-f (leaves|keeps|renders|making)×(premiums|prices|costs|rates|quality|the pool|defaults)×(unaffected|unchanged|stable|flat|intact)
+  /\b(?:leaves?|leaving|keeps?|keeping|renders?|making)\b[^.]{0,40}\b(?:premiums?|prices?|costs?|rates?|quality|the pool|defaults?|losses?)\s+(?:unaffected|unchanged|stable|flat|intact|undisturbed)\b/i,
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -198,12 +200,12 @@ const SHIELD_EN = [
 const NOCHANGE_ZH = [
   // ②-a (不会|不能|并不会|并不能|并不|没有|未必)×(可选)×(改变|影响|削弱|放松|动摇|扭曲|刺激|变化)×(可选)×(行为|决策|动机|努力|谨慎|风险偏好)
   /(?:不会|不能|并不会|并不能|并不|没有|未必|不太会|不见得)[^。，！？；\n]{0,10}(?:改变|影响|削弱|放松|动摇|扭曲|刺激|左右|决定|变化)(?:到|起|出|了)?[^。，！？；\n]{0,12}(?:行为|行为方式|决策|决策方式|动机|努力|谨慎|风险偏好|经营方式|管理方式|驾驶习惯|用药习惯|就医行为)/,
-  // ②-b (行为|决策|动机|努力|谨慎|风险偏好)×(并不会|并不会|并不能|并不|没有|未必)×(有什么)×(改变|变化|影响|削弱|放松)
-  /(?:行为|行为方式|决策|决策方式|动机|努力|谨慎|风险偏好|经营方式|管理方式|驾驶习惯|就医行为)[^。，！？；\n]{0,6}(?:并?不会|并不会|并不能|并不|没有|未必)(?:有什么|什么|任何)?(?:改变|变化|影响|削弱|放松|不同)/,
+  // ②-b (行为|决策|动机|努力|谨慎|风险偏好)×(并不会|并不能|并不|没有|未必)×(有什么|任何|有)×(改变|变化|影响|削弱|放松|不同)
+  /(?:行为|行为方式|决策|决策方式|动机|努力|谨慎|风险偏好|经营方式|管理方式|驾驶习惯|就医行为)[^。，！？；\n]{0,6}(?:并?不会|并不会|并不能|并不|没有|未必)(?:有)?(?:什么|任何|有何)?(?:改变|变化|影响|削弱|放松|不同)/,
   // ②-c (不会|不能|并不会|并不能|并不)×(可选)×(更|更加|越发|越来越)×(大胆|冒险|激进|松懈|大意|放任|投机|冒进|更多风险|过度冒险|加杠杆|加码|冒进)
   /(?:不会|不能|并不会|并不能|并不|不至于|未必)[^。，！？；\n]{0,10}(?:更|更加|越发|越来越)?(?:大胆|冒险|激进|松懈|大意|放任|投机|冒进|更多风险|过度冒险|加杠杆|加码|冲动|挥霍|浪费)/,
-  // ②-d 独立否认形（开车不会有什么变化/不会有什么不同）
-  /(?:不会|不能|并不会|并不能|并不|没有|未必|不太会|不见得)(?:有什么|什么|任何)?(?:变化|改变|不同|区别|差别)/,
+  // ②-d 独立否认形（开车不会有什么变化/不会有任何改变/不会有什么不同）
+  /(?:不会|不能|并不会|并不能|并不|没有|未必|不太会|不见得)(?:有)?(?:什么|任何|有何)?(?:变化|改变|不同|区别|差别)/,
 ];
 
 // 腿② 行为不变断言（英文）
@@ -308,11 +310,14 @@ function dedupeOverlap(arr) {
   return out.sort((a, b) => a.idx - b.idx);
 }
 
-// 收集某语言侧两腿的全部有效匹配
+// 收集某语言侧两腿的全部有效匹配（注入值非数组时按空处理——
+// 负例注入可用 /(?!)/ 或 [] 两种形态关闭某组腿）
 function collectLegs(text, aList, bList) {
   const am = [], bm = [];
-  for (const re of aList) for (const x of allMatches(re, text)) am.push(x);
-  for (const re of bList) for (const x of allMatches(re, text)) {
+  const A = Array.isArray(aList) ? aList : [];
+  const B = Array.isArray(bList) ? bList : [];
+  for (const re of A) for (const x of allMatches(re, text)) am.push(x);
+  for (const re of B) for (const x of allMatches(re, text)) {
     if (flipAlive(text, x)) bm.push(x);
   }
   return { am: dedupeOverlap(am), bm: dedupeOverlap(bm) };
