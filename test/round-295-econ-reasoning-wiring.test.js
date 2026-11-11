@@ -231,15 +231,19 @@ console.log('=== F 引擎 think 路径真 dispatch ===');
   });
 
   // 真实 HTTP JSON-RPC e2e（同 mcp-auth-e2e-real.test.js 范式）
+  // 端口段 21500-21899：与 mcp-auth-e2e-real 的 18500-18999 零重叠
+  // （r295 池化首跑 3 条红项定位：端口段重叠 → 双方 spawn 同端口互撞，
+  // 对方 server 先绑定则我方 initialize 通、tools/list 全 401）
   const { spawn } = require('child_process');
   const http = require('http');
-  const PORT = 18600 + Math.floor(Math.random() * 400);
+  const PORT = 21500 + Math.floor(Math.random() * 400);
   const TOKEN = 'r295-e2e-' + Math.random().toString(36).slice(2);
   const rpc = (method, params, headers) => new Promise((resolve, reject) => {
     const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method, params });
     const req = http.request({ host: '127.0.0.1', port: PORT, path: '/mcp', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), ...headers } }, res => {
       let d = ''; res.on('data', c => d += c); res.on('end', () => resolve({ status: res.statusCode, body: d }));
     });
+    req.setTimeout(20000, () => req.destroy(new Error('rpc timeout 20s')));
     req.on('error', reject); req.write(body); req.end();
   });
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -250,13 +254,14 @@ console.log('=== F 引擎 think 路径真 dispatch ===');
     cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'],
   });
   let ready = false;
-  for (let i = 0; i < 50; i++) {
-    await sleep(400);
+  // 就绪等待放宽到 60s（池化负载下 server 启动可能 >20s）
+  for (let i = 0; i < 120; i++) {
+    await sleep(500);
     try {
       const r = await rpc('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 't', version: '1' } }, {});
       if (r.status === 200 || r.status === 401) { ready = true; break; }
     } catch (_) { /* 未起 */ }
-    if (child.exitCode !== null) break;
+    if (child.exitCode !== null) break; // 端口被抢/启动失败：子进程已退出
   }
   if (ready) {
     const AUTH = { Authorization: `Bearer ${TOKEN}` };
