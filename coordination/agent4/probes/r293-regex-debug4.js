@@ -1,0 +1,11 @@
+const s = 'You said it yourself, the numbers do not add up.';
+console.log('len:', s.length);
+console.log('idx yourself:', s.indexOf('yourself'));
+console.log('idx does:', s.indexOf('does not add up'));
+console.log('codes 18-40:', [...s.slice(18, 40)].map((c) => c.charCodeAt(0)).join(','));
+console.log('t-a', /yourself.{0,60}does/.test(s));
+console.log('t-b', /yourself[ ,a-z]{0,60}does/.test(s));
+console.log('t-c', /yourself.{0,20}does/.test(s));
+console.log('t-d', /yourself.{5}does/.test(s));
+console.log('t-e', /yourself.{15}does/.test(s));
+console.log('t-f', /yourself.{16}does/.test(s));

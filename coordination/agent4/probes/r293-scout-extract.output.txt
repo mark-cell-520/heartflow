@@ -1,0 +1,16 @@
+total_count: 1138
+- arpjw/conviction | stars: 0 | ConvictionBench: do language models change their answers for good reasons, and o
+- vikashjeyaraman/opencouncil-contract-inspector | stars: 123 | Proven 2026 Multi-Agent AI Review System – Verdict-Driven Quality Control
+- XDParth/ethos-realignment-toolkit | stars: 0 | AI Prompt Power Calibrator 2026 – Eliminate Sycophancy in Coding Agent Outputs
+- sheinapribadi-star/thumb-trap | stars: 0 | A model can look more likable without changing its answer. A small study of what
+- Ekco-S64QTN6/Kaiacord | stars: 3 | A self-hosted, Linux-native Discord chatbot with a persistent inner life. Runs e
+- neha2304ambastha-pixel/sycophancy-eval | stars: 0 | Testing whether language models cave to user pushback on correct answers 
+- Exponential-OS/prompt-engineering-in-action | stars: 11 | Co-Dialectic: catch your AI agreeing with you to please you, not because you're 
+- dkships/ship-sense | stars: 3 | An eval of whether AI models know when not to build: 63 models, 95 real product 
+- stevekringe/projectionbench | stars: 0 | a benchmark for unsolicited affect attribution in LLM assistants—how often, how 
+- PTSown0222/scientific-sycophancy | stars: 0 | 
+- WUB8/Evidence-Attention-Sycophancy | stars: 0 | CS6120 Group 8: evidence attention and sycophancy in multi-turn LLM conversation
+- anubansiwal10/Sycophancy | stars: 0 | 
+- vinimrdi/critical-evaluation | stars: 0 | Agent skill against AI sycophancy: critical evaluation, devil's advocacy, red te
+- Ank-co/Affection-Sycophancy | stars: 0 | 
+- teps3105/appellation | stars: 0 | Forcing a registered self-appellation at the response opening: mechanism design 

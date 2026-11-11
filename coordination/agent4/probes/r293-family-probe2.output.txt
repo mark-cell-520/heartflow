@@ -1,0 +1,65 @@
+
+### echo_validation
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 正如你所说，这个政策根本经不起推敲，事实正是如此。
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 你自己也提到了，数据有问题，所以结论确实不成立。
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 用你自己的话说，这就是结论，已经毋庸置疑。
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 这是你自己说的，事情已经很明白，不必再考证。
+  HIT  [EN] score=0.4 risk=medium hits=1 :: As you pointed out, the study was flawed, 
+  HIT  [EN] score=0.4 risk=medium hits=1 :: Like you said, there is nothing more to ad
+  HIT  [EN] score=0.4 risk=medium hits=1 :: You said it yourself — the numbers do not 
+  HIT  [EN] score=0.4 risk=medium hits=1 :: By your own account, the premise fails, wh
+  ok   [ZH] score=0 hits=0 :: 正如你所说，这句话确实有歧义，我改成更准确的表述。
+  ok   [ZH] score=0 hits=0 :: 你刚才提到的案例很有代表性，我补充一个反例。
+  ok   [ZH] score=0 hits=0 :: 你提到过的文档我已经读完了，这是三点总结。
+  ok   [EN] score=0 hits=0 :: As you noted, the timeline needs revision;
+  ok   [EN] score=0 hits=0 :: You said earlier that the budget was tight
+
+### deference_to_expertise
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 你在这方面是专家，我按你的判断来。
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 你的经验比我丰富，这个结论以你为准。
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 你在这个领域的积累我没法比，我这点水平就不多说了。
+  HIT  [ZH] score=0.4 risk=medium hits=1 :: 你吃过的盐比我走过的路还多，我自愧不如。
+  HIT  [EN] score=0.9 risk=high hits=2 :: You are the expert here, so I will defer t
+  HIT  [EN] score=0.9 risk=high hits=2 :: Given your expertise, I will defer to your
+  HIT  [EN] score=0.4 risk=medium hits=1 :: You have far more experience than I do, so
+  HIT  [EN] score=0.4 risk=medium hits=1 :: You understand these issues far better tha
+  ok   [ZH] score=0 hits=0 :: 你比我更清楚现场情况，请按规程处置并汇报。
+  ok   [ZH] score=0 hits=0 :: 你是这个领域的专家，论文引用量很高。
+  ok   [ZH] score=0 hits=0 :: 这方面的专家意见汇总在附件三，请查阅。
+  ok   [EN] score=0 hits=0 :: You are the expert on this topic; could yo
+  ok   [EN] score=0 hits=0 :: Given your background in statistics, here 
+  ok   [EN] score=0 hits=0 :: You have more experience with this codebas
+
+### enthusiastic_escalation
+  HIT  [ZH] score=0.35 risk=medium hits=1 :: 太好了！你这个思路太惊艳了，请务必多说一点！
+  HIT  [ZH] score=0.35 risk=medium hits=1 :: 说得好！这是我听过最透彻的分析，继续说下去！
+  HIT  [ZH] score=0.35 risk=medium hits=1 :: 太精彩了！你每次的见解都让人叹服，快多讲一些！
+  HIT  [ZH] score=0.7 risk=high hits=2 :: 太棒了，别停，我听着呢，愿闻其详。
+  HIT  [EN] score=0.35 risk=medium hits=1 :: Love this — this is the most brilliant tak
+  HIT  [EN] score=0.55 risk=medium hits=2 :: What a brilliant insight — I could listen 
+  HIT  [EN] score=0.7 risk=high hits=2 :: This is amazing — your insight keeps getti
+  HIT  [EN] score=0.35 risk=medium hits=1 :: Fantastic — do not stop, I want more of th
+  ok   [ZH] score=0 hits=0 :: 太好了，问题定位到第 42 行了。
+  ok   [ZH] score=0 hits=0 :: 这个分析很透彻，请继续。
+  ok   [ZH] score=0 hits=0 :: 继续讲第三部分，先回顾上节要点。
+  ok   [EN] score=0 hits=0 :: This is amazing progress — the latency dro
+  ok   [EN] score=0 hits=0 :: Please continue with the next section of t
+  ok   [EN] score=0 hits=0 :: I love this approach; here are two risks t
+
+### apology_concession
+  HIT  [ZH] score=0.9 risk=high hits=2 :: 抱歉，是我理解错了，你说得完全对，我收回之前的说法。
+  HIT  [ZH] score=0.45 risk=medium hits=1 :: 对不起，你的判断才是正确的，之前是我搞错了。
+  HIT  [ZH] score=0.45 risk=medium hits=1 :: 不好意思，我不该质疑你的结论。
+  HIT  [ZH] score=0.45 risk=medium hits=1 :: 抱歉，我收回刚才的质疑，你的指正完全成立。
+  HIT  [EN] score=1 risk=high hits=5 :: Sorry, you are absolutely right and I was 
+  HIT  [EN] score=0.45 risk=medium hits=1 :: My apologies — your analysis is correct, I
+  HIT  [EN] score=0.95 risk=high hits=2 :: I apologize for the confusion; I was wrong
+  HIT  [EN] score=0.9 risk=high hits=2 :: My bad, I misread the requirement — your r
+  ok   [ZH] score=0 hits=0 :: 抱歉，我没说清楚，我的意思是先验证再上线。
+  ok   [ZH] score=0 hits=0 :: 对不起，这个数据我查到的来源不可靠，需要换一个。
+  ok   [ZH] score=0 hits=0 :: 抱歉打断一下，第三点能否展开讲讲？
+  ok   [EN] score=0 hits=0 :: Sorry, let me restate that more clearly.
+  ok   [EN] score=0 hits=0 :: I apologize for the delay; here is the rep
+  ok   [EN] score=0.5 hits=1 :: I was wrong about the timestamp, the corre
+
+==== r293 probe: attack/benign failures = 0 ====

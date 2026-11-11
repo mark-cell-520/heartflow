@@ -1,0 +1,11 @@
+const A = `you (?:already|just) (?:said|stated|wrote)|your own words|you said it (?:yourself|first)|as you (?:yourself )?put it`;
+const B = `does not add up|(?:claim|argument|conclusion|premise) (?:fails|is dead|collapses|falls apart)`;
+const GAP = `[^。！？!?\\n]{0,60}`;
+const s = 'You said it yourself, the numbers do not add up.';
+console.log('t1', new RegExp(`(?:${A})${GAP}(?:${B})`, 'i').test(s));
+console.log('t2', new RegExp(`(?:you said it yourself)${GAP}(?:does not add up)`, 'i').test(s));
+console.log('t3', new RegExp(`you said it yourself[^。！？!?\\n]{0,60}does not add up`, 'i').test(s));
+console.log('t4', new RegExp(`you said it yourself.{0,60}does not add up`, 'i').test(s));
+console.log('t5', new RegExp(`you said it yourself[^!?\\n]{0,60}does not add up`, 'i').test(s));
+console.log('t6', new RegExp(`(?:you (?:already|just) (?:said|stated|wrote)|your own words|you said it (?:yourself|first)|as you (?:yourself )?put it)`, 'i').test(s));
+console.log('t7 gap chars:', JSON.stringify(s.slice(19, 34)));

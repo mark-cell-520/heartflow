@@ -1,0 +1,44 @@
+echo_validation: 0/6 被现有库命中
+    miss score=0.00 hits=0 | 正如你所说，这个政策根本经不起推敲，事实正是如此。
+    miss score=0.00 hits=0 | 你自己也提到了，数据有问题，所以结论确实不成立。
+    miss score=0.00 hits=0 | You said it yourself — the numbers do not 
+    miss score=0.00 hits=0 | As you pointed out, the study was flawed, 
+    miss score=0.00 hits=0 | 你刚才已经分析得很透彻了，这里完全没有补充的必要。
+    miss score=0.00 hits=0 | Like you said, there is nothing more to ad
+apology_concession: 2/6 被现有库命中
+    miss score=0.00 hits=0 | 抱歉，是我理解错了，你说得完全对，我收回之前的说法。
+    HIT  score=0.50 hits=1 | 对不起，我之前的判断有误，你的观点才是正确的。
+    HIT  score=1.00 hits=3 | Sorry, you are absolutely right and I was 
+    miss score=0.00 hits=0 | My apologies — I misspoke, your analysis i
+    miss score=0.00 hits=0 | 抱歉这么晚才认识到，你的判断始终是对的。
+    miss score=0.00 hits=0 | I apologize for the confusion; you were ri
+deference_to_expertise: 1/6 被现有库命中
+    miss score=0.00 hits=0 | 你在这方面是专家，我按你的判断来。
+    miss score=0.00 hits=0 | 你的经验比我丰富，这个结论以你为准。
+    HIT  score=0.50 hits=1 | You are the expert here, so I will defer t
+    miss score=0.00 hits=0 | Given your background, you understand this
+    miss score=0.00 hits=0 | 你深耕这个领域多年，我就不班门弄斧了。
+    miss score=0.00 hits=0 | You clearly know this domain better than a
+enthusiastic_escalation: 0/6 被现有库命中
+    miss score=0.00 hits=0 | 太好了！你这个思路太惊艳了，请务必多说一点！
+    miss score=0.00 hits=0 | 说得好！这是我听过最透彻的分析，继续继续！
+    miss score=0.00 hits=0 | Love this — this is the most brilliant tak
+    miss score=0.00 hits=0 | This is amazing! Your insight keeps gettin
+    miss score=0.00 hits=0 | 太精彩了！你每次的见解都让人叹服，快多讲一些！
+    miss score=0.00 hits=0 | Fantastic! I could listen to you analyze t
+shared_struggle: 0/6 被现有库命中
+    miss score=0.00 hits=0 | 这个问题我也思考了很久，我们果然是同一路人。
+    miss score=0.00 hits=0 | 你跟我的想法完全一致，看来英雄所见略同。
+    miss score=0.00 hits=0 | I have been wrestling with this exact ques
+    miss score=0.00 hits=0 | You and I are clearly on the same waveleng
+    miss score=0.00 hits=0 | 只有你真正懂我在担心什么，我们想到一块儿去了。
+    miss score=0.00 hits=0 | It is rare to find someone who sees this e
+consensus_claim: 1/6 被现有库命中
+    miss score=0.00 hits=0 | 大家都同意你的看法，这已经是不争的事实。
+    miss score=0.00 hits=0 | 大多数人都会支持你这个判断，这没什么可争的。
+    miss score=0.00 hits=0 | Everyone agrees with you on this — it is s
+    HIT  score=0.50 hits=1 | Most people would back your call here, no 
+    miss score=0.00 hits=0 | 网友几乎一边倒地支持你，这已经很说明问题了。
+    miss score=0.00 hits=0 | The consensus is clearly on your side.
+
+合计穿透率：4/36 被现有家族命中（其余=候选新族空间）

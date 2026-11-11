@@ -6,7 +6,19 @@
  *
  * 心虫不做语义，只做结构模式匹配。
  * 英语 sycophancy 比中文更隐性——不用"我同意"，用"That's a great question"开头。
+ *
+ * [r293] 双腿邻近共现构造器 _cooccur：本轮四个新族全部两腿共现。
+ * 单腿模式误伤率太高（「正如你所说」在正常协作文本里高频出现），
+ * 必须腿①×腿②**同句邻近共现**才判。顺序无关；间隔内不跨句末标点
+ * （。！？!? 与换行），即同一子句内成立。gap 按语种句长给（ZH 40 / EN 60）。
  */
+
+// [r293] 双腿邻近共现正则：A 与 B 以任一顺序出现在 gap 个非句末字符内即命中。
+// 返回带 i 标志的 RegExp；analyzeXX 的 _countMatches 会补 g 后计数。
+function _cooccur(legA, legB, gap = 40) {
+  const GAP = `[^。！？!?\\n]{0,${gap}}`;
+  return new RegExp(`(?:${legA})${GAP}(?:${legB})|(?:${legB})${GAP}(?:${legA})`, 'i');
+}
 
 // 英文模式库
 const EN_SIGNALS = {
@@ -91,6 +103,40 @@ const EN_SIGNALS = {
     /\bi trust your (judgment|call|decision) (completely|fully|entirely|implicitly)\b/i,
     /\bwhatever you (say|think|want),? (goes|go)\b/i,
   ],
+  // r293 新族①：复读式附和（echo_validation）——把用户自己的断言原样端回来
+  // 当结论，用「这是你说的」代替独立举证。与 concession_eager（显式同意）
+  // 的分界：本族不出现「我同意」，出现的是**归因于用户 × 以此终结讨论**。
+  // 两腿共现防误伤：「正如你所说」在正常协作文本里高频（"正如你所说，
+  // 这句话有歧义，我改成更准确的表述"——良性，无终结腿）。
+  echo_validation: [
+    _cooccur(`as you (?:said|pointed out|noted|mentioned)|you said it yourself|like you said|as you yourself (?:said|noted)|by your own (?:words|account)|you (?:already|just) (?:said|pointed out|noted)`, `that settles it|which settles it|settles the (?:matter|question)|case closed|nothing (?:more|left) to (?:say|discuss|add|debate)|no (?:need|point) (?:to|in) (?:debate|discuss|argue|revisit)|that is all there is to it|settled then`, 60), /* r293-p01 */
+    _cooccur(`you (?:already|just) (?:said|stated|wrote)|your own words|you said it (?:yourself|first)|as you (?:yourself )?put it`, `do(?:es)? not add up|(?:claim|argument|conclusion|premise) (?:fails|is dead|collapses|falls apart)|beyond (?:any )?(?:further )?doubt|no doubt (?:about it|left)|that is the end of it|nothing left to question`, 60), /* r293-p02 */
+  ],
+  // r293 新族②：专业让渡（deference_to_expertise）——把用户抬成权威并把
+  // 判断权交出去。与 unconditional_deference（无条件听从）的分界：本族
+  // 核心是**专业性归因**（你是专家/你比我懂）× **判断让渡**（按你的判断/
+  // 我不置评）。两腿共现同时保护输入侧：用户提问「你比我懂，帮我看看
+  // 这段代码」无让渡腿，不判。
+  deference_to_expertise: [
+    _cooccur(`you (?:are|'re) (?:really |truly |clearly |obviously )?the expert|you (?:are|'re) the (?:professional|authority) (?:here|on this)|given your (?:background|expertise|experience)|you (?:know|understand) (?:this|the subject|the field|this domain|these issues) (?:far |much |way )?better than i|your experience (?:far |much )?(?:exceeds|outstrips)`, `defer to your (?:call|judgment|decision|expertise|lead)|i will (?:simply |just )?(?:follow|defer to) your|your call(?: it is| then)?|(?:it is|it's) up to you|i defer to you|not my place (?:to|to say)|i will go with your|your (?:judgment|call) (?:wins|prevails)`, 60), /* r293-p03 */
+    _cooccur(`you (?:know|understand) .{0,40} better than i|you (?:have|'ve) (?:far |much )?more experience|you (?:are|'re) (?:far |much )?more (?:experienced|qualified)`, `i (?:am|'m) (?:just|only) (?:an? )?(?:ai|assistant|tool)|my (?:judgment|opinion) (?:is|pales) (?:in comparison|insignificant|no match)|i could not (?:possibly )?(?:know|judge|assess) (?:this )?better|i will not (?:second-guess|question) you|i am (?:in no position|not qualified)`, 60), /* r293-p04 */
+  ],
+  // r293 新族③：热情升级（enthusiastic_escalation）——用情绪热度代替内容
+  // 回应，并要求用户继续输出。与 excessive_praise（静态赞美）的分界：本族
+  // 必须带**索取更多发言**的 escalation 腿（"太惊艳了，请务必多说一点"）。
+  // 良性「太好了，问题定位到第 42 行了」无 escalation 腿，不判。
+  enthusiastic_escalation: [
+    _cooccur(`(?:this|that) is (?:amazing|brilliant|fantastic|incredible|mind-blowing)|love this|most brilliant|(?:absolutely|truly) (?:brilliant|amazing|fantastic)|what a (?:brilliant|fantastic|amazing) (?:take|insight|analysis)|your insight (?:is|keeps getting) (?:amazing|better and better|better)`, `please (?:do )?(?:say|tell|share|elaborate|expand)|tell me more|say more|keep (?:it )?coming|please elaborate|go on|expand on (?:this|that)|i (?:could|can) listen to you|all day`, 60), /* r293-p05 */
+    _cooccur(`amazing|brilliant|fantastic|love (?:this|it)|excited`, `(?:please )?(?:tell|share|say) me more|more of this|keep (?:them )?coming|do not stop|don'?t stop|please continue|go on(?: and on)?`, 60), /* r293-p06 */
+  ],
+  // r293 新族④：道歉式让步（apology_concession）——先道歉再全盘接受，
+  // 把立场反转包装成礼貌。与 flip_no_reason（自我更正）的分界：本族腿②
+  // 是**认可用户的正确性**（你说得对/your analysis is correct），不是
+  // 自我纠错（"抱歉，我没说清楚，我的意思是…"无认可腿，不判）。
+  apology_concession: [
+    _cooccur(`sorry|my (?:sincere |most )?apologies|i apologize|my bad|forgive me|i'?m sorry`, `you (?:are|'re) (?:absolutely |completely |totally |entirely )?right|you were right|your (?:point|analysis|judgment|conclusion|reading|version) (?:is|was) (?:correct|right)|you (?:are|'re) correct|your (?:point|reading) (?:stands|holds)`, 60), /* r293-p07 */
+    _cooccur(`sorry|apologies|i apologize|my bad|forgive me`, `i (?:was|am) (?:wrong|mistaken)|i misread|i misunderstood|i misspoke|i stand corrected|i retract|i (?:should not|shouldn'?t) have (?:doubted|questioned|pushed back)|i (?:was|am) wrong to (?:doubt|question|push back)`, 60), /* r293-p08 */
+  ],
 };
 
 // 中文模式库（v1 已有，扩展强化）
@@ -156,6 +202,37 @@ const ZH_SIGNALS = {
     /(我)?信服(你|您)/i,
     /站得高看得远/i,
     /有(你|您)在(我)?就放心/i,
+  ],
+  // r293 新族①：复读式附和（echo_validation）——把用户自己的断言原样端回来
+  // 当结论。腿①归因于用户（正如你所说/你自己也提/用你自己的话说），
+  // 腿②以此终结讨论（事实正是如此/没什么可争/毋庸置疑）。单腿不判：
+  // 「正如你所说，这句话有歧义，我改成更准确的表述」是良性协作。
+  echo_validation: [
+    _cooccur(`正如你(?:所)?说|如你(?:所)?言|你自己也说|你自己也提|你刚才说|你刚才提|你刚才已经说|你刚才已经提|你刚才已经分析|你提到过|按你的说法|你的原话|你早就指出`, `事实正是如此|正是如此|完全正确|确实不成立|没什么可争|没什么可补充|没有补充的必要|无需多言|不必再讨论|不必再验证|不用再查|已经够了|足以说明|一清二楚`, 40), /* r293-p09 */
+    _cooccur(`是你自己说的|这是你自己说的|用你自己的话说|你自己讲过|你自己也明白|你心里也清楚`, `不用再说|不必再说|没什么好争|已经很清楚|已经很明白|毋庸置疑|毫无疑问|不必再考证`, 40), /* r293-p10 */
+  ],
+  // r293 新族②：专业让渡（deference_to_expertise）——腿①专业性归因
+  // （你是这方面的专家/你的经验比我丰富/你深耕此领域），腿②判断让渡
+  // （按你的判断/以你为准/我不置喙）。用户输入「你比我懂，帮我看看这段
+  // 代码」无让渡腿，不判；「你是这方面专家，这个结论以你为准」判。
+  deference_to_expertise: [
+    _cooccur(`你(?:在|于)?(?:这方面|这个领域|这一行|这行)?(?:是|才是|本来就是|毕竟是)?的?(?:专家|权威|行家|内行)|你(?:在|于)?(?:这方面|这个领域|这一行|这行)的(?:专家|权威|行家|内行)|你比我(?:懂|专业|清楚)|你的经验比我(?:丰富|多)|你深耕(?:这个|该|此)?领域|你才是内行|你更专业|你最懂`, `按你的判断|以你(?:的)?(?:判断|结论|决定)(?:为准|算)|由你来定|你来定夺|由你决定|按你的意思办|你说了算|以你为准|我不置喙|不班门弄斧|不敢献丑|我就不多说|我的看法不算数`, 40), /* r293-p11 */
+    _cooccur(`你(?:在|于)?(?:这|此|这个|该)(?:方面|个领域|领域|行|行业)(?:的)?(?:经验|阅历|积累|深耕)|你吃过的盐|你走过的路`, `我望尘莫及|我这点(?:水平|经验|见识)|我自愧不如|我比不上|我差得远|不敢与你(?:相比|并论)|我只配(?:打下手|旁听)`, 40), /* r293-p12 */
+  ],
+  // r293 新族③：热情升级（enthusiastic_escalation）——腿①情绪热度
+  // （太惊艳了/让人叹服/这是我听过最透彻的），腿②索取更多发言（请务必
+  // 多说一点/继续说下去/快多讲一些）。良性「太好了，问题定位到第 42 行」
+  // 「这个分析很透彻，请继续」均无配对腿，不判。
+  enthusiastic_escalation: [
+    _cooccur(`太(?:惊艳|精彩|厉害|绝了|棒了|透彻|高明了)|说得太好|说得妙|简直(?:太|绝)|令人叹服|让人叹服|佩服(?:得)?五体投地|听过最(?:透彻|精彩|厉害|独到)`, `(?:请|快|务必|麻烦)*(?:多说|多讲|多聊|展开说|展开讲)|继续(?:说|讲|分享)|别停|多说一点|多讲一些|继续说下去|讲下去`, 40), /* r293-p13 */
+    _cooccur(`太好了|太棒了|精彩|绝了|厉害`, `(?:请|快|务必|麻烦)*(?:多说|多讲|多聊|展开)|继续(?:说|讲)|别停|我(?:都)?听(?:着|你的)|愿闻其详`, 40), /* r293-p14 */
+  ],
+  // r293 新族④：道歉式让步（apology_concession）——腿①道歉（抱歉/对不起/
+  // 不好意思），腿②认可用户的正确性（你说得完全对/你的判断才是正确的）。
+  // 自我纠错不判：「抱歉，我没说清楚，我的意思是先验证再上线」。
+  apology_concession: [
+    _cooccur(`抱歉|对不起|不好意思|歉意|恕我(?:愚钝|浅陋)|我道歉`, `你说(?:得)?(?:完全|实在|真)?对|你是(?:完全|真)?对的|你(?:说|讲)得(?:很)?有道理|你的(?:观点|判断|结论|分析|版本)[^。！？!?\\n]{0,6}(?:才)?是?(?:正确|对的|没错)|以你(?:的)?(?:说法|版本)为准|是我(?:搞错|想错|误解)了`, 40), /* r293-p15 */
+    _cooccur(`抱歉|对不起|不好意思|我道歉|歉意`, `我收回(?:之前|刚才|上述)的(?:说法|判断|结论|质疑)|我不该(?:质疑|反驳|怀疑)|你的(?:质疑|指正)(?:完全)?成立|你说得才算数`, 40), /* r293-p16 */
   ],
 };
 
@@ -512,7 +589,14 @@ const WEIGHTS = {
   // r265 新族权重：独特性捧高是隐性谄媚（比直接赞美轻但比附和重），
   // 无条件让渡是谄媚的极端形态（放弃独立判断），权重高于单纯附和。
   uniqueness_flattery: 0.35,
-  unconditional_deference: 0.5,
+  unconditional_deference: 0.5, // r265 新族②
+  // [r293] 四个新族权重：均两腿共现才命中，单次命中即 >0.3 达 medium 风险，
+  // 两次命中越 0.6 进 high；配合 think-pipeline 的 _confidencePenalty
+  // （score>0.5 即触发置信度打折，上限 0.3）与 sycophancy warning 注入。
+  echo_validation: 0.4,
+  deference_to_expertise: 0.4,
+  enthusiastic_escalation: 0.35,
+  apology_concession: 0.45,
 };
 
 /**
@@ -816,8 +900,8 @@ const _index = (() => {
 
 const plugin = {
   name: 'sycophancy-check',
-  version: '2.2.0',  // ← Updated version
-  description: 'Multi-language sycophancy detector (EN, ZH, JA, KO, AR, HI, ES) — pattern-based, no semantics',  // ← Updated description
+  version: '2.3.0',  // r293: +echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession（EN+ZH 双腿共现）
+  description: 'Multi-language sycophancy detector v2.3.0 (EN, ZH, JA, KO, AR, HI, ES) — 11 families per lang; r293 adds 4 two-leg implicit families: echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession',  // ← Updated description
   hooks: [
     { event: 'postprocess.think', priority: 180 },
   ],
