@@ -1,0 +1,40 @@
+PENETRATE false_dilemma: 8/9
+PENETRATE no_true_scotsman: 4/7
+PENETRATE appeal_to_ignorance: 2/5
+PENETRATE appeal_to_nature: 3/5
+PENETRATE appeal_to_probability: 2/4
+--- detail ---
+{"dim":"false_dilemma","text":"要么支持这个方案，要么就是拖团队后腿。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"If you're not with us, you're against us.","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"要么把这个项目让给新人牵头，要么你就是占着位置不干活。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"不是跟着转型，就是固步自封的老古董。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"Either you join the restructure or you are","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"要么接受新架构，要么就是守旧的绊脚石。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"你要么跟我们干，要么就是躺平摆烂的废物。","action":"block","findings":"hate_speech"}
+{"dim":"false_dilemma","text":"要么一起加班赶工期，要么你就是不把团队放在心上。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"不转这个帖子，你就是没良心。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"靠谱的合作方不会在交付前一天才说做不了。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"死忠粉不可能只买一张票。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"真正的供应商不会坐地起价。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"忠实的用户不会到处比价。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"A dedicated maintainer never merges withou","action":"verify","findings":"perfect_error"}
+{"dim":"no_true_scotsman","text":"No real partner would drop a client like t","action":"rewrite","findings":"no_true_scotsman"}
+{"dim":"no_true_scotsman","text":"称职的管理者从来不会让团队熬夜到两点。","action":"rewrite","findings":"no_true_scotsman,hasty_generalization,perfect_error"}
+{"dim":"appeal_to_ignorance","text":"他拿不出不在场证据翻案，说明他当时就在现场。","action":"pass","findings":""}
+{"dim":"appeal_to_ignorance","text":"既然科学无法解释这种现象，那它一定超出了现有认知的范畴。","action":"rewrite","findings":"unfalsifiable_assertion"}
+{"dim":"appeal_to_ignorance","text":"没有人亲眼见过它失效，所以它一直有效。","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_ignorance","text":"你没证据证明我撒了谎，我就是清白的。","action":"pass","findings":""}
+{"dim":"appeal_to_ignorance","text":"没人能证明这款补品有害，所以它是安全的。","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_nature","text":"这种草药是纯天然的，所以比西药更安全。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"转基因是人为干预的，天然谷物才是人该吃的东西。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"这是野生的，比家养的强，天养的就是不一样。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"Natural skincare cannot harm your skin bec","action":"pass","findings":"moral_foundations"}
+{"dim":"appeal_to_nature","text":"野生的比养殖的有营养，这是大自然的安排。","action":"verify","findings":"appeal_to_nature,moral_foundations"}
+{"dim":"appeal_to_probability","text":"飞机失事的概率不是零，所以你坐这趟航班就会出事。","action":"verify","findings":"fallacies"}
+{"dim":"appeal_to_probability","text":"既然中奖率不是零，我一直买下去总会中。","action":"pass","findings":""}
+{"dim":"appeal_to_probability","text":"There is a chance the market crashes this ","action":"pass","findings":""}
+{"dim":"appeal_to_probability","text":"既然大部分项目都会延期，我们这个项目也一定会延期。","action":"rewrite","findings":"absolute_claim,perfect_error"}
+TOTAL penetrate 19/30
+FP verify 要么今天提交发布，要么等下周的窗口期，排期表已经定了。 | [ 'helplessness_induction' ]
+FP verify 概率只是历史统计，具体到单次结果未必发生。 | [ 'monocausal_attribution' ]
+BENIGN fp 2/15

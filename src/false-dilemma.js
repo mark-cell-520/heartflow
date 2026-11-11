@@ -18,6 +18,12 @@
  *       （不接受这个安排，就是不想在公司干了）/ 逼迫二选（你总得
  *       选一个信）/ 二选框架×威胁（要么按流程走，要么出了事别来找我）；
  *       EN You are either part of the solution or part of the problem
+ *   · [r289] 要么A要么B×贬损标签（无威胁词形）：要么-frame 或
+ *       不是A就是B frame × 定性等式（就是-link）× 贬损标签（拖后腿 /
+ *       绊脚石 / 老古董 / 躺平摆烂 / dead weight）；否定行为×主语
+ *       插入×品质标签（不转这个帖子，你就是没良心）；EN if you're
+ *       not with us, you're against us / either you join … or you
+ *       are dead weight。良性二元陈述无定性等式，双因子交叉豁免
  *
  * 为什么现有 64 维拦不住：
  *   · double_bind 管权威关系下的双重束缚（亲子/上下级两难指令），
@@ -146,6 +152,54 @@ const ALIGN_PRESSURE_EN = /\b(?:your\s+(?:choice|call)|you\s+decide|decide\s+for
 const ALIGN_THREAT_ZH = /(别来找我|别怪我|后果自负|自己承担|出了事|出什么事|自求多福|走着瞧|等着看|担着|兜不了走|兜着走|吃不了)/;
 const ALIGN_THREAT_EN = /\b(?:do\s+not\s+come\s+(?:running|crying|back)|deal\s+with\s+(?:it|that|the\s+\w+|whatever)\s+yourself|on\s+your\s+own\s+head|face\s+the\s+consequences)\b/i;
 
+// ─── [r289] 要么A要么B×贬损标签族（无威胁词形）────────────────
+// 池化探针 r289（coordination/agent4/probes/r289-probe.js，HEAD
+// 6.8.170）实测：false_dilemma 8/9 新措辞穿透（全池最高）。穿透样本
+// 带要么-frame 且一侧被贴贬损标签，但**不**带既有 STIGMA 结构
+// （不支持就是反对）也**不**带威胁后果词（路由⑦射程外），整族零命中：
+//   「要么支持这个方案，要么就是拖团队后腿。」
+//   「要么把这个项目让给新人牵头，要么你就是占着位置不干活。」
+//   「不是跟着转型，就是固步自封的老古董。」
+//   「不转这个帖子，你就是没良心。」（主语插入形，旧支要求「就是」
+//      紧贴逗号后，收「你就是」）
+//   "If you're not with us, you're against us."（否定条件形）
+//   "Either you join the restructure or you are dead weight."（立场
+//      动词开放形，join 类不在 ALIGN_EQUATE_EN 的 with/for 表内）
+// 判据核心：**定性等式**——第二选项经「就是/便是」与贬损标签绑定，
+// 选项 B 从并列选择变成身份指控（你就是X）。良性二元陈述
+// （「要么努力工作，要么躺平」「要么签字要么违约」）无此等式，
+// 双因子交叉天然豁免。真升级②：既有维度全新措辞家族，维度计数
+// 不变、src/index.js 零改动。
+
+// 腿① 贬损标签词表（结论侧）：把非A选项定性为劣迹/劣根性/局外人。
+// 边界：只收定性标签；行为描述（明天接着干/等下周）不入表。
+const DEROG_ZH = /(?:拖后腿|拖团队后腿|拖项目后腿|扯后腿|拉后腿|绊脚石|老古董|固步自封|守旧|躺平|摆烂|废物|饭桶|刺头|杠精|逃兵|懦夫|软骨头|占着位置|占着茅坑|不干活|出工不出力|不把[^，。？！；\n]{0,6}放在心上|没把[^，。？！；\n]{0,6}放在心上|冷血|没良心|没有良心|无心|不配|不够格|异类|外人|看戏|唱反调|对着干|作对|负能量|不合作|不配合|不团结|没担当|不负责|自私|冷漠)/;
+
+// 腿② 要么-frame × 定性等式（无结论侧——结论由 DEROG_ZH 交叉判定）。
+// 「要么A，要么就是B」「要么A，要么你就是B」：第二连接词必须是
+// 就是/便是/即/等于（定性等式），plain「要么A，要么B」不收。
+const DEROG_FRAME_ZH = /(?:要么|或者|再?不然)(?:[^，。？！；\n]{0,30}?)[，,]?(?:要么|或者)?(?:你|你们|他|她)?(?:就是|便是|即|等于)/;
+
+// 腿②-b 不是A就是B frame（二选一定性句式，复用 STIGMA_ZH 既有结构）。
+const NEG_EQ_FRAME_ZH = /(?:不是|算不上|不算|绝非)(?:[^，。？！；\n]{0,12}?)(?:，|,)?(?:就是|便是|即|等于)/;
+
+// 腿①-S5 否定行为×主语插入×品质标签：「不转这个帖子，你就是没良心」。
+// 与既有 STIGMA_ZH 不转发支的差：逗号后允许主语代词（你就是/他就是），
+// 旧支要求「就是」紧贴逗号后。带品质标签的否定等式本身就是情感
+// 胁迫，单独即命中（与 ALIGN_NEGACT_ZH 单独支同设计）。
+const NEGACT_SUBJ_ZH = /(?:不|没)(?:转|转发|分享|点赞|转评|声援|买|用|看|听|支持|认同|同意|配合|参与|接受|采纳|跟着|站出来|出声)(?:[^，。？！；\n]{0,12}?)[，,]?(?:你|您|你们|他|她)?(?:就是|便是|等于|意味着)(?:[^，。？！；\n]{0,8}?)(?:没良心|没有良心|冷血|无心|不爱国|不忠|不孝|卖国|叛徒|走狗|别有用心|居心不良|不是人|不配|不够格|自私|冷漠|没担当)/;
+
+// 腿③ EN if-you're-not-with-us 否定条件形（既有 STIGMA_EN 只收
+// "you're with us or against us" 直陈形，否定条件形整族射程外）。
+// 要求逗号后接 against 结论——良性 "not with us on this detail,
+// you can still review" 无结论不判。
+const NOTWITH_EN = /\bif\s+you(?:'re| are)\s+not\s+(?:with|for)\s+(?:us|me|him|her|them|the\s+\w+)[^.!?;]{0,40}?,\s*(?:then\s+)?you(?:'re| are)\s+(?:against\s+(?:us|me)|the\s+enemy|part\s+of\s+the\s+problem|on\s+the\s+wrong\s+side|no\s+better\s+than)\b/i;
+
+// 腿④ EN either-you-X-or-you're-Y(贬损)：立场动词开放形。既有
+// ALIGN_EQUATE_EN 只收 with/for/part of/on board 起头形，"either
+// you join … or you are dead weight" 的 join/commit 类动词不收。
+const EITHER_DEROG_EN = /\beither\s+you\s+[^.!?;]{2,50}?\s+or\s+you(?:'re| are)\s+(?:a\s+|an\s+|the\s+)?(?:dead\s+weight|deadweight|holding\s+(?:us|the\s+team|everyone)\s+back|dragging\s+(?:us|the\s+team)\s+down|part\s+of\s+the\s+problem|in\s+the\s+way|against\s+us|the\s+enemy|not\s+one\s+of\s+us|a\s+liability|ball\s+and\s+chain)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以自定义正则替换指定常量
@@ -231,6 +285,42 @@ function checkFalseDilemma(text, inject) {
     return { hit: true, score: 0.76, detail: '二选一×威胁后果(出了事别来找我)' };
   }
 
+  // ─── [r289] 新路由⑨：要么A要么B×贬损标签（无威胁词形） ──────
+  const derogZh = (R.DEROG_ZH || DEROG_ZH).test(text);
+  const derogFrameZh = (R.DEROG_FRAME_ZH || DEROG_FRAME_ZH).test(text);
+  const negEqFrame = (R.NEG_EQ_FRAME_ZH || NEG_EQ_FRAME_ZH).test(text);
+  const negActSubj = (R.NEGACT_SUBJ_ZH || NEGACT_SUBJ_ZH).test(text);
+  const notWithEn = (R.NOTWITH_EN || NOTWITH_EN).test(text);
+  const eitherDerogEn = (R.EITHER_DEROG_EN || EITHER_DEROG_EN).test(text);
+
+  // 路由⑨c（ZH 单独支）：不X(主语插入)你就是Y(品质标签)——带品质
+  // 标签的否定等式本身就是情感胁迫，无需第二腿（与 S2 单独支同设计）。
+  if (negActSubj) {
+    return { hit: true, score: 0.80, detail: '站队二分(不X你就是没良心)' };
+  }
+
+  // 路由⑨e（EN 单独支）：if you're not with us, you're against us
+  if (notWithEn) {
+    return { hit: true, score: 0.80, detail: '站队二分(not with us 形)' };
+  }
+
+  // 路由⑨d（EN 单独支）：either you X or you're Y(贬损标签)
+  if (eitherDerogEn) {
+    return { hit: true, score: 0.78, detail: '二选一×贬损标签(dead weight 形)' };
+  }
+
+  // 路由⑨a（ZH 交叉支）：要么-frame × 定性等式 × 贬损标签。事实/排期
+  // 二元不判（「要么签字要么就是违约」无贬损标签，双因子天然覆盖，
+  // 这里再兜一层显式豁免）。
+  if (derogZh && derogFrameZh && !factual && !scheduled) {
+    return { hit: true, score: 0.78, detail: '二选一×贬损标签(要么A就是拖后腿)' };
+  }
+
+  // 路由⑨b（ZH 交叉支）：不是A就是B(贬损) frame × 贬损标签。
+  if (derogZh && negEqFrame && !factual && !scheduled) {
+    return { hit: true, score: 0.76, detail: '二选一×贬损标签(不是A就是老古董)' };
+  }
+
   return { hit: false, score: 0, detail: '' };
 }
 
@@ -242,5 +332,7 @@ module.exports = {
     ALIGN_EQUATE_ZH, ALIGN_NEGACT_ZH, ALIGN_FORCEPICK_ZH, ALIGN_BINARYONLY_ZH,
     ALIGN_EQUATE_EN, ALIGN_PRESSURE_ZH, ALIGN_PRESSURE_EN,
     ALIGN_THREAT_ZH, ALIGN_THREAT_EN,
+    DEROG_ZH, DEROG_FRAME_ZH, NEG_EQ_FRAME_ZH, NEGACT_SUBJ_ZH,
+    NOTWITH_EN, EITHER_DEROG_EN,
   }),
 };
