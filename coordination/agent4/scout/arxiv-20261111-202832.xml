@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/rAg7bR6WV5Ezy94btXP/sKigZ7o</id>
+  <title>arXiv Query: search_query=all:causal OR all:inference OR all:fallacy OR all:statistical OR all:reasoning OR all:bias OR all:detection OR all:rules&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-11T20:28:33Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:causal+OR+(all:inference+OR+(all:fallacy+OR+(all:statistical+OR+(all:reasoning+OR+(all:bias+OR+(all:detection+OR+all:rules))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>804960</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14519v1</id>
+    <title>Medical Image Segmentation: Foundation Model Adaptation versus Task-Specific Training</title>
+    <updated>2026-11-10T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.14519v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14519v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models pretrained on large natural-image collections are increasingly adapted for medical image segmentation, in the expectation that they will replace models trained for each task. Most comparisons, however, use data from the training distribution and a single task-specific baseline whose configuration is rarely justified, and therefore provide limited evidence of performance at new clinical sites. It also remains unclear how much of a foundation model must be adapted, and what determines this. We adapted a foundation model, DINOv2, with strategies ranging from tuning only its bias terms to full fine-tuning, and compared it with U-Nets and ResU-Nets trained from scratch. Experiments covered colonoscopy, breast ultrasound and dermoscopy, with testing on held-out data from the training source and on independent datasets from other institutions. The adapted foundation model generalised better on every external dataset. Within the training distribution, the task-specific models remained competitive when training data were abundant, and delineated boundaries more precisely, while the foundation model more often missed small lesions. Only a small fraction of the foundation model required adaptation, and the capacity needed was determined by the imaging domain rather than by the adaptation method. A widely used polyp test set was also found to duplicate images from another benchmark. Foundation-model adaptation is therefore warranted where models must work across sites, with capacity selected on the target domain.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Emre Kutlusan</name>
+    </author>
+    <author>
+      <name>Yongmin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14515v1</id>
+    <title>AutoScaffold: AI-Guided Scaffolding for Reinforcement Learning of Language Models</title>
+    <updated>2026-11-10T18:58:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.14515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning with verifiable rewards (RLVR) produces rich training experience, yet outcome rewards reduce each attempt to a single number and leave most of this information unused. Training-time scaffolds, such as strategies or hints added to the prompt during training, offer a natural way to turn this information into guidance, but their design and adaptation are largely left to humans and tailored to specific domains. We introduce AutoScaffold, a unified AI-for-AI framework that turns a student's training experience into adaptive scaffolds, with minimal domain-specific information and no human intervention during training. A frozen teacher periodically examines this experience, diagnoses bottlenecks, and designs scaffolds in two forms: (i) strategies shared across a class of tasks and (ii) hints for individual hard tasks, adjusting the content and amount of support as the student learns. The scaffolds are removed at evaluation. We apply the same framework to ALFWorld, search-based QA, mathematical reasoning, and GPU kernel generation. When evaluated without scaffolds, students trained with AutoScaffold outperform those trained with the corresponding RL baselines in all four domains, with gains of 7.2 points in ALFWorld success and 4.0 points in average QA exact match. On GPU kernel generation, AutoScaffold increases the fraction of tasks with a correct kernel that runs faster than the PyTorch reference by up to 5.0 points. On math, our student surpasses QuestA's reported accuracy using approximately one-third as many student training steps. Analyses show that the teacher identifies a different failure in each task class and shifts its scaffolds from step-by-step workflows to targeted fixes as the student improves, and that its revised scaffolds help the student learn more than keeping the previous scaffold or using no scaffold.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:46Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zijian Zhang</name>
+    </author>
+    <author>
+      <name>Rizhen Hu</name>
+    </author>
+    <author>
+      <name>Jiangweizhi Peng</name>
+    </author>
+    <author>
+      <name>Shiyang Li</name>
+    </author>
+    <author>
+      <name>Sujay Bhatt</name>
+    </author>
+    <author>
+      <name>Sihan Zeng</name>
+    </author>
+    <author>
+      <name>Mingyi Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14511v1</id>
+    <title>Pyrite: Building and Benchmarking Protein-Ligand Pose Ranking Agents</title>
+    <updated>2026-11-10T18:56:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.14511v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14511v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting how a ligand binds to its target is central to small-molecule drug discovery. Modern cofolding models can generate diverse candidate poses, but reliably ranking these candidates remains challenging. We introduce Pyrite, a pairwise pose-ranking benchmark comprising 1,500 pose pairs across diverse protein-ligand complexes. Expert chemists equipped with 3D visualization tools and physics-based scores perform near chance, highlighting the difficulty of interpreting available chemical signals. To investigate automated ranking, we introduce PyriteRep, a structured representation of molecular geometry, protein-ligand interactions, and physicochemical scores, and develop two LLM-based agents: PyriteReasoner, which directly compares poses through text-based reasoning, and PyriteFeaturizer, which generates executable code to construct features for logistic regression, optionally incorporating features derived from LLM subcalls. These agents achieve up to 67% and 74% accuracy, respectively, exceeding observed expert performance. LLM-guided feature discovery generally outperforms direct reasoning, while Group Relative Policy Optimization (GRPO) improves open-weight models, enabling them to match or surpass closed-source frontier models in our evaluations. These results establish Pyrite as a challenging test of pose-ranking ability and highlight LLM-guided feature discovery as a promising approach to interpret and combine the outputs of computational chemistry tools.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:56:32Z</published>
+    <arxiv:comment>32 pages, Agentic AI for Biological Discovery Workshop (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Megha Srivastava</name>
+    </author>
+    <author>
+      <name>Michael H. Lim</name>
+    </author>
+    <author>
+      <name>Allison M. Keys</name>
+    </author>
+    <author>
+      <name>Pranav Murugan</name>
+    </author>
+    <author>
+      <name>Nate Gruver</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14506v1</id>
+    <title>Annular Counterexamples and Skew-Shape Block Identities</title>
+    <updated>2026-11-10T18:55:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14506v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14506v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We establish four connected results on weighted order ideals, cluster coefficients, and block-statistic enumerators. First, we give a counterexample to Theorem 14 of Kang, Lee and Lim (European Journal of Combinatorics, 2026): in the rank-two annular cluster model, a single bridging-lamination coefficient row produces $1+q^2$, contradicting the asserted unimodality. We identify the unsupported initial case in their published induction. Second, we refute their log-concavity Conjecture 1: the same gap example violates log-concavity, and a further single-curve computation gives the full-support polynomial $1+2q+7q^2+10q^3+9q^4+4q^5+q^6$, which also fails log-concavity. Third, we establish the skew-shape block-statistic identity proposed in Kahane's Conjecture 4.4 (arXiv:2607.11225v1) for arbitrary finite skew Young diagrams, under an explicitly specified root-exclusion convention. Its proof combines commuting tableau-transfer matrices, a connected-block inverse kernel, and finite polynomial differential equations; the corresponding mathematical statements have Lean 4/Mathlib formalizations. Fourth, we derive a bivariate block refinement whose coefficients are nonnegative after shifting the order parameter by one and, when necessary, multiplying by a monomial in the weight parameter. We specify the correction to the printed root convention, confirmed by Kahane in correspondence, and the geometric sign and specialization conventions clarified by the relevant authors for the annular examples.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:26Z</published>
+    <arxiv:comment>Complete Lean 4 formalization available at this GitHub repository: https://github.com/adamtilepe/Annular_Counterexamples_and_Skew-Shape_Block_Identities</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Adam Tilèpe</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14501v1</id>
+    <title>Mutual Linearity in Nonlinear Population Dynamics</title>
+    <updated>2026-11-10T18:51:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.14501v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14501v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mutual Linearity in Nonlinear Population DynamicsMutual linearity, the persistence of affine relations among stationary observables under arbitrarily strong changes of one transition rate, is known for Markov jump processes and chemical reaction networks. We show that generalized Lotka--Volterra dynamics form a new class of mutually linear systems, even though species can go extinct and attractors can be chaotic. Any change to one species' equation acts on the others as one effective press and keeps all abundances affinely related: piecewise across extinctions, and as time averages on chaotic attractors.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.PE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:44Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Shiling Liang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14498v1</id>
+    <title>Measuring Robustness and Efficiency in a Connectome-Constrained Fly Visual System Model: Linking an Adversarial and a Perceptual Illusion</title>
+    <updated>2026-11-10T18:51:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Biological visual systems compute reliably under tight metabolic and wiring constraints, whereas artificial vision systems consume far more energy and can be sensitive to adversarial perturbations. Whether networks with brain-like wiring are more robust at lower computational cost is unclear. We address this by benchmarking a task-optimized, continuous-time recurrent neural network of the fly visual system constrained by its synaptic connectome (FlyNet) against artificial neural networks. We compare it against CNNs, RAFT, and continuous-time recurrent neural networks without detailed connectome constraints (sCTRNN, CTRNN) on a collision-detection task within a differentiable 3D rendering pipeline. FlyNet is adversarially vulnerable but, relative to its compute, more robust to common video corruptions than RAFT, while using up to five orders of magnitude fewer FLOPs. The CTRNNs remain more robust than FlyNet across almost all tested perturbations, suggesting that connectome constraints benefit efficiency, through their low edge count, over robustness. Recurrence improves robustness to white-box attacks in RAFT and temporal context improves robustness to common corruptions. FlyNet's position and velocity representations degrade under adversarial textures but recover under counterfactual textures that restore correct classification while staying equally far from training, ruling out unfamiliar textures as the cause of failure. The reverse-phi illusion similarly disrupts these representations and inverts the same low-level motion statistic as the adversarial textures. Optimizing this input statistic alone, without access to the network, suffices to induce classification failure, attributing both perturbations to the same circuit vulnerability. Connectome-constrained models can thus surface adversarial failure mechanisms as testable hypotheses about biological perceptual vulnerabilities.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:31Z</published>
+    <arxiv:comment>39 pages, 24 figures, 2 tables, Accepted at 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alexandre Garcia-Duran</name>
+    </author>
+    <author>
+      <name>Alejandro Rodriguez-Garcia</name>
+    </author>
+    <author>
+      <name>Manuel Molano-Mazón</name>
+    </author>
+    <author>
+      <name>Alexandre Hyafil</name>
+    </author>
+    <author>
+      <name>Srikanth Ramaswamy</name>
+    </author>
+    <author>
+      <name>Janne K. Lappalainen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14493v1</id>
+    <title>Comparative Analysis of Agent Evaluation Frameworks: Stability, Detection, and Discovery in Enterprise Analytics Agents</title>
+    <updated>2026-11-10T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.14493v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14493v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deploying LLM-based analytics agents in enterprise settings requires evaluation frameworks that can reliably detect failures across complex, multi-tool workflows. We present a three-phase comparative study of three evaluation frameworks, each representing a distinct evaluation paradigm (trace-based LLM judging, text-only LLM judging with red-teaming, and deterministic heuristics), applied to two analytics agents in a controlled research setting using frozen execution traces. Phase 1 quantifies evaluation harness stability through repeated measurements, finding that 97% of configurations meet the stability threshold and that stability patterns are agent-independent. Phase 2 measures known risk detection on 72 ground-truth test cases, where the trace-based framework achieves the best precision-recall balance (F1=0.90) while text-only evaluation matches on recall but generates 5x more false alarms. Phase 3 evaluates unknown risk discovery, uncovering 24 novel failures with zero overlap between functional testing and security red-teaming. Our results demonstrate that (1) the information available to the evaluation harness determines evaluation quality, (2) functional and security evaluation are complementary, and (3) LLM-based evaluation harnesses surface subtle errors that human reviewers miss. We recommend a two-framework strategy: trace-based evaluation for functional assessment and adversarial red-teaming for security validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:06Z</published>
+    <arxiv:comment>Accepted to KDD 2026, Jeju, Korea. 9 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Howard Zhang</name>
+    </author>
+    <author>
+      <name>Chuck Arvin</name>
+    </author>
+    <author>
+      <name>Logan Brown</name>
+    </author>
+    <author>
+      <name>Mihir Bhatia</name>
+    </author>
+    <author>
+      <name>Neelu Choudhary</name>
+    </author>
+    <author>
+      <name>Lily Miao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14492v1</id>
+    <title>ReTrace: Distilling Tool-Using Agents into Planner-Free Workflows</title>
+    <updated>2026-11-10T18:49:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.14492v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14492v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Business process automation runs the same Standard Operating Procedure (SOP) again and again on new inputs. Large Language Model (LLM) agents can follow an SOP written in natural language, but they call an LLM to choose every step of every run, which adds latency and cost at scale. We present ReTrace, which turns an SOP and a few logged agent runs into a reusable workflow in which code, not an LLM, selects the next step. The agent's reasoning, the explanation it writes with each tool call, often states why it took an action; the tool calls alone do not. ReTrace extracts the condition behind each step, merges these conditions across runs into a compact rule document, and generates an executable workflow from it. Only this last stage depends on the platform, so rule documents can be compiled for different orchestration platforms. On $79$ procedures from our production platform, ReTrace workflows reach $93.8\%$ completion, against $96.8\%$ for the agent, at $24\%$ lower cost per task. On $τ^2$-Bench, they reach $75.8\%$ task success (agent: $80.6\%$) and run in $1.3$s instead of $170$s; three rounds of repair on training failures lift $k{=}2$ workflows from $66.7\%$ to $81.2\%$. On eight SOP-Bench procedures, ReTrace without repair trails few-shot generation ($80.6\%$ vs. $83.6\%$), but repair from labeled training failures lifts it to $87.8\%$ at $0.40$s per task, compared to $85.5\%$ in $46.6$s for the agent.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:47Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Kaiyuan Hou</name>
+    </author>
+    <author>
+      <name>Yang Ping Kuo</name>
+    </author>
+    <author>
+      <name>Indranil Bhattacharya</name>
+    </author>
+    <author>
+      <name>Rohith Nama</name>
+    </author>
+    <author>
+      <name>Arushi Gupta</name>
+    </author>
+    <author>
+      <name>Carlos D. Castillo</name>
+    </author>
+    <author>
+      <name>Prathap Ramachandra</name>
+    </author>
+    <author>
+      <name>Xiaofan Jiang</name>
+    </author>
+    <author>
+      <name>Francesco Carbone</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14491v1</id>
+    <title>TimeSeek: Multi-Task and Multi-Domain Pretraining for Generalized Time Series Analytics</title>
+    <updated>2026-11-10T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time series analytics has been widely applied across various domains. While existing time series foundation models (TSFMs) have demonstrated promising results, they still face two major challenges: 1) Most TSFMs mainly rely on stacking Transformer layers to increase parameter size, lacking the ability to adaptively model complex time series patterns from multi-domain data. 2) Current TSFMs are primarily pre-trained for specific tasks, e.g., forecasting or anomaly detection, and a few models support multiple tasks, but they fail to fully leverage task specificity and commonality, resulting in suboptimal performance. To address these challenges, we propose TimeSeek, a novel generalized time series analytics model that adaptively models time series patterns from multi-domain data and unifies multiple tasks in pre-training. Conceptually, TimeSeek is guided by selective information sharing under domain and task heterogeneity. From the perspective of multi-domain data, we propose a Multi-Domain Feature Extractor that adaptively captures temporal dependencies and channel correlations based on domain-specific characteristics, including progressive multi-scale modeling and adaptive slot channel modeling. From the perspective of the diversity of tasks, we propose multi-task collaborative training, which leverages task specificity and task commonality through task customization and cross-task training, effectively unifying multiple tasks in pre-training and better adapting to diverse downstream scenarios. After pre-training on large-scale time series data, TimeSeek achieves state-of-the-art performance in forecasting, anomaly detection, and classification tasks across both few-shot learning and zero-shot situations, together with favorable inference efficiency.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:26Z</published>
+    <arxiv:comment>Accepted by IEEE Transactions on Pattern Analysis and MachineIntelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Peng Chen</name>
+    </author>
+    <author>
+      <name>Yihang Wang</name>
+    </author>
+    <author>
+      <name>Zhongwen Rao</name>
+    </author>
+    <author>
+      <name>Yang Shu</name>
+    </author>
+    <author>
+      <name>Yuying Qiu</name>
+    </author>
+    <author>
+      <name>Yuxuan Chen</name>
+    </author>
+    <author>
+      <name>Lujia Pan</name>
+    </author>
+    <author>
+      <name>Bin Yang</name>
+    </author>
+    <author>
+      <name>Chenjuan Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14484v1</id>
+    <title>Nonperturbative string dynamics in a (2+1)D lattice gauge theory on a superconducting quantum processor</title>
+    <updated>2026-11-10T18:45:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.14484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Electric flux strings underpin confinement in gauge theories. In two spatial dimensions, their evolution involves competing processes of charge motion, pair creation, and transverse deformation. Accessing these dynamics beyond perturbative limits challenges classical approaches, as entanglement growth restricts the times accessible to tensor-network simulations. Here we use quantum simulation to investigate a (2+1)D Z2 lattice gauge theory with dynamical matter and an explicit magnetic plaquette interaction, spanning strongly confined and nonperturbative deconfined regimes. Using 63 superconducting qubits, including 12 ancillas, we evolve initially localized strings with static or dynamical endpoint charges. Spatially resolved measurements reveal rapid charge and flux spreading in the deconfined regime, enhanced matter occupation in the string interior near the pair-creation resonance, and suppressed spreading at strong electric fields. String-path occupations further probe transverse rearrangements between configurations connected by plaquette operations. Retaining separate matter and gauge degrees of freedom makes local Gauss-law constraints directly accessible for error detection. Combining these constraints with ancilla checks and noise rescaling, we measure dynamics in circuits containing up to 15 second-order Trotter steps. Our results establish quantum simulation as a practical approach to exploring nonperturbative string dynamics in two spatial dimensions, with gauge redundancy serving as an experimental resource.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Sanziana Stelea</name>
+    </author>
+    <author>
+      <name>Anthony Gandon</name>
+    </author>
+    <author>
+      <name>Francesco Tacchino</name>
+    </author>
+    <author>
+      <name>Jad C. Halimeh</name>
+    </author>
+    <author>
+      <name>Ivano Tavernelli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14483v1</id>
+    <title>Mechanistic Interpretability Needs a Logic of Inference</title>
+    <updated>2026-11-10T18:45:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.14483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Neural networks are increasingly studied not merely as predictive systems, but as complex systems whose internal computations are themselves objects of scientific inquiry. Recent progress in mechanistic interpretability (MI) has made it possible to identify neurons, features, circuits, population structures, and dynamical patterns associated with model behavior. As these tools improve, attention is shifting from what can be observed inside a model to how those observations support mechanistic explanations. We examine the parallel efforts of neuroscience and MI to address this question and identify recurring inferential bottlenecks when inferring mechanisms from complex neural systems. We propose five principles and organize them into a recursive logic for a more rigorous procedure of mechanistic inference. These principles provide a framework that supports scientific discovery in two senses: it helps turn local interpretability findings into cumulative knowledge of mechanisms within models, and it makes those mechanisms sufficiently precise to generate testable hypotheses about domains beyond the models. Evidence beyond MI is ultimately required to establish what model mechanisms reveal about the world.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:07Z</published>
+    <arxiv:comment>NeurIPS 2026 Interp4Discovery (Oral)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zhimin Hu</name>
+    </author>
+    <author>
+      <name>Chen Jiang</name>
+    </author>
+    <author>
+      <name>Hanbo Xie</name>
+    </author>
+    <author>
+      <name>N. Apurva Ratan Murty</name>
+    </author>
+    <author>
+      <name>Sashank Varma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14480v1</id>
+    <title>Pterodactyl: Pushing the Limits of Efficient Automated Translation Evaluation</title>
+    <updated>2026-11-10T18:41:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14480v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14480v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we present 1020 Group's submission to the WMT26 shared task on automated quality evaluation. Our system, Pterodactyl, was engineered specifically for subtasks 2 and 3, that is, segment-level quality score prediction and the detection of error-free segments. Pterodactyl is a highly customizable, ultra-low cost system optimized for binary classification in translation triage and data curation. It is based on an LLM-as-a-judge approach, with prompt engineering and model selection guided by ROC analysis. We also developed several variants of Pterodactyl that were specifically adapted for subtasks 3.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:37Z</published>
+    <arxiv:comment>6 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Proceedings of the Eleventh Conference on Machine Translation (WMT 2026), pp. 1638-1643, 2026</arxiv:journal_ref>
+    <author>
+      <name>Evelyn Y. Garland</name>
+    </author>
+    <author>
+      <name>Carola F. Berger</name>
+    </author>
+    <arxiv:doi>10.18653/2026.wmt-main.96</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/2026.wmt-main.96" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14479v1</id>
+    <title>Learning a model of non-stationary nuisances with non-local correlations for object detection</title>
+    <updated>2026-11-10T18:41:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.14479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We tackle the problem of detecting faint objects in multivariate data corrupted by a strong and spatially correlated nuisance component in the low-sample regime. Standard covariance-based models often yield unstable or ill-conditioned estimators of the nuisance statistics, severely degrading detection performance. We propose a data-driven approach based on sparse precision matrix modeling, where the precision matrix is approximated through a pivoted sparse Cholesky factorization whose non-zeros coefficients are learned by maximum likelihood. This yields a low-complexity yet expressive statistical model of the nuisance. Building on this model, we derive a generalized likelihood ratio test for faint source detection enabling direct control of the false alarm rate. The approach is evaluated on an astrophysical application: the detection of exoplanets by high contrast imaging, where it achieves state-of-the-art performance.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:30Z</published>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <arxiv:journal_ref>EUSIPCO 2026</arxiv:journal_ref>
+    <author>
+      <name>Olivier Flasseur</name>
+    </author>
+    <author>
+      <name>Eric Thiébaut</name>
+    </author>
+    <author>
+      <name>Loïc Denis</name>
+    </author>
+    <author>
+      <name>Samuel Thé</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14470v1</id>
+    <title>TanCRAFT: Context-Reasoned Anticipatory Feedback for Assembly Tasks</title>
+    <updated>2026-11-10T18:33:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.14470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Preventing human error in physical assembly tasks requires assistance systems that can intervene before mistakes are made. This is especially challenging in settings where users are free to choose the construction order and correctness depends on the evolving assembly rather than a fixed next step. We present TanCRAFT, a four-stage real-time predictive assistance system that tracks the scene state, reasons about the current partial assembly, forecasts the near-future motion of manipulated pieces, and intervenes when the predicted placement is incompatible with the target. We instantiate our framework and confirm its effectiveness in a controlled tangram assembly task through offline benchmarks and a within-subject user study. Our findings show that the predictive feedback significantly reduces mistakes relative to unguided and reactive sessions, while yielding the lowest mean perceived workload and shortest mean completion time. Overall, these results demonstrate the value of predictive feedback for error prevention and provide a step toward cost-aware assistance for automation and human-robot workcells.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:33:53Z</published>
+    <arxiv:comment>This work has been submitted to the IEEE for possible publication</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Sassan Mokhtar</name>
+    </author>
+    <author>
+      <name>Lars Doorenbos</name>
+    </author>
+    <author>
+      <name>Marius Bock</name>
+    </author>
+    <author>
+      <name>Sina Mokhtar</name>
+    </author>
+    <author>
+      <name>Katharina Beckh</name>
+    </author>
+    <author>
+      <name>Dominik Bach</name>
+    </author>
+    <author>
+      <name>Juergen Gall</name>
+    </author>
+  </entry>
+</feed>
