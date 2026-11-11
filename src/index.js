@@ -962,6 +962,9 @@ const { checkZeroSumFallacy } = require('./zero-sum-fallacy.js');
 // 管断言在构造层面排除任何反证观测。缩写 ufa grep 0 命中无冲突。
 const { checkUnfalsifiableAssertion } = require('./unfalsifiable-assertion.js');
 const _checkWeakEvidenceStrongClaim = require('./weak-evidence-strong-claim.js').checkWeakEvidenceStrongClaim;
+// [r293] 第 246 维度 stolen_concept（偷取概念谬误：援引一个概念却又否认其
+// 赖以成立的能力，据此否定该概念本身）。模块 src/stolen-concept.js。
+const { checkStolenConcept } = require('./stolen-concept.js');
 // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差 /
 // volunteer bias / 自选组效果归因：群体自行决定是否进入某项目/工具/
 // 服务，再据此把结果差异归因于该项目本身——「自愿参加培训的员工绩效
@@ -2427,6 +2430,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 计算点。同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。wesc——
   // weak evidence strong claim 缩写，grep 0 命中无冲突。
   const wesc = _applyPedagogyRelaxation(_checkWeakEvidenceStrongClaim(_normText), "weak_evidence_strong_claim", pedagogyRelaxation);
+  // [r293] 第 246 维度 stolen_concept（偷取概念谬误）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。skc——
+  // stolen concept 缩写，grep 0 命中无冲突。
+  const skc = _applyPedagogyRelaxation(checkStolenConcept(_normText), "stolen_concept", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -3104,6 +3111,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r288 接线] 第 245 维度 weak_evidence_strong_claim 参与判定（弱证据强断言错配）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: wesc.score, name:'weak_evidence_strong_claim'},
+    // [r293] 第 246 维度 stolen_concept 参与判定（偷取概念谬误）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: skc.score, name:'stolen_concept'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -4371,6 +4381,8 @@ function discriminate(text, evidence = [], contentMode) {
     unfalsifiable_assertion: '把断言改成可以被推翻的形式：给出可观测指标、判决性条件与失败判据（「若 X 发生则本解释不成立」）；若断言指向当前不可观测的实体，须明示它何时、以何种观测可被检验，而不是把「测不到」当作支持',
     // [r288 接线] 第 245 维度 weak_evidence_strong_claim（弱证据强断言错配）。
     weak_evidence_strong_claim: '证据强度与断言强度错配：一个结论的确定性上限由它最弱的那条证据决定——传闻转述（听说/据说/网传/Sources say）、个人见证（我朋友/亲测/worked once）、泛称匿名信源都不可回溯，不足以承载「彻底治愈/百分之百/guaranteed」这类绝对化断言；要么把断言降到证据能支撑的程度（「可能有效，待验证」），要么换成可回溯的信源（临床数据/研究报告/具名来源），不得把不可核验的传闻包装成绝对化结论',
+    // [r293] 第 246 维度 stolen_concept（偷取概念谬误）。
+    stolen_concept: '偷取概念：论证援引了某个概念（科学/理性/逻辑/证据/真理/观测）却否认该概念赖以成立的能力（「证明不了/解释不了/一无所用」），再据此否定概念本身（「不可信/毫无价值/是循环」）——概念的能力被否认，论证却仍在暗中使用它。修法二选一：①保留概念并收窄结论（「科学只能处理可观测现象，超验问题它不覆盖」——范围限定不是否定）；②否定概念就不得再援引它作为依据（改用不依赖该概念的独立前提），并明示用什么替代；不得用「X 做不到 Y」推出「X 整体作废」',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -5603,6 +5615,17 @@ function discriminate(text, evidence = [], contentMode) {
     // #133 anecdotal（个例结局→领域结论）、#200 availability_bias 的射程
     // 边界见 src/weak-evidence-strong-claim.js 头注释。
     'weak_evidence_strong_claim',
+    // [r293] 第 246 维度 stolen_concept（偷取概念谬误：能力型概念×能力否认
+    // 谓语×贬斥结论——「科学证明不了上帝，所以科学一无所用」式自拆台论证）
+    // 登记。verify 级——单句也可能是对错误论证的正确转述与批评（「用科学
+    // 暂时解释不了的事来否定科学本身，是偷取概念谬误」正是本族要教的判别
+    // 动作）、哲学教学、认识论讨论，rewrite/block 会误伤。verify 的含义是
+    // 「这段文本援引一个概念的能力却又否认该能力并据此否定概念本身，逻辑
+    // 上自相矛盾，需要先指出矛盾点再评估其结论」。与 #245
+    // weak_evidence_strong_claim（弱证据类型×绝对化断言）、#136
+    // circular_reasoning（循环论证）、#60 unfalsifiable_confirmation
+    // （双果自证）的射程边界见 src/stolen-concept.js 头注释。
+    'stolen_concept',
   ]);
   // pass：无问题通过
 
@@ -6174,6 +6197,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 弱证据类型腿×绝对化断言腿，两腿共现+邻近窗，四类豁免）。wesc——
     // weak evidence strong claim 缩写。
     weak_evidence_strong_claim: wesc,
+    // [r293] 第 246 维度 stolen_concept 补登记（偷取概念谬误）。skc——
+    // stolen concept 缩写。同上：九处一次接齐。
+    stolen_concept: skc,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -6512,6 +6538,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r162] 第 162 维度 incredulity 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       inc.count ? inc.count + ' 处诉诸个人怀疑' : '',
+      // [r293] 第 246 维度 stolen_concept 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      skc.count ? skc.count + ' 处偷取概念' : '',
       // [r164] 第 163 维度 doublespeak 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ds.count ? ds.count + ' 处语义洗白' : '',
@@ -17261,6 +17290,9 @@ module.exports = {
   // [r288 接线] 第 245 维度 weak_evidence_strong_claim 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   _checkWeakEvidenceStrongClaim,
+  // [r293] 第 246 维度 stolen_concept 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkStolenConcept,
   // [r251] 第 227 维度 means_as_end 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkMeansAsEnd,
