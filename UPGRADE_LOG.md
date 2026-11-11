@@ -1,3 +1,47 @@
+## r296 — 信息与激励盲区三子族（逆选择/道德风险/搭便车）插件层 dispatch（真升级②+③+④）
+
+**日期** 2026-11-11 20:43–21:00 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 src/index.js 改动、gate 层维度计数不变，不 bump）  **轮次** r296（kind: dimension）
+
+### 开轮状态
+基线四门禁全绿（hf4-gates.sh --json：verify 16/16、guard-abilities 20/20 维度 246、doc-numbers 24/24、bidirectional 召回 52/52 误拦 302/326）。provisional 孤儿探测器井已枯竭（r295 消费 18 个后全部有 dispatch），转新家族。两轮共 22 候选探针实证（v6.8.174 gate() 全量）：A 近因加权/B 预防原则滥用/C 确定性效应/D 委托代理脱节被既有维度代拦或边界模糊，E 信息与激励盲区三子族攻击 10/10 完全穿透、econ 插件 0/0——E 胜出，12:43Z 认领并推送（commit 3113e64）。
+
+### 缺口实证（改前探针，两轮 22 候选）
+- 探针一（probe-r296.js，12 候选 A–L）：A_recency_weighting / D_moral_hazard_denial / E_adverse_selection_denial / F_free_rider / G_jevons_overclaim / I_prevalence_paradox 六个零命中确认
+- 探针二（probe-r296b.js，10 经济决策候选 M–V + econ 插件对照）：机会成本否认、逆选择、道德风险、搭便车四类全零命中，econ 插件 0/0
+- src/ 下无任何 adverse/lemon/moral-hazard/free-rider 相关文件（grep 实证）——全新家族
+
+### 落地内容
+1. `src/incentive-blind-spot.js`（新增，约 16KB，provisional 第 247 维度）：三子族两腿共现判据（缺一不判）
+   - adverse_selection 逆选择忽视：池子/信贷语境（保险/保费/参保/医保/贷款/信贷/二手车；EN insurance pool/premium/loan/used car）× 无扭曲断言（自然吸引各类风险/对保费没有影响/自动平衡/不存在问题；EN attracts a balanced mix/no effect on premiums/balances itself）
+   - moral_hazard 道德风险忽视：兜底/保障语境（全额/兜底/担保/包赔/补贴/救助/注资；EN full coverage/guarantee/backstop/bailout/safety net）× 行为不变断言（不会改变/不会削弱/不会更冒险/没有影响；EN does not change behavior/will not affect incentives）
+   - free_rider 搭便车盲区：集体/公共语境（公共/大家一起/别人/总会有人/团队/社区；EN public good/community/others/someone else）× 脱责式退出（我个人不用参与/轮不到我出力/让别人去管；EN I don't need to do my part/let others contribute/someone else will handle it）
+   - 中英分列腿族；翻转短语守卫（不等于/并非/不能说/未必；EN not that/far from——腿②自身含「不会/没有」类否认词即攻击形态，故不用通用否定守卫，只拦整体翻转）；纠偏豁免（防范逆选择/guard against moral hazard 整条豁免）；近距离窗 ZH60/EN180；`__internals()` 暴露全部腿族常量供负例注入
+2. `src/plugins/econ-reasoning-check/index.js`：FAMILIES +3（18→21 族，econ 13→16），postprocess.think 真 dispatch + MCP `heartflow_econ_fallacy_check` action 域 +3 键；version 1.0.0→1.1.0；src/index.js 零改动
+3. 测试三件套：`test/incentive-blind-spot.test.js`（12/12）+ `test/round-296-incentive-blind-spot-wiring.test.js`（26/26，含 E 段真引擎 dispatch 实证 penalty+warning、F 段真实 HTTP JSON-RPC e2e 三族 action）+ `round-295` 轮测随族表 18→21 更新（63/63）
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/16
+- node scripts/guard-abilities.js — 20/20（dimensions 键 246，本轮不变）
+- node test/doc-numbers-accuracy.test.js — 24/24
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤）
+- test/incentive-blind-spot.test.js — 12/12（攻击中英 21 条+维度归属+档位；良性 24 条零误伤含 10 条疑难 FP 压力；豁免/边界锁；负例注入双腿+豁免+距离窗）
+- test/round-296-incentive-blind-spot-wiring.test.js — 26/26（A 模块/B 插件/C FP 22 条/D 负例注入 5 组/E 引擎 think 路径真 dispatch：_discrimination.econReasoning moral_hazard 族 + _confidencePenalty>0 + warning 含「道德风险忽视」/F 真实 server tools/call 三族 action hit:true/G 维度 246 不回归）
+- test/round-295-econ-reasoning-wiring.test.js — 63/63（族表 18→21，B/E 段三新族全过）
+- 模块层 FP 扫描 — 官方良性语料 326 条（gate-benchmark 97 + extended 154 + vertical 150 + mixed 25）**FP=0**
+- 负例注入删条 — **15 个 → 15 个变红，0 个未变红**（12 双腿删除 + 1 纠偏豁免删除 + 1 距离窗承重 + 1 翻转守卫样本；键名取自 `__internals()` 实测暴露）
+- 海外扫描 — 三源如实空返（arXiv OR 噪声查询 parse-fail、GitHub 0 repos、S2 限流），按既有形态纯规则自建，未编造命中
+
+### 已知未修项（含为什么不修）
+1. **gate 层 dimMap 接线未做**——src/index.js 是 4 号写保护红线（宪法硬禁令），三族以 provisional 247 登记，接线规格（导出函数签名/VERIFY 级建议/九处接入点清单）写在 `coordination/reports/r296-dimension-agent4.md` §五，交接 1 号主力。
+2. **跨句腿形态待红队压测**——窗内跨句（池语境上一句、无扭曲断言下一句）按设计命中，但修饰变体/倒装/否定对冲的矩阵测试未做，交接 2 号。
+3. **data/test-count.json 缓存基线 21,237 通过/150 失败**为 r296 前最后一次全量（非本轮引入）；本轮 +44 断言（2 新文件 + r295 文件扩 6），全量回归后需重跑 measure + sync 落账（模块数 163→164、测试数 +44）。
+4. **清单外漂移 2 处**（CONTRIBUTING.md 维度数 191≠246、CURRENT_STATE.md 模块数 162≠163）r295 起记录，非门禁查的形状，留 1 号判断。
+
+### 踩坑（三条）
+1. **正则可选组里的「有」抢先匹配挡住「有任何」**：②-b 腿首版写 `(?:有什么|什么|任何)?`，「不会有任何改变」里 `有` 不在组内→整体不命中；给组里补 `有` 后又踩第二种形态——`有` 比 `任何` 先匹配、吃掉属于「任何」的「有」，剩下「任何改变」无法被动词组接住。修法：拆成两级独立可选组 `(?:有)?(?:什么|任何|有何)?`，两种语序（有什么/有任何/有何）都覆盖。
+2. **负例注入用 /(?!)/ 关闭数组型腿会崩**：既有模块的 `collectLegs` 用 `for...of` 遍历腿数组，注入正则（非数组）抛 "aList is not iterable"——r295 轮测的注入形态是 /(?!) 但那批模块的遍历恰好容忍。本模块 collectLegs 加 `Array.isArray` 卫兵，非数组按空处理，两种注入形态（[] 或 /(?!)/）都走通，单测双形态都断言。
+3. **腿①名词是腿②短语的子串时，超距测试假阳性**：「保险池…这对保费没有影响」中「保费」既是池名词又是腿②短语成分，距离恒 0——超距测试必须让腿②不含腿①名词（换「统筹基金没有压力」形态）才测得真实距离窗。
+
 ## r295 — econ-reasoning-check 插件层 + MCP 18 族首次 dispatch（真升级③+④）
 
 **日期** 2026-11-11 16:48–17:40 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.173 → 6.8.174  **轮次** r295（kind: dimension）
