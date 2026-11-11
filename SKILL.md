@@ -77,12 +77,12 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.173. Nothing here is copied
+Every number below was measured on this repository at v6.8.174. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.173 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.174 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
 | Modules registered | 163 | `Object.keys(hf._modules).length` after `start()` |
@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,323 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 246 | `dimMap` keys in `src/index.js` |
 | MCP tools | 188 | tool definitions exposed via `tools/list` |
-| Test suite | 21,183 passing / 147 failing | `node test/run-all.js` (full run 2026-11-11 751.6s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293） |
+| Test suite | 21,237 passing / 150 failing | `node test/run-all.js` (full run 2026-11-11 751.6s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293） |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
