@@ -1,0 +1,20 @@
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+gate-benchmark | total 0 | EN 0 | 当前EN命中relative_pration 0
+gate-benchmark-extended | total 0 | EN 0 | 当前EN命中relative_pration 0
+vertical-benign | total 0 | EN 0 | 当前EN命中relative_pration 0
+benign-mixed | total 25 | EN 21 | 当前EN命中relative_pration 0

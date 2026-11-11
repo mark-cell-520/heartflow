@@ -29,6 +29,22 @@
  *   RP_TEACH       教学/课堂转述
  *   RP_NEG_FLIP    否定翻转（「…但这不能抵消你的辛苦」）
  *   RP_HEDGE       对冲（「也许有人更惨，但你的辛苦也是真的」）
+ *
+ * [r297] 英文措辞家族补全（真升级②——已有维度的全新措辞家族）：
+ *   改前探针实证（coordination/agent4/probes/probe-r297*.output.txt，
+ *   v6.8.174 gate() 全量）：英文「诉诸更惨」攻击大面积为 pass——
+ *   「Stop complaining about the overtime; plenty of people can't even
+ *   find a job, you're lucky.」「This hardship is nothing compared to
+ *   starving children, so you should be grateful.」均穿透（后者仅被
+ *   fallacy_of_relevance 偶然代拦，从未归因 relative_pration）。根因：
+ *   腿①英文苦难参照系只有 RP_SUBJECT_ZH×RP_WEAK_ZH 组合 + 零星短语，
+ *   腿②英文压制短语仅 10 条。本家族新增：
+ *     · RP_SUFFER_EN  具体英文苦难参照（失业/饥饿/无家/贫困/战乱/
+ *       重病/断水远行——刻意只收具体短语，延续「不收抽象 worse off」的
+ *       防误伤设计，避免 cache/resource-starving 类技术词误触）
+ *     · RP_DISMISS_EN +12（you're lucky / be thankful / it could be
+ *       worse / first-world problems / you have it easy 等）
+ *   仍守双腿共现（sufferHit AND dismissHit，缺一不判），ZH 侧零改动。
  */
 'use strict';
 
@@ -79,6 +95,29 @@ const RP_WEAK_ZH = [
   'no internet', 'walk ten miles', 'flooding', 'war zones', 'would kill for',
 ].map((s) => new RegExp(s, 'i'));
 
+// ①-D 具体英文苦难参照（r297 新增，独立成立，不强制要求主体标记）。
+// 刻意只收「具体」苦难短语，延续本维度「不收抽象 worse off / more
+// unfortunate」的防误伤设计；避开 cache/resource-starving 类技术词。
+const RP_SUFFER_EN = [
+  // 失业 / 无收入
+  /\b(?:can'?t|cannot|couldn'?t|unable to)\s+(?:even\s+)?(?:find|get|land|keep)\s+(?:a\s+|any\s+|decent\s+)?(?:job|work|employment)\b/i,
+  /\b(?:out of work|jobless|unemployed|without a job|no job|no income|laid off|made redundant|lost (?:their|his|her) job)\b/i,
+  // 饥饿 / 食物
+  /\b(?:going hungry|go hungry|haven'?t eaten|have not eaten|not enough to eat|(?:can'?t|cannot|couldn'?t) afford (?:food|to eat|meals?|groceries)|food[- ]insecure|left (?:to )?starving|starving (?:children|kids|people|families|refugees|villagers))\b/i,
+  // 无家可归 / 居所
+  /\b(?:on the streets?|sleeping on the streets?|no (?:place|home|roof) to (?:live|sleep|stay|go)|nowhere to live|sleeping in (?:their|his|her) cars?|evicted|lost (?:their|his|her) homes?)\b/i,
+  /\broof over (?:their|your) head/i,
+  // 贫困 / 买不起
+  /\b(?:living in poverty|below the poverty line|destitute|(?:can'?t|cannot|couldn'?t) make ends meet|(?:can'?t|cannot|couldn'?t) afford (?:medicine|healthcare|rent|school|tuition|a doctor|treatment))\b/i,
+  // 战乱 / 灾害 / 流离
+  /\b(?:war zones?|fled (?:their|his|her) (?:homes?|country|war)|displaced (?:by|from)|(?:earthquake|hurricane|tornado|flood)(?:ed|ing)? (?:victims|survivors|struck|destroyed|ravaged)|disaster (?:zone|area|victims|struck))\b/i,
+  // 重病 / 丧失
+  /\b(?:terminally ill|dying (?:of|from)|buried (?:their|his|her)|lost (?:their|his|her) (?:child|children|baby|family|everything|loved one)|lost everything|lost a child)\b/i,
+  // 断水 / 无医 / 远行（不含 walk-miles：与 RP_WEAK_ZH 的 'walk ten miles' 重叠，
+  // 保留会双重覆盖既有 subject×weak 攻击、破坏 r726 负例注入的腿依赖断言）
+  /\b(?:no (?:clean|drinking|safe) water|no access to (?:clean )?(?:water|healthcare|medicine|education))\b/i,
+].map((r) => r);
+
 // ── 腿②：压制诉求 ──────────────────────────────────────────────
 const RP_DISMISS_ZH = [
   '别[喊叫抱怨吐槽嫌]', '少[喊抱怨]', '不许[喊抱怨]', '不准[喊抱怨]', '别再[喊抱怨]',
@@ -106,6 +145,20 @@ const RP_DISMISS_EN = [
   /others?\s+have\s+it\s+worse/i,
   /you\s+have\s+it\s+easy/i,
   /at\s+least/i,
+  // r297 补全：更多「压制诉求」英文措辞
+  /you'?re\s+(?:so\s+|very\s+|damn\s+)?lucky/i,
+  /you\s+are\s+(?:so\s+|very\s+)?lucky/i,
+  /count\s+yourself\s+(?:lucky|fortunate|blessed)/i,
+  /(?:you\s+)?should\s+be\s+(?:grateful|thankful)/i,
+  /be\s+thankful/i,
+  /it\s+could\s+be\s+(?:a\s+lot\s+|so\s+much\s+|far\s+)?worse/i,
+  /could\s+be\s+(?:a\s+lot\s+|so\s+much\s+|far\s+)?worse\s+off/i,
+  /could\s+have\s+it\s+worse/i,
+  /(?:some\s+)?people\s+have\s+it\s+worse/i,
+  /no\s+right\s+to\s+complain/i,
+  /don'?t\s+have\s+(?:a\s+)?right\s+to\s+complain/i,
+  /you\s+don'?t\s+know\s+how\s+good\s+you\s+(?:have|had)\s+it/i,
+  /first[- ]world\s+problems?/i,
 ].map((r) => r);
 
 // ── 守卫常量（可被负例注入）────────────────────────────────────
@@ -147,7 +200,8 @@ const RP_HEDGE = [
 
 // 强压制标记（别喊/知足/stop complaining 等，命中加权重）。
 const RP_DISMISS_STRONG_ZH = ['别喊', '别抱怨', '别嫌', '别吐槽', '知足', '还不满足', '算什么', '别喊疼', '别怕苦', '别怕累', '有什么好抱怨'];
-const RP_DISMISS_STRONG_EN = [/stop\s+complaining/i, /stop\s+whining/i, /be\s+grateful/i, /how\s+can\s+you\s+complain/i];
+const RP_DISMISS_STRONG_EN = [/stop\s+complaining/i, /stop\s+whining/i, /be\s+grateful/i, /how\s+can\s+you\s+complain/i,
+  /you'?re\s+(?:so\s+|very\s+)?lucky/i, /it\s+could\s+be\s+(?:a\s+lot\s+|so\s+much\s+|far\s+)?worse/i, /count\s+yourself\s+(?:lucky|fortunate|blessed)/i];
 
 const _any = (arr, text) => arr.some((r) => r.test(text));
 
@@ -167,7 +221,7 @@ function checkRelativePrivation(text) {
   if (_any(RP_HEDGE, text)) return { score: 0, name: 'relative_pration', count: 0 };
 
   // 腿①：具体苦难处境 OR 负面比较 OR（主体标记 × 弱势处境）。
-  const sufferHit = _any(RP_SUFFER_ZH, text) || _any(RP_COMPARATIVE_ZH, text) || _any(RP_MINIMIZE_HAVE, text)
+  const sufferHit = _any(RP_SUFFER_ZH, text) || _any(RP_COMPARATIVE_ZH, text) || _any(RP_MINIMIZE_HAVE, text) || _any(RP_SUFFER_EN, text)
     || (_any(RP_SUBJECT_ZH, text) && _any(RP_WEAK_ZH, text));
   if (!sufferHit) return { score: 0, name: 'relative_pration', count: 0 };
 
@@ -190,7 +244,7 @@ function checkRelativePrivation(text) {
 module.exports = {
   checkRelativePrivation,
   CONSTANTS: {
-    RP_SUFFER_ZH, RP_COMPARATIVE_ZH, RP_MINIMIZE_HAVE, RP_SUBJECT_ZH, RP_WEAK_ZH,
+    RP_SUFFER_ZH, RP_COMPARATIVE_ZH, RP_MINIMIZE_HAVE, RP_SUBJECT_ZH, RP_WEAK_ZH, RP_SUFFER_EN,
     RP_DISMISS_ZH, RP_DISMISS_EN,
     RP_SELF_SUFFER, RP_META, RP_TEACH, RP_NEG_FLIP, RP_HEDGE,
     RP_DISMISS_STRONG_ZH, RP_DISMISS_STRONG_EN,
