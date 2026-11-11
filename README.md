@@ -16,9 +16,9 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 245 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
-×  1,316 dispatch routes  ×  20,964 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  21,118 passing tests  ×  2 npm dependencies
 45 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
-×  1,316 dispatch routes  ×  20,964 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  21,118 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -206,7 +206,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.171**. Not marketing copy.
+Measured on this repository at **v6.8.172**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -215,7 +215,7 @@ Measured on this repository at **v6.8.171**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 245 |
 | MCP tools | 185 |
-| Test suite | 20,964 passing / 139 failing | `node test/run-all.js` (full run 2026-11-11 643.9s; passed baseline resynced per r241/r412 precedent — failed 139 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复)) |
+| Test suite | 21,118 passing / 144 failing | `node test/run-all.js` (full run 2026-11-11 751.6s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声)) |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -387,6 +387,7 @@ duplicate the log.
 | 6.8.170 | 2026-11-11 | r288（原 r287 撞号重编号）：第 245 维度 `weak_evidence_strong_claim` 弱证据强断言错配上线（真升级①）——弱证据腿 × 绝对化断言腿双腿共现，维度 244→245、VERIFY 211→212、模块 162 不变；`src/index.js` 接线 8 处；轮测注入删条全绿；论文依据 arXiv 2605.03534（SURE-RAG）|
 | 6.8.169 | 2026-11-11 | r287（原 r286 撞号重编号）：`false_dilemma` 站队胁迫二分族上线（真升级②）——认同等同式/否定行为×负面定性单独支/逼迫二选/EN 立场负载 either-or/施压/威胁后果 8 常量 + 3 路由，维度计数 244 不变、`src/index.js` 零改动；轮测 84/84、注入删条 8/8、池化穿透 5/8→0/8 |
 | 6.8.171 | 2026-11-11 | r289：`false_dilemma` 要么A要么B×贬损标签族上线（真升级②）——要么-frame/不是A就是B frame × 定性等式（就是-link）× 贬损标签（拖后腿/绊脚石/老古董/躺平摆烂/dead weight）、否定行为×主语插入×品质标签（不转这个帖子，你就是没良心）、EN if you're not with us…against us/either you join…dead weight 共 6 常量 + 5 路由，维度计数 245 不变、`src/index.js` 零改动；轮测 96/96、注入删条 6/6、池化穿透 8/9→0/9 |
+| 6.8.172 | 2026-11-11 | r291：`appeal_to_nature` 诉诸自然「非自然/人造/工业即有害」反向族上线（真升级②）——腿①' 非自然性生产断言 ZH 7 支 + EN 4 支 × 腿②' 危害/不如结论 ZH 3 支 + EN 2 支，双路由不交叉配对（自然×优越 / 非自然×危害，交叉组合不判）；自然性裸存在句补腿 n8/e9/s6；附 `no_true_scotsman` HEDGE_RE「不可能」假豁免修复；维度计数 245 不变、`src/index.js` 零改动；轮测 91/91、池化穿透 9/13→3/13 |
 | 6.8.168 | 2026-11-11 | **第 244 维度 unfalsifiable_assertion（不可证伪断言）上线** — 判别「**在构造层面排斥任何反证观测的实质性断言**」结构：断言本身排除了任何能观测到它不成立的场景，于是永远无法被推翻。四形：**CN-A 不可观测实体**（能量场/气场/祖先的庇佑在起作用，只是仪器测不到）、**CN-B 事后可调解释**（没显灵是因为你心不够诚/市场不好只是暂时的调整）、**CN-C 无限延期验证**（再等等/时机未到/下次一定）、**CN-D 万能免责**（这套方法永远有效，不灵只能说明你没做对/市场永远是对的，错的只能是你的仓位）。判据**两腿共现**：腿①实质性结论/预测/机制断言，腿②构造上排除反证观测；CN-D 自身即完整结构独立成案。边界划清：#202 unfalsifiable_confirmation 管双果自证（事后解释层），#182 absence_of_problems 管有界阴性结论全称化，#62 appeal_to_ignorance 管举证责任分配——本维度管「断言构造本身排除反证」。豁免表七组：科学假说、可检验预测、范围限定、对冲、教学转述、拒绝推断、疑问句。模块 `src/unfalsifiable-assertion.js`（406 行，两腿判据 + 四形 + 豁免表），`src/index.js` 七处接线（require / 计算点 / allDims / dimMap×2 / guidance / VERIFY_DIMS / 导出）。验证：轮测 `test/round-285-unfalsifiable-assertion.test.js` 9/9（攻击 ZH 11/11 + EN 11/11 全命中、良性 48 条零误伤、gate 入口攻击全 rewrite 且维度承重、CN-D 独立成案、腿①缺失不误判、空输入不崩）；四门禁 verify 16/0、guard 20/20@244维、doc 24/24、双向 52/52 + 误拦 302/326。维度 243→244，VERIFY 210→211，模块 162 不变。 |
 | 6.8.167 | 2026-11-11 | **统计素养 wired 维度 cue-density 轴共现观察族扩展（r285，真升级②）** — `base_rate_neglect`（基础概率忽视）第二轴落地，来源海外真实命中论文 arXiv "Two base rates, two weights: base-rate neglect has a second axis"（r285 扫描入档）：把共现读成判断需两次基础概率校正——结果先验（古典轴，既有腿）+ **线索自身出现频率**（本轮新增）。缺口实证：改前统计素养五候选族 24 条新措辞攻击中本族 4/8 完全穿透（gate pass 且零维度承重）为最高。新增腿① `CUE_ZH`/`CUE_EN` 共现观察族（十个被骗的老人里九个都接过陌生来电 / Nine out of ten fraud victims / Every executive who got fired / Almost all the companies that collapsed / 有个共同点）、腿② `CUE_CONF_ZH`/`CUE_CONF_EN` 新归属落点（你很可能已经被盯上了 / 八成也危险了 / 铁定会出事；probably being targeted / likely next on the list / going to fail）、豁免 `EXEMPT_CUEDENSITY`（线索本身就很常见 = 计及 cue 密度的正确推理）。轮测 53/53；负例注入删条 13/13 变红；存量 round-263/279/267 不回归；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。 |
 | 6.8.165 | 2026-11-11 | **因果与反事实推理 wired 维度自然措辞家族扩展（r283-a，真升级②）** — `common_cause`：腿①共变表补时段共变无并列形（冰淇淋卖得多的月份溺水事故也多）、的-link 比较平行形（消防车越多的火灾损失越大）、EN with-more 平行共变形（Cities with more police have more crime）；共动词表并入 16 个飙升族度词（飙升/暴涨/激增/骤降…，并入既有首元素，round-264 长度断言不破）。`collider_bias`：腿②共变表补裸比字比较形（比例比普通人高）、EN least·most 交叉形；腿③结论表补 dismiss+养生价值族（不会说话/情商低/不值钱/长寿/养生/保健——良性靠腿①条件筛选+腿②比较共变+结论形三重要件）。`reverse_causation`：处置表补纪律处分/学业处置/关系解除族（劝退/开除/降级/离婚/拉黑）、EN expelled/demoted/held back 族；结果表补裸表现结果族（成绩差/幸福感更低）；群体名词补夫妻/情侣。探针穿透 18/36 → 13/36（剩余 3 条为设计内边界：无结论观察句本身非谬误断言）；轮测 95/95（攻击 12 全承重 + 良性 14 零误伤 + 既有对照 7 + 注入删条 17/17 变红 + 登记 11）；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。留痕：「看来」口语推断词族曾扩后经注入-删条否证非承重（co1/co4 均经 C-b 裸结论路径命中），已撤回并留注记。 |
