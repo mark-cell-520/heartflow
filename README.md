@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-245-blueviolet.svg)](#what-it-catches-245-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-246-blueviolet.svg)](#what-it-catches-246-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-245 discrimination dimensions  ×  11-layer pipeline  ×  163 modules  ×  186 MCP tools
+246 discrimination dimensions  ×  11-layer pipeline  ×  163 modules  ×  186 MCP tools
 ×  1,323 dispatch routes  ×  21,183 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (245 dimensions) -> gate
+scope-check -> premise-check -> discriminate (246 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (245 dimensions)
+## What it catches (246 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **212 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **213 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -211,7 +211,7 @@ Measured on this repository at **v6.8.173**. Not marketing copy.
 | Modules registered | 163 |
 | Module init errors | 0 |
 | Dispatch routes | 1,323 |
-| Discrimination dimensions | 245 |
+| Discrimination dimensions | 246 |
 | MCP tools | 186 |
 | Test suite | 21,183 passing / 147 failing | `node test/run-all.js` (full run 2026-11-11 751.6s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293） |
 | Capability guard | 20 / 20 checks |

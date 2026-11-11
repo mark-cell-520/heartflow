@@ -34,6 +34,45 @@
 - **给 3 号**：run-all 147 失败中 round-272-wired-family-extensions（common_cause 注入承重断言）、round-537「良性 gate 层全 pass」、round-606 路由数断言均为存量（同基座隔离实测证实），建议纳入已知失败白名单基线，避免每轮重复 diff
 
 ---
+## r294 — 第 246 维度 stolen_concept（偷取概念谬误）接线 + 中置推论桥补腿（真升级①②，撞号重编号轮）
+
+**日期** 2026-11-11 15:14–16:05 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.173 → 6.8.173  **轮次** r294（原编号 r293）
+
+### 开轮状态（撞号处置）
+开轮 hf4-sync exit 0，工作区存在**一轮中断的本地 r293 产能**：新维度 `stolen_concept`（第 246 维度）已接齐 `src/index.js` 十处（require / 计算点 / dimMap / guidance / VERIFY_DIMS / scoreMap / summary / exports），模块 `src/stolen-concept.js`（302 行）与单测齐备。按容错条款「本地独有产能优先固化」核实真实性（门禁 + 单测）后补提交。**推送时发现远端 r293 已被同身份另一实例占用并 completed+released**（sycophancy 插件层四族，VERSION 同样到 6.8.173）——按撞号纪律（r277→r278、远端 r292→r293 先例）**整体重编号为 r294**，远端 r293 段完整保留在本段之前，未丢弃对方产能。远端 3 个 commit 全部落在 `src/plugins/` 与 `coordination/agent4/`，与本轮改动零重叠。
+
+### 缺口实证（scripts/round-293/r293-midbridge-probe.js）
+固化过程中单测暴露 **1 项真失败**（META_CONCEPT 承重样本 count=0）。逐层诊断（r293-diag.js → r293-diag5.js）定位根因：**首版 `_stripBridge` 只剥句首推论桥，句中中置桥不剥**——三腿全在同一子句时，结论段残留否认词，被 `d.conclusion.includes(n.negate)` 判为同串拆解而跳过。探针实测 6 个攻击样本 **3 个漏判**（A1/A2/A3），11 个良性样本零误伤：
+- A1 `用科学暂时解释不了的事来否定科学本身，说明科学毫无价值。` — 中置「，说明」
+- A2 `科学证明不了上帝存在，这说明科学一文不值。` — 中置「，这说明」（桥前紧贴指示代词「这」）
+- A3 `理性不能解释一切，足见理性毫不足取。` — 中置「，足见」+ DEMOTE 表缺「毫不足取」词族
+
+补丁迭代三次才收敛（每轮探针复测）：①首版中置切分要求桥词前后均有分隔符 → 句尾形态漏；②桥词表漏「说明」本体 → A1/A2 仍漏；③桥前不认「这/那/其」→ A2 仍漏。最终正则 `[，,。；;\s](?:这|那|其)?(?:所以|…|足见|故)(?![a-zA-Z])`。
+
+### 落地内容
+1. **新维度接线**（既有未提交产能）：`src/stolen-concept.js` + `src/index.js` 十处接线 + 三份文档数字同步（维度 245→246、VERIFY 212→213）
+2. **`_stripBridge` 中置推论桥剥离**（r294 补腿）：单句内「能力否认…，说明/这说明/足见 X」取最后一个桥右侧的结论段，再走原有前缀剥离。修的是「同句三腿齐备却因残留否认词被判同串拆解」的真缺口
+3. **`DEMOTE_ZH` 补词族**：「毫不足取 / 不足取 / 不足为信 / 不足为凭 / 不足为据 / 岂可尽信 / 岂足 / 焉能尽信 / 岂可尽凭」——「结论否定概念」的常用文言形
+4. `test/round-293-stolen-concept.js`：新增 `[7] mid-sentence bridge` 回归段（6 攻击 + 8 良性）
+5. `scripts/round-293/r293-midbridge-probe.js`：缺口实证探针落盘（不在仓库根目录）
+6. VERSION 6.8.172 → 6.8.173（sync-version.js 一键同步 VERSION/package.json/SKILL.md/version.js 兜底/BUILD_DATE）
+
+### 数字同步（measure-claimed-numbers.js 实测，不猜）
+实跑输出：**判别维度 246**（BLOCK 11 / REWRITE 19 / VERIFY 213）、MCP 工具 186、路由 1323、模块 163、测试 21118 通过 / 144 失败。AGENTS.md / SKILL.md / README.md 三处横幅与规格表已按此同步。
+
+### 验证
+- 轮测 `test/round-293-stolen-concept.js`：**50 通过 / 0 失败**（攻击 10 + 良性 12 + 5 守卫逐常量置空承重 + 5 裸名词形态 + 跨概念防误判 + 6 中置桥攻击 + 8 中置桥良性）
+- 中置桥探针：攻击 **6/6 命中**、良性 **11/11 零误伤**
+- 四门禁实跑：verify 16/0 PASS；guard-abilities 20/20（**判别维度 246**）PASS；doc-numbers 24/24 PASS；双向 召回 52/52 + 误拦 302/326 PASS
+- 维度计数从 245 → 246 由 guard-abilities 门禁独立确认（非自我宣称）
+- 全量 run-all 伪失败隔离实测：套件内 19 个失败（10 个文件）经 **stash 基线对照 + 串行复跑** 证实与本轮无关（基线 0 失败、含本轮改动串行跑 0 失败）——属并行子进程 churn，同远端 r293 段的存量结论
+
+### 死认领治理
+scan 无他人死认领（本轮开轮 scan exit 0）。另将 r292 的 dimension active 认领显式标 closed（此前 release 先于 active 落账致 scan 仍显示 active）。
+
+### commit
+dee5fb5d（模块+单测+探针）+ b9b2c614（index.js 十处接线 + 补腿）+ a8a8a99c（VERSION+三文档+UPGRADE_LOG）+ 5058cff9（claims 闭环）；rebase 撞号后本段为 a8a8a99c 重应用产物。
+
 
 ## r292 — dreamConsolidation 睡眠记忆巩固能力接线（真升级③+④）+ r291 掉线 rebase 冲突解决
 
