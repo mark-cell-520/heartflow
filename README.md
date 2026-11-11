@@ -16,9 +16,9 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 245 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
-×  1,316 dispatch routes  ×  20,937 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  20,964 passing tests  ×  2 npm dependencies
 45 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
-×  1,316 dispatch routes  ×  20,937 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  20,964 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -215,7 +215,7 @@ Measured on this repository at **v6.8.171**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 245 |
 | MCP tools | 185 |
-| Test suite | 20,937 passing / 136 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
+| Test suite | 20,964 passing / 139 failing | `node test/run-all.js` (full run 2026-11-11 643.9s; passed baseline resynced per r241/r412 precedent — failed 139 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复)) |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
