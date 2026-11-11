@@ -1,0 +1,27 @@
+=== 攻击命中（每族）===
+  ✓ budget_value_conflation (econ) score=0.6
+  ✓ average_marginal_conflation (econ) score=0.6
+  ✓ mental_accounting (econ) score=0.72
+  ✓ perverse_incentive (econ) score=0.62
+  ✓ winners_curse (econ) score=0.62
+  ✓ tragedy_of_commons (econ) score=0.72
+  ✓ illusion_of_control (econ) score=0.72
+  ✓ disposition_effect (econ) score=0.72
+  ✓ endowment_effect (econ) score=0.72
+  ✓ anchoring_effect (econ) score=0.62
+  ✓ present_bias (econ) score=0.72
+  ✓ peak_end_rule (econ) score=0.62
+  ✓ effort_justification (econ) score=0.62
+  ✓ p_hacking (stats) score=1
+  ✓ inverse_gamblers_fallacy (stats) score=0.74
+  ✓ significance_effect_size (stats) score=0.72
+  ✓ selection_on_dependent_variable (stats) score=0.62
+  ✓ ad_hominem (stats) score=0.55
+攻击: 18/18 命中
+=== 良性零误伤（前 12 条）===
+良性: 12/12 零误伤
+=== 性能基准（2000 字结论 × 50 次）===
+50 次 × 2000 字 = 39ms（均 0.8ms/次）
+守卫: empty.score= 0 short.score= 0 null.score= 0
+only=anchoring_effect → 1 族, keys: anchoring_effect
+only=ad_hominem 于锚定句 → 0 族（应为 0）
