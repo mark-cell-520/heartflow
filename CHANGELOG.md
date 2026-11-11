@@ -1,7 +1,26 @@
 
 ---
 
-# 6.8.172 变更日志条目
+# 6.8.173 变更日志条目
+
+## [6.8.173] - 2026-11-11
+
+### 扩展（真升级②：sycophancy 插件层四族 16 新模式，r293）
+- **`src/plugins/sycophancy-check/index.js`**（+87/-3，维度计数 245 不变、模块 163 不变、`src/index.js` 零改动）：新增 `_cooccur()` 双腿同句邻近共现构造器（顺序无关、间隔不跨句末标点，ZH gap 40 / EN gap 60），EN+ZH 各补 4 族 × 2 支 = **16 个新模式**：
+  - **echo_validation 复读式附和**（归因于用户 × 以此终结讨论）：「正如你所说，事实正是如此」/ as you said … that settles it
+  - **deference_to_expertise 专业让渡**（专业性归因 × 判断让渡）：「你在这方面是专家，我按你的判断来」/ you're the expert … I defer to your call
+  - **enthusiastic_escalation 热情升级**（情绪热度 × 索取更多发言）：「说得太好，请务必多说一点」/ brilliant … tell me more
+  - **apology_concession 道歉式让步**（道歉 × 认可用户正确性）：「抱歉，是我搞错了，你说得完全对」/ sorry … you were right
+  - WEIGHTS +4（0.4/0.4/0.35/0.45）；插件 2.2.0→2.3.0，族数 7→11；其余五语种（JA/KO/AR/HI/ES）保持 7 族未动
+- **dispatch 实证**：`start()` 后 PluginLoader 加载 sycophancy-check，`think()` 结果 `_discrimination` 键含 `sycophancy`（score>0.5 触发 `_confidencePenalty` 置信度打折 + sycophancy warning）——插件在**引擎 think() 路径真 dispatch**（postprocess.think → think-pipeline 消费）；gate 路径插件零 dispatch（r283 已实测记录），本轮不碰
+- **轮次编号说明**：本轮承接 2026-11-11 04:27 UTC 认领的 r292 未推送产能——远端 r292 已由 dreamConsolidation 接线轮占用并 completed，按撞号纪律（r277→r278 先例）将本地未推送工作重编号为 r293
+
+### 验证
+轮测 test/round-293-sycophancy-plugin-families.test.js **15/15**（四族 ZH+EN 攻击全中、良性单出不判、16 模式各自独立命中、存量七族回归、插件元数据）；负例注入删条 **16/16 变红**（逐支把 `_cooccur(...)` 替换为 `/(?!)/i`，轮测断言失败转红、零崩溃，每次注入后立即还原，终态逐字节校验一致 + 还原后全绿）；四门禁 verify 16/0、guard 20/20@245、doc 24/24、双向 召回 52/52 + 误拦 302/326 与基线零偏差；全量 run-all 21,183 passed / 147 failed / 21,330，+3 failed 经同基座隔离实测（撤插件改动 + 移出本轮轮测复跑）为并发池 churn；海外扫描三源如实空返/不可集成（arXiv「Rate exceeded」限流、GitHub "sycophancy" 1138 repos 均为 benchmark/eval 仓库无纯规则可集成件、S2 429），按既有形态纯规则自建，未编造命中。
+
+---
+
+
 
 ## [6.8.172] - 2026-11-11
 

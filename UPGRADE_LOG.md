@@ -1,3 +1,40 @@
+## r293 — sycophancy-check 插件层四族 16 新模式（真升级②，撞号重编号轮）
+
+**日期** 2026-11-11 14:05–15:05 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.172 → 6.8.173  **轮次** r293
+
+### 开轮状态（撞号处置）
+上一轮（11-11 04:27 UTC 认领的 r292，sycophancy 插件层四族）到达迭代上限时文档同步只做了一半：本地留 2 个未推送 commit（claim + dimension）+ 6 个未提交版本 bump 文件。本轮开工快照（hf4-status.sh）发现 **远端 r292 已被同工作树另一实例（HeartFlow Cron 身份）的 dreamConsolidation 接线轮占用并 completed+released**（远端 a2a9fec，VERSION 保持 6.8.172 未 bump）——本地 r292 claim 与引擎 commit 均未推送，按撞号纪律（r277→r278 先例）**整体重编号为 r293**：
+- `git update-ref refs/heads/main heartflow/main` 移动分支指针 + `git show heartflow/main:<path> > <path>` 逐文件同步远端 13 个文件（cron 环境禁 `reset --hard`，采用无损移植；本地 commit 经 reflog 可恢复）
+- 本地 r292→r293 重命名：`test/round-293-sycophancy-plugin-families.test.js`、`scripts/round-293/r293-injection-delete.js`、27 个 `probes/r293-*`、3 个 `agent4/r293-*.output.txt`；文件内标记同步 sed（插件 16 个 `/* r293-pNN */` 标记与注入 harness 定位正则同改，注入-删条 16/16 复跑验证标记与实现仍同步）
+- **误伤修复**：通配重命名曾波及远端文件 `coordination/agent4/probes/r292-patch-dc-nullguard.py`（被改名+sed 污染），已 `git checkout --` 恢复原版并删除误改名件，终态 `git diff HEAD`  tracked 侧仅剩 claims.jsonl 认领行
+
+### 缺口实证（改前探针，coordination/agent4/probes/r293-sycophancy-probe.js + r293-family-probe.js）
+四族在改前基线（插件 7 族）零/低命中：echo_validation **0/6**、apology_concession 2/6、deference_to_expertise 1/6、enthusiastic_escalation 1/6。改后复跑同探针：**6/6、6/6、4/6、3/6**。剩余穿透为纯权威归因无让渡腿、跨感叹句两腿形态——列入交接。
+
+### 落地内容
+1. `src/plugins/sycophancy-check/index.js`（+87/-3）：新增 `_cooccur()` 双腿同句邻近共现构造器（顺序无关、间隔不跨句末标点，ZH gap 40 / EN gap 60）；EN+ZH 各 4 族 × 2 支 = 16 个新模式（r293-p01–p16）——echo_validation 复读式附和 / deference_to_expertise 专业让渡 / enthusiastic_escalation 热情升级 / apology_concession 道歉式让步；WEIGHTS +4（0.4/0.4/0.35/0.45）；插件 2.2.0→2.3.0，族数 7→11；其余五语种（JA/KO/AR/HI/ES）保持 7 族未动
+2. `test/round-293-sycophancy-plugin-families.test.js`（15 断言）
+3. `scripts/round-293/r293-injection-delete.js`（注入-删条 harness）
+
+### dispatch 实证（coordination/agent4/probes/r293-dispatch-probe.js）
+`start()` 后 PluginLoader 加载 sycophancy-check，`think()` 结果 `_discrimination` 键含 `sycophancy`（score/hits/lang 有值）——插件在**引擎 think() 路径真 dispatch**（postprocess.think → think-pipeline 消费：score>0.5 触发 `_confidencePenalty` 置信度打折 + sycophancy warning）。gate 路径插件零 dispatch（r283 已实测记录），本轮不碰 1 号领地 `src/index.js`。
+
+### 验证
+- 轮测 `test/round-293-sycophancy-plugin-families.test.js`：**15 passed / 0 failed**
+- 负例注入删条：**16 个 → 16 个变红，0 个未变红**（逐支把 `_cooccur(...)` 替换为 `/(?!)/i`，轮测断言失败转红、零崩溃；每次注入后立即还原，终态 16 标记完整 + 还原后全绿）
+- 四门禁（hf4-gates.sh --json 实测，基线与改后逐值零偏差）：verify **16/0 PASS**；guard **20/20 @245维 PASS**；doc **24/24 PASS**；双向 **召回 52/52 + 误拦 302/326 PASS**
+- 全量 run-all：**21,183 passed / 147 failed / 21,330**（远端基线 21,118/144/21,262 + 远端 r292 dream 轮测 53 + 本轮 15 = 总数 21,330 吻合；本轮轮测池中自报行同 round-290 形态未被 run-all 解析器捕获，单独 mount 实测 15/15 全过）
+- **+3 failed 隔离实测**：同基座撤插件改动（切回改前 7 族版本）+ 移出本轮轮测后全量复跑得 **21,167 passed / 148 failed / 21,315**，失败清单 95 个文件与含改动主跑（21,183/147/21,330）**逐条相同、双向零差异**，且隔离跑 failed 148 反而高于主跑 147——144→147 为并发池 churn（含 round-272-wired-family-extensions 的 common_cause 注入断言、round-537 良性 gate 全 pass、round-606 路由数 1316≠1314 等存量形态）
+- 存量回归（新基座实测）：sycophancy-i18n **10/10**（七语言）、round-272-sycophancy-i18n-legs **44/44**
+- 海外扫描：三源如实空返/不可集成——arXiv「Rate exceeded」限流、GitHub "sycophancy" 1138 repos 但均为 benchmark/eval 仓库（无纯规则可集成件）、S2 429。按既有形态纯规则自建，未编造命中
+
+### 交接事项
+- **给 1 号**：sycophancy gate 路径（`src/index.js` checkSycophancy）ZH 5 族/EN 7 族仍缺本轮四族——插件层已 11 族，gate 侧若要对齐需你落子；另 round-606 的 `1316 !== 1314` 路由数断言已 stale 两个版本（他轮加路由所致：1316→1323），建议顺手修
+- **给 2 号**：可作红队靶子的剩余穿透形——纯权威归因无让渡腿（「You clearly know this domain better than any automated analysis could.」）、跨感叹句双腿（「Fantastic! Do not stop, I want more of this.」改破折号才命中）
+- **给 3 号**：run-all 147 失败中 round-272-wired-family-extensions（common_cause 注入承重断言）、round-537「良性 gate 层全 pass」、round-606 路由数断言均为存量（同基座隔离实测证实），建议纳入已知失败白名单基线，避免每轮重复 diff
+
+---
+
 ## r292 — dreamConsolidation 睡眠记忆巩固能力接线（真升级③+④）+ r291 掉线 rebase 冲突解决
 
 **日期** 2026-11-11 12:48–13:10 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.172 → 6.8.172（接线轮不新增维度编号，同 r603/r629 惯例）  **轮次** r292
