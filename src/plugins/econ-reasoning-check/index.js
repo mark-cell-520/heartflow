@@ -1,5 +1,5 @@
 /**
- * econ-reasoning-check — 经济与资源推理 + 统计素养 18 族辨别器（插件层接线，r295）
+ * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 21 族辨别器（插件层接线，r295 起草族 + r296 扩族）
  *
  * 背景（实例化 ≠ 接线 的集中清理）：
  *   r219-r253 三十多轮里，4 号按「经济与资源推理 / 统计素养」选题库逐族起草了
@@ -8,8 +8,11 @@
  *   有 326 条官方良性语料验证——但**从未进过任何 dispatch 路径**：
  *   gate 路径要改 src/index.js 八处接入点（1 号独占），草稿头注释一致写着
  *   「src/index.js 接线由 1 号主力补全」，而该接线始终未发生。
- *   本轮用插件层（PluginLoader 自动发现，零改 heartflow.js）+ MCP 工具层
- *   把这 18 个能力首次接入引擎：
+ *   r296 补入信息与激励盲区三子族（src/incentive-blind-spot.js：逆选择
+ *   忽视 / 道德风险忽视 / 搭便车盲区——隐藏信息、隐藏行动、集体行动的
+ *   否认式断言，r296 起草 + 326 条官方良性语料零误命中实证）。
+ *   本插件族表用插件层（PluginLoader 自动发现，零改 heartflow.js）+
+ *   MCP 工具层把这 21 个能力接入引擎：
  *     ① postprocess.think hook → result._discrimination.econReasoning
  *        （think-pipeline 消费：score>0.5 → _confidencePenalty 置信度打折
  *         + warning，与 sycophancy-check 同合约）
@@ -47,6 +50,10 @@ const FAMILIES = [
   { key: 'significance_effect_size',       mod: '../../significance-effect-size.js',       fn: 'detectSignificanceEffectSize',      group: 'stats', zh: '显著性≠重要性',        en: 'significance ≠ effect size',     round: 'r250' },
   { key: 'selection_on_dependent_variable',mod: '../../selection-on-dependent-variable.js',fn: 'detectSelectionOnDependentVariable',group: 'stats', zh: '选择依赖变量/按结果归因', en: 'selection on dependent variable', round: 'r252' },
   { key: 'ad_hominem',                     mod: '../../ad-hominem.js',                     fn: 'checkAdHominem',                    group: 'stats', zh: '人身攻击',             en: 'ad hominem',                     round: 'r253' },
+  // ── econ：信息与激励盲区（r296，src/incentive-blind-spot.js 三子族）──
+  { key: 'adverse_selection',              mod: '../../incentive-blind-spot.js',           fn: 'detectAdverseSelection',            group: 'econ',  zh: '逆选择忽视',           en: 'adverse selection blind spot',   round: 'r296' },
+  { key: 'moral_hazard',                   mod: '../../incentive-blind-spot.js',           fn: 'detectMoralHazard',                 group: 'econ',  zh: '道德风险忽视',         en: 'moral hazard blind spot',        round: 'r296' },
+  { key: 'free_rider',                     mod: '../../incentive-blind-spot.js',           fn: 'detectFreeRider',                   group: 'econ',  zh: '搭便车盲区',           en: 'free-rider blind spot',          round: 'r296' },
 ];
 
 const _cache = new Map();
@@ -62,7 +69,7 @@ function _detector(fam) {
 }
 
 /**
- * 对一段文本跑 18 族检测。
+ * 对一段文本跑 21 族检测。
  * @param {string} text 待检测文本（think 结论 / MCP 工具入参）
  * @param {{only?: string, inject?: object}} [opts]
  *   only   — 只跑某一族（MCP 工具 action=<family key>）
@@ -117,8 +124,8 @@ function analyze(text, opts) {
 
 const plugin = {
   name: 'econ-reasoning-check',
-  version: '1.0.0', // r295：18 族首次 dispatch（postprocess.think + 2 个 MCP 只读工具）
-  description: '经济与资源推理 + 统计素养 18 族辨别器（r295 插件层接线）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem。这些族 r219-r253 起草后从未 dispatch，本轮首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具。',
+  version: '1.1.0', // r296：+信息与激励盲区 3 子族（adverse_selection / moral_hazard / free_rider）
+  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 21 族辨别器（r295 插件层接线 + r296 扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）。',
   hooks: [
     { event: 'postprocess.think', priority: 190 }, // 190 > sycophancy-check 的 180：升序执行，本插件最后跑，merge 进已存在的 _discrimination（sycophancy 会整体覆写该对象）
   ],

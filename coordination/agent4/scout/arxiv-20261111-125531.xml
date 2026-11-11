@@ -1,0 +1,399 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/WRj/ocGyruxm8biKykPF6Gs6Cek</id>
+  <title>arXiv Query: search_query=all:adverse OR all:selection OR all:moral OR all:hazard OR all:free OR all:rider OR all:LLM OR all:reasoning OR all:econ.GN OR all:cs.AI&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-11T12:55:35Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:adverse+OR+(all:selection+OR+(all:moral+OR+(all:hazard+OR+(all:free+OR+(all:rider+OR+(all:LLM+OR+(all:reasoning+OR+(all:econ.GN+OR+all:cs.AI))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>645860</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14519v1</id>
+    <title>Medical Image Segmentation: Foundation Model Adaptation versus Task-Specific Training</title>
+    <updated>2026-11-10T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.14519v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14519v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models pretrained on large natural-image collections are increasingly adapted for medical image segmentation, in the expectation that they will replace models trained for each task. Most comparisons, however, use data from the training distribution and a single task-specific baseline whose configuration is rarely justified, and therefore provide limited evidence of performance at new clinical sites. It also remains unclear how much of a foundation model must be adapted, and what determines this. We adapted a foundation model, DINOv2, with strategies ranging from tuning only its bias terms to full fine-tuning, and compared it with U-Nets and ResU-Nets trained from scratch. Experiments covered colonoscopy, breast ultrasound and dermoscopy, with testing on held-out data from the training source and on independent datasets from other institutions. The adapted foundation model generalised better on every external dataset. Within the training distribution, the task-specific models remained competitive when training data were abundant, and delineated boundaries more precisely, while the foundation model more often missed small lesions. Only a small fraction of the foundation model required adaptation, and the capacity needed was determined by the imaging domain rather than by the adaptation method. A widely used polyp test set was also found to duplicate images from another benchmark. Foundation-model adaptation is therefore warranted where models must work across sites, with capacity selected on the target domain.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Emre Kutlusan</name>
+    </author>
+    <author>
+      <name>Yongmin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14515v1</id>
+    <title>AutoScaffold: AI-Guided Scaffolding for Reinforcement Learning of Language Models</title>
+    <updated>2026-11-10T18:58:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.14515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning with verifiable rewards (RLVR) produces rich training experience, yet outcome rewards reduce each attempt to a single number and leave most of this information unused. Training-time scaffolds, such as strategies or hints added to the prompt during training, offer a natural way to turn this information into guidance, but their design and adaptation are largely left to humans and tailored to specific domains. We introduce AutoScaffold, a unified AI-for-AI framework that turns a student's training experience into adaptive scaffolds, with minimal domain-specific information and no human intervention during training. A frozen teacher periodically examines this experience, diagnoses bottlenecks, and designs scaffolds in two forms: (i) strategies shared across a class of tasks and (ii) hints for individual hard tasks, adjusting the content and amount of support as the student learns. The scaffolds are removed at evaluation. We apply the same framework to ALFWorld, search-based QA, mathematical reasoning, and GPU kernel generation. When evaluated without scaffolds, students trained with AutoScaffold outperform those trained with the corresponding RL baselines in all four domains, with gains of 7.2 points in ALFWorld success and 4.0 points in average QA exact match. On GPU kernel generation, AutoScaffold increases the fraction of tasks with a correct kernel that runs faster than the PyTorch reference by up to 5.0 points. On math, our student surpasses QuestA's reported accuracy using approximately one-third as many student training steps. Analyses show that the teacher identifies a different failure in each task class and shifts its scaffolds from step-by-step workflows to targeted fixes as the student improves, and that its revised scaffolds help the student learn more than keeping the previous scaffold or using no scaffold.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:46Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zijian Zhang</name>
+    </author>
+    <author>
+      <name>Rizhen Hu</name>
+    </author>
+    <author>
+      <name>Jiangweizhi Peng</name>
+    </author>
+    <author>
+      <name>Shiyang Li</name>
+    </author>
+    <author>
+      <name>Sujay Bhatt</name>
+    </author>
+    <author>
+      <name>Sihan Zeng</name>
+    </author>
+    <author>
+      <name>Mingyi Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14514v1</id>
+    <title>Contrastive Discovery: Open-Ended Scientific Discovery over Competing Explanations</title>
+    <updated>2026-11-10T18:58:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.14514v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14514v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM agents are increasingly used for open-ended, data-driven scientific discovery, yet most of them evaluate hypotheses pointwise, testing an empirical claim $h$ only against its complement $\neg h$. When evidence rejects $h$, the agent learns that one explanation is unlikely but not which alternative the evidence supports. To recover that alternative, we introduce Contrastive Discovery, which replaces the single hypothesis with a contrast set, a scientific question paired with mutually exclusive and collectively exhaustive competing explanations. Each experiment is scored by how its evidence redistributes belief across the set, and the question is resolved when belief concentrates on one explanation. Because contrast sets change only the unit an agent proposes and scores, an existing agent can use them to re-evaluate evidence it has already collected or to guide its search. Across six domains, $89\%$ of the pointwise candidates with the largest belief shifts are rejections. On the same evidence, contrast sets resolve $73\%$ of these candidates to a specific alternative. When contrast sets guide search, the agent resolves $67\%$ more questions than pointwise surprisal under the same experiment budget. In a blinded study, $38$ human experts chose the same explanation on $78\%$ of resolved questions and on $82\%$ of questions where the pointwise agent rejected its hypothesis and stopped. Together, these results support explicit competing explanations as a way for discovery agents to resolve more scientific questions from the same evidence and validation budget.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:43Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 55 pages. Project page: https://codiscovery.ai/contrastive-discovery/</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>James J. Kim</name>
+    </author>
+    <author>
+      <name>Yijia Dai</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14511v1</id>
+    <title>Pyrite: Building and Benchmarking Protein-Ligand Pose Ranking Agents</title>
+    <updated>2026-11-10T18:56:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.14511v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14511v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting how a ligand binds to its target is central to small-molecule drug discovery. Modern cofolding models can generate diverse candidate poses, but reliably ranking these candidates remains challenging. We introduce Pyrite, a pairwise pose-ranking benchmark comprising 1,500 pose pairs across diverse protein-ligand complexes. Expert chemists equipped with 3D visualization tools and physics-based scores perform near chance, highlighting the difficulty of interpreting available chemical signals. To investigate automated ranking, we introduce PyriteRep, a structured representation of molecular geometry, protein-ligand interactions, and physicochemical scores, and develop two LLM-based agents: PyriteReasoner, which directly compares poses through text-based reasoning, and PyriteFeaturizer, which generates executable code to construct features for logistic regression, optionally incorporating features derived from LLM subcalls. These agents achieve up to 67% and 74% accuracy, respectively, exceeding observed expert performance. LLM-guided feature discovery generally outperforms direct reasoning, while Group Relative Policy Optimization (GRPO) improves open-weight models, enabling them to match or surpass closed-source frontier models in our evaluations. These results establish Pyrite as a challenging test of pose-ranking ability and highlight LLM-guided feature discovery as a promising approach to interpret and combine the outputs of computational chemistry tools.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:56:32Z</published>
+    <arxiv:comment>32 pages, Agentic AI for Biological Discovery Workshop (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Megha Srivastava</name>
+    </author>
+    <author>
+      <name>Michael H. Lim</name>
+    </author>
+    <author>
+      <name>Allison M. Keys</name>
+    </author>
+    <author>
+      <name>Pranav Murugan</name>
+    </author>
+    <author>
+      <name>Nate Gruver</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14509v1</id>
+    <title>Artificial Currency and Separate Selling: A 3-Approximation for Consumer Surplus</title>
+    <updated>2026-11-10T18:56:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.14509v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14509v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the allocation of indivisible items to buyers with additive values drawn from independent distributions. The objective is consumer surplus net of burnt payments. We consider artificial-currency mechanisms: buyers receive personalized budgets of a currency worthless outside the mechanism and use them to bid across items. The better of separate selling and artificial-currency mechanisms provides a 3-approximation to optimal consumer surplus. The guarantee holds at every Bayes--Nash equilibrium, without equilibrium selection. Both branches are necessary: either alone may capture only a vanishing share of the optimum. The proof decomposes benchmark surplus into a stable part captured by artificial currency and a variation covered by separate selling.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:56:27Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Yang Cai</name>
+    </author>
+    <author>
+      <name>Yingkai Li</name>
+    </author>
+    <author>
+      <name>Jinzhao Wu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14508v1</id>
+    <title>When Does the Real Wiring Win? Testing connectome structure-function claims against unmeasured physiology</title>
+    <updated>2026-11-10T18:55:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.14508v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14508v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Connectome-constrained models are often used to argue that a measured wiring diagram outperforms shuffled or rewired wiring, and hence that structure shapes function. Such comparisons can confound wiring with how the models are tuned: a connectome fixes who connects to whom, not the excitability, gains or plasticity rates the model also needs, and modellers often tune these until the real-wiring model works. We separate three estimands: physiology tuned on the real wiring and transferred to nulls (P1), each wiring tuned on its own (P2), and P2 restricted to physiology consistent with independent data (P3). The biases involved are known in machine learning (under-tuned baselines, inherited weights, winner's curse); we measure what they do to biological conclusions, using synthetic ground truth, placebo nulls and three Drosophila circuit models. Some claims survive every protocol we test: segregated reward and punishment dopamine improves learning, and head-direction topography is required for a persistent bump. Others do not. In the mushroom body, the real Kenyon-cell output wiring beats a cross-subtype identity shuffle by 0.09 under P1 and P2 but loses to it by 0.09 under P3 (95% CIs exclude zero; held-out runs confirm). The verdict is set by the share of alpha'beta' cells among active Kenyon cells, which P1 selects low; at the share implied by imaging (about 44%) the real-wiring model fails to learn, exposing a model inadequacy rather than a deficit of the fly's wiring. In flyvis, P1 penalises a mirrored connectome, which has a constructed solution within 0.07 (median) of the real error, more than a spatially shuffled one in 50 of 50 members; the ranking survives ten-fold longer retraining but depends on the checkpoint at fifty-fold. A credible structural claim needs matched optimisation, data-constrained physiology and a model that still works there.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:48Z</published>
+    <arxiv:comment>23 pages, 5 figures, 10 tables. Code, data and prediction files are included as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yeyuan Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14497v1</id>
+    <title>Excess charge in the Engel-Dreizler model of atoms and molecules</title>
+    <updated>2026-11-10T18:51:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.14497v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14497v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove an explicit excess-charge bound for the exchange-free Engel--Dreizler functional of atoms and molecules. If $αλ\le1/1233$ and $α^3Z_k^2\le1/137$ for each nucleus, every finite-mass electronic minimizer whose total energy, including nuclear repulsion, is nonpositive satisfies $N-\sum_kZ_k&lt;(5913/1000)λ^{3/2}K$. For the gradient coefficient $λ=1/9$, this gives $N-\sum_kZ_k&lt;0.219K$. The energy hypothesis holds automatically for atoms and for local minima of the Born--Oppenheimer energy at which the electronic infimum is attained. The proof uses no symmetry of the density, restriction on the total nuclear charge, or minimum nuclear separation. We combine molecular Sommerfeld estimates with a convex nonlinear comparison in the variable $F(p)$. The failure of the latter comparison at very high density is represented by a nonnegative Newton potential. A quartic coercivity estimate, obtained from nuclear repulsion and a signed localized Hardy inequality, controls the total mass of this source. The chemical potential is retained throughout. Exact covariance yields the invariant parameter domain, and all finite numerical inequalities are reduced to rational arithmetic.</summary>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.other" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:11Z</published>
+    <arxiv:primary_category term="math-ph"/>
+    <author>
+      <name>Rafael Benguria</name>
+    </author>
+    <author>
+      <name>Heinz Siedentop</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14495v1</id>
+    <title>SkipLane: Write-Once, Conflict-Free Accumulation for Zero-Skipping CNN Engines on FPGAs</title>
+    <updated>2026-11-10T18:50:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.14495v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14495v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Skipping zero activations saves multiplications in CNN accelerators, but it complicates accumulation: the products in a compressed input window belong to different output columns and must be merged. In our earlier engine, this merging was done by read-modify-write (RMW) of a row buffer, which made sparse inputs slower than dense ones even at 87% sparsity. Existing designs either merge kernel rows through RMW or reduce bank conflicts with extra hardware, without eliminating them. SkipLane makes the entire accumulation path write-once. Each kernel row is processed in its own lane, which holds partial sums in three registers and retires up to three finished columns per cycle into memory banks that cannot conflict. Lanes and input channels are summed only at readout, so no partial sum is ever read back. Multipliers left idle by zero weights compute a second filter in the same pass. In RTL simulation, the engine stays within 0.5% of its frontend bound up to 70% sparsity and is 1.10-1.26$\times$ faster than an SCNN-style scatter accumulator with 18 banks and ideal RMW at 50-80% sparsity. Six engines meet 140 MHz on a PYNQ-Z2 using 21.1k LUTs and run LeNet-5 bit-exact on the board. For conv1, the engine needs 1.94$\times$ fewer cycles than a dense engine (1.26$\times$ faster end to end); for conv2, whose rows are only 13 pixels wide, it reaches 0.87$\times$ the dense speed.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:51Z</published>
+    <arxiv:comment>5 pages, 5 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Aditya Saboo</name>
+    </author>
+    <author>
+      <name>Pratibha Verma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14493v1</id>
+    <title>Comparative Analysis of Agent Evaluation Frameworks: Stability, Detection, and Discovery in Enterprise Analytics Agents</title>
+    <updated>2026-11-10T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.14493v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14493v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deploying LLM-based analytics agents in enterprise settings requires evaluation frameworks that can reliably detect failures across complex, multi-tool workflows. We present a three-phase comparative study of three evaluation frameworks, each representing a distinct evaluation paradigm (trace-based LLM judging, text-only LLM judging with red-teaming, and deterministic heuristics), applied to two analytics agents in a controlled research setting using frozen execution traces. Phase 1 quantifies evaluation harness stability through repeated measurements, finding that 97% of configurations meet the stability threshold and that stability patterns are agent-independent. Phase 2 measures known risk detection on 72 ground-truth test cases, where the trace-based framework achieves the best precision-recall balance (F1=0.90) while text-only evaluation matches on recall but generates 5x more false alarms. Phase 3 evaluates unknown risk discovery, uncovering 24 novel failures with zero overlap between functional testing and security red-teaming. Our results demonstrate that (1) the information available to the evaluation harness determines evaluation quality, (2) functional and security evaluation are complementary, and (3) LLM-based evaluation harnesses surface subtle errors that human reviewers miss. We recommend a two-framework strategy: trace-based evaluation for functional assessment and adversarial red-teaming for security validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:06Z</published>
+    <arxiv:comment>Accepted to KDD 2026, Jeju, Korea. 9 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Howard Zhang</name>
+    </author>
+    <author>
+      <name>Chuck Arvin</name>
+    </author>
+    <author>
+      <name>Logan Brown</name>
+    </author>
+    <author>
+      <name>Mihir Bhatia</name>
+    </author>
+    <author>
+      <name>Neelu Choudhary</name>
+    </author>
+    <author>
+      <name>Lily Miao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14492v1</id>
+    <title>ReTrace: Distilling Tool-Using Agents into Planner-Free Workflows</title>
+    <updated>2026-11-10T18:49:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.14492v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14492v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Business process automation runs the same Standard Operating Procedure (SOP) again and again on new inputs. Large Language Model (LLM) agents can follow an SOP written in natural language, but they call an LLM to choose every step of every run, which adds latency and cost at scale. We present ReTrace, which turns an SOP and a few logged agent runs into a reusable workflow in which code, not an LLM, selects the next step. The agent's reasoning, the explanation it writes with each tool call, often states why it took an action; the tool calls alone do not. ReTrace extracts the condition behind each step, merges these conditions across runs into a compact rule document, and generates an executable workflow from it. Only this last stage depends on the platform, so rule documents can be compiled for different orchestration platforms. On $79$ procedures from our production platform, ReTrace workflows reach $93.8\%$ completion, against $96.8\%$ for the agent, at $24\%$ lower cost per task. On $τ^2$-Bench, they reach $75.8\%$ task success (agent: $80.6\%$) and run in $1.3$s instead of $170$s; three rounds of repair on training failures lift $k{=}2$ workflows from $66.7\%$ to $81.2\%$. On eight SOP-Bench procedures, ReTrace without repair trails few-shot generation ($80.6\%$ vs. $83.6\%$), but repair from labeled training failures lifts it to $87.8\%$ at $0.40$s per task, compared to $85.5\%$ in $46.6$s for the agent.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:47Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Kaiyuan Hou</name>
+    </author>
+    <author>
+      <name>Yang Ping Kuo</name>
+    </author>
+    <author>
+      <name>Indranil Bhattacharya</name>
+    </author>
+    <author>
+      <name>Rohith Nama</name>
+    </author>
+    <author>
+      <name>Arushi Gupta</name>
+    </author>
+    <author>
+      <name>Carlos D. Castillo</name>
+    </author>
+    <author>
+      <name>Prathap Ramachandra</name>
+    </author>
+    <author>
+      <name>Xiaofan Jiang</name>
+    </author>
+    <author>
+      <name>Francesco Carbone</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14491v1</id>
+    <title>TimeSeek: Multi-Task and Multi-Domain Pretraining for Generalized Time Series Analytics</title>
+    <updated>2026-11-10T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time series analytics has been widely applied across various domains. While existing time series foundation models (TSFMs) have demonstrated promising results, they still face two major challenges: 1) Most TSFMs mainly rely on stacking Transformer layers to increase parameter size, lacking the ability to adaptively model complex time series patterns from multi-domain data. 2) Current TSFMs are primarily pre-trained for specific tasks, e.g., forecasting or anomaly detection, and a few models support multiple tasks, but they fail to fully leverage task specificity and commonality, resulting in suboptimal performance. To address these challenges, we propose TimeSeek, a novel generalized time series analytics model that adaptively models time series patterns from multi-domain data and unifies multiple tasks in pre-training. Conceptually, TimeSeek is guided by selective information sharing under domain and task heterogeneity. From the perspective of multi-domain data, we propose a Multi-Domain Feature Extractor that adaptively captures temporal dependencies and channel correlations based on domain-specific characteristics, including progressive multi-scale modeling and adaptive slot channel modeling. From the perspective of the diversity of tasks, we propose multi-task collaborative training, which leverages task specificity and task commonality through task customization and cross-task training, effectively unifying multiple tasks in pre-training and better adapting to diverse downstream scenarios. After pre-training on large-scale time series data, TimeSeek achieves state-of-the-art performance in forecasting, anomaly detection, and classification tasks across both few-shot learning and zero-shot situations, together with favorable inference efficiency.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:26Z</published>
+    <arxiv:comment>Accepted by IEEE Transactions on Pattern Analysis and MachineIntelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Peng Chen</name>
+    </author>
+    <author>
+      <name>Yihang Wang</name>
+    </author>
+    <author>
+      <name>Zhongwen Rao</name>
+    </author>
+    <author>
+      <name>Yang Shu</name>
+    </author>
+    <author>
+      <name>Yuying Qiu</name>
+    </author>
+    <author>
+      <name>Yuxuan Chen</name>
+    </author>
+    <author>
+      <name>Lujia Pan</name>
+    </author>
+    <author>
+      <name>Bin Yang</name>
+    </author>
+    <author>
+      <name>Chenjuan Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14487v1</id>
+    <title>Re-Search: Dissecting LLM Ideation Through a Two-Player Questioning Game</title>
+    <updated>2026-11-10T18:47:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.14487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Research ideation is iterative: researchers refine their ideas step by step based on feedback. Yet existing evaluations obscure this search process, making it difficult to understand how LLMs explore the space of research ideas and what limits their progress. We introduce Re-Search, which adapts the format of Twenty Questions to research ideation: given only the research problem of a published paper, a model must rediscover the paper's core idea by asking yes-or-no questions. Built from 200 ICML 2026 papers, Re-Search tracks how a model's idea evolves as it asks questions and receives binary oracle feedback, isolating ideation from execution. Across six recent LLMs, nearly all progress happens within the first 30 of 100 questions, which largely decide how the game ends; after that, most models plateau. Through controlled interventions on the candidate questions and the hypothesis space, we find that the bottleneck is generation, not judgment: models recognize a good idea or a good question when one is offered, but often cannot produce it on their own. We further analyze the ideation traces and find that models fail by either over-exploiting one direction or over-exploring too many. These findings point to concrete design principles for autoresearch systems: since models can judge candidates they cannot produce, enriching the search with externally sourced ideas and questions may be more effective than improving any single model's generation ability.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:47:22Z</published>
+    <arxiv:comment>Preprint. 15 figures, 10 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Muhan Gao</name>
+    </author>
+    <author>
+      <name>Hangxiao Zhu</name>
+    </author>
+    <author>
+      <name>Xinqi Su</name>
+    </author>
+    <author>
+      <name>Yu Zhang</name>
+    </author>
+    <author>
+      <name>Daniel Khashabi</name>
+    </author>
+    <author>
+      <name>Kuan-Hao Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14480v1</id>
+    <title>Pterodactyl: Pushing the Limits of Efficient Automated Translation Evaluation</title>
+    <updated>2026-11-10T18:41:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14480v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14480v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we present 1020 Group's submission to the WMT26 shared task on automated quality evaluation. Our system, Pterodactyl, was engineered specifically for subtasks 2 and 3, that is, segment-level quality score prediction and the detection of error-free segments. Pterodactyl is a highly customizable, ultra-low cost system optimized for binary classification in translation triage and data curation. It is based on an LLM-as-a-judge approach, with prompt engineering and model selection guided by ROC analysis. We also developed several variants of Pterodactyl that were specifically adapted for subtasks 3.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:37Z</published>
+    <arxiv:comment>6 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Proceedings of the Eleventh Conference on Machine Translation (WMT 2026), pp. 1638-1643, 2026</arxiv:journal_ref>
+    <author>
+      <name>Evelyn Y. Garland</name>
+    </author>
+    <author>
+      <name>Carola F. Berger</name>
+    </author>
+    <arxiv:doi>10.18653/2026.wmt-main.96</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/2026.wmt-main.96" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14477v1</id>
+    <title>FERN: Cross-Benchmark Table Retrieval for Text-to-SQL with Frozen Retrievers and Learned Ranking</title>
+    <updated>2026-11-10T18:39:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.14477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Text-to-SQL systems over large pooled catalogs must first retrieve the tables a question needs. We compare against the published table recall of RASL, which uses Claude 3.5 models to extract keywords and select tables, on pooled BIRD, Spider, and Fiben catalogs. FERN (Feature-Engineered Ranking with No generative LLM) instead fuses three frozen retrievers into 100 candidates, describes each with up to 120 features, and reorders them with LightGBM rankers fitted once on BIRD's training questions. On Spider, where it was not fitted, its candidate pool alone reaches RASL's published recall at fifteen tables (98.0), and the ranker raises the share of questions with every gold table in the top five (complete@5) from 83.9% to 95.6%. At five tables, FERN's recall is within one point of RASL's on Spider (96.7 vs 97.0) and on BIRD with its evidence hints (96.6 vs 97.5), and 8.2 points below on BIRD without them (89.3). On 121 real BEAVER questions, without BEAVER fitting, its recall at fifteen (82.1) falls between two BEAVER-trained retrievers (80.8, 84.5), but its complete@15 is below both (49.6 vs 54.5 and 62.0). On Fiben, it falls far short at fifteen tables (54.2 vs 69.2, different question sets), although its recall at fifty is numerically close to RASL's question-only retrieval result (80.7 vs 79.4). On BIRD dev with evidence, non-retrieval features raise complete@5 by 7.7 points over retrieval signals alone. On BIRD dev, median latency is 208 ms per question on one A100, without hosted model calls.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:39:49Z</published>
+    <arxiv:comment>19 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Arjun Rao</name>
+    </author>
+    <author>
+      <name>Nishant Gopinath</name>
+    </author>
+  </entry>
+</feed>
