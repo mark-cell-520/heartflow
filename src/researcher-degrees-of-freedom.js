@@ -171,6 +171,69 @@
  *     doesn't that / how else / what else / who doesn't / if not）。
  */
 
+// ─── [r298 补] 腿① FLEX 中性复数枚举形（多重比较 / 子群捕捞）──────────
+// r298 立项缺口实证（scripts/round-298/probe-gap-r298.js，v6.8.174 实测）：
+// 本维度原有 FLEX 只收「反复/直到/只报告/换了终点」这类**流程操纵形**——
+// 攻击者必须自供「我反复试」「我只报告显著的」。而真实世界（A/B 报告、
+// 增长实验、临床亚组分析、论文结果段）里最常见的形态是**中性复数枚举**：
+// 「测试了 20 个指标，有一个显著」「30 个子群里 subgroup C 达到 p=0.04」
+// 「40 个变量中 3 个显著」。全程没有一个「反复/直到/只报告」字样，却与
+// optional stopping 承载**同一个统计错误**：显著性成了「试了多少次」的
+// 函数，而不是证据强度的度量。r298 前该族 12 条攻击样本 gate 穿透 10/12、
+// 模块命中 0/12（真零命中）。本子族只补**枚举形**这一措辞家族，判据仍
+// 是两腿共现（腿① 复数枚举 × 腿② 显著性/结论封装），不降低既有门槛。
+const MULT_ENUM_ZH = [
+  // Z1 裸数量 + 检验对象（「20个候选指标中」「测试了20个指标」「三十多个参数组合」）。
+  // r298 教训：曾拆成「动词+数量」与「裸数量」两条并加前置负向断言求互斥，
+  // 但中文无词边界、负向断言只能挡住首位数字，「测试了20」里的「0」仍能
+  // 从第二位起匹配裸数量形，两条永远同时命中、逐条删条证明不了各自承重。
+  // 故合并为一条裸数量形（动词前缀可有无不影响命中），专属样本见
+  // scripts/round-298/r298-injection-delete.js。
+  /[0-9０-９一二两三四五六七八九十百千万零几数多]+\s*(?:个|种|项|次|组|套)\s*(?:候选|可能|潜在)?(?:指标|终点|变量|子群|维度|口径|模型|回归|检验|比较|假设|参数|组合)/,
+  // Z3 数据切分形·把/将（「把数据拆分成很多块」）
+  /(?:把|将)[^。；]{0,6}(?:数据|样本|用户|结果)[^。；]{0,14}(?:切分|拆分|切割|分组|分层|切片)/,
+  // Z4 数据切分形·按/依（「按各种口径重新切分数据」）
+  /(?:按|沿着|依|照)[^。；]{0,10}(?:维度|口径|角度|切法|变量)[^。；]{0,10}(?:切分|拆分|分组|分层|切片|切开)/,
+  // Z5 子群/亚组分析 + 显著性（「子群分析中，40岁以上那一组效果显著」）
+  /(?:子群|亚组|分组|切片|分层)(?:分析)?[^。；]{0,14}(?:显著|p\s*[<>=])/,
+  // Z6 直到找到显著形（「直到发现一个显著的配置」）
+  /(?:直到|直至)(?:找到|发现|出现|看到|碰见|拿下)(?:一个|某个|一项|一组|一条)?[^。；]{0,6}(?:显著|p\s*[<>=])/,
+  // Z7 其中只有一个显著形（「其中只有一项显著」）
+  /(?:其中|之中|里面|当中)[^。；]{0,4}(?:只有|仅有|仅|偏偏)?(?:一个|一项|一组|一条|唯一)[^。；]{0,10}(?:显著|p\s*[<>=])/,
+];
+
+// ─── [r298 补] 腿① FLEX 中性复数枚举形（英文）──────────────────────
+const MULT_ENUM_EN = [
+  // E1 动词 + 数量 + 检验对象（"tested 20 different outcomes"）
+  /\b(?:tested|checked|ran|analy[sz]ed|tried|compared|examined|evaluated)\s+(?:[a-z]+\s+){0,3}\d+\s+(?:[a-z]+\s+){0,2}(?:outcomes?|endpoints?|metrics?|variables?|subgroups?|dimensions?|measures?|comparisons?|specifications?|models?|parameters?|combinations?)/i,
+  // E2 被动形（"20 outcomes were tested"）
+  /\b\d+\s+(?:outcomes?|endpoints?|metrics?|variables?|subgroups?|measures?|comparisons?|specifications?|models?|parameters?|combinations?)\s+(?:were|was)\s+(?:tested|analy[sz]ed|checked|compared|evaluated|examined)/i,
+  // E3 部分格（"of the 40 variables we checked" / "among 12 exploratory outcomes"）
+  /\b(?:of|among|out\s+of)\s+(?:the\s+)?\d+\s+(?:[a-z]+\s+){0,2}(?:outcomes?|endpoints?|metrics?|variables?|subgroups?|measures?|comparisons?|specifications?|parameters?|combinations?)\b/i,
+  // E4 with/after + 数量 + 检验对象 + 过去分词（"With 30 subgroups analyzed"）
+  /\b(?:with|after)\s+\d+\s+(?:[a-z]+\s+)?(?:outcomes?|endpoints?|metrics?|variables?|subgroups?|measures?|comparisons?|parameters?|combinations?)\s+(?:analy[sz]ed|tested|checked|compared|evaluated|examined)/i,
+  // E5 数据切分形（"slicing the data every way" / "split the data into dozens of slices"）
+  /\b(?:slic(?:e|ed|ing)|split|cut|segment(?:ed|ing)?|dice[ds]?)\s+(?:the\s+)?(?:data|dataset|results|sample)\s+(?:every\s+way|in\s+every\s+way|by\s+every\s+\w+|into\s+(?:dozens|many|several|numerous|\d+))/i,
+  // E6 直到拿到显著（"until one reached significance" / "until we finally found a significant result"）
+  /\b(?:until|before|till)\s+(?:we\s+|they\s+|it\s+|one\s+|a\s+|an\s+|the\s+)?(?:finally\s+)?(?:found|got|obtained|reached|hit|saw|landed\s+on)\s+(?:a\s+|an\s+|the\s+)?(?:significant|statistically\s+significant|significance)/i,
+  // E7 具名子群（"subgroup C reached p=0.04"）
+  /\bsubgroup\s+[A-Z]\s+(?:reached|showed|hit|came\s+in\s+at|was\s+at)\b/i,
+];
+
+// ─── [r298 补] 腿② CLAIM 中性复数枚举形的结论封装（英文）────────────
+// 该族攻击的显著性结论常以 "the result we needed" / "reached significance"
+// 收尾，二者均非 CLAIM_EN 原有条目的子串匹配，r298 前整族腿②缺失。
+const CLAIM_EN_R298 = [
+  // C1 「我们想要的结果」形（"We kept testing until we got the result we needed."）
+  // r298 教训：曾拆成「动词+想要的结果」与「无动词·想要的结果」两条并加负向
+  // 断言求互斥，但 "got the result we needed" 里 result 前的 "the " 让断言落空，
+  // 两条仍同时命中。故合并为一条（动词前缀可有无不影响命中）。
+  /\b(?:result|outcome|finding|answer)s?\s+(?:we|they|i)\s+(?:needed|wanted|hoped\s+for|were\s+looking\s+for|was\s+after)\b/i,
+  // C2 "reached significance" 形统计显著性结论封装
+  // （"significance" 不是 "significant" 的子串，CLAIM_EN 原有条目整体漏收）
+  /\b(?:reached|attained|hit)\s+(?:statistical\s+)?significance\b/i,
+];
+
 // ─── 腿① FLEX 流程被结果反向决定的动作（中文）──────────────────────
 // r161 教训：枚举腿必须含裸名词形态——「事后」「反推」「数据挖掘」
 // 去掉前后缀仍须命中。
@@ -320,6 +383,11 @@ const FLEX_EN = [
   /secondary\s+(?:outcome|endpoint|metric)s?\s+(?:that\s+)?(?:was|were)\b/i,
 ];
 
+// [r298] 中性复数枚举形子族合入腿①（置于末尾；负例注入删条时可整组摘除，
+// 见 scripts/round-298/r298-injection-delete.js）
+FLEX_ZH.push(...MULT_ENUM_ZH);
+FLEX_EN.push(...MULT_ENUM_EN);
+
 const CLAIM_EN = [
   /statistically\s+significant|significant/i,
   /p\s*[<>=]|p-?value|p\s+value/i,
@@ -335,7 +403,16 @@ const CLAIM_EN = [
   // 的 significant 语境共同构成结论封装。
   /\bthat\s+(?:was|were)\b/i,
   /\bwhich\s+(?:was|were)\b/i,
+  // [r298 补] 「拿到我们想要的结果」形（"We kept testing until we got the
+  // result we needed."）——腿①已有 kept ... until，但结论封装词缺失，
+  // 该族 r298 前模块命中 0。只收 needed/wanted/hoped for/looking for，
+  // 刻意不收 "as expected"（良性实验描述的高频短语，误伤代价过高）。
+  // 以及 "reached significance" 形（"significance" 不是 "significant" 的
+  // 子串，CLAIM_EN 原有条目整体漏收该族）。
 ];
+
+// [r298] 腿②新增结论封装形整组合入（负例注入删条时可整组摘除）
+CLAIM_EN.push(...CLAIM_EN_R298);
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
 const EXEMPT_META_ZH = [
@@ -571,6 +648,7 @@ module.exports = {
   checkResearcherDegreesOfFreedom,
   __internals: () => ({
     FLEX_ZH, CLAIM_ZH, FLEX_EN, CLAIM_EN,
+    MULT_ENUM_ZH, MULT_ENUM_EN, CLAIM_EN_R298,
     EXEMPT_META_ZH, EXEMPT_META_EN,
     EXEMPT_CORRECT_ZH, EXEMPT_CORRECT_EN,
     NEG_ZH, NEG_EN, WIN_FLEX_CLAIM_ZH, WIN_FLEX_CLAIM_EN,

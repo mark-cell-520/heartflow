@@ -1,0 +1,335 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/4Z03VWM6nKXBmpsKEHbCUDmWPg0</id>
+  <title>arXiv Query: search_query=all:multiple OR all:comparisons OR all:multiplicity OR all:data OR all:dredging OR all:statistical OR all:inference&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-11T18:21:50Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:multiple+OR+(all:comparisons+OR+(all:multiplicity+OR+(all:data+OR+(all:dredging+OR+(all:statistical+OR+all:inference)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1181660</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14519v1</id>
+    <title>Medical Image Segmentation: Foundation Model Adaptation versus Task-Specific Training</title>
+    <updated>2026-11-10T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.14519v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14519v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models pretrained on large natural-image collections are increasingly adapted for medical image segmentation, in the expectation that they will replace models trained for each task. Most comparisons, however, use data from the training distribution and a single task-specific baseline whose configuration is rarely justified, and therefore provide limited evidence of performance at new clinical sites. It also remains unclear how much of a foundation model must be adapted, and what determines this. We adapted a foundation model, DINOv2, with strategies ranging from tuning only its bias terms to full fine-tuning, and compared it with U-Nets and ResU-Nets trained from scratch. Experiments covered colonoscopy, breast ultrasound and dermoscopy, with testing on held-out data from the training source and on independent datasets from other institutions. The adapted foundation model generalised better on every external dataset. Within the training distribution, the task-specific models remained competitive when training data were abundant, and delineated boundaries more precisely, while the foundation model more often missed small lesions. Only a small fraction of the foundation model required adaptation, and the capacity needed was determined by the imaging domain rather than by the adaptation method. A widely used polyp test set was also found to duplicate images from another benchmark. Foundation-model adaptation is therefore warranted where models must work across sites, with capacity selected on the target domain.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Emre Kutlusan</name>
+    </author>
+    <author>
+      <name>Yongmin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14517v1</id>
+    <title>The closure of the nonreal roots of bounded-height polynomials is connected exactly at pronic heights</title>
+    <updated>2026-11-10T18:58:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.14517v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14517v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let C_h be the closure of the nonreal roots of integer polynomials with coefficients of modulus at most h. With the nonzero real roots included, the closure is connected at every height; without them, connectedness becomes arithmetic. We prove that C_h is connected exactly when h=q(q-1) is a pronic number 2, 6, 12, 20, ..., and has at least five components otherwise. At height two this confirms a twenty-year-old numerical observation of Shmerkin and Solomyak on double zeros of power series: apart from 1/2 they form the interval $[1/ρ,1)=C_2\cap(0,1)$, with $ρ$ the tribonacci constant. Disconnection is almost always infinite. For (p-1)^2&lt;h&lt;=p^2-3, $h\neq p(p-1)$, infinitely many components with nonempty interior accumulate at $\pm p$ and $\pm 1/p$, and when h&lt;p(p-1) these four points are themselves components. Next to each square q^2&gt;=16, at least two of the three heights q^2-2, q^2-1, q^2 have infinitely many components accumulating at a common point of (1/(q+1),1/q). Explicit series give infinitely many components at every nonpronic height below 167 other than 1, 3, 4, 9, 25, 63 and 81, and in general at most sqrt(X)+1 nonpronic heights h&lt;=X can have finitely many components, although C_h is a Peano compactum at every height. The proofs compare values and derivatives of all admissible power series near a real double zero; the comparison sets are open and closed in the whole core, so components separated near the axis cannot reconnect elsewhere. On the real axis, the double zeros at heights 1, 3, 4, 7 form sets with infinitely many components; at height one this proves a conjecture of Shmerkin and Solomyak and one of Solomyak on the connectedness locus for pairs of affine maps.</summary>
+    <category term="math.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:59Z</published>
+    <arxiv:comment>45 pages, 8 figures, with a 35-page supplement (80 pages in all). Computational companion: Zenodo, doi:10.5281/zenodo.24117729</arxiv:comment>
+    <arxiv:primary_category term="math.CV"/>
+    <author>
+      <name>Bernat Espigule</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14514v1</id>
+    <title>Contrastive Discovery: Open-Ended Scientific Discovery over Competing Explanations</title>
+    <updated>2026-11-10T18:58:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.14514v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14514v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM agents are increasingly used for open-ended, data-driven scientific discovery, yet most of them evaluate hypotheses pointwise, testing an empirical claim $h$ only against its complement $\neg h$. When evidence rejects $h$, the agent learns that one explanation is unlikely but not which alternative the evidence supports. To recover that alternative, we introduce Contrastive Discovery, which replaces the single hypothesis with a contrast set, a scientific question paired with mutually exclusive and collectively exhaustive competing explanations. Each experiment is scored by how its evidence redistributes belief across the set, and the question is resolved when belief concentrates on one explanation. Because contrast sets change only the unit an agent proposes and scores, an existing agent can use them to re-evaluate evidence it has already collected or to guide its search. Across six domains, $89\%$ of the pointwise candidates with the largest belief shifts are rejections. On the same evidence, contrast sets resolve $73\%$ of these candidates to a specific alternative. When contrast sets guide search, the agent resolves $67\%$ more questions than pointwise surprisal under the same experiment budget. In a blinded study, $38$ human experts chose the same explanation on $78\%$ of resolved questions and on $82\%$ of questions where the pointwise agent rejected its hypothesis and stopped. Together, these results support explicit competing explanations as a way for discovery agents to resolve more scientific questions from the same evidence and validation budget.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:43Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 55 pages. Project page: https://codiscovery.ai/contrastive-discovery/</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>James J. Kim</name>
+    </author>
+    <author>
+      <name>Yijia Dai</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14513v1</id>
+    <title>Online Graph Coloring: Competitive Ratios Separating Randomized and Deterministic Algorithms</title>
+    <updated>2026-11-10T18:58:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.14513v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14513v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study online coloring, focusing on the competitive ratio. The best previously known results were (1) a lower bound of $Ω(n / \log^2 n)$ for both deterministic and randomized algorithms by Halldórsson and Szegedy (1994), (2) an upper bound of $O(n / \log n)$ for randomized algorithms by Halldórsson (1997), and (3) an upper bound of $O(n / \log \log n)$ for deterministic algorithms by Kawarabayashi, Yoneda, and Yoneda (2025). In this paper, we improve these results as follows:
+  1. A new lower bound of $Ω(n / \log n)$ for deterministic algorithms.
+  2. A new upper bound of $O(n (\log \log n)^2 / \log^2 n)$ for randomized algorithms.
+  3. A new upper bound of $O(n / (\log \log n)^{2-\varepsilon})$ for deterministic algorithms for every fixed $\varepsilon&gt;0$.
+  For randomized algorithms, we nearly close the gap between the lower and upper bounds; the remaining gap is only $O((\log \log n)^2)$.
+  We establish the asymptotic separation between randomized and deterministic online graph coloring. Against an oblivious adversary, a polynomial-time randomized algorithm achieves a competitive ratio asymptotically smaller than any deterministic algorithm can guarantee, even with unlimited computation.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:28Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Ken-ichi Kawarabayashi</name>
+    </author>
+    <author>
+      <name>Hirotaka Yoneda</name>
+    </author>
+    <author>
+      <name>Masataka Yoneda</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14508v1</id>
+    <title>When Does the Real Wiring Win? Testing connectome structure-function claims against unmeasured physiology</title>
+    <updated>2026-11-10T18:55:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.14508v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14508v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Connectome-constrained models are often used to argue that a measured wiring diagram outperforms shuffled or rewired wiring, and hence that structure shapes function. Such comparisons can confound wiring with how the models are tuned: a connectome fixes who connects to whom, not the excitability, gains or plasticity rates the model also needs, and modellers often tune these until the real-wiring model works. We separate three estimands: physiology tuned on the real wiring and transferred to nulls (P1), each wiring tuned on its own (P2), and P2 restricted to physiology consistent with independent data (P3). The biases involved are known in machine learning (under-tuned baselines, inherited weights, winner's curse); we measure what they do to biological conclusions, using synthetic ground truth, placebo nulls and three Drosophila circuit models. Some claims survive every protocol we test: segregated reward and punishment dopamine improves learning, and head-direction topography is required for a persistent bump. Others do not. In the mushroom body, the real Kenyon-cell output wiring beats a cross-subtype identity shuffle by 0.09 under P1 and P2 but loses to it by 0.09 under P3 (95% CIs exclude zero; held-out runs confirm). The verdict is set by the share of alpha'beta' cells among active Kenyon cells, which P1 selects low; at the share implied by imaging (about 44%) the real-wiring model fails to learn, exposing a model inadequacy rather than a deficit of the fly's wiring. In flyvis, P1 penalises a mirrored connectome, which has a constructed solution within 0.07 (median) of the real error, more than a spatially shuffled one in 50 of 50 members; the ranking survives ten-fold longer retraining but depends on the checkpoint at fifty-fold. A credible structural claim needs matched optimisation, data-constrained physiology and a model that still works there.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:48Z</published>
+    <arxiv:comment>23 pages, 5 figures, 10 tables. Code, data and prediction files are included as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yeyuan Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14506v1</id>
+    <title>Annular Counterexamples and Skew-Shape Block Identities</title>
+    <updated>2026-11-10T18:55:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14506v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14506v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We establish four connected results on weighted order ideals, cluster coefficients, and block-statistic enumerators. First, we give a counterexample to Theorem 14 of Kang, Lee and Lim (European Journal of Combinatorics, 2026): in the rank-two annular cluster model, a single bridging-lamination coefficient row produces $1+q^2$, contradicting the asserted unimodality. We identify the unsupported initial case in their published induction. Second, we refute their log-concavity Conjecture 1: the same gap example violates log-concavity, and a further single-curve computation gives the full-support polynomial $1+2q+7q^2+10q^3+9q^4+4q^5+q^6$, which also fails log-concavity. Third, we establish the skew-shape block-statistic identity proposed in Kahane's Conjecture 4.4 (arXiv:2607.11225v1) for arbitrary finite skew Young diagrams, under an explicitly specified root-exclusion convention. Its proof combines commuting tableau-transfer matrices, a connected-block inverse kernel, and finite polynomial differential equations; the corresponding mathematical statements have Lean 4/Mathlib formalizations. Fourth, we derive a bivariate block refinement whose coefficients are nonnegative after shifting the order parameter by one and, when necessary, multiplying by a monomial in the weight parameter. We specify the correction to the printed root convention, confirmed by Kahane in correspondence, and the geometric sign and specialization conventions clarified by the relevant authors for the annular examples.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:26Z</published>
+    <arxiv:comment>Complete Lean 4 formalization available at this GitHub repository: https://github.com/adamtilepe/Annular_Counterexamples_and_Skew-Shape_Block_Identities</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Adam Tilèpe</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14504v1</id>
+    <title>Emergent Biological Capabilities in a Foundation Model for Molecular Interactions</title>
+    <updated>2026-11-10T18:53:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.14504v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14504v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models trained on large unlabeled corpora develop emergent capabilities, tasks that go beyond the training objective. We extend this paradigm to multimodal biology with Bonbon, a foundation model for molecular interactions trained on approximately 3.2 trillion tokens of paired protein-ligand sequences. From a single representation space, Bonbon exhibits three zero-shot emergent capabilities at hierarchical levels of resolution: functional (mechanism of action), residue (binding site localization, including orthosteric/allosteric discrimination), and bond (covalent versus non-covalent engagement). All three capabilities generalize to out-of-distribution complexes. Bonbon was trained on protein-ligand sequences alone, without any task-specific supervision and without structural coordinates. We conducted controlled scaling experiments across six model scales from 42M to 1.6B parameters; every capability evaluated shows a sharp jump at the largest scale on continuous metrics, even as pretraining loss decreases smoothly. This demonstrates that loss-based scaling laws alone are insufficient to predict when zero-shot emergent capabilities become available. The capabilities reported here emerge after training at a 1:2,000 parameter-to-token ratio to accommodate the sparsity of paired biological interaction data. The same frozen representations achieve state-of-the-art binding and affinity prediction at five orders of magnitude greater speed than co-folding methods. In prospective wet-lab validation across nine disease targets spanning seven protein families, Bonbon achieves a 61.5% dose-response hit rate on de novo compounds, yielding structurally novel molecules not previously reported to inhibit these proteins, including for out-of-distribution targets.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.BM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:53:01Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026 (Main Track, Oral)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Adi Mashiach</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14502v1</id>
+    <title>Zeros of Katz's p-adic Eisenstein series E2</title>
+    <updated>2026-11-10T18:51:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.14502v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14502v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For every prime $p\geq5$, the zeros of Katz's $p$-adic Eisenstein series $E_2$ on elliptic curves with good ordinary reduction have exactly $\lfloor p/12\rfloor+1$ distinct $j$-invariants. We prove that all these invariants lie in finite unramified extensions of $\mathbf{Q}_p$. Their reductions are given by a classical formula involving the supersingular polynomial, and each nonelliptic residue class contains a unique simple zero. For the Legendre family, hypergeometric congruences determine the polynomial of the lifted invariants modulo every power of $p$. We also study isogenies between the zeros. Each $p$-power isogeny class contains at most one zero $j$-invariant, and any two distinct isogenous zero invariants are algebraic over $\mathbf{Q}$. At a fixed cyclic degree, the nonelliptic isogenies give points in a finite divisor over $\mathbf{Q}$ on the corresponding modular curve. Its degree bounds their number and their fields of definition, and excludes several small degrees. The only zeros with complex multiplication have $j=0$ or $1728$. Whether a non-CM zero can have an algebraic $j$-invariant remains open.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:53Z</published>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Abdellah Sebbar</name>
+    </author>
+    <author>
+      <name>Khalil Besrour</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14501v1</id>
+    <title>Mutual Linearity in Nonlinear Population Dynamics</title>
+    <updated>2026-11-10T18:51:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.14501v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14501v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mutual Linearity in Nonlinear Population DynamicsMutual linearity, the persistence of affine relations among stationary observables under arbitrarily strong changes of one transition rate, is known for Markov jump processes and chemical reaction networks. We show that generalized Lotka--Volterra dynamics form a new class of mutually linear systems, even though species can go extinct and attractors can be chaotic. Any change to one species' equation acts on the others as one effective press and keeps all abundances affinely related: piecewise across extinctions, and as time averages on chaotic attractors.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.PE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:44Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Shiling Liang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14499v1</id>
+    <title>Spatial patterns of transportation choice in Niterói</title>
+    <updated>2026-11-10T18:51:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14499v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14499v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Characterizing how people move through a city requires spatially and temporally fine-grained data that are often costly and difficult to obtain. Here, we introduce a computational framework that uses macroscopic, aggregated, and static urban data to construct a microscopic, dynamic, and spatially detailed representation of urban mobility. Building on an existing activity simulator, the framework combines a synthetic population, the built environment, and transport networks to generate daily trips and assign walking, car, or public transit. Applied to approximately 475,000 synthetic residents of Niterói, Brazil, simulated neighborhood-level transit patterns show a strong association with an empirical activity proxy (Pearson r=0.885). Walking is more prevalent in compact central areas, car use increases toward the periphery, and public-transit use remains comparatively high along bus corridors. Reducing walking times to and from bus stops by 30% increases the modeled public-transit-to-car ratio by 11.3%, with larger transit-share gains in several peripheral areas. These results reveal spatial differences in transportation choice and identify where improved transit access may have the greatest modeled effect.</summary>
+    <category term="physics.soc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.OT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:37Z</published>
+    <arxiv:primary_category term="physics.soc-ph"/>
+    <author>
+      <name>Sandro Martinelli Reia</name>
+    </author>
+    <author>
+      <name>Taylor Anderson</name>
+    </author>
+    <author>
+      <name>Dieter Pfoser</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14498v1</id>
+    <title>Measuring Robustness and Efficiency in a Connectome-Constrained Fly Visual System Model: Linking an Adversarial and a Perceptual Illusion</title>
+    <updated>2026-11-10T18:51:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Biological visual systems compute reliably under tight metabolic and wiring constraints, whereas artificial vision systems consume far more energy and can be sensitive to adversarial perturbations. Whether networks with brain-like wiring are more robust at lower computational cost is unclear. We address this by benchmarking a task-optimized, continuous-time recurrent neural network of the fly visual system constrained by its synaptic connectome (FlyNet) against artificial neural networks. We compare it against CNNs, RAFT, and continuous-time recurrent neural networks without detailed connectome constraints (sCTRNN, CTRNN) on a collision-detection task within a differentiable 3D rendering pipeline. FlyNet is adversarially vulnerable but, relative to its compute, more robust to common video corruptions than RAFT, while using up to five orders of magnitude fewer FLOPs. The CTRNNs remain more robust than FlyNet across almost all tested perturbations, suggesting that connectome constraints benefit efficiency, through their low edge count, over robustness. Recurrence improves robustness to white-box attacks in RAFT and temporal context improves robustness to common corruptions. FlyNet's position and velocity representations degrade under adversarial textures but recover under counterfactual textures that restore correct classification while staying equally far from training, ruling out unfamiliar textures as the cause of failure. The reverse-phi illusion similarly disrupts these representations and inverts the same low-level motion statistic as the adversarial textures. Optimizing this input statistic alone, without access to the network, suffices to induce classification failure, attributing both perturbations to the same circuit vulnerability. Connectome-constrained models can thus surface adversarial failure mechanisms as testable hypotheses about biological perceptual vulnerabilities.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:31Z</published>
+    <arxiv:comment>39 pages, 24 figures, 2 tables, Accepted at 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alexandre Garcia-Duran</name>
+    </author>
+    <author>
+      <name>Alejandro Rodriguez-Garcia</name>
+    </author>
+    <author>
+      <name>Manuel Molano-Mazón</name>
+    </author>
+    <author>
+      <name>Alexandre Hyafil</name>
+    </author>
+    <author>
+      <name>Srikanth Ramaswamy</name>
+    </author>
+    <author>
+      <name>Janne K. Lappalainen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14497v1</id>
+    <title>Excess charge in the Engel-Dreizler model of atoms and molecules</title>
+    <updated>2026-11-10T18:51:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.14497v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14497v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove an explicit excess-charge bound for the exchange-free Engel--Dreizler functional of atoms and molecules. If $αλ\le1/1233$ and $α^3Z_k^2\le1/137$ for each nucleus, every finite-mass electronic minimizer whose total energy, including nuclear repulsion, is nonpositive satisfies $N-\sum_kZ_k&lt;(5913/1000)λ^{3/2}K$. For the gradient coefficient $λ=1/9$, this gives $N-\sum_kZ_k&lt;0.219K$. The energy hypothesis holds automatically for atoms and for local minima of the Born--Oppenheimer energy at which the electronic infimum is attained. The proof uses no symmetry of the density, restriction on the total nuclear charge, or minimum nuclear separation. We combine molecular Sommerfeld estimates with a convex nonlinear comparison in the variable $F(p)$. The failure of the latter comparison at very high density is represented by a nonnegative Newton potential. A quartic coercivity estimate, obtained from nuclear repulsion and a signed localized Hardy inequality, controls the total mass of this source. The chemical potential is retained throughout. Exact covariance yields the invariant parameter domain, and all finite numerical inequalities are reduced to rational arithmetic.</summary>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.other" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:11Z</published>
+    <arxiv:primary_category term="math-ph"/>
+    <author>
+      <name>Rafael Benguria</name>
+    </author>
+    <author>
+      <name>Heinz Siedentop</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14495v1</id>
+    <title>SkipLane: Write-Once, Conflict-Free Accumulation for Zero-Skipping CNN Engines on FPGAs</title>
+    <updated>2026-11-10T18:50:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.14495v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14495v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Skipping zero activations saves multiplications in CNN accelerators, but it complicates accumulation: the products in a compressed input window belong to different output columns and must be merged. In our earlier engine, this merging was done by read-modify-write (RMW) of a row buffer, which made sparse inputs slower than dense ones even at 87% sparsity. Existing designs either merge kernel rows through RMW or reduce bank conflicts with extra hardware, without eliminating them. SkipLane makes the entire accumulation path write-once. Each kernel row is processed in its own lane, which holds partial sums in three registers and retires up to three finished columns per cycle into memory banks that cannot conflict. Lanes and input channels are summed only at readout, so no partial sum is ever read back. Multipliers left idle by zero weights compute a second filter in the same pass. In RTL simulation, the engine stays within 0.5% of its frontend bound up to 70% sparsity and is 1.10-1.26$\times$ faster than an SCNN-style scatter accumulator with 18 banks and ideal RMW at 50-80% sparsity. Six engines meet 140 MHz on a PYNQ-Z2 using 21.1k LUTs and run LeNet-5 bit-exact on the board. For conv1, the engine needs 1.94$\times$ fewer cycles than a dense engine (1.26$\times$ faster end to end); for conv2, whose rows are only 13 pixels wide, it reaches 0.87$\times$ the dense speed.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:51Z</published>
+    <arxiv:comment>5 pages, 5 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Aditya Saboo</name>
+    </author>
+    <author>
+      <name>Pratibha Verma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14491v1</id>
+    <title>TimeSeek: Multi-Task and Multi-Domain Pretraining for Generalized Time Series Analytics</title>
+    <updated>2026-11-10T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time series analytics has been widely applied across various domains. While existing time series foundation models (TSFMs) have demonstrated promising results, they still face two major challenges: 1) Most TSFMs mainly rely on stacking Transformer layers to increase parameter size, lacking the ability to adaptively model complex time series patterns from multi-domain data. 2) Current TSFMs are primarily pre-trained for specific tasks, e.g., forecasting or anomaly detection, and a few models support multiple tasks, but they fail to fully leverage task specificity and commonality, resulting in suboptimal performance. To address these challenges, we propose TimeSeek, a novel generalized time series analytics model that adaptively models time series patterns from multi-domain data and unifies multiple tasks in pre-training. Conceptually, TimeSeek is guided by selective information sharing under domain and task heterogeneity. From the perspective of multi-domain data, we propose a Multi-Domain Feature Extractor that adaptively captures temporal dependencies and channel correlations based on domain-specific characteristics, including progressive multi-scale modeling and adaptive slot channel modeling. From the perspective of the diversity of tasks, we propose multi-task collaborative training, which leverages task specificity and task commonality through task customization and cross-task training, effectively unifying multiple tasks in pre-training and better adapting to diverse downstream scenarios. After pre-training on large-scale time series data, TimeSeek achieves state-of-the-art performance in forecasting, anomaly detection, and classification tasks across both few-shot learning and zero-shot situations, together with favorable inference efficiency.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:26Z</published>
+    <arxiv:comment>Accepted by IEEE Transactions on Pattern Analysis and MachineIntelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Peng Chen</name>
+    </author>
+    <author>
+      <name>Yihang Wang</name>
+    </author>
+    <author>
+      <name>Zhongwen Rao</name>
+    </author>
+    <author>
+      <name>Yang Shu</name>
+    </author>
+    <author>
+      <name>Yuying Qiu</name>
+    </author>
+    <author>
+      <name>Yuxuan Chen</name>
+    </author>
+    <author>
+      <name>Lujia Pan</name>
+    </author>
+    <author>
+      <name>Bin Yang</name>
+    </author>
+    <author>
+      <name>Chenjuan Guo</name>
+    </author>
+  </entry>
+</feed>
