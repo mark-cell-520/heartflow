@@ -231,6 +231,8 @@ const WRITE_TOOLS = new Set([
   'heartflow_memory_write_control',
   'heartflow_memory_eraser',
   'heartflow_memory_consolidation',
+  // [r291] dreamConsolidation 含 updateDecayParams 写操作，收口到 user 角色
+  'heartflow_dream_consolidation',
   'heartflow_memory_compress',
   'heartflow_memory_integrity',
   'heartflow_agentic_memory',
@@ -3304,6 +3306,19 @@ function _strategicRestraintFallback() {
   } catch (_) { _srFallback = null; }
   return _srFallback;
 }
+// [r291] DreamConsolidation 进程内回退单例（与 _strategicRestraintFallback 同范式）。
+// 引擎常驻实例（heartflow.dreamConsolidation）优先；MCP 进程未启动引擎时用它兜底，
+// 保证 getDreamHistory / getLastDream 跨调用读到同一份 dreamHistory，
+// 不再每次调用 new 出空历史（r627 在 strategicRestraint 上实测过「每次 new」的坏症状）。
+let _dcFallback = null;
+function _dreamConsolidationFallback() {
+  if (_dcFallback) return _dcFallback;
+  try {
+    const { DreamConsolidation } = require('./dream/dream-consolidation.js');
+    _dcFallback = new DreamConsolidation(null);
+  } catch (_) { _dcFallback = null; }
+  return _dcFallback;
+}
 
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
@@ -4240,6 +4255,59 @@ const HANDLERS = {
       }
 
       return { error: `未知 action: ${action}（可用 evaluate / getDontList / addDont / removeDont / checkMission / getStats / listMissions）` };
+    } catch (e) { return { error: e.message }; }
+  },
+
+  // [r291] DreamConsolidation 接线（真升级③：已加载未 dispatch 能力接线）。
+  // 与 r627 strategicRestraint 同范式：引擎常驻实例优先，进程未启动引擎时退化到
+  // 回退单例。此前该模块已实例化但从未进 _modules → 全库 0 条 dispatch 路由，
+  // MCP 侧也无 handler —— 两处都不可达。本 handler 覆盖 7 个公开方法。
+  heartflow_dream_consolidation: (args) => {
+    try {
+      const dc = (heartflow && heartflow.dreamConsolidation) || _dreamConsolidationFallback();
+      if (!dc) return { error: '睡眠记忆巩固引擎未初始化：引擎未启动且回退单例创建失败' };
+      const action = args?.action || 'dreamNow';
+
+      // dreamNow：跑一轮巩固（默认 action，含睡眠阶段推进/剪枝/合成/冲突检测）
+      if (action === 'dreamNow') {
+        return { action: 'dreamNow', ...dc.dreamNow() };
+      }
+
+      // dream：完整参数版巩固
+      if (action === 'dream') {
+        const r = dc.dream({
+          consolidate: args?.consolidate !== false,
+          prune: args?.prune !== false,
+          synthesize: args?.synthesize !== false,
+          sleepStage: typeof args?.sleepStage === 'string' ? args.sleepStage : 'REM',
+          newEntries: Array.isArray(args?.newEntries) ? args.newEntries : [],
+          detectConflicts: args?.detectConflicts !== false
+        });
+        return { action: 'dream', ...r };
+      }
+
+      // dreamCycle：多周期模拟
+      if (action === 'dreamCycle') {
+        const cycles = typeof args?.cycles === 'number' && args.cycles > 0 ? args.cycles : 4;
+        return { action: 'dreamCycle', ...dc.dreamCycle(cycles) };
+      }
+
+      // getLastDream / getDreamHistory：读最近一次 / 历史统计
+      if (action === 'getLastDream') return { action: 'getLastDream', ...dc.getLastDream() };
+      if (action === 'getDreamHistory') return { action: 'getDreamHistory', ...dc.getDreamHistory() };
+
+      // getDecayParams：读衰退参数（只读）
+      if (action === 'getDecayParams') return { action: 'getDecayParams', ...dc.getDecayParams() };
+
+      // updateDecayParams：改衰退参数（写操作，user 角色，由 WRITE_TOOLS 收口）
+      if (action === 'updateDecayParams') {
+        if (!args || typeof args.params !== 'object' || args.params === null) {
+          return { error: 'updateDecayParams 需要 params 对象（halfLifeDays/reinforcementBonus/accessBoostFactor/minRetentionScore）' };
+        }
+        return { action: 'updateDecayParams', ...dc.updateDecayParams(args.params) };
+      }
+
+      return { error: `未知 action: ${action}（可用 dreamNow / dream / dreamCycle / getLastDream / getDreamHistory / getDecayParams / updateDecayParams）` };
     } catch (e) { return { error: e.message }; }
   },
 

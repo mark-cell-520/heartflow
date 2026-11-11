@@ -132,7 +132,7 @@ class DreamConsolidation {
    */
   _detectConflicts(newEntries) {
     const conflicts = [];
-    if (!this.memory.listLearned || !newEntries || newEntries.length === 0) return conflicts;
+    if (!(this.memory && this.memory.listLearned) || !newEntries || newEntries.length === 0) return conflicts;
     
     const existing = this.memory.listLearned();
     for (const newEntry of newEntries) {
@@ -247,7 +247,7 @@ class DreamConsolidation {
    */
   _computeReinforcementWeight(key, entry) {
     if (!entry) {
-      if (!this.memory.get) return 0.5;
+      if (!(this.memory && this.memory.get)) return 0.5;
       entry = this.memory.get(key);
     }
     if (!entry) return 0.3;
@@ -349,7 +349,7 @@ class DreamConsolidation {
     const creativityFactor = stage.creativityBoost;
     
     // 执行巩固 (带睡眠阶段调制)
-    if (consolidate && this.memory.consolidate) {
+    if (consolidate && this.memory && this.memory.consolidate) {
       const baseResult = this.memory.consolidate();
       results.consolidation = {
         ...baseResult,
@@ -454,7 +454,7 @@ class DreamConsolidation {
   _pruneWithDecay(pruningFactor = 1.0) {
     const pruned = [];
     const retained = [];
-    if (!this.memory.listLearned) return { pruned_count: 0, pruned_keys: [], retained_count: 0, decayScores: [] };
+    if (!(this.memory && this.memory.listLearned)) return { pruned_count: 0, pruned_keys: [], retained_count: 0, decayScores: [] };
     
     const learned = this.memory.listLearned();
     const decayScores = [];
@@ -496,7 +496,7 @@ class DreamConsolidation {
    * @param {number} creativityFactor - 创造力因子 (0.0-1.0)
    */
   _synthesizeEnhanced(creativityFactor = 0.5) {
-    if (!this.memory.listLearned) return { insight: 'No memory system available.', topics: [], priority: 0 };
+    if (!(this.memory && this.memory.listLearned)) return { insight: 'No memory system available.', topics: [], priority: 0 };
     
     const allLearned = this.memory.listLearned();
     const recentLearned = allLearned

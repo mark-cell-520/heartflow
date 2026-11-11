@@ -426,6 +426,12 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"check（默认）/ families / list"}},"required":["text"]}
   },
 
+  {
+    name: 'heartflow_dream_consolidation',
+    description: "睡眠记忆巩固引擎（DreamConsolidation，r291 接线）——把「已实例化但全库 0 条 dispatch 路由」的记忆巩固能力暴露为可调用入口。此前 src/core/heartflow.js 一直在实例化它、think-pipeline 也一直在调 dreamNow()，但它从未进 _modules → generateAllowedRoutes 扫不到 → dispatch('dreamConsolidation.*') 逐条抛 route not allowed（r291 探针实测 7/7 全抛）；本轮补注册后 7 条路由首次可达。能力：① 记忆衰退评分（按 core/identity/consolidated/lesson/pattern 分层半衰期 + 访问频率强化，score=2^(-age/半衰期)）；② 梦质量度量；③ 巩固冲突检测；④ 洞察优先级排序；⑤ 记忆强化加权；⑥ 睡眠阶段感知（NREM1-4/REM，各阶段巩固率/剪枝率/创造力增益不同）；⑦ 多周期模拟；⑧ 梦叙事生成。action: dreamNow（默认，跑一轮巩固，含睡眠阶段推进/剪枝/合成/冲突检测）；dream（完整参数版：consolidate/prune/synthesize/sleepStage/newEntries/detectConflicts）；dreamCycle（多周期模拟，cycles 默认 4）；getLastDream 读最近一次梦结果；getDreamHistory 读历史（avgQuality/stageDistribution）；getDecayParams 读衰退参数（各层半衰期/强化增量/访问增益）；updateDecayParams 改衰退参数（写操作，user 角色）。走引擎常驻实例（heartflow.dreamConsolidation），跨调用共享 dreamHistory；引擎未启动时退化到进程内单例。零 LLM 依赖。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"dreamNow（默认）/ dream / dreamCycle / getLastDream / getDreamHistory / getDecayParams / updateDecayParams"},"cycles":{"type":"number","description":"dreamCycle 的模拟周期数，默认 4"},"sleepStage":{"type":"string","description":"dream 的睡眠阶段：NREM1 / NREM2 / NREM3 / REM / NREM4"},"consolidate":{"type":"boolean","description":"dream 是否执行巩固，默认 true"},"prune":{"type":"boolean","description":"dream 是否执行剪枝，默认 true"},"synthesize":{"type":"boolean","description":"dream 是否执行合成，默认 true"},"detectConflicts":{"type":"boolean","description":"dream 是否检测冲突，默认 true"},"params":{"type":"object","description":"updateDecayParams 的衰退参数（halfLifeDays/reinforcementBonus/accessBoostFactor/minRetentionScore）"}},"required":[]}
+  },
+
 ];
 
 // [AUDIT-FIX 2026-10-11] 并入运行时验证过的只读工具集（86 个）。

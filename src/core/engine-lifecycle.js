@@ -94,7 +94,17 @@ function _registerModules(hf) {
         'formula',
         'cognitiveIndex',
         'decisionEngineV2', 'memoryConsolidation', 'emotionDynamics', 'cognitiveLoadV2', 'dreamEngineV2',
-        'psychologyDialogue'
+        'psychologyDialogue',
+        // [r291] dreamConsolidation 接线（真升级③：已加载未 dispatch）：
+        // src/core/heartflow.js L1721 一直在实例化它（catch 里还备了 consolidate/healthCheck
+        // 兜底），think-pipeline.js L940 也一直在调 dreamNow()，但它从未出现在本名单 →
+        // 从未进 _modules → generateAllowedRoutes 扫不到 → 全库 0 条引擎侧路由，
+        // dispatch('dreamConsolidation.*') 逐条抛 'route not allowed'（r291 探针实测 7/7 全抛）。
+        // 即「实例活着、能力完整（16 方法）、引擎内零路由」——与 r603 progressJudgment 同型。
+        // 补名后 generateAllowedRoutes 自动扫出 7 条公开方法路由：
+        // dream / dreamNow / dreamCycle / getLastDream / getDreamHistory /
+        // getDecayParams / updateDecayParams（_ 开头私有方法按设计不收）。
+        'dreamConsolidation'
     ];
     for (const name of subsystemNames) {
         if (hf[name] !== null && hf[name] !== undefined) {

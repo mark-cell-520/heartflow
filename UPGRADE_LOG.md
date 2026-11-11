@@ -1,3 +1,39 @@
+## r292 — dreamConsolidation 睡眠记忆巩固能力接线（真升级③+④）+ r291 掉线 rebase 冲突解决
+
+**日期** 2026-11-11 12:48–13:10 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.172 → 6.8.172（接线轮不新增维度编号，同 r603/r629 惯例）  **轮次** r292
+
+### 开轮状态
+r291 交接明确：必须换方向 + 必须落子 `consciousness/` / `src/plugins/` / `src/tools/` / `src/core/psychology/` 之一（连续四轮顶层 `src/` 触「每 3 轮至少 1 轮」红线）。首跑 hf4-sync ahead=0/behind=0，但 scan 暴露 **r291 04:02 UTC 方向轮换认领掉线残留**：README.md 与 coordination/claims.jsonl 处于 `UU` 冲突未解决状态，且工作区有 ~86 行未提交接线产能。按「掉线恢复」+「本地独有产能优先固化」处置，未丢弃未覆盖。
+
+### 缺口实证（HEAD 对照，coordination/agent4/probes/r291-dc-wiring-probe.js）
+`dreamConsolidation` 是「实例活着、能力完整、全库零路由」型缺口（与 r603 progressJudgment、r402/r404/r577 valueInternalizer 同型）：
+- `src/core/heartflow.js` L1721 一直在 `new DreamConsolidation(this.memory)`（catch 里还备 consolidate/healthCheck 兜底）
+- `think-pipeline.js` 一直在调 `dreamNow()`
+- 但实例从未进 `_modules` → `generateAllowedRoutes` 扫不到 → `ALLOWED_ROUTES` 0 条命中 → `dispatch('dreamConsolidation.*')` 逐条抛 `route not allowed`
+- **HEAD 导出对照实测**（`git archive HEAD` → /tmp/hf4-r291-head）：HEAD 3/3 全抛 `route not allowed`；工作区 3/3 `ok`。缺口真实、修复有效。
+- MCP 侧同样零 handler、tools-registry 零定义，外部不可达。
+
+### 落地内容
+1. `src/core/engine-lifecycle.js`：`subsystemNames` 名单补 `'dreamConsolidation'`（在 `_registerModules()` 之后、`generateAllowedRoutes` 之前的同一时序）→ `ALLOWED_ROUTES` 首次扫出 7 条：`dream` / `dreamNow` / `dreamCycle` / `getLastDream` / `getDreamHistory` / `getDecayParams` / `updateDecayParams`
+2. `src/mcp/tools-registry.js`：新增 MCP 工具 #186 `heartflow_dream_consolidation`（含完整 JSDoc 射程与 action 说明）
+3. `src/mcp-server.js`：handler 映射 + WRITE_TOOLS 写权限收口（`updateDecayParams` 是写操作，须 user 角色）+ 引擎未启动时退化到进程内单例 `_dreamConsolidationFallback()`
+4. **附带修复真缺陷** `src/dream/dream-consolidation.js`：退化路径 `new DreamConsolidation(null)` 下有 5 处 `this.memory.xxx` 裸访问直接 TypeError（L135/L250/L352/L457/L499）——即新 MCP 工具在引擎未启动的退化路径上必崩。5 处全部加空值守卫（`!this.memory.` → `!(this.memory && this.memory.`，L352 补 memory 存在性前置）。探针 `r292-patch-dc-nullguard.py`，每处 assert count==1 保证唯一替换。
+
+### 数字同步（measure-claimed-numbers.js 实测，不猜）
+`scripts/measure-claimed-numbers.js` 实跑输出：**MCP 工具 186 / 路由 1323 / 模块 163 / 测试通过 21118**。据此同步 AGENTS.md 横幅、SKILL.md 横幅+规格表+capability map、README.md 规格表（README 冲突块的「Stashed changes」侧本就是这套值，冲突解决后即一致）。
+
+### 验证
+- 轮测 `test/round-292-dream-consolidation-wiring.test.js`：**53 通过 / 0 失败**（A 引擎侧接线 7+3+3 条断言、B MCP 侧接线含 WRITE_TOOLS 集合字面量断言、C 7 个公开方法逐个真调用 + 5 个睡眠阶段 + 读写闭环、D 单例语义、E 异常入参不崩、F 良性 gate pass 不变 + 维度计数 245、G 移除接线行后名单不剩该名）
+- 四门禁实跑：verify 16/0 PASS；guard-abilities 20/20（判别维度 245）PASS；doc-numbers 24/24 PASS；双向 召回 52/52 + 误拦 302/326 PASS
+- 良性误伤对照：stash 掉本轮改动后同段探针 `dreamConsolidation in _modules: false`（缺口确由本接线产生）；`[MemoryBank] Decryption failed` 告警为环境 AES key 问题、基线路径同样出现，与本轮无关
+- 存量不回归：`src/index.js` 零改动、维度计数 245 不变、BLOCK/REWRITE/VERIFY 三集合计数 11/19/212 不变
+
+### 死认领治理
+scan 无他人死认领。r291 的 04:02 方向轮换认领（claimed 超 6h 无 release）标为 **abandoned**——其产能（dreamConsolidation 接线）由本轮 r292 完成，upstream 的 r291 诉诸自然反向族记录（completed+released 6.8.172）原样保留，claims.jsonl 冲突双留解决。r291 掉线时 hf4-sync 的 auto-stash（f921c733）内容经逐字节比对确认已被工作区完整包含（3 个接线文件 SAME，README/claims 为冲突解决后的正确状态），drop 清理。
+
+### commit
+待提交（测试+探针 / 引擎+MCP+文档 / claims 闭环三分组）。
+
 ## r291 — 诉诸自然「非自然即有害」反向族 + 裸存在句补腿（真升级②）
 
 **日期** 2026-11-11 10:41–11:15 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.171 → 6.8.172  **轮次** r291
