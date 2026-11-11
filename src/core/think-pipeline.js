@@ -729,6 +729,22 @@ async function runThinkPipeline(result, input, engine) {
     }
   } catch (_) { /* HookBus 失败不阻断 */ }
 
+  // ─── [r295] 插件判别结果消费（必须晚于上面 postprocess.think fire）──
+  // 顺序教训：上面的 inline「辨别反哺决策」块（515-732 行）跑在 hook fire 之前，
+  // 插件写的 _discrimination 它永远读不到（sycophancy 的 _confidencePenalty
+  // 走该块即为死代码）。econ-reasoning-check 插件（r295 接线）在 hook 里写
+  // _discrimination.econReasoning，故消费点设在 fire 之后，折扣才真实生效。
+  try {
+    if (result && result.output) {
+      const econ = result._discrimination && result._discrimination.econReasoning;
+      if (econ && econ.totalHits > 0 && econ.score > 0.5) {
+        result._confidencePenalty = Math.max(result._confidencePenalty || 0, Math.min(0.3, econ.score * 0.2));
+        const warns = result.output.warnings || (result.output.warnings = []);
+        warns.push(`经济/统计推理谬误(${(econ.families || []).map(f => f.label).join(',')})，结论已打折`);
+      }
+    }
+  } catch (_) { /* 辨别闭环不阻断 */ }
+
   // ─── [v6.3.9] 指令防火墙检查
   try {
     if (result && result.output && typeof _FirewallCheck === 'function') {

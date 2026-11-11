@@ -3320,6 +3320,55 @@ function _dreamConsolidationFallback() {
   return _dcFallback;
 }
 
+// [r295] 经济/统计推理辨别器：引擎常驻插件实例优先，进程未启动引擎时 require 插件模块。
+// 插件（src/plugins/econ-reasoning-check/）的 analyze 是纯函数无状态，两种来源等价。
+function _econReasoningAnalyzer() {
+  if (heartflow && typeof heartflow._econReasoningAnalyzer === 'function') return heartflow._econReasoningAnalyzer;
+  try {
+    const mod = require('./plugins/econ-reasoning-check/index.js');
+    if (mod && typeof mod.analyze === 'function') return mod.analyze;
+  } catch (_) { /* 插件缺失：返回 null，handler 报错 */ }
+  return null;
+}
+
+// [r295] heartflow_econ_fallacy_check / heartflow_stats_literacy_check 共用 handler。
+// group: 'econ'（13 族经济与资源推理）| 'stats'（5 族统计素养）。
+// action: all（默认，跑全组）/ 单一族 key（单族详查）。
+function handleEconReasoningCheck(args, group) {
+  try {
+    const analyze = _econReasoningAnalyzer();
+    if (!analyze) return { error: '经济/统计推理辨别器插件不可用（src/plugins/econ-reasoning-check/ 加载失败）' };
+    const text = typeof args?.text === 'string' ? args.text : '';
+    if (!text || text.length < 6) return { error: '需要 text 参数（至少 6 字符）', group };
+    const action = typeof args?.action === 'string' && args?.action ? args.action : 'all';
+    if (action === 'all') {
+      const r = analyze(text);
+      const families = (r.families || []).filter(f => f.group === group);
+      return {
+        tool: group === 'econ' ? 'heartflow_econ_fallacy_check' : 'heartflow_stats_literacy_check',
+        group, action: 'all',
+        score: r.score, risk: r.risk, totalHits: r.totalHits,
+        families,
+        familyCount: families.length,
+        note: group === 'econ'
+          ? '经济与资源推理 13 族（r219-r245 起草，r295 首次 dispatch）；命中族见 families，逐族判据/豁免见各模块头注释'
+          : '统计素养 5 族（r232-r284 起草，r295 首次 dispatch）；命中族见 families，逐族判据/豁免见各模块头注释',
+      };
+    }
+    // 单族详查
+    const r = analyze(text, { only: action });
+    const fam = (r.families || [])[0] || null;
+    if (!fam) {
+      return { tool: group === 'econ' ? 'heartflow_econ_fallacy_check' : 'heartflow_stats_literacy_check', group, action, hit: false, score: r.score };
+    }
+    return {
+      tool: group === 'econ' ? 'heartflow_econ_fallacy_check' : 'heartflow_stats_literacy_check',
+      group, action, hit: true,
+      family: fam, score: r.score, risk: r.risk,
+    };
+  } catch (e) { return { error: e.message }; }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -4310,6 +4359,14 @@ const HANDLERS = {
       return { error: `未知 action: ${action}（可用 dreamNow / dream / dreamCycle / getLastDream / getDreamHistory / getDecayParams / updateDecayParams）` };
     } catch (e) { return { error: e.message }; }
   },
+
+  // [r295] 经济与资源推理 13 族 + 统计素养 5 族辨别器（真升级④：新 MCP 只读工具）。
+  // 与 dreamConsolidation 同范式：优先走引擎常驻插件实例（hf._econReasoningAnalyzer，
+  // PluginLoader 自动加载 src/plugins/econ-reasoning-check/），未启动引擎时直接
+  // require 插件模块（纯函数，无状态依赖）。此前这 18 个 provisional 模块
+  // （r219-r284 起草）从未进过任何 dispatch 路径，攻击句全穿引擎。
+  heartflow_econ_fallacy_check: (args) => handleEconReasoningCheck(args, 'econ'),
+  heartflow_stats_literacy_check: (args) => handleEconReasoningCheck(args, 'stats'),
 
   heartflow_drift_detect: (args) => {
     try {

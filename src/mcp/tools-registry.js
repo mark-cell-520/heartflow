@@ -432,6 +432,18 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"dreamNow（默认）/ dream / dreamCycle / getLastDream / getDreamHistory / getDecayParams / updateDecayParams"},"cycles":{"type":"number","description":"dreamCycle 的模拟周期数，默认 4"},"sleepStage":{"type":"string","description":"dream 的睡眠阶段：NREM1 / NREM2 / NREM3 / REM / NREM4"},"consolidate":{"type":"boolean","description":"dream 是否执行巩固，默认 true"},"prune":{"type":"boolean","description":"dream 是否执行剪枝，默认 true"},"synthesize":{"type":"boolean","description":"dream 是否执行合成，默认 true"},"detectConflicts":{"type":"boolean","description":"dream 是否检测冲突，默认 true"},"params":{"type":"object","description":"updateDecayParams 的衰退参数（halfLifeDays/reinforcementBonus/accessBoostFactor/minRetentionScore）"}},"required":[]}
   },
 
+  {
+    name: 'heartflow_econ_fallacy_check',
+    description: "经济与资源推理 13 族辨别器（r295 接线）——把 r219-r245 起草后从未 dispatch 的 13 个 provisional 检测模块首次暴露为可调用入口。此前这些族在 gate 层零维度键（dimMap 无 budget_value_conflation/average_marginal_conflation/mental_accounting/perverse_incentive/winners_curse/tragedy_of_commons/illusion_of_control/disposition_effect/endowment_effect/anchoring_effect/present_bias/peak_end_rule/effort_justification），攻击句全穿引擎。判据继承各模块：两腿共现（缺一不判）+ 概念教学/纠正陈述/疑问句豁免；模块层已在 326 条官方良性语料上零误命中。族单：budget_value_conflation 预算约束≠价值判断（预算不够所以不值得做）/ average_marginal_conflation 平均≠边际（平均成本低所以再生产一台更便宜）/ mental_accounting 心理账户（年终奖是外快所以可以挥霍）/ perverse_incentive 激励反噬（按销量发奖金所以员工刷单）/ winners_curse 赢家诅咒（中标说明报价合理）/ tragedy_of_commons 公地悲剧（公共草场不多放羊就吃亏）/ illusion_of_control 控制幻觉（自己选号中奖率更高）/ disposition_effect 处置效应（涨的拿不住跌的死活不卖）/ endowment_effect 禀赋效应（是我的所以给多少都不换）/ anchoring_effect 锚定效应（标价五百万降二十万觉得占便宜）/ present_bias 现时偏差（今晚先痛快吃了以后再说）/ peak_end_rule 峰终定律（结尾惊艳所以整趟都值）/ effort_justification 努力正当化（熬了几个月所以质量没问题）。action: all（默认，跑全部 13 族）/ <family key>（单族详查）。零 LLM 依赖、只读不改。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"all（默认，跑全部 13 族）/ 单一族 key：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification"}},"required":["text"]}
+  },
+
+  {
+    name: 'heartflow_stats_literacy_check',
+    description: "统计素养 5 族辨别器（r295 接线）——把 r232-r284 起草后从未 dispatch 的 5 个 provisional 检测模块首次暴露为可调用入口。族单：p_hacking 多重比较/数据挖掘（试了 30 组参数终于有一组 p<0.05）/ inverse_gamblers_fallacy 逆赌徒谬误（连中两次头奖一定是骰子被动过）/ significance_effect_size 显著性≠重要性（p<0.001 所以效应一定很大）/ selection_on_dependent_variable 选择依赖变量/按结果归因（活下来的公司都融过资所以融资能救命）/ ad_hominem 人身攻击（他是个骗子所以他说的数据全是假的）。判据继承各模块：两腿共现（缺一不判）+ 豁免表（概念教学/纠正陈述/反诈安全提醒/法律程序转述/疑问句）；模块层已在官方良性语料上零误命中。与既有维度的边界：selection_bias(168) 管抽样框偏倚、本族管按结果变量筛样本；poisoning_the_well(134) 管预先污名化+拒绝采信、本族腿②是内容连带否定；genetic_fallacy(131) 管来源-质量推断、本族腿①含人格攻击不限来源。action: all（默认，跑全部 5 族）/ <family key>（单族详查）。零 LLM 依赖、只读不改。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"all（默认，跑全部 5 族）/ 单一族 key：p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem"}},"required":["text"]}
+  },
+
 ];
 
 // [AUDIT-FIX 2026-10-11] 并入运行时验证过的只读工具集（86 个）。
