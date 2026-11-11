@@ -86,6 +86,16 @@ const STREAK_ZH = /(?:连[输赢败开押下注]|连胜|连败|连续[二三四�
 // [r280 新增族] 自然口语形（探针实测穿透）：has been cold / been hot
 // （冷热时长直述）、luck can't stay bad（运气守恒义务形）、cold
 // streak / cold spell（冷淡期）。
+// [r289 新增族] 日常事件连发形（探针实测：「连续迟到五天」「连挂三科」
+// 「这个月一直下雨」整族穿过——原腿①只收赌局/博弈连发（连输/连开/大小
+// 连续开出），不收生活事件的「一直/连续 X N 天」单向持续形）
+const STREAK_DAILY_ZH = /(?:连续|接连|连着|一连|连日|连日来|向来|一向|素来|从来都|一直|这[个上本]?[天周月年]|近[一二三四五六七八九十\d]+[天周月年]|这[几两三四五六七八九十\d]+[天周月年]来?|[这前那][几两三四五六七八九十\d]+[天周月年])[^。！？!?]{0,8}(?:迟到|缺席|旷工|下雨|下雪|刮风|降温|升温|熬夜|失眠|挂科|不及格|被拒|失败|失约|爽约|迷路|摔倒|感冒|生病|加班|堵车|断网|死机|丢东西|没中|输|败|错|翻车|掉线|投诉|退货|延期|倒霉|倒霉透|不顺|走背运)|连[续着]?[挂迟输败错摔翻][^。！？!?]{0,4}[一二三四五六七八九十百千\d]+[科场次天人回把下月周]|[^。！？!?]{0,6}[了过上][^。！？!?]{0,6}[一二三四五六七八九十\d]+[天周月年]|连[续着]?[一二三四五六七八九十\d]+[天晚][^。！？!?]{0,4}(?:没吃|没睡|没喝|没休息|没合眼)/;
+
+// [r289 新增族] 日常事件反转断言形（探针实测：「第四场该反弹了」「今天
+// 该准时到」「这次该过了」「该好起来了」整族穿过——原腿②只收赌局术语
+// （该出大小/该转运/必中），不收日常事件「该 + 反向结果」）
+const DUE_DAILY_ZH = /(?:该|该要|应该|也该|总该|总得要|总得|该是|应该是|该着|轮到)[^。！？!?]{0,6}(?:反弹|翻盘|触底|回暖|回升|好转|好起来|好点|好一些|好点些|涨回来|回涨|放晴|雨停|晴天|转晴|准时|按时|成功|成事|过了|及格|过线|过了|中了|中奖|赢一把|赢一次|赢了|赢一局|顺一趟|顺一点|硬气一回|争气一回|硬一次|得意一回|走点?[运正]运|转运|输一?[把局次]?[了来]?|吃点东西|吃上饭|吃口饭|饿[了来]?|困[了来]?|醒[了来]?|睡个好觉|睡好|轻松一点|松一口气|歇一歇|歇会儿|休息一下|到货|来|来一次|来了)/;
+
 const STREAK_EN = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|many|several|multiple|so\s+many)\s+(?:times?\s+in\s+a\s+row|consecutive\s+(?:times|losses|wins|flips|tosses)|losses|wins|times|tosses|flips|draws|tails|heads|reds|blacks|spins|hands|rounds|rolls|pulls|games)\b|\b(?:a\s+streak\s+of|streak\s+of|a\s+(?:losing|winning|hot|cold)\s+streak)\b|\b(?:has\s+been|have\s+been|it\s+has\s+been)\s+(?:tails|heads|red|black|winning|losing|on\s+a\s+(?:losing|winning)\s+streak)\b|\b(?:has|have)\s+not\s+paid\s+out|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+in\s+a\s+row\b|\b(?:come|comes|came|coming)\s+up\s+(?:tails|heads|red|black|winning|losing)\b|\b(?:tails|heads|reds|blacks)\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+times\b|\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:straight|consecutive)\s+(?:losses|wins|defeats|games|tosses|flips)\b|\b(?:has|have)\s+been\s+(?:cold|hot|dry)\b|\b(?:luck|my\s+luck|fortune)\s+(?:can['\u2019]?t|cannot|could\s+not)\s+stay\b|\bcold\s+(?:streak|spell|run)\b/i;
 
 // ─── 腿②：反转/概率升高预期（中文）────────────────────────────────
@@ -113,9 +123,16 @@ const THIRD_PERSON_EXEMPT = /(?:概率论老师|统计学老师|数学老师|概
  */
 function checkZh(text, R) {
   const streak = R.STREAK_ZH || STREAK_ZH;
+  const streakDaily = R.STREAK_DAILY_ZH || STREAK_DAILY_ZH;
   const due = R.DUE_ZH || DUE_ZH;
-  if (!streak.test(text)) return null;
+  const dueDaily = R.DUE_DAILY_ZH || DUE_DAILY_ZH;
+  const hasStreak = streak.test(text) || streakDaily.test(text);
+  if (!hasStreak) return null;
   if (due.test(text)) return { route: 'zh:streak×due' };
+  // [r289 新族] 日常事件反转断言：连发形 × 该反向形。
+  // 必须双腿都命中——单有「该反弹」无连发语境是正常预期，单有连发
+  // 无反转断言是单纯陈述不幸，均不判。
+  if (dueDaily.test(text)) return { route: 'zh:daily×reversal' };
   return null;
 }
 
@@ -173,7 +190,7 @@ function checkGamblersFallacy(text, inject) {
 module.exports = {
   checkGamblersFallacy,
   __internals: () => ({
-    STREAK_ZH, STREAK_EN, DUE_ZH, DUE_EN,
+    STREAK_ZH, STREAK_DAILY_ZH, DUE_ZH, DUE_DAILY_ZH, STREAK_EN, DUE_EN,
     META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT,
   }),
 };

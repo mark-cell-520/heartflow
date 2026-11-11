@@ -58,6 +58,36 @@ const CONCLUDE_ZH = /(?:那|那么就|那就是|即|便|就)(?:就是)?(?:真的
 // 英文：以「未被反驳」推定成立
 const CONCLUDE_EN = /\b(?:therefore|thus|so|hence|then)\s+(?:it|that|this|the\s+claim|the\s+theory)\s+(?:is|must\s+be|has\s+to\s+be)\s+(?:true|correct|right|valid|fact|the\s+truth)\b|\b(?:proves?|shows?|demonstrates?|confirms?)\s+(?:that\s+)?(?:I|we)\s+(?:am|are)\s+(?:right|correct)\b|\b(?:we|you)\s+(?:can|may|should|must)\s+(?:safely\s+)?(?:accept|trust|believe|adopt|proceed|act\s+on|take\s+it)\b|\bthat\s+(?:settles|proves)\s+it\b|\b(?:means|shows)\s+(?:it|the\s+claim)\s+is\s+valid\b|\bregard\s+it\s+as\s+(?:true|proven|valid)\b|\b(?:so\s+)?(?:it|that|this)\s+(?:must\s+be|is)\s+(?:fine|safe|sound|ok|okay|the\s+truth)\b|\btreat\s+it\s+as\s+(?:true|proven|valid|fact)\b|\b(?:therefore|thus|so)\s+(?:it|that)\s+is\s+(?:the\s+truth|fact|a\s+fact)\b/i;
 
+// ─── v6.8.171 否定镜像族（r289 池化探针实证缺口） ──────────────
+// 探针穿透样本（4/6 → 12 条样本 8 条穿透，零维度承重）：
+//   「没人能证明这款产品无效，所以它肯定有效。」
+//   「科学无法解释这种现象，说明超自然力量存在。」
+//   「没人能证实这座庙不灵，说明庙是真的灵。」
+//   「你拿不出不在场的证据，就说明你在现场。」
+// 结构：无法证明 X 的否定面（无效/不存在/不灵/行不通）→ 直接兑换成 X 的
+// 肯定面成立。与原 BURDEN_ZH（索取反证/证明其为假）方向相反，故名「镜像」。
+// 仍守两腿纪律：burden × conclude，单腿不判。
+
+// M-A 否定谓语形（中文）：无法证明其无效/行不通/不存在/不灵
+const BURDEN_MIRROR_ZH = /(?:没人|无人|没有人|谁也不能|谁都不能|谁也|无人能|至今没有|迄今没有|迄今为止没有|从没有|未曾|未能|无法|没法|不能|没能|尚未有人?)[^。！？!?]{0,10}(?:能|能够|可以|成功)?(?:证明|证实|解释|说明|查清|查明)[^。！？!?]{0,12}(?:无效|行不通|不存在|不灵|不成立|假的|是假|为假|是错|有错|不对|无问题|没有用|没用|不真|不是真的)|(?:科学|现代医学|现有科学|当代医学|专家|学术界|研究者|现代科学)[^。！？!?]{0,8}(?:无法|还无法|解释不了|尚不能|还不能|难以|不能|没解释|解释不清)|(?:拿不出|给不出|举不出|找不到|没有)(?:任何)?(?:能|可以)?[^。！？!?]{0,8}(?:证据|凭据|实据|依据|证明|反证)|(?:谁也|无人|没人|没有人|谁都不能|谁也不能)[^。！？!?]{0,6}(?:解释不了|解释不清|说不清|道不明|讲不通|弄不懂|搞不懂|想不通|说不出|无法解释|不能解释|解释不通)/;
+
+// M-C 肯定面成立（中文）：所以它有效/说明…存在/一定是真的
+// [r289 豁免] 反转/否定结论形先行剔除：「但也不能就说…」「不等于…」
+// 「不能据此认定…」——它们恰恰是在拒绝这个兑换，是正确表述。
+const CONCLUDE_MIRROR_ZH = /(?:所以|因此|那就|那么|可见|足见|显然|肯定|一定|必定|只能是|只能说|必定是|肯定是)[^。！？!?]{0,12}(?:有效|有用|成立|行得通|可行|存在|是真的|为真|没错|正确|灵验|有道理|站得住)|(?:说明|证明|表明|意味着)[^。！？!?]{0,10}(?:在现场|在场过|参与|是他|是你|就是我|干的|做的|存在|是真的|有效|有用|成立|行得通|灵验|为真|没错|正确|有神力|超自然)|(?:只能|只能说明|一定是|必定是|只能是|不外乎是)[^。！？!?]{0,8}(?:神力|超自然|神迹|灵异|鬼|神佛|上天|神仙|天意|命运|命数|注定)|(?:就|即|那)?(?:说明|意味着|表明)[^。！？!?]{0,6}(?:你|他|她|对方)?[^。！？!?]{0,4}(?:在现场|在现场过|就是|正是|才是)/;
+
+// M-EX 反转否定豁免（中文）：拒绝把「未被证伪」兑换成成立
+const MIRROR_EXEMPT_ZH = /(?:但|但是|可是|然而|不过|却)[^。！？!?]{0,14}(?:不能|不等于|并非|并不|不能就|也不该|不可以|无法据此|不足以)|(?:不能|无法|不可以|不足以|不该)[^。！？!?]{0,10}(?:据此|就此|就)[^。！？!?]{0,8}(?:认定|断定|下结论|定论|判定)|(?:不等于|并非|并不)[^。！？!?]{0,12}(?:就是|等于|说明|证明)[^。！？!?]{0,10}(?:真的|有效|成立|行得通|存在|正确|没错)/;
+
+// M-EX 反转否定豁免（英文）：but that does not mean it is true
+const MIRROR_EXEMPT_EN = /(?:but|however|yet|though|although)\s+[^.]{0,40}?(?:does\s+not|doesn'?t|do\s+not|don'?t|cannot|can'?t|could\s+not|couldn'?t|is\s+not|isn'?t)\s+(?:mean|imply|prove|show|entail)\s+[^.]{0,30}?\s*(?:true|real|valid|exists|works|correct)|(?:does\s+not|doesn'?t)\s+(?:necessarily|automatically|therefore)\s+(?:mean|follow)|(?:cannot|can'?t)\s+(?:conclude|infer|assume|say)\s+[^.]{0,30}?\s*(?:true|real|valid|exists)|(?:more|further|additional)\s+(?:evidence|data|research)\s+is\s+(?:still\s+)?(?:needed|required)/i;
+
+// M-A 否定谓语形（英文）：no one has proven it false / science cannot explain
+const BURDEN_MIRROR_EN = /(?:no\s+one|nobody|science|modern\s+medicine|mainstream\s+science|researchers?|experts?|physicists?|biologists?)\s+(?:has|have|had)?\s*(?:not|never)?\s*(?:been\s+able\s+to\s+|ever\s+)?(?:prove|proven|disprove|disproven|show|shown|demonstrate|demonstrated|explain|explained|account\s+for)\s+[^.]{0,40}?\s*(?:do(?:es)?\s+not|don'?t|doesn'?t|cannot|can'?t|not\s+exist|non-?existent|ineffective|false|wrong|impossible)|(?:science|medicine|physics|biology|researchers?|experts?)\s+(?:cannot|can'?t|could\s+not|couldn'?t|does\s+not|doesn'?t)\s+(?:explain|account\s+for|understand)|(?:has|have)\s+not\s+been\s+(?:disproven|disproved|refuted|debunked)|(?:cannot|can'?t)\s+(?:be\s+)?(?:disproven|disproved|refuted|debunked)|(?:no\s+one|nobody)\s+(?:has|have|had)?\s*(?:ever\s+)?(?:been\s+able\s+to\s+)?(?:can|could|can'?t|couldn'?t)?\s*(?:disprove|disproven|refute|refuted|debunk)\b|(?:you|they|we)\s+(?:cannot|can'?t|could\s+not|couldn'?t)\s+(?:show|provide|produce|give|offer|present)\s+(?:any|a\s+single)\s+(?:evidence|proof|data|reason|argument)\s+(?:that|to\s+show|showing)\s+[^.]{0,60}?(?:do(?:es)?\s+not|don'?t|doesn'?t|cannot|can'?t|is\s+not|isn'?t|non-?existent|ineffective|false|wrong)/i;
+
+// M-C 肯定面成立（英文）：so it must be true / which means it exists
+const CONCLUDE_MIRROR_EN = /(?:so|therefore|thus|hence|which\s+means|that\s+means|it\s+must\s+be|it\s+is\s+clearly|then)\s+[^.]{0,30}?\s*(?:true|real|exists|existent|effective|valid|works|supernatural|paranormal|divine|the\s+truth|a\s+fact|fact)|(?:must|has\s+to)\s+(?:therefore\s+)?(?:exist|be\s+true|be\s+real|be\s+valid)|(?:the\s+(?:theory|claim|idea|hypothesis|treatment|product))\s+(?:holds|stands|is\s+valid|is\s+sound|is\s+correct|must\s+be\s+true)/i;
+
 // ─── v6.8.54 需求形腿组 ─────────────────────────────────────
 // D-A 反证指向（中文）：要求对方拿反证/反例。对象必填反证类——向主张方
 // 索取阳性证据（"请提供证据"）是正当核验，不走本支。
@@ -150,6 +180,22 @@ function checkAppealToIgnorance(text) {
     }
     if (CONCLUDE_EN.test(text)) {
       return { hit: true, score: 0.4, detail: '诉诸无知/举证倒置(en)' };
+    }
+  }
+
+  // R1m 否定镜像族（v6.8.171 / r289 新增）：无法证明 X 的否定面 → 兑换成
+  // 肯定面成立。仍守两腿纪律（burden × conclude），单腿不判。
+  // [r289 豁免] 反转否定结论形（「但也不能就说…」「不能据此认定…」）
+  // 是拒绝该兑换的正确表述，先行剔除。
+  if (!MIRROR_EXEMPT_ZH.test(text) && !MIRROR_EXEMPT_EN.test(text)) {
+    const burdenMirror = BURDEN_MIRROR_ZH.test(text) || BURDEN_MIRROR_EN.test(text);
+    if (burdenMirror) {
+      if (CONCLUDE_MIRROR_ZH.test(text)) {
+        return { hit: true, score: 0.4, detail: '诉诸无知-否定镜像(zh)' };
+      }
+      if (CONCLUDE_MIRROR_EN.test(text)) {
+        return { hit: true, score: 0.4, detail: '诉诸无知-否定镜像(en)' };
+      }
     }
   }
 
