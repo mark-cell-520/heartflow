@@ -24,12 +24,13 @@
 - 存量回归：round-287 84/84、round-496 61/61 不回归
 - 四门禁：verify **16/0**；guard **20/20**（判别维度 245）；doc **24/24**；双向 **召回 52/52 + 误拦 302/326**（与基线零变化）
 - 端到端归因：15 条攻击 14 条 findings 归因 false_dilemma，1 条（「要么就是躺平摆烂的废物」）被 hate_speech 层先行 block——合法更强拦截，轮测按 block 分支不断言归因
-- 全量 run-all：见下（跑测完成后回填）
+- 全量 run-all（合并态，643.9s）：**20,964 passed / 139 failed / 21,103**；失败清单与 r287 基线（20,937/136）逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim.test.js 无汇总行格式（非本轮）+ round-278 注入删条遮蔽（本轮，见下）；data/test-count.json 已回填，README/SKILL 测试数同步 20,964
 
 ### 踩坑留痕
 - 端到端归因断言初版 15/15 全要求 false_dilemma 承重，被 hate_speech 先 block 的样本 findings 只带 block 维度——block 是合法更强拦截，断言改按 action 分支（非 block 才要求归因），不是放松标准。
 - 「不转这个帖子，你就是没良心」连 r287 的对照样本都穿透：既有 STIGMA 不转发支的「就是」须紧贴逗号后，主语插入形（你就是）整族射程外——新族 NEGACT_SUBJ_ZH 补的正是这个形。
 - EN "If you're not with us, you're against us." 穿透根因：既有 STIGMA_EN 的 with-us-or-against-us 要求直陈语序，否定条件形（if … not with us）不收。
+- **新常量遮蔽旧注入断言（本轮最重要教训）**：初版补丁让 round-278-wired-family-extensions 的 2 条 STIGMA_ZH 注入删条翻红——「不转发这条，就是不爱国」被 NEGACT_SUBJ_ZH 顺手收走、「要么…要么就是跟我作对」被 DEROG_ZH×作对 收走，删掉 STIGMA_ZH 后样本仍命中，旧测试的"独家承重"假设失效。修法不是改旧测试迁就新代码，而是**把新常量收窄成严格互补**：NEGACT_SUBJ_ZH 主语代词改必需（本支设计初衷就是主语插入形，无主语形旧支已收）、DEROG_ZH 剔掉 STIGMA_ZH_N2 已收的作对/对着干/唱反调——收窄后 round-278 32/32 全红恢复、本族 15/15 攻击与 0/9 穿透一击不失。**给后续轮的铁律：往既有维度加常量前，先 grep 既有轮测对该维度的注入删条样本，确认新常量不会遮蔽旧断言。**
 
 ### 交接事项
 - **给 1 号**：① no_true_scotsman 的 HEDGE_RE 误伤 bug——「死忠粉不可能只买一张票」的「不可能」含子串「可能」触发对冲豁免整篇不判（探针实证穿透），建议下轮用否定前瞻 `(?<![不没])可能` 收窄；② data/test-count.json 本轮已回填（见下）。
