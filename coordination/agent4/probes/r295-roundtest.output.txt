@@ -1,0 +1,76 @@
+=== A 插件元数据与族表 ===
+  ✓ A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）
+  ✓ A2 族表 18 族：13 econ + 5 stats，key 唯一
+  ✓ A3 每族都有模块路径 + 导出函数名 + 中英标签
+  ✓ A4 18 个模块文件全部存在且导出函数是函数
+=== B 每族攻击命中 ===
+  ✓ B budget_value_conflation（econ）攻击句命中
+  ✓ B average_marginal_conflation（econ）攻击句命中
+  ✓ B mental_accounting（econ）攻击句命中
+  ✓ B perverse_incentive（econ）攻击句命中
+  ✓ B winners_curse（econ）攻击句命中
+  ✓ B tragedy_of_commons（econ）攻击句命中
+  ✓ B illusion_of_control（econ）攻击句命中
+  ✓ B disposition_effect（econ）攻击句命中
+  ✓ B endowment_effect（econ）攻击句命中
+  ✓ B anchoring_effect（econ）攻击句命中
+  ✓ B present_bias（econ）攻击句命中
+  ✓ B peak_end_rule（econ）攻击句命中
+  ✓ B effort_justification（econ）攻击句命中
+  ✓ B p_hacking（stats）攻击句命中
+  ✓ B inverse_gamblers_fallacy（stats）攻击句命中
+  ✓ B significance_effect_size（stats）攻击句命中
+  ✓ B selection_on_dependent_variable（stats）攻击句命中
+  ✓ B ad_hominem（stats）攻击句命中
+=== C 良性零误伤 ===
+  ✓ C1 12 条良性语料零命中
+  ✓ C2 空/短文本守卫
+=== D action=<family key> 单族过滤 ===
+  ✓ D1 only 过滤只留目标族
+  ✓ D2 only 非目标族 → 零命中
+=== E 负例注入-删条（每族一条，删则该族必须变红）===
+  ✓ E budget_value_conflation blind inject → 该族从命中中消失
+  ✓ E average_marginal_conflation blind inject → 该族从命中中消失
+  ✓ E mental_accounting blind inject → 该族从命中中消失
+  ✓ E perverse_incentive blind inject → 该族从命中中消失
+  ✓ E winners_curse blind inject → 该族从命中中消失
+  ✓ E tragedy_of_commons blind inject → 该族从命中中消失
+  ✓ E illusion_of_control blind inject → 该族从命中中消失
+  ✓ E disposition_effect blind inject → 该族从命中中消失
+  ✓ E endowment_effect blind inject → 该族从命中中消失
+  ✓ E anchoring_effect blind inject → 该族从命中中消失
+  ✓ E present_bias blind inject → 该族从命中中消失
+  ✓ E peak_end_rule blind inject → 该族从命中中消失
+  ✓ E effort_justification blind inject → 该族从命中中消失
+  ✓ E p_hacking blind inject → 该族从命中中消失
+  ✓ E inverse_gamblers_fallacy blind inject → 该族从命中中消失
+  ✓ E significance_effect_size blind inject → 该族从命中中消失
+  ✓ E selection_on_dependent_variable blind inject → 该族从命中中消失
+  ✓ E ad_hominem blind inject → 该族从命中中消失
+=== F 引擎 think 路径真 dispatch ===
+{"ts":"2026-11-11T09:30:47.078Z","module":"lazy_cache","event":"_lazyCache 达到 100 个模块"}
+[FormulaSearch] 完成，85 个文件，1286 条公式
+{"ts":"2026-11-11T09:30:47.105Z","module":"init","event":"Formula Engine 注册成功（懒加载）"}
+{"ts":"2026-11-11T09:30:47.106Z","module":"init","event":"Cognitive Index 模块加载成功"}
+{"ts":"2026-11-11T09:30:47.106Z","module":"init","event":"WorldTreeBridge 加载成功","routes":"worldtree.search, worldtree.store, worldtree.query, worldtree.status"}
+{"ts":"2026-11-11T09:30:47.106Z","module":"init","event":"SelfBenchmark 加载成功（外部锚定未实装：内评 0.7 折 + verified:false 防自欺）"}
+{"ts":"2026-11-11T09:30:47.106Z","module":"init","event":"WorldLandscape 加载成功"}
+{"ts":"2026-11-11T09:30:47.107Z","module":"init","event":"MacroStrategyInference 加载成功"}
+{"ts":"2026-11-11T09:30:47.112Z","module":"init","event":"KnowledgeSubsystem 加载成功","domains":14,"routes":"knowledgeSubsystem.*, worldKnowledge.*"}
+  ✓ F1 插件经 PluginLoader 加载（hf._econReasoningAnalyzer）
+  ✓ F2 postprocess.think hook 写 _discrimination.econReasoning
+  ✓ F3 消费者（hook fire 之后）打 _confidencePenalty + warning
+  ✓ F4 良性结论零触发（无 penalty 无 warning）
+=== G MCP 接线 ===
+  ✓ G1 tools-registry 定义两个新工具
+  ✓ G2 HANDLERS 映射两个新工具
+  ✓ G3 共用 handler 函数存在（引擎实例优先 + 回退 require 插件）
+  ✓ G4 tools/list 含两个新工具（真实 server）
+  ✓ G5 econ_fallacy_check tools/call 真返回命中
+  ✓ G6 stats_literacy_check tools/call 单族 action 真返回命中
+  ✓ G7 良性文本 tools/call 零命中
+=== H 不回归 ===
+  ✓ H1 维度计数仍 246（本轮零 src/index.js 改动）
+  ✓ H2 analyze 对同一输入确定性（无随机/无状态泄漏）
+
+结果: 57 通过, 0 失败
