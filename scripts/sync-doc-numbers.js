@@ -153,9 +153,14 @@ const TARGETS = [
   // 注意：工具数与路由数在同一行但**分两个捕获组**，合成一条正则会把
   // 两个数字一起替换掉（曾把 1,761 一起改成 1,770 的格式串），
   // 所以 AGENTS 侧工具数与路由数必须各自独立锚定，不共用一个 pattern。
+  // [r295 修复] AGENTS.md 横幅的 `**` 粗体标记在 r288（d9f9d70）被无意剥掉
+  // （"**Zero LLM dependency.**" → "Zero LLM dependency."），此后本 pattern
+  // 再也匹配不上横幅，工具数 Banner 静默脱同步——doc-numbers 报红而本脚本
+  // --check 对 Banner 报"已一致"（pattern 匹配不到即视为无漂移，正是
+  // r414/r415 注释警告过的盲区类）。粗体标记改可选 `\*{0,2}`，两种形状都守。
   {
     num: 'tools',
-    re: /(\*\*Zero LLM dependency\.\*\*\s+\d+ dimensions,\s+\d+ modules,\s+)(\d+)(\s+MCP tools)/,
+    re: /(\*{0,2}Zero LLM dependency\.\*{0,2}\s+\d+ dimensions,\s+\d+ modules,\s+)(\d+)(\s+MCP tools)/,
     docs: ['AGENTS.md'],
   },
   { num: 'tools', re: /(\d+ modules\s*×\s*)(\d+)(\s*MCP tools)/, docs: ['SKILL.md', 'README.md'] },
@@ -201,9 +206,12 @@ const TARGETS = [
   // r554/r556 补登记第 82 维后 doc-numbers 连报 5 项失败（横幅 80 vs 实测 81、
   // Block/Rewrite/Verify 层计数 10/11/47 vs 10/13/48），而这些形状都写在
   // 「不写三份文档」的硬边界里，只有机器记账能修。三条括号计数各自独立锚定。
+  // [r295 修复] 同 tools pattern：r288 剥掉横幅 `**` 后本 pattern 静默失效，
+  // 粗体标记改可选 `\*{0,2}`（dimensions 当前值虽正确，但下一个维度轮会重演
+  // 工具数刚发生的静默脱同步）。
   {
     num: 'dims',
-    re: /(\*\*Zero LLM dependency\.\*\*\s+)(\d+)(\s+dimensions,\s+\d+ modules,\s+\d+ MCP tools,\s+[\d,]+\s+dispatch)/,
+    re: /(\*{0,2}Zero LLM dependency\.\*{0,2}\s+)(\d+)(\s+dimensions,\s+\d+ modules,\s+\d+ MCP tools,\s+[\d,]+\s+dispatch)/,
     docs: ['AGENTS.md'],
   },
   // [r415] SKILL.md 也有 `## The N dimensions` 章节标题，但原 pattern 的
@@ -361,6 +369,9 @@ function syncPackageJson(want, checkOnly) {
     { re: /(\d+)\s+discrimination dimensions/, val: want.dims, name: '维度数' },
     { re: /(\d+)\s+MCP tools/, val: want.tools, name: 'MCP 工具数' },
     { re: /([\d,]+)\s+dispatch routes/, val: want.routes.toLocaleString('en-US'), name: '路由数' },
+    // [r295 修复] 模块数此前不在 rules 里——r292 模块 162→163 后 description
+    // 的 "162 modules" 静默残留（doc-numbers 不查 package.json，无人报红）。
+    { re: /(\d+)\s+modules/, val: want.modules, name: '模块数' },
   ];
   let desc = d.description;
   for (const r of rules) {

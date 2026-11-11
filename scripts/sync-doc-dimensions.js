@@ -53,8 +53,9 @@ function measureDims() {
  * 只列真实出现过的形状；历史记录区不在这份清单里。
  */
 const PATTERNS = [
-  // AGENTS.md 横幅：**Zero LLM dependency.** 50 dimensions, 137 modules, ...
-  /(\*\*Zero LLM dependency\.\*\*\s+)(\d+)( dimensions,)/,
+  // [r295 修复] r288（d9f9d70）无意剥掉 AGENTS.md 横幅的 `**` 粗体标记后
+  // 本 pattern 静默失效（匹配不到=视为无漂移）。粗体标记改可选 `\*{0,2}`。
+  /(\*{0,2}Zero LLM dependency\.\*{0,2}\s+)(\d+)( dimensions,)/,
   // README / SKILL 横幅：50 discrimination dimensions × 11-layer pipeline
   /(\s)(\d+)( discrimination dimensions)/,
   // README / SKILL 章节标题：## The 50 dimensions
