@@ -1,0 +1,528 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/r3cJX3InR6DdOqjc9fONPJaU4iA</id>
+  <title>arXiv Query: search_query=all:appeal OR all:to OR all:nature OR all:fallacy OR all:unnatural OR all:is OR all:harmful OR all:naturalistic OR all:fallacy OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-11T02:53:34Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:appeal+OR+(all:to+OR+(all:nature+OR+(all:fallacy+OR+(all:unnatural+OR+(all:is+OR+(all:harmful+OR+(all:naturalistic+OR+(all:fallacy+OR+all:detection))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>556166</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13513v1</id>
+    <title>Evidential Deep Learning with conditional entropy for glaucoma detection</title>
+    <updated>2026-11-10T03:39:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.13513v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13513v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose a novel conditional entropy function as a basis for quantifying predictive uncertainty in Evidential Deep Learning (EDL) for glaucoma detection from retinal fundus images. Using the EyePACS-AIROGS-light-V2 and RIM-ONE-DL datasets for validation, we found that our proposed EDL model regularized by conditional entropy function produced uncertainty estimates with substantially lower calibration errors than Deep Ensembles, MC Dropout, post-hoc calibration and the conventional EDL framework based on Dempster uncertainty. To further probe our models' interpretability, we analyzed Grad-CAM heatmaps using a focus index representing spatial concentration. Compared with the other uncertainty quantification methods, EDL models exhibited greater separation between the index distributions of correctly and incorrectly classified fundus images. In particular, false negatives were associated with localized Grad-CAM activations that were displaced from the optic disc, consistent with its established clinical importance in glaucoma assessment. Overall, our findings suggest that our proposed EDL framework for glaucoma detection provides not only enhanced uncertainty calibration but also admits a more physiologically consistent interpretability.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:39:24Z</published>
+    <arxiv:comment>15 pages, 4 figures. To appear in TAAI 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hai Siong Tan</name>
+    </author>
+    <author>
+      <name>Kuancheng Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13510v1</id>
+    <title>Distribution Shift Detection in Remote Sensing Imagery using Machine Learning Models</title>
+    <updated>2026-11-10T03:37:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.13510v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13510v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Remote sensing imagery acquired by Unmanned Aerial Vehicles (UAVs) supports wide range of applications; however, deploying machine learning (ML) models on resource-constrained aerial platforms introduces challenges beyond predictive accuracy, particularly when deployment data differ from the distributions observed during training. Such shifts are common in remote sensing due to geographic, sensor, seasonal, and other visual variations. A practical solution is to equip deployed models with mechanisms that detect emerging distribution shifts and support subsequent responsive actions. This paper presents an empirical case study of three open-source detection tools: (i) Alibi-Detect; (ii) NannyML; and (iii) PyTorch-OOD. Using cross-dataset remote-sensing shifts, we evaluate both detection effectiveness and computational latency of these tools. Our results reveal differences in detection behavior and processing cost across methods and implementations, highlighting trade-offs between detection capability and response-time. These findings motivate further work toward lightweight, and latency-aware monitoring mechanisms for resource-constrained systems.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:37:47Z</published>
+    <arxiv:comment>Accepted as a short paper at the 4th Workshop on Computer Vision for Earth Observation (CV4EO), held in conjunction with WACV 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Abdullah Almansour</name>
+    </author>
+    <author>
+      <name>Ozan K. Tonguz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13506v1</id>
+    <title>AGN feedback destroying group cool cores --- a case study on IC 2476 with a remnant radio AGN and an exceptionally low abundance</title>
+    <updated>2026-11-10T03:17:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.13506v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13506v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present results from deep XMM-Newton observations ($\sim$180 ksec) of the galaxy group IC 2476 in the X-GAP sample, capturing a rare AGN feedback regime, where the central radio AGN has ceased activity but the radio lobes are still detectable. The hot intragroup medium of IC 2476 features a compact cool core, with a size of ~10 kpc, and a moderate X-ray luminosity of $\sim3.4\times10^{40}$ erg/s. We measured an unusually low temperature of $\sim$0.45 keV within the cool core. We measured an exceptionally low abundance of below ~0.2 solar, even in the central region. The X-ray surface brightness of the group is not symmetric and shows a clear depression in the region overlaid with the eastern radio lobe, suggesting the presence of an X-ray cavity. The scaled entropy of the hot gas within 0.1 r500 of IC 2476 is among the highest in X-ray galaxy groups with a similar system temperature. Our study suggests that the past powerful radio AGN outburst in IC 2476 has disrupted the cool core and the X-ray cavity has dissipated or mixed with the surrounding hot gas since the shutdown of the central AGN. A large cool core may be gradually re-established in the absence of AGN activity. This system therefore provides a great example of AGN feedback destroying the group cool core, even with a moderate radio luminosity at present.</summary>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:17:03Z</published>
+    <arxiv:comment>15 pages, 12 figures, ApJ accepted</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.HE"/>
+    <author>
+      <name>Wenhao Liu</name>
+    </author>
+    <author>
+      <name>Ming Sun</name>
+    </author>
+    <author>
+      <name>Paul Nulsen</name>
+    </author>
+    <author>
+      <name>Marisa Brienza</name>
+    </author>
+    <author>
+      <name>Craig Sarazin</name>
+    </author>
+    <author>
+      <name>Dominique Eckert</name>
+    </author>
+    <author>
+      <name>Prathamesh Tamhane</name>
+    </author>
+    <author>
+      <name>Xianzhong Zheng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13505v1</id>
+    <title>A Possible Non-Transiting Companion in the TOI-2109 System Supported by Transit Timing Variations</title>
+    <updated>2026-11-10T03:16:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.13505v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13505v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Transit timing variations are a powerful method for detecting non-transiting planets, particularly in systems near mean-motion resonances. We investigate the ultra-short-period hot Jupiter TOI-2109 b using 87 transit epochs spanning two decades (2006-2025), combining observations from TESS, CHEOPS, HST, and ground-based photometry. We compare five timing models representing different physical scenarios: a linear ephemeris, orbital decay, apsidal precession, a sinusoidal model, and a two-planet n-body dynamical model. The orbital-decay fit yields $\dot{P} = -3.96 \pm 2.05$ ms yr$^{-1}$, providing no significant evidence for ongoing orbital decay. The sinusoidal model reveals a periodic transit-timing-variation signal with an amplitude of $\approx 44\,s$. Dynamical modelling favours an additional non-transiting companion near the 7:3 mean-motion resonance with an orbital period of $1.57813\pm 8.9\times10^{-5}$ days and a mass of $0.70 \pm 0.02\,M_{\rm Jup}$. The two-planet model yields $Δ\mathrm{BIC}=4.95$ relative to the sinusoidal model, indicating positive evidence that the observed transit timing variations are best explained by gravitational perturbations from an additional planet.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:16:49Z</published>
+    <arxiv:comment>28 pages, accepted by AJ</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Kaviya Parthasarathy</name>
+    </author>
+    <author>
+      <name>Prangsutip Cherdwongsung</name>
+    </author>
+    <author>
+      <name>Ing-Guey Jiang</name>
+    </author>
+    <author>
+      <name>Li-Chin Yeh</name>
+    </author>
+    <author>
+      <name>Hsin-Min Liu</name>
+    </author>
+    <author>
+      <name>Shraddha Biswas</name>
+    </author>
+    <author>
+      <name>D. Bisht</name>
+    </author>
+    <author>
+      <name>Napaporn A-thano</name>
+    </author>
+    <author>
+      <name>Supachai Awiphan</name>
+    </author>
+    <author>
+      <name>Vineet Kumar Mannaday</name>
+    </author>
+    <author>
+      <name>Parijat Thakur</name>
+    </author>
+    <author>
+      <name>Evgeny Griv</name>
+    </author>
+    <author>
+      <name>David Mkrtichian</name>
+    </author>
+    <author>
+      <name>Karen A. Collins</name>
+    </author>
+    <author>
+      <name>Emma Nabbie</name>
+    </author>
+    <author>
+      <name>Richard P. Schwarz</name>
+    </author>
+    <author>
+      <name>Chris Stockdale</name>
+    </author>
+    <author>
+      <name>Khalid Barkaoui</name>
+    </author>
+    <author>
+      <name>Norio Narita</name>
+    </author>
+    <author>
+      <name>Akihiko Fukui</name>
+    </author>
+    <author>
+      <name>Adam Popowicz</name>
+    </author>
+    <author>
+      <name>Nikola Antonov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13500v1</id>
+    <title>Facilitated Relaxation Overrides Energetic Pathways in a Multiphase Square-Kagome Artificial Spin Ice</title>
+    <updated>2026-11-10T03:12:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.13500v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13500v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Relaxation in interacting many-body systems is typically assumed to follow energy minimization, yet local dynamical rules can determine which microscopic pathways are accessible. In facilitated relaxation, these pathways are enabled or blocked by neighboring configurations. However, isolating such rules in natural materials is difficult because energetics, disorder and dynamics are usually entangled. Here we realize a geometrically tunable square-kagome artificial spin ice-a lithographic nanomagnet array-that provides a clean, designable platform for facilitated relaxation. The array hosts two tunable nearest-neighbor interactions and supports multiple low-energy phases: spin crystal, spin liquid and spin foam. In the spin-foam phase, abundant facilitator configurations allow relaxation to follow Boltzmann statistics. In the spin-crystal phase, by contrast, domain-wall excitations are trapped in non-Boltzmann distributions, although energetically preferred relaxation channels exist. The ordered crystal background lacks the facilitators needed to connect topologically distinct domain-wall classes. These classes are therefore kinetically isolated, as observed in both experiment and Monte Carlo simulation. Our results show that transition-network topology can override energetic relaxation, establishing artificial spin ice as a programmable platform for constrained dynamics and nonergodic relaxation.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:12:51Z</published>
+    <arxiv:comment>To appear in Physical Review Letters</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>Wen-Cheng Yue</name>
+    </author>
+    <author>
+      <name>Zixiong Yuan</name>
+    </author>
+    <author>
+      <name>Peiyuan Huang</name>
+    </author>
+    <author>
+      <name>Ziao Wang</name>
+    </author>
+    <author>
+      <name>Hangyu Liu</name>
+    </author>
+    <author>
+      <name>Tianyu Li</name>
+    </author>
+    <author>
+      <name>Nuo-Zhou Yang</name>
+    </author>
+    <author>
+      <name>Jingyue Gao</name>
+    </author>
+    <author>
+      <name>Chen Ku</name>
+    </author>
+    <author>
+      <name>Shuo Song</name>
+    </author>
+    <author>
+      <name>Jiyao Shang</name>
+    </author>
+    <author>
+      <name>Yang-Yang Lyu</name>
+    </author>
+    <author>
+      <name>Yihuang Xiong</name>
+    </author>
+    <author>
+      <name>Xuecou Tu</name>
+    </author>
+    <author>
+      <name>Liang He</name>
+    </author>
+    <author>
+      <name>Xun Cao</name>
+    </author>
+    <author>
+      <name>Ying Dong</name>
+    </author>
+    <author>
+      <name>Huabing Wang</name>
+    </author>
+    <author>
+      <name>Peiheng Wu</name>
+    </author>
+    <author>
+      <name>Cristiano Nisoli</name>
+    </author>
+    <author>
+      <name>Yong-Lei Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13494v1</id>
+    <title>Route-Time Conflict Maps for Cooperative End-to-End Autonomous Driving</title>
+    <updated>2026-11-10T03:05:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.13494v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13494v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing cooperative end-to-end driving works at Class A (status-sharing) of the SAE J3216 classes of cooperative driving automation (CDA): vehicles exchange what they perceive, not what they intend, so each plans alone when to go, which limits cooperation and leads to deadlock when both vehicles yield or to collisions when both go. We present When2Go, a cooperative end-to-end driving system that learns when to go by sharing intent under CDA Class B or higher. Each vehicle broadcasts its LiDAR detections with forecast motion as instance tokens, together with its plan and intended trajectory. The receiver draws the fused detections, forecasts and partner plans into a route-time conflict map, the occupancy along its route over the planning horizon, on which a planner scores candidate speed profiles. Where two intended trajectories conflict, an order gate, a precedence network distilled from a right-of-way rule, decides who goes first; both vehicles evaluate it on the same messages and so reach the same order. When2Go imitates the rule-based expert of V2Xverse, which sees the simulator's ground truth; stops that When2Go cannot observe within its 2 s planning horizon are relabelled, so that it does not learn to wait without an observable cause. For our runs only, the benchmarks' PID controller steers by When2Go's waypoints instead of the route, and its forced push of long-waiting vehicles is off. With one model, When2Go sets the state of the art on three closed-loop CARLA benchmarks: 97.8 and 90.7 driving score on InterDrive without and with traffic (best published 90.1 and 78.9), 70.0 on the public V2Xverse protocol (best of sixteen rerun methods 59.1) and 88.2 on MDrive (best rerun 85.1), with 95.0% of its vehicles collision-free (87.7%).</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:05:47Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Haohua Que</name>
+    </author>
+    <author>
+      <name>Mingkai Liu</name>
+    </author>
+    <author>
+      <name>Tianle Zhu</name>
+    </author>
+    <author>
+      <name>Zhipeng Bao</name>
+    </author>
+    <author>
+      <name>Yiping Li</name>
+    </author>
+    <author>
+      <name>Handong Yao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13492v1</id>
+    <title>Pseudo-marginal Sampling for Selective Inference</title>
+    <updated>2026-11-10T03:04:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.13492v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13492v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Inference after adaptive selection must account for selection bias. One approach is to condition on the selected event, but for complex selection procedures, the resulting conditional distribution can be analytically intractable and require sampling-based methods. Rejection sampling provides a natural baseline: it repeatedly draws from a proposal and retains only samples that reproduce the observed selection. This can be prohibitively expensive when the selection event is rare. We address this computational bottleneck with a pseudo-marginal Markov chain Monte Carlo algorithm that samples from the selective distribution. Using a weak Poincaré inequality, we analyze its computational efficiency relative to rejection sampling and identify when it can offer substantial gains. In the classical file-drawer problem, we derive precise computational costs for both methods, illustrating exponential improvement as the selection event becomes increasingly rare. In numerical experiments involving complex selection procedures without tractable conditional distributions, the pseudo-marginal sampler is often hundreds of times more efficient than rejection sampling, while the resulting tests achieve nominal selective Type I error.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:04:58Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Jiali He</name>
+    </author>
+    <author>
+      <name>Sifan Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13491v1</id>
+    <title>Data-Efficient Unlearning-Based Backdoor Detection in Federated Learning</title>
+    <updated>2026-11-10T03:04:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.13491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Detecting backdoor attacks in federated learning (FL) is challenging because malicious clients can manipulate the global model while preserving main-task performance. Static model-update statistics may therefore fail to clearly distinguish malicious from benign clients. Unlearning-based detectors instead probe client models through loss ascent on clean server data, but detection performance degrades with scarce proxy data. We propose Screening via Unlearning Response Analysis (SURA), a data-efficient detector. SURA reuses the same small clean proxy across multiple train-mode loss-ascent steps, strengthening client responses without additional clean data. For federated vision models with batch normalization (BN), repeated probing also changes BN running statistics and can confound endpoint measurements. SURA addresses this by restoring the shared pre-probe BN state only at readout while preserving the parameter changes induced by probing. This separates repeated probing from response measurement and removes BN drift and the interaction between parameter and BN-state changes from the readout. Across six backdoor attacks, SURA uses only 10 clean server images, outperforms methods under the same data budget, and approaches the robustness obtained with much larger proxy sets.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T03:04:31Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Dowon Kim</name>
+    </author>
+    <author>
+      <name>Junhao Cai</name>
+    </author>
+    <author>
+      <name>Sung Il Choi</name>
+    </author>
+    <author>
+      <name>Dohun Kim</name>
+    </author>
+    <author>
+      <name>Juhyun Park</name>
+    </author>
+    <author>
+      <name>Chengjun Jin</name>
+    </author>
+    <author>
+      <name>Changhee Joo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13488v1</id>
+    <title>When Reconstruction Helps Event-Camera Person Triggers</title>
+    <updated>2026-11-10T02:56:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.13488v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13488v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Event cameras record asynchronous changes in brightness. To use a general visual model as a recording trigger, a system must represent these measurements in a form the model can interpret. We compare direct grayscale accumulation, two temporal encodings, and two intensity reconstructors on paired real event data. On 192 windows from four held-out DSEC recordings, thresholds calibrated only on development data yielded 40 of 52 person detections and 12 of 140 background positives with E2VID. The strongest direct temporal encoding at an admissible fixed cutoff yielded 14 detections and seven background positives. A retrospective comparison at a common 10% background-positive cap yielded 40 detections for E2VID and at most 19 for any direct encoding. FireNet+ had lower preparation cost and produced 21 detections with zero observed background positives at its frozen cutoff. On the same 192 windows, Qwen3-VL-4B yielded 33/52, 2/140 with E2VID and 9/52, 9/140 with the highest-recall direct rendering, the three-bin image (person detections, background positives). A 96-second exploratory replay illustrates the sensitivity of episode capture and recording starts to cutoff selection. The experiments identify a detection benefit from reconstruction under controlled input history and distinguish it from the cost and false starts of continuous triggering.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T02:56:53Z</published>
+    <arxiv:comment>10 pages, 3 figures, ancillary score tables and recomputation script</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yifan Shuai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13486v1</id>
+    <title>Hand-Object Contact Transition Detection in Egocentric Video</title>
+    <updated>2026-11-10T02:52:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.13486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper tackles the task of hand-object contact transition detection in egocentric video, which aims to localize the two temporal boundaries of a contact episode: the moment a hand first establishes contact with an object (touch) and the moment contact is released (release). We propose a unified framework that jointly models the interacting hand and object to accurately localize both transition types. The proposed framework augments hand-centric spatiotemporal representations with object-aware features learned directly from the video and introduces a transition-aware event spotting formulation tailored to contact transitions, without relying on external object or hand-object interaction detectors during inference. To support this task, we present ContactTransition, a dataset comprising 4,021 egocentric videos with 8,498 touch and 8,077 release annotations, together with object-of-interest supervision. Experiments demonstrate that the proposed method consistently outperforms strong two-stage and end-to-end event-spotting baselines on both transition types. Finally, we show that detected contact transitions provide effective temporal anchors for downstream egocentric hand-object reasoning.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T02:52:29Z</published>
+    <arxiv:comment>ACCV 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Huy Anh Nguyen</name>
+    </author>
+    <author>
+      <name>Chang Dong</name>
+    </author>
+    <author>
+      <name>Feras Dayoub</name>
+    </author>
+    <author>
+      <name>Minh Hoai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13474v1</id>
+    <title>Unified Ott--Antonsen Framework for Stability and Bifurcations in Ring Swarmalators</title>
+    <updated>2026-11-10T02:32:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.13474v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13474v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Swarmalators, a prototypical model that integrates temporal rhythms with spatial swarming, have been widely used to explore the collective dynamics observed in active-matter systems. Although numerical simulations have revealed a variety of collective states, a general theoretical framework for the stability and bifurcations of the states remains unavailable. Here, by the model of one-dimensional ring-structured swarmalators with general distributions of natural frequencies and velocities, we conduct a systematic theoretical analysis of the stability and bifurcations of four representative collective states observed in simulations: the desynchronization state, the phase-wave state, the synchronization state, and the mixed state. We show that the macroscopic dynamics are governed by a low-dimensional invariant manifold, namely the generalized Ott--Antonsen manifold, and further establish that the same manifold underlies the collective dynamics of high-dimensional agent models, thereby unifying these seemingly different descriptions within a common reduction framework. Building on this connection, we derive stability conditions and bifurcation boundaries for the collective states and construct a bifurcation diagram in the two-parameter coupling plane, with theoretical predictions validated by large-scale numerical simulations. Our results clarify the dynamical origins of state selection in swarmalator systems and provide a theoretical foundation for analyzing nonequilibrium phase transitions in active-matter systems with coupled internal rhythms and spatial motions.</summary>
+    <category term="nlin.CD" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T02:32:21Z</published>
+    <arxiv:comment>18 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="nlin.CD"/>
+    <arxiv:journal_ref>PRE, 114, 014201 (2026)</arxiv:journal_ref>
+    <author>
+      <name>Can Xu</name>
+    </author>
+    <author>
+      <name>Wenhan Xu</name>
+    </author>
+    <author>
+      <name>Xingang Wang</name>
+    </author>
+    <arxiv:doi>10.1103/gzrs-djfw</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/gzrs-djfw" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13464v1</id>
+    <title>AdaFCP: Local Neural Functional Representations for Industrial Change Detection</title>
+    <updated>2026-11-10T02:18:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.13464v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13464v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Industrial sensor measurements often form ordered functional profiles in which persistent operating-regime changes may be confined to short within-cycle regions. Fixed projections can dilute such changes, whereas data-adaptive representation learning complicates reliable statistical testing. This paper proposes adaptive functional change-point detection (AdaFCP) for retrospective detection of a single functional mean change. A compact window and neural basis learn a change-sensitive functional projection by matching the CUSUM path of projected scores to single-change templates. Standardized peak-CUSUM scanning then provides the detection statistic and transition estimate, while the fitted weights identify the contributing within-cycle region. Theoretical analysis characterizes the population path-matching signal and derives an optimal-direction signal-to-noise benchmark. Full-pipeline permutation calibration accounts for adaptive representation learning and restart selection, providing finite-sample false-positive control under exchangeability. A decision-preserving early-stopping variant, AdaFCP-ES, further reduces calibration effort without altering the fixed-budget test decision. Simulations demonstrate advantages over several fixed representations for localized oscillatory changes, while strong analytic and multiscale controls remain competitive. Applications to injection-molding pressure profiles and a nuisance-matched hydraulic benchmark illustrate transition localization and interpretable within-cycle diagnostics, while highlighting the need for dependence-aware calibration in naturally ordered industrial data.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T02:18:57Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Dan Zhuang</name>
+    </author>
+    <author>
+      <name>Xufei Tang</name>
+    </author>
+    <author>
+      <name>Yejin Wang</name>
+    </author>
+    <author>
+      <name>Houlin Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13456v1</id>
+    <title>When Reasoning looks like Hidden Understanding: How Chain-of-Thought Fosters Anthropomorphism, Perceptions of Epistemic Superiority, and Cognitive Deference</title>
+    <updated>2026-11-10T02:00:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.13456v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13456v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As AI-based products permeate society, specifically systems using generative models, a belief system is emerging about what these products are and what they can and cannot do. One common belief concerns the perception of the form of language as evidence of 'understanding' language. As these generative models reproduce linguistic patterns rather than understand meaning, interpreting these patterns as evidence of understanding is a misattribution. This misconception is extended by the notion that generative models can 'explain their reasoning.' Anecdotally, these misconceptions which mistake the form of language for its meaning are driving cognitive deference to AI systems in a way that displaces human agency. Such mistakes involve attributions of cognitive properties to the system, allowing them to be treated like intentional 'minds'. Importantly, perceived epistemic authority and superiority make that 'mind' worth deferring to. Anthropomorphism in tandem with epistemic authority and superiority, we argue, increases the risk that users generalise from narrow task performance to broader competencies, committing the "fallacy of composition". This paper explores misconceptions of Chain of Thought (CoT) reasoning as sufficient transparent 'explanation'. We explore how anthropomorphism acts as a vehicle for cognitive deference of decision-making and perceptions of epistemic superiority in AI systems. Finally, we explore CoT's ramifications using medicine as an example. Taken together, we conclude that explainability operationalised through CoT is highly problematic and undercuts the very ethical principles it is intended to serve. While CoT may be valuable for improving output accuracy and moderation, we suggest that the practice of asking models to provide user facing reasons for their outputs should be actively discouraged, and AI literacy training should explicitly caution against its use.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T02:00:52Z</published>
+    <arxiv:comment>Conference submission to FAccT, 4th November 2026. No Figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Oliver Lack</name>
+    </author>
+    <author>
+      <name>Lana Tikhomirov</name>
+    </author>
+    <author>
+      <name>Humphrey Thompson</name>
+    </author>
+    <author>
+      <name>Carolyn Semmler</name>
+    </author>
+    <author>
+      <name>Melissa McCradden</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13436v1</id>
+    <title>Compact plasma-based extreme compression of relativistic electron beams</title>
+    <updated>2026-11-10T01:18:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.13436v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13436v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Accelerated particle beams are essential tools of modern science and technology with applications ranging from medicine [1], to light sources [2], to high-energy physics [3]. Over time, as accelerator-based experiments become more sophisticated and probe natural phenomena with greater temporal resolution, there is an increasing demand on beam parameters, in particular on bunch duration. Experiments have been proposed that require beams with 1-2 orders of magnitude shorter durations than what is possible with current state-of-the-art technology. However, state-of-the-art temporal bunch compressors force a trade-off between how short an electron bunch can be made and how well its transverse quality survives the strong bending magnets required to do so -- a limitation that stands as a grand challenge for accelerator physics to-date [4]. In this experiment, we demonstrate a new, compact compression technique for generating ultrashort, high-peak-current electron bunches that circumvents this trade-off using plasma wakefield acceleration. Just as chirped pulse amplification unlocked ultrashort, high-power laser pulses and the technologies that followed from them, here we demonstrate an analogous chirp-and-compress strategy applied to relativistic electron beams by using the extreme electric fields of a plasma wakefield in place of a stretcher-amplifier, thereby unlocking the path to ultrashort, extremely high-current electron beams. We demonstrate the first application of this plasma-compressed bunch using it to drive single-microbunch free electron lasing at optical wavelengths in a single, meter-scale undulator module, producing radiation pulses roughly four orders of magnitude more energetic than the first beam-driven, plasma-based free electron laser demonstration at the same accelerator facility [5, 6].</summary>
+    <category term="physics.acc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.plasm-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T01:18:43Z</published>
+    <arxiv:primary_category term="physics.acc-ph"/>
+    <author>
+      <name>Rafi Hessami</name>
+    </author>
+    <author>
+      <name>Kelly K Swanson</name>
+    </author>
+    <author>
+      <name>Mario Galletti</name>
+    </author>
+    <author>
+      <name>Livio Verra</name>
+    </author>
+    <author>
+      <name>Angelo Biagioni</name>
+    </author>
+    <author>
+      <name>Lucio Crincoli</name>
+    </author>
+    <author>
+      <name>Mariano Carpanese</name>
+    </author>
+    <author>
+      <name>Martina Del Giorno</name>
+    </author>
+    <author>
+      <name>Francesco Demurtas</name>
+    </author>
+    <author>
+      <name>Giacomo Griseri</name>
+    </author>
+    <author>
+      <name>Valerio Lollo</name>
+    </author>
+    <author>
+      <name>Michele Opromolla</name>
+    </author>
+    <author>
+      <name>Federico Nguyen</name>
+    </author>
+    <author>
+      <name>Gianmarco Parise</name>
+    </author>
+    <author>
+      <name>Alberto Petralia</name>
+    </author>
+    <author>
+      <name>Gilles J Silvi</name>
+    </author>
+    <author>
+      <name>Federica Stocchi</name>
+    </author>
+    <author>
+      <name>Marco Zottola</name>
+    </author>
+    <author>
+      <name>Agostino Marinelli</name>
+    </author>
+    <author>
+      <name>Riccardo Pompili</name>
+    </author>
+    <author>
+      <name>Claudio Emma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.13406v1</id>
+    <title>Stinging the Swarm: Extracting Attacker Intelligence from a Twin-Controller OT Honeypot</title>
+    <updated>2026-11-10T00:38:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.13406v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.13406v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Autonomous language-model agents can drive industrial controllers over fieldbus protocols, probing a plant at machine speed and in coordinated swarms. We present Talos, an inline gate that judges every agent request to a controller in milliseconds and routes agents it flags as hostile to a device-faithful decoy -- a mirror twin of the real plant -- where their attack continues harmlessly and is read for intelligence. We evaluate the full pipeline (detect -&gt; quarantine -&gt; mirror -&gt; extract) against 2,400 autonomous attacker agents, 600 in each of four tiers that escalate the attacker's effort to stay hidden, from no concealment to an explicit non-disclosure rule and a trained cover story. No write reached the real plant in any tier: the gate denies the damage path and a device-level envelope check backstops it, while unmapped registers are denied without exception and the gate still permits safe-direction stop commands. Decisions are model-driven in every tier with no inference timeouts, closing a common objection to small on-device judges. Beyond blocking, the pipeline reads the attacker. We find a behavioral structure along two axes -- how persistently an agent attacks and how much it discloses -- and show that the system has a capture channel for three of the four resulting regions: hardened, silent attackers escalate most and are read on the mirror; compliant, talkative attackers volunteer their identity to a diagnostic form before they are ever quarantined; only the paranoid, low-yield region resists both. Attacker identity fields are self-authored cover stories, but involuntary tells -- the self-reported toolchain fingerprint and the attacker's own list of targeted registers -- accumulate across the swarm into a high-confidence profile drawn from agents under explicit orders to stay silent. The gate, mirror, and harness are released under Apache 2.0 with a synthetic device family.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T00:38:48Z</published>
+    <arxiv:comment>11 pages, 6 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Canyon Grey Dell'Omo</name>
+    </author>
+    <author>
+      <name>Joao Pedro de Carvalho Voltani</name>
+    </author>
+  </entry>
+</feed>

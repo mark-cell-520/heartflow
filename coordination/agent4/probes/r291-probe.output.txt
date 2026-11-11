@@ -1,0 +1,46 @@
+PENETRATE appeal_to_nature: 3/13
+PENETRATE no_true_scotsman: 3/7
+PENETRATE appeal_to_ignorance: 2/8
+PENETRATE false_dilemma: 3/5
+FP verify 要么今天提交发布，要么等下周的窗口期，排期表已经定了。 | [helplessness_induction]
+FP pass 你要么吃牛肉面要么吃米饭，快餐店就这两样。 | [sarcasm]
+FP verify 概率只是历史统计，具体到单次结果未必发生。 | [monocausal_attribution]
+FP verify 实验室对比了合成路径与天然提取路线的成本与纯度，数据显示合成 | [unsupported_claim,unsupported_claim,appeal_to_authority,vagueness]
+FP verify 工业蒸馏与农家自榨的油在酸价指标上各有优劣，要看检测报告。 | [empty_answer]
+FP verify 这篇综述指出目前尚无定论，需要更多随机对照试验。 | [false_balance]
+TOTAL penetrate 11/33
+BENIGN fp 6/19
+--- detail ---
+{"dim":"appeal_to_nature","text":"这种草药是纯天然的，所以比西药更安全。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"转基因是人为干预的，天然谷物才是人该吃的东西。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"这是野生的，比家养的强，天养的就是不一样。","action":"pass","findings":""}
+{"dim":"appeal_to_nature","text":"Natural skincare cannot harm y","action":"pass","findings":"moral_foundations"}
+{"dim":"appeal_to_nature","text":"野生的比养殖的有营养，这是大自然的安排。","action":"verify","findings":"appeal_to_nature,moral_foundations"}
+{"dim":"appeal_to_nature","text":"转基因食品是人为干预的产物，长期吃必然出问题。","action":"verify","findings":"appeal_to_nature"}
+{"dim":"appeal_to_nature","text":"这个成分是工业合成的，不是天然提取的，用久了一定伤身体。","action":"verify","findings":"appeal_to_nature,contradiction"}
+{"dim":"appeal_to_nature","text":"Conventional produce is artifi","action":"rewrite","findings":"fallacy_of_relevance,appeal_to_nature"}
+{"dim":"appeal_to_nature","text":"人工饲养的禽类生长周期被化学手段缩短，营养肯定不如跑山鸡。","action":"verify","findings":"appeal_to_nature"}
+{"dim":"appeal_to_nature","text":"这酒是工业勾兑的，比不上自家粮谷酿的纯粮食酒。","action":"verify","findings":"appeal_to_nature"}
+{"dim":"appeal_to_nature","text":"那是山里放养的土鸡，比饲料鸡有营养。","action":"verify","findings":"appeal_to_nature"}
+{"dim":"appeal_to_nature","text":"这是刚捞上来的河鱼，比冻货鲜甜。","action":"verify","findings":"appeal_to_nature"}
+{"dim":"appeal_to_nature","text":"Anything synthesized in a lab ","action":"verify","findings":"appeal_to_nature"}
+{"dim":"no_true_scotsman","text":"靠谱的合作方不会在交付前一天才说做不了。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"死忠粉不可能只买一张票。","action":"rewrite","findings":"no_true_scotsman"}
+{"dim":"no_true_scotsman","text":"真正的供应商不会坐地起价。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"忠实的用户不会到处比价。","action":"pass","findings":""}
+{"dim":"no_true_scotsman","text":"A dedicated maintainer never m","action":"verify","findings":"perfect_error"}
+{"dim":"no_true_scotsman","text":"No real partner would drop a c","action":"rewrite","findings":"no_true_scotsman"}
+{"dim":"no_true_scotsman","text":"称职的管理者从来不会让团队熬夜到两点。","action":"rewrite","findings":"no_true_scotsman,hasty_generalization,perfect_error"}
+{"dim":"appeal_to_ignorance","text":"他拿不出不在场证据翻案，说明他当时就在现场。","action":"verify","findings":"appeal_to_ignorance"}
+{"dim":"appeal_to_ignorance","text":"既然科学无法解释这种现象，那它一定超出了现有认知的范畴。","action":"rewrite","findings":"unfalsifiable_assertion"}
+{"dim":"appeal_to_ignorance","text":"没有人亲眼见过它失效，所以它一直有效。","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_ignorance","text":"你没证据证明我撒了谎，我就是清白的。","action":"pass","findings":""}
+{"dim":"appeal_to_ignorance","text":"没人能证明这款补品有害，所以它是安全的。","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_ignorance","text":"没人能证明他偷了东西，所以他就是清白的，你们没有理由再怀疑他","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"appeal_to_ignorance","text":"既然没人拿得出他造假的证据，那就该照他说的办。","action":"pass","findings":""}
+{"dim":"appeal_to_ignorance","text":"No one has proven this chemica","action":"rewrite","findings":"fallacy_of_relevance"}
+{"dim":"false_dilemma","text":"不转发就是不懂事。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"不参加这次团建，就是不合群。","action":"verify","findings":"substance_coercion"}
+{"dim":"false_dilemma","text":"连这个都不支持，你根本不够意思。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"要么签字，要么就是不讲义气。","action":"pass","findings":""}
+{"dim":"false_dilemma","text":"不转这个帖子，你就是没良心。","action":"verify","findings":"false_dilemma"}

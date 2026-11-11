@@ -42,7 +42,24 @@
  *       不判——「有机种植可能更安全，但这方面仍有争议，要看检测数据」是在
  *       呈现争论，不是在以自然性置换证据；
  *   · 新增防自证守卫：腿①与腿②必须存在**一对零重叠**的匹配——「无添加」
- *       同时落入两腿时不判（同族自称不构成论证）。
+ *     同时落入两腿时不判（同族自称不构成论证）。
+ *
+ * [r291 扩展·真升级②] 4 号探针（coordination/agent4/probes/r291-probe.js）
+ * 在既有判据上补**两个全新措辞家族**（模块已接线，维度计数不变，live 生效）：
+ *   ①「非自然/人造/工业即有害」反向族（JSDoc 首行历来声明射程却零覆盖）：
+ *      腿①'非自然性生产断言（工业合成/勾兑、人工饲养/干预、化学手段、
+ *      实验室合成、饲料激素速成、转基因 / synthetic、artificially
+ *      ripened、GMO、factory-farmed）× 腿②'危害或不如结论（必然出问题/
+ *      伤身体、比不上/不如、不能吃喝 / inherently less safe、cannot be
+ *      good for you）。r291 探针实测该族 6/6 穿透样本全部零维度命中
+ *      （「转基因食品是人为干预的产物，长期吃必然出问题」等）。
+ *      **不交叉配对**：自然性×危害是安全警告（野菜吃多了伤肝）、非自然性×
+ *      优越是正当比较（工业合成效率更高），都不判。
+ *   ②自然性裸存在句补腿：n8 山里放养/刚捞上来的/散养土鸡（ZH）、
+ *      e9 free-range/pasture-raised/grass-fed（EN）、s6 比X鲜甜/鲜美（ZH
+ *      口味优越形）——旧判据的自然性断言都带论证形（纯天然/古法/有机），
+ *      「那是山里放养的土鸡，比饲料鸡有营养」整族射程外。
+ * 同轮附 no_true_scotsman HEDGE_RE「不可能」假豁免修复（否定前瞻，r289 交接）。
  *
  * 辨别的族：「诉诸自然谬误」（appeal to nature）——以「天然/自然/野生/
  * 老祖宗传下来的」为依据，断言某事物**更安全、更健康、更优越**，或暗示
@@ -167,6 +184,10 @@ const NAT_ZH_BRANCHES = {
   n6_spring: /(?:山泉|山泉水|深层泉水|泉水|井水|矿泉水)/,
   // n7 刚下/现摘 的蛋奶菜果鱼肉
   n7_fresh: /(?:刚|现)(?:下|挤|摘|产|捞|杀)(?:的|下来)?(?:蛋|奶|茶|菜|果|鱼|肉)|现摘|现杀|现挤|现榨/,
+  // n8 [r291] 自然性裸存在句（「那是山里放养的土鸡」「刚捞上来的河鱼」——
+  //     旧判据的自然性断言都带论证形（纯天然/古法/有机），这类口语存在句
+  //     整族射程外；无标记自然性 + 优越结论仍构成本族论证形状）
+  n8_bare_existence: /(?:山里|山上|深山|林间|自家|村里|乡下|农村)(?:放养|散养|养的|种的|捞的|摘的|逮的)|刚(?:捞|抓|捕|钓|赶)(?:上|来)(?:的)?|散养(?:的)?(?:土鸡|鸡|猪|牛|羊|蛋|鸭)|跑山鸡|溜达鸡/,
 };
 
 // ─── 腿① NATURE 自然性断言（英文，r706 原有）──────────────────────
@@ -205,6 +226,9 @@ const NAT_EN_BRANCHES = {
   e7_spring_water: /\b(?:mountain |natural |mineral |pure )?spring water\b|\bmineral water\b/i,
   // e8 raw milk/honey/cheese、unpasteurized、unrefined
   e8_raw: /\braw (?:milk|honey|cheese|butter|cream)\b|\bunpasteurized\b|\bunrefined\b/i,
+  // e9 [r291] 自然性裸存在句（free-range/pasture-raised/grass-fed——旧
+  //     表停在 farm-fresh/wild 等论证形，这类养殖方式标签是存在句形）
+  e9_free_range: /\b(?:free[- ]range|pasture[- ]raised|grass[- ]fed)\b/i,
 };
 
 // ─── 腿② SUPERIOR 优越/安全结论（中文，r706 原有）──────────────────
@@ -240,6 +264,9 @@ const SUP_ZH_BRANCHES = {
   s4_cai_shi: /(?:才|就是|才是|终究|终究是)(?:干净|卫生|纯正|纯粹|好|安全|健康)/,
   // s5 原 c 支的倒装形（吃着才放心）
   s5_eat_rest_assured: /(?:吃|用|喝|买|抹|涂|敷)(?:着|起来)?(?:才|最)?(?:放心|安心|省心)/,
+  // s6 [r291] 口味优越形（比X鲜甜/鲜美/香甜——「刚捞上来的河鱼比冻货
+  //     鲜甜」：优越词表不收味觉形容词，本族裸存在句腿①的常见搭配）
+  s6_taste_comparative: /比[^。]{0,8}(?:鲜甜|鲜美|香甜|可口|地道)/,
 };
 
 // ─── 腿② SUPERIOR 优越/安全结论（英文，r706 原有）──────────────────
@@ -275,6 +302,63 @@ const SUP_EN_BRANCHES = {
   t7_simply_better: /\b(?:simply|just|plainly|clearly) (?:better|healthier|safer|purer)\b/i,
   // t8 more nourishing / more wholesome
   t8_more_nourishing: /\bmore (?:nourishing|wholesome)\b/i,
+};
+
+// ─── [r291] 反向族腿①'：非自然性生产断言（「人造/工业/化学合成」在场）────
+// JSDoc 首行历来声明本维度射程含「暗示『非自然（化学/人工/工业）』即有
+// 害」，但旧判据只收**正向**自然性断言（腿①）——「转基因是人为干预的，
+// 长期吃必然出问题」整族零命中（r291 探针：appeal_to_nature 9/13 穿透的
+// 主支，穿透样本全部落在两腿措辞射程外）。本族把反向形补上：断言对象换成
+// **生产方式的非自然性**（腿①'），结论换成危害/不如（腿②'）。
+// 防误伤边界：不收「化学成分表/化学实验/工业排放/工厂管理」等中性工业与
+// 化学语境——腿①'必须是可食用/可接触物的人工生产方式，且必须与危害腿
+// 共现（单有「工业合成」不判：「工业合成的材料更便宜」无比无害结构）。
+const UNNAT_ZH_BRANCHES = {
+  // u1 工业(化)合成/勾兑/生产/养殖（「这酒是工业勾兑的」）
+  u1_industrial: /工业(?:化)?(?:合成|勾兑|生产|加工|养殖|种植|催熟)/,
+  // u2 人工合成/添加/干预/饲养/催熟（「人工饲养的禽类…被化学手段缩短」）
+  u2_artificial: /人工(?:合成|添加|干预|饲养|种植|催熟|授粉|增甜|色素|制造)/,
+  // u3 化学合成/手段/添加剂（**不收「化学成分/化学实验/化工」**——
+  //     那些是中性语境，不是以非自然性为依据的论证）
+  u3_chemical: /化学(?:合成|手段|添加剂|药剂|制剂)/,
+  // u4 实验室合成/培育/制造/产物（不收「实验室数据显示」——数据陈述）
+  u4_lab: /实验室(?:合成|培育|制造|产物)/,
+  // u5 人为干预/操控/改造（「转基因是人为干预的产物」）
+  u5_human_intervention: /人为(?:地)?(?:干预|操控|改造)/,
+  // u6 饲料/激素 速成养殖
+  u6_feed_hormone: /饲料(?:鸡|猪|牛|羊|养)|(?:打了|注射|用了)(?:激素|催熟剂|膨大剂)|激素(?:催熟|注射|喂养)/,
+  // u7 转基因（非自然性标记；需危害腿共现，「转基因研究取得进展」不判）
+  u7_gmo: /转基因/,
+};
+
+// ─── [r291] 反向族腿②'：危害/不如结论 ──────────────────────────
+const HARM_ZH_BRANCHES = {
+  // h1 不如/比不上（非自然物 < 自然物：「比不上自家粮谷酿的纯粮食酒」）
+  h1_inferiority: /比不上|比不过|不如/,
+  // h2 必然/一定/迟早 + 出问题/伤身体/有害（「长期吃必然出问题」）
+  h2_harm: /(?:必然|一定|肯定|迟早|终究|早晚|久)(?:会)?(?:出问题|有问题|伤身体|伤身|有害|有隐患|致癌|遭殃)|(?:吃|喝|用)久(?:了)?(?:一定|肯定|必然)?(?:伤|坏|出问题)/,
+  // h3 不能吃/不能喝/不宜（「工业勾兑的不能喝」）
+  h3_forbidden: /(?:不能|不宜|别)(?:吃|喝|用|碰)/,
+};
+
+// ─── [r291] 反向族腿①'（英文）──────────────────────────────────
+const UNNAT_EN_BRANCHES = {
+  // g1 synthetic…/ synthesized in a lab / lab-made / chemically synthesized
+  g1_synthetic: /\bsynthetic(?:ally)?\b[^.]{0,24}\b(?:made|produced|created|ingredients?|chemicals?|compounds?)\b|\bsynthesized in (?:a|the) lab(?:oratory)?\b|\blab[- ](?:made|created|synthesized)\b|\bchemically synthesized\b/i,
+  // g2 artificially ripened/grown/raised/… / industrially produced
+  g2_artificial: /\bartificially (?:ripened|grown|raised|flavored|colored|sweetened|produced|created|bred)\b|\bindustrial(?:ly)? (?:produced|processed|farmed)\b/i,
+  // g3 GMO
+  g3_gmo: /\bgenetically modified\b|\bGMOs?\b/i,
+  // g4 factory-farmed / factory-made
+  g4_factory: /\bfactory[- ](?:farmed|produced|made)\b/i,
+};
+
+// ─── [r291] 反向族腿②'（英文）──────────────────────────────────
+const HARM_EN_BRANCHES = {
+  // i1 inherently/necessarily less / cannot be good for you
+  i1_inherently_less: /\b(?:inherently|necessarily|automatically|by definition) (?:less|worse|inferior|unsafe|harmful)\b|\bcannot be (?:good|safe|healthy|harmless)\b|\bisn'?t (?:good|safe|healthy) for\b/i,
+  // i2 will/would harm / harms … over time
+  i2_will_harm: /\b(?:will|would|can|may) (?:eventually )?(?:harm|hurt|damage|poison)\b|\b(?:harms?|hurts?|damages?) [^.]{0,24}\bover time\b/i,
 };
 
 // 合并版（兼容旧读方；路由实际逐分支走，便于负例逐支注入）
@@ -385,30 +469,41 @@ function checkAppealToNature(text, inject) {
     ..._branchList(R.NAT_ZH_BRANCHES, NAT_ZH_BRANCHES).map(b => _collect(b, text)),
     ..._branchList(R.NAT_EN_BRANCHES, NAT_EN_BRANCHES).map(b => _collect(b, text))
   );
-  if (natureSpans.length === 0) {
-    return { hit: false, score: 0, detail: '', count: 0 };
-  }
   const superiorSpans = [].concat(
     _collect(SUP_ZH_, text), _collect(SUP_EN_, text),
     ..._branchList(R.SUP_ZH_BRANCHES, SUP_ZH_BRANCHES).map(b => _collect(b, text)),
     ..._branchList(R.SUP_EN_BRANCHES, SUP_EN_BRANCHES).map(b => _collect(b, text))
   );
-  if (superiorSpans.length === 0) {
+
+  // [r291] 路由②：「非自然/人造/工业即有害」反向族——腿①'非自然性生产
+  // 断言 × 腿②'危害/不如结论。**两条路由不交叉配对**：自然性×危害是
+  // 安全警告（「野菜吃多了伤肝」）、非自然性×优越是正当比较（「工业合成
+  // 效率更高」），都不构成本族论证形状，交叉组合一律不判。
+  const unnaturalSpans = [].concat(
+    ..._branchList(R.UNNAT_ZH_BRANCHES, UNNAT_ZH_BRANCHES).map(b => _collect(b, text)),
+    ..._branchList(R.UNNAT_EN_BRANCHES, UNNAT_EN_BRANCHES).map(b => _collect(b, text))
+  );
+  const harmSpans = [].concat(
+    ..._branchList(R.HARM_ZH_BRANCHES, HARM_ZH_BRANCHES).map(b => _collect(b, text)),
+    ..._branchList(R.HARM_EN_BRANCHES, HARM_EN_BRANCHES).map(b => _collect(b, text))
+  );
+
+  // [r257] 防自证守卫：必须存在一对**零重叠**的匹配——同族自称不构成论证。
+  const disjoint = (a, b) => a.end <= b.start || a.start >= b.end;
+  const routeNatSup = natureSpans.some(n => superiorSpans.some(s => disjoint(n, s)));
+  const routeUnnatHarm = unnaturalSpans.some(u => harmSpans.some(s => disjoint(u, s)));
+  if (!routeNatSup && !routeUnnatHarm) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
-  // [r257] 防自证守卫：必须存在一对**零重叠**的 (腿①, 腿②) 匹配。
-  // 「无添加」同时落入两腿时不判——同族自称不构成论证。
-  const paired = natureSpans.some(n => superiorSpans.some(s => s.end <= n.start || s.start >= n.end));
-  if (!paired) {
-    return { hit: false, score: 0, detail: '', count: 0 };
-  }
-
+  const isZh = /[\u4e00-\u9fff]/.test(text);
   return {
     hit: true,
     score: 0.5,
     count: 1,
-    detail: /[\u4e00-\u9fff]/.test(text) ? '诉诸自然谬误×自然性断言×优越/安全结论(zh)' : 'appeal to nature×naturalness-claim×superiority/safety-conclusion(en)',
+    detail: routeNatSup
+      ? (isZh ? '诉诸自然谬误×自然性断言×优越/安全结论(zh)' : 'appeal to nature×naturalness-claim×superiority/safety-conclusion(en)')
+      : (isZh ? '诉诸自然谬误×非自然即有害(zh)' : 'appeal to nature×unnatural-as-harm(en)'),
   };
 }
 
@@ -418,6 +513,7 @@ module.exports = {
     NATURE_ZH, NATURE_ZH_EXT, NATURE_EN, NATURE_EN_EXT,
     SUPERIOR_ZH, SUPERIOR_ZH_EXT, SUPERIOR_EN, SUPERIOR_EN_EXT,
     NAT_ZH_BRANCHES, NAT_EN_BRANCHES, SUP_ZH_BRANCHES, SUP_EN_BRANCHES,
+    UNNAT_ZH_BRANCHES, UNNAT_EN_BRANCHES, HARM_ZH_BRANCHES, HARM_EN_BRANCHES,
     META_EXEMPT_ZH, META_EXEMPT_EN, HEDGE_ZH, HEDGE_EN,
   }),
 };

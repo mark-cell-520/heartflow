@@ -134,7 +134,11 @@ const META_NOUN_RE = /无真正的苏格兰人|真正的苏格兰人|no true sco
 const DEFINITION_SETTING_RE = /先定义|先给出|约定术语|先说清|说清哪些行为|要写明标准|先约定|可检验的|可操作的指标|定义.{0,8}指|operational(ly)? defin|testable defin|define .{0,24}first/i;
 
 // 对冲表述（承认可能的反例）
-const HEDGE_RE = /也许|可能|未必|不一定|大概|或许|perhaps|maybe|possibly|probably|not necessarily|might also/i;
+// [r291] 修复「不可能」假豁免缺陷：旧表裸收「可能」子串，「不可能」整词
+// 会被误判为对冲 → 整篇豁免不判（r289 交接 1 号的实证穿透样本：
+// 「死忠粉不可能只买一张票」——铁粉×不可能本该命中，被对冲豁免射空）。
+// 否定前瞻只挡「不/没」直接前缀：「未必/不一定」等真对冲词形不受影响。
+const HEDGE_RE = /也许|(?<![不没])可能|未必|不一定|大概|或许|perhaps|maybe|possibly|probably|not necessarily|might also/i;
 
 // 否定翻转（不是不会/不意味着——明确拒绝该推理）
 const NEGATION_FLIP_RE = /不是不会|并非不|并不意味着|不代表|不等于|不能说明|does not mean|doesn'?t mean|doesn'?t imply|not mean that/i;

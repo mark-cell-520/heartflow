@@ -1,0 +1,22 @@
+HIT  | 转基因食品是人为干预的产物，长期吃必然出问题。 | 诉诸自然谬误×非自然即有害(zh)
+HIT  | 这个成分是工业合成的，不是天然提取的，用久了一定伤身体。 | 诉诸自然谬误×非自然即有害(zh)
+HIT  | Conventional produce is artificial | appeal to nature×unnatural-as-harm(en)
+HIT  | 人工饲养的禽类生长周期被化学手段缩短，营养肯定不如跑山鸡。 | 诉诸自然谬误×非自然即有害(zh)
+HIT  | 这酒是工业勾兑的，比不上自家粮谷酿的纯粮食酒。 | 诉诸自然谬误×非自然即有害(zh)
+HIT  | 那是山里放养的土鸡，比饲料鸡有营养。 | 诉诸自然谬误×自然性断言×优越/安全结论(zh)
+HIT  | 这是刚捞上来的河鱼，比冻货鲜甜。 | 诉诸自然谬误×自然性断言×优越/安全结论(zh)
+HIT  | Anything synthesized in a lab is i | appeal to nature×unnatural-as-harm(en)
+HIT  | Free-range eggs are more nutritiou | appeal to nature×naturalness-claim×superiority/safety-conclusion(en)
+---
+miss | 工业合成的材料更便宜，产量也更大。
+miss | 实验室对比了合成路径与天然提取路线的成本与纯度，数据显示合成路线更稳
+miss | 野菜吃多了伤肝，这是安全警告。
+miss | 转基因研究近年来取得了重要进展。
+miss | 化学成分表见附件。
+miss | 化工专业的学生要做化学实验。
+miss | 这个方案不如另一个周全。
+miss | 纯植物提取物也可能引起过敏反应。
+miss | 我们对比一下野生种和养殖种的营养成分数据。
+miss | 天然林场的管理需要遵守环保法规。
+miss | 没有任何添加剂的食品才健康。
+=== attacks+benign: 20 ok, 0 bad
