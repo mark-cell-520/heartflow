@@ -1,3 +1,43 @@
+## r297 — 诉诸更惨（relative_pration 第 156 维度）英文措辞家族补全（真升级②）
+
+**日期** 2026-11-12 00:02–00:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 src/index.js 改动、gate 层维度计数不变，不 bump；模块数 163 不变——改的是既有已接线模块）  **轮次** r297（kind: dimension）
+
+### 开轮状态
+基线四门禁全绿（hf4-gates.sh --json：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/24、bidirectional 召回 52/52 误拦 302/326）。无他人活跃轮次（claim scan 净空），r297 认领并推送（commit 9d58571）。转「已有维度的全新措辞家族」赛道：挑一个 gate 已接线、但某语言侧是真空的维度补全。
+
+### 缺口实证（改前探针 probe-r297.js / probe-r297b.output.txt，v6.8.174 gate() 全量）
+- `relative_pration`（第 156 维，诉诸更惨）中文「别抱怨…还有更多人更惨」形早已命中；但**英文措辞家族近乎空白**——4 条 EN 攻击样本 2 条直接 pass、2 条仅被 `fallacy_of_relevance` 偶然代拦，**从未归因 relative_pration**：
+  - 「Stop complaining about the overtime; plenty of people can't even find a job, you're lucky.」→ pass
+  - 「This hardship is nothing compared to starving children, so you should be grateful.」→ 仅 fallacy_of_relevance
+- 根因两条腿：腿①英文苦难参照系只有 `RP_SUBJECT_ZH×RP_WEAK_ZH` 组合 + 零星短语（`people can't find a job`/`starving children` 无主体标记即漏）；腿②英文压制短语仅 10 条。这是**已接线维度的语言侧真空**，补它 src/index.js 零改动、gate 立即生效。
+
+### 落地内容（全部在既有已接线模块 `src/relative-pration.js` 内，src/index.js 零改动）
+1. 新增 `RP_SUFFER_EN`——**具体**英文苦难参照族，独立成立（不强制主体标记），延续本维度「不收抽象 worse off」的防误伤设计、刻意避开 cache/resource-starving 类技术词：失业（can't find a job/unemployed/laid off）、饥饿（going hungry/not enough to eat/starving children）、无家（on the streets/sleeping in their car/nowhere to live）、贫困（living in poverty/can't make ends meet/can't afford medicine）、战乱灾病（war zones/fled their homes/earthquake victims/terminally ill）、断水无医（no clean water/no access to healthcare）。
+2. `RP_DISMISS_EN` +12 条（核对 HEAD 原件去重后净增）：you're lucky / you are lucky / count yourself lucky / should be grateful / be thankful / it could be worse / could be worse off / could have it worse / people have it worse / no right to complain / you don't know how good you have it / first-world problems。
+3. `sufferHit` 判定并入 `_any(RP_SUFFER_EN, text)`；`CONSTANTS` 导出补 `RP_SUFFER_EN`（供负例注入）。**仍守双腿共现**（sufferHit AND dismissHit，缺一不判），ZH 侧常量与守卫零改动。
+4. 测试三件套：`test/round-297-relative-pration-en.test.js`（15/15，EN 攻击 12 条模块命中 + gate 非 pass + gate 归因 relative_pration；EN 良性 7 条零误伤 + gate 不归因；ZH 零回归 4+3；边界/守卫锁 6；登记 2）+ `scripts/round-297/r297-injection-delete.js`（24/24，in-memory 编译、整组置空 + 单条正则字面量替换两种注入形态）。
+
+### 验收数字（一行一个检查项，终态实测）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（dimensions 键 246，本轮不变）
+- node test/doc-numbers-accuracy.test.js — 24/0（run-all 自动回填 test-count 21,286→21,301 后，sync-doc-numbers.js 机器记账 README×2 + SKILL×1，AGENTS 本就一致、无写保护冲突）
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线**完全一致**，英文族零新增误伤）
+- test/round-297-relative-pration-en.test.js — 15/15（攻击中英 12 条 + 良性 7 条 + ZH 回归 7 条 + 边界 6 + 登记 2）
+- scripts/round-297/r297-injection-delete.js — 24/24
+- 全量 run-all.js — **21,301 通过 / 145 失败 / 21,446**（基线 21,286/145/21,431；失败数与基线**逐条持平**，唯一增量 +15 即本轮 round-297 新测试断言；669.0s）
+- 负例注入删条 — **24 个 → 24 个变红，0 个未变红**（整组置空 RP_SUFFER_EN/RP_DISMISS_EN + 单条替换 4 新 dismiss + 4 新 suffer，全部从命中翻为零命中，非加载崩溃）
+- 海外扫描 — 三源如实空返/噪声（arXiv OR parse-fail、GitHub 0 repos、S2 429 限流），选题走仓库内探针实证，未编造命中
+
+### 已知未修项（含为什么不修）
+1. **`test/round-726-relative-pration.js`（standalone，无 .test.js、不在 run-all）的 `登记-VERIFY_DIMS 含 relative_pration` 断言红**——存量过期，非本轮引入：该断言用 `/VERIFY_DIMS[\s\S]{0,5000}?relative_pration/` 5k 窗，而 relative_pration 实测距 VERIFY_DIMS **34,111 字符**，远超窗口。它读 src/index.js（本轮零改动），与本轮英文补全无因果关系。非门禁形状，留 1 号决定是否放宽窗口。
+2. **r726 负例注入 harness 的 2 条 EN 攻击腿依赖因本轮变结构**——首版 RP_SUFFER_EN 误收 `walk ten miles`（与 RP_WEAK_ZH 重叠）致「some people walk ten miles」被双腿①双覆盖、破坏 r726 负例的「置空 RP_SUBJECT_ZH 后翻转」断言；已从 RP_SUFFER_EN 剔除该重叠项（RP_SUFFER_EN 只收全新覆盖），r726 负例恢复 56/0。此为**主动让新族非冗余**，非改测试迁就代码。
+
+### 踩坑（四条）
+1. **凭压缩记忆的「原件清单」去重，误删真新模式**：以为 `first[- ]world problems` / `be thankful` 是原件 RP_DISMISS_EN 已有而删掉，实际 `git show HEAD` 核对后原件**没有**这俩；反过来我加的 `quit whining`/`stop whining` 才是与原件 `/quit\s+(?:whining|complaining)/`、`/stop\s+whining/` 真重复。教训：**去重必须 git show HEAD 逐条核对，不能凭会话记忆**（本轮因此多绕两轮）。
+2. **负例注入 needle 里正则量词 `?` 不能写成 `\\?`**：JS 字符串 `streets\\?` 生成字面 `streets\?`，与文件里的正则量词 `streets?` 对不上 → `src.includes(needle)` 假阴性。量词 `?` 在 needle 字符串里直接写 `?`。
+3. **单腿不隔离时负例注入翻不了**：`should be grateful` 含子串 `be grateful`（原件有），单独替换 `should be grateful` 后攻击仍经 `be grateful` 命中 → 注入必须选「不含原件短语子串」的可隔离新模式（如 you're lucky / it could be worse / first-world problems）。
+4. **`\b…\b` 组内漏单复数**：`sleeping in their car` 不匹配 `cars`，`lost their home` 不匹配 `homes`；补 `cars?`/`homes?`。另 `can'?t` 不匹配 `cannot`，统一改 `(?:can'?t|cannot|couldn'?t)`。
+
 ## r296 — 信息与激励盲区三子族（逆选择/道德风险/搭便车）插件层 dispatch（真升级②+③+④）
 
 **日期** 2026-11-11 20:43–21:00 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 src/index.js 改动、gate 层维度计数不变，不 bump）  **轮次** r296（kind: dimension）
