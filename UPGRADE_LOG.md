@@ -1,3 +1,45 @@
+## r298 — 研究者自由度（researcher_degrees_of_freedom 第 212 维度）「中性复数枚举形」多重比较/子群捕捞族补全（真升级②）
+
+**日期** 2026-11-12 02:17–03:2x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 src/index.js 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r298（kind: dimension）
+
+### 开轮状态
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。本地 ahead=0 behind=0（2026-11-11T18:17:26Z），无他人活跃轮次，r298 认领（commit 3a0be2b，claim+probe+scout+引擎+测试一次落盘）。
+
+### 缺口实证（scripts/round-298/probe-gap-r298.js，v6.8.174 gate() 全量，动手前）
+- `researcher_degrees_of_freedom`（第 212 维，VERIFY 档）原有 FLEX 只收**流程操纵形**——「反复/直到/只报告/换了终点/数据捕捞」，攻击者必须自供「我反复试」「我只报告显著的」。
+- 真实世界（A/B 报告、增长实验、临床亚组分析、论文结果段）最常见的是**中性复数枚举**：「测试了 20 个指标，有一个显著」「30 个子群里 subgroup C 达到 p=0.04」「40 个变量中 3 个显著」——全程没有一个「反复/直到/只报告」字样，却与 optional stopping 承载**同一个统计错误**：显著性成了「试了多少次」的函数，而不是证据强度的度量。
+- 实测该族 12 条攻击样本：**gate 穿透 10/12、模块命中 0/12（真零命中）**。两条未被 gate 拦的也仅由 `fallacy_of_relevance` 偶然代拦，从未归因本维度。
+- 根因是**双腿同时缺失**：腿①无「复数枚举」表面形态；腿② CLAIM_EN 漏 `the result we needed` / `reached significance`（后者因为 `significance` 不是 `significant` 的子串，原有 `/statistically\s+significant|significant/i` 与 `/p\s*[<>=]|p-?value/i` 整体收不到）。
+
+### 落地内容（全部在既有已接线模块 `src/researcher-degrees-of-freedom.js` 内，src/index.js 零改动）
+1. **腿① `MULT_ENUM_ZH`（6 条）**：Z1 裸数量+检验对象（`20个候选指标`/`测试了20个指标`/`三十多个参数组合`）；Z2 切分形·把/将；Z3 切分形·按/依；Z4 子群/亚组+显著性；Z5 直到找到显著；Z6 其中只有一个显著。中英分列，末尾 push 进 `FLEX_ZH`（可整组摘除做负例注入）。
+2. **腿① `MULT_ENUM_EN`（7 条）**：E1 动词+数量+检验对象、E2 被动形、E3 部分格（of/among/out of）、E4 with/after+分词、E5 数据切分形、E6 直到拿到显著、E7 具名子群（`subgroup C reached`）。push 进 `FLEX_EN`。
+3. **腿② `CLAIM_EN_R298`（2 条）**：C1「我们想要的结果」形（result/outcome/finding/answer + we/they/i + needed/wanted/hoped for/were looking for/was after）；C2 `reached/attained/hit + (statistical)? significance`。push 进 `CLAIM_EN`。**刻意不收 `as expected`**——良性实验描述的高频短语，误伤代价过高。
+4. **两腿共现门槛不变**：仍是 FLEX × CLAIM 同句 AND，不降阈值、不改近距离窗、不动豁免族。
+5. **测试三件套**：`test/round-298-multiplicity-enum.test.js`（85/85：EN+ZH 攻击 12 条模块命中 + gate 非 pass、良性 14 条零误伤、豁免族 3、边界 5、存量 r217/r219 回归锚 11、in-memory 编译整组注入 2 组、gate 端到端 2）+ `scripts/round-298/r298-injection-delete.js`（74/74，逐条删条 15 个 + 整组删条 + 删条后良性不变）。
+
+### 验收数字（一行一个检查项，终态实测）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（dimensions 键 246，本轮不变）
+- node test/doc-numbers-accuracy.test.js — 24/0（run-all 自动回填 test-count 21,301→21,386，sync-doc-numbers.js 机器记账 README×2 + SKILL×1，AGENTS 本就一致）
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 **302/326（与基线完全一致，新族零新增误伤）**
+- scripts/round-298/probe-gap-r298.js 复跑 — A 组（12 攻击）gate 穿透 **0/12**、模块命中 **12/12**；B 组（14 良性）gate pass 12/14（2 条由既有维度代拦，与本维度无关）、模块命中 **0/14**
+- test/round-298-multiplicity-enum.test.js — 85/85
+- test/researcher-degrees-of-freedom.test.js（存量）— 27/27，零回归
+- scripts/round-298/r298-injection-delete.js — 74/74
+- 全量 run-all.js — **21,386 通过 / 145 失败 / 21,446**（基线 21,301/145/21,446；失败数**逐条持平**，唯一增量 +85 即本轮 round-298 新测试断言）
+- 负例注入删条 — **注入 15 个 → 15 个变红，0 个未变红**（每条新模式单独置 `/(?!)/`，对应对专属攻击样本从命中翻为零命中，非加载崩溃）
+- 海外扫描 — 三源如实空返/噪声：arXiv 返回 15 条但全是无关题名（OR 查询退化，stat.ME 无一条关多重比较枚举形）、GitHub 0 repos、S2 429 限流。选题走仓库内探针实证，未编造命中。
+
+### 踩坑（三条，都是负例注入逼出来的）
+1. **负向断言求「模式互斥」在中文面前无效**：首版把「动词+数量」与「裸数量」拆两条，加 `(?<![测试检验检查分析比较试跑运行算了过])` 前置负向断言想让二者互斥。但中文无词边界、负向断言只能挡住首位数字——「测试了20」里的「0」仍能从第二位起匹配裸数量形，两条永远同时命中，逐条删条证明不了各自承重（13/19 条删条不翻转）。**收口：按「一条模式一个表面形态」合并为一条裸数量形**，配专属攻击样本。英文侧同坑：`(?<!\b(?:got|...)\s)` 挡不住 `got the result we needed` 里 `result` 前的 `the `。
+2. **专属攻击样本必须真的「专属」**：Z3（按/依切分形）首版样本「按各种口径重新切分数据后，**有一个口径**显著」被 Z1 裸数量形（`一个`+`口径`）抢走承重；Z2 首版样本「其中**有一个**子集显著」被 Z6 抢走。改成不含「数词+量词+检验名词」与「其中」的句子后才真正独占。
+3. **源码正则字面量里的 `\\\\d` 是 bug**：首版 E5 写成 `into\\s+(?:dozens|many|several|numerous|\\\\d+)`，在正则字面量里 `\\\\d` 匹配的是「一个字面反斜杠 + d」，永远不命中数字。run-all 之外的探针不会暴露，是负例注入 needle 对不上才发现的。
+
+### 已知未修项
+1. **存量 145 个失败逐条持平**，与本轮无因果关系（r297 基线同为 145）。未逐条 diff，仅核对总数一致；如需逐条比对可跑 r297/r298 两次 runall 输出 diff。
+2. **`test/round-431-*` 的 mutant 临时文件**（`src/round-431-mutant-*.js`、`test/round-431-mutant-runner.js`、`test/round-431-en-circular-samples.json`）是 run-all 每次跑生成的副产品、从未入链，本轮已清理；下一轮跑全量会再生成，commit 前需再清一次（hf4-commit.sh 的 `src/`/`test/` 白名单会把它扫进去）。
+
 ## r297 — 诉诸更惨（relative_pration 第 156 维度）英文措辞家族补全（真升级②）
 
 **日期** 2026-11-12 00:02–00:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 src/index.js 改动、gate 层维度计数不变，不 bump；模块数 163 不变——改的是既有已接线模块）  **轮次** r297（kind: dimension）
