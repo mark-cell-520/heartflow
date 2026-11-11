@@ -1,0 +1,327 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/j35sniEYWPXl4Xgv5oRLmsL8eSA</id>
+  <title>arXiv Query: search_query=all:gambler OR all:fallacy OR all:law OR all:of OR all:large OR all:numbers OR all:short OR all:run OR all:balancing OR all:probability OR all:reasoning&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-11T23:54:11Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:gambler+OR+(all:fallacy+OR+(all:law+OR+(all:of+OR+(all:large+OR+(all:numbers+OR+(all:short+OR+(all:run+OR+(all:balancing+OR+(all:probability+OR+all:reasoning)))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1294263</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14519v1</id>
+    <title>Medical Image Segmentation: Foundation Model Adaptation versus Task-Specific Training</title>
+    <updated>2026-11-10T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.14519v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14519v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models pretrained on large natural-image collections are increasingly adapted for medical image segmentation, in the expectation that they will replace models trained for each task. Most comparisons, however, use data from the training distribution and a single task-specific baseline whose configuration is rarely justified, and therefore provide limited evidence of performance at new clinical sites. It also remains unclear how much of a foundation model must be adapted, and what determines this. We adapted a foundation model, DINOv2, with strategies ranging from tuning only its bias terms to full fine-tuning, and compared it with U-Nets and ResU-Nets trained from scratch. Experiments covered colonoscopy, breast ultrasound and dermoscopy, with testing on held-out data from the training source and on independent datasets from other institutions. The adapted foundation model generalised better on every external dataset. Within the training distribution, the task-specific models remained competitive when training data were abundant, and delineated boundaries more precisely, while the foundation model more often missed small lesions. Only a small fraction of the foundation model required adaptation, and the capacity needed was determined by the imaging domain rather than by the adaptation method. A widely used polyp test set was also found to duplicate images from another benchmark. Foundation-model adaptation is therefore warranted where models must work across sites, with capacity selected on the target domain.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Emre Kutlusan</name>
+    </author>
+    <author>
+      <name>Yongmin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14517v1</id>
+    <title>The closure of the nonreal roots of bounded-height polynomials is connected exactly at pronic heights</title>
+    <updated>2026-11-10T18:58:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.14517v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14517v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let C_h be the closure of the nonreal roots of integer polynomials with coefficients of modulus at most h. With the nonzero real roots included, the closure is connected at every height; without them, connectedness becomes arithmetic. We prove that C_h is connected exactly when h=q(q-1) is a pronic number 2, 6, 12, 20, ..., and has at least five components otherwise. At height two this confirms a twenty-year-old numerical observation of Shmerkin and Solomyak on double zeros of power series: apart from 1/2 they form the interval $[1/ρ,1)=C_2\cap(0,1)$, with $ρ$ the tribonacci constant. Disconnection is almost always infinite. For (p-1)^2&lt;h&lt;=p^2-3, $h\neq p(p-1)$, infinitely many components with nonempty interior accumulate at $\pm p$ and $\pm 1/p$, and when h&lt;p(p-1) these four points are themselves components. Next to each square q^2&gt;=16, at least two of the three heights q^2-2, q^2-1, q^2 have infinitely many components accumulating at a common point of (1/(q+1),1/q). Explicit series give infinitely many components at every nonpronic height below 167 other than 1, 3, 4, 9, 25, 63 and 81, and in general at most sqrt(X)+1 nonpronic heights h&lt;=X can have finitely many components, although C_h is a Peano compactum at every height. The proofs compare values and derivatives of all admissible power series near a real double zero; the comparison sets are open and closed in the whole core, so components separated near the axis cannot reconnect elsewhere. On the real axis, the double zeros at heights 1, 3, 4, 7 form sets with infinitely many components; at height one this proves a conjecture of Shmerkin and Solomyak and one of Solomyak on the connectedness locus for pairs of affine maps.</summary>
+    <category term="math.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:59Z</published>
+    <arxiv:comment>45 pages, 8 figures, with a 35-page supplement (80 pages in all). Computational companion: Zenodo, doi:10.5281/zenodo.24117729</arxiv:comment>
+    <arxiv:primary_category term="math.CV"/>
+    <author>
+      <name>Bernat Espigule</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14515v1</id>
+    <title>AutoScaffold: AI-Guided Scaffolding for Reinforcement Learning of Language Models</title>
+    <updated>2026-11-10T18:58:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.14515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning with verifiable rewards (RLVR) produces rich training experience, yet outcome rewards reduce each attempt to a single number and leave most of this information unused. Training-time scaffolds, such as strategies or hints added to the prompt during training, offer a natural way to turn this information into guidance, but their design and adaptation are largely left to humans and tailored to specific domains. We introduce AutoScaffold, a unified AI-for-AI framework that turns a student's training experience into adaptive scaffolds, with minimal domain-specific information and no human intervention during training. A frozen teacher periodically examines this experience, diagnoses bottlenecks, and designs scaffolds in two forms: (i) strategies shared across a class of tasks and (ii) hints for individual hard tasks, adjusting the content and amount of support as the student learns. The scaffolds are removed at evaluation. We apply the same framework to ALFWorld, search-based QA, mathematical reasoning, and GPU kernel generation. When evaluated without scaffolds, students trained with AutoScaffold outperform those trained with the corresponding RL baselines in all four domains, with gains of 7.2 points in ALFWorld success and 4.0 points in average QA exact match. On GPU kernel generation, AutoScaffold increases the fraction of tasks with a correct kernel that runs faster than the PyTorch reference by up to 5.0 points. On math, our student surpasses QuestA's reported accuracy using approximately one-third as many student training steps. Analyses show that the teacher identifies a different failure in each task class and shifts its scaffolds from step-by-step workflows to targeted fixes as the student improves, and that its revised scaffolds help the student learn more than keeping the previous scaffold or using no scaffold.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:46Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zijian Zhang</name>
+    </author>
+    <author>
+      <name>Rizhen Hu</name>
+    </author>
+    <author>
+      <name>Jiangweizhi Peng</name>
+    </author>
+    <author>
+      <name>Shiyang Li</name>
+    </author>
+    <author>
+      <name>Sujay Bhatt</name>
+    </author>
+    <author>
+      <name>Sihan Zeng</name>
+    </author>
+    <author>
+      <name>Mingyi Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14512v1</id>
+    <title>Solving the SU(2) BFSS model</title>
+    <updated>2026-11-10T18:57:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.14512v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14512v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We numerically solve the ground state wavefunction of SU(2) BFSS matrix quantum mechanics. We compare ground correlators against islands obtained using the matrix bootstrap and find agreement up to five significant figures. The power law tail of this wavefunction determines the three-point amplitude, which agrees with the computation of Herderschee and Maldacena. Beyond the ground state, we extract the non-perturbative four-point scattering amplitude using Lüscher's method. In the appropriate regime, we find agreement with the Born-Oppenheimer approximation that yields the well-known $v^4/r^7$ interaction. We also find explicit bound states with positive energies in various SO(9) irreps. These are closely related to the bound states whose existence was recently discovered by OpenAI. Finally, we identify metastable resonances in the spectrum.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:57:34Z</published>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Kabir Bajaj</name>
+    </author>
+    <author>
+      <name>Henry W. Lin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14511v1</id>
+    <title>Pyrite: Building and Benchmarking Protein-Ligand Pose Ranking Agents</title>
+    <updated>2026-11-10T18:56:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.14511v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14511v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting how a ligand binds to its target is central to small-molecule drug discovery. Modern cofolding models can generate diverse candidate poses, but reliably ranking these candidates remains challenging. We introduce Pyrite, a pairwise pose-ranking benchmark comprising 1,500 pose pairs across diverse protein-ligand complexes. Expert chemists equipped with 3D visualization tools and physics-based scores perform near chance, highlighting the difficulty of interpreting available chemical signals. To investigate automated ranking, we introduce PyriteRep, a structured representation of molecular geometry, protein-ligand interactions, and physicochemical scores, and develop two LLM-based agents: PyriteReasoner, which directly compares poses through text-based reasoning, and PyriteFeaturizer, which generates executable code to construct features for logistic regression, optionally incorporating features derived from LLM subcalls. These agents achieve up to 67% and 74% accuracy, respectively, exceeding observed expert performance. LLM-guided feature discovery generally outperforms direct reasoning, while Group Relative Policy Optimization (GRPO) improves open-weight models, enabling them to match or surpass closed-source frontier models in our evaluations. These results establish Pyrite as a challenging test of pose-ranking ability and highlight LLM-guided feature discovery as a promising approach to interpret and combine the outputs of computational chemistry tools.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:56:32Z</published>
+    <arxiv:comment>32 pages, Agentic AI for Biological Discovery Workshop (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Megha Srivastava</name>
+    </author>
+    <author>
+      <name>Michael H. Lim</name>
+    </author>
+    <author>
+      <name>Allison M. Keys</name>
+    </author>
+    <author>
+      <name>Pranav Murugan</name>
+    </author>
+    <author>
+      <name>Nate Gruver</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14508v1</id>
+    <title>When Does the Real Wiring Win? Testing connectome structure-function claims against unmeasured physiology</title>
+    <updated>2026-11-10T18:55:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.14508v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14508v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Connectome-constrained models are often used to argue that a measured wiring diagram outperforms shuffled or rewired wiring, and hence that structure shapes function. Such comparisons can confound wiring with how the models are tuned: a connectome fixes who connects to whom, not the excitability, gains or plasticity rates the model also needs, and modellers often tune these until the real-wiring model works. We separate three estimands: physiology tuned on the real wiring and transferred to nulls (P1), each wiring tuned on its own (P2), and P2 restricted to physiology consistent with independent data (P3). The biases involved are known in machine learning (under-tuned baselines, inherited weights, winner's curse); we measure what they do to biological conclusions, using synthetic ground truth, placebo nulls and three Drosophila circuit models. Some claims survive every protocol we test: segregated reward and punishment dopamine improves learning, and head-direction topography is required for a persistent bump. Others do not. In the mushroom body, the real Kenyon-cell output wiring beats a cross-subtype identity shuffle by 0.09 under P1 and P2 but loses to it by 0.09 under P3 (95% CIs exclude zero; held-out runs confirm). The verdict is set by the share of alpha'beta' cells among active Kenyon cells, which P1 selects low; at the share implied by imaging (about 44%) the real-wiring model fails to learn, exposing a model inadequacy rather than a deficit of the fly's wiring. In flyvis, P1 penalises a mirrored connectome, which has a constructed solution within 0.07 (median) of the real error, more than a spatially shuffled one in 50 of 50 members; the ranking survives ten-fold longer retraining but depends on the checkpoint at fifty-fold. A credible structural claim needs matched optimisation, data-constrained physiology and a model that still works there.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:48Z</published>
+    <arxiv:comment>23 pages, 5 figures, 10 tables. Code, data and prediction files are included as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yeyuan Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14505v1</id>
+    <title>Continual-ARC: Measuring Skill Acquisition over a Working Lifetime</title>
+    <updated>2026-11-10T18:55:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.14505v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14505v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agent harnesses have emerged as a promising mechanism for continual learning, alongside test-time parametric learning. However, the current benchmarks have several limitations: they generally focus on a single applied domain, serve each instance only once, and assume a single family of learner, so memory-based and weight-based systems are rarely compared on the same scale. We propose Continual-ARC, a lifelong stream built from the three ARC-AGI editions, whose tasks need no domain knowledge. The same tasks return after dormant gaps with fresh instances, while new tasks keep arriving. On each instance, the learner may pay for demonstrations, submit answers, or act inside the harness, with retries permitted on incorrect submissions, which are paid for. Each instance is scored based on the share of this feedback budget consumed. Since a learner may keep anything between instances, memory-based and weight-based systems are scored on the same scale. After the stream, the learner is frozen and tested on fresh instances of the tasks it met, which measures memorization, and on unseen tasks, which measures generalization. We run an agent harness with frozen weights, with and without persistence, on Qwen3.5-9B and GLM-5.3 Flash, comparing them with two prompting floors, a program-induction method and Qwen3.5-9B's weights trained to imitate GLM-5.3 Flash. Persistence in the harness generally does not improve memorization unless provided with explicit expert guidance. Most harness-based methods still learn less than a floor that simply caches each task's demonstrations, across all models we tested. No harness-based method gains on unseen tasks, whereas weight-based learning shows substantial gains. This opens the door to future weight-based continual learning that could teach models to drive harnesses in new domains.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:01Z</published>
+    <arxiv:comment>51 pages, 13 figures. Code and run records: https://github.com/unifyai/continual-arc</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Daniel Lenton</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14504v1</id>
+    <title>Emergent Biological Capabilities in a Foundation Model for Molecular Interactions</title>
+    <updated>2026-11-10T18:53:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.14504v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14504v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models trained on large unlabeled corpora develop emergent capabilities, tasks that go beyond the training objective. We extend this paradigm to multimodal biology with Bonbon, a foundation model for molecular interactions trained on approximately 3.2 trillion tokens of paired protein-ligand sequences. From a single representation space, Bonbon exhibits three zero-shot emergent capabilities at hierarchical levels of resolution: functional (mechanism of action), residue (binding site localization, including orthosteric/allosteric discrimination), and bond (covalent versus non-covalent engagement). All three capabilities generalize to out-of-distribution complexes. Bonbon was trained on protein-ligand sequences alone, without any task-specific supervision and without structural coordinates. We conducted controlled scaling experiments across six model scales from 42M to 1.6B parameters; every capability evaluated shows a sharp jump at the largest scale on continuous metrics, even as pretraining loss decreases smoothly. This demonstrates that loss-based scaling laws alone are insufficient to predict when zero-shot emergent capabilities become available. The capabilities reported here emerge after training at a 1:2,000 parameter-to-token ratio to accommodate the sparsity of paired biological interaction data. The same frozen representations achieve state-of-the-art binding and affinity prediction at five orders of magnitude greater speed than co-folding methods. In prospective wet-lab validation across nine disease targets spanning seven protein families, Bonbon achieves a 61.5% dose-response hit rate on de novo compounds, yielding structurally novel molecules not previously reported to inhibit these proteins, including for out-of-distribution targets.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.BM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:53:01Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026 (Main Track, Oral)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Adi Mashiach</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14503v1</id>
+    <title>$G_2'$-Slodowy Slices II: Anosov Representations</title>
+    <updated>2026-11-10T18:52:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.14503v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14503v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We find \emph{exotic} connected components of Anosov representations of surface groups in the higher rank group $G=G_2'$ that are neither $ι$-Fuchsian deformations nor higher rank Teichmüller spaces. These representations are found through the non-abelian Hodge correspondence via $G_2'$-Higgs bundles that we call \emph{$α$-bundles} and \emph{$β$-bundles}, which are particular cyclic Higgs bundles in the Slodowy slices of the $\mathfrak{sl}_2$-triples associated to the simple roots $α$ and $β$ of $\mathfrak{g}_2^{\mathbb{C}}$. We first prove that (most) $β$-bundles that are also Hodge bundles are $P_β$-Anosov and $α$-bundles are $P_α$-Anosov. The strategy employed is new, geometric, and general. For $σ\in \{α, β\}$, we then show the locally homogeneous $(G_2', G_2'/P_σ)$-manifold ${\mathscr{M}}_σ(ρ)$ recently described in arXiv:2510.12757, for the representation $ρ:π_1S\rightarrow G_2'$ associated to a $σ$-bundle, coincides up to finite cover with the corresponding geometric structure for $ρ$ defined via domains of discontinuity by Guichard-Wienhard and Kapovich-Leeb-Porti. Consequently, we find that $π_1({\mathscr{M}}_σ(ρ))$ is an invariant for the connected component of $ρ$ in the space of $P_σ$-Anosov representations. After verifying the folklore result that the $G_2'$-character variety has exactly three connected components, we conclude lower bounds for the number of connected components of $P_σ$-Anosov representations in the two non-Hitchin components, most of which are exotic.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:52:47Z</published>
+    <arxiv:comment>53 pages, 7 figures, 1 table. No AI proof assistance</arxiv:comment>
+    <arxiv:primary_category term="math.DG"/>
+    <author>
+      <name>Colin Davalo</name>
+    </author>
+    <author>
+      <name>Parker Evans</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14502v1</id>
+    <title>Zeros of Katz's p-adic Eisenstein series E2</title>
+    <updated>2026-11-10T18:51:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.14502v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14502v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For every prime $p\geq5$, the zeros of Katz's $p$-adic Eisenstein series $E_2$ on elliptic curves with good ordinary reduction have exactly $\lfloor p/12\rfloor+1$ distinct $j$-invariants. We prove that all these invariants lie in finite unramified extensions of $\mathbf{Q}_p$. Their reductions are given by a classical formula involving the supersingular polynomial, and each nonelliptic residue class contains a unique simple zero. For the Legendre family, hypergeometric congruences determine the polynomial of the lifted invariants modulo every power of $p$. We also study isogenies between the zeros. Each $p$-power isogeny class contains at most one zero $j$-invariant, and any two distinct isogenous zero invariants are algebraic over $\mathbf{Q}$. At a fixed cyclic degree, the nonelliptic isogenies give points in a finite divisor over $\mathbf{Q}$ on the corresponding modular curve. Its degree bounds their number and their fields of definition, and excludes several small degrees. The only zeros with complex multiplication have $j=0$ or $1728$. Whether a non-CM zero can have an algebraic $j$-invariant remains open.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:53Z</published>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Abdellah Sebbar</name>
+    </author>
+    <author>
+      <name>Khalil Besrour</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14500v1</id>
+    <title>The expected number of holes of the planar Wiener sausage</title>
+    <updated>2026-11-10T18:51:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.14500v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14500v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>```text Let $β_1^T(r)$ be the number of holes, that is, the first Betti number, of the Wiener sausage of radius $r$ of a planar Brownian motion run up to time $T$. We prove that $\mathbb{E}[β_1^T(r)]$ is of order $T/(r^2(\log T)^2)$ as $T\to\infty$, for each fixed $r&gt;0$, which completes the lower bound obtained in a companion paper from a law for the inradii of the cavities of the path. We also identify which parts of the complement of the path contribute at leading order. At unit time and radius $\varepsilon$, the holes lying in the unbounded component of the complement have expected number $O(\varepsilon^{-2+θ_0})$ for an absolute $θ_0&gt;0$, whereas the additional holes created when a cavity fragments under erosion have expected number of exact order $\varepsilon^{-2}(\log(1/\varepsilon))^{-2}$. In particular the one-pocket constant of the lower bound is strictly improved. The upper bound is obtained by pricing the contact configurations that pin near-critical pockets along the two independent arms of the path from a deterministic time, each arm contributing one factor $1/\log(1/\varepsilon)$. The outer estimate combines a stratified form of this first-moment bound with a packing argument near the frontier of the path, and the splitting lower bound forces a dumbbell-shaped cavity by a local construction followed by two logarithmic avoidance probabilities. The upper bound and the two structural estimates use no limit theorem for the shapes of cavities; the shape law enters only through the lower bound of the companion paper. ```</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:39Z</published>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Tristan Guillaume</name>
+      <arxiv:affiliation>CY Cergy Paris University</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14496v1</id>
+    <title>RS-JEPA: Remote Sensing Joint-Embedding Predictive Architecture with Scan-Path Views for Cross-Sensor Image Retrieval</title>
+    <updated>2026-11-10T18:51:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.14496v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14496v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cross-sensor remote sensing image retrieval aims to find scenes with the same content across heterogeneous sensors, such as SAR and optical or panchromatic (PAN) and multispectral (MS) imagery, without manual labels. Existing self-supervised methods either reconstruct sensor-specific pixel detail, align each image only with its co-registered twin, or rely on large transformers with 118-173M parameters (and up to 398M). We introduce RS-JEPA, a compact joint-embedding predictive framework built on a Vision Mamba encoder shared by both sensors. Since a state-space encoder reads an image as an ordered sequence of patches, we propose scan-path views, which treat two reading orders of the same image as two views with identical pixels and predict the hidden patches in one order from the visible patches in the other.To keep this prediction challenging, we propose Adversarial View Coupling (AVC), which learns the hardest split of the visible patches, and a neighbourhood consensus loss that aligns the scene similarities of both sensors. Extensive experiments on SAR-optical (BEN-14K, CBRSIR-VS) and PAN-MS (DSRSID) benchmarks demonstrate that RS-JEPA achieves the highest F1@5 among twelve re-implemented methods (72.92, 80.35 and 94.43) with a retrieval network of only 3.88M parameters (14.57M in training, 8-16times fewer than prior JEPA retrievers). Like prior methods, RS-JEPA trains on co-registered pairs. Our results highlight reading order as a source of self-supervised views. code: https://github.com/Tanishq251/RSJEPA.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:05Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tanishq Rachamalla</name>
+    </author>
+    <author>
+      <name>Srishti Kaushik</name>
+    </author>
+    <author>
+      <name>Muhammad Attique Khan</name>
+    </author>
+    <author>
+      <name>Gustau Camps-Valls</name>
+    </author>
+    <author>
+      <name>Swalpa Kumar Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14495v1</id>
+    <title>SkipLane: Write-Once, Conflict-Free Accumulation for Zero-Skipping CNN Engines on FPGAs</title>
+    <updated>2026-11-10T18:50:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.14495v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14495v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Skipping zero activations saves multiplications in CNN accelerators, but it complicates accumulation: the products in a compressed input window belong to different output columns and must be merged. In our earlier engine, this merging was done by read-modify-write (RMW) of a row buffer, which made sparse inputs slower than dense ones even at 87% sparsity. Existing designs either merge kernel rows through RMW or reduce bank conflicts with extra hardware, without eliminating them. SkipLane makes the entire accumulation path write-once. Each kernel row is processed in its own lane, which holds partial sums in three registers and retires up to three finished columns per cycle into memory banks that cannot conflict. Lanes and input channels are summed only at readout, so no partial sum is ever read back. Multipliers left idle by zero weights compute a second filter in the same pass. In RTL simulation, the engine stays within 0.5% of its frontend bound up to 70% sparsity and is 1.10-1.26$\times$ faster than an SCNN-style scatter accumulator with 18 banks and ideal RMW at 50-80% sparsity. Six engines meet 140 MHz on a PYNQ-Z2 using 21.1k LUTs and run LeNet-5 bit-exact on the board. For conv1, the engine needs 1.94$\times$ fewer cycles than a dense engine (1.26$\times$ faster end to end); for conv2, whose rows are only 13 pixels wide, it reaches 0.87$\times$ the dense speed.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:51Z</published>
+    <arxiv:comment>5 pages, 5 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Aditya Saboo</name>
+    </author>
+    <author>
+      <name>Pratibha Verma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14493v1</id>
+    <title>Comparative Analysis of Agent Evaluation Frameworks: Stability, Detection, and Discovery in Enterprise Analytics Agents</title>
+    <updated>2026-11-10T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.14493v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14493v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deploying LLM-based analytics agents in enterprise settings requires evaluation frameworks that can reliably detect failures across complex, multi-tool workflows. We present a three-phase comparative study of three evaluation frameworks, each representing a distinct evaluation paradigm (trace-based LLM judging, text-only LLM judging with red-teaming, and deterministic heuristics), applied to two analytics agents in a controlled research setting using frozen execution traces. Phase 1 quantifies evaluation harness stability through repeated measurements, finding that 97% of configurations meet the stability threshold and that stability patterns are agent-independent. Phase 2 measures known risk detection on 72 ground-truth test cases, where the trace-based framework achieves the best precision-recall balance (F1=0.90) while text-only evaluation matches on recall but generates 5x more false alarms. Phase 3 evaluates unknown risk discovery, uncovering 24 novel failures with zero overlap between functional testing and security red-teaming. Our results demonstrate that (1) the information available to the evaluation harness determines evaluation quality, (2) functional and security evaluation are complementary, and (3) LLM-based evaluation harnesses surface subtle errors that human reviewers miss. We recommend a two-framework strategy: trace-based evaluation for functional assessment and adversarial red-teaming for security validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:06Z</published>
+    <arxiv:comment>Accepted to KDD 2026, Jeju, Korea. 9 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Howard Zhang</name>
+    </author>
+    <author>
+      <name>Chuck Arvin</name>
+    </author>
+    <author>
+      <name>Logan Brown</name>
+    </author>
+    <author>
+      <name>Mihir Bhatia</name>
+    </author>
+    <author>
+      <name>Neelu Choudhary</name>
+    </author>
+    <author>
+      <name>Lily Miao</name>
+    </author>
+  </entry>
+</feed>
