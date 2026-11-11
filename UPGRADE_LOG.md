@@ -1,3 +1,27 @@
+## r295 — econ-reasoning-check 插件层 + MCP 18 族首次 dispatch（真升级③+④）
+
+**日期** 2026-11-11 16:48–17:40 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.173 → 6.8.174  **轮次** r295（kind: dimension）
+
+### 缺口实证（改前探针，coordination/agent4/probes/r295-orphan-scan.py）
+`src/` 下 18 个 provisional 检测模块（anchoring-effect / endowment-effect / disposition-effect / mental-accounting / perverse-incentive / tragedy-of-commons / illusion-of-control / winners-curse / effort-justification / present-bias / peak-end-rule / budget-value-conflation / average-marginal-conflation / p-hacking / inverse-gamblers-fallacy / significance-effect-size / selection-on-dependent-variable / ad-hominem）各自有单测、有 `__internals()` 注入口、有轮报告零命中实证，但**对 `src/index.js` / `src/core/heartflow.js` 懒加载表 / hook-bus / MCP 的 grep 全空**——从未进过任何 dispatch 路径，攻击句全穿引擎。模块头注释一致写着「src/index.js 接线由 1 号主力补全」，该接线自 r219 起草起始终未发生。（framing-effect 有 require+exports 属已接线，排除。）
+
+### 落地内容
+1. `src/plugins/econ-reasoning-check/index.js`（新增 153 行）：18 族表（13 econ + 5 stats，key/模块路径/导出函数/中英标签/起草轮次）+ `analyze(text, {only, inject})` 聚合器 + `postprocess.think` hook（priority 190 > sycophancy 180，升序执行本插件最后跑，merge 进已存在 `_discrimination`）；干净文本不碰 `_discrimination`（零开销）；`inject` 直通各模块负例注入口
+2. `src/core/think-pipeline.js`（+19/-7）：消费块置于 hook fire **之后**——顺序教训见下
+3. `src/mcp/tools-registry.js` + `src/mcp-server.js`：`heartflow_econ_fallacy_check` / `heartflow_stats_literacy_check` 两个只读工具（MCP 186→188、HANDLERS 184→190），共用 handler 引擎实例优先 + 回退 require
+4. `test/round-295-econ-reasoning-wiring.test.js`（57 断言）+ 5 个探针
+
+### 真缺陷发现：think-pipeline 消费顺序（交接 1 号）
+inline「辨别反哺决策」块（`src/core/think-pipeline.js` L515-732）跑在 `postprocess.think` hook fire（L737）**之前**——插件写的 `_discrimination` 它永远读不到。sycophancy-check 的 `_confidencePenalty`/warning 走该块即为**死代码**（r293 报告里「score>0.5 触发置信度打折」的 dispatch 实证只验证了 `_discrimination` 被写，未验证折扣生效）。本轮 econ 消费块改置 fire 之后，探针实测 penalty/warning 真生效；sycophancy 侧未动（不改他人行为），建议 1 号将其消费块同样后移。
+
+### 验证
+- 轮测 `test/round-295-econ-reasoning-wiring.test.js`：**57 passed / 0 failed**（A4 元数据 / B18 族攻击全中 / C2 良性+守卫 / D2 only 过滤 / **E18 注入删条** / F4 真引擎 dispatch / G7 MCP 接线含真实 HTTP JSON-RPC e2e / H2 不回归）
+- 负例注入删条：**18 个 → 18 个变红，0 个未变红**（键名取自 `coordination/agent4/probes/r295-internals-probe.output.txt` 各模块 `__internals()` 实测暴露，非猜测；首轮用猜的键名 18/18 未变红，取真实键后全红）
+- dispatch 探针（r295-dispatch-probe.js）：真 `HeartFlow` 实例 + 真 `runThinkPipeline`——`_discrimination.econReasoning`（anchoring_effect, score 0.62）→ `_confidencePenalty=0.124` + warning「经济/统计推理谬误(锚定效应)，结论已打折」；良性结论（成本加成定价句）零触发
+- 插件层探针（r295-plugin-probe.js）：18/18 攻击命中、12/12 良性零误伤、2000 字 × 50 次 = 40ms（0.8ms/次）
+- 四门禁（hf4-gates.sh 实测）：verify **16/0 PASS**；guard **20/20 @246维 PASS**；双向 **召回 52/52 + 误拦 302/326 PASS**；doc **23/24**——唯一红项 `AGENTS.md 说 186 MCP tools，实测 188`，AGENTS.md 对 4 号为系统写保护（patch 被拦且禁止换路径），需 1 号/人工更新该一行
+- 海外扫描（hf4-scout.sh，三源如实空返）：arXiv OR 查询返回标题全不相关、GitHub 0 repos、S2 HTTP 429——按既有形态纯规则自建，未编造命中
+
 ## r293 — sycophancy-check 插件层四族 16 新模式（真升级②，撞号重编号轮）
 
 **日期** 2026-11-11 14:05–15:05 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.172 → 6.8.173  **轮次** r293

@@ -1,6 +1,24 @@
 
 ---
 
+# 6.8.174 变更日志条目
+
+## [6.8.174] - 2026-11-11
+
+### 接线（真升级③+④：经济与资源推理 + 统计素养 18 族首次 dispatch，r295）
+- **`src/plugins/econ-reasoning-check/index.js`**（新增，维度计数 246 不变、`src/index.js` 零改动、`_modules` 163 不变）：把 r219-r284 三十多轮起草后**从未进过任何 dispatch 路径**的 18 个 provisional 检测模块首次接入引擎——模块层一直有单测、有零命中实证、有 326 条良性语料验证，但头注释一致写着「src/index.js 接线由 1 号主力补全」而该接线始终未发生，攻击句全穿引擎。新插件经 PluginLoader 自动发现（heartflow.js 懒加载表零改动），挂 `postprocess.think`（priority 190，晚于 sycophancy-check 的 180——升序执行，本插件最后跑，merge 进已存在的 `_discrimination` 不被 sycophancy 整体覆写）：
+  - **econ 13 族**（经济与资源推理）：budget_value_conflation 预算约束≠价值判断（r219）/ average_marginal_conflation 平均≠边际（r220）/ mental_accounting 心理账户（r235）/ perverse_incentive 激励反噬（r236）/ winners_curse 赢家诅咒（r237）/ tragedy_of_commons 公地悲剧（r238）/ illusion_of_control 控制幻觉（r239）/ disposition_effect 处置效应（r240）/ endowment_effect 禀赋效应（r241）/ anchoring_effect 锚定效应（r242）/ present_bias 现时偏差（r243）/ peak_end_rule 峰终定律（r245）/ effort_justification 努力正当化（r234）
+  - **stats 5 族**（统计素养）：p_hacking 多重比较/数据挖掘（r232）/ inverse_gamblers_fallacy 逆赌徒谬误（r248）/ significance_effect_size 显著性≠重要性（r250）/ selection_on_dependent_variable 选择依赖变量/按结果归因（r252）/ ad_hominem 人身攻击（r283 提交携带，此前仅 fallacies 子标签）
+  - 判据形态继承各模块：两腿共现（缺一不判）+ 豁免表（概念教学/纠正陈述/疑问句）；插件层聚合只写 `_discrimination`，不动 gate.action，双向门禁不受影响
+- **`src/core/think-pipeline.js`**（+19/-7）：新增插件判别结果消费块，**置于 `postprocess.think` hook fire 之后**——顺序教训：既有的 inline「辨别反哺决策」块（L515-732）跑在 hook fire 之前，插件写的 `_discrimination` 它永远读不到（sycophancy 的 `_confidencePenalty` 走该块实为死代码，交接给 1 号）；新消费块读 `econReasoning`：score>0.5 → `_confidencePenalty`（与 sycophancy 折扣取 max 不互相覆盖）+ warning「经济/统计推理谬误(…)，结论已打折」
+- **`src/mcp/tools-registry.js`** + **`src/mcp-server.js`**（MCP 工具 186→188、HANDLERS 184→190）：两个只读工具 `heartflow_econ_fallacy_check`（econ 13 族）/ `heartflow_stats_literacy_check`（stats 5 族），共用 `handleEconReasoningCheck(args, group)`——引擎常驻实例优先（`hf._econReasoningAnalyzer`）、进程未启动引擎时回退 require 插件模块（纯函数无状态，与 dreamConsolidation 同范式）；`action: all|<family key>` 单族详查；完整 JSDoc 射程（族清单 + 攻击句示例 + 与 selection_bias/poisoning_the_well/genetic_fallacy 的边界）
+- **`test/round-295-econ-reasoning-wiring.test.js`**（新增，57 断言）：A 族表元数据 / B 18 族攻击全中（score>0.5）/ C 12 良性零误伤 / D `action=<family>` 过滤 / **E 18 个负例注入-删条**（盲注各模块 `__internals()` 真实键的两条腿，该族必须从命中消失——证明每族 dispatch 承重）/ F 真引擎 dispatch（PluginLoader 加载 + hook 写 `_discrimination.econReasoning` + 消费者打 penalty+warning + 良性零触发）/ G 真实 HTTP JSON-RPC e2e（tools/list 含两工具、tools/call 攻击命中/良性零误）/ H 维度计数 246 不变 + gate 维度表零本轮族键
+
+### 验证
+轮测 **57/57**（A4+B18+C2+D2+E18+F4+G7+H2）；负例注入 **18 个 → 18 个变红，0 个未变红**（键名取自各模块 `__internals()` 实测暴露，非猜测）；探针实证：引擎 think() 路径真 dispatch（`_discrimination.econReasoning` score=0.62 anchoring_effect → `_confidencePenalty=0.124` + warning，良性结论零触发）；插件层 18/18 攻击命中、12/12 良性零误伤、0.8ms/2000字；四门禁 verify **16/0 PASS**、guard **20/20 @246维 PASS**、双向 **召回 52/52 + 误拦 302/326 PASS**；doc **23/24**——唯一红项为 AGENTS.md 横幅「186 MCP tools」需随实测 188 更新，但 AGENTS.md 对 4 号为系统写保护文件（patch 被拦、禁止换路径重试），该一行更新需 1 号或人工执行；海外扫描 arXiv OR 查询标题全不相关、GitHub 0 repos、S2 HTTP 429——三源如实空返，按既有形态纯规则自建，未编造命中。
+
+---
+
 # 6.8.173 变更日志条目
 
 ## [6.8.173] - 2026-11-11
