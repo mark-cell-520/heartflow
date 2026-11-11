@@ -29,6 +29,26 @@
 
 ---
 
+# 6.8.171 变更日志条目
+
+## [6.8.171] - 2026-11-11
+
+### 扩展（真升级②：逻辑谬误 wired 维度全新措辞家族，r289）
+- **`false_dilemma` 虚假两难（第 65 维度）要么A要么B×贬损标签族**（`src/false-dilemma.js`，+55 行，维度计数 245 不变、模块 162 不变、`src/index.js` 零改动）：6 个可注入常量 + 5 条新路由。池化探针 r289 实测 false_dilemma **8/9 新措辞穿透**（全池最高）——穿透样本带要么-frame 且一侧被贴贬损标签，但不带既有 STIGMA 结构（不支持就是反对）也不带威胁后果词（路由⑦射程外），整族零命中
+  - `DEROG_ZH` 贬损标签词表（拖后腿/绊脚石/老古董/固步自守/躺平/摆烂/废物/占着位置/不把X放在心上/冷血/没良心/异类/外人/负能量…）
+  - `DEROG_FRAME_ZH` 要么-frame × 定性等式（第二连接词须为就是/便是/即/等于——选项 B 经等式与标签绑定成身份指控；plain「要么A，要么B」不收）
+  - `NEG_EQ_FRAME_ZH` 不是A就是B frame
+  - `NEGACT_SUBJ_ZH` 否定行为×主语插入×品质标签单独支（不转这个帖子，你就是没良心——既有 STIGMA 不转发支要求「就是」紧贴逗号后，收不进「你就是」形）
+  - `NOTWITH_EN` EN if you're not with us … against us 否定条件形单独支（既有 STIGMA_EN 只收 with us or against us 直陈形）
+  - `EITHER_DEROG_EN` EN either you X or you're Y(贬损) 立场动词开放形（join/commit 类动词不在既有 ALIGN_EQUATE_EN 的 with/for/part of 表内）
+  - 路由⑨a（要么-frame × DEROG 交叉）、⑨b（不是A就是B × DEROG 交叉）、⑨c/d/e（三个单独支）；良性二元陈述（要么努力工作要么躺平 / 要么签字要么就是违约）无定性等式或无贬损标签，双因子交叉天然豁免
+- 海外扫描如实记录空返：arXiv 查询被 OR 展开返回无关论文（量子计算/天文）、GitHub repos 0 命中、Semantic Scholar 429 限流——按既有形态纯规则自建，未编造命中
+
+### 验证
+轮测 test/round-289-false-dilemma-derog.test.js **96/96**（攻击 15/15 命中、良性 14/14 零误报、注入删条 6/6、对照 8/8、存量族不回归）；池化穿透复跑 false_dilemma 8/9→**0/9**；存量 round-287 84/84、round-496 61/61 不回归；四门禁 verify 16/0、guard 20/20@245 维、doc 24/24、双向 召回 52/52 + 误拦 302/326 与基线零变化。
+
+---
+
 # 6.8.168 变更日志条目
 
 ## [6.8.168] - 2026-11-11

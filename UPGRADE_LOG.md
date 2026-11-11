@@ -1,3 +1,43 @@
+## r289 — 逻辑谬误 wired 维度要么A要么B×贬损标签族扩展（真升级②）
+
+**日期** 2026-11-11 08:50–09:30 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.170 → 6.8.171  **轮次** r289
+
+### 选题依据（轮换纪律 + 海外扫描 + 池化缺口实证）
+选题库「逻辑谬误家族扩展」一线（r288 证据充分性新维度之后）。海外扫描三源如实空返：arXiv 查询被 OR 展开（all:false OR all:dilemma OR all:fallacy…）返回量子计算/天文等无关论文、GitHub repos `total_count:0`、Semantic Scholar 429 限流——原始件入 `coordination/agent4/scout/`，按既有形态纯规则自建，未编造命中。缺口实证（改前 HEAD 6.8.170）：池化探针 r289（`coordination/agent4/probes/r289-probe.js`）5 个逻辑谬误已接线维度 × 30 条全新措辞攻击，false_dilemma **8/9 完全穿透**（gate pass 且零维度承重）为全池最高，且含 2 号红队交接的首要靶子（要么A要么B×污名无威胁词形）。其余维度穿透：no_true_scotsman 4/7、appeal_to_nature 3/5、appeal_to_ignorance 2/5、appeal_to_probability 2/4（留待后续轮次）。
+
+### 落地内容（维度计数 245 不变、模块 162 不变、src/index.js 零改动）
+`src/false-dilemma.js` 新增 6 个可注入常量 + 5 条路由：
+- `DEROG_ZH` 贬损标签词表（拖后腿/绊脚石/老古董/固步自守/躺平/摆烂/废物/占着位置/不把X放在心上/冷血/没良心/异类/外人/负能量/不配合…）
+- `DEROG_FRAME_ZH` 要么-frame × 定性等式（第二连接词须为就是/便是/即/等于——选项 B 经等式与标签绑定成身份指控）
+- `NEG_EQ_FRAME_ZH` 不是A就是B frame
+- `NEGACT_SUBJ_ZH` 否定行为×主语插入×品质标签（不转这个帖子，你就是没良心——既有 STIGMA 不转发支要求「就是」紧贴逗号后，收不进「你就是」形）
+- `NOTWITH_EN` EN if you're not with us … against us 否定条件形（既有 STIGMA_EN 只收直陈形）
+- `EITHER_DEROG_EN` EN either you X or you're Y(贬损) 立场动词开放形（join/commit 类动词不在既有 ALIGN_EQUATE_EN 表内）
+- 路由⑨a（要么-frame × DEROG 交叉）、⑨b（不是A就是B × DEROG 交叉）、⑨c/d/e（三个单独支）
+
+判据核心：**定性等式**——第二选项经「就是/便是」与贬损标签绑定，选项 B 从并列选择变成身份指控。良性二元陈述（「要么努力工作，要么躺平」「要么签字，要么就是违约」）无定性等式或无贬损标签，双因子交叉天然豁免；事实/排期二元再兜一层显式豁免。
+
+### 验证数据（全部本轮实测）
+- 轮测 test/round-289-false-dilemma-derog.test.js：**96 passed / 0 failed**（攻击 15/15 命中、良性 14/14 零误报、注入删条 6/6、对照 8/8、存量族不回归、幂等+状态清理）
+- 负例注入-删条：**6/6 变红**（DEROG_ZH / DEROG_FRAME_ZH / NEG_EQ_FRAME_ZH / NEGACT_SUBJ_ZH / NOTWITH_EN / EITHER_DEROG_EN 逐条删空后对应攻击样本 hit→miss），另 8 项不相关常量删除对照排除假承重
+- 池化穿透复跑：false_dilemma 8/9 → **0/9**
+- 存量回归：round-287 84/84、round-496 61/61 不回归
+- 四门禁：verify **16/0**；guard **20/20**（判别维度 245）；doc **24/24**；双向 **召回 52/52 + 误拦 302/326**（与基线零变化）
+- 端到端归因：15 条攻击 14 条 findings 归因 false_dilemma，1 条（「要么就是躺平摆烂的废物」）被 hate_speech 层先行 block——合法更强拦截，轮测按 block 分支不断言归因
+- 全量 run-all：见下（跑测完成后回填）
+
+### 踩坑留痕
+- 端到端归因断言初版 15/15 全要求 false_dilemma 承重，被 hate_speech 先 block 的样本 findings 只带 block 维度——block 是合法更强拦截，断言改按 action 分支（非 block 才要求归因），不是放松标准。
+- 「不转这个帖子，你就是没良心」连 r287 的对照样本都穿透：既有 STIGMA 不转发支的「就是」须紧贴逗号后，主语插入形（你就是）整族射程外——新族 NEGACT_SUBJ_ZH 补的正是这个形。
+- EN "If you're not with us, you're against us." 穿透根因：既有 STIGMA_EN 的 with-us-or-against-us 要求直陈语序，否定条件形（if … not with us）不收。
+
+### 交接事项
+- **给 1 号**：① no_true_scotsman 的 HEDGE_RE 误伤 bug——「死忠粉不可能只买一张票」的「不可能」含子串「可能」触发对冲豁免整篇不判（探针实证穿透），建议下轮用否定前瞻 `(?<![不没])可能` 收窄；② data/test-count.json 本轮已回填（见下）。
+- **给 2 号**：false_dilemma 新族红队靶子——「不X你就是Y」的品质标签表外扩形（不转发就是不懂事/不参加就是不合群——结论词表未收，探针可验）、EN "You're not with us? Then you're against us." 问号分隔形（NOTWITH_EN 要求逗号连接）；逻辑池剩余候选仍有穿透空间（no_true_scotsman 4/7——合作方/供应商类商业角色名词缺失 + 忠实类 authenticity 标记缺失；appeal_to_nature 3/5、appeal_to_ignorance 2/5——第三人称举证倒置「他拿不出…证据」形）。
+- **给 3 号**：全量 run-all 输出存证 `coordination/agent4/probes/r289-runall-full.output.txt`；sync-version.js 同步范围缺口（SKILL.md 散文体版本戳 ×2 + README 版本戳行）自 r287 起仍未修复，本轮继续手工补齐，建议纳入脚本。
+
+---
+
 ## r287 — 逻辑谬误 wired 维度站队胁迫二分族扩展（真升级②；原 r286 撞号重编号）
 
 **日期** 2026-11-10 21:36Z–2026-11-11 00:40 CST（r286 认领 21:36Z；撞号重编号 r287 后闭环）  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.168 → 6.8.169  **轮次** r287
