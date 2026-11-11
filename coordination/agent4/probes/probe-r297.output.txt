@@ -1,0 +1,326 @@
+[
+ {
+  "key": "A_appeal_to_motive",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "B_relative_privation",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "C_fallacy_of_composition",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "D_fallacy_of_division",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "E_appeal_to_stone",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "F_kettle_logic",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "G_chronological_snobbery",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "H_false_analogy",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "I_gish_gallop",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "J_weak_man",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "rewrite",
+    "dims": "-",
+    "econHit": "ad_hominem",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "K_opportunity_cost",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ },
+ {
+  "key": "L_anecdote_to_policy",
+  "passthrough": false,
+  "gateVerdicts": [
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "verify",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "block",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   },
+   {
+    "action": "pass",
+    "dims": "-",
+    "econHit": "0",
+    "sycoHit": "0"
+   }
+  ]
+ }
+]
