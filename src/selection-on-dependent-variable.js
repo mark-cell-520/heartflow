@@ -116,6 +116,34 @@
  * （「活下来的都融过资，所以我们要设对照组」——是正当做法）；以及特征 X
  * 与结果在两句里主语错位但仍在窗内的罕见句式——纯规则无法在不误伤的前提
  * 下收窄，宁缺勿滥。
+ *
+ * ─── r309 新措辞家族（真升级②：已有维度的全新措辞家族）──────────────────
+ * 探针实证（r309-probe.js，gate() 全量 findings 口径，v6.8.178）：存量判据
+ * 的腿①字符类 [^。，！？；\n] 被**逗号**系统性切断——现代汉语把结果群体和
+ * 全称词分放在两个分句（「活过寒冬的公司，它们都裁过员」），存量族整体
+ * 失配；且结果动词/名词表缺「获奖/冠军/成功者/瘦」等高频成功学话语词。
+ * 8 条攻击探针 7 条穿透整个 gate（唯一被 fallacies 代拦的 B2 句「所以心态好
+ * 就能长寿」命中的是存量腿②）。新增三组平行常量族（**不并存量数组**，
+ * 避开 r280/r265 length 断言与既有负例注入语义）：
+ *   · SELECT2_ZH 族 A「研究动作 × 结果群体」：访谈/采访/调查/统计/观察/
+ *     复盘/对比/研究/分析/追踪/回访 + 结果群体名词或动词结构——成功学与
+ *     养生话语最常用的取样句式（「我们访谈了20位业绩冠军」「统计了所有
+ *     上岸的考生」「对比了所有获奖的作品」）；
+ *   · SELECT2_ZH 族 B「结果名词群体 + 全称」：冠军/赢家/成功者/学霸/
+ *     状元/获奖者/寿星/百岁老人… + ( pronoun)? + 全称词；
+ *   · SELECT2_ZH 族 C「逗号容忍版」：[结果动词]的[名词]，他们/它们…都
+ *     ——存量族被逗号切断形态的平行收口；
+ *   · SELECT2_EN「research verb × (who|that) + got into/made the
+ *     cut/…」+ (all|every|each|the) + 结果名词扩展（admitted
+ *     students/graduates/centenarians/top performers…）；
+ *   · CAUSE2_ZH「新结果名词腿②」：与存量腿②**同一动词类**，仅结果名词
+ *     换成存量表外的 冠军/夺魁/上榜/获奖/瘦/减重/爆红/升职/…——因此注入
+ *     {CAUSE_ZH: []} 时存量攻击样本仍全灭（新名词不出现在存量样本里），
+ *     既有负例注入测试语义不变。
+ * 合并点在 findSignatures 的 langs 表（R.SELECT2_ZH || SELECT2_ZH 平行
+ * 注入通道），豁免/否定守卫/防自证/距离窗全部复用存量机制。
+ * 良性边界：族 A 单独出现（「访谈了20位冠军，他们训练都很刻苦」）无腿②
+ * 不判；「不能说刻苦是夺冠的原因」类对冲句走存量 CORRECTIVE 豁免。
  */
 'use strict';
 
@@ -146,8 +174,32 @@ const CAUSE_EN = [
   /\b(?:is|are|was|were)\s+what\s+(?:saves?|saved|cures?|cured|causes?|caused|makes?|made|gets?|got|drives?|drove|enables?|enabled)\b/i,
 ];
 
+// ─── r309 新措辞家族（平行常量，不并存量数组——避开 length 断言与既有
+// 负例注入语义；合并点在 findSignatures）──────────────────────────────
+// SELECT2_ZH 族 A：研究动作 × 结果群体（成功学/养生话语的标准取样句式）
+const SELECT2_ZH = [
+  /(?:访谈|采访|调查|统计|观察|复盘|对比|研究|分析|追踪|回访|取样|抽样|翻阅|梳理)[^。！？\n]{0,16}(?:冠军|赢家|胜者|成功者|佼佼者|学霸|状元|获奖者|得奖者|上榜者|上榜|夺魁者|折桂者|寿星|百岁老人|岁老人|幸存者|生还者|上岸者|入围者|入选者|夺奖者|头名|榜首|金牌得主|活过|活下来|幸存|上岸|夺冠|康复|痊愈|战胜|逆袭|翻盘|突围|登顶|胜出|获奖|得奖|金榜题名|考上|考入|录取|创业成功|减肥成功|备考成功|转型成功|出头|爆红|出圈|名列前茅|拔得头筹)/,
+  // 族 B：结果名词群体 + （代词）+ 全称词（逗号可有可无）
+  /(?:冠军|赢家|胜者|成功者|佼佼者|学霸|状元|获奖者|得奖者|上榜者|夺魁者|折桂者|寿星|百岁老人|幸存者|生还者|上岸者|入围者|入选者|夺奖者|头名|榜首|金牌得主|冠军队|夺冠的球队)[^。！？\n]{0,10}(?:都|全|个个|人人|无一例外|普遍|清一色|全都|尽数|皆|无一不是)/,
+  // 族 C：逗号容忍版——存量族被 [，,、；;] 切断的形态平行收口
+  /(?:活下来|活了过来|活过来了|活过|活过来|幸存下来|幸存|存活|上岸|闯出来|闯出|走出来|挺过来|挺过|熬过|熬过来|战胜|夺冠|康复|痊愈|突围|胜出|登顶|治好|治愈|逃过|度过|脱颖而出|逆袭|翻盘|获奖|得奖|金榜题名|考上|考入|录取|创业成功|减肥成功|备考成功|转型成功|爆红|出圈|名列前茅|拔得头筹)[^。！？\n]{0,8}的[^。！？\n]{0,12}[，,、；;][^。！？\n]{0,8}(?:他们|她们|它们|其|这些人|这些企业|这些公司|这些团队|这些选手|这些球员|这些学生|这些老人|这些患者|这些孩子|大家)[^。！？\n]{0,4}(?:都|全|个个|人人|无一例外|普遍|清一色|全都|尽数|皆)/,
+];
+// SELECT2_EN：research verb × (who|that) + 结果动词；或 (all|every|…) +
+// **仅存量表外**的结果名词（survivors/winners/champions/victors 已在存量
+// SELECT_EN——不收，否则注入 {SELECT_EN: []} 时存量攻击样本仍命中）
+const SELECT2_EN = [
+  /\b(?:surveyed?|studied?|interviewed?|observed?|analy[sz]ed?|compared?|tracked?|reviewed?|sampled?|polled?)\b[^.]{0,30}?\b(?:who|that)\s+(?:got\s+into|got\s+in|made\s+it\s+into|was\s+admitted\s+to|were\s+admitted\s+to|qualified\s+for|earned|achieved|attained|landed|graduated\s+from|placed|made\s+the\s+(?:team|cut|list)|won|beat|passed|reached|survived|recovered|overcame|succeeded|summited|triumphed|escaped|pulled\s+through|outlasted|endured|prevailed)\b/i,
+  /\b(?:all|every|each|the)\s+(?:[\w]{0,12}\s){0,2}(?:admitted\s+students?|admits?|graduates?|centenarians?|top\s+performers?|high\s+achievers?|medalists?|finalists?)\b/i,
+  /\b(?:surveyed?|studied?|interviewed?|observed?|analy[sz]ed?|compared?|tracked?|reviewed?|sampled?|polled?)\b[^.]{0,40}?\b(?:lottery\s+winners?|contest\s+winners?|jackpot\s+winners?|medalists?|finalists?|admitted\s+students?|admits?|graduates?|centenarians?|top\s+performers?|high\s+achievers?|winners?|champions?|victors?|survivors?)\b/i,
+];
+// CAUSE2_ZH：与存量腿②同一动词类，仅结果名词换成存量表外的新词——注入
+// {CAUSE_ZH: []} 时存量攻击样本仍全灭（新名词不出现在存量样本里）
+const CAUSE2_ZH = [
+  /(?:所以|因此|据此|可见|足见|这说明|这证明|足以证明|正说明|充分说明|这意味着|足以表明|表明|说明)[^。！？\n]{0,8}(?:能|让|使|就能|方能|才会|导致|致使|造就|决定|拯救|救了|治好|治愈|带活|成就|换来)[^。！？\n]{0,6}(?:冠军|夺魁|折桂|上榜|获奖|得奖|头名|榜首|金牌|第一|瘦下来|瘦|减重|爆红|出圈|破纪录|创纪录|升职|晋升|录用|录取|绩优|销冠|offer|Offer|过冬|佳作|业绩|学霸|闯出来|闯出)/,
+];
+
 // ─── 豁免 A：概念教学（点名选择依赖变量 / 选择偏差这个概念本身）─────────
-const CONCEPT_ZH = /(?:选择依赖变量|按结果选择|以结果选择|结果选择|样本选择|选择偏差|选择性偏误|选择效应|幸存者偏差|生存者偏差|因果推断|因果识别|内生性|选择性样本|对撞|辛普森|研究方法|研究设计|统计学|统计|教材|课堂|课本|教学|论文|这篇研究|这项研究|样本筛选|条件筛选)/;
+const CONCEPT_ZH = /(?:选择依赖变量|按结果选择|以结果选择|结果选择|样本选择|选择偏差|选择性偏误|选择效应|幸存者偏差|生存者偏差|因果推断|因果识别|内生性|选择性样本|对撞|辛普森|研究方法|研究设计|统计学|教材|课堂|课本|教学|论文|这篇研究|这项研究|样本筛选|条件筛选)/;
 const CONCEPT_EN = /\b(?:selection\s+(?:bias|on\s+the\s+(?:dependent|outcome)|effect)|conditioning\s+on\s+the\s+outcome|survivorship|survivor\s+bias|collider|endogeneity|selection\s+effect|selected\s+on\s+the\s+outcome|causal\s+inference|causal\s+identification|research\s+method|methodology|textbook|lecture|study\s+found|paper)\b/i;
 
 // ─── 豁免 B：正确因果与对冲（要求反事实对照 / 指出相关不等于因果 / 点明
@@ -206,8 +258,8 @@ function dist(a, b) {
 function findSignatures(text, R) {
   const sigs = [];
   const langs = [
-    { sel: R.SELECT_ZH || SELECT_ZH, cau: R.CAUSE_ZH || CAUSE_ZH, w: R.W_ZH != null ? R.W_ZH : W_ZH, lang: 'zh', isZh: true },
-    { sel: R.SELECT_EN || SELECT_EN, cau: R.CAUSE_EN || CAUSE_EN, w: R.W_EN != null ? R.W_EN : W_EN, lang: 'en', isZh: false },
+    { sel: (R.SELECT_ZH || SELECT_ZH).concat(R.SELECT2_ZH || SELECT2_ZH), cau: (R.CAUSE_ZH || CAUSE_ZH).concat(R.CAUSE2_ZH || CAUSE2_ZH), w: R.W_ZH != null ? R.W_ZH : W_ZH, lang: 'zh', isZh: true },
+    { sel: (R.SELECT_EN || SELECT_EN).concat(R.SELECT2_EN || SELECT2_EN), cau: (R.CAUSE_EN || CAUSE_EN), w: R.W_EN != null ? R.W_EN : W_EN, lang: 'en', isZh: false },
   ];
   for (const L of langs) {
     const selM = collect(text, L.sel, L.isZh);
@@ -280,7 +332,8 @@ module.exports = {
   detectSelectionOnDependentVariable,
   __internals: () => ({
     SELECT_ZH, SELECT_EN,
-    CAUSE_ZH, CAUSE_EN,
+    SELECT2_ZH, SELECT2_EN,
+    CAUSE_ZH, CAUSE_EN, CAUSE2_ZH,
     CONCEPT_ZH, CONCEPT_EN, CORRECTIVE_ZH, CORRECTIVE_EN,
     NEG_BEFORE_ZH, NEG_BEFORE_EN, W_ZH, W_EN,
     collect, findSignatures,
