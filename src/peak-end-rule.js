@@ -58,14 +58,18 @@
  *
  * 判据（三要素近距共现，缺一不判；等价于双腿链：腿①峰终锚点，
  * 腿②整体正面裁定×时长折让须共现，防单个褒义词冒充裁定）：
- *   ① 峰终锚点——峰值或结尾时刻被单独点出；
+ *   ① 峰终锚点——峰值或结尾时刻被单独点出（r310 补：事件日锚点，
+ *      搬家/上线/发证/答辩…那天、那晚、当天）；
  *   ② 整体正面裁定——对「整趟/整场/整体/全程/这趟/这场/the whole/
- *      the entire/overall」给出正面结论（值/成功/满分/值得/完美；
- *      EN worth it / a success / went well / excellent）；
+ *      the entire/overall」给出正面结论（r310 补：指示词裁定，
+ *      这次/这一切/这十年/这一年/全部都…值了/没白费/幸福/圆满；
+ *      EN the whole thing / all of it / everything / not in vain）；
  *   ③ 时长折让信号——体验的主体/时长被刻画为又长又闷/乏味/煎熬/
- *      赶路/无聊（EN dragged / dull / brutal / agony / dismal）；
+ *      赶路/无聊（r310 补：吵架/崩溃/折磨/熬夜/睡眠剥夺；
+ *      EN fought / argued / chaos / nightmare / sleepless）；
  *   ④ 三要素近距离窗（ZH 60 / EN 180），裁定词与时长词均查否定前缀
- *      （整体并不值/结尾并不惊艳）。
+ *      （整体并不值/结尾并不惊艳；r310 补 NEG_INSIDE 一点都/压根/
+ *      根本/丝毫，指示词裁定腿专用守卫 (?<![不没未无莫])）。
  *
  * 为什么取 VERIFY 级：单句可能只是客观转述一次峰终实验，也可能是
  * 一段整体确实优秀、只是顺带提到结尾的正当评价。verify 的语义是
@@ -83,6 +87,9 @@
  *     缺正面裁定即无本族）；
  *   · 有正面裁定无时长折让（全程都很满意，结尾尤其好——没有「忽视
  *     时长」结构，可能是真好）；
+ *   · 整体负面/保留裁定（r310 新增豁免族：有峰终但整体只给中等/
+ *     不值/乏善可陈/merely average——缺正面整体裁定即无本族，
+ *     可负例注入证明承重）；
  *   · 纯抱怨无峰终锚点（这次旅行一塌糊涂——缺峰终锚点与正面裁定）；
  *   · hasty_generalization / outcome_bias / anecdotal_as_proof 领地
  *     （见上边界）。
@@ -119,9 +126,60 @@ const DURATION_EN = [
   /\b(?:dragged|drag|dull|boring|bored|brutal|agony|agonizing|painful|stressful|tedious|mediocre|miserable|exhausting|dismal|lackluster|forgettable|tiring|grueling|dreadful|a slog|put me to sleep|punishing|rough|trying|interminable|arduous)\b/i,
 ];
 
+// ─── r310 新措辞家族：事件日锚点 × 过程痛苦 × 指示词整体裁定 ───────────
+// 缺口实证（scripts/round-310/probe.js + probe2.js，v6.8.178 基线）：
+// 中文「虽然装修那三个月天天吵架，但搬家那天全家都很开心，所以这次
+// 装修值了」类句子（事件日锚点 × 过程痛苦 × 指示词整体裁定）11/12
+// 穿透本模块，其中 4 条穿透整个 gate（fallacy_of_relevance 只兜住带
+// 「虽然…但…所以」显式推理桥的少数形）；EN「the day we moved in…
+// so the whole thing was worth it」同样穿透。根因是三张表都缺这一类：
+//   · WHOLE_VERDICT_ZH 只认「整趟/整场/整体/这趟/这段…」存量指示词，
+//     不认「这次/这一切/这十年/这一年/这一切/全部都」类指示词裁定，
+//     也没有「没白费/没白/不枉/幸福」类结论词；
+//   · PEAK_END_ZH 只认「结尾/最后一幕/那一刻」类时段锚点，不认
+//     「搬家那天/上线那天/发证那天/答辩那晚」类事件日锚点；
+//   · DURATION_ZH 缺「吵架/崩溃/折磨/熬夜」类新型过程痛苦词。
+// 修法：三条腿各补平行常量（存量数组不动，存量测试的注入语义与
+// 攻击归因零变化），findSignatures 里 concat 合并。
+
+// 腿①b 事件日锚点：整体评价被系到某个高光日子（搬家/上线/发证/答辩…那天）
+const PEAK_END_ZH2 = [
+  /(?:搬家|乔迁|迁新居|上线|发布|发售|发证|发奖|答辩|毕业|婚礼|求婚|订婚|开业|开学|典礼|出院|夺冠|获奖|揭晓|庆功|表彰|剪彩|通车|通水|通电|颁奖|开题|交割|挂牌|解封|首演|首映|开机|杀青|结课|满月|升学|查分|放榜|出分|敲钟|上市|开口|第一次|生日|百日|周年|金婚|银婚)[^。，！？；\n]{0,4}(?:那天|那晚|那夜|当天|当日)/,
+  /(?:那天|那晚|那夜|当天|当日)[^。，！？；\n]{0,12}(?:很|挺|超|格外|特别|分外|简直)?(?:开心|高兴|浪漫|激动|兴奋|难忘|美好|幸福|圆满|惊艳|震撼|满足|踏实|骄傲|风光|体面|热闹|温馨|感动)/,
+];
+
+// 腿②a2 指示词整体裁定：这次/这一切/这十年…值了/没白费/幸福/圆满
+// （裁定词前加 (?<![不没未无莫]) 守卫：「这次不值」不判，「这一切就没白费」判）
+const WHOLE_VERDICT_ZH2 = [
+  /(?:这次|这一切|这些年|这十年|这五年|这三年|这几个月|这大半年|这一年|这一年多|整个过程|整段|全部|所有|一切|每一点|从头到尾|点点滴滴|日日夜夜|分分秒秒)[^。，！？；\n]{0,14}(?<![不没未无莫])(?:值|值得|没(?:有)?白费|没白|不枉|不虚此行|幸福|美好|圆满|成功|划算|不亏|舒坦|安心|欣慰)/,
+];
+
+// 腿②b2 新时长折让词：关系冲突/崩溃/折磨/睡眠剥夺（存量词表外的新痛苦形）
+const DURATION_ZH2 = [
+  /(?:吵架|争吵|争执|吵个不停|一直在吵|冲突不断|闹得凶|鸡飞狗跳|鸡犬不宁|不得安宁|乌烟瘴气|一团乱麻|互相折磨|折磨|撕破脸|内耗|互撕|拉扯|熬过来|硬扛|死撑|苦撑|疲于奔命|累到虚脱|崩溃|濒临崩溃)/,
+  /(?:吵了|吵到|吵得|吵过|熬夜|通宵|睡不好|没睡好|睡眠不足|连轴转|没日没夜)/,
+];
+
 // ─── 距离窗（峰终锚点 × 整体裁定 × 时长折让）────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
+
+// r310 EN 侧平行常量（同族三腿，存量数组不动）
+// 腿①b2 事件日锚点：the day we… / the last day / graduation day / launch day
+const PEAK_END_EN2 = [
+  /\b(?:the\s+day\s+we|the\s+day\s+I|moving[- ]in\s+day|the\s+last\s+day|the\s+final\s+day|the\s+closing\s+day|graduation\s+day|wedding\s+day|launch\s+day|opening\s+day|the\s+day\s+it\s+(?:launched|opened|shipped|went\s+live))\b/i,
+  /\b(?:that\s+)?(?:last|final)\s+(?:night|evening)\b[^.]{0,40}\b(?:was|felt)\s+(?:great|amazing|perfect|wonderful|incredible|unforgettable|magical)\b/i,
+];
+// 腿②a2 指示词整体裁定：the whole thing / all of it / everything / these past ten years
+const WHOLE_VERDICT_EN2 = [
+  /\b(?:the\s+whole\s+thing|the\s+whole\s+ordeal|all\s+of\s+it|everything|these\s+(?:past\s+)?(?:ten|three|five|few|two)\s+years|the\s+whole\s+(?:process|experience|journey))\b[^.]{0,60}\b(?:was\s+worth\s+it|worth\s+it|paid\s+off|worthwhile|made\s+it\s+worthwhile|was\s+all\s+worth\s+it)\b/i,
+  /\b(?:was|were|is|wasn'?t|weren'?t|isn'?t)\s+(?:not\s+in\s+vain|all\s+in\s+vain)\b/i,
+  /\b(?:made|makes|making)\s+it\s+(?:all\s+)?worthwhile\b/i,
+];
+// 腿②b2 新时长折让词：争吵/混乱/噩梦/睡眠剥夺
+const DURATION_EN2 = [
+  /\b(?:fought|fights|fighting|argued|arguing|chaos|chaotic|nightmare|sleepless|unpleasant|fraught|tumultuous|rocky|turbulent|constant\s+arguments?|we\s+fought)\b/i,
+];
 
 // ─── 豁免：概念讨论（本族名称/创始人/学科术语的教学定义句）────
 const CONCEPT_ZH = /(?:峰终|峰值.?终[值点]|持续时间忽视|时长忽视|忽视(?:持续|时长|过程)|体验评价|卡尼曼|卡恩曼|卡尼曼|弗雷德里克|雷德梅尔|延伸性拟人|结局偏见|终点定律|峰终法则)/;
@@ -130,6 +188,13 @@ const CONCEPT_EN = /\bpeak[- ]end\b|\bduration\s+neglect\b|\bduration\s+(?:is\s+
 // ─── 豁免：均衡评价/考量时长/按完整数据决策的正当做法 ────────────
 const CORRECTIVE_ZH = /(?:综合(?:时长|全程|整个过程|考虑时长|兼顾)|按时间加权|考量(?:时长|全程|持续)|看整体(?:分布|过程)|看全程|整体分布|平均每(?:天|次|时段)|(?:不能|不应|别|不要|而非|而不是)[^。，！？；\n]{0,8}(?:只|单)(?:凭|看|因为|以)[^。，！？；\n]{0,10}(?:结尾|峰值|高光|最后|峰终)|(?:结尾|峰值|高光|最后)[^。，！？；\n]{0,6}(?:不能|不该|不应|无法|不足以)[^。，！？；\n]{0,8}(?:掩盖|替代|抹杀|代表|代替)|打折扣|辩证|全面评价|均衡|一分为二)/;
 const CORRECTIVE_EN = /\b(?:weigh(?:ed|ing|s)?|consider(?:ed|ing)?|averag(?:e|ed|es|ing)|balanc(?:e|ed|es|ing))\s+(?:the\s+)?(?:full|whole|entire|overall)\s+(?:duration|length|experience|runtime|journey)\b|\bacross\s+(?:every|all)\s+(?:session|day|touchpoint|moment|stage)\b|\bnot\s+(?:just|only)\s+(?:the\s+)?(?:ending|peak|finale|last)\b|\b(?:ending|peak|finale)\s+(?:cannot|can'?t|doesn'?t|shouldn'?t)\s+(?:carry|mask|redeem|substitute)\b|\bholistic(?:ally)?\b|\bthe\s+whole\s+(?:journey|experience|process)\b/i;
+
+// ─── r310 豁免：整体负面/保留裁定（有峰终但整体只给中等/不值——缺正面
+// 整体裁定即无本族；r310-probe3 实证新事件日锚点腿放大了存量裁定腿
+// 宽窗误匹配：「the last day was great, but overall the vacation was
+// merely average」类句子被旧裁定腿「the trip…great」误配，需显式排除）──
+const NEGATIVE_VERDICT_ZH = /(?:整体|全程|整个过程|整件事|这场|这趟|这部电影|这顿饭|全部|所有|总的来.?说|综合来.?看|总体来说|归根到底)[^。，！？；\n]{0,10}(?:中等|中上|中等偏上|一般|平平|乏善可陈|差强人意|不咋样|不行|不太好|不好|不值|保留|存疑|打折|勉强|不过尔尔|平庸|毁于一旦)/;
+const NEGATIVE_VERDICT_EN = /\b(?:merely|only|just)\s+(?:average|mediocre|okay|so-so|passable|fine)\b|\bnot\s+worth\s+(?:it|repeating|watching|another|the\s+time|mentioning)\b|\bmixed\s+(?:feelings|reviews|verdict|bag)\b|\boverall\s+(?:mediocre|average|disappointing|underwhelming|a\s+(?:letdown|disappointment|bust|dud))\b/i;
 
 // 工具 ─────────────────────────────────────────────────────────
 function allMatches(re, text) {
@@ -146,7 +211,7 @@ function allMatches(re, text) {
 const NEG_BEFORE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|并没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能|并不会|不属于|不改变|不影响|不提升|不提高|不起|不灵|从不|绝不|永不|打死不|死活不|坚决不|不觉得|不感觉|没觉得|没感觉|谈不上|不会再|不会|不再|别|并未因|并没有因|不因|并不|并没)[^。，！？；\n]{0,5}$/;
 const IMMEDIATE_NEG_ZH = /(?:不|没|未|无|非)$/;
 const SHORT_NEG_ZH = /(?:不|没|未|无|非|莫|甭)[^。，！？；\n]{0,2}$/;
-const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|并没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能|并不会|不属于|不改变|不影响|不提升|不提高|不起|不灵|从不|绝不|永不|打死不|死活不|坚决不|并不|并没|而非|而不是|绝非|而非是)/;
+const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|并没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能|并不会|不属于|不改变|不影响|不提升|不提高|不起|不灵|从不|绝不|永不|打死不|死活不|坚决不|并不|并没|而非|而不是|绝非|而非是|一点都|压根|根本|丝毫|完全没|压根没)/;
 
 const NEG_INSIDE_EN = /\bnot\s+that\b|\bnot\s+to\s+say\b|\bhardly\b|\bbarely\b|\bfar\s+from\b|\bno\s+guarantee\b|\bnot\s+necessarily\b|\bmakes?\s+no\s+difference\b|\bnot\s+(?:worth|really|that\s+good|a\s+success)\b/i;
 const NEG_BEFORE_EN = /\b(?:not|no|cannot|can'?t|doesn'?t|don'?t|isn'?t|aren'?t|wasn'?t|weren'?t|won'?t|wouldn'?t|couldn'?t|shouldn'?t|mustn'?t|never|neither|nor|no\s+longer|not\s+anymore|hardly|barely|far\s+from|nowhere\s+near)\s+(?:\w+\s+){0,4}$/i;
@@ -192,15 +257,19 @@ function findSignatures(text, R) {
   const sigs = [];
   const langs = [
     {
-      peak: R.PEAK_END_ZH || PEAK_END_ZH,
-      verdict: R.WHOLE_VERDICT_ZH || WHOLE_VERDICT_ZH,
-      dur: R.DURATION_ZH || DURATION_ZH,
+      // r310：存量腿与 r310 新腿 concat 合并不动存量注入语义——
+      // 存量键注入数组时整体替换（[]→只剩新腿，存量攻击须不依赖新腿），
+      // 存量键注入永假正则时 .concat 抛 TypeError（与存量行为一致，
+      // gate 聚合层 _safeDetect 与插件层 try/catch 兜底）。
+      peak: (R.PEAK_END_ZH || PEAK_END_ZH).concat(R.PEAK_END_ZH2 || PEAK_END_ZH2),
+      verdict: (R.WHOLE_VERDICT_ZH || WHOLE_VERDICT_ZH).concat(R.WHOLE_VERDICT_ZH2 || WHOLE_VERDICT_ZH2),
+      dur: (R.DURATION_ZH || DURATION_ZH).concat(R.DURATION_ZH2 || DURATION_ZH2),
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
-      peak: R.PEAK_END_EN || PEAK_END_EN,
-      verdict: R.WHOLE_VERDICT_EN || WHOLE_VERDICT_EN,
-      dur: R.DURATION_EN || DURATION_EN,
+      peak: (R.PEAK_END_EN || PEAK_END_EN).concat(R.PEAK_END_EN2 || PEAK_END_EN2),
+      verdict: (R.WHOLE_VERDICT_EN || WHOLE_VERDICT_EN).concat(R.WHOLE_VERDICT_EN2 || WHOLE_VERDICT_EN2),
+      dur: (R.DURATION_EN || DURATION_EN).concat(R.DURATION_EN2 || DURATION_EN2),
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -238,6 +307,11 @@ function detectPeakEndRule(text, inject) {
   if ((R.CORRECTIVE_ZH || CORRECTIVE_ZH).test(text) || (R.CORRECTIVE_EN || CORRECTIVE_EN).test(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
+  // 豁免（r310）：整体负面/保留裁定——有峰终但整体只给中等/不值，
+  // 缺正面整体裁定即无本族（见 NEGATIVE_VERDICT_* 注释）
+  if ((R.NEGATIVE_VERDICT_ZH || NEGATIVE_VERDICT_ZH).test(text) || (R.NEGATIVE_VERDICT_EN || NEGATIVE_VERDICT_EN).test(text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
 
   const sigs = findSignatures(text, R);
   if (sigs.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
@@ -267,8 +341,12 @@ module.exports = {
     PEAK_END_ZH, PEAK_END_EN,
     WHOLE_VERDICT_ZH, WHOLE_VERDICT_EN,
     DURATION_ZH, DURATION_EN,
+    PEAK_END_ZH2, PEAK_END_EN2,
+    WHOLE_VERDICT_ZH2, WHOLE_VERDICT_EN2,
+    DURATION_ZH2, DURATION_EN2,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
+    NEGATIVE_VERDICT_ZH, NEGATIVE_VERDICT_EN,
     PAIR_ZH, PAIR_EN,
   }),
 };

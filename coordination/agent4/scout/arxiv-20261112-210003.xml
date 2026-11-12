@@ -1,0 +1,390 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/ahJpi3BAZY4t0mdpEoS1AthfaKE</id>
+  <title>arXiv Query: search_query=all:peak-end OR all:rule OR all:duration OR all:neglect OR all:experience OR all:evaluation OR all:Kahneman&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-12T21:00:08Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:peak-end+OR+(all:rule+OR+(all:duration+OR+(all:neglect+OR+(all:experience+OR+(all:evaluation+OR+all:Kahneman)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>779243</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14519v1</id>
+    <title>Medical Image Segmentation: Foundation Model Adaptation versus Task-Specific Training</title>
+    <updated>2026-11-10T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.14519v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14519v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models pretrained on large natural-image collections are increasingly adapted for medical image segmentation, in the expectation that they will replace models trained for each task. Most comparisons, however, use data from the training distribution and a single task-specific baseline whose configuration is rarely justified, and therefore provide limited evidence of performance at new clinical sites. It also remains unclear how much of a foundation model must be adapted, and what determines this. We adapted a foundation model, DINOv2, with strategies ranging from tuning only its bias terms to full fine-tuning, and compared it with U-Nets and ResU-Nets trained from scratch. Experiments covered colonoscopy, breast ultrasound and dermoscopy, with testing on held-out data from the training source and on independent datasets from other institutions. The adapted foundation model generalised better on every external dataset. Within the training distribution, the task-specific models remained competitive when training data were abundant, and delineated boundaries more precisely, while the foundation model more often missed small lesions. Only a small fraction of the foundation model required adaptation, and the capacity needed was determined by the imaging domain rather than by the adaptation method. A widely used polyp test set was also found to duplicate images from another benchmark. Foundation-model adaptation is therefore warranted where models must work across sites, with capacity selected on the target domain.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Emre Kutlusan</name>
+    </author>
+    <author>
+      <name>Yongmin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14516v1</id>
+    <title>TorchCurves: Differentiable Parametric Curves</title>
+    <updated>2026-11-10T18:58:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.14516v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14516v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present TorchCurves, a PyTorch library that treats vector-valued parametric curves as learnable primitives. Its central operation maps batches of scalar inputs to points on curves represented in B-spline or Legendre polynomial bases, with differentiation through both inputs and coefficients. Curve coefficients can be optimized jointly with the surrounding model or produced by another network. The library provides trainable modules, reusable basis modules, and a functional interface, supporting applications ranging from continuous feature embeddings to Kolmogorov-Arnold networks and functional regression. Its implementation combines classical evaluation algorithms with vectorized PyTorch operations, emphasizing readability and maintainability without custom hardware kernels. Timing experiments compare curve evaluation against NumPy and SciPy and KAN training against EfficientKAN across a range of problem sizes. The results illustrate where this generality remains computationally practical and where overhead is substantial. Library is available on GitHub at https://github.com/alexshtf/torchcurves.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:52Z</published>
+    <arxiv:comment>Software paper for a library I've been working on for more than a year</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Alex Shtoff</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14515v1</id>
+    <title>AutoScaffold: AI-Guided Scaffolding for Reinforcement Learning of Language Models</title>
+    <updated>2026-11-10T18:58:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.14515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning with verifiable rewards (RLVR) produces rich training experience, yet outcome rewards reduce each attempt to a single number and leave most of this information unused. Training-time scaffolds, such as strategies or hints added to the prompt during training, offer a natural way to turn this information into guidance, but their design and adaptation are largely left to humans and tailored to specific domains. We introduce AutoScaffold, a unified AI-for-AI framework that turns a student's training experience into adaptive scaffolds, with minimal domain-specific information and no human intervention during training. A frozen teacher periodically examines this experience, diagnoses bottlenecks, and designs scaffolds in two forms: (i) strategies shared across a class of tasks and (ii) hints for individual hard tasks, adjusting the content and amount of support as the student learns. The scaffolds are removed at evaluation. We apply the same framework to ALFWorld, search-based QA, mathematical reasoning, and GPU kernel generation. When evaluated without scaffolds, students trained with AutoScaffold outperform those trained with the corresponding RL baselines in all four domains, with gains of 7.2 points in ALFWorld success and 4.0 points in average QA exact match. On GPU kernel generation, AutoScaffold increases the fraction of tasks with a correct kernel that runs faster than the PyTorch reference by up to 5.0 points. On math, our student surpasses QuestA's reported accuracy using approximately one-third as many student training steps. Analyses show that the teacher identifies a different failure in each task class and shifts its scaffolds from step-by-step workflows to targeted fixes as the student improves, and that its revised scaffolds help the student learn more than keeping the previous scaffold or using no scaffold.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:46Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zijian Zhang</name>
+    </author>
+    <author>
+      <name>Rizhen Hu</name>
+    </author>
+    <author>
+      <name>Jiangweizhi Peng</name>
+    </author>
+    <author>
+      <name>Shiyang Li</name>
+    </author>
+    <author>
+      <name>Sujay Bhatt</name>
+    </author>
+    <author>
+      <name>Sihan Zeng</name>
+    </author>
+    <author>
+      <name>Mingyi Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14514v1</id>
+    <title>Contrastive Discovery: Open-Ended Scientific Discovery over Competing Explanations</title>
+    <updated>2026-11-10T18:58:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.14514v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14514v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM agents are increasingly used for open-ended, data-driven scientific discovery, yet most of them evaluate hypotheses pointwise, testing an empirical claim $h$ only against its complement $\neg h$. When evidence rejects $h$, the agent learns that one explanation is unlikely but not which alternative the evidence supports. To recover that alternative, we introduce Contrastive Discovery, which replaces the single hypothesis with a contrast set, a scientific question paired with mutually exclusive and collectively exhaustive competing explanations. Each experiment is scored by how its evidence redistributes belief across the set, and the question is resolved when belief concentrates on one explanation. Because contrast sets change only the unit an agent proposes and scores, an existing agent can use them to re-evaluate evidence it has already collected or to guide its search. Across six domains, $89\%$ of the pointwise candidates with the largest belief shifts are rejections. On the same evidence, contrast sets resolve $73\%$ of these candidates to a specific alternative. When contrast sets guide search, the agent resolves $67\%$ more questions than pointwise surprisal under the same experiment budget. In a blinded study, $38$ human experts chose the same explanation on $78\%$ of resolved questions and on $82\%$ of questions where the pointwise agent rejected its hypothesis and stopped. Together, these results support explicit competing explanations as a way for discovery agents to resolve more scientific questions from the same evidence and validation budget.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:43Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 55 pages. Project page: https://codiscovery.ai/contrastive-discovery/</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>James J. Kim</name>
+    </author>
+    <author>
+      <name>Yijia Dai</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14511v1</id>
+    <title>Pyrite: Building and Benchmarking Protein-Ligand Pose Ranking Agents</title>
+    <updated>2026-11-10T18:56:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.14511v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14511v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting how a ligand binds to its target is central to small-molecule drug discovery. Modern cofolding models can generate diverse candidate poses, but reliably ranking these candidates remains challenging. We introduce Pyrite, a pairwise pose-ranking benchmark comprising 1,500 pose pairs across diverse protein-ligand complexes. Expert chemists equipped with 3D visualization tools and physics-based scores perform near chance, highlighting the difficulty of interpreting available chemical signals. To investigate automated ranking, we introduce PyriteRep, a structured representation of molecular geometry, protein-ligand interactions, and physicochemical scores, and develop two LLM-based agents: PyriteReasoner, which directly compares poses through text-based reasoning, and PyriteFeaturizer, which generates executable code to construct features for logistic regression, optionally incorporating features derived from LLM subcalls. These agents achieve up to 67% and 74% accuracy, respectively, exceeding observed expert performance. LLM-guided feature discovery generally outperforms direct reasoning, while Group Relative Policy Optimization (GRPO) improves open-weight models, enabling them to match or surpass closed-source frontier models in our evaluations. These results establish Pyrite as a challenging test of pose-ranking ability and highlight LLM-guided feature discovery as a promising approach to interpret and combine the outputs of computational chemistry tools.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:56:32Z</published>
+    <arxiv:comment>32 pages, Agentic AI for Biological Discovery Workshop (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Megha Srivastava</name>
+    </author>
+    <author>
+      <name>Michael H. Lim</name>
+    </author>
+    <author>
+      <name>Allison M. Keys</name>
+    </author>
+    <author>
+      <name>Pranav Murugan</name>
+    </author>
+    <author>
+      <name>Nate Gruver</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14504v1</id>
+    <title>Emergent Biological Capabilities in a Foundation Model for Molecular Interactions</title>
+    <updated>2026-11-10T18:53:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.14504v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14504v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Foundation models trained on large unlabeled corpora develop emergent capabilities, tasks that go beyond the training objective. We extend this paradigm to multimodal biology with Bonbon, a foundation model for molecular interactions trained on approximately 3.2 trillion tokens of paired protein-ligand sequences. From a single representation space, Bonbon exhibits three zero-shot emergent capabilities at hierarchical levels of resolution: functional (mechanism of action), residue (binding site localization, including orthosteric/allosteric discrimination), and bond (covalent versus non-covalent engagement). All three capabilities generalize to out-of-distribution complexes. Bonbon was trained on protein-ligand sequences alone, without any task-specific supervision and without structural coordinates. We conducted controlled scaling experiments across six model scales from 42M to 1.6B parameters; every capability evaluated shows a sharp jump at the largest scale on continuous metrics, even as pretraining loss decreases smoothly. This demonstrates that loss-based scaling laws alone are insufficient to predict when zero-shot emergent capabilities become available. The capabilities reported here emerge after training at a 1:2,000 parameter-to-token ratio to accommodate the sparsity of paired biological interaction data. The same frozen representations achieve state-of-the-art binding and affinity prediction at five orders of magnitude greater speed than co-folding methods. In prospective wet-lab validation across nine disease targets spanning seven protein families, Bonbon achieves a 61.5% dose-response hit rate on de novo compounds, yielding structurally novel molecules not previously reported to inhibit these proteins, including for out-of-distribution targets.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.BM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:53:01Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026 (Main Track, Oral)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Adi Mashiach</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14498v1</id>
+    <title>Measuring Robustness and Efficiency in a Connectome-Constrained Fly Visual System Model: Linking an Adversarial and a Perceptual Illusion</title>
+    <updated>2026-11-10T18:51:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Biological visual systems compute reliably under tight metabolic and wiring constraints, whereas artificial vision systems consume far more energy and can be sensitive to adversarial perturbations. Whether networks with brain-like wiring are more robust at lower computational cost is unclear. We address this by benchmarking a task-optimized, continuous-time recurrent neural network of the fly visual system constrained by its synaptic connectome (FlyNet) against artificial neural networks. We compare it against CNNs, RAFT, and continuous-time recurrent neural networks without detailed connectome constraints (sCTRNN, CTRNN) on a collision-detection task within a differentiable 3D rendering pipeline. FlyNet is adversarially vulnerable but, relative to its compute, more robust to common video corruptions than RAFT, while using up to five orders of magnitude fewer FLOPs. The CTRNNs remain more robust than FlyNet across almost all tested perturbations, suggesting that connectome constraints benefit efficiency, through their low edge count, over robustness. Recurrence improves robustness to white-box attacks in RAFT and temporal context improves robustness to common corruptions. FlyNet's position and velocity representations degrade under adversarial textures but recover under counterfactual textures that restore correct classification while staying equally far from training, ruling out unfamiliar textures as the cause of failure. The reverse-phi illusion similarly disrupts these representations and inverts the same low-level motion statistic as the adversarial textures. Optimizing this input statistic alone, without access to the network, suffices to induce classification failure, attributing both perturbations to the same circuit vulnerability. Connectome-constrained models can thus surface adversarial failure mechanisms as testable hypotheses about biological perceptual vulnerabilities.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:31Z</published>
+    <arxiv:comment>39 pages, 24 figures, 2 tables, Accepted at 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alexandre Garcia-Duran</name>
+    </author>
+    <author>
+      <name>Alejandro Rodriguez-Garcia</name>
+    </author>
+    <author>
+      <name>Manuel Molano-Mazón</name>
+    </author>
+    <author>
+      <name>Alexandre Hyafil</name>
+    </author>
+    <author>
+      <name>Srikanth Ramaswamy</name>
+    </author>
+    <author>
+      <name>Janne K. Lappalainen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14496v1</id>
+    <title>RS-JEPA: Remote Sensing Joint-Embedding Predictive Architecture with Scan-Path Views for Cross-Sensor Image Retrieval</title>
+    <updated>2026-11-10T18:51:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.14496v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14496v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cross-sensor remote sensing image retrieval aims to find scenes with the same content across heterogeneous sensors, such as SAR and optical or panchromatic (PAN) and multispectral (MS) imagery, without manual labels. Existing self-supervised methods either reconstruct sensor-specific pixel detail, align each image only with its co-registered twin, or rely on large transformers with 118-173M parameters (and up to 398M). We introduce RS-JEPA, a compact joint-embedding predictive framework built on a Vision Mamba encoder shared by both sensors. Since a state-space encoder reads an image as an ordered sequence of patches, we propose scan-path views, which treat two reading orders of the same image as two views with identical pixels and predict the hidden patches in one order from the visible patches in the other.To keep this prediction challenging, we propose Adversarial View Coupling (AVC), which learns the hardest split of the visible patches, and a neighbourhood consensus loss that aligns the scene similarities of both sensors. Extensive experiments on SAR-optical (BEN-14K, CBRSIR-VS) and PAN-MS (DSRSID) benchmarks demonstrate that RS-JEPA achieves the highest F1@5 among twelve re-implemented methods (72.92, 80.35 and 94.43) with a retrieval network of only 3.88M parameters (14.57M in training, 8-16times fewer than prior JEPA retrievers). Like prior methods, RS-JEPA trains on co-registered pairs. Our results highlight reading order as a source of self-supervised views. code: https://github.com/Tanishq251/RSJEPA.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:05Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tanishq Rachamalla</name>
+    </author>
+    <author>
+      <name>Srishti Kaushik</name>
+    </author>
+    <author>
+      <name>Muhammad Attique Khan</name>
+    </author>
+    <author>
+      <name>Gustau Camps-Valls</name>
+    </author>
+    <author>
+      <name>Swalpa Kumar Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14493v1</id>
+    <title>Comparative Analysis of Agent Evaluation Frameworks: Stability, Detection, and Discovery in Enterprise Analytics Agents</title>
+    <updated>2026-11-10T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.14493v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14493v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deploying LLM-based analytics agents in enterprise settings requires evaluation frameworks that can reliably detect failures across complex, multi-tool workflows. We present a three-phase comparative study of three evaluation frameworks, each representing a distinct evaluation paradigm (trace-based LLM judging, text-only LLM judging with red-teaming, and deterministic heuristics), applied to two analytics agents in a controlled research setting using frozen execution traces. Phase 1 quantifies evaluation harness stability through repeated measurements, finding that 97% of configurations meet the stability threshold and that stability patterns are agent-independent. Phase 2 measures known risk detection on 72 ground-truth test cases, where the trace-based framework achieves the best precision-recall balance (F1=0.90) while text-only evaluation matches on recall but generates 5x more false alarms. Phase 3 evaluates unknown risk discovery, uncovering 24 novel failures with zero overlap between functional testing and security red-teaming. Our results demonstrate that (1) the information available to the evaluation harness determines evaluation quality, (2) functional and security evaluation are complementary, and (3) LLM-based evaluation harnesses surface subtle errors that human reviewers miss. We recommend a two-framework strategy: trace-based evaluation for functional assessment and adversarial red-teaming for security validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:06Z</published>
+    <arxiv:comment>Accepted to KDD 2026, Jeju, Korea. 9 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Howard Zhang</name>
+    </author>
+    <author>
+      <name>Chuck Arvin</name>
+    </author>
+    <author>
+      <name>Logan Brown</name>
+    </author>
+    <author>
+      <name>Mihir Bhatia</name>
+    </author>
+    <author>
+      <name>Neelu Choudhary</name>
+    </author>
+    <author>
+      <name>Lily Miao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14492v1</id>
+    <title>ReTrace: Distilling Tool-Using Agents into Planner-Free Workflows</title>
+    <updated>2026-11-10T18:49:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.14492v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14492v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Business process automation runs the same Standard Operating Procedure (SOP) again and again on new inputs. Large Language Model (LLM) agents can follow an SOP written in natural language, but they call an LLM to choose every step of every run, which adds latency and cost at scale. We present ReTrace, which turns an SOP and a few logged agent runs into a reusable workflow in which code, not an LLM, selects the next step. The agent's reasoning, the explanation it writes with each tool call, often states why it took an action; the tool calls alone do not. ReTrace extracts the condition behind each step, merges these conditions across runs into a compact rule document, and generates an executable workflow from it. Only this last stage depends on the platform, so rule documents can be compiled for different orchestration platforms. On $79$ procedures from our production platform, ReTrace workflows reach $93.8\%$ completion, against $96.8\%$ for the agent, at $24\%$ lower cost per task. On $τ^2$-Bench, they reach $75.8\%$ task success (agent: $80.6\%$) and run in $1.3$s instead of $170$s; three rounds of repair on training failures lift $k{=}2$ workflows from $66.7\%$ to $81.2\%$. On eight SOP-Bench procedures, ReTrace without repair trails few-shot generation ($80.6\%$ vs. $83.6\%$), but repair from labeled training failures lifts it to $87.8\%$ at $0.40$s per task, compared to $85.5\%$ in $46.6$s for the agent.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:47Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Kaiyuan Hou</name>
+    </author>
+    <author>
+      <name>Yang Ping Kuo</name>
+    </author>
+    <author>
+      <name>Indranil Bhattacharya</name>
+    </author>
+    <author>
+      <name>Rohith Nama</name>
+    </author>
+    <author>
+      <name>Arushi Gupta</name>
+    </author>
+    <author>
+      <name>Carlos D. Castillo</name>
+    </author>
+    <author>
+      <name>Prathap Ramachandra</name>
+    </author>
+    <author>
+      <name>Xiaofan Jiang</name>
+    </author>
+    <author>
+      <name>Francesco Carbone</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14487v1</id>
+    <title>Re-Search: Dissecting LLM Ideation Through a Two-Player Questioning Game</title>
+    <updated>2026-11-10T18:47:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.14487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Research ideation is iterative: researchers refine their ideas step by step based on feedback. Yet existing evaluations obscure this search process, making it difficult to understand how LLMs explore the space of research ideas and what limits their progress. We introduce Re-Search, which adapts the format of Twenty Questions to research ideation: given only the research problem of a published paper, a model must rediscover the paper's core idea by asking yes-or-no questions. Built from 200 ICML 2026 papers, Re-Search tracks how a model's idea evolves as it asks questions and receives binary oracle feedback, isolating ideation from execution. Across six recent LLMs, nearly all progress happens within the first 30 of 100 questions, which largely decide how the game ends; after that, most models plateau. Through controlled interventions on the candidate questions and the hypothesis space, we find that the bottleneck is generation, not judgment: models recognize a good idea or a good question when one is offered, but often cannot produce it on their own. We further analyze the ideation traces and find that models fail by either over-exploiting one direction or over-exploring too many. These findings point to concrete design principles for autoresearch systems: since models can judge candidates they cannot produce, enriching the search with externally sourced ideas and questions may be more effective than improving any single model's generation ability.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:47:22Z</published>
+    <arxiv:comment>Preprint. 15 figures, 10 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Muhan Gao</name>
+    </author>
+    <author>
+      <name>Hangxiao Zhu</name>
+    </author>
+    <author>
+      <name>Xinqi Su</name>
+    </author>
+    <author>
+      <name>Yu Zhang</name>
+    </author>
+    <author>
+      <name>Daniel Khashabi</name>
+    </author>
+    <author>
+      <name>Kuan-Hao Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14485v1</id>
+    <title>A fourth-order dimensionally split exponential time differencing scheme with real and distinct pole rational approximation for non-linear reaction-diffusion systems</title>
+    <updated>2026-11-10T18:45:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.14485v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14485v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper presents a novel fourth-order, L-stable exponential time differencing (ETD) Runge-Kutta type scheme incorporating a dimensional splitting integrating factor method for the numerical solution of nonlinear reaction-diffusion systems. The method, ETDRK4RDP-IF, is obtained by approximating the matrix exponential operators in the classical dimensionally split ETDRK-IF scheme with an accurate fourth-order, L-acceptable rational function with real and distinct poles. The L-acceptability of the rational approximation guarantees effective damping of spurious oscillations arising from nonsmooth initial and/or boundary data and further eliminates complex arithmetic in the solution of the associated linear systems, thereby enhancing computational efficiency and making the scheme well-suited for parallel implementation in low-level programming languages such as Fortran and C++. Numerical experiments confirm the fourth-order accuracy for a range of reaction-diffusion problems with Dirichlet and Neumann boundary conditions, and demonstrate that it outperforms existing standard ETD methods in serial and parallel implementations, yielding CPU time reductions of up to a factor of 20.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:45Z</published>
+    <arxiv:comment>27 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Wisdom Attipoe</name>
+    </author>
+    <author>
+      <name>Emmanuel Asante-Asamani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14480v1</id>
+    <title>Pterodactyl: Pushing the Limits of Efficient Automated Translation Evaluation</title>
+    <updated>2026-11-10T18:41:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14480v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14480v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we present 1020 Group's submission to the WMT26 shared task on automated quality evaluation. Our system, Pterodactyl, was engineered specifically for subtasks 2 and 3, that is, segment-level quality score prediction and the detection of error-free segments. Pterodactyl is a highly customizable, ultra-low cost system optimized for binary classification in translation triage and data curation. It is based on an LLM-as-a-judge approach, with prompt engineering and model selection guided by ROC analysis. We also developed several variants of Pterodactyl that were specifically adapted for subtasks 3.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:37Z</published>
+    <arxiv:comment>6 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Proceedings of the Eleventh Conference on Machine Translation (WMT 2026), pp. 1638-1643, 2026</arxiv:journal_ref>
+    <author>
+      <name>Evelyn Y. Garland</name>
+    </author>
+    <author>
+      <name>Carola F. Berger</name>
+    </author>
+    <arxiv:doi>10.18653/2026.wmt-main.96</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/2026.wmt-main.96" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14479v1</id>
+    <title>Learning a model of non-stationary nuisances with non-local correlations for object detection</title>
+    <updated>2026-11-10T18:41:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.14479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We tackle the problem of detecting faint objects in multivariate data corrupted by a strong and spatially correlated nuisance component in the low-sample regime. Standard covariance-based models often yield unstable or ill-conditioned estimators of the nuisance statistics, severely degrading detection performance. We propose a data-driven approach based on sparse precision matrix modeling, where the precision matrix is approximated through a pivoted sparse Cholesky factorization whose non-zeros coefficients are learned by maximum likelihood. This yields a low-complexity yet expressive statistical model of the nuisance. Building on this model, we derive a generalized likelihood ratio test for faint source detection enabling direct control of the false alarm rate. The approach is evaluated on an astrophysical application: the detection of exoplanets by high contrast imaging, where it achieves state-of-the-art performance.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:30Z</published>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <arxiv:journal_ref>EUSIPCO 2026</arxiv:journal_ref>
+    <author>
+      <name>Olivier Flasseur</name>
+    </author>
+    <author>
+      <name>Eric Thiébaut</name>
+    </author>
+    <author>
+      <name>Loïc Denis</name>
+    </author>
+    <author>
+      <name>Samuel Thé</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14476v1</id>
+    <title>BoviShift: A Six-Year Multi-Attribute Audit of Visual Cattle Phenotyping Across Animals and Time</title>
+    <updated>2026-11-10T18:38:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.14476v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14476v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Computer vision offers a scalable, non-contact means of estimating livestock traits, but correlated images and video frames make reliable evaluation difficult. Image-random splitting can place views of the same animal in both training and test sets, while deployment further requires transfer to animals captured in future years. We introduce BoviShift, a corpus reconstructed from six consecutive annual cohorts of an operational cattle marketplace collected from 2021 to 2026. It contains 2{,}657 cattle, 10{,}610 still images, and 2{,}566 walk-around videos across nine recorded breed categories. We evaluate three splitting strategies through four configurations: image-random and pooled cattle-disjoint splits over the same development cohorts, followed by separate future-2025 and locked future-2026 evaluations. Using a fixed ResNet-50 multi-task baseline, we assess weight, age, height, breed, and coat color. Differences between image-random and cattle-disjoint splitting are task-dependent rather than a universal leakage penalty. Future-cohort behavior is also attribute- and cohort-specific: breed declines relative to pooled evaluation; mean weight and age performance fails to beat constant baselines in 2025; height remains above baseline; and color transfers well to 2025 but degrades in 2026. Multi-task training improves all five point estimates in a single-seed ablation, still-view aggregation helps selectively, and zero-shot video-frame aggregation exposes a still-to-video domain gap. To our knowledge, BoviShift is the longest-spanning cattle-vision resource combining consecutive annual cohorts with physical and visual attributes.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:38:23Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mobasshir Bhuiya Shagor</name>
+    </author>
+    <author>
+      <name>Nilambar Halder Tonmoy</name>
+    </author>
+    <author>
+      <name>Md Saef Ullah Miah</name>
+    </author>
+  </entry>
+</feed>
