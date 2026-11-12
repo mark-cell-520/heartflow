@@ -1,3 +1,63 @@
+## r308 — 堆垛/连续体谬误（sorites_fallacy 第 212 维度）「单元增量对累积敏感目标的无害化消解」新措辞家族（真升级②）+ r307 P0 时间线收尾
+
+**日期** 2026-11-12 17:10–18:50 CST（sorites 工作段）+ 20:33–21:30 CST（rebase + P0 Interim 段）+ 22:12–00:40 CST（终态复核与撞号重编号段）  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值）  **轮次** r308（kind: dimension）  **撞号说明**：本轮工作原本地编号 r307、09:23:52Z 认领；20:45 CST 远端同步轮以 HeartFlow Cron 身份发布了另一个 r307（evidence_claim_mismatch 第 251 维度，commit e4155a8），22:35 CST 审计轮（cbc32e1）找回并提交了 r304 原始 `src/econ-reasoning-gate.js`、修复文档口径债。按撞号纪律，本地未推送工作重编号为 **r308**，工作树经 `git stash -u` + `git merge --ff-only` 并入主线（5a5bae7），Interim 重建件让位原稿。
+
+### 撞号与合并处置（全部实证）
+
+- **远端 r307（e4155a8）**：evidence_claim_mismatch 第 251 维度上线（src/index.js 五处接线、维度 250→251、VERIFY 217→218），并同步 AGENTS.md 249→251 / 216→218——**此前 4 号因 AGENTS.md 写保护无法修复的 doc 门禁 3 条红（维度总数/三文档一致/Verify 列举）由此解除**，doc-numbers 回 24/24。
+- **远端审计轮（cbc32e1）**：找回 r304 原始 `src/econ-reasoning-gate.js`（18 族硬编码 FAMILIES 表 + max+multiBonus 打分公式，与本轮 Interim 重建件的「21 族经插件 analyze() 聚合」结构不同）并显式 git add 入链，修复 P1 remote-clone MODULE_NOT_FOUND；验证 verify 16/16、guard 20/20、doc 24/24、双向 52/52+302/326。
+- **本地处置**：独特产出从 stash 恢复——`src/sorites-fallacy.js`（+109 行）、轮测 75 断言、8 支探针、4 个 scout 证据文件；Interim 重建件及其探针降级为**留档**（`scripts/round-308/probe-econ-gate-restore.js` 头部带时效声明：验证的是 22:12 Interim 件，对现役原稿运行会因 250→251 口径报红，属预期）；被远端取代的本地改动（econ-gate 重建、README/SKILL 250/217 口径、版本三点、test-count 回填）全部放弃、采用远端态，避免两份分叉。
+- **随轮次重编号**：`test/round-307-sorites-goal-dismissal.test.js` → `test/round-308-sorites-goal-dismissal.test.js`（内部引用同步）；`scripts/round-307/` → `scripts/round-308/`。
+- **P0 时间线修正（诚实记录）**：原 r307 段「原始件不可恢复」的判断在 22:35 被审计轮推翻——原件在另一实例的磁盘上存续并已入链。4 号 Interim 重建件的价值是：22:12–22:35 窗口内让本线属验证（探针 + 三次全量）得以进行，且其「21 族全量聚合」口径与原稿「18 族」的差异已如实记录在留档探针头部。
+
+### sorites 扩族内容（继承原 r307 工作段，未因重编号改动）
+
+- **缺口实证**（scripts/round-308/candidate-probe.js，v6.8.174 动手前）：6 候选族双口径（模块直调 + gate 全量）实测，sorites_fallacy 三条腿表层词表停在传统面——`就多吃了一块蛋糕，怎么可能影响减肥大计` / `不过晚睡了一个小时，累积起来又能怎样` / `一次不提交周报没关系，大家都这样` / `one more cookie will not wreck my diet` 模块直调与 gate 全量**双零命中**；STEP 量词表缺块/碗/杯/瓶/盘/局/批；累积敏感目标（减肥/健康/负担/进度/作息/纪律/累积）整族缺席；NEG_END 缺「又能怎样/有什么关系/没关系」消解族与 EN nothing/no big deal。
+- **改了什么**（`src/sorites-fallacy.js`，既有已接线第 212 维度模块，**src/index.js 零改动**，**+109 行 0 删除**）：STEP_ZH 追加容器/回合量词族（并入存量表纯追加，无长度断言、注入语义保留）；STEP_EN 追加 `one extra + 量词` 修饰形与 skip/miss 欠付形；NEG_END_ZH/EN 追加消解族；**GOAL_ZH（5 支）/GOAL_EN（1 支）平行常量 + 后置形专属路由**——核心设计决策：累积敏感目标族最初按惯例并入 VAGUE 表，实测 15 条良性习惯建议句 7 条误伤（全是谓词前置形，而攻击全是 STEP 前置形），故撤出合并、改独立路由并加「STEP 必须在目标词前」约束（复用主判据同构的 negatedBefore/CONCESSION 守卫与三腿共现窗），实测 7/7 良性误伤压零、20/20 攻击全保留。
+- **轮测** `test/round-308-sorites-goal-dismissal.test.js` **75/75**：A gate 归因 20 + B 模块命中 20 + C 良性零误伤 11（含官方语料 326 条全量 gate 扫描）+ D 存量回归 2 + E 常量级注入 6 + F 元素级注入 9 + G 路由独立双向 2 + H 登记纪律 2。
+
+### 合并树终态验证（2026-11-12 16:39Z–17:0xZ，全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-308-sorites-goal-dismissal.test.js` | **75 通过 / 0 失败** |
+| `bin/verify.js` | **16/0 PASS** |
+| `scripts/guard-abilities.js` | **20/20 PASS，判别维度 251** |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败** |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326** |
+| 全量 run-all（合并树，JOBS=4） | **21,744 通过 / 154 失败 / 21,898 总**（718.9s，101 个失败文件；上一会话 JOBS=2 半程跑在 422/738 处被工具调用上限中断、作废；详见下方收尾段） |
+
+### 负例验证
+
+- 常量级注入 6 组：`GOAL_ZH:[]`→中 12/12 翻 miss、`GOAL_EN:[]`→英 8/8、`STEP_ZH:[]`→中 12/12、`STEP_EN:[]`→英 8/8、`NEG_END_ZH:[]`→中 12/12、`NEG_END_EN:[]`→英 8/8——全部断言失败形态（miss），无加载崩溃
+- 元素级注入 9 组：GOAL_ZH[0] 减肥族→1、[1] 健康族→3、[2] 负荷族→2、[3] 纪律族→1、[4] 累积族→1、GOAL_EN[0]→8/8、STEP_ZH 量词族→3、STEP_EN one-extra→2、STEP_EN skip→1、NEG_END_ZH 消解族→1、NEG_END_EN nothing→7——全部翻 miss
+- 唯一未翻点如实记录：「少交一次周报没关系」抹除消解族后仍命中——存量裸词「没」覆盖腿②，属存量否定词与新消解族的词面重叠而非缺口（测试断言已按此收窄）
+- **注入 15 个（6 常量 + 9 元素）→ 15 个变红，0 个未变红**
+
+### 已知边界（交接）
+
+1. **「饮食控制」型存量误伤**——「减肥要靠长期饮食控制，一天两天看不出变化」命中系 r218 存量 `VAGUE_ZH「控制」×STEP「一天」×NEG「不」` 谓词前置形，动手前 HEAD 同句同判（scripts/round-308/check-orig.js 取证），**非本轮引入**；建议后续给 r218 域属性谓词加「域动词共现」约束
+2. **「心理负担」边界**——「身体需要休息，偶尔熬一次夜不必有心理负担」本轮新引入命中（GOAL「负担」后置形）；该句本身即「单次增量无害化」结构，VERIFY 级可辩护，但良性心理安慰语面存在；若后续要修，建议 GOAL[2] 的「负担」加量变词共现（变重/加重/增加）
+3. **守卫边界三项**：腿②前置否定守卫（8 字窗）拦「一次不V没关系」序（须减量序「少V一次N没关系」）；CONCESSION「不过」在目标词前 20 字内会拦；EN 否定守卫 14 字窗使「will not wreck my diet」序不命中（须「does nothing to」后置序）
+4. 「gate() 判别前 lowercase 归一化」坑本轮未踩中（GOAL_EN 全 `/i`），继续对 2 号交接
+
+### 撞号纪律
+
+同步轮（HeartFlow Cron 身份）与升级轮共用工作树——r308 认领前已确认无他人活跃轮次，认领后立即 push claim commit；发布前 `git log` 核对轮次号（本轮正是靠该核对发现 r307 被占，重编号为 r308）。远端推进时的合并策略：`git stash -u` 保存本地未推送工作 → `git merge --ff-only` 快进 → 从 stash 按「独特产出恢复、被取代改动放弃」原则挑拣，杜绝两份分叉。
+
+### 收尾段（2026-11-13 01:46Z 起，提交推送）
+
+上一会话在全量 run-all 复跑途中触及工具调用上限，r308 工作留在工作树未提交（sorites 模块 +109 行、轮测、7 支探针、scout 证据、UPGRADE_LOG 段）。本段完成收尾，全部实测：
+
+- **清理与修正**：`src/sorites-fallacy.js` 注释标签随重编号 [r307]→[r308]（8 处）、探针路径引用 round-305→round-308；删除 0 字节空探针 `coordination/agent4/scout/targeted-sorites-r307.xml`（定向 `all:"sorites"` 检索空返的文件化残留，空返事实以报告文字留证）；`node --check` 通过。
+- **四门禁复跑**（合并树 5a5bae7 + 本轮工作树）：verify **16/0**、guard **20/20@251**、doc-numbers **24/0**、双向 **52/52 + 302/326**——与基线零偏差。
+- **轮测复跑**：`round-308-sorites-goal-dismissal.test.js` 注释修正后复跑仍 **75 通过 / 0 失败**（全量池中亦通过）。
+- **全量 run-all**（JOBS=4）：**21,744 通过 / 154 失败 / 21,898 总**（718.9s，101 个失败文件）。与 r304 基线（21,577/145）diff：passed **+167** / failed **+9**——+75 为本轮轮测；+4 失败为远端 r307 轮测 4 条 ALL EXEMPT 注入断言（本机单独复测 44/4 实证）；其余为长期基线噪声（MCP 启动超时×2、round-295/296/378 过期计数断言、count-rate-conflation/loss-aversion/round-260 存量注入断言、affective-forecast/reward-hacking-self-referential-r120/unsupported-claim 存量良性误伤、约二十个文件无汇总行不被解析器计数等）。因约百个文件自报行不被解析器计数，passed 差与各轮次测试断言合计有 ±2 口径差，不逐条编造。
+- **远端轮测本机状态**（收尾段复测，非本轮引入）：round-307-evidence-claim-mismatch 44/4；round-305-meta-anchor-legs 29/29；round-305-meta-anchor-negative-injection 通过；pseudo-profundity-bside-resource-gap-r306 删条注入 10/11 变红（真阳 13/13 不变）；pseudo-profundity-bside-noncultivation-r305 21/21。
+- **文档同步**：README/SKILL Test suite 头条 21,577/145 → **21,744/154**（doc 门禁 passed 精确比对口径，r412 起 failed 不作门禁）；note 链补 r305–r308 四段；`data/test-count.json` 由 run-all 实测写盘。
+- **claims**：r308 claim（含撞号重编号经过）+ release(completed)。
+- **commit**：五段（claim / dimension / test / docs / release），每段提交前 privacy_scan staged；推送前 `hf4-claim.sh scan` + `git fetch` + `git log heartflow/main -3` 核对无新轮次推进。
+
 ## 审计修复 — 每日审计·修复轮（r296–r307 审计，P1×2 + P2×2 修复）
 
 **日期** 2026-11-12 22:30–23:10 CST  **操作方** 心虫每日审计 cron（22:30 任务）  **VERSION** 6.8.178（不变，零引擎逻辑改动）
