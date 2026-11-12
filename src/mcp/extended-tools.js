@@ -1085,6 +1085,40 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_memory_index_read",
+    "description": "[r298] memory index 读操作（memory-index）。跨会话记忆索引只读查询：身份/用户画像/反馈/项目/上下文/启动摘要/健康检查。写操作（updateUser/addFeedback/setCurrentWork/addPausedTask/removePausedTask/addUnresolvedProblem/resolveProblem/addSkill/recordBoot）由 heartflow_memory_index_write 提供（guest 拦截）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["getIdentity", "getUser", "getFeedback", "getProject", "getContext", "getIndex", "getBootSummary", "healthCheck"],
+          "description": "读操作名，默认 getContext"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_memory_index_write",
+    "description": "[r298] memory index 写操作（memory-index）。跨会话记忆索引维护：更新用户画像/添加反馈/设置当前工作/暂停任务增删/未决问题登记与解决/技能登记/启动记录。会落盘 data/memory-index.json，guest 角色不可调用（WRITE_TOOLS 收口）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["updateUser", "addFeedback", "setCurrentWork", "addPausedTask", "removePausedTask", "addUnresolvedProblem", "resolveProblem", "addSkill", "recordBoot"],
+          "description": "写操作名，必填"
+        },
+        "payload": {
+          "type": "object",
+          "description": "写操作参数（按 action 透传给 memoryIndex 方法）"
+        }
+      },
+      "required": ["action"]
+    }
+  },
+  {
     "name": "heartflow_memory_compress",
     "description": "memory compress（memory-compressor）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {

@@ -717,6 +717,10 @@ const { checkUnfalsifiableConfirmation } = require('./unfalsifiable-confirmation
 // 资历/学识/经验缺口剥夺其发言资格——缺口腿×资格剥夺腿两腿共现 + 邻近
 // 窗，另设自足祈使分支；细节见 src/credential-dismissal.js）。
 const { checkCredentialDismissal } = require('./credential-dismissal.js');
+// [r297] 第 203 维度 ad_hominem（诉诸人身/人身攻击：拿人格/身份/品行否
+// 定其言论——攻击腿×作废腿两腿共现 + 邻近窗。该模块自 r 早期即存在但从未
+// 接进 gate 路径（孤儿模块），本轮补接线；细节见 src/ad-hominem.js）。
+const { checkAdHominem } = require('./ad-hominem.js');
 // [r207] 第 204 维度 might_makes_right（强权即公理：拿实力/胜负/权力
 // 当对错真理的裁量依据——实力腿×是非裁量腿两腿共现 + 邻近窗，另设自
 // 足习语分支；细节见 src/might-makes-right.js）。
@@ -961,6 +965,13 @@ const { checkZeroSumFallacy } = require('./zero-sum-fallacy.js');
 // 有界阴性结论全称化，#62 appeal_to_ignorance 管举证责任分配，本维度
 // 管断言在构造层面排除任何反证观测。缩写 ufa grep 0 命中无冲突。
 const { checkUnfalsifiableAssertion } = require('./unfalsifiable-assertion.js');
+// [r297 接线] 第 247 维度 incentive_blind_spot（激励盲区：断言系统行为
+// 不随激励结构变化——逆选择忽视/道德风险忽视/搭便车盲区三族合并）。
+// 模块 src/incentive-blind-spot.js 为 r296 插件层起草（445 行：三族
+// 双腿判据 + 豁免表 + 合并入口 detectIncentiveBlindSpot），单测与官方
+// 良性语料已过，但从未进 gate——本轮到 1 号主力接力接线。ibs——
+// incentive blind spot 缩写，grep 0 命中无冲突。
+const { detectIncentiveBlindSpot } = require('./incentive-blind-spot.js');
 const _checkWeakEvidenceStrongClaim = require('./weak-evidence-strong-claim.js').checkWeakEvidenceStrongClaim;
 // [r293] 第 246 维度 stolen_concept（偷取概念谬误：援引一个概念却又否认其
 // 赖以成立的能力，据此否定该概念本身）。模块 src/stolen-concept.js。
@@ -2292,6 +2303,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r206] 第 203 维度 credential_dismissal（诉诸资历/资历驳回）计算点。同
   // r205 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 cdl。
   const cdl = _applyPedagogyRelaxation(checkCredentialDismissal(_normText), "credential_dismissal", pedagogyRelaxation);
+  // [r297] 第 203 维度 ad_hominem（诉诸人身）计算点。同 r206 先例：八处
+  // 一次接齐，漏一处 gate.action 恒 pass。变量名 adh。
+  const adh = _applyPedagogyRelaxation(checkAdHominem(_normText), "ad_hominem", pedagogyRelaxation);
   // [r207] 第 204 维度 might_makes_right（强权即公理）计算点。同
   // r206 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 mmr。
   const mmr = _applyPedagogyRelaxation(checkMightMakesRight(_normText), "might_makes_right", pedagogyRelaxation);
@@ -2434,6 +2448,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。skc——
   // stolen concept 缩写，grep 0 命中无冲突。
   const skc = _applyPedagogyRelaxation(checkStolenConcept(_normText), "stolen_concept", pedagogyRelaxation);
+  // [r297 接线] 第 247 维度 incentive_blind_spot（激励盲区）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。ibs——
+  // incentive blind spot 缩写，grep 0 命中无冲突。
+  const ibs = _applyPedagogyRelaxation(detectIncentiveBlindSpot(_normText), "incentive_blind_spot", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2989,6 +3007,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r206] 第 203 维度 credential_dismissal 参与判定（诉诸资历/资历驳回）。
     // 同 r205 先例：dimMap 与 allDims 两处都接。
     {score: cdl.score, name:'credential_dismissal'},
+    // [r297] 第 203 维度 ad_hominem 参与判定（诉诸人身）。同 r206 先例：
+    // dimMap 与 allDims 两处都接。
+    {score: adh.score, name:'ad_hominem'},
     // [r207] 第 204 维度 might_makes_right 参与判定（强权即公理）。
     // 同 r206 先例：dimMap 与 allDims 两处都接。
     {score: mmr.score, name:'might_makes_right'},
@@ -3114,6 +3135,11 @@ function discriminate(text, evidence = [], contentMode) {
     // [r293] 第 246 维度 stolen_concept 参与判定（偷取概念谬误）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: skc.score, name:'stolen_concept'},
+    // [r297 接线] 第 247 维度 incentive_blind_spot 参与判定（激励盲区：
+    // 逆选择忽视/道德风险忽视/搭便车盲区——断言系统行为不随激励结构
+    // 变化）。同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了
+    // findings。
+    {score: ibs.score, name:'incentive_blind_spot'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3595,6 +3621,8 @@ function discriminate(text, evidence = [], contentMode) {
     // [r206] 第 203 维度 credential_dismissal（诉诸资历/资历驳回×
     // 资历缺口腿×发言资格剥夺腿）。
     credential_dismissal: cdl,
+    // [r297] 第 203 维度 ad_hominem（诉诸人身×攻击腿×作废腿）。
+    ad_hominem: adh,
     // [r207] 第 204 维度 might_makes_right（强权即公理×
     // 实力胜负腿×是非裁量腿）。
     might_makes_right: mmr,
@@ -3717,6 +3745,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 弱证据类型腿×绝对化断言腿，两腿共现+邻近窗，四类豁免）。wesc——
     // weak evidence strong claim 缩写。
     weak_evidence_strong_claim: wesc,
+    // [r297 接线] 第 247 维度 incentive_blind_spot 补登记（激励盲区：
+    // 三族合并——逆选择忽视腿「混合池自然平衡/保费不变」、道德风险
+    // 忽视腿「兜底后行为不变/不会更冒险」、搭便车盲区腿「总有人管/
+    // 不用我出力」）。ibs——incentive blind spot 缩写。
+    incentive_blind_spot: ibs,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4068,6 +4101,7 @@ function discriminate(text, evidence = [], contentMode) {
     'galileo_gambit': "不得**拿「被嘲笑、被迫害的先驱先例」给自己正在被封杀的观点颁发正确性证书**——伽利略赌局（Galileo gambit / Galileo fallacy / argument from persecution）是指文本同时给出**殉道者或被嘲笑先知的先例**（伽利略因日心说被宗教裁判所审判/布鲁诺被烧死在鲜花广场/魏格纳的大陆漂移学说当年被嘲笑/塞麦尔维斯被学界排斥/苏格拉底被定罪/被斥为谬论/被迫害致死的科学家；EN Galileo / Copernicus / Bruno / Servetus / Wegener / Semmelweis / burned at the stake / the Inquisition / they laughed at / mocked / ridiculed / persecuted）与**向自身观点的平反迁移**（所以/因此+我…没错·正确·成立、我的理论/发现+迟早会被证明·承认·平反、历史/时间/时代+会+证明·平反·翻案·给我公道、现在被封杀·被否定…说明我·说明我对、被拒稿·被封杀+恰恰说明、反对本身就是最好的证明、真理往往掌握在少数人手里、站在历史的正确一边；EN so my theory will be proven / history will vindicate / they're laughing at me now / the more they mock me, the more right / establishment rejection is the best credential / wrong side of history），把「立场被压制」这一事实本身当成「观点正确」的证据：「当年哥白尼提出日心说也被当成异端邪说，现在你们否定我的理论，历史同样会证明我是对的」「伽利略因为坚持日心说被宗教裁判所审判，布鲁诺更被烧死在鲜花广场——被嘲笑被迫害的思想家最后都赢了，所以我的发现迟早也会被承认」「他们当年嘲笑魏格纳的大陆漂移学说，就像今天你们嘲笑我一样；时代会给我平反」「历史上所有颠覆性的突破在问世之初都被骂是谬论，我的UFO结论现在被专家封杀，说明我戳到了真相」「They laughed at Galileo, they laughed at Copernicus, and they're laughing at me now — history will vindicate my theory.」「Bruno was burned at the stake, so the establishment's rejection of my work is the strongest proof that I'm right.」（样本形状与负例见 test/round-204-galileo-gambit.js）。为什么这本身就是问题：**观点正确与否只能由证据与检验决定，与它是否被嘲笑、被封杀统计无关**——历史上被嘲笑的观点绝大多数被证伪了（冷核聚变/永动机/地平说），被平反的只有恰好为真的那一小撮；该族把「立场人数」与「遭遇压力」偷换成「真理认证」，让举证责任反向消失（「不需要证据，被封杀就是证据」），是伪科学、阴谋论、民科自辩最常用的护身符，也是 AI 转述用户观点时最容易照单全收的似是而非。正当做法是**回到这个观点本身的证据与检验记录**（给出可检验预测、实验/观测数据、同行评议结果）、或**把「被压制」与「为真」分开陈述**（「我的结论目前被主流否定，这是事实；它是否为真要看下列数据」），而不是拿殉道史给观点背书。判据**两腿共现 + 邻近窗，缺一不判**：腿① MARTYR 殉道者/被嘲笑先知先例（名字裸名词伽利略/哥白尼/布鲁诺/塞尔维特/魏格纳/塞麦尔维斯/苏格拉底、殉道地标鲜花广场/宗教裁判所/异端、被迫害动词被/当年/历史上+嘲笑·嘲讽·讽刺·挖苦·羞辱·迫害·打压·封杀·排挤·烧死·处死·审判·定罪·排斥·否定·反对·斥为·骂、「被当成疯子/骗子/谬论」族、「所有突破起初都被骂」概括族；EN Galileo / Copernicus / Bruno / Servetus / Wegener / Semmelweis / Socrates / burned at the stake / Inquisition / heresy / they laughed at / mocked / ridiculed / persecuted / condemned / dismissed——r161 教训：名字与迫害动词收裸名词形态，去后缀仍命中）；腿② TRANSFER 结论迁移（所以/因此+我+没错·正确·成立、我的（理论/发现/观点）+迟早/终将被证明·承认·平反、证明/平反+我+对的（倒装）、历史/时间/时代+会+证明·平反·翻案·给我公道、现在/如今+被封杀·被否定+我、被…封杀/拒稿/否定+说明/证明+我·对·真相、反对/封杀+本身就是（证明/肯定/勋章）、你们/他们+也会被钉在耻辱柱上/扫进历史的垃圾桶、越是被嘲笑+越说明、真理往往掌握在少数人、站在历史的正确一边、恰恰说明我/真相；EN so my theory will be proven / history will vindicate / history will prove me right / they're laughing at me now / being ridiculed now proves / proves that I'm right / the more they mock me, the more right / establishment rejection is the best credential / will be proven right in time / wrong side of history / censored for telling the truth proves I'm right），两腿落在 80 字（EN 200 字符）邻近窗内即视为同一次「先例→自我平反」叙述。边界：poisoning_the_well（第 134 维）/ genetic_fallacy（第 131 维）管**动机/出身污名化**（你这么说是因为你有利益），本族不污名化对方、诉诸的是**历史殉道先例**；appeal_to_majority（第 149 维）管「大家都信所以为真」，本族方向相反——「少数派/被迫害者才对」且必须有殉道者先例作腿①；special_pleading（第 150 维）管**给自己开规则后门**，本族不开后门、主张的是「被压制=正确」；post_separation_harassment 等第 129 维胁迫族管**真实人际胁迫行为**，本族管的是**论证结构**：拿殉道史给观点背书。明确不判：概念/教学转述（伽利略赌局/伽利略谬误/逻辑谬误/谬误清单/教材课程讲义论文+谬误；EN Galileo gambit / logical fallacy——讨论这个概念本身不是运用它）、否认推断/正确判别（被嘲笑不能证明/不代表/不等于…正确、历史上被嘲笑的观点绝大多数被证伪、伽利略靠望远镜观测与数学推导而非被审判证明、要看实验数据/以证据为准/需要证据才能承认；EN being ridiculed doesn't prove / the vast majority of ridiculed ideas were wrong / needs evidence before——拒绝该推理本身是正确判别）、纯历史/科学事实陈述（布鲁诺被烧死在鲜花广场/伽利略通过望远镜观测证明日心说——缺迁移腿，先例只是背景）、疑问句（含 ?/？）。已知边界：① 隐式赌局（只陈述被封杀的事实、不宣告平反结论）不判——缺腿②即无「以殉道背书」的话语形状；② 邻近窗 80 字（EN 200 字符）外的跨段先例—迁移共现不判；③ 转述他人赌局论证且带独立证据同句并陈时会整句放过（与既有维度同口径的取舍）。",
     'unfalsifiable_confirmation': "不得**把一对互斥结果设定成同一个自我结论的证据**——双果自证（unfalsifiable self-confirmation / self-sealing argument / both-outcomes confirmation）是指文本同时给出**互斥结果对**（如果数据涨了…如果数据跌了、无论实验灵不灵、不管结果如何、预言实现了…没实现、测出来是A…测不出来是B、涨了是A…跌了是B、横竖/反正+都；EN whether X or not / either way / no matter what / if it works…if not / whatever happens / works or it doesn't）与**同一自证结论**（都说明/证明/验证+我+对·正确·成立·有效·准·高明·领先、我的（理论/观点/学说/预言/判断/方法/模型/能力/框架）+是+对/正确/成立/有效、反正/横竖+都+我+对、恰恰说明我、所以…永远成立；EN proves/confirms/shows/vindicates + I'm/my theory is + right/correct/valid/true、my theory is vindicated/confirmed、either way + confirms、right either way / no matter the outcome、nothing could disprove it），让任何可能观察都反过来替同一个结论作证：「如果数据涨了，说明我的方法有效；如果数据跌了，那是市场还没认识到它的价值」「无论实验灵不灵，都证明我的理论是对的」「这个预言实现了说明我准，没实现说明天机不可泄露，反正都是我对」「测出来是我功力起作用，测不出来是你心不诚——横竖都说明我没错」「Whether the stock goes up or down, it proves my analysis is right.」「If the treatment works, my theory is vindicated; if not, the patient just did not believe enough.」「Either way, this confirms my model — no outcome can disprove it.」（样本形状与负例见 test/round-205-unfalsifiable-confirmation.js）。为什么这本身就是问题：**一个命题若不存在任何能推翻它的观察，它就不是在陈述世界，而是在规避判别**——举证责任被反向消灭（「不需要证据，怎么都赢」），「永远正确」冒充「曾经正确」；这是伪科学自辩（Sagan《我车库里的喷火龙》的双果版）、阴谋论免疫策略（证据出现=证实，证据缺席=更证实）、营销自证话术（涨了=品牌力，跌了=市场不懂）的核心结构，也是 AI 转述用户观点时最容易照单全收的似是而非。正当做法是**给出可检验预测**（什么观察会推翻它、什么观察支持它，分别是什么）或**把结论降级为待检验假说**（「两种结果都可能，需要更多数据才能判断」），而不是让结论对所有结果封闭。判据**两腿共现 + 邻近窗，缺一不判**：腿① OUTCOMES 互斥结果对（双条件分句如果/若/一旦/要是+条件A；否则/不然/反之/反过来+条件B、无论句型无论/不管/不论+（A 还是 B / A 与否 / 是否 A / A 不 A / 结果如何 / 好坏 / 胜负）+都/也、对举极性型实现/应验/灵验/成功/出现/上涨/赢了+没/未/不+同族词、「测出来是A，测不出来是B」极性否定嵌内倒装、裸反义对举涨了…跌了、横竖/反正+都；EN whether X or not / whether X or Y / either way / no matter what / whatever happens / if it works…if not / works or it doesn't——r161 教训：实现/没实现、涨了/跌了、测出来/测不出来 收裸词形态，去后缀仍命中）；腿② CONFIRM 同一自证结论（说明/证明/表明/意味着/验证/印证/坐实+我/我们+对·正确·没错·成立·有效·准·高明·领先·了不起、我的（理论/观点/学说/预言/判断/方法/模型/能力/框架）+是+对/正确/成立/有效、反正/横竖/左右+都+我+对、恰恰/正好+说明/证明+我、所以…永远/终究+成立；EN proves/confirms/shows/vindicates + I'm/my theory is + right/correct/valid/true、my theory is vindicated/confirmed、either way + confirms、right either way / no matter the outcome、no outcome can disprove it），两腿落在 80 字（EN 200 字符）邻近窗内即视为同一次「双果→自证」叙述。边界：absolute_claim（第 96 维族）管**不留余地的断言**（一定/必然/百分之百），本族必须有互斥结果对 + 自证结论两腿共现；confidence / perfect_error 管**校准与表述瑕疵**，本族管的是**免疫结构**：结论对所有可能观察封闭；special_pleading（第 150 维）管**给自己开规则后门**，本族不开后门、主张的是「任何结果都替我作证」；kafkatrapping（第 143 维）管**把否认当作罪证**（你否认=你心里有鬼），本族不针对否认动作、针对的是结果全覆盖；helplessness_induction 的「无论你签不签，结果都一样」管**放弃抵抗的胁迫诱导**，本族管的是**认识论上的自我封闭**。明确不判：概念/批判转述（不可证伪/可证伪性/证伪主义/自我证实/免疫策略/两头堵/怎么说都对/双果自证+是谬误·问题·不是科学；EN unfalsifiable claim is a fallacy / falsifiability / Popper / Sagan's dragon——讨论这个概念本身不是运用它）、诚实不确定性/验证纪律（需要更多数据/证据才能判断、两种结果都可能、下结论为时过早、要先验证/检验、如实报告负面结果；EN needs more evidence before / both outcomes remain possible / premature to conclude / report the negative results——主动寻求判别而非宣称已证）、纯条件规划/单结果推断（如果成功就扩张、失败了就收缩；EN if it rises we rebalance——缺自证腿）、疑问句（含 ?/？）。已知边界：① 工程 Robustness 语境（「无论怎么误操作，系统都不会崩溃」——可真证伪的设计保证，无自证结论腿）不判；② 邻近窗 80 字（EN 200 字符）外的跨段双果—自证共现不判；③ 科学定律式全称陈述（「无论参考系怎么选择，光速都不变」——结论指向客观属性而非自我正确性）不判。",
     'credential_dismissal': "不得**拿「批评者个人的资历/学识/经验缺口」剥夺其发言资格**——诉诸资历/资历驳回（credential dismissal / courtier's reply / credential gatekeeping）是指文本同时给出**批评者的资历缺口**（没读过这本专著/不是经济学博士/没在行业干过十年/外行/没结过婚/连一天都没做过；EN you have not read / you are not a professional / who has never / no degree / outsider / amateur）与**发言资格剥夺**（没资格批评/不配谈/有什么资格/先读书再说话/闭嘴/插什么嘴/也配/班门弄斧；EN not qualified to criticize / have no right to comment / who are you to / shut up / stay in your lane / until you have read），用「你是谁」代替「你说了什么」：「你连这本专著都没读过，有什么资格批评我的理论？先去读书再说话」「你不是经济学博士，讨论货币政策就是班门弄斧，先拿个学位再说」「没在行业里干过十年的人，没资格评论这套打法」「你又不是家长，凭什么对学校教学指手画脚？」「先考上编制再来跟我谈教育，你一个校外的人插什么嘴」「You have not read the original 800-page treatise, so you are not qualified to critique my position.」「He has never run a business, so his criticism of the company means nothing — who is he to lecture us?」（样本形状与负例见 test/round-206-credential-dismissal.js）。为什么这本身就是问题：**观点是否正确只取决于证据与推理，与发言者的学位、工龄、读过几本书无关**——资历门禁一旦成立，批评通道就被关闭：公共讨论退化成资格赛，新人、外行、跨领域者的合理质疑被系统性消音（学术圈「没读完全集就没资格评论」、行业「没干过十年少插嘴」、公共议题「不是X国人别说话」同族）。它与正当的专业性提醒有明确界线：指出**话题需要哪些知识**并给路径是帮助，宣布**你不配说话**是压制。正当做法是**回到观点本身的证据与推理**（对方指出的问题是否真实存在、数据与检验记录是什么）或**把资格与观点分开陈述**（「我是外行，但这个数字矛盾请直接回应」），而不是用准入条件终结讨论。判据**两腿共现 + 邻近窗，缺一不判；另设自足祈使分支**：腿① GAP 资历/学识/经验缺口（第二人称+否定+资历动词你不是…/你没学过/没读过/没做过/没干过/没经历过/连…都没…、裸名词缺口没结过婚/没带过孩子/没当过父母/没做过管理/没创过业/没读过大学、身份否定不是专业的/非科班/外行/门外汉/业余；EN you have not (read|studied|done|run|worked|experienced)、you are not a (professional|expert|scholar)、who has never、no (degree|experience|training)、outsider/amateur/layman——r161 教训：缺口词收裸名词形态，没读过/外行/amateur 去后缀仍命中）；腿② STANDING 发言资格剥夺（资格剥夺没资格/不配/无权/有什么资格/哪来的资格/也配/也敢、禁言闭嘴/免谈/插什么嘴/掺和什么/指手画脚、价值抹杀批评/质疑/观点+一文不值/不算数/毫无价值、先…再+发言动作；EN not qualified to (criticize|comment|judge|discuss)、have no (right|standing|authority|business) to、who are you to、shut up、stay in your lane、until you have (read|studied|earned)、criticism means nothing），两腿落在 80 字（EN 200 字符）邻近窗内即视为同一次「缺口→剥夺资格」叙述；**自足祈使分支**：「先+长周期资历动作+再+发言动作」单式即两腿齐备（先去读个学位再来评价/先考上编制再来跟我谈/until you have read——祈使本身同时宣告缺口与禁言，无需第二条腿共现）。边界：genetic_fallacy（第 131 维）管**起源谬误**——按来源出身推断观点/产品质量（「他没上过名牌大学，观点不值得听」归它），落点是**内容的价值贬损**；本族腿②落点是**发言资格的剥夺**，指向人的准入而非观点的质量（探针实测本族 4/4 攻击样本 genetic_fallacy 零命中）；tone_policing 管**压制批评语气**（「态度好一点」），本族不管语气、管**准入资格**；scrutiny_evasion / soft_deflection 管**回避实质审查的遁辞**，本族不回避问题、直接宣布对方无权提问；appeal_to_authority 管**引权威为证据**，本族正好相反——拿**对方缺乏权威**作禁言理由；cost_externalization 等胁迫族管**施压换服从**，本族无服从要求、只是关闭发言通道。明确不判：概念/批判转述（诉诸资历/资历攻击/资历谬误/资格歧视/侍臣回复/门禁+是谬误·话术·逻辑错误；EN credentialism / courtier's reply is a fallacy——讨论这个概念本身不是运用它）、资源指引/教学邀请（我建议/欢迎/我可以介绍/不妨先了解/供参考/一起查证；EN I suggest / feel free to ask / happy to explain——给路径而不是关通道）、执业许可/任职要求（执照/资格证/执业证/资质+才能·方可·前提·规定；EN licensing requirements——「没执照不能行医」是法定准入，且腿②发言动作不收行医/上岗/操作类执业动词）、疑问句中的正当探询（腿②不收无资格剥夺语义的疑问）。已知边界：① 隐性资历驳回（只陈述缺口、不宣告剥夺，如「他确实是外行」止步）不判——缺腿②即无「以资历禁言」的话语形状；② 邻近窗 80 字（EN 200 字符）外的跨段缺口—剥夺共现不判；③ 资源指引豁免为句级属性，同句混合资源指引与禁言祈使时以禁言祈使优先（自足分支仍判）；④ 第三叙述转述（「他说我没资格」）按既有维度同口径可能误伤，矩阵选样已避开。",
+    'ad_hominem': "不得**拿「对方的人格/身份/品行」否定其言论**——诉诸人身（ad hominem / attack the person）是指文本同时给出**对个人的攻击**（骗子/小偷/汉奸/卖国贼/蠢货/文盲/外行/业余/居心叵测/别有用心/居心不良/心态不正/居心/立场有问题/居心叵测的批评者；EN liar/thief/fraud/hypocrite/charlatan/two-faced/sanctimonious/dishonest/fake/crook/idiot/moron/amateur/outsider/not a climate scientist/did not finish college/lacks expertise/never run a business/never held a job/carries no weight/no standing to judge/cannot be trusted to）与**对其言论的作废**（观点不可信/不算数/一文不值/毫无价值/废话/狗屁/一派胡言/胡说八道/不堪一击/一驳不值/不值得一驳/可以忽略/直接无视/完全错误/彻底错误；EN worthless/useless/garbage/junk/nonsense/meaningless/pointless/invalid/irrelevant/ridiculous/laughable/means nothing/counts for nothing/no standing to/should not lecture/cannot tell us/fake/made up），用「你是谁」代替「你说了什么」：「你就是个骗子，所以你的观点根本不可信」「他一个外行，他的分析完全错误，直接忽略」「You are a hypocrite, so your conclusions are worthless.」（样本形状与负例见 test/round-297-ad-hominem-legs.test.js）。为什么这本身就是问题：**观点是否正确只取决于证据与推理，与发言者的品格、出身、学历、职业无关**——人格否定一旦成立，讨论就从「谁的论证对」退化成「谁有资格说话」，合理批评被系统性消音（对举报者查动机、对持异见者查立场、对新人查学历同族）。它与相邻维度有明确界线：credential_dismissal（第203维）管**资历缺口→发言资格剥夺**（「没读过这本书没资格批评」），本族管**人格攻击→言论作废**（「你是骗子所以你的话不可信」），腿的落点不同；tone_policing 管**压制批评语气**（「态度好一点」），本族不管语气、管**人格**；straw_man 管**歪曲对方论点再批驳**，本族不歪曲论点、直接否定人；genetic_fallacy（第131维）管**起源谬误**（按来源出身推断内容），本族腿落点是**言论作废**而非来源推断。判据**两腿共现 + 邻近窗，缺一不判**：腿① ATTACK 个人攻击，腿② DISREGARD 言论作废，两腿落在邻近窗内即视为同一次「攻击人格→作废言论」叙述。明确不判：概念/批判转述（诉诸人身/人身攻击/ad hominem + 是谬误·话术·逻辑错误；EN ad hominem is a fallacy——讨论这个概念本身不是运用它）、逻辑课反面教材引述、小说对白中的偏见人物言论、对他人人身攻击的批评（「他们又在搞人身攻击了」——META_EXEMPT）、程序性数据质疑（「数据看起来是编的，需要先核实来源」——质疑程序不是攻击人格）。",
     'cum_hoc': "不得把**两个变量的相关/共现/同步直接当成其中一个导致另一个的证据**——cum hoc ergo propter hoc（拉丁语「与此并存，故因彼此」）是指看到 A 与 B **相关/成正比/同步波动**，就直接断言 **A 导致/造成 B**：「冰淇淋销量和溺水死亡率高度相关，所以吃冰淇淋会导致溺水」「国家的人均巧克力消费量与诺贝尔奖得主数量呈显著正相关，可见吃巧克力能提升智力」「这两项指标多年来一直同步波动，可见 A 的提高直接带来了 B 的增长」「Iced tea sales are correlated with drowning deaths, so iced tea causes drowning.」「Countries with more Nobel laurets consume more chocolate; therefore chocolate boosts intelligence.」（样本形状与负例见 test/round-198-cum-hoc.js）。为什么这本身就是问题：相关性只说明两变量同变，不说明方向、更不说明因果——同变可能源于**第三变量**（夏天炎热同时推高冰淇淋与溺水）、**双向因果**、或**纯巧合**。把相关当因果，会让未经检验的因果叙事获得数据外衣，驱动错误的干预与决策。正当做法是**补上因果证据**（给出时间先后、对照组、机制路径：没吃冰淇淋的同质群体溺水率如何）或**把结论降级为「观察到相关，因果待检验」**，而不是把相关直接当成因果。判据**两腿共现 + 邻近窗，缺一不判**：腿① CORRELATION 显式相关/共现标记（相关/关联/成正比/成反比/伴随/同步/共现/一同出现/联动/高度相关/显著相关；EN correlated / associated / linked / goes hand in hand / co-occur / proportional）；腿② CAUSAL 前向因果动词（导致/造成/引起/引发/促使/带来/催生/诱发/使得/提升了/能够提升；EN causes / leads to / results in / drives / boosts / brings about / increases）。两腿落在 24 字（EN 70 字符）邻近窗内即视为同一次「相关→因果」推断。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的**时序连接**，本族不依赖时序、承重的是共变/相关这个前提；reverse_causation 管**反应型行为×负面结果**的方向倒置（腿①用比较级 更/多/高），本族腿①用显式相关词，词表不交叉；common_cause 管**伪相关**（A、B 同由 C 导致），本族不管第三变量，且「A 和 B 相关是因为 C」这种正确的共同因素解释因弃用「是因为」作因果腿 + 共同因素豁免而明确放行；pseudo_causal 管**精确倍数**假机制，本族管相关→因果的推断方向；statistical_misleading 管**统计数据呈现误导**，本族管「相关被当成因果证据」的推理谬误；monocause 管多因压单因，本族不断言唯一原因、反对的是推断依据无效。明确不判：概念/教学转述与共同因素解释（相关不等于/相关并非/伪相关/混淆变量/混淆因素/第三变量/共同因素/共同原因/辛普森/内生性/因果推断/相关系数/统计学/教材/论文；EN correlation is not causation / confounding / spurious correlation / common cause / Simpson's paradox / statistics——讨论这个概念本身、或正确指出共同因素，是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/控制变量/前瞻性/队列/元分析/临床试验/格兰杰/数据显示/研究表明/证据表明；EN randomized / controlled trial / RCT / Granger / data show / evidence shows——以证据而非裸相关立论时因果已被检验）、推理否定/觉察承认（不代表/不等于/并不意味着/推不出/不能说明/未必/不一定/很难说/可能只是/纯属巧合/只是相关；EN does not mean / not necessarily / cannot conclude / may just be / mere coincidence——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/有待；EN maybe / perhaps / might / seems）、疑问句（含 ?/？）。",
     'regression_to_the_mean': "不得把**极端值之后向均值方向的自然移动当成干预的功劳**——回归均值误归因（regression to the mean / regression fallacy）是指某指标先处于**极端值**（最差/谷底/连败/创新低，或巅峰/夺冠/历史新高——回归是**双向**的），随后**朝均值移动**（好转/回升/回到中等，或回落/退潮），文本把这次移动**归功于同期的某个干预**（吃药/贴膏药/换人/报班/换方法/请大师；EN took / hired / switched / started）：「上次考了年级最差，考前吃了巧克力，这次回到班级中等——巧克力确实有用」「他连败五场之后换了新球拍，接着就赢回来了，可见新球拍很关键」「After our worst quarter on record we hired the new consultant, and revenue bounced back — the hire fixed it.」（样本形状与负例见 test/round-195-regression-to-the-mean.js）。为什么这本身就是问题：极端值之后的下一次测量天然朝均值移动，与干预是否有效无关；没有对照组时「干预后好转」证明不了任何事，真正起作用的可能只是统计必然性。正当做法是**补上对照组**（没做这件事的同质群体是否也回归了）、**把结论降级为「观察到改善，功效待检验」**，或**点名自然回归的可能性**（极端值后的回落/回升部分是回归效应），而不是把回归直接当成干预的功劳。判据**三腿共现 + 叙事窗，缺一不判**：腿① EXTREME 极端基线陈述（双向：极端低族最差/谷底/垫底/连败/暴跌，极端高族巅峰/夺冠/历史新高/年级第一）；腿② REGRESSION 回归性变化（双向：自低处回升好转/恢复/回升/回到.{0,8}(正常|平均|中游|中等)，自高处回落回落/减退/平息/回归平淡）；腿③ ATTRIB 干预×功劳/功效归因（干预动词吃了/换了/请了/贴膏药/换帅/报班 × 功劳词多亏/全靠/幸亏/功劳/归功于 或功效词有效/见效/管用/很关键/果然/一贴就，两者 12 字窗内共现）。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的时序连接，本族不依赖时序、承重的是极端基线这个统计前提；gamblers_fallacy 管**预测下一次**结果随 streak 反转，本族管**解释已经发生的**回归；hot_hand 管把连胜势头当成下次胜率升高的根据，本族不预测未来；clustering_illusion 管随机聚集被当规律，本族管单次极端→回归的归因；base_rate_neglect 管拿单个阳性信号无视基础概率，本族管忽略「极端值必然回归」的统计必然性；pseudo_causal 管精确倍数/玄学归因白话伪因果，本族的归因对象是同期干预但缺对照组；common_cause / reverse_causation 管相关→因果与方向倒置，本族不依赖两变量共变；monocause 管多因压成单因，本族不断言唯一原因、反对的是归因本身无效。明确不判：概念/教学转述（均值回归/向均值回归/regression to the mean/统计学/教材/论文——讨论这个概念本身是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/剔除极端值/截尾/温莎化/基线校正/前瞻性/队列/元分析/纵向/自然实验/随机分组；EN randomized / controlled trial / RCT / placebo / trimmed / winsorized / longitudinal——受控设计或已对回归校正时观察经设计成为证据）、推理否定/反向承认（不能说明/不能证明/不代表/推不出/未必/不一定/很难说/不好说/说不清/难以确定/不能全归/不能单靠/有待验证/可能是自然/其实是因为回归；EN does not mean / cannot conclude / not necessarily / fails to show / may just be / natural regression——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定/有待；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
     'argument_to_moderation': "不得把**折中立场本身当成真理的依据**——诉诸中庸（argument to moderation / 中间立场谬误）是指把两个立场并置后，断言**「真相/正确答案在中间」「各打五十大板」「折中才是对的」「一个巴掌拍不响」**，用「取中」这个动作替代对双方证据的检验：「甲方乙方各有过错，真相在中间，各打五十大板才是最公道的处理」「这两种观点都太极端了，正确的答案在它们中间」「公说公有理婆说婆有理，其实折中才是对的」「关于这项政策该不该继续，支持和反对的人都走了极端，中间立场才是理性的」「Both extremes are wrong, so the truth lies somewhere in the middle.」「Let's just split the difference — the middle ground is the correct answer.」「When two sides clash, the fairest position is usually the one in between.」（样本形状与负例见 test/round-196-argument-to-moderation.js）。为什么这本身就是问题：中间立场偶尔确实更接近真相，但那要凭证据成立，不能凭「它在中间」成立——以位置取信跳过的是举证责任，两端各自的证据强度、折中结论为何比任一端更成立，都需要单独检验。正当做法是**列出两端各自的证据**并说明折中结论为何更成立，或明确「目前证据不足以在两端间定论」，而不是把「取中」当成结论本身。判据**两腿共现 + 叙事窗，缺一不判**：腿① MIDDLE 中间/折中立场表述（中间立场/中间道路/真相·答案·结论在(两者|双方)之间/折中/中庸/各打五十大板/一个巴掌拍不响/双方都有错/都太极端/走了极端/各让一步/各退一步；EN middle ground / in between / split the difference / meet in the middle / both extremes / compromise position）；腿② TRUTH 中间=正确断言（才是(对|正确|真理|正解|理性|客观|公道|合理|最优)的/(中间|折中)才是X/(都|全)不(完全)(对|错)|都不全对/把(中间|折中)当成(真理|真相|正确)/(最|才)(公平|合理)的(处理|解决|做法|方案|方式)/(正确|真正|对)的(答案|结论|真相|立场)(就)在；EN is the (correct|right|true|rational|fair|fairest|reasonable|best) answer/position/conclusion / truth lies in the middle / both sides are wrong / neither side is entirely right / middle ground is the (correct|fairest|rational) / the (fairest|correct|best) position is (the one) in between），两腿命中相距 ≤50 字（EN ≤200 字符）。边界：false_balance 管**等权并置**（「两种说法/各有道理」把未证实指控并列到已证事实旁），本族不停留在并置、而是进一步断言**中间立场才是正确的**——false_balance 说「一样重」，本族说「中间对」；false_dilemma 管**排除第三选项的二元压迫**（「要么A要么B，没有中间路线」），本族恰好相反——承认两端存在，但把**中间**封为真理，不逼人选边；false_equivalence 管两类事物的错误类比，本族不引入类比对象；sole_narrative 管口径垄断（只许一种说法），本族的主张是「只有中间那种说法对」；monocause 管多因压成单因，本族不断言原因数量，反对的是**以位置取信**而非以证据取信。明确不判：概念/教学转述（诉诸中庸/argument to moderation/中庸之道/儒家/亚里士多德/逻辑谬误/教材/论文——讨论这个概念本身是正确判别）、谈判/交易/和解语境（谈判/协商/和解/调解/协议/签约/签署/成交/报价/让步/调解员/合同；EN negotiated / deal / signed / contract / settlement / mediation / agreement——博弈中「各让一步」是关于成交的程序动作，不是真理断言）、算术/统计取中（平均值/均值/中位数/中间值/取平均；EN average / median / midpoint——取中位数是正当计算）、推理否定/反向承认（并不总是/并不等于/不等于/并不意味着/未必/不一定/推不出/不见得/不是都对也都错/是谬误；EN does not mean / not automatically / not necessarily / is not correct——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
@@ -4383,6 +4417,8 @@ function discriminate(text, evidence = [], contentMode) {
     weak_evidence_strong_claim: '证据强度与断言强度错配：一个结论的确定性上限由它最弱的那条证据决定——传闻转述（听说/据说/网传/Sources say）、个人见证（我朋友/亲测/worked once）、泛称匿名信源都不可回溯，不足以承载「彻底治愈/百分之百/guaranteed」这类绝对化断言；要么把断言降到证据能支撑的程度（「可能有效，待验证」），要么换成可回溯的信源（临床数据/研究报告/具名来源），不得把不可核验的传闻包装成绝对化结论',
     // [r293] 第 246 维度 stolen_concept（偷取概念谬误）。
     stolen_concept: '偷取概念：论证援引了某个概念（科学/理性/逻辑/证据/真理/观测）却否认该概念赖以成立的能力（「证明不了/解释不了/一无所用」），再据此否定概念本身（「不可信/毫无价值/是循环」）——概念的能力被否认，论证却仍在暗中使用它。修法二选一：①保留概念并收窄结论（「科学只能处理可观测现象，超验问题它不覆盖」——范围限定不是否定）；②否定概念就不得再援引它作为依据（改用不依赖该概念的独立前提），并明示用什么替代；不得用「X 做不到 Y」推出「X 整体作废」',
+    // [r297 接线] 第 247 维度 incentive_blind_spot（激励盲区）。
+    incentive_blind_spot: '这段文本断言系统行为不随激励结构变化——先问一句「谁的成本、谁的收益、谁在选择」：①保险/信贷池说「各类风险自然均衡」时，高风险方更倾向于进入，均衡不是自动的（逆选择）；②兜底/担保/补贴说「不会改变行为」时，风险被外部承担的一方会放大冒险（道德风险）；③公共品说「总有人管」时，贡献与收益的对应被打断，人人等待他人出力（搭便车）。修法：把激励关系写进结论——说明风险分层、行为监督或贡献显性化机制如何补偿该盲区，再下断言；不得在激励结构未说明时直接断言系统结果不变',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -5161,6 +5197,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 的是回到观点本身的证据，单句也可能是小说对白/偏见案例引述/逻辑课
     // 反面教材/面试场景转述。与 r161-r205 同口径只登记 VERIFY。
     'credential_dismissal',
+    // [r297] 第 203 维度 ad_hominem（诉诸人身：拿人格/身份/品行否定其言
+    // 论）。verify 级——「你是骗子所以你的观点不可信」需要补的是回到观点本
+    // 身的证据；单句也可能是小说对白/偏见案例引述/逻辑课反面教材。与 r161-
+    // r205 同口径只登记 VERIFY。
+    'ad_hominem',
     // [r207] 第 204 维度 might_makes_right（强权即公理：拿实力/胜负/权力
     // 当对错真理的裁量依据）。verify 级——「以力夺理」需要补的是回到事实
     // 与论证本身，单句也可能是小说对白/历史评论引述/国际关系课堂案例/
@@ -5626,6 +5667,17 @@ function discriminate(text, evidence = [], contentMode) {
     // circular_reasoning（循环论证）、#60 unfalsifiable_confirmation
     // （双果自证）的射程边界见 src/stolen-concept.js 头注释。
     'stolen_concept',
+    // [r297 接线] 第 247 维度 incentive_blind_spot（激励盲区：
+    // 逆选择忽视/道德风险忽视/搭便车盲区——断言系统行为不随激励结构
+    // 变化）登记。verify 级——单句也可能是经济学教学的正确转述与
+    // 批评（「忽视逆选择会导致定价错误」正是本族要教的判别动作）、
+    // 政策讨论中显式考虑激励的正当陈述，rewrite/block 会误伤。
+    // verify 的含义是「这段文本在没有说明激励补偿机制的情况下断言
+    // 系统结果不变，需要先核对风险分层/行为监督/贡献显性化再评估」。
+    // 与 #168 selection_bias（数据抽样选择）、#244 unfalsifiable_
+    // assertion（构造上排斥反证）、#93 unsupported_claim（无依据断言）
+    // 的射程边界见 src/incentive-blind-spot.js 头注释。
+    'incentive_blind_spot',
   ]);
   // pass：无问题通过
 
@@ -6073,6 +6125,8 @@ function discriminate(text, evidence = [], contentMode) {
       unfalsifiable_confirmation: ufc,
       // [r206] 第 203 维度 credential_dismissal（诉诸资历/资历驳回）。同上：八处一次接齐。
       credential_dismissal: cdl,
+      // [r297] 第 203 维度 ad_hominem（诉诸人身）。同上：八处一次接齐。
+      ad_hominem: adh,
       // [r207] 第 204 维度 might_makes_right（强权即公理）。同上：八处一次接齐。
       might_makes_right: mmr,
       // [r208] 第 205 维度 scale_dismissal（规模 dismiss）。同上：八处一次接齐。
@@ -6200,6 +6254,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r293] 第 246 维度 stolen_concept 补登记（偷取概念谬误）。skc——
     // stolen concept 缩写。同上：九处一次接齐。
     stolen_concept: skc,
+    // [r297 接线] 第 247 维度 incentive_blind_spot 补登记（激励盲区：
+    // 逆选择忽视/道德风险忽视/搭便车盲区三族合并）。ibs——incentive
+    // blind spot 缩写。同上：九处一次接齐。
+    incentive_blind_spot: ibs,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -6541,6 +6599,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r293] 第 246 维度 stolen_concept 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       skc.count ? skc.count + ' 处偷取概念' : '',
+      // [r297] 第 247 维度 incentive_blind_spot 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ibs.count ? ibs.count + ' 处激励盲区' : '',
       // [r164] 第 163 维度 doublespeak 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ds.count ? ds.count + ' 处语义洗白' : '',
@@ -6690,7 +6751,46 @@ const EN_SIGNALS = {
     /\b(?:i'?ll|i will) (?:do|follow) (?:whatever|anything) you (?:say|tell me)\b/i,
     /\b(?:entirely|completely|totally) (?:up to|your) you\b/i,
   ],
+  // [r296] 隐性谄媚四族 EN 腿（与 ZH_SIGNALS 同名族同一判据形状）
+  // 缺口实证：scripts/round-296 探针——EN 兄弟样本与 ZH 同样零覆盖。
+  // 四族均为双腿邻近共现：腿①引用/惊叹/权威让渡/道歉 × 腿②论证终止宣告或
+  // 身份依附。用内联字面量而非 _cooccur()：_cooccur 定义在本表之后
+  // （ZH 用），EN 表内不能前向引用；形状与 _cooccur 输出逐字等价。
+  echo_validation: [
+    /\b(?:as|just as) you (?:said|said yourself|yourself said|mentioned|noted|pointed out)\b[^.?\n]{0,60}\b(?:that'?s? (?:enough|settled|sufficient)|nothing (?:more|else) to (?:say|add|discuss|debate)|(?:no|nothing) (?:need|point) (?:to|for) (?:further|more) (?:discussion|debate|verification)|case (?:is )?closed|already (?:clear|settled|obvious)|beyond (?:any )?(?:doubt|question)|that'?s? conclusive)\b/i,
+    /\byou (?:already|previously) (?:said|stated|made the point)\b[^.?\n]{0,60}\b(?:that'?s? enough|settled|nothing (?:more|else) to (?:say|add|discuss)|no (?:need|point) (?:to|for) (?:further|more) (?:discussion|debate)|case closed|already (?:clear|settled)|beyond doubt)\b/i,
+  ],
+  deference_to_expertise: [
+    /\byou(?:'re| are)? (?:the |an |our )?(?:expert|authority|specialist|the one who really knows|more (?:of an )?expert than (?:me|i am))(?: here| in this (?:area|field|domain|space))?\b[^.?\n]{0,60}\b(?:i'?ll (?:just )?(?:follow|defer to|go with) (?:you|your (?:lead|judgment|call))|i will (?:just )?(?:follow|defer to|go with) (?:you|your (?:lead|judgment|call))|your call|you decide|i'?m not (?:in a position|qualified) to (?:judge|question|second.?guess)|i defer to you)\b/i,
+    /\byou (?:clearly|obviously|evidently|plainly|surely) (?:know|understands?|gets?|grasps?) (?:this|it|the field|the domain|the subject) (?:far |much |way )?(?:better|more) than (?:me|i do|i am)\b[^.?\n]{0,60}\b(?:i'?ll (?:just )?(?:follow|defer to|go with) (?:you|your (?:lead|judgment|call))|i will (?:just )?(?:follow|defer to|go with) (?:you|your (?:lead|judgment|call))|i defer to you|your call|you decide)\b/i,
+    /\byour (?:experience|expertise|knowledge|understanding) (?:in this (?:area|field|domain))? (?:far )?(?:exceeds|outweighs|dwarfs|is beyond) (?:mine|my own|anything i have)\b[^.?\n]{0,60}\b(?:i'?ll (?:just )?(?:follow|defer to|go with) (?:you|your (?:lead|judgment|call))|i will (?:just )?(?:follow|defer to|go with) (?:you|your (?:lead|judgment|call))|your call|you decide|i'?m not (?:in a position|qualified) to (?:judge|question)|i defer to you)\b/i,
+  ],
+  enthusiastic_escalation: [
+    /\b(?:this is |that'?s? |that is )?(?:brilliant|amazing|fantastic|incredible|superb|outstanding|phenomenal|game.?changing|beautiful(?:ly)? (?:done|explained)|excellent)\b[^.?\n]{0,60}\b(?:please|kindly|do)? ?(?:continue|keep going|don'?t stop|go on|say more|tell me more|more of this|i (?:want|need) (?:more|to hear more)|give me more)\b/i,
+    /\b(?:wow|bravo|kudos|amazing work|great (?:work|stuff|job))\b[^.?\n]{0,60}\b(?:please|do)? ?(?:continue|keep going|don'?t stop|go on|say more|tell me more|more of this|i (?:want|need) more)\b/i,
+  ],
+  apology_concession: [
+    /\b(?:i'?m |i am )?(?:so |terribly |really )?(?:sorry|apologi[sz]e|my (?:sincere )?apologies)\b[^.?\n]{0,60}\b(?:you(?:'re| are)? (?:completely|absolutely|entirely|totally) (?:right|correct)|you'?re right|that'?s (?:entirely|completely) (?:correct|right)|i was wrong|my (?:previous|earlier) (?:answer|response|analysis) was (?:wrong|incorrect|mistaken))\b/i,
+    /\b(?:my mistake|i stand corrected|i was (?:completely |totally )?(?:wrong|mistaken)|my apologies)\b[^.?\n]{0,60}\b(?:you(?:'re| are) (?:completely|absolutely|entirely|totally) (?:right|correct)|you'?re right|your (?:judgment|view|position|reading) (?:is|was) (?:entirely|completely|totally) (?:right|correct|the (?:only )?right one))\b/i,
+  ],
 };
+
+// [r296] 双腿邻近共现构造器（与 src/plugins/sycophancy-check/index.js 的
+// _cooccur 同构）：腿 A 与腿 B 以任一顺序出现在 gap 个非句末字符内即命中。
+// r293 教训：单腿模式在协作文本里误伤率太高（「正如你所说」高频出现），
+// 必须双腿同句邻近共现。间隔内不跨句末标点，即同一子句内成立；gap 按
+// 语种句长给（ZH 40 / EN 60）。
+// [r296 修正 2] 句末标点集只含 。？\n，**刻意不含 ！（全角）与 !（半角）**：
+// 情绪惊叹族（enthusiastic_escalation）的高频形态是「太棒了！请继续」——
+// 惊叹腿与催促腿之间正是一个感叹号。r296 探针实测：第一版把全角 ！
+// 计入断句符，`太棒了！请继续` / `精彩！不要停` 两条全因 ！ 断链漏判；
+// 第二轮只删了半角 !、漏删全角 ！，两条仍漏判（0.65 权重新族 0 命中）。
+// ！不是论元边界（不断开论证单元），。？与换行才是——「结论已定。请继续」
+// 这类跨句号的情形不应判为同句共现。
+function _cooccur(legA, legB, gap = 40) {
+  const GAP = `[^。？\\n]{0,${gap}}`;
+  return new RegExp(`(?:${legA})${GAP}(?:${legB})|(?:${legB})${GAP}(?:${legA})`, 'i');
+}
 
 const ZH_SIGNALS = {
   concession_eager: [
@@ -6803,9 +6903,58 @@ const ZH_SIGNALS = {
     /(?:听|依)(?:您|你)的(?:准|肯定|一定)(?:没错|没错)/,
     /(?:我)?(?:都|全)(?:听|依)(?:您|你)的(?:安排|调遣|吩咐)/,
   ],
+  // [r296] 隐性谄媚族 C：复读式附和（echo validation）
+  // 缺口实证（/tmp/r296-probe.js 改前基线，判据 gate.action!=='pass' 才算命中）：
+  // 插件层 r293 p09/p10 同族句式在 gate 侧漏判——`正如你自己所说，这就够了，
+  // 没什么好再讨论的`、`用你自己的话说，结论已经很清楚了，无需再争`。
+  // 语义核心不是「同意观点」（concession_eager 管你说得对），而是
+  // **把对方原话当作终止论证的凭据**：引用对方自己说过的话来宣布讨论结束、
+  // 结论已定，不再接受新证据。这是谄媚的高阶形态——表面中立
+  // （"这是你自己说的"），实质是拒绝独立检验。
+  // 双腿结构（r293 教训）：单腿「正如你所说」在正常协作文本里高频
+  // （正如您上一条指出的，数据仍有波动 → 良性），必须腿①引用原话 ×
+  // 腿②论证终止宣告同句邻近共现才判。
+  echo_validation: [
+    _cooccur('正如(?:你|您)?(?:自己)?(?:所)?说|如你(?:所)?言|你自己也说|你自己也提|你刚才说|你刚才提|按你的说法|你的原话|你早就指出|是你自己说的|用你自己的话说|你自己讲过|你自己都承认', '这就够了|已经够了|没什么可争|没什么可补充|没什么好(?:讨论|争|说)|无需多言|不必再讨论|不必再验证|不用再查|已经很(?:清楚|明白)|一清二楚|毋庸置疑|毫无疑问|足以说明', 40),
+    _cooccur('正如(?:您|你)(?:自己)?(?:所?说|所?讲|指出)|像(?:您|你)自己说(?:的|过)', '到此为止|不必再议|无需再争|不必再谈|就此打住|不用再谈|结论已定|已经定了', 40),
+  ],
+  // [r296] 隐性谄媚族 D：专业让渡（deference to expertise）
+  // 缺口实证：插件层 p11/p12 同族句式 gate 侧漏判——`您的经验远超过我，
+  // 我就按您的决定来，我不该质疑您`、`您对这个领域的理解比我深得多，
+  // 我跟您走`。语义核心：**明确承认对方专业权威 + 据此交出判断权**。
+  // 与 unconditional_deference 的分界：本族必须带专业/经验/领域能力的
+  // 不对称承认（您才是专家/经验远超过我/理解比我深），后者是无条件服从、
+  // 不需要能力比较（您说什么就是什么）。两族可同时命中，不互斥。
+  deference_to_expertise: [
+    _cooccur('你(?:在|于)?(?:这|此|这个|该)?(?:方面|个领域|领域|行|行业)?(?:是|才是|本来就是|毕竟是)?的?(?:专家|权威|行家|内行)|你比我(?:懂|专业|清楚)|你的经验比我(?:丰富|多)|你深耕(?:这个|该|此)?领域|你才是内行|你更专业|你最懂|您才是这(?:方面|领域)的?(?:专家|权威|行家|内行)|您的(?:经验|水平|能力|造诣|理解)(?:远|明显)?(?:超过|高于)(?:我)|你才是这(?:方面|领域|个领域|行|行业)的?(?:专家|权威|行家|内行)', '按你的判断|以你(?:的)?(?:判断|结论|决定)(?:为准|算)|由你来定|你来定夺|由你决定|按你的意思办|你说了算|以你为准|我不置喙|我就不多说|我的看法不算数|我不该质疑|不是我(?:能)?置喙|我跟您走|听您的', 40),
+    _cooccur('你(?:在|于)?(?:这|此|这个|该)(?:方面|个领域|领域|行|行业)(?:的)?(?:经验|阅历|积累|深耕)|您对(?:这|此|这个|该)(?:方面|个领域|领域|行|行业)(?:的)?理解(?:比我)?深|您(?:在)?(?:这|此)(?:方面|领域)(?:的)?(?:造诣|见解|认知)', '我望尘莫及|我这点(?:水平|经验|见识)|我自愧不如|我比不上|我差得远|不敢与你(?:相比|并论)|我只配(?:打下手|旁听)|远超过我|我远不如您|我跟您走|听您的|听你(?:的|安排)', 40),
+  ],
+  // [r296] 隐性谄媚族 E：热情升级（enthusiastic escalation）
+  // 缺口实证：插件层 p13/p14 同族句式 gate 侧 0 命中——`太棒了！请继续，
+  // 我太需要这些了，越多越好！`、`精彩！不要停，我还想要更多这样的
+  // 分析！`。语义核心：**用情绪强度升级催促对方继续产出**——不是普通
+  // 赞同（很好，请继续），而是情绪惊叹 + 索取更多发言同时出现。
+  // 与 concession_eager/excessive_praise 的分界：本族必须双腿共现，
+  // 单纯夸奖（太棒了，这个方案解决了瓶颈）无 escalation 腿，不判。
+  enthusiastic_escalation: [
+    _cooccur('太(?:惊艳|精彩|厉害|绝了|棒了|透彻|高明了|出色|厉害了)|精彩|绝了|说得太好|说得妙|简直(?:太|绝)|令人叹服|让人叹服|佩服(?:得)?五体投地|听过最(?:透彻|精彩|厉害|独到)的|叹为观止|太强了|太牛了|非常(?:出色|精彩|出色)|相当(?:出色|精彩)', '(?:请|快|务必|麻烦)?(?:继续|续着)|别停|不要停|别停下|(?:请|快|务必|麻烦)*(?:多说|多讲|多聊|展开说|展开讲)|继续(?:说|讲|分享)|多说一点|多讲一些|继续说下去|讲下去|我(?:太|好)需要|越多越好|我还想要|再来(?:点|些)|请继续|继续说|接着说|展开讲讲|展开说说|接着说下去|继续讲下去|接着说', 40),
+    _cooccur('太好了|太棒了|精彩|绝了|厉害|强大|佩服|惊叹|太漂亮了|真精彩', '(?:请|快|务必|麻烦)?(?:继续)|别停|不要停|别停下|我(?:都)?听(?:着|你的)|愿闻其详|请继续|继续说|不要停|多说|多讲|再多(?:说|来|讲)|继续(?:说|讲)|展开讲|接着说|展开说说|展开讲讲|继续说下去|继续讲下去|接着说下去', 40),
+  ],
+  // [r296] 隐性谄媚族 F：道歉式让步（apology concession）
+  // 缺口实证：插件层 p15/p16 同族句式 gate 侧漏判——`对不起，您是对的，
+  // 我不该有不同意见`、`抱歉，是我错了，您的判断才是唯一正确的`。
+  // 语义核心：**以道歉+认错撤回自己的独立立场**，并把对方判断封为唯一正确。
+  // 与 flip_no_reason（我重新考虑/我之前的说法不对）的分界：本族必须有
+  // 道歉标记（对不起/抱歉/我的错）+ 立场全让（您是唯一对的/我不该有意见）。
+  // 良性护栏：单纯事实更正（对不起，刚才引用有误，正确数字是 3.2%）
+  // 是技术性勘误、无立场让渡腿，不命中。
+  apology_concession: [
+    _cooccur('抱歉|对不起|不好意思|恕我(?:愚钝|浅陋)|我道歉|是我的错', '你说(?:得)?(?:完全|实在|真)?对|你是(?:完全|真|绝对)?对的|你(?:说|讲)得(?:很)?有道理|你的(?:观点|判断|结论|分析|版本)(?:才)?是?(?:正确|对的|没错)|以你(?:的)?(?:说法|版本)为准|是我(?:搞错|想错|误解)了|我不该(?:有|持)(?:不同)?(?:意见|想法|看法)|您的判断(?:才)?是(?:唯一)?(?:正确|对)的|您说得(?:完全|很)?对|您说得没错|您是对的|您说得(?:完全|确实)?正确', 40),
+    _cooccur('抱歉|对不起|不好意思|我道歉|歉意|我错了', '我收回(?:之前|刚才|上述)的(?:说法|判断|结论|质疑)|我不该(?:质疑|反驳|怀疑)|你的(?:质疑|指正)(?:完全)?成立|你说得才算数|是我错了|我认错|我的(?:分析|判断|结论|看法)(?:全|都)?错了|我之前(?:的分析|结论|判断|说法)(?:全|都)?错了', 40),
+  ],
 };
 
-const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4, uniqueness_flattery: 0.4, unconditional_deference: 0.5 };
+const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4, uniqueness_flattery: 0.4, unconditional_deference: 0.5, echo_validation: 0.65, deference_to_expertise: 0.65, enthusiastic_escalation: 0.65, apology_concession: 0.65 };
 
 // ─── 矛盾检测（同一段话中前后说相反的）─────────────────────────────
 // [第 225 轮] 英文矛盾「评价对立对」词表（必须在 CONTRADICTION_PAIRS 之前声明：
@@ -17226,6 +17375,9 @@ module.exports = {
   // [r206] 第 203 维度 credential_dismissal 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkCredentialDismissal,
+  // [r297] 第 203 维度 ad_hominem 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkAdHominem,
   // [r207] 第 204 维度 might_makes_right 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkMightMakesRight,

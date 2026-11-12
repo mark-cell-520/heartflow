@@ -315,7 +315,11 @@ console.log('=== E 引擎 think 路径真 dispatch ===');
     const { discriminate } = require(path.join(ROOT, 'src/index.js'));
     const d = discriminate('neutral baseline text');
     const n = Object.keys(d.dimensions || {}).length;
-    assert.strictEqual(n, 246, `维度数 ${n} ≠ 246`);
+    // r301 注：原断言 246 锚定 r296 接线时的维度数。r297/r299 WIP 已把
+    // ad_hominem（第203维）与 incentive_blind_spot（第247维）接入 gate
+    // 维度表（src/index.js 接线 + VERIFY_DIMS 登记），真实维度数为 248，
+    // 与 guard-abilities 门禁实测一致。锚更新为 248。
+    assert.strictEqual(n, 248, `维度数 ${n} ≠ 248`);
     // 本轮三族键不得出现在 gate 维度表（gate 层零接线，交接项给 1 号）
     const newKeys = Object.keys(d.dimensions || {}).filter(k => /adverse_selection|moral_hazard|free_rider/.test(k));
     assert.strictEqual(newKeys.length, 0, `gate 维度表出现本轮族键: ${newKeys.join(',')}`);

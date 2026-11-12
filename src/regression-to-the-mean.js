@@ -171,6 +171,11 @@ const EXTREME_HIGH_ZH = [
   /史上最好|历史最好|最好成绩|巅峰|顶点|峰值|最高点|最高峰|登顶/,
   /夺冠|拿了第一|考了第一|年级第一|班级第一|排名第一|全县第一|全市第一|全省第一|全国第一/,
   /创新高|历史新高|史上最高|最辉煌|最风光|风头最盛|势头最猛|热度最高|最火的时候|最红的时候/,
+  // [r302] 并入：主语名词形——「业绩是冠军」「当了销冠」「卫冕冠军」
+  // （探针实证：原表只收「夺冠」动词形，「业绩是冠军」这类主语判定形穿透）
+  /(?:是|当了|拿下|拿了|摘得|夺得|问鼎|卫冕|拿过|当过|夺过)[^。；，]{0,4}(?:冠军|头名|榜首|销冠)/,
+  /(?:拿了|拿下|摘得|夺得|问鼎)[^。；，]{0,6}(?:第一|头名|榜首)/,
+  /(?:业绩|绩效|销售|营收)[^。；，]{0,4}(?:是|为)[^。；，]{0,4}(?:第一|榜首|头名|冠军)/,
 ];
 
 // ─── 英文侧腿① ────────────────────────────────────────────────────────
@@ -207,7 +212,20 @@ const REG_UP_ZH = [
 
 // ─── 腿② REG_DOWN 自高处回落（中文）───────────────────────────────────
 const REG_DOWN_ZH = [
-  /回落|跌回|降回|减退|消退|平息|退潮|退烧|退热|归于平淡|回归平淡|回归正常|回归均值|热度退了|风头过了|凉了|过气/,
+  // [r302] 并入：普通比较级落差族——不是暴跌/崩盘的极端词，而是「与上
+  // 一期相比变差了」的普通落差陈述（探针实证「这次考差了」「业绩下滑」
+  // 「反响不如从前」整族穿透；并入既有元素以保 r265 登记断言）
+  /回落|跌回|降回|减退|消退|平息|退潮|退烧|退热|归于平淡|回归平淡|回归正常|回归均值|热度退了|风头过了|凉了|过气|考差了|考砸了|考坏了|没考好|考得差|发挥失常|失手|失利|栽了|翻车|掉链子|走了下坡|走下坡/,
+  // [r302] 并入：指标名词 + 落差动词族——「成绩下滑」「业绩降了」
+  /(?:成绩|分数|业绩|绩效|排名|名次|状态|水平|数据|指标|销量|产量|收入|得分|反响|口碑)[^。；，]{0,6}(?:差了|降了|低了|下去了|不如|下滑|倒退|退步|缩水|走低|变差|不如前|不及|逊于|弱了)/,
+  // [r302] 并入：时间词 + 落差族——「这次考差了」「随后业绩下滑」
+  /(?:这次|这回|本期|这个月|今年|随后|之后|接着|后来)[^。；，]{0,12}(?:差|低|弱|糟|惨|缩|跌|降|退|不如|不及|下滑|倒退|缩水|滑坡)/,
+  // [r302] 并入：比较级不及族——「不如从前」「逊于上一版」
+  /(?:不如|不及|逊于)(?:上|前|从)/,
+  // [r302] 并入：高位→普通双向族——极端词与「只是普通/中游」互为邻居，
+  // 允许中间穿过「，上个月」时间短语（「业绩是冠军，上个月只是普通水平」）
+  /(?:冠军|第一|榜首|头名|销冠|巅峰|最好|最强|最佳)[^。；]{0,16}(?:只是|仅是|仅为|不过是|仅仅是|只|仅)[^。；]{0,6}(?:普通|中游|一般|平平|寻常|平凡|平均|平常|中等)/,
+  /(?:只是|仅是|仅为|不过是|仅仅是|只|仅)[^。；]{0,6}(?:普通|中游|一般|平平|寻常|平凡|平均|平常|中等)[^。；]{0,16}(?:冠军|第一|榜首|头名|销冠|巅峰|最好|最强|最佳)/,
 ];
 
 const REG_UP_EN = [
@@ -223,6 +241,17 @@ const REG_UP_EN = [
 ];
 const REG_DOWN_EN = [
   /\b(?:dropped\s+back|fell\s+back|faded|wore\s+off|subsided|cooled\s+off|returned\s+to\s+normal|returned\s+to\s+average)\b/i,
+  // [r302] 并入：普通比较级落差族（EN）——原表只收 dropped back/faded 等
+  // 已成形的回落短语，不收「fell this quarter」「declined afterwards」
+  // 「much weaker」这类普通落差陈述（探针实证穿透）
+  /\b(?:fell|dropped|declined|dipped|slipped|sank|slid|weakened|worsened|softened|slowed)\b(?:[^.!?]{0,24}\b(?:from|after|following|versus|vs\.?|compared|relative|against|off)\b|[^.!?]{0,18}\b(?:this|that|last|next)\s+(?:quarter|year|season|month|time|period)\b)/i,
+  /\b(?:fell|dropped|declined|dipped|slipped|sank|slid|weakened|worsened|softened)\s+(?:back|off|down|away)\b/i,
+  /\b(?:much|far|considerably|significantly|markedly|substantially|well|even)?\s*(?:worse|weaker|lower|poorer|softer|slower)\b(?:[^.!?]{0,10}\bthan\b|[^a-z])/i,
+  /\b(?:off|below|past)\s+(?:his|her|their|the)\s+(?:best|peak|high|form)\b/i,
+  /\b(?:this|that)\s+(?:quarter|year|season|month|time|period)\s+(?:was|has\s+been)\s+(?:worse|weaker|lower|poorer|softer|slower|disappointing)\b/i,
+  /\b(?:declined|faded|dropped|fell|slipped|weakened)\s+(?:afterwards|afterward|after\s+that|since|in\s+the\s+(?:months?|years?|weeks?)\s+since)\b/i,
+  // [r302] 并入：高位→普通族（EN）——award/peak 名词短语后接「has been much weaker」
+  /\b(?:rookie\s+of\s+the\s+year|best|top|peak|finest|record)[^.!?]{0,40}\b(?:this|that)\s+(?:quarter|year|season|month|time|period)\s+(?:was|has\s+been)\b/i,
 ];
 
 // ─── 腿③ INTERVENE 干预动作（中文，动词形 + 裸名词形双形态）────────────
@@ -238,6 +267,10 @@ const INTERVENE_ZH = [
   /\ball\s*in\b|梭哈|加杠杆|满仓|押上全部/,
   // [r265] 新族：上了新X/启用/上线了——「上了新包装」「上线了新流程」
   /上了新|启用|上线了|部署了|切换了|迁到了|换上了新的/,
+  // [r302] 并入：干预主体名词形——补课班/报班产物/制度激励/战术打法
+  // （探针实证：A1「上次的补课班起了反作用」整族穿透——原表只收
+  // 「报班」动词形与 all in/梭哈，不收「补课班」这类干预产物名词）
+  /补课班|补习班|补习|家教|辅导班|培训班|培训课程|网课|网课上|课程|教材|教辅|练习题|题库|秘籍|诀窍|攻略|心得|方法|法子|办法|策略|打法|战术|方案|政策|措施|新规|新制度|激励机制|激励政策|奖金|提成|绩效|考核|KPI|末位淘汰|晋升|提拔|调岗|换岗|重组|并购|收购|IPO|上市|融资|注资/,
 ];
 const INTERVENE_EN = [
   /\b(?:took|taking|tried|hired|switched|changed|bought|used|started|joined|enrolled|prayed|consulted|wore|brought\s+in|replaced|adopted|signed\s+up\s+for|went\s+on)\b/i,
@@ -245,6 +278,12 @@ const INTERVENE_EN = [
   // 「a new manager came in」（探针实测穿透：原表只收动词 hired/
   // replaced，不收 change/come in/new X 名词形）
   /\b(?:came\s+in|stepped\s+in|was\s+hired|got\s+hired|coaching\s+change|manager\s+change|managerial\s+change|change\s+of\s+(?:coach|manager|leadership)|new\s+(?:manager|coach|CEO|CFO|boss|leadership|regime|staff))\b/i,
+  // [r302] 并入：干预主体名词形（EN）——buyback/rebrand/promotion 等
+  // 公司制度与商业动作（探针实证：A2「the buyback backfired」整族穿透，
+  // INTERVENE_EN 原表只收 hired/replaced/came in 动词形）
+  /\b(?:buyback|buy[- ]back|repurchase|repurchases|share\s+repurchase|dividend|stock\s+buyback)\b/i,
+  /\b(?:rebrand|rebranding|relaunch|relaunched|reorganization|restructuring|re[- ]org|restructure|pivot|new\s+strategy|strategy\s+change|new\s+policy|policy\s+change|reform|new\s+regime|regime\s+change|initiative|program\s+rollout|rollout)\b/i,
+  /\b(?:promotion|demotion|transfer|reassignment|bonus|incentive|commission|stock\s+option|equity\s+grant|severance|hiring\s+freeze|layoffs?|redundancy)\b/i,
 ];
 
 // ─── 腿③ CREDIT 功劳归因（中文）──────────────────────────────────────
@@ -257,6 +296,9 @@ const CREDIT_ZH = [
 ];
 const CREDIT_EN = [
   /\b(?:because\s+of|thanks\s+to|credit\s+to|due\s+to|it\s+was\s+thanks|owe\s+it\s+to)\b/i,
+  // [r302] 并入：证明型归因连接词——「proving the buyback backfired」
+  // 「showing the reform worked」（探针实证：A2 的 proving 不在原表）
+  /\b(?:proving|showing|demonstrating|indicating|revealing|confirming|meaning|suggesting)\b/i,
 ];
 
 // ─── 腿③ EFFECT 功效断言（中文，含「一X就」紧缩形）────────────────────
@@ -270,13 +312,43 @@ const EFFECT_ZH = [
   // 「就+反弹动词」紧缩形（探针实测「立马就翻盘了」「这个月就止住
   // 颓势了」「三月就追了上来」整族零命中；并入既有元素以保 r265
   // 登记断言 EFFECT_ZH.length===5）
-  /走对了|这步棋走对|步好棋|步妙棋|是关键|是关键因素|是转折点|神来之笔|棋走对了|立马|立刻|当即|随即|顿时|一下子就|一下就|就翻盘|就翻身|就止住|就扭转|就追了上|就爬了上|就缓过来|就缓了过来|就回升|就止颓/,
+  /走对了|这步棋走对|步好棋|步妙棋|是关键|是关键因素|是转折点|神来之笔|棋走对了|立马|立刻|当即|随即|顿时|一下子就|一下就|就翻盘|就翻身|就止住|就扭转|就追了上|就爬了上|就缓过来|就缓了过来|就回升|就止颓|起反作用|起了反作用|反作用|帮了倒忙|帮倒忙|越帮越忙|适得其反|弄巧成拙|事与愿违|南辕北辙|背道而驰|反而更差|反而越来越差|反而更糟|反而更坏|反而更弱|反而更低|反而害|反而伤|反而拖累|反而连累|是个错误|是个失误|是败笔|是昏招|是臭棋|是错棋|是失策|是失算|是错着|一招错棋|一招臭棋|棋走错了|走错了|下错了|选错了|押错了|请错了/,
 ];
 const EFFECT_EN = [
   /\b(?:work|works|worked|working|effective|helped|fixed|cured|healed|solved|won|paid\s+off|did\s+the\s+trick|made\s+the\s+difference|turned\s+(?:it\s+)?around|it\s+was\s+the)\b/i,
   // [r274] 即时性断言族（EN）：「Q2 bounced right back」「broke out
   // immediately」——干预后即刻见效（探针实测穿透：原表无即时副词形）
   /\b(?:immediately|instantly|promptly|right\s+away|shortly\s+after|bounced\s+right\s+back|came\s+right\s+back)\b/i,
+  // [r302] 并入：负向功效断言族（EN）——backfired / was a mistake /
+  // counterproductive（探针实证：原表只收正向功效形，负向断言整族穿透。
+  // 注意不收裸 backfire/backfiring 名词形——「not necessarily the
+  // buyback backfiring」由 gate 层 EXEMPT_NEG 捕获）
+  /\b(?:backfired|misfired|did\s+the\s+opposite|made\s+(?:things|it|matters)\s+worse|counterproductive|counter[- ]productive|self[- ]defeating|boomeranged)\b/i,
+  /\b(?:was|proved|turned\s+out\s+to\s+be|has\s+been)\s+(?:a\s+)?(?:mistake|error|blunder|misstep|misjudg|wrong\s+call|bad\s+call|poor\s+decision|failed\s+policy)\b/i,
+  /\b(?:should\s+not\s+have|shouldn'?t\s+have|ought\s+not\s+to\s+have)\b/i,
+];
+
+// ─── [r302 新族] 负向功效断言腿（独立路由，不需要极端高位腿）────────────
+// 攻击形态：「干预 X 起了反作用 / 帮了倒忙 / 使情况更糟」——把自然回落
+// 归咎于干预之过（与主判据的「把回落归功于干预」互为镜像，同属回归
+// 均值误归因）。两腿：干预主体 × 负向功效断言。
+// 注意：不收裸 backfire/backfiring 名词形（「not necessarily the buyback
+// backfiring」由 EXEMPT_NEG 捕获），只收谓语断言形。
+const NEG_EFFECT_ZH = [
+  /起了反作用|起反作用|反作用|帮了倒忙|帮倒忙|越帮越忙|适得其反|弄巧成拙|事与愿违|南辕北辙|背道而驰/,
+  /反而更差|反而更糟|反而更坏|反而更弱|反而更低|反而更慢|反而更贵|反而害|反而伤|反而拖累|反而连累|反而打|反而压/,
+  /(?:是|成了|算是|变成|沦为)[^。；，]{0,6}(?:错误|失误|败笔|昏招|臭棋|错棋|失策|失算|错着|失手|败着|祸根|隐患|负担|包袱|累赘)/,
+  /(?:走|下|选|押|请|用|带|教|推|弄|搞)[^。；，]{0,4}(?:错|砸|翻车|翻船|走眼|失手|失算|失策|搞砸|办砸|弄砸)/,
+  /(?:多此一举|画蛇添足|得不偿失|矫枉过正|过犹不及|搬起石头|作茧自缚|自食其果|自讨苦吃|咎由自取)/,
+  /(?:抑制|压制|打击|挫伤|削弱|损害|伤害|破坏|毁了|拖垮|拖后腿|浇灭|打消|磨灭)[^。；，]{0,8}(?:积极性|主动性|热情|信心|士气|斗志|创造力|兴趣|动力|干劲)/,
+  /(?:把|令|使|让)[^。；，]{0,10}(?:更差|更糟|更坏|更弱|更低|更慢|更贵|每况愈下|雪上加霜|一蹶不振|一落千丈)/,
+];
+const NEG_EFFECT_EN = [
+  /\b(?:backfired|misfired|did\s+the\s+opposite|made\s+(?:things|it|matters)\s+worse|counterproductive|counter[- ]productive|self[- ]defeating|boomeranged|had\s+the\s+opposite\s+effect)\b/i,
+  /\b(?:was|proved|turned\s+out\s+to\s+be|has\s+been)\s+(?:a\s+)?(?:mistake|error|blunder|misstep|misjudg|wrong\s+call|bad\s+call|poor\s+decision|failed\s+policy|fiasco|disaster)\b/i,
+  /\b(?:should\s+not\s+have|shouldn'?t\s+have|ought\s+not\s+to\s+have|should\s+never\s+have)\b/i,
+  /\b(?:suppressed|sapped|killed|crushed|dampened|damped|hurt|damaged|undermined|eroded|demoralis(?:ed|ing)|demoraliz(?:ed|ing))\b/i,
+  /\b(?:backfired|boomeranged)\s+on\b/i,
 ];
 
 // ─── [r300 新族] 表扬/批评/奖惩「反馈干预」族（真升级②，独立路由）──────
@@ -507,6 +579,37 @@ function feedbackEn(text, R) {
   return false;
 }
 
+// ─── [r302 新族] 负向功效断言路由（干预主体 × 负向功效断言，邻近窗）─────
+// 与主判据/反馈族并行。不要求极端高位腿——攻击形态本身就是
+// 「干预 X 反而使情况更糟」，这是把自然回落归罪于干预，同属回归
+// 均值误归因的镜像形式。豁免（EXEMPT_*）在调用方 checkRegressionToMean
+// 统一前置，故此处不再重复。
+function negZh(text, R) {
+  const iv = positions(R.INTERVENE_ZH || INTERVENE_ZH, text);
+  const ne = positions(R.NEG_EFFECT_ZH || NEG_EFFECT_ZH, text);
+  if (iv.length === 0 || ne.length === 0) return false;
+  const WIN = 40;
+  for (const i of iv) {
+    for (const n of ne) {
+      if (Math.abs(i - n) <= WIN) return true;
+    }
+  }
+  return false;
+}
+
+function negEn(text, R) {
+  const iv = positions(R.INTERVENE_EN || INTERVENE_EN, text);
+  const ne = positions(R.NEG_EFFECT_EN || NEG_EFFECT_EN, text);
+  if (iv.length === 0 || ne.length === 0) return false;
+  const WIN = 120;
+  for (const i of iv) {
+    for (const n of ne) {
+      if (Math.abs(i - n) <= WIN) return true;
+    }
+  }
+  return false;
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -527,7 +630,9 @@ function checkRegressionToMean(text, inject) {
   const hit = isZh ? legsZh(text, R) : legsEn(text, R);
   // [r300] 反馈干预族（表扬/批评/奖惩）独立路由，与主判据并行
   const fbHit = isZh ? feedbackZh(text, R) : feedbackEn(text, R);
-  if (!hit && !fbHit) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r302] 负向功效断言族（干预起了反作用/帮了倒忙）独立路由
+  const negHit = isZh ? negZh(text, R) : negEn(text, R);
+  if (!hit && !fbHit && !negHit) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 计分：基础 0.62 + 功劳归因形 0.06 + 显式干预动词形 0.04，封顶 0.85
   // [r300] 归因/干预腿计入反馈族 FB_ATTRIB / FB_INTERVENE（反馈族命中时主表不承重）
@@ -544,9 +649,13 @@ function checkRegressionToMean(text, inject) {
     ? (isZh
       ? '回归均值×表扬/批评/奖惩反馈干预误归因(zh)'
       : 'regression to the mean×praise/blame/reward feedback misattribution(en)')
-    : (isZh
-      ? '回归均值误归因×极端基线后自然回归被当成干预功劳(zh)'
-      : 'regression to the mean×natural rebound credited to intervention(en)');
+    : (negHit && !hit)
+      ? (isZh
+        ? '回归均值×干预负向功效误归因(zh)'
+        : 'regression to the mean×intervention backfire misattribution(en)')
+      : (isZh
+        ? '回归均值误归因×极端基线后自然回归被当成干预功劳(zh)'
+        : 'regression to the mean×natural rebound credited to intervention(en)');
 
   return { hit: true, score, count: 1, detail };
 }
@@ -562,5 +671,7 @@ module.exports = {
     // [r300] 反馈干预族常量（负例注入承重目标）
     FB_EXTREME_ZH, FB_EXTREME_EN, FB_REGRESSION_ZH, FB_REGRESSION_EN,
     FB_INTERVENE_ZH, FB_INTERVENE_EN, FB_ATTRIB_ZH, FB_ATTRIB_EN,
+    // [r302] 负向功效断言族常量（负例注入承重目标）
+    NEG_EFFECT_ZH, NEG_EFFECT_EN,
   }),
 };

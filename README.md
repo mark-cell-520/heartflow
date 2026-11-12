@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-246-blueviolet.svg)](#what-it-catches-246-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-248-blueviolet.svg)](#what-it-catches-248-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-246 discrimination dimensions  ×  11-layer pipeline  ×  163 modules  ×  188 MCP tools
-×  1,323 dispatch routes  ×  21,577 passing tests  ×  2 npm dependencies
+248 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  190 MCP tools
+×  1,341 dispatch routes  ×  21,517 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 246 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 248 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (246 dimensions) -> gate
+scope-check -> premise-check -> discriminate (248 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -171,7 +171,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 163 modules)
+### Capability domains (7 domains, 164 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (246 dimensions)
+## What it catches (248 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **213 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **215 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,16 +204,16 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.174**. Not marketing copy.
+Measured on this repository at **v6.8.175**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 163 |
+| Modules registered | 164 |
 | Module init errors | 0 |
-| Dispatch routes | 1,323 |
-| Discrimination dimensions | 246 |
-| MCP tools | 188 |
-| Test suite | 21,577 passing / 145 failing | `node test/run-all.js` (full run 2026-11-12 ~750s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293；r301 接续 r300 基线（21,483/145/21,628），唯一 +22 即本轮新测试 round-301-law-of-averages.test.js（gamblers_fallacy 第148维『长期平均论证短期补偿/连发形追投』新措辞家族，22 断言单独 mount 实测 22/22 全过、池中自报同格式可解析），失败数 145 逐条持平；r302 接续 r301 基线（21,505/145/21,650），唯一 +12 即本轮新测试 round-302-law-of-small-numbers-quant.test.js（law_of_small_numbers 第239维『小样本→数量化总体裁定（概率/比率/均值）』新措辞家族，12 断言单独 mount 实测 12/12 全过、池中自报同格式可解析），失败数 145 逐条持平；r303 接续 r302 基线（21,517/145/21,662），唯一 +31 即本轮新测试 round-303-average-marginal-rate.test.js（average_marginal_conflation 第214维『产量/效率/速率型平均值→边际量』新措辞家族，31 断言单独 mount 实测 31/31 全过、池中自报行同 round-290 形态因 JOBS=4 交错未被解析器按序捕获、非真实失败），失败数 145 逐条持平；r304 接续 r303 基线（21,548/145/21,693），唯一 +29 即本轮新测试 round-304-weak-evidence-ai-source.test.js（weak_evidence_strong_claim 第245维『AI 模型输出与社交平台视频/直播/博主作为不可回溯弱证据信源』新措辞家族，29 断言单独 mount 实测 29/29 全过、池中自报同格式可解析），失败数 145 逐条持平） |
+| Dispatch routes | 1,341 |
+| Discrimination dimensions | 248 |
+| MCP tools | 190 |
+| Test suite | 21,517 passing / 145 failing | `node test/run-all.js` (full run 2026-11-12 ~750s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293；r301 接续 r300 基线（21,483/145/21,628），唯一 +22 即本轮新测试 round-301-law-of-averages.test.js（gamblers_fallacy 第148维『长期平均论证短期补偿/连发形追投』新措辞家族，22 断言单独 mount 实测 22/22 全过、池中自报同格式可解析），失败数 145 逐条持平；r302 接续 r301 基线（21,505/145/21,650），唯一 +12 即本轮新测试 round-302-law-of-small-numbers-quant.test.js（law_of_small_numbers 第239维『小样本→数量化总体裁定（概率/比率/均值）』新措辞家族，12 断言单独 mount 实测 12/12 全过、池中自报同格式可解析），失败数 145 逐条持平；r303 接续 r302 基线（21,517/145/21,662），唯一 +31 即本轮新测试 round-303-average-marginal-rate.test.js（average_marginal_conflation 第214维『产量/效率/速率型平均值→边际量』新措辞家族，31 断言单独 mount 实测 31/31 全过、池中自报行同 round-290 形态因 JOBS=4 交错未被解析器按序捕获、非真实失败），失败数 145 逐条持平；r304 接续 r303 基线（21,548/145/21,693），唯一 +29 即本轮新测试 round-304-weak-evidence-ai-source.test.js（weak_evidence_strong_claim 第245维『AI 模型输出与社交平台视频/直播/博主作为不可回溯弱证据信源』新措辞家族，29 断言单独 mount 实测 29/29 全过、池中自报同格式可解析），失败数 145 逐条持平） |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -381,7 +381,8 @@ This table exists so a reader can see the shape of the line in ten seconds, not 
 duplicate the log.
 
 | Version | Date | Change |
-|---------|------|--------|
+|--------|-------|--------|
+| 6.8.175 | 2026-11-12 | r302：`regression_to_the_mean` 干预负向功效断言族上线（真升级②）——`src/regression-to-the-mean.js` 新增独立两腿路由 `negZh`/`negEn`（干预主体 × 负向功效断言，含补习班/辅导班/课程/教材/题库/秘笈/攻略 与 buyback/restructuring/promotion/layoffs 等名词族），把自然回落归罪于干预之过；维度 248 不变、`src/index.js` 零改动；轮测 11/11、变体矩阵攻击 8/8 非 pass、良性 7/7 clean；四门禁 verify 16/0、guard 20/20@248、双向 52/52+302/326、doc 24/24 |
 | 6.8.170 | 2026-11-11 | r288（原 r287 撞号重编号）：第 245 维度 `weak_evidence_strong_claim` 弱证据强断言错配上线（真升级①）——弱证据腿 × 绝对化断言腿双腿共现，维度 244→245、VERIFY 211→212、模块 162 不变；`src/index.js` 接线 8 处；轮测注入删条全绿；论文依据 arXiv 2605.03534（SURE-RAG）|
 | 6.8.169 | 2026-11-11 | r287（原 r286 撞号重编号）：`false_dilemma` 站队胁迫二分族上线（真升级②）——认同等同式/否定行为×负面定性单独支/逼迫二选/EN 立场负载 either-or/施压/威胁后果 8 常量 + 3 路由，维度计数 244 不变、`src/index.js` 零改动；轮测 84/84、注入删条 8/8、池化穿透 5/8→0/8 |
 | 6.8.171 | 2026-11-11 | r289：`false_dilemma` 要么A要么B×贬损标签族上线（真升级②）——要么-frame/不是A就是B frame × 定性等式（就是-link）× 贬损标签（拖后腿/绊脚石/老古董/躺平摆烂/dead weight）、否定行为×主语插入×品质标签（不转这个帖子，你就是没良心）、EN if you're not with us…against us/either you join…dead weight 共 6 常量 + 5 路由，维度计数 245 不变、`src/index.js` 零改动；轮测 96/96、注入删条 6/6、池化穿透 8/9→0/9 |

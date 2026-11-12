@@ -26,11 +26,15 @@ const WRITE_TOOLS = [
   'heartflow_memory_eraser',
   'heartflow_decision_decide',
   'heartflow_self_heal',
+  // [r298] memoryIndex 写工具（WRITE_TOOLS 收口新增项，同步进抽样清单）
+  'heartflow_memory_index_write',
 ];
 
 const READ_TOOLS = [
   'heartflow_think',
   'heartflow_check_output',
+  // [r298] memoryIndex 读工具（读不拦，验证 guest 可调）
+  'heartflow_memory_index_read',
 ];
 
 function argsFor(tool) {
@@ -38,6 +42,8 @@ function argsFor(tool) {
   if (tool === 'heartflow_decision_decide') return { task: 't', options: [] };
   if (tool === 'heartflow_think') return { input: 'test' };
   if (tool === 'heartflow_check_output') return { text: 'test' };
+  if (tool === 'heartflow_memory_index_write') return { action: 'addSkill', payload: { name: 'perm-test-probe', level: 'probe' } };
+  if (tool === 'heartflow_memory_index_read') return { action: 'healthCheck' };
   return { action: 'stats' };
 }
 

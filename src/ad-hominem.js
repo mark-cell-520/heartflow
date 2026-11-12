@@ -118,6 +118,12 @@ const ATTACK_ZH = new RegExp(
   '|不是这个专业|不是学这个的|不是搞这个的|专业不对口|跨行|外行说内行|外行指导内行' +
   '|不懂装懂|半懂不懂|半瓶水|一瓶不满半瓶晃|一知半解|略懂|懂点皮毛|皮毛都不懂' +
   '|没资格|哪来的资格|凭什么|也配|哪配|算老几|你算|你能|就凭你|你行你上|你行你来做' +
+  // c2 [r298] 无经验否定族（从来没做过这一行/没干过这行/没做过这个工作）
+  // ——r298 探针实测：「他从来没做过这一行，所以他的分析完全错误」腿②命中
+  // （完全错误）但腿① false。与 ATTACK_EN c4 族形态对应。
+  '|(?:从来|从未|压根|根本|完全)?(?:没|未)(?:有)?(?:做过|干过|搞过|做过|经历过|接触过|入过)(?:这|那)?(?:一|几)?(?:行|个行|行当|门|块|领域|方面|类|种)(?:工作|活儿|事情|事)?' +
+  '|(?:从来|从未|压根|根本)?(?:没|未)(?:做过|干过|搞过|经历过|接触过)(?:这个|那个|这类|那类|任何)?(?:工作|活儿|项目|事情|业务|职业|岗位)' +
+  '|(?:入行|从业)(?:时间|经历)?(?:很|太|挺|非常)?(?:短|少|浅|不够|不足)' +
   '|水平有限|水平不行|能力不够|能力不足|资历不够|资历浅|经验不足|too inexperienced)' +
   // d 阵营/利益归因
   '|(?:既得利益者|既得利益|利益相关方|利益集团|被收买|收买了|拿了钱的|拿钱的|拿钱办事|拿了钱办事|收钱的|收了钱|收人钱财|拿人钱财|替人消灾|替人说话' +
@@ -178,6 +184,25 @@ const ATTACK_EN = new RegExp(
   // c2 not even a / not a real（否定专业身份）
   "|\\bnot\\s+even\\s+a?n?\\s*[a-z]+(?:ist|er|or|ian|ician|expert|professional|scientist|engineer|doctor|professor|researcher|analyst|economist|statistician|journalist|lawyer|academic)\\b" +
   "|\\b(?:is|are)\\s+(?:not\\s+)?a?\\s*(?:real|true|qualified|credentialed|licensed|accredited)\\s+(?:scientist|engineer|doctor|expert|professional|researcher|analyst|economist|academic|scholar|journalist|statistician)" +
+  // c3 [r296] 简单否定专业身份（not a climate scientist / not an industry expert /
+  // not professional auditors / no data scientist / not lawyers）——主语连接放宽、
+  // 冠词可选、职业名多词修饰、复数。与 credential_dismissal GAP_EN 形态对齐。
+  "|\\b(?:you'?re|you\\s+are|he'?s|he\\s+is|she'?s|she\\s+is|they'?re|they\\s+are|we'?re|we\\s+are)\\s+(?:not|no)\\s+(?:a|an)?\\s*(?:[\\w-]+\\s+){0,3}(?:scientist|researcher|analyst|expert|specialist|economist|statistician|engineer|doctor|lawyer|academic|scholar|practitioner|professional|historian|journalist|clinician|auditor|manager|founder)s?\\b" +
+  "|\\b(?:didn'?t|did\\s+not|never)\\s+(?:finish|complete|graduate(?:\\s+from)?|attend)\\s+(?:\\w+\\s+){0,2}(?:college|university|school|grad\\s+school)\\b" +
+  "|\\b(?:lacks?|lacking|without)\\s+(?:any\\s+|the\\s+|enough\\s+|sufficient\\s+)?(?:expertise|experience|standing|qualifications?|authority|credibility|training|background)\\b" +
+  "|\\b(?:has\\s+)?never\\s+(?:run|worked\\s+(?:at|in)|built|managed|led|taught|studied|practiced)\\s+(?:a|an|any)?\\s*(?:business|company|team|school|lab|project|field|industry|finance|law|medicine|tech|education|government|nonprofit|startup|labour|labor)\\b" +
+  "|\\b(?:outsiders?|amateurs?|laym[ae]n|laypeople|laypersons?|non[- ]professionals?|dilettantes?)\\b" +
+  // c4 [r298] 无经验否定族（has never done this kind of work / never worked in
+  // the field）——r298 探针实测漏判：「他从来没做过这一行，所以他的分析
+  // 完全错误」腿②命中但腿① false。与 ZH 从来没做过这一行 形态对应。
+  "|\\b(?:has|have|had)\\s+(?:never\\s+)?(?:done|worked\\s+(?:in|on)|built|shipped|delivered|handled|seen)\\s+(?:this|that|these|any|real|actual)?\\s*(?:kind\\s+of\\s+)?(?:work|job|project|thing|line\\s+of\\s+work|business|field|industry)\\b" +
+  "|\\b(?:never|didn'?t|did\\s+not)\\s+(?:done|worked\\s+(?:in|on)|built|shipped|delivered|handled)\\s+(?:this|that|any|real)?\\s*(?:kind\\s+of\\s+)?(?:work|job|thing|business|field|industry)\\b" +
+  // c5 [r298] 成果连带贬损（their assessment is invalid / his reasoning is
+  // fundamentally flawed）——攻击落点是「归属人的成果被定性为废」，属对
+  // 提出论点者的能力连带否定（腿① c 类延伸）。r298 探针实测：「Their
+  // assessment of our process is invalid, so we can ignore it.」腿②命中
+  // （is invalid）但腿① false。
+  "|\\b(?:his|her|their|your|our)\\s+(?:assessment|analysis|reasoning|logic|argument|report|paper|study|conclusions?|findings?|work|critique|criticism|method|methodology|model|numbers?|data)\\s+(?:\\w+\\s+){0,3}(?:is|are)\\s+(?:invalid|wrong|flawed|fundamentally\\s+flawed|worthless|junk|nonsense|garbage|irrelevant|meaningless|misguided|baseless|unfounded)\\b" +
   // e motive
   "|\\b(?:attention\\s+seeking|clout\\s+chasing|chasing\\s+clout|fame\\s+seeking|wants\\s+attention" +
   "|wants\\s+to\\s+go\\s+viral|rags?\\s+to\\s+riches|bandwagon|jumping\\s+on\\s+the\\s+bandwagon" +
@@ -252,6 +277,19 @@ const DISREGARD_EN = new RegExp(
   "|\\b(?:dismiss|discount|disregard|reject)\\s+(?:his|her|their)\\s+(?:opinion|view|take|argument|analysis|claim|data)" +
   "|\\bnot\\s+worth\\s+(?:considering|listening|responding|engaging|dignifying|a\\s+response)" +
   "|\\b(?:deserves?|deserving|merits?|meriting)\\s+(?:no|zero|little)\\s+(?:response|reply|attention|consideration|credence|weight|rebuttal|answer)" +
+  // d [r296] 采信否定族——与 credential_dismissal STANDING_EN 对齐
+  // d1 no standing/right/authority/qualifications to <动作>
+  "|\\b(?:no|not\\s+enough|without|lack(?:s|ing)?)\\s+(?:\\w+\\s+){0,2}(?:standing|right|authority|qualifications?|credibility|expertise|basis|grounds?)\\s+to\\s+(?:judge|evaluate|assess|decide|rate|rank|grade|comment|critique|review|opine|weigh\\s+in|say|speak|talk|lecture|dictate|preach)\\b" +
+  // d2 <意见/分析> means/counts for nothing
+  "|\\b(?:opinion|view|take|argument|analysis|claim|advice|word|position|stance|criticism|input|thoughts?)\\s+(?:means?|counts?|amounts?)\\s+(?:for\\s+)?(?:nothing|little|zero|next\\s+to\\s+nothing)\\b" +
+  // d3 should not/may not + <专业动作>（含 us 宾语）
+  "|\\b(?:should\\s+not|shouldn'?t|may\\s+not|must\\s+not|can'?t|cannot|ought\\s+not\\s+to|has\\s+no\\s+business)\\s+(?:\\w+\\s+){0,2}(?:lecture|dictate|preach|tell|teach|advise|instruct|judge|evaluate|assess|comment|opine|weigh\\s+in|give)\\s+(?:us|me|him|her|them|anyone|people)?\\b" +
+  // d4 fake / fabricated / made up（内容作废形容词，原表漏 fake）
+  "|\\b(?:is|are|'s|s)?\\s*(?:completely\\s+|totally\\s+|utterly\\s+|just\\s+|simply\\s+|plain\\s+)?(?:fake|fabricated|forged|made\\s+up|cooked|doctored)\\b" +
+  // d5 your/our/their + <结论> is worthless/garbage（原 c 段只收 his/her/their）
+  "|\\b(?:your|our|their|his|her|the)\\s+(?:conclusion[s]?|argument[s]?|claim[s]?|opinion[s]?|view[s]?|analysis|reasoning|logic|numbers?|statistics?|data|findings?|work|paper|report|theory|model|critique|criticism|assessment|take)\\s+(?:\\w+\\s+){0,4}(?:is|are)\\s+(?:worthless|useless|garbage|junk|nonsense|meaningless|pointless|invalid|irrelevant|ridiculous|laughable)\\b",
+  // [r297] 'i' 曾被拼进 source（成为 ...laughable)\bi 的尾字母），导致 d5 段
+  //        永不匹配且 flags 丢失——改为 flags 参数
   'i'
 );
 
@@ -265,6 +303,16 @@ const LEGAL_FACT_EXEMPT = /(?:受贿|受贿罪|渎职|滥用职权|贪污|挪用
 const META_EXEMPT = /(?:这|那就是|这就是|这正是|那正是|属于|属于一种|称为|所谓|所谓的那种|是一种|这是一种|典型的|常见的|经典的)(?:一种|典型的|常见的|经典的|隐性|常见|典型|明显)?(?:人身攻击|诉诸人身|ad hominem|argumentum ad hominem|ad hominem attack|personal attack)|(?:人身攻击|诉诸人身|ad hominem|personal attack|argumentum ad hominem)(?:是|属于|是一种|正是|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型)?(?:谬误|谬说|逻辑错误|逻辑谬误|错误论证|非形式谬误|话术|手法|手段|策略|伎俩|套路|现象|问题|错误|fallacy|manipulation|tactic|rhetorical technique|form of|symptom of|common)/i;
 
 // ─── 豁免四：自嘲与自愿担责（攻击对象是说话者自己，且请求谅解/纠错）──
+// [r298] 局部否定豁免（PARTIAL_CRITIQUE_EXEMPT）——正当批评与人身攻击的界线：
+// 「Your analysis is wrong on point three, but the overall approach is sound.」
+// 是局部否定+整体肯定的正当批评，不是因人废言。r298 c5 补腿实测误伤 5/5
+// （见 scripts/round-298/r298-c5-fp-probe.js），故新增本护栏。
+// 判据：局部限定语（on point N / in one respect / in part / on the second
+// point / here / in this section）与整体肯定/转折标志（but / however /
+// though / overall / the rest / otherwise / nonetheless）**共现**才豁免——
+// 单有局部限定无转折（整体作废句可能恰好含 here）不放行。
+const PARTIAL_CRITIQUE_EXEMPT = /(?:\b(?:on|in|at)\s+(?:the\s+)?(?:(?:first|second|third|fourth|fifth|last|final|next|previous|one|two|other|main|key|central|single|only|individual)\s+){0,2}(?:point|aspect|respect|detail|section|part|step|claim|area|question|issue)s?\b|\bin\s+(?:one|this|that|a)\s+(?:respect|aspect|area|detail|particular)\b|\bhere\b|\bin\s+part\b|\bpartially\b|\bminor\s+(?:point|issue|quibble|detail)\b)[^.?!]{0,120}?(?:\b(?:but|however|though|although|yet|nonetheless|nevertheless|overall|otherwise|on\s+the\s+whole|the\s+rest|rest\s+of|apart\s+from|aside\s+from|except\s+for)\b)/i;
+
 const SELF_DEPRECATION_EXEMPT = /(?:我|咱|俺|本人|在下)(?:是|只是个|不过是|一个|就是个|也就一个)?[^。！？；\n]{0,12}(?:外行|门外汉|业余|新手|菜鸟|小白|水平有限|能力有限|不太懂|不懂|不专业|非专业|没学过|初学|入门|新人|生手|手生)[^。！？；\n]{0,20}(?:请|还望|望|恳请|多多|多|尽管|欢迎|欢迎指出|欢迎纠正|欢迎拍砖|包涵|见谅|多包涵|多见谅|指正|赐教|纠错|拍砖|批评|指点|opinions? welcome|correct me|please be gentle|take this with a grain of salt|if I'?m wrong)/i;
 
 /**
@@ -283,6 +331,7 @@ function checkAdHominem(text, inject) {
   const LEGAL_FACT_EXEMPT_ = R.LEGAL_FACT_EXEMPT || LEGAL_FACT_EXEMPT;
   const META_EXEMPT_ = R.META_EXEMPT || META_EXEMPT;
   const SELF_DEPRECATION_EXEMPT_ = R.SELF_DEPRECATION_EXEMPT || SELF_DEPRECATION_EXEMPT;
+  const PARTIAL_CRITIQUE_EXEMPT_ = R.PARTIAL_CRITIQUE_EXEMPT || PARTIAL_CRITIQUE_EXEMPT;
 
   // 评析这套话术 → 不是运用它
   if (META_EXEMPT_.test(text)) {
@@ -298,6 +347,10 @@ function checkAdHominem(text, inject) {
   }
   // 自嘲与自愿担责：攻击对象是说话者自己且请求谅解/纠错
   if (SELF_DEPRECATION_EXEMPT_.test(text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  // 局部否定：正当的局部批评+整体肯定不是因人废言
+  if (PARTIAL_CRITIQUE_EXEMPT_.test(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
@@ -323,5 +376,5 @@ function checkAdHominem(text, inject) {
 
 module.exports = {
   checkAdHominem,
-  __internals: () => ({ ATTACK_ZH, ATTACK_EN, DISREGARD_ZH, DISREGARD_EN, ANTIFRAUD_EXEMPT, LEGAL_FACT_EXEMPT, META_EXEMPT, SELF_DEPRECATION_EXEMPT }),
+  __internals: () => ({ ATTACK_ZH, ATTACK_EN, DISREGARD_ZH, DISREGARD_EN, ANTIFRAUD_EXEMPT, LEGAL_FACT_EXEMPT, META_EXEMPT, SELF_DEPRECATION_EXEMPT, PARTIAL_CRITIQUE_EXEMPT }),
 };

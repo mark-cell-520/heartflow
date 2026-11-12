@@ -131,8 +131,31 @@ const GAP_EN = [
   /\b(?:has\s+)?never\s+(?:run|worked\s+at|built|managed|led|taught|studied|practiced)\s+(?:a|an|any)?\s*(?:business|company|team|school|lab|project|field|industry)\b/i,
   // no (degree|experience|training|track record|credentials)
   /\b(?:has\s+)?no\s+(?:degree|experience|training|track\s+record|credentials?|qualifications?|background)\b/i,
-  // outsider / amateur / layman（裸名词）
-  /\b(?:outsider|amateur|layman|layperson|non[- ]professional|dilettante)\b/i,
+  // [r296] didn't finish (college|school|university) / skipped (college|grad school)
+  // [r296 审计修正] 动词补过去式：r296 首版只收 finish/complete 原形，实测
+  // `He never finished university, so his criticism means nothing.` 腿①漏判
+  // （审计复跑 r296-leg-debug：never finished → gap=-）。didn't finish 形态
+  // 原形已收，但 never finished / he completed 的 -ed 形态不匹配，补上。
+  /\b(?:didn'?t|did\s+not|never)\s+(?:finish|finished|complete|completed|graduate|graduated|attend|attended)\s+(?:\w+\s+){0,2}(?:college|university|school|grad\s+school)\b/i,
+  // [r296] 复合职业名身份否定：not a climate scientist / not an industry expert
+  // （主语连接放宽 you're/he's/they are…；冠词可选——not professional
+  //  auditors / no data scientist 无冠词形态；职业名允许多词修饰）
+  /\b(?:you'?re|you\s+are|he'?s|he\s+is|she'?s|she\s+is|they'?re|they\s+are|we'?re|we\s+are)\s+(?:not|no)\s+(?:a|an)?\s*(?:[\w-]+\s+){0,3}(?:scientist|researcher|analyst|expert|specialist|economist|statistician|engineer|doctor|lawyer|academic|scholar|practitioner|professional|historian|journalist|clinician|auditor|manager|founder)s?\b/i,
+  // [r296] lack(s)/without + 资格名词（裸缺口形，无 no/never 前缀）
+  /\b(?:lacks?|lacking|without)\s+(?:any\s+|the\s+|enough\s+|sufficient\s+)?(?:expertise|experience|standing|qualifications?|authority|credibility|training|background)\b/i,
+  // [r296] 行业名词补入 never worked 槽位（finance/law/medicine/tech/education…）
+  /\b(?:has\s+)?never\s+(?:run|worked\s+(?:at|in)|built|managed|led|taught|studied|practiced)\s+(?:a|an|any)?\s*(?:business|company|team|school|lab|project|field|industry|finance|law|medicine|tech|education|government|nonprofit|startup|labour|labor)\b/i,
+  // outsider / amateur / layman（裸名词；[r296] 补复数 outsiders/laymen）
+  /\b(?:outsiders?|amateurs?|laym[ae]n|laypeople|laypersons?|non[- ]professionals?|dilettantes?)\b/i,
+  // [r296] without + 资格名词（without a degree/any experience/any standing）
+  /\bwithout\s+(?:a|an|any|the|enough|sufficient)\s+(?:\w+\s+){0,2}(?:degree|experience|training|standing|qualification[s]?|expertise|background|credential[s]?)\b/i,
+  // [r296] never held/never had + 职业/岗位名词（never held a real job / never had a real job）
+  // [r296 审计修正] 补 any/practical/sufficient 三修饰与 acquired/accumulated：
+  // 实测 `She never had any real experience in the field.` 腿①漏判（名词表
+  // 无 experience，experience 只在 no/lacks/without 槽位）。并入 experience
+  // 与 track record 后此腿与 no experience 族重叠但形态互补（never had
+  // vs no），保留双轨。
+  /\bnever\s+(?:held|had|got|obtained|earned|acquired|accumulated)\s+(?:a|an|any)?\s*(?:real\s+|proper\s+|practical\s+|actual\s+){0,3}(?:job|position|post|role|office|degree|title|experience|training|track\s+record|background|expertise)\b/i,
 ];
 
 // ─── 腿② STANDING 发言资格剥夺（中文）────────────────────────────
@@ -175,8 +198,23 @@ const STANDING_EN = [
   // until you have (read|studied|earned|done) …
   /\b(?:until|before)\s+you\s+(?:have|'?ve)\s+(?:read|studied|earned|got(?:ten)?|done|run|built|proven)\b/i,
   // (criticism|opinion|view) means nothing / is worthless（允许中间隔修饰语）
-  /\b(?:criticism|critique|opinion|view|complaint|argument|objection)[^.]{0,20}(?:means|is)\s+(?:nothing|worthless|invalid|irrelevant|beneath\s+contempt)\b/i,
-  /\b(?:not|never)\s+(?:been|done)\s+[^.]{0,40}?\bso\s+(?:your|his|her|their)\s+(?:criticism|opinion|view|judgment)\s+(?:means|is|counts)/i,
+  // [r296 审计修正] 补 counts for nothing / is nonsense / is meaningless /
+  // deserves no response 三族：r296 首版 means nothing 只覆盖 means/is，审计
+  // 复跑 r296-leg-debug 实测 `your opinion counts for nothing`、`their
+  // criticism deserves no response`、`your analysis is nonsense` 腿②全漏
+  // （standing=-）。counts for 与 deserves 不限于 nothing 一个补足。
+  /\b(?:criticism|critique|opinion|view|complaint|argument|objection|analysis|assessment|take|input|report|paper|study|conclusion|findings?|work|numbers?|data)[^.]{0,20}(?:means|is|are|counts for|carries)\s+(?:nothing|worthless|invalid|irrelevant|nonsense|meaningless|beneath\s+contempt)/i,
+  /\b(?:criticism|critique|opinion|view|complaint|argument|objection|analysis|objection)\s+deserves\s+no\s+(?:response|reply|attention|credence|consideration)\b/i,
+  /(?:not|never)\s+(?:been|done)\s+[^.]{0,40}?\bso\s+(?:your|his|her|their)\s+(?:criticism|opinion|view|judgment)\s+(?:means|is|counts)/i,
+  // [r296] can/may/should be dismissed（被动采信否定，不收 be worth 类正当评价）
+  /\b(?:can|could|may|might|should|must|ought\s+to|is\s+to|are\s+to)\s+(?:safely\s+|simply\s+|just\s+|therefore\s+|thus\s+|easily\s+)*be\s+(?:dismissed|disregarded|discounted|ignored|rejected|set\s+aside)\b/i,
+  // [r296] 裸判断动作剥夺（no qualifications/standing to judge/evaluate/assess/decide…）
+  /\b(?:no|not\s+enough|without|lack(?:s|ing)?)\s+(?:\w+\s+){0,2}(?:qualifications?|standing|authority|credibility|expertise|basis|grounds?)\s+to\s+(?:judge|evaluate|assess|decide|rate|rank|grade|comment|critique|review|opine|weigh\s+in)\b/i,
+  // [r296] 能力/行动剥夺（cannot/shouldn't + 专业动作）
+  /\b(?:can'?t|cannot|can\s+not|should\s+not|shouldn'?t|may\s+not|must\s+not|ought\s+not\s+to|has\s+no\s+business)\s+(?:\w+\s+){0,2}(?:review|comment|judge|evaluate|assess|lecture|advise|opine|weigh\s+in|dictate|preach|tell\s+us|teach\s+us|give)\b/i,
+  // [r296] 采信否定（ignore/disregard/discount + 指代宾语；carries no weight）
+  /\b(?:ignore|disregard|discredit|discount|dismiss)\s+(?:his|her|their|the|this|these|any|all)?\s*(?:\w+\s+){0,2}(?:opinion|view|analysis|take|claim|argument|thesis|work|model|paper|report|conclusion|findings?|advice)\b/i,
+  /\b(?:carries?|has|holds)\s+no\s+(?:weight|credence|authority|validity|force)\b/i,
 ];
 
 // ─── 豁免一：概念/批判转述（讨论这个概念本身不是运用它）────────────

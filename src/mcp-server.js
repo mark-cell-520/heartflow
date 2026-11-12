@@ -242,6 +242,11 @@ const WRITE_TOOLS = new Set([
   'heartflow_meta_memory',
   'heartflow_memory_bank',
   'heartflow_project_context',
+  // [r298] memoryIndex 写操作：updateUser/addFeedback/setCurrentWork/
+  // addPausedTask/removePausedTask/addUnresolvedProblem/resolveProblem/
+  // addSkill/recordBoot 全部落盘 data/memory-index.json，收口到 user 角色。
+  // 对应读工具 heartflow_memory_index_read 不在此集合（纯读不拦）。
+  'heartflow_memory_index_write',
   // 审计账本（可被篡改即失去审计意义）
   'heartflow_retention_log',
   'heartflow_outbound_ledger',
@@ -4925,6 +4930,57 @@ const HANDLERS = {
       const inst = new MemoryBank({ silent: true, rootPath: HF_DIR });
       const r = inst.getStats ? inst.getStats() : (inst.recall ? inst.recall(args?.query || '') : {});
       return { result: r, timestamp: Date.now() };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [r298] memoryIndex 读操作接线：实例在 heartflow.js L1465 构造、
+  // 22 方法完整，r298 探针实测接线前 dispatch 22/22 全 not allowed。
+  // 读方法白名单显式枚举（防止 printBootSummary 等控制台输出型方法
+  // 经 MCP 调用产生噪声；_ 前缀私有方法天然被 instanceof 检查挡不住，
+  // 故用枚举收口而非通配）。
+  heartflow_memory_index_read: (args) => {
+    try {
+      const { MemoryIndex } = require('./memory/memory-index.js');
+      const inst = new MemoryIndex(HF_DIR);
+      const READ_ACTIONS = {
+        getIdentity: () => inst.getIdentity(),
+        getUser: () => inst.getUser(),
+        getFeedback: () => inst.getFeedback(),
+        getProject: () => inst.getProject(),
+        getContext: () => inst.getContext(),
+        getIndex: () => inst.getIndex(),
+        getBootSummary: () => inst.getBootSummary(),
+        healthCheck: () => inst.healthCheck(),
+      };
+      const action = args?.action || 'getContext';
+      const fn = READ_ACTIONS[action];
+      if (!fn) return { error: `不支持的读操作: ${action}（可用: ${Object.keys(READ_ACTIONS).join(', ')}）` };
+      const r = fn();
+      return { result: r, action, timestamp: Date.now() };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [r298] memoryIndex 写操作接线：写方法同样显式枚举，
+  // guest 拦截由 WRITE_TOOLS（heartflow_memory_index_write）统一收口。
+  heartflow_memory_index_write: (args) => {
+    try {
+      const { MemoryIndex } = require('./memory/memory-index.js');
+      const inst = new MemoryIndex(HF_DIR);
+      const p = args?.payload || {};
+      const WRITE_ACTIONS = {
+        updateUser: () => inst.updateUser(p),
+        addFeedback: () => inst.addFeedback(p),
+        setCurrentWork: () => inst.setCurrentWork(p),
+        addPausedTask: () => inst.addPausedTask(p),
+        removePausedTask: () => inst.removePausedTask(p?.id !== undefined ? p.id : p),
+        addUnresolvedProblem: () => inst.addUnresolvedProblem(p),
+        resolveProblem: () => inst.resolveProblem(p?.id !== undefined ? p.id : p),
+        addSkill: () => inst.addSkill(p),
+        recordBoot: () => inst.recordBoot(p),
+      };
+      const action = args?.action;
+      const fn = action && WRITE_ACTIONS[action];
+      if (!fn) return { error: `不支持的写操作: ${action}（可用: ${Object.keys(WRITE_ACTIONS).join(', ')}）` };
+      const r = fn();
+      return { result: r, action, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
   heartflow_memory_write_control: (args) => {

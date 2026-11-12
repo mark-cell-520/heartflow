@@ -146,7 +146,10 @@ t('登记-dimensions/导出/__internals/存量长度不变', () => {
   assert.strictEqual(I.EXTREME_LOW_EN.length, 3, 'EXTREME_LOW_EN 应仍为 3');
   assert.strictEqual(I.REG_UP_ZH.length, 8, 'REG_UP_ZH 应仍为 8');
   assert.strictEqual(I.REG_UP_EN.length, 3, 'REG_UP_EN 应仍为 3');
-  assert.strictEqual(I.INTERVENE_ZH.length, 8, 'INTERVENE_ZH 应仍为 8');
+  // r302 例外：INTERVENE_ZH 由 r302 显式补入第 9 条（干预主体名词形——「补课班/
+  // 补习班/家教/辅导班/培训课程/网课」等干预产物名词，探针实证 A1「上次的补课班
+  // 起了反作用」整族穿透）。此为本轮已知的、有据的唯一追加，非意外增长。
+  assert.strictEqual(I.INTERVENE_ZH.length, 9, 'INTERVENE_ZH 应为 9（r300 基线 8 + r302 显式补入 1）');
   assert.strictEqual(I.CREDIT_ZH.length, 4, 'CREDIT_ZH 应仍为 4');
   assert.strictEqual(I.EFFECT_ZH.length, 5, 'EFFECT_ZH 应仍为 5');
   assert.strictEqual(I.EXEMPT_NEG_ZH.length, 3, 'EXEMPT_NEG_ZH 应仍为 3');

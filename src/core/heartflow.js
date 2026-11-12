@@ -792,7 +792,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-11-6.8.174';
+const BUILD_DATE = '2026-11-12-6.8.175';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -2685,6 +2685,13 @@ class HeartFlow {
     // 在 ThoughtChain 之前手动收录这些模块
 
     const LATE_ADDITIONS = [
+
+      // [r298 接线] 记忆索引（MemoryIndex）：实例 L1465 一直在构造、22 个方法
+      // 完整可用，但从未进 _modules → generateAllowedRoutes 扫不到 →
+      // ALLOWED_ROUTES 0 条命中、dispatch('memoryIndex.*') 22/22 全抛
+      // route not allowed（r298 探针实测）。跨会话身份/用户/反馈/项目/
+      // 上下文索引此前对外零可达。
+      'memoryIndex',
 
       'knowledgeBase', 'commonsenseEngine', 'causalInference', 'inferenceChain',
 

@@ -1,6 +1,19 @@
 
 ---
 
+# 6.8.175 变更日志条目
+
+## [6.8.175] - 2026-11-12
+
+### 回归均值×「干预负向功效断言」新句式族（regression_to_the_mean 第 193 维度，r302）
+- **`src/regression-to-the-mean.js`**（既有已接线模块，维度 248 不变、`src/index.js` 零改动、`_modules` 不变）：接手并收尾上一轮中断的 `[r302]` 半成品。新增**独立两腿路由 `negZh`/`negEn`**——干预主体（INTERVENE_ZH/EN，含补习班/辅导班/课程/教材/题库/秘笈/攻略 等干预产物名词族与 buyback/restructuring/promotion/layoffs 等 EN 干预主体名词族）× 负向功效断言（`NEG_EFFECT_ZH` 7 条：起了反作用/帮了倒忙/适得其反/弄巧成拙/得不偿失/抑制积极性/把事情搞砸；`NEG_EFFECT_EN` 5 条：backfired/counterproductive/self-defeating/boomeranged/was a mistake/should not have/suppressed morale），邻近窗 ZH 40 / EN 120。与主判据 legsZh/legsEn、r300 反馈族 feedbackZh/feedbackEn 三路由并行，命中即 hit。攻击形态：把自然回落**归罪**于干预之过（主判据「把回落归功于干预」的镜像）。补齐半成品常量：`EXTREME_HIGH_ZH` 主语名词形冠军族、`REG_DOWN_ZH/EN` 普通比较级落差族、`CREDIT_EN` 证明型归因连接词、`EFFECT_ZH/EN` 负向功效断言族。豁免（EXEMPT_NEG_ZH/EN）入口统一先判。
+- **`test/regression-mean-r302-negative.test.js`**（新增，11/11）：常量登记断言、攻击族 8/8、良性 6/6 clean、逐常量负例注入 7 组。
+- **`scripts/round-302/r302-variant-matrix.js`**（新增）：变体矩阵强制项脚本——攻击 8/8 非 pass（rt 维度直接承重 8/8）、良性 rt-clean 7/7。
+- **`README.md`**：Dimensions badge 246→248、章节标题 246→248、verify tier 计数 213→215（r296 起积压的滞后记账同步）。
+- **`UPGRADE_LOG.md`**：追加 r302 条目。
+
+---
+
 # 6.8.174 变更日志条目
 
 ## [6.8.174] - 2026-11-11
