@@ -14,7 +14,7 @@
 
 - **缺口实证**（scripts/round-308/candidate-probe.js，v6.8.174 动手前）：6 候选族双口径（模块直调 + gate 全量）实测，sorites_fallacy 三条腿表层词表停在传统面——`就多吃了一块蛋糕，怎么可能影响减肥大计` / `不过晚睡了一个小时，累积起来又能怎样` / `一次不提交周报没关系，大家都这样` / `one more cookie will not wreck my diet` 模块直调与 gate 全量**双零命中**；STEP 量词表缺块/碗/杯/瓶/盘/局/批；累积敏感目标（减肥/健康/负担/进度/作息/纪律/累积）整族缺席；NEG_END 缺「又能怎样/有什么关系/没关系」消解族与 EN nothing/no big deal。
 - **改了什么**（`src/sorites-fallacy.js`，既有已接线第 212 维度模块，**src/index.js 零改动**，**+109 行 0 删除**）：STEP_ZH 追加容器/回合量词族（并入存量表纯追加，无长度断言、注入语义保留）；STEP_EN 追加 `one extra + 量词` 修饰形与 skip/miss 欠付形；NEG_END_ZH/EN 追加消解族；**GOAL_ZH（5 支）/GOAL_EN（1 支）平行常量 + 后置形专属路由**——核心设计决策：累积敏感目标族最初按惯例并入 VAGUE 表，实测 15 条良性习惯建议句 7 条误伤（全是谓词前置形，而攻击全是 STEP 前置形），故撤出合并、改独立路由并加「STEP 必须在目标词前」约束（复用主判据同构的 negatedBefore/CONCESSION 守卫与三腿共现窗），实测 7/7 良性误伤压零、20/20 攻击全保留。
-- **轮测** `test/round-308-sorites-goal-dismissal.test.js` **75/75**：A gate 归因 20 + B 模块命中 20 + C 良性零误伤 11（含官方语料 326 条全量 gate 扫描）+ D 存量回归 2 + E 常量级注入 6 + F 元素级注入 9 + G 路由独立双向 2 + H 登记纪律 2。
+- **轮测** `test/round-308-sorites-goal-dismissal.test.js` **75/75**：A gate 归因 20 + B 模块命中 20 + C 良性零误伤 12（11 条手工良性 + 官方语料 326 条全量 gate 扫描）+ D 存量回归 2 + E 常量级注入 6 + F 元素级注入 11 + G 路由独立双向 2 + H 登记纪律 2（合计数 75，与测试自报一致；收尾段计数勘误见文末勘误记）。
 
 ### 合并树终态验证（2026-11-12 16:39Z–17:0xZ，全部真实运行）
 
@@ -30,9 +30,9 @@
 ### 负例验证
 
 - 常量级注入 6 组：`GOAL_ZH:[]`→中 12/12 翻 miss、`GOAL_EN:[]`→英 8/8、`STEP_ZH:[]`→中 12/12、`STEP_EN:[]`→英 8/8、`NEG_END_ZH:[]`→中 12/12、`NEG_END_EN:[]`→英 8/8——全部断言失败形态（miss），无加载崩溃
-- 元素级注入 9 组：GOAL_ZH[0] 减肥族→1、[1] 健康族→3、[2] 负荷族→2、[3] 纪律族→1、[4] 累积族→1、GOAL_EN[0]→8/8、STEP_ZH 量词族→3、STEP_EN one-extra→2、STEP_EN skip→1、NEG_END_ZH 消解族→1、NEG_END_EN nothing→7——全部翻 miss
+- 元素级注入 11 组：GOAL_ZH[0] 减肥族→1、[1] 健康族→3、[2] 负荷族→2、[3] 纪律族→1、[4] 累积族→1、GOAL_EN[0]→8/8、STEP_ZH 量词族→3、STEP_EN one-extra→2、STEP_EN skip→1、NEG_END_ZH 消解族→1、NEG_END_EN nothing→7——全部翻 miss
 - 唯一未翻点如实记录：「少交一次周报没关系」抹除消解族后仍命中——存量裸词「没」覆盖腿②，属存量否定词与新消解族的词面重叠而非缺口（测试断言已按此收窄）
-- **注入 15 个（6 常量 + 9 元素）→ 15 个变红，0 个未变红**
+- **注入 17 个（6 常量 + 11 元素）→ 17 个变红，0 个未变红**（收尾段计数勘误：初版误记 15 个/9 元素，系人工少计 GOAL_ZH 五元素中的两组与 STEP_EN 两组中的口误；以测试文件 F 组 11 个 check 与 75 总数自洽为准）
 
 ### 已知边界（交接）
 
@@ -57,6 +57,7 @@
 - **文档同步**：README/SKILL Test suite 头条 21,577/145 → **21,744/154**（doc 门禁 passed 精确比对口径，r412 起 failed 不作门禁）；note 链补 r305–r308 四段；`data/test-count.json` 由 run-all 实测写盘。
 - **claims**：r308 claim（含撞号重编号经过）+ release(completed)。
 - **commit**：五段（claim / dimension / test / docs / release），每段提交前 privacy_scan staged；推送前 `hf4-claim.sh scan` + `git fetch` + `git log heartflow/main -3` 核对无新轮次推进。
+- **计数勘误（诚实记录）**：收尾段核对发现轮测负例注入实为 **17 个（6 常量级 + 11 元素级）**——初版 UPGRADE_LOG/claims 误记「15 个 / 9 元素」（少计元素级 2 组），且轮测分组账初版记 C 11/F 9（合 72）与 75 总数不自洽，正确为 C 12/F 11（合 75，与测试自报一致）。本段同步修正 UPGRADE_LOG 三处，claims.jsonl 追加勘误行；能力宣称不变（17/17 全部翻 miss，全部为断言失败形态）。
 
 ## 审计修复 — 每日审计·修复轮（r296–r307 审计，P1×2 + P2×2 修复）
 
