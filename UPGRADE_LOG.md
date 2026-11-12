@@ -1,3 +1,38 @@
+## r302 — 小数定律（law_of_small_numbers 第 239 维度）「小样本 → 数量化总体裁定（概率/比率/均值）」新措辞家族（真升级②）
+
+**日期** 2026-11-12 09:5x–10:4x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r302（kind: dimension）
+
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。海外扫描三源如实空返/噪声（arXiv OR-query 15 篇全为通用论文、无 small-numbers 偏误专文；GitHub `total_count:0`；S2 429 限流）——无可整合纯规则实现，选题走仓库内探针实证，定性为既有 Tversky-Kahneman 模块的措辞家族扩展。r302 认领后立即 push claim commit（撞号纪律，f848e6a）。
+
+### 缺口实证（scripts/round-302/probe-candidates-r302.js + probe-quant-r302.js + probe-gate-r302.js，v6.8.174 gate() 动手前）
+候选探针扫 7 个统计/行为族，`law_of_small_numbers`（第 239 维）与 `fundamental_attribution_error` 各有 3/4 干净空白，选定前者（空白更连贯：腿①小样本锚点已存在，腿②b UNIVERSAL_ZH/EN 只收**定性裁定**词——铁律/肯定有效/这里养人/都一个样——漏收**数量化结论形**）。动手前 `law_of_small_numbers` 对候选族 4 条攻击仅 1 条被承重（且是 `perfect_error` 顺带、非本维），3 条整句穿透 gate：
+- `抛十次硬币有七次正面，可见这枚硬币正面概率就是七成。`（率 + 数值）
+- `我连开了三把都出货，这游戏爆率就是五成。`（率 + 数值）
+- `I met three 1.9m Shandong men in a row, so Shandong people are on average far taller.`（平均 + 比较幅度）
+- `Ten coin flips landed seven heads, so this coin clearly has a 70% chance of heads.`（number-first）
+
+根因：**「拿小样本给总体参数定一个数」——抛十次七正→正面概率就是七成 / 连开三把→爆率五成 / 见了三个一米九→平均身高就是比别处高一大截 / EN a 70% chance——这一小数定律最教科书式的量化裁定形，腿②b UNIVERSAL 一条都不收。**
+
+### 改了什么
+- `src/law-of-small-numbers.js`（既有已接线模块，第 239 维度，**src/index.js 零改动**）：新增 4 个常量 `QUANT_RATE_ZH`（37 个率/概率名词表：概率/几率/胜率/爆率/转化率/存活率/治愈率/好评率/留存率/满意度…）+ `QUANT_NUM_ZH`（数值结论形：X成 / 百分之X / 数字% / 百分点 / 裸一至两位数九十）+ `QUANT_ZH`（2 支：率+数值、平均/均值+比较幅度）+ `QUANT_EN`（3 支：number-first "a 70% chance"、rate-first "the rate is 100%"、"on average far taller"）；新增**平行 quant 路由**——腿①小样本锚点 × 腿③数量化裁定近距共现即判，与腿②b UNIVERSAL 完全并行。**不并入存量 UNIVERSAL 数组**（避开 r280/r265 的 length===N 登记断言），复用共享豁免入口（EXEMPT/CONCEPT/CORRECTIVE 在 findSignatures 入口统一先判）与 `dist()`；evidence/details 增 `kind==='quant'` 分支；`__internals` 新导出 QUANT_ZH/QUANT_EN 供负例注入。
+- `test/round-302-law-of-small-numbers-quant.test.js`（新增，**12/12**）：攻击 10（中英 quant 型，gate 非 pass 且 findings 承重 law_of_small_numbers）、良性 10 零误伤（大样本正当统计 + 样本量不足 + 单腿陈述）、负例注入 6 组（QUANT_ZH/QUANT_EN 整族删 → 承重攻击全翻 miss；SMALL_N 双腿删 → quant 路由失腿①）、逐元素注入 2（QUANT_ZH[0] 率值腿 / QUANT_ZH[1] 均值腿各自删 → 专署攻击翻 miss、另一腿仍命中）、路由独立性 2（删 UNIVERSAL_ZH 不影响 quant 命中、删 QUANT_ZH 不影响存量 pair 命中）、引擎闸良性不入 findings。
+- `scripts/round-302/{probe-candidates,probe-quant,probe-gate}-r302.js`（新增：候选族缺口探针 + QUANT 正则原型验证 + 上线后 gate() 层确认）。
+- `UPGRADE_LOG.md`（r302 条目）、`README.md`/`SKILL.md`（机器记账 21,505 → 21,517 passing；`data/test-count.json` 已由 run-all 自动回填 21,517/145/21,662）；报告 `coordination/reports/r302-dimension-agent4.md`（本地留档，`reports/` 自 r268 起被 gitignore 覆盖、不入链）。
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（判别维度 246）
+- node test/doc-numbers-accuracy.test.js — 24/0
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线**完全一致**，新族零新增误伤）
+- 全量 run-all.js — 21,517 通过 / 145 失败 / 21,662（基线 21,505/145/21,650，唯一 +12 即本轮新测试，失败数逐条持平）
+- 负例（注入-删条）— 6 组 → 承重攻击 **26/26 翻 miss、0 未变红**（QUANT_ZH 6/6、QUANT_EN 4/4、SMALL_N_ZH 6/6、SMALL_N_EN 4/4、逐元素 QUANT_ZH[0] 5/5、逐元素 QUANT_ZH[1] 1/1）；另 5 条 still-hit 对照（删一条腿另一腿仍命中）+ 路由独立性 2/2
+
+### 与存量判据的关系 / 已知窄口
+- quant 路由与存量腿②b UNIVERSAL 完全并行、互不依赖：注入 UNIVERSAL_ZH 全置空，quant 攻击仍命中；注入 QUANT_ZH 全置空，存量 pair 攻击（「抛了三次硬币都是正面，这枚硬币明显是偏的」类）仍命中（round-302 测试已带双向对照）。
+- **已知腿①（SMALL_N）窄口，非本轮引入**：EN 腿①不收 "men/tries/twice" 等样本名词，故 `I met three tall men…` / `It failed twice out of three tries…` 两条 EN 攻击 quant 路由无法触发（leg① 缺锚点）。SMALL_N_EN 是**全模块共享腿**，扩它会同时放大 pair 路由召回面、有冲击 302 误拦基线之虞，故本轮不动、留待专门轮次评估。
+- 良性大样本正当统计句（"对三万人的调查…好评率高达92%" / "五年生存率达到60%"）会有 QUANT **词面**命中，但无腿①小样本锚点共现，模块正确地不判——这是 quant 路由"必须双腿共现"设计的预期形态。
+- 显式引用「大数定律 / law of large numbers」字样或带样本量不足标记（还需要更多数据/远远不够/样本太小）的攻击/陈述被既有 CONCEPT/CORRECTIVE 豁免放行（按 r300/r301 纪律不动共享豁免）。
+
 ## r301 — 赌徒谬误（gamblers_fallacy 第 148 维度）「长期平均论证短期补偿 / 连发形追投」新措辞家族（真升级②）
 
 **日期** 2026-11-12 07:3x–08:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r301（kind: dimension）
