@@ -1,0 +1,343 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/IQGiuc5mVQi9rGDZQAiyWhJowN8</id>
+  <title>arXiv Query: search_query=all:statistical OR all:significance OR all:effect OR all:size OR all:misinterpretation OR all:p-value OR all:practical OR all:importance OR all:economics&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-12T22:44:12Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:significance+OR+(all:effect+OR+(all:size+OR+(all:misinterpretation+OR+(all:p-value+OR+(all:practical+OR+(all:importance+OR+all:economics)))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1404471</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14517v1</id>
+    <title>The closure of the nonreal roots of bounded-height polynomials is connected exactly at pronic heights</title>
+    <updated>2026-11-10T18:58:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.14517v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14517v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let C_h be the closure of the nonreal roots of integer polynomials with coefficients of modulus at most h. With the nonzero real roots included, the closure is connected at every height; without them, connectedness becomes arithmetic. We prove that C_h is connected exactly when h=q(q-1) is a pronic number 2, 6, 12, 20, ..., and has at least five components otherwise. At height two this confirms a twenty-year-old numerical observation of Shmerkin and Solomyak on double zeros of power series: apart from 1/2 they form the interval $[1/ρ,1)=C_2\cap(0,1)$, with $ρ$ the tribonacci constant. Disconnection is almost always infinite. For (p-1)^2&lt;h&lt;=p^2-3, $h\neq p(p-1)$, infinitely many components with nonempty interior accumulate at $\pm p$ and $\pm 1/p$, and when h&lt;p(p-1) these four points are themselves components. Next to each square q^2&gt;=16, at least two of the three heights q^2-2, q^2-1, q^2 have infinitely many components accumulating at a common point of (1/(q+1),1/q). Explicit series give infinitely many components at every nonpronic height below 167 other than 1, 3, 4, 9, 25, 63 and 81, and in general at most sqrt(X)+1 nonpronic heights h&lt;=X can have finitely many components, although C_h is a Peano compactum at every height. The proofs compare values and derivatives of all admissible power series near a real double zero; the comparison sets are open and closed in the whole core, so components separated near the axis cannot reconnect elsewhere. On the real axis, the double zeros at heights 1, 3, 4, 7 form sets with infinitely many components; at height one this proves a conjecture of Shmerkin and Solomyak and one of Solomyak on the connectedness locus for pairs of affine maps.</summary>
+    <category term="math.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:59Z</published>
+    <arxiv:comment>45 pages, 8 figures, with a 35-page supplement (80 pages in all). Computational companion: Zenodo, doi:10.5281/zenodo.24117729</arxiv:comment>
+    <arxiv:primary_category term="math.CV"/>
+    <author>
+      <name>Bernat Espigule</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14516v1</id>
+    <title>TorchCurves: Differentiable Parametric Curves</title>
+    <updated>2026-11-10T18:58:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.14516v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14516v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present TorchCurves, a PyTorch library that treats vector-valued parametric curves as learnable primitives. Its central operation maps batches of scalar inputs to points on curves represented in B-spline or Legendre polynomial bases, with differentiation through both inputs and coefficients. Curve coefficients can be optimized jointly with the surrounding model or produced by another network. The library provides trainable modules, reusable basis modules, and a functional interface, supporting applications ranging from continuous feature embeddings to Kolmogorov-Arnold networks and functional regression. Its implementation combines classical evaluation algorithms with vectorized PyTorch operations, emphasizing readability and maintainability without custom hardware kernels. Timing experiments compare curve evaluation against NumPy and SciPy and KAN training against EfficientKAN across a range of problem sizes. The results illustrate where this generality remains computationally practical and where overhead is substantial. Library is available on GitHub at https://github.com/alexshtf/torchcurves.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:52Z</published>
+    <arxiv:comment>Software paper for a library I've been working on for more than a year</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Alex Shtoff</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14512v1</id>
+    <title>Solving the SU(2) BFSS model</title>
+    <updated>2026-11-10T18:57:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.14512v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14512v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We numerically solve the ground state wavefunction of SU(2) BFSS matrix quantum mechanics. We compare ground correlators against islands obtained using the matrix bootstrap and find agreement up to five significant figures. The power law tail of this wavefunction determines the three-point amplitude, which agrees with the computation of Herderschee and Maldacena. Beyond the ground state, we extract the non-perturbative four-point scattering amplitude using Lüscher's method. In the appropriate regime, we find agreement with the Born-Oppenheimer approximation that yields the well-known $v^4/r^7$ interaction. We also find explicit bound states with positive energies in various SO(9) irreps. These are closely related to the bound states whose existence was recently discovered by OpenAI. Finally, we identify metastable resonances in the spectrum.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:57:34Z</published>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Kabir Bajaj</name>
+    </author>
+    <author>
+      <name>Henry W. Lin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14510v1</id>
+    <title>Gradient Estimates for Singular-Degenerate Elliptic Equations with Solution-Dependent Coefficients</title>
+    <updated>2026-11-10T18:56:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14510v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14510v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study a conormal boundary value problem for a class of singular-degenerate quasilinear elliptic equations in divergence form in bounded domains. The leading terms are measurable in the spatial variable and depend nonlinearly on both the solution and its gradient. The singularity or degeneracy is governed by a power of the distance to the domain boundary, with exponent greater than negative one. In particular, the corresponding weights need not belong to the Muckenhoupt $A_2$ class. Assuming that the weighted mean oscillations of the leading terms in the spatial variable are sufficiently small on small balls and that the domains have Lipschitz boundaries with sufficiently small Lipschitz constants, we establish global weighted $W^{1,p}$-estimates for weak solutions with bounded weighted mean oscillation. Our results extend recent estimates for equations whose leading terms are independent of the solution itself.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.FA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:56:31Z</published>
+    <arxiv:comment>40 pages, comments are welcome</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Van Le</name>
+    </author>
+    <author>
+      <name>Tuoc Phan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14506v1</id>
+    <title>Annular Counterexamples and Skew-Shape Block Identities</title>
+    <updated>2026-11-10T18:55:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14506v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14506v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We establish four connected results on weighted order ideals, cluster coefficients, and block-statistic enumerators. First, we give a counterexample to Theorem 14 of Kang, Lee and Lim (European Journal of Combinatorics, 2026): in the rank-two annular cluster model, a single bridging-lamination coefficient row produces $1+q^2$, contradicting the asserted unimodality. We identify the unsupported initial case in their published induction. Second, we refute their log-concavity Conjecture 1: the same gap example violates log-concavity, and a further single-curve computation gives the full-support polynomial $1+2q+7q^2+10q^3+9q^4+4q^5+q^6$, which also fails log-concavity. Third, we establish the skew-shape block-statistic identity proposed in Kahane's Conjecture 4.4 (arXiv:2607.11225v1) for arbitrary finite skew Young diagrams, under an explicitly specified root-exclusion convention. Its proof combines commuting tableau-transfer matrices, a connected-block inverse kernel, and finite polynomial differential equations; the corresponding mathematical statements have Lean 4/Mathlib formalizations. Fourth, we derive a bivariate block refinement whose coefficients are nonnegative after shifting the order parameter by one and, when necessary, multiplying by a monomial in the weight parameter. We specify the correction to the printed root convention, confirmed by Kahane in correspondence, and the geometric sign and specialization conventions clarified by the relevant authors for the annular examples.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:26Z</published>
+    <arxiv:comment>Complete Lean 4 formalization available at this GitHub repository: https://github.com/adamtilepe/Annular_Counterexamples_and_Skew-Shape_Block_Identities</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Adam Tilèpe</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14501v1</id>
+    <title>Mutual Linearity in Nonlinear Population Dynamics</title>
+    <updated>2026-11-10T18:51:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.14501v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14501v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mutual Linearity in Nonlinear Population DynamicsMutual linearity, the persistence of affine relations among stationary observables under arbitrarily strong changes of one transition rate, is known for Markov jump processes and chemical reaction networks. We show that generalized Lotka--Volterra dynamics form a new class of mutually linear systems, even though species can go extinct and attractors can be chaotic. Any change to one species' equation acts on the others as one effective press and keeps all abundances affinely related: piecewise across extinctions, and as time averages on chaotic attractors.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.PE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:44Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Shiling Liang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14499v1</id>
+    <title>Spatial patterns of transportation choice in Niterói</title>
+    <updated>2026-11-10T18:51:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14499v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14499v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Characterizing how people move through a city requires spatially and temporally fine-grained data that are often costly and difficult to obtain. Here, we introduce a computational framework that uses macroscopic, aggregated, and static urban data to construct a microscopic, dynamic, and spatially detailed representation of urban mobility. Building on an existing activity simulator, the framework combines a synthetic population, the built environment, and transport networks to generate daily trips and assign walking, car, or public transit. Applied to approximately 475,000 synthetic residents of Niterói, Brazil, simulated neighborhood-level transit patterns show a strong association with an empirical activity proxy (Pearson r=0.885). Walking is more prevalent in compact central areas, car use increases toward the periphery, and public-transit use remains comparatively high along bus corridors. Reducing walking times to and from bus stops by 30% increases the modeled public-transit-to-car ratio by 11.3%, with larger transit-share gains in several peripheral areas. These results reveal spatial differences in transportation choice and identify where improved transit access may have the greatest modeled effect.</summary>
+    <category term="physics.soc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.OT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:37Z</published>
+    <arxiv:primary_category term="physics.soc-ph"/>
+    <author>
+      <name>Sandro Martinelli Reia</name>
+    </author>
+    <author>
+      <name>Taylor Anderson</name>
+    </author>
+    <author>
+      <name>Dieter Pfoser</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14498v1</id>
+    <title>Measuring Robustness and Efficiency in a Connectome-Constrained Fly Visual System Model: Linking an Adversarial and a Perceptual Illusion</title>
+    <updated>2026-11-10T18:51:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Biological visual systems compute reliably under tight metabolic and wiring constraints, whereas artificial vision systems consume far more energy and can be sensitive to adversarial perturbations. Whether networks with brain-like wiring are more robust at lower computational cost is unclear. We address this by benchmarking a task-optimized, continuous-time recurrent neural network of the fly visual system constrained by its synaptic connectome (FlyNet) against artificial neural networks. We compare it against CNNs, RAFT, and continuous-time recurrent neural networks without detailed connectome constraints (sCTRNN, CTRNN) on a collision-detection task within a differentiable 3D rendering pipeline. FlyNet is adversarially vulnerable but, relative to its compute, more robust to common video corruptions than RAFT, while using up to five orders of magnitude fewer FLOPs. The CTRNNs remain more robust than FlyNet across almost all tested perturbations, suggesting that connectome constraints benefit efficiency, through their low edge count, over robustness. Recurrence improves robustness to white-box attacks in RAFT and temporal context improves robustness to common corruptions. FlyNet's position and velocity representations degrade under adversarial textures but recover under counterfactual textures that restore correct classification while staying equally far from training, ruling out unfamiliar textures as the cause of failure. The reverse-phi illusion similarly disrupts these representations and inverts the same low-level motion statistic as the adversarial textures. Optimizing this input statistic alone, without access to the network, suffices to induce classification failure, attributing both perturbations to the same circuit vulnerability. Connectome-constrained models can thus surface adversarial failure mechanisms as testable hypotheses about biological perceptual vulnerabilities.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:31Z</published>
+    <arxiv:comment>39 pages, 24 figures, 2 tables, Accepted at 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alexandre Garcia-Duran</name>
+    </author>
+    <author>
+      <name>Alejandro Rodriguez-Garcia</name>
+    </author>
+    <author>
+      <name>Manuel Molano-Mazón</name>
+    </author>
+    <author>
+      <name>Alexandre Hyafil</name>
+    </author>
+    <author>
+      <name>Srikanth Ramaswamy</name>
+    </author>
+    <author>
+      <name>Janne K. Lappalainen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14491v1</id>
+    <title>TimeSeek: Multi-Task and Multi-Domain Pretraining for Generalized Time Series Analytics</title>
+    <updated>2026-11-10T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time series analytics has been widely applied across various domains. While existing time series foundation models (TSFMs) have demonstrated promising results, they still face two major challenges: 1) Most TSFMs mainly rely on stacking Transformer layers to increase parameter size, lacking the ability to adaptively model complex time series patterns from multi-domain data. 2) Current TSFMs are primarily pre-trained for specific tasks, e.g., forecasting or anomaly detection, and a few models support multiple tasks, but they fail to fully leverage task specificity and commonality, resulting in suboptimal performance. To address these challenges, we propose TimeSeek, a novel generalized time series analytics model that adaptively models time series patterns from multi-domain data and unifies multiple tasks in pre-training. Conceptually, TimeSeek is guided by selective information sharing under domain and task heterogeneity. From the perspective of multi-domain data, we propose a Multi-Domain Feature Extractor that adaptively captures temporal dependencies and channel correlations based on domain-specific characteristics, including progressive multi-scale modeling and adaptive slot channel modeling. From the perspective of the diversity of tasks, we propose multi-task collaborative training, which leverages task specificity and task commonality through task customization and cross-task training, effectively unifying multiple tasks in pre-training and better adapting to diverse downstream scenarios. After pre-training on large-scale time series data, TimeSeek achieves state-of-the-art performance in forecasting, anomaly detection, and classification tasks across both few-shot learning and zero-shot situations, together with favorable inference efficiency.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:26Z</published>
+    <arxiv:comment>Accepted by IEEE Transactions on Pattern Analysis and MachineIntelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Peng Chen</name>
+    </author>
+    <author>
+      <name>Yihang Wang</name>
+    </author>
+    <author>
+      <name>Zhongwen Rao</name>
+    </author>
+    <author>
+      <name>Yang Shu</name>
+    </author>
+    <author>
+      <name>Yuying Qiu</name>
+    </author>
+    <author>
+      <name>Yuxuan Chen</name>
+    </author>
+    <author>
+      <name>Lujia Pan</name>
+    </author>
+    <author>
+      <name>Bin Yang</name>
+    </author>
+    <author>
+      <name>Chenjuan Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14487v1</id>
+    <title>Re-Search: Dissecting LLM Ideation Through a Two-Player Questioning Game</title>
+    <updated>2026-11-10T18:47:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.14487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Research ideation is iterative: researchers refine their ideas step by step based on feedback. Yet existing evaluations obscure this search process, making it difficult to understand how LLMs explore the space of research ideas and what limits their progress. We introduce Re-Search, which adapts the format of Twenty Questions to research ideation: given only the research problem of a published paper, a model must rediscover the paper's core idea by asking yes-or-no questions. Built from 200 ICML 2026 papers, Re-Search tracks how a model's idea evolves as it asks questions and receives binary oracle feedback, isolating ideation from execution. Across six recent LLMs, nearly all progress happens within the first 30 of 100 questions, which largely decide how the game ends; after that, most models plateau. Through controlled interventions on the candidate questions and the hypothesis space, we find that the bottleneck is generation, not judgment: models recognize a good idea or a good question when one is offered, but often cannot produce it on their own. We further analyze the ideation traces and find that models fail by either over-exploiting one direction or over-exploring too many. These findings point to concrete design principles for autoresearch systems: since models can judge candidates they cannot produce, enriching the search with externally sourced ideas and questions may be more effective than improving any single model's generation ability.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:47:22Z</published>
+    <arxiv:comment>Preprint. 15 figures, 10 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Muhan Gao</name>
+    </author>
+    <author>
+      <name>Hangxiao Zhu</name>
+    </author>
+    <author>
+      <name>Xinqi Su</name>
+    </author>
+    <author>
+      <name>Yu Zhang</name>
+    </author>
+    <author>
+      <name>Daniel Khashabi</name>
+    </author>
+    <author>
+      <name>Kuan-Hao Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14485v1</id>
+    <title>A fourth-order dimensionally split exponential time differencing scheme with real and distinct pole rational approximation for non-linear reaction-diffusion systems</title>
+    <updated>2026-11-10T18:45:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.14485v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14485v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper presents a novel fourth-order, L-stable exponential time differencing (ETD) Runge-Kutta type scheme incorporating a dimensional splitting integrating factor method for the numerical solution of nonlinear reaction-diffusion systems. The method, ETDRK4RDP-IF, is obtained by approximating the matrix exponential operators in the classical dimensionally split ETDRK-IF scheme with an accurate fourth-order, L-acceptable rational function with real and distinct poles. The L-acceptability of the rational approximation guarantees effective damping of spurious oscillations arising from nonsmooth initial and/or boundary data and further eliminates complex arithmetic in the solution of the associated linear systems, thereby enhancing computational efficiency and making the scheme well-suited for parallel implementation in low-level programming languages such as Fortran and C++. Numerical experiments confirm the fourth-order accuracy for a range of reaction-diffusion problems with Dirichlet and Neumann boundary conditions, and demonstrate that it outperforms existing standard ETD methods in serial and parallel implementations, yielding CPU time reductions of up to a factor of 20.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:45Z</published>
+    <arxiv:comment>27 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Wisdom Attipoe</name>
+    </author>
+    <author>
+      <name>Emmanuel Asante-Asamani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14484v1</id>
+    <title>Nonperturbative string dynamics in a (2+1)D lattice gauge theory on a superconducting quantum processor</title>
+    <updated>2026-11-10T18:45:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.14484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Electric flux strings underpin confinement in gauge theories. In two spatial dimensions, their evolution involves competing processes of charge motion, pair creation, and transverse deformation. Accessing these dynamics beyond perturbative limits challenges classical approaches, as entanglement growth restricts the times accessible to tensor-network simulations. Here we use quantum simulation to investigate a (2+1)D Z2 lattice gauge theory with dynamical matter and an explicit magnetic plaquette interaction, spanning strongly confined and nonperturbative deconfined regimes. Using 63 superconducting qubits, including 12 ancillas, we evolve initially localized strings with static or dynamical endpoint charges. Spatially resolved measurements reveal rapid charge and flux spreading in the deconfined regime, enhanced matter occupation in the string interior near the pair-creation resonance, and suppressed spreading at strong electric fields. String-path occupations further probe transverse rearrangements between configurations connected by plaquette operations. Retaining separate matter and gauge degrees of freedom makes local Gauss-law constraints directly accessible for error detection. Combining these constraints with ancilla checks and noise rescaling, we measure dynamics in circuits containing up to 15 second-order Trotter steps. Our results establish quantum simulation as a practical approach to exploring nonperturbative string dynamics in two spatial dimensions, with gauge redundancy serving as an experimental resource.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Sanziana Stelea</name>
+    </author>
+    <author>
+      <name>Anthony Gandon</name>
+    </author>
+    <author>
+      <name>Francesco Tacchino</name>
+    </author>
+    <author>
+      <name>Jad C. Halimeh</name>
+    </author>
+    <author>
+      <name>Ivano Tavernelli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14481v1</id>
+    <title>Divisor Folding and Finite-Group Trace Obstructions</title>
+    <updated>2026-11-10T18:44:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.14481v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14481v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For a symmetric integer frequency set of size $n$ with Fourier floor $K$, we study a positive trace weighted by the reciprocal of the regularized Fourier multiplier. If restriction to frequencies divisible by $p$ leaves $n/p+O(K^2)$ frequencies, then for $n\ge K^4$ and $p\ll n/K^3$ the original trace differs by $O(n)$ from $p$ times the core trace at the inherited regularization. The transfer reaches cores of size $\asymp K^3$ and preserves vanishing triple density with diverging normalized triple count. We construct exactly regular finite abelian spectra at these scales for which the linear core trace bound fails by a power. The examples use unions of classical semiprimitive cyclotomic classes and also give obstructions in both reflection parities in odd characteristic. Finally, we bound the overlap of lifts of a core by its smallest positive Fourier height and the symmetry of the lifts. These bounds exclude balanced lifts of the binary examples in a range of cyclic extensions and quantify the asymmetry required in odd prime split extensions.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:44:38Z</published>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Abhishek Shankar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14479v1</id>
+    <title>Learning a model of non-stationary nuisances with non-local correlations for object detection</title>
+    <updated>2026-11-10T18:41:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.14479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We tackle the problem of detecting faint objects in multivariate data corrupted by a strong and spatially correlated nuisance component in the low-sample regime. Standard covariance-based models often yield unstable or ill-conditioned estimators of the nuisance statistics, severely degrading detection performance. We propose a data-driven approach based on sparse precision matrix modeling, where the precision matrix is approximated through a pivoted sparse Cholesky factorization whose non-zeros coefficients are learned by maximum likelihood. This yields a low-complexity yet expressive statistical model of the nuisance. Building on this model, we derive a generalized likelihood ratio test for faint source detection enabling direct control of the false alarm rate. The approach is evaluated on an astrophysical application: the detection of exoplanets by high contrast imaging, where it achieves state-of-the-art performance.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:30Z</published>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <arxiv:journal_ref>EUSIPCO 2026</arxiv:journal_ref>
+    <author>
+      <name>Olivier Flasseur</name>
+    </author>
+    <author>
+      <name>Eric Thiébaut</name>
+    </author>
+    <author>
+      <name>Loïc Denis</name>
+    </author>
+    <author>
+      <name>Samuel Thé</name>
+    </author>
+  </entry>
+</feed>

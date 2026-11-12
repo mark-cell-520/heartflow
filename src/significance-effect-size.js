@@ -127,6 +127,19 @@
  *     0.05——没有推断连接，显著性只是并列事实）；
  *   · 单腿句（只报 p 值无裁定、只「这个方法更好」无显著性陈述）；
  *   · false_precision / p_hacking / count_rate_conflation 领地。
+ *
+ * [r311 升级] 腿②新实质性裁定措辞家族（真升级②）：存量四族不认的
+ * 新裁定腿——ZH「影响深远/意义深远/效应深远」（MAGNITUDE_ZH2）、
+ * 「含金量高/价值很大/分量很足/很有价值/很有分量」
+ * （IMPORTANCE_ZH2）；EN「impactful / game-changer /
+ * world-changing / consequential / matters in practice /
+ * implications are huge / far-reaching impact / of great value」
+ * （IMPORTANCE_EN2 + MAGNITUDE_EN2）。探针 12/12 穿透本模块、
+ * 官方良性语料 228 条零误命中（coordination/agent4/probes/
+ * r311-probe*.js）。实现为平行常量 + findSignatures concat 合并，
+ * 存量四族注入语义不变（新键注入 [] 整体替换新腿；存量键注入永假
+ * 正则时 .concat 抛 TypeError，与存量行为一致，聚合层 _safeDetect
+ * 兜底）。src/index.js 零改动。
  */
 'use strict';
 
@@ -193,6 +206,43 @@ const MAGNITUDE_ZH = [
 ];
 const MAGNITUDE_EN = [
   /\bthe\s+effect\s+is\s+(?:large|big|huge|substantial|enormous)\b/i, /\b(?:large|big|huge|substantial|enormous)\s+effect\b/i, /\bthe\s+improvement\s+is\s+(?:big|large|substantial|huge)\b/i, /\bhuge\s+difference\b/i, /\bsubstantial\b/i,
+];
+
+// ─── [r311] 腿② 新实质性裁定族（平行常量，存量四族注入语义不变）──────
+// 影响深远/意义深远：把「差异可检出」外推到「效应影响深远」——存量
+// MAGNITUDE 只收「效应很大/改进很大」类直接规模词，不收「深远」族；
+// 探针实证 6/6 穿透（coordination/agent4/probes/r311-probe.js）。
+const MAGNITUDE_ZH2 = [
+  /影响(?:极为|极其|非常|十分|相当)?(?:深远|广泛|广大)/,
+  /意义(?:极为|极其|非常|十分|相当)?深远/,
+  /效应(?:极为|极其|非常)?深远/,
+];
+// 含金量/价值/分量：把显著性外推到「成果本身有价值有分量」——存量
+// IMPORTANCE 只收「重要/重大/突破性」族，不收「含金量/分量」族；
+// 探针实证 5/5 穿透。
+const IMPORTANCE_ZH2 = [
+  /含金量(?:很|非常|相当)?(?:高|十足|满满)/,
+  /价值(?:很|非常|相当)?(?:大|高)/,
+  /分量(?:很|非常|相当)?(?:足|重)/,
+  /(?:很|非常|相当|颇)有价值/,
+  /(?:很|相当|颇)有分量/,
+];
+// EN 侧新裁定腿：impactful / game-changer / world-changing /
+// consequential / matters in practice / implications are huge。
+const IMPORTANCE_EN2 = [
+  /\bimpactful\b/i,
+  /\bgame[- ]chang(?:er|ing)\b/i,
+  /\bworld[- ]changing\b/i,
+  /\b(?:truly |highly |genuinely |deeply |profoundly )?consequential\b/i,
+  /\bmatters?\s+(?:a\s+(?:great\s+deal|lot)\s+)?in\s+practice\b/i,
+  /\b(?:has|have|carries|with)\s+(?:real|major|significant|huge|enormous|profound)?\s*(?:practical\s+)?implications\b/i,
+  /\bof\s+(?:great|considerable|major|enormous|immense)\s+(?:value|importance)\b/i,
+];
+const MAGNITUDE_EN2 = [
+  /\b(?:huge|enormous|massive|profound|far[- ]reaching|sweeping)\s+implications\b/i,
+  /\bimplications\s+(?:are|is)\s+(?:huge|enormous|massive|profound|far[- ]reaching)\b/i,
+  /\bfar[- ]reaching\s+(?:impact|consequences|effects)\b/i,
+  /\b(?:matters|mattered)\s+(?:a\s+great\s+deal\s+)?in\s+the\s+real\s+world\b/i,
 ];
 
 // ─── 推断标记（结论由显著性推出，而非并列陈述）─────────────────
@@ -295,10 +345,10 @@ function findSignatures(text, R) {
     {
       sig: R.SIG_ZH || SIG_ZH,
       verdicts: {
-        importance: R.IMPORTANCE_ZH || IMPORTANCE_ZH,
+        importance: (R.IMPORTANCE_ZH || IMPORTANCE_ZH).concat(R.IMPORTANCE_ZH2 || IMPORTANCE_ZH2),
         superior: R.SUPERIOR_ZH || SUPERIOR_ZH,
         scale: R.SCALE_ZH || SCALE_ZH,
-        magnitude: R.MAGNITUDE_ZH || MAGNITUDE_ZH,
+        magnitude: (R.MAGNITUDE_ZH || MAGNITUDE_ZH).concat(R.MAGNITUDE_ZH2 || MAGNITUDE_ZH2),
       },
       infer: R.INFER_ZH || INFER_ZH,
       w: R.W_ZH != null ? R.W_ZH : W_ZH,
@@ -307,10 +357,10 @@ function findSignatures(text, R) {
     {
       sig: R.SIG_EN || SIG_EN,
       verdicts: {
-        importance: R.IMPORTANCE_EN || IMPORTANCE_EN,
+        importance: (R.IMPORTANCE_EN || IMPORTANCE_EN).concat(R.IMPORTANCE_EN2 || IMPORTANCE_EN2),
         superior: R.SUPERIOR_EN || SUPERIOR_EN,
         scale: R.SCALE_EN || SCALE_EN,
-        magnitude: R.MAGNITUDE_EN || MAGNITUDE_EN,
+        magnitude: (R.MAGNITUDE_EN || MAGNITUDE_EN).concat(R.MAGNITUDE_EN2 || MAGNITUDE_EN2),
       },
       infer: R.INFER_EN || INFER_EN,
       w: R.W_EN != null ? R.W_EN : W_EN,
@@ -386,6 +436,8 @@ module.exports = {
     SUPERIOR_ZH, SUPERIOR_EN,
     SCALE_ZH, SCALE_EN,
     MAGNITUDE_ZH, MAGNITUDE_EN,
+    MAGNITUDE_ZH2, MAGNITUDE_EN2,
+    IMPORTANCE_ZH2, IMPORTANCE_EN2,
     INFER_ZH, INFER_EN,
     W_ZH, W_EN,
     CONCEPT_ZH, CONCEPT_EN,

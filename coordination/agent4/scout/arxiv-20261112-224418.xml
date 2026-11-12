@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api//TZPsjk2wQ+4vBF90XSnVocA+Fk</id>
+  <title>arXiv Query: search_query=all:statistical OR all:significance OR all:practical OR all:importance OR all:rule-based OR all:fallacy OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-12T22:44:18Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:significance+OR+(all:practical+OR+(all:importance+OR+(all:rule-based+OR+(all:fallacy+OR+all:detection)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>974507</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14516v1</id>
+    <title>TorchCurves: Differentiable Parametric Curves</title>
+    <updated>2026-11-10T18:58:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.14516v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14516v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present TorchCurves, a PyTorch library that treats vector-valued parametric curves as learnable primitives. Its central operation maps batches of scalar inputs to points on curves represented in B-spline or Legendre polynomial bases, with differentiation through both inputs and coefficients. Curve coefficients can be optimized jointly with the surrounding model or produced by another network. The library provides trainable modules, reusable basis modules, and a functional interface, supporting applications ranging from continuous feature embeddings to Kolmogorov-Arnold networks and functional regression. Its implementation combines classical evaluation algorithms with vectorized PyTorch operations, emphasizing readability and maintainability without custom hardware kernels. Timing experiments compare curve evaluation against NumPy and SciPy and KAN training against EfficientKAN across a range of problem sizes. The results illustrate where this generality remains computationally practical and where overhead is substantial. Library is available on GitHub at https://github.com/alexshtf/torchcurves.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:52Z</published>
+    <arxiv:comment>Software paper for a library I've been working on for more than a year</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Alex Shtoff</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14512v1</id>
+    <title>Solving the SU(2) BFSS model</title>
+    <updated>2026-11-10T18:57:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.14512v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14512v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We numerically solve the ground state wavefunction of SU(2) BFSS matrix quantum mechanics. We compare ground correlators against islands obtained using the matrix bootstrap and find agreement up to five significant figures. The power law tail of this wavefunction determines the three-point amplitude, which agrees with the computation of Herderschee and Maldacena. Beyond the ground state, we extract the non-perturbative four-point scattering amplitude using Lüscher's method. In the appropriate regime, we find agreement with the Born-Oppenheimer approximation that yields the well-known $v^4/r^7$ interaction. We also find explicit bound states with positive energies in various SO(9) irreps. These are closely related to the bound states whose existence was recently discovered by OpenAI. Finally, we identify metastable resonances in the spectrum.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:57:34Z</published>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Kabir Bajaj</name>
+    </author>
+    <author>
+      <name>Henry W. Lin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14506v1</id>
+    <title>Annular Counterexamples and Skew-Shape Block Identities</title>
+    <updated>2026-11-10T18:55:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14506v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14506v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We establish four connected results on weighted order ideals, cluster coefficients, and block-statistic enumerators. First, we give a counterexample to Theorem 14 of Kang, Lee and Lim (European Journal of Combinatorics, 2026): in the rank-two annular cluster model, a single bridging-lamination coefficient row produces $1+q^2$, contradicting the asserted unimodality. We identify the unsupported initial case in their published induction. Second, we refute their log-concavity Conjecture 1: the same gap example violates log-concavity, and a further single-curve computation gives the full-support polynomial $1+2q+7q^2+10q^3+9q^4+4q^5+q^6$, which also fails log-concavity. Third, we establish the skew-shape block-statistic identity proposed in Kahane's Conjecture 4.4 (arXiv:2607.11225v1) for arbitrary finite skew Young diagrams, under an explicitly specified root-exclusion convention. Its proof combines commuting tableau-transfer matrices, a connected-block inverse kernel, and finite polynomial differential equations; the corresponding mathematical statements have Lean 4/Mathlib formalizations. Fourth, we derive a bivariate block refinement whose coefficients are nonnegative after shifting the order parameter by one and, when necessary, multiplying by a monomial in the weight parameter. We specify the correction to the printed root convention, confirmed by Kahane in correspondence, and the geometric sign and specialization conventions clarified by the relevant authors for the annular examples.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:55:26Z</published>
+    <arxiv:comment>Complete Lean 4 formalization available at this GitHub repository: https://github.com/adamtilepe/Annular_Counterexamples_and_Skew-Shape_Block_Identities</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Adam Tilèpe</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14501v1</id>
+    <title>Mutual Linearity in Nonlinear Population Dynamics</title>
+    <updated>2026-11-10T18:51:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.14501v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14501v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mutual Linearity in Nonlinear Population DynamicsMutual linearity, the persistence of affine relations among stationary observables under arbitrarily strong changes of one transition rate, is known for Markov jump processes and chemical reaction networks. We show that generalized Lotka--Volterra dynamics form a new class of mutually linear systems, even though species can go extinct and attractors can be chaotic. Any change to one species' equation acts on the others as one effective press and keeps all abundances affinely related: piecewise across extinctions, and as time averages on chaotic attractors.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.PE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:44Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Shiling Liang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14498v1</id>
+    <title>Measuring Robustness and Efficiency in a Connectome-Constrained Fly Visual System Model: Linking an Adversarial and a Perceptual Illusion</title>
+    <updated>2026-11-10T18:51:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Biological visual systems compute reliably under tight metabolic and wiring constraints, whereas artificial vision systems consume far more energy and can be sensitive to adversarial perturbations. Whether networks with brain-like wiring are more robust at lower computational cost is unclear. We address this by benchmarking a task-optimized, continuous-time recurrent neural network of the fly visual system constrained by its synaptic connectome (FlyNet) against artificial neural networks. We compare it against CNNs, RAFT, and continuous-time recurrent neural networks without detailed connectome constraints (sCTRNN, CTRNN) on a collision-detection task within a differentiable 3D rendering pipeline. FlyNet is adversarially vulnerable but, relative to its compute, more robust to common video corruptions than RAFT, while using up to five orders of magnitude fewer FLOPs. The CTRNNs remain more robust than FlyNet across almost all tested perturbations, suggesting that connectome constraints benefit efficiency, through their low edge count, over robustness. Recurrence improves robustness to white-box attacks in RAFT and temporal context improves robustness to common corruptions. FlyNet's position and velocity representations degrade under adversarial textures but recover under counterfactual textures that restore correct classification while staying equally far from training, ruling out unfamiliar textures as the cause of failure. The reverse-phi illusion similarly disrupts these representations and inverts the same low-level motion statistic as the adversarial textures. Optimizing this input statistic alone, without access to the network, suffices to induce classification failure, attributing both perturbations to the same circuit vulnerability. Connectome-constrained models can thus surface adversarial failure mechanisms as testable hypotheses about biological perceptual vulnerabilities.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:31Z</published>
+    <arxiv:comment>39 pages, 24 figures, 2 tables, Accepted at 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alexandre Garcia-Duran</name>
+    </author>
+    <author>
+      <name>Alejandro Rodriguez-Garcia</name>
+    </author>
+    <author>
+      <name>Manuel Molano-Mazón</name>
+    </author>
+    <author>
+      <name>Alexandre Hyafil</name>
+    </author>
+    <author>
+      <name>Srikanth Ramaswamy</name>
+    </author>
+    <author>
+      <name>Janne K. Lappalainen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14493v1</id>
+    <title>Comparative Analysis of Agent Evaluation Frameworks: Stability, Detection, and Discovery in Enterprise Analytics Agents</title>
+    <updated>2026-11-10T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.14493v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14493v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deploying LLM-based analytics agents in enterprise settings requires evaluation frameworks that can reliably detect failures across complex, multi-tool workflows. We present a three-phase comparative study of three evaluation frameworks, each representing a distinct evaluation paradigm (trace-based LLM judging, text-only LLM judging with red-teaming, and deterministic heuristics), applied to two analytics agents in a controlled research setting using frozen execution traces. Phase 1 quantifies evaluation harness stability through repeated measurements, finding that 97% of configurations meet the stability threshold and that stability patterns are agent-independent. Phase 2 measures known risk detection on 72 ground-truth test cases, where the trace-based framework achieves the best precision-recall balance (F1=0.90) while text-only evaluation matches on recall but generates 5x more false alarms. Phase 3 evaluates unknown risk discovery, uncovering 24 novel failures with zero overlap between functional testing and security red-teaming. Our results demonstrate that (1) the information available to the evaluation harness determines evaluation quality, (2) functional and security evaluation are complementary, and (3) LLM-based evaluation harnesses surface subtle errors that human reviewers miss. We recommend a two-framework strategy: trace-based evaluation for functional assessment and adversarial red-teaming for security validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:06Z</published>
+    <arxiv:comment>Accepted to KDD 2026, Jeju, Korea. 9 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Howard Zhang</name>
+    </author>
+    <author>
+      <name>Chuck Arvin</name>
+    </author>
+    <author>
+      <name>Logan Brown</name>
+    </author>
+    <author>
+      <name>Mihir Bhatia</name>
+    </author>
+    <author>
+      <name>Neelu Choudhary</name>
+    </author>
+    <author>
+      <name>Lily Miao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14491v1</id>
+    <title>TimeSeek: Multi-Task and Multi-Domain Pretraining for Generalized Time Series Analytics</title>
+    <updated>2026-11-10T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time series analytics has been widely applied across various domains. While existing time series foundation models (TSFMs) have demonstrated promising results, they still face two major challenges: 1) Most TSFMs mainly rely on stacking Transformer layers to increase parameter size, lacking the ability to adaptively model complex time series patterns from multi-domain data. 2) Current TSFMs are primarily pre-trained for specific tasks, e.g., forecasting or anomaly detection, and a few models support multiple tasks, but they fail to fully leverage task specificity and commonality, resulting in suboptimal performance. To address these challenges, we propose TimeSeek, a novel generalized time series analytics model that adaptively models time series patterns from multi-domain data and unifies multiple tasks in pre-training. Conceptually, TimeSeek is guided by selective information sharing under domain and task heterogeneity. From the perspective of multi-domain data, we propose a Multi-Domain Feature Extractor that adaptively captures temporal dependencies and channel correlations based on domain-specific characteristics, including progressive multi-scale modeling and adaptive slot channel modeling. From the perspective of the diversity of tasks, we propose multi-task collaborative training, which leverages task specificity and task commonality through task customization and cross-task training, effectively unifying multiple tasks in pre-training and better adapting to diverse downstream scenarios. After pre-training on large-scale time series data, TimeSeek achieves state-of-the-art performance in forecasting, anomaly detection, and classification tasks across both few-shot learning and zero-shot situations, together with favorable inference efficiency.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:26Z</published>
+    <arxiv:comment>Accepted by IEEE Transactions on Pattern Analysis and MachineIntelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Peng Chen</name>
+    </author>
+    <author>
+      <name>Yihang Wang</name>
+    </author>
+    <author>
+      <name>Zhongwen Rao</name>
+    </author>
+    <author>
+      <name>Yang Shu</name>
+    </author>
+    <author>
+      <name>Yuying Qiu</name>
+    </author>
+    <author>
+      <name>Yuxuan Chen</name>
+    </author>
+    <author>
+      <name>Lujia Pan</name>
+    </author>
+    <author>
+      <name>Bin Yang</name>
+    </author>
+    <author>
+      <name>Chenjuan Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14484v1</id>
+    <title>Nonperturbative string dynamics in a (2+1)D lattice gauge theory on a superconducting quantum processor</title>
+    <updated>2026-11-10T18:45:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.14484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Electric flux strings underpin confinement in gauge theories. In two spatial dimensions, their evolution involves competing processes of charge motion, pair creation, and transverse deformation. Accessing these dynamics beyond perturbative limits challenges classical approaches, as entanglement growth restricts the times accessible to tensor-network simulations. Here we use quantum simulation to investigate a (2+1)D Z2 lattice gauge theory with dynamical matter and an explicit magnetic plaquette interaction, spanning strongly confined and nonperturbative deconfined regimes. Using 63 superconducting qubits, including 12 ancillas, we evolve initially localized strings with static or dynamical endpoint charges. Spatially resolved measurements reveal rapid charge and flux spreading in the deconfined regime, enhanced matter occupation in the string interior near the pair-creation resonance, and suppressed spreading at strong electric fields. String-path occupations further probe transverse rearrangements between configurations connected by plaquette operations. Retaining separate matter and gauge degrees of freedom makes local Gauss-law constraints directly accessible for error detection. Combining these constraints with ancilla checks and noise rescaling, we measure dynamics in circuits containing up to 15 second-order Trotter steps. Our results establish quantum simulation as a practical approach to exploring nonperturbative string dynamics in two spatial dimensions, with gauge redundancy serving as an experimental resource.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Sanziana Stelea</name>
+    </author>
+    <author>
+      <name>Anthony Gandon</name>
+    </author>
+    <author>
+      <name>Francesco Tacchino</name>
+    </author>
+    <author>
+      <name>Jad C. Halimeh</name>
+    </author>
+    <author>
+      <name>Ivano Tavernelli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14480v1</id>
+    <title>Pterodactyl: Pushing the Limits of Efficient Automated Translation Evaluation</title>
+    <updated>2026-11-10T18:41:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14480v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14480v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we present 1020 Group's submission to the WMT26 shared task on automated quality evaluation. Our system, Pterodactyl, was engineered specifically for subtasks 2 and 3, that is, segment-level quality score prediction and the detection of error-free segments. Pterodactyl is a highly customizable, ultra-low cost system optimized for binary classification in translation triage and data curation. It is based on an LLM-as-a-judge approach, with prompt engineering and model selection guided by ROC analysis. We also developed several variants of Pterodactyl that were specifically adapted for subtasks 3.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:37Z</published>
+    <arxiv:comment>6 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Proceedings of the Eleventh Conference on Machine Translation (WMT 2026), pp. 1638-1643, 2026</arxiv:journal_ref>
+    <author>
+      <name>Evelyn Y. Garland</name>
+    </author>
+    <author>
+      <name>Carola F. Berger</name>
+    </author>
+    <arxiv:doi>10.18653/2026.wmt-main.96</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/2026.wmt-main.96" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14479v1</id>
+    <title>Learning a model of non-stationary nuisances with non-local correlations for object detection</title>
+    <updated>2026-11-10T18:41:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.14479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We tackle the problem of detecting faint objects in multivariate data corrupted by a strong and spatially correlated nuisance component in the low-sample regime. Standard covariance-based models often yield unstable or ill-conditioned estimators of the nuisance statistics, severely degrading detection performance. We propose a data-driven approach based on sparse precision matrix modeling, where the precision matrix is approximated through a pivoted sparse Cholesky factorization whose non-zeros coefficients are learned by maximum likelihood. This yields a low-complexity yet expressive statistical model of the nuisance. Building on this model, we derive a generalized likelihood ratio test for faint source detection enabling direct control of the false alarm rate. The approach is evaluated on an astrophysical application: the detection of exoplanets by high contrast imaging, where it achieves state-of-the-art performance.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:30Z</published>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <arxiv:journal_ref>EUSIPCO 2026</arxiv:journal_ref>
+    <author>
+      <name>Olivier Flasseur</name>
+    </author>
+    <author>
+      <name>Eric Thiébaut</name>
+    </author>
+    <author>
+      <name>Loïc Denis</name>
+    </author>
+    <author>
+      <name>Samuel Thé</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14462v1</id>
+    <title>Accurate predictions of properties of energetic materials with tabular foundation models</title>
+    <updated>2026-11-10T18:29:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14462v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14462v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We use TabPFN, a recently developed tabular foundation model, to predict three properties of energetic materials: impact sensitivity, decomposition temperature and crystal density. Without any hyperparameter tuning, TabPFN outperforms the best published models for all three properties. It also substantially outperforms a wide range of established machine-learning models, including tuned gradient boosting (XGBoost), random forests and Gaussian processes. This holds both when the models are given hand-crafted molecular descriptors and when they are given learned representations from Chemprop's message-passing neural network. In particular, for all three properties, TabPFN applied to Chemprop's own embedding is more accurate than Chemprop's predictions. TabPFN is also among the fastest models we consider, more than an order of magnitude faster than XGBoost. As TabPFN predicts the entire distribution of the target rather than just a single value, it offers built-in uncertainty quantification, which we compare with the empirical distributions of compounds with repeated measurements. Finally, we interpret the predictions using Shapley values, which rank the features by their importance.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:29:37Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Vagn Krister Nes Glomsrud</name>
+    </author>
+    <author>
+      <name>Mathias Bynke</name>
+    </author>
+    <author>
+      <name>Lars Henry Berge Olsen</name>
+    </author>
+    <author>
+      <name>Dennis Christensen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14457v1</id>
+    <title>Measuring Kaplan--Meier Overestimation Under Competing Risks: Event Ordering, Quantification, and Exact Inference</title>
+    <updated>2026-11-10T18:26:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.14457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Competing risks arise when individuals may experience multiple mutually exclusive event types. Competing events are frequently treated as censoring and analysed using Kaplan--Meier (KM) methods, which overestimate real-world event risks. While the existence of KM overestimation is well known, its determinants, magnitude, and inferential properties remain poorly characterised.
+  We develop a nonparametric framework that treats competing risks overestimation as a statistical quantity in its own right. We show that competing event frequency alone is insufficient to characterise KM overestimation and develop an event ordering theory describing how temporal event allocation influences overestimation. Based on these results, we derive a closed-form Total Overestimation Diagnostic (TOD) that quantifies total KM overestimation directly from routine survival analysis output. We establish exact error equivalence results for both cause-specific and total overestimation. In particular, Product Limit Error Equivalence shows that inference for TOD reduces exactly to ordinary overall survival estimation.
+  Simulation experiments validate the theoretical results and show that independent censoring primarily affects precision rather than overestimation magnitude. Across six benchmark competing risks datasets, cause-specific overestimation is characterised by both total overestimation and temporal event allocation. These results provide a practical framework for assessing competing risks relevance and determining when cumulative incidence methods should be preferred to naïve KM risks.
+  The proposed framework transforms competing risks overestimation from a qualitative warning into a measurable quantity that can be routinely quantified, interpreted, and incorporated into reporting practice.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:26:33Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Ferran Espuny-Pujol</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14452v1</id>
+    <title>Revisiting the centrifugal breakout scaling relationship for H$α$ emission in light of $ρ$ Oph C, the coolest B-type star with an H$α$-bright centrifugal magnetosphere</title>
+    <updated>2026-11-10T18:20:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.14452v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14452v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The corotating magnetospheres of B-type stars are strongly affected by magnetic field strength and rotational velocity, which determine both the geometry and strength of visible and radio emission; however, H$α$ emission largely disappears below a bolometric luminosity of $\log{(L / L_\odot)} \sim 2.8$. The nearby B5 V star $ρ$ Oph C (HD 147932) is the least-luminous rapidly rotating magnetic B-type star to display magnetospheric H$α$ emission. While $ρ$ Oph C's radio magnetosphere has been extensively studied, its magnetic field and H$α$ magnetosphere have been constrained only via snapshot observations. We present a new dataset of high-resolution ESPaDOnS spectropolarimetry covering the star's rotational period, which is revisited by combining Hipparcos, K2 and TESS photometry. We find that the star's magnetic field strength and geometry are consistent with the model inferred from radio data. As expected from the magnetic model, there is very little variability in H$α$. Comparison of the light curve to both equivalent width measurements from metallic lines and magnetospheric models suggests that the star's photometric variability is dominated by surface chemical abundance spots; however, there is complex rotationally modulated variability at about the mmag level which probably originates in the magnetosphere. $ρ$ Oph C is the least luminous B-type star in which magnetospheric H$α$ emission has yet been detected, and its emission is notably weaker than the predictions of the centrifugal breakout model. Its photometric eclipse depth is also much lower than predicted by the CBO model. However, its radio luminosity is consistent with CBO predictions. We speculate on this basis that $ρ$ Oph C may be a transitional object between effective temperature regimes with hydrogen-dominated and decoupled metallic winds.</summary>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:20:40Z</published>
+    <arxiv:comment>13 pages, 11 figures, accepted for publication in MNRAS</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.SR"/>
+    <author>
+      <name>M. E. Shultz</name>
+    </author>
+    <author>
+      <name>E. Alecian</name>
+    </author>
+    <author>
+      <name>I. Berry</name>
+    </author>
+    <author>
+      <name>J. Krtička</name>
+    </author>
+    <author>
+      <name>J. Labadie-Bartz</name>
+    </author>
+    <author>
+      <name>P. Leto</name>
+    </author>
+    <author>
+      <name>S. P. Owocki</name>
+    </author>
+    <author>
+      <name>A. ud-Doula</name>
+    </author>
+    <author>
+      <name>G. A. Wade</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14451v1</id>
+    <title>A Lightweight Differentiable Method for Real-Time Skin Rendering and Digitization</title>
+    <updated>2026-11-10T18:20:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.14451v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14451v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Inverse rendering for skin typically relies on offline path tracing to estimate physical properties, which fail to map directly to the approximate shaders utilized in interactive applications, such as game engines. We bridge this gap by directly estimating subsurface scattering parameters tailored for real-time rendering pipelines. We introduce a differentiable Screen-Space Subsurface Scattering (SSSS) framework that enables the joint optimization of spatially varying base textures and scattering distances. To account for local variations in skin thickness, we estimate these parameters across distinct facial regions, generating a blended profile map ready for production runtime engines. Our pipeline utilizes a low-cost, single-light, single-view capture setup designed for accessible and practical appearance acquisition. Optimization is driven by a masked loss function targeting regions where subsurface scattering effects are dominant. We validate our approach on a real-world dataset of $45$ individuals across the Monk Skin Tone Scale, ensuring demographic generalization. Furthermore, we complement this evaluation with synthetic data, a multi-light setup validating our single-light assumption, and a tilted-view configuration confirming angular consistency. Results demonstrate that our method effectively recovers scattering parameters from lightweight inputs, yielding realistic skin appearance directly compatible with standard real-time shaders.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:20:11Z</published>
+    <arxiv:comment>20 pages, 25 figures; includes 6 pages of supplementary material. Accepted to Computers and Graphics</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mario Marquez-Balduque</name>
+    </author>
+    <author>
+      <name>Carlos Rodriguez-Pardo</name>
+    </author>
+    <author>
+      <name>Jorge Lopez-Moreno</name>
+    </author>
+  </entry>
+</feed>
