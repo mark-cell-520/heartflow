@@ -129,7 +129,7 @@
  *   · false_precision / p_hacking / count_rate_conflation 领地。
  *
  * [r311 升级] 腿②新实质性裁定措辞家族（真升级②）：存量四族不认的
- * 新裁定腿——ZH「影响深远/意义深远/效应深远」（MAGNITUDE_ZH2）、
+ * 新裁定腿——ZH「影响深远/意义深远」（MAGNITUDE_ZH2）、
  * 「含金量高/价值很大/分量很足/很有价值/很有分量」
  * （IMPORTANCE_ZH2）；EN「impactful / game-changer /
  * world-changing / consequential / matters in practice /
@@ -215,7 +215,6 @@ const MAGNITUDE_EN = [
 const MAGNITUDE_ZH2 = [
   /影响(?:极为|极其|非常|十分|相当)?(?:深远|广泛|广大)/,
   /意义(?:极为|极其|非常|十分|相当)?深远/,
-  /效应(?:极为|极其|非常)?深远/,
 ];
 // 含金量/价值/分量：把显著性外推到「成果本身有价值有分量」——存量
 // IMPORTANCE 只收「重要/重大/突破性」族，不收「含金量/分量」族；
@@ -239,7 +238,6 @@ const IMPORTANCE_EN2 = [
   /\bof\s+(?:great|considerable|major|enormous|immense)\s+(?:value|importance)\b/i,
 ];
 const MAGNITUDE_EN2 = [
-  /\b(?:huge|enormous|massive|profound|far[- ]reaching|sweeping)\s+implications\b/i,
   /\bimplications\s+(?:are|is)\s+(?:huge|enormous|massive|profound|far[- ]reaching)\b/i,
   /\bfar[- ]reaching\s+(?:impact|consequences|effects)\b/i,
   /\b(?:matters|mattered)\s+(?:a\s+great\s+deal\s+)?in\s+the\s+real\s+world\b/i,
