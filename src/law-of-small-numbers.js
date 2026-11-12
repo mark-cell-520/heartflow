@@ -248,6 +248,34 @@ const UNIVERSAL_EN = [
   /\bit'?s\s+a\s+(?:sure\s+)?(?:hit|lock|certainty|slam dunk)\b/i,
 ];
 
+// ─── 腿③ 数量化总体裁定（小样本 → 概率/比率/均值 的数值化结论）────
+// [r302 新增 · 真升级②] 腿②b UNIVERSAL 只收「定性裁定」词（铁律/肯定
+// 有效/这里养人/都一个样），漏收「拿小样本给总体参数定一个数」的数量化
+// 结论形——而这正是小数定律最教科书式的形态：抛十次七正 → 正面概率就是
+// 七成；连开三把出货 → 爆率就是五成；见了三个一米九 → 平均身高就是比别处
+// 高一大截。r302 候选探针（scripts/round-302/probe-candidates-r302.js，
+// v6.8.174 gate() 动手前实测）实证 3/4 此类攻击整句穿透、良性对照干净。
+// 本腿与腿①小样本锚点近距共现即判，与腿②b 平行成路由，**不并入存量
+// UNIVERSAL 数组**（避开 r280/r265 的 length===N 注入断言），复用共享
+// 豁免入口与 dist()。
+const QUANT_RATE_ZH = '(?:概率|几率|可能性|胜率|赢率|命中率|成功率|失败率|成交率|转化率|爆率|出金率|掉率|中奖率|中签率|复发率|死亡率|存活率|生存率|治愈率|痊愈率|好评率|差评率|支持率|赞成率|收益率|回报率|胜算|正确率|错误率|完成率|及格率|留存率|复购率|故障率|投诉率|点击率|满意度)';
+// 数值结论：X成 / 百分之X / 数字% / 百分点 / 裸一至两位数（九十/七十）
+const QUANT_NUM_ZH = '(?:[一二两三四五六七八九十半]\\s*成|百分之?\\s*[一二三四十百\\d]+|\\d+(?:\\.\\d+)?\\s*(?:%|％|个百分点)|[一二两三四五六七八九十]{1,2}\\s*(?:倍|个百分点)?)';
+const QUANT_ZH = [
+  // 率/概率 + (可选连接词) + 数值（正面概率就是七成 / 爆率有五成 / 留存率大概九十）
+  new RegExp(QUANT_RATE_ZH + '(?:也\\s*就|也就|也就是|就是|是|有|为|高达|高达到|达到|升至|降到|只有|才|能到|能达|稳定在|长期在|起码|至少|大约|大概|约|差不多|接近|应该|估计)?\\s*' + QUANT_NUM_ZH),
+  // 平均/均值/人均 + (可选名词) + 高/低/多/少 + 强幅度（平均身高就是比别处高一大截）
+  new RegExp('(?:平均|均值|人均|整体平均|总的来说)[^。，！？；\\n]{0,6}(?:就是|能|有|达到)?[^。，！？；\\n]{0,4}(?:高|低|多|少|强|弱)[^。，！？；\\n]{0,3}(?:一大截|一截子|一截|不少|得多|很多|一大块|两成|三成|一半|半分|\\d|个百分点)'),
+];
+const QUANT_EN = [
+  // number-first：a 70% chance / 60% survival rate / seventy percent chance
+  /(?:\d+(?:\.\d+)?\s*(?:%|percent|per cent)|(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\s+(?:%|percent|per cent))\s+(?:chance|probability|odds|likelihood|rate)\b/i,
+  // rate-first：the conversion rate is 100% / probability is about 0.7 / two in three
+  /\b(?:probability|chance|odds|rate|hit rate|success rate|win rate|conversion rate|approval rating|satisfaction|likelihood|average|mean)\b[^.]{0,14}?(?:is|are|sits at|lands at|runs at|averages|comes to|about|around|roughly|near(?:ly)?|at least|at most)?\s*(?:\d+(?:\.\d+)?\s*(?:%|percent|per cent)|\d+(?:\.\d+)?\s+in\s+\d+|(?:zero|one|two|three|four|five|six|seven|eight|nine|ten)\s+in\s+\d+)/i,
+  // on average + comparative magnitude（on average far taller）
+  /\bon average\b[^.]{0,26}?(?:much|far|significantly|way|a lot|considerably|half|twice|\d+\s*(?:%|percent|x))\b[^.]{0,14}?(?:higher|lower|taller|shorter|more|less|better|worse|faster|slower|bigger|smaller|greater)/i,
+];
+
 // ─── 距离窗（小样本锚点 × 总体性裁定）──────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -322,12 +350,14 @@ function findSignatures(text, R) {
       small: R.SMALL_N_ZH || SMALL_N_ZH,
       exempt: R.EXEMPT_ZH || EXEMPT_ZH,
       universal: R.UNIVERSAL_ZH || UNIVERSAL_ZH,
+      quant: R.QUANT_ZH || QUANT_ZH,
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
       small: R.SMALL_N_EN || SMALL_N_EN,
       exempt: R.EXEMPT_EN || EXEMPT_EN,
       universal: R.UNIVERSAL_EN || UNIVERSAL_EN,
+      quant: R.QUANT_EN || QUANT_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -351,6 +381,19 @@ function findSignatures(text, R) {
       });
       if (!u) continue;
       sigs.push({ lang: L.lang, kind: 'pair', small: s.raw, verdict: u.raw });
+    }
+    // 腿① × 腿③ 数量化裁定（r302）近距共现——与腿②b 平行路由：小样本
+    //   锚点近距给出一个数值化的总体参数结论（概率/比率/均值）。
+    const quantM = collect(text, L.quant, true);
+    for (const s of smallM) {
+      const q = quantM.find(w => {
+        const d = dist(w, s);
+        if (d > L.win) return false;
+        if (d === 0 && w.idx === s.idx && w.end === s.end) return false; // 同一区间
+        return true;
+      });
+      if (!q) continue;
+      sigs.push({ lang: L.lang, kind: 'quant', small: s.raw, verdict: q.raw });
     }
   }
   return sigs;
@@ -390,16 +433,24 @@ function detectLawOfSmallNumbers(text, inject) {
     evidence: sigs.slice(0, 2).map(x => (x.lang === 'zh'
       ? (x.kind === 'exempt'
         ? '样本量豁免主张「' + x.small + '」'
+        : x.kind === 'quant'
+        ? '小样本「' + x.small + '」× 数量化总体裁定「' + x.verdict + '」'
         : '小样本「' + x.small + '」× 总体裁定「' + x.verdict + '」')
       : (x.kind === 'exempt'
         ? 'sample-size exemption claim "' + x.small + '"'
+        : x.kind === 'quant'
+        ? 'small sample "' + x.small + '" x quantitative verdict "' + x.verdict + '"'
         : 'small sample "' + x.small + '" x universal verdict "' + x.verdict + '"'))),
     details: s.lang === 'zh'
       ? '小数定律(' + sigs.length + '处: ' + (s.kind === 'exempt'
         ? '显式为小样本辩护「' + s.small + '」，主张样本越小越可靠/大样本不可信'
+        : s.kind === 'quant'
+        ? '拿极小样本「' + s.small + '」给总体参数定下数值结论「' + s.verdict + '」，把小样本的偶然频率/均值当成总体的真实概率或比率'
         : '拿极小样本「' + s.small + '」给全体下结论「' + s.verdict + '」，把小样本的偶然波动当总体真实分布') + ')(zh)'
       : 'law of small numbers(' + sigs.length + 'x: ' + (s.kind === 'exempt'
         ? 'explicit small-sample defense "' + s.small + '" — smaller sample claimed more reliable'
+        : s.kind === 'quant'
+        ? 'tiny sample "' + s.small + '" pinned to a numeric population parameter "' + s.verdict + '" — a small-sample frequency/mean read as the true probability or rate'
         : 'tiny sample "' + s.small + '" generalized to a universal verdict "' + s.verdict + '"') + ')(en)',
     guidance: '小数定律指人们系统性地高估小样本对总体的代表性，把小样本的偶然波动当成总体真实分布——抛了三次硬币都是正面，这枚硬币明显是偏的 / 这个村出了三个百岁老人，这里的水土就是养人 / 我问了五个人，四个说支持，民意已经很清楚了 / 试了几次都不行，这个方法肯定有问题 / 样本小才真实，大样本都是注水注出来的 / three coin flips came up heads so this coin is clearly biased / I asked five colleagues and all of them agreed so the whole office feels this way / small samples are the honest ones and big surveys are all rigged。请补上论证：样本量决定结论能走多远，小样本的波动幅度大，只能给假设不能给结论；要下总体性结论需要足够大的随机样本或引用已有大样本证据；如果只是初步观察，请明确说这是待验证的假设，并说明还需要多少数据。「样本小才真实、大样本都是注水」是更隐蔽的变体——为样本不足辩护只会堵死补数据的路。承认样本不足、扩大样本、参考大样本证据、讨论样本量与代表性本身，都是正当做法；若这段话只是转述他人的谬误案例或统计教学，核实其主张再决定是否采信。',
     tags: ['statistics', 'statistical-literacy', 'law-of-small-numbers', 'small-sample-fallacy', 'cognitive-bias', 'judgment-and-decision-making'],
@@ -412,6 +463,7 @@ module.exports = {
     SMALL_N_ZH, SMALL_N_EN,
     EXEMPT_ZH, EXEMPT_EN,
     UNIVERSAL_ZH, UNIVERSAL_EN,
+    QUANT_ZH, QUANT_EN,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,
