@@ -59,18 +59,18 @@ for (const t of MA_CAND) {
 console.log('');
 console.log('=== B. 官方良性语料（当前基线：两模块直调命中清单）===');
 const corpora = [
-  ['gate-97', path.join(ROOT, 'test', 'gate-benchmark.js')],
-  ['extended', path.join(ROOT, 'test', 'gate-benchmark-extended.js')],
-  ['vertical', path.join(ROOT, 'test', 'vertical-benign-benchmark.js')],
-  ['mixed', path.join(ROOT, 'test', 'benign-mixed-benchmark.js')],
+  ['gate-97', path.join(ROOT, 'test', 'gate-benchmark.js'), 'SAMPLES'],
+  ['extended', path.join(ROOT, 'test', 'gate-benchmark-extended.js'), 'SAMPLES'],
+  ['vertical', path.join(ROOT, 'test', 'vertical-benign-benchmark.js'), 'CATEGORIES'],
+  ['mixed', path.join(ROOT, 'test', 'benign-mixed-benchmark.js'), 'SAMPLES'],
 ];
 let total = 0;
 const sigHits = [], maHits = [];
-for (const [label, file] of corpora) {
+for (const [label, file, key] of corpora) {
   let mod;
   try { mod = require(file); } catch (e) { console.log(`${label}: load-fail ${e.message}`); continue; }
-  const SAMPLES = mod.SAMPLES || mod.samples || {};
-  const items = Array.isArray(SAMPLES) ? SAMPLES : Object.values(SAMPLES).flat();
+  const raw = mod[key] || {};
+  const items = Array.isArray(raw) ? raw : Object.values(raw).flat();
   for (const s of items) {
     const text = typeof s === 'string' ? s : (s && s.text) || '';
     if (!text) continue;

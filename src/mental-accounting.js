@@ -109,6 +109,18 @@
  *   「不能/严禁 + 挥霍」否定句式反对浪费——均因腿②缺失或被
  *   否定前缀拦下，双腿判据天然不命中，另由 326 条官方良性语料
  *   零误伤验证。）
+ *
+ * [r311 升级] 新来源标签 × 新消费许可措辞家族（真升级②）：存量
+ * SOURCE 只收个人收入标签（奖金/意外之财/中奖/报销/卡券/红包），
+ * 不收公共资金与劳务创作收入——「政府补贴花不掉不用计较」「课题
+ * 经费跟工资不一样花起来不用顾忌」「佣金提成来得容易不觉得可惜」
+ * 「版税到账跟工资不是一个性质」「救济款不拿白不拿」「压岁钱是
+ * 白来的」类攻击穿透；存量 SPEND 不收「没有心理负担/不用顾忌/
+ * 犒劳自己/奢侈一把」（EN treated myself / no strings attached /
+ * without guilt）。探针 14/16 穿透本模块（2 条已被存量腿代拦）、
+ * 官方良性语料 228 条零误命中（coordination/agent4/probes/
+ * r311-probe*.js）。实现为平行常量 + findSignatures concat 合并，
+ * 存量四组注入语义不变。src/index.js 零改动。
  */
 'use strict';
 
@@ -136,6 +148,56 @@ const SOURCE_ZH = [
   /(?:省下来的|省下的|攒下来的|节省下来的|优惠省下的|折扣省出的|比价省下的|返现|返利)/,
   // ①-i 白得类
   /(?:白捡的|白来的|白得的|捡来的|天上掉下来的|天上掉的|不要钱的|免费送的|白拿的|白给的)/,
+];
+
+// ─── [r311] 腿① 新来源标签族（平行常量，存量注入语义不变）──────────
+// 公共资金类：补贴/拨款/经费/救济——「公家的钱花不掉不心疼」是企业版
+// 心理账户的常见形，存量来源表只收个人收入标签，不收专项公共资金。
+const SOURCE_ZH2 = [
+  // ①-j 人情往来（压岁钱/利是）
+  /(?:压岁钱|压岁红包|利是钱|利市红包)/,
+  // ①-k 公共资金（补贴/拨款/经费/救济/扶贫）
+  /(?:政府补贴|国家补贴|财政补贴|补贴款|补贴金|专项拨款|财政拨款|课题经费|科研经费|项目经费|专项资金|救济款|救济金|扶贫款|帮扶资金|低保金|奖金池)/,
+  // ①-l 劳务/创作收入（佣金/提成/版税/稿费/劳务费）
+  /(?:佣金|提成|抽成|版税|稿费|劳务费|专家费|咨询费|演出费|出场费)/,
+];
+
+// ─── [r311] 腿②-A 新消费/免责许可族（平行常量，存量注入语义不变）────
+// 存量 SPEND_ZH 收「不心疼/随便花/挥霍」族，不收「负担/顾忌/犒赏/
+// 奢侈一把」族；探针实证 14/16 穿透（2 条已被存量腿代拦）。
+const SPEND_ZH2 = [
+  // ②-i 负担/顾忌族（花起来没有负担/不用顾忌——显式免责）
+  /(?:没有|毫无|没啥|没什么|不会有|不存在|不曾有)[^。，！？；\n]{0,6}(?:心理负担|负担|顾忌|顾虑)/,
+  /(?:不用|不必|无需|无须|没必要|犯不着|不须|用不着)[^。，！？；\n]{0,4}(?:顾忌|顾虑|节省|省着|节约|俭省|计较|斟酌|心疼|可惜)/,
+  // ②-j 自我犒赏族（年终奖到账犒劳自己——把来源钱当奖励额度）
+  /(?:犒劳|犒赏|奖赏|奖励|慰劳)自己/,
+  // ②-k 一把族（奢侈一把/享受一把/放纵一把）
+  /(?:奢侈|奢华|阔绰|放纵|任性|享受)一把/,
+  // ②-l 花起来不心疼族（显式消费桥 + 免责，「花起来没啥可惜」）
+  /(?:花|买|用)起来(?:也)?(?:不|没啥|没什么)[^。，！？；\n]{0,3}(?:心疼|可惜|纠结|犹豫)/,
+];
+
+// ─── [r311] 腿① 新来源标签族（英文，平行常量）────────────────────
+const SOURCE_EN2 = [
+  /\blucky money\b/i,
+  /\bred envelope\b/i,
+  /\b(?:government |state |public )?(?:subsidy|subsidies|grants?)\b/i,
+  /\bresearch (?:grant|funding|budget)\b/i,
+  /\brelief (?:payment|money|funds?)\b/i,
+  /\b(?:sales )?commission\b/i,
+  /\broyalt(?:y|ies)\b/i,
+  /\btip money\b/i,
+  /\bbonus pool\b/i,
+];
+
+// ─── [r311] 腿②-A 新消费/免责许可族（英文，平行常量）──────────────
+const SPEND_EN2 = [
+  /\btreat(?:ed|ing|s)?\s+(?:myself|himself|herself|ourselves|themselves)\b/i,
+  /\b(?:rewarded|spoiled|spoiling)\s+(?:myself|himself|herself|ourselves|themselves)\b/i,
+  /\bno strings attached\b/i,
+  /\bwithout\s+(?:any\s+)?(?:guilt|remorse|hesitation)\b/i,
+  /\bmight as well\s+(?:treat|indulge|enjoy)\b/i,
+  /\bindulge\s+(?:a\s+(?:little|bit)|myself|once)\b/i,
 ];
 
 // ─── 腿① 来源标签锚点（英文）────────────────────────────────────
@@ -299,10 +361,10 @@ function hasAccountingFrame(text, R) {
  * NOTCOUNT 型腿②须同句另见 BRIDGE 消费动词/放任桥梁。
  */
 function findSignatures(text, R) {
-  const srcZh = R.SOURCE_ZH || SOURCE_ZH;
-  const srcEn = R.SOURCE_EN || SOURCE_EN;
-  const spendZh = R.SPEND_ZH || SPEND_ZH;
-  const spendEn = R.SPEND_EN || SPEND_EN;
+  const srcZh = (R.SOURCE_ZH || SOURCE_ZH).concat(R.SOURCE_ZH2 || SOURCE_ZH2);
+  const srcEn = (R.SOURCE_EN || SOURCE_EN).concat(R.SOURCE_EN2 || SOURCE_EN2);
+  const spendZh = (R.SPEND_ZH || SPEND_ZH).concat(R.SPEND_ZH2 || SPEND_ZH2);
+  const spendEn = (R.SPEND_EN || SPEND_EN).concat(R.SPEND_EN2 || SPEND_EN2);
   const ncZh = R.NOTCOUNT_ZH || NOTCOUNT_ZH;
   const ncEn = R.NOTCOUNT_EN || NOTCOUNT_EN;
 
@@ -408,6 +470,7 @@ module.exports = {
   detectMentalAccounting,
   __internals: () => ({
     SOURCE_ZH, SOURCE_EN, SPEND_ZH, SPEND_EN, NOTCOUNT_ZH, NOTCOUNT_EN,
+    SOURCE_ZH2, SOURCE_EN2, SPEND_ZH2, SPEND_EN2,
     BRIDGE_ZH, BRIDGE_EN,
     CONCEDE_ZH, CONCEDE_EN, DECOUPLE_ZH, DECOUPLE_EN,
     ACCOUNT_ZH, ACCOUNT_EN, META_ZH, META_EN,
