@@ -1,3 +1,50 @@
+## r310 — 峰终定律（peak_end_rule 第 246 维度 econ_reasoning_gate 聚合族）「事件日锚点 × 过程痛苦 × 指示词整体裁定」新措辞家族（真升级②）
+
+**日期** 2026-11-12 20:55–21:15 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值，同 r305/r308/r309 先例）  **轮次** r310（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 246 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
+
+### 缺口实证（scripts/round-310/probe.js + probe2.js，v6.8.178 动手前）
+
+中文「虽然装修那三个月天天吵架，但搬家那天全家都很开心，所以这次装修值了」类句子 **11/12 穿透本模块**（模块直调零命中），其中 4 条穿透整个 gate——`fallacy_of_relevance` 只兜住带「虽然…但…所以」显式推理桥的少数形；EN「Although the trip was mostly miserable, the day we moved in felt perfect, so the whole thing was worth it」同样穿透。根因三条，全部实证：
+
+1. 存量 `WHOLE_VERDICT_ZH` 不认「这次/这一切/这十年/这几个月」类**指示词整体裁定**，也不认「没白费/没白/不枉/幸福/圆满」类新结论词；
+2. 存量 `PEAK_END_ZH` 不认「搬家那天/上线那天/发证那天/敲钟那天/求婚那晚」类**事件日锚点**（只认最后/结尾/收官/散会等泛指时刻）；
+3. 存量 `DURATION_ZH` 缺「吵架/争吵/崩溃/折磨/熬夜/睡不好/吵了」类**关系冲突与睡眠剥夺**新痛苦词（EN 侧缺 fought/argued/chaos/nightmare/sleepless/fighting）。
+
+### 改了什么（src/peak-end-rule.js，+约 90 行 0 删除存量逻辑，src/index.js 零改动）
+
+- **PEAK_END_ZH2 两支**：①事件名词锚点（搬家/乔迁/迁新居/上线/发布/发售/发证/发奖/答辩/毕业/婚礼/求婚/订婚/开业/开学/典礼/出院/夺冠/获奖/揭晓/庆功/表彰/剪彩/通车/通水/通电/颁奖/开题/交割/挂牌/解封/首演/首映/开机/杀青/结课/满月/升学/查分/放榜/出分/敲钟/上市/开口/第一次/生日/百日/周年/金婚/银婚 + 那天/那晚/那夜/当天/当日）；②裸「那天/那晚/那夜/当天/当日 + 高光情绪词」（开心/高兴/浪漫/激动/兴奋/难忘/美好/幸福/圆满/惊艳/震撼/满足/踏实/骄傲/风光/体面/热闹/温馨/感动）。
+- **WHOLE_VERDICT_ZH2 一支**：指示词裁定（这次/这一切/这些年/这十年/这五年/这三年/这几个月/这大半年/这一年/这一年多/整个过程/整段/全部/所有/一切/每一点/从头到尾/点点滴滴/日日夜夜/分分秒秒 + ≤14 字 + 值/值得/没(有)白费/没白/不枉/不虚此行/幸福/美好/圆满/成功/划算/不亏/舒坦/安心/欣慰），裁定词前 `(?<![不没未无莫])` 前瞻守卫（「这次不值」「装修根本不值」不判，「这一切就没有白费」判——实证「没白费」在真实语料中常以「没有白费」形态出现，词表已含 `没(?:有)?`）。
+- **DURATION_ZH2 两支**：①关系冲突词（吵架/争吵/争执/冲突/冷战/内耗/崩溃/折磨/煎熬…）；②动作/睡眠形（吵了/吵到/翻旧账/撕破脸/熬夜/通宵/睡不好/睡眠不足/昼夜颠倒/连轴转/996/007）。
+- **EN 三支平行常量**：PEAK_END_EN2（the day we/I、moving-in day、the last/final/closing day、graduation/wedding/launch/opening/anniversary day、that last/final night/evening）；WHOLE_VERDICT_EN2（the whole thing/the whole ordeal/all of it/everything/these (past) ten|three|five|few|two years + worth it/paid off/worthwhile；was (not) in vain；made it (all) worthwhile）；DURATION_EN2（fought/fights/fighting/argued/arguing/chaos/chaotic/nightmare/sleepless/unpleasant/fraught/tumultuous/rocky/turbulent/constant arguments/we fought）。
+- **新误伤修复——NEGATIVE_VERDICT_ZH/EN 豁免族**：r310-probe3 实证新事件日锚点腿放大了存量 EN 裁定腿的宽窗误匹配（「the last day was great, but overall the vacation was merely average」被旧腿 `the trip…great` 误配），补「整体/全程/总的来说/overall + 中等/中上/一般/乏善可陈/差强人意/不值/merely average/not worth…」负面整体裁定豁免，实现模块头注中「缺正面整体裁定即无本族」的显式化，带注入证明。
+- **NEG_INSIDE 补 5 词**：一点都/压根/根本/丝毫/完全没（指示词裁定腿否定守卫）。
+- 合并点在 `findSignatures` 的 langs 表（`(R.X || X).concat(R.X2 || X2)` 平行注入通道）：存量键注入数组=整体替换、注入永假正则时 `.concat` 抛 TypeError——与存量注入语义逐条一致；存量 12 条攻击、良性/边界/两组豁免族归因零变化（存量测试 16/16 复跑同分）。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-310-peak-end-event-day-verdicts.test.js` | **18 通过 / 0 失败**（A gate 归因 1 + B 模块 1 + C 良性 2 + D 存量回归 2 + E 常量级注入 6 + F 元素级注入 1 + G 路由独立 1 + H 登记纪律 3，F 组内含 11 元素逐一断言） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 PASS，判别维度 251**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，零新增误伤） |
+| 全量 run-all（JOBS=4） | 见 coordination/reports/r310-runall.output.txt |
+
+### 负例验证
+
+- 常量级注入 8 组：`PEAK_END_ZH2:[]`→新事件日/裸日锚点攻击全失配、`WHOLE_VERDICT_ZH2:[]`→新指示词裁定攻击全失配、`DURATION_ZH2:[]`→新痛苦词攻击全失配、`PEAK_END_EN2:[]`→EN 8/8 全失配、`WHOLE_VERDICT_EN2:[]`→纯新裁定 EN 5/5 全失配、`DURATION_EN2:[]`→纯新痛苦 EN 5/5 全失配、六新常量全删→22 条新攻击全灭（新家族整体承重）、`NEGATIVE_VERDICT_ZH/EN` 注入永假正则→负面整体裁定豁免句变红（新豁免族承重）——全部断言失败形态（miss），无加载崩溃
+- 存量注入语义不变：删 `PEAK_END_ZH/WHOLE_VERDICT_ZH/DURATION_ZH`（及 EN 对应）→存量 12+7 条攻击仍全灭，新腿不顶替存量注入语义
+- 元素级注入 11 组：PEAK_END_ZH2[0][1]、WHOLE_VERDICT_ZH2[0]、DURATION_ZH2[0][1]、PEAK_END_EN2[0][1]、WHOLE_VERDICT_EN2[0][1][2]、DURATION_EN2[0]——逐一删除后每组至少一条攻击翻红（PEAK_END_EN2[1] 首版零翻红，暴露缺 evening 锚点专属攻击句，补「The months of fighting were a nightmare, but that final evening was wonderful…」后承重；该句又暴露 DURATION_EN2 漏 fighting，补词后翻红）
+- **注入 19 个（8 常量 + 11 元素）→ 19 个变红，0 个未变红**
+- 官方良性语料 272 条全量零误命中（gate-benchmark 97 + extended + vertical + mixed）
+
+### 已知边界（交接）
+
+1. **熬夜/煎熬 型时长腿被存量兜住**——「复习那半年天天熬夜…这一切煎熬都算值了」的「煎熬」在存量 `DURATION_ZH` 中，删 `DURATION_ZH2` 后仍命中；此类句不能作为新时长腿的纯子集注入样本，轮测已如实移出（说明见测试内注释）。
+2. **EN 三条攻击的裁定词被存量裁定腿同时匹配**——EN1/EN7「the whole thing was worth it」命中存量 `WHOLE_VERDICT_EN` 宽窗（the whole + was worth it），EN6「it was worth it」命中存量窄窗 `(it|that|this)+was+worth it`；新裁定腿纯子集为其余 5 条，注入样本选择已如实反映存量腿覆盖，不谎称全覆盖。
+3. **ZH 负面整体裁定豁免的承重句为混合信号形**（「…所以这次装修值了，不过整体评价只能算中上」）——纯负面句（「整体只能说一般」）不含正面裁定词，无豁免也不命中，豁免族对 ZH 是防御性冗余、对 EN 是实弹（存量宽窗误配），两语如实分列。
+
 ## r309 — 选择依赖变量（selection_on_dependent_variable 第 249 维度 econ_reasoning_gate 聚合族）「按结果选样本」新措辞家族（真升级②）
 
 **日期** 2026-11-12 19:00–20:10 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值，同 r305/r308 先例）  **轮次** r309（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
