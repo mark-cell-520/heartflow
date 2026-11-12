@@ -29,7 +29,7 @@
 | `scripts/guard-abilities.js` | **20/20 PASS，判别维度 251**（与基线一致） |
 | `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败**（与基线一致） |
 | `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，零新增误伤） |
-| 全量 run-all（JOBS=4） | 见 coordination/reports/r310-runall.output.txt |
+| 全量 run-all（JOBS=4，并发池 print 交错，本轮测试汇总行落于 r310-runall.output.txt 第 1563 行） | **21,777 通过 / 154 失败 / 21,931 总**——与 r309 基线 21,759/154/21,913 差 passed +18 / failed +0，+18 恰为本轮轮测断言数 |
 
 ### 负例验证
 
