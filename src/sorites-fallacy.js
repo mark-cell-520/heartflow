@@ -79,6 +79,30 @@
  *     不算秃/One more grain doesn't make a heap / Removing one hair
  *     doesn't make you bald / One more cent doesn't make you rich）。
  *
+ * [r307 扩族] 探针实证（scripts/round-305/，动手前）：日常消解话术整族射
+ * 程外——「就多吃了一块蛋糕，减肥大计怎么可能因此受影响」「不过晚睡了
+ * 一个小时，累积起来又能怎样」「少交一次周报没关系，大家都习惯了」
+ * 「one more cookie does nothing to my diet」「staying up one extra
+ * hour changes nothing about my health」模块直调与 gate() 全量双零命中，
+ * 良性预干净。根因是三条腿的表层词表停在传统面：STEP 量词缺块/碗/杯/
+ * 瓶/盘/局/批，累积敏感目标（减肥/健康/负担/进度/作息/纪律）整族缺席，
+ * NEG_END 缺「又能怎样/有什么关系/没关系」与 EN nothing/no big deal。
+ * 本轮按 r218「一次违约不算失信」同范式扩族：
+ *   - STEP_ZH 追加容器/回合量词族（并入存量表，纯追加）；
+ *   - STEP_EN 追加 one-extra 修饰与 skip/miss 欠付形（并入存量表）；
+ *   - NEG_END_ZH 追加消解族、NEG_END_EN 追加 nothing 族（并入存量表）；
+ *   - 累积敏感目标族 GOAL_ZH/GOAL_EN 为**平行常量 + 后置形专属路由**：
+ *     实测并入 VAGUE 表后 15 条良性习惯建议句 7 条误伤（「减肥要靠长期
+ *     饮食控制，一天两天看不出变化」「锻炼重在坚持，少练一次无伤大雅」
+ *     全是谓词前置形，而攻击句全部是 STEP 前置形），故独立路由并加
+ *     「STEP 必须在目标词前」约束，实测 7/7 良性误伤压零、20/20 攻击
+ *     全保留、官方语料 326 条零误伤。src/index.js 零改动。
+ * 已知边界（交接）：腿②前置否定守卫会拦「一次不V没关系」序（须减量序
+ * 「少V一次N没关系」）；CONCESSION「不过」在谓词前 20 字内会拦；EN 否定
+ * 守卫 14 字窗使「will not wreck my diet」序不命中（须「does nothing
+ * to」后置序）；「饮食控制」型 r218 存量误伤（VAGUE「控制」×STEP「一天」
+ * ×NEG「不」的谓词前置形）非本轮引入，本轮动手前 HEAD 同句同判。
+ *
  * 为什么取 VERIFY 级：单句也可能是对 sorites 悖论的合法课堂转述、对
  * 模糊谓词边界的正确哲学讨论（「堆是模糊谓词，边界依赖约定」），或对
  * 渐变过程的客观描述（「积少成多」），rewrite 会误伤（与 r206-r215
@@ -130,6 +154,12 @@ const STEP_ZH = [
   /少一粒|少一颗|少一根|少一分|少一毫|少一次|少一回|少一天|少一小时|少一秒|少一个|少一点|少一些|减少一粒|减少一根|减少一分|减少一个|去掉一个|去掉一粒|减掉一个|减掉一根|抽掉一根|拿走一个|拿掉一根|省略一个|略去一个/,
   /多一粒|多一颗|多一根|多一分|多一毫|多一次|多一回|多一天|多一小时|多一秒|多一个|多一点|多一些|增加一粒|增加一根|增加一分|增加一个|添上一根|再加上一个|再添一根|再添一个/,
   /再少一点|再多一点|再少一根|再多一根|再少一粒|再多一粒|再少一个|再多一个|再少一分|再多一分/,
+  // [r307] 常用容器/回合量词缺族（块/碗/杯/瓶/盘/碟/串/批/局/副/锅/盆——
+  // 「就多了一块蛋糕」「多喝一杯酒」「多打一局游戏」整族此前射程外，
+  // 量词表停在米/粒/根/钱的传统面，日常摄入与娱乐增量全缺）
+  /一块|一碗|一杯|一瓶|一盘|一碟|一串|一批|一局|一副|一锅|一盆|一屉/,
+  /少一碗|少一杯|少一块|少一局|少一批|少一盘|少一瓶|少一串/,
+  /多一碗|多一杯|多一块|多一局|多一批|多一盘|多一瓶|多一串/,
 ];
 
 // ─── 腿① STEP 单元增量宣告（英文）────────────────────────────────
@@ -142,6 +172,11 @@ const STEP_EN = [
   /\b(?:grain|hair|cent|penny|step|unit)\s+by\s+(?:grain|hair|cent|penny|step|unit)\b/i,
   /\blittle\s+by\s+little\b/i,
   /\bone\s+at\s+a\s+time\b/i,
+  // [r307] 「one extra + 量词」增量形与 skip/miss 欠付形缺席——「staying
+  // up one extra hour changes nothing」「one more skipped workout」族整句
+  // 此前在 EN 侧零覆盖（存量修饰链只有 more/additional）
+  /\b(?:one|a\s+single|another)\s+extra\s+(?:grain|hair|cent|penny|step|inch|gram|drop|bit|piece|unit|item|degree|notch|increment|day|hour|minute|second|person|dollar|point|bug|task|chore|errand|meeting|class|session|workout|meal|night|week)\b/i,
+  /\b(?:skip|skips|skipped|skipping|miss|misses|missing|skip\s+out\s+on)\s+(?:one|a\s+single|just\s+one)\s+(?:more\s+)?(?:workout|session|class|meal|payment|day|night|step|dose|rep)\b/i,
 ];
 
 // ─── 腿② VAGUE 模糊谓词 × 否定终点（中文）───────────────────────
@@ -184,6 +219,10 @@ const NEG_END_ZH = [
   /再(?:多|少|大|小|高|矮|胖|瘦|贵|便宜|快|慢|重|轻)?也(?:不|没|未必|不算|称不上|说不上)/,
   /也(?:不|没|未必|算不得|称不上|说不上|不等于)/,
   /照样|依然|仍然|还是|照旧|照旧是/,
+  // [r307] 无害化消解族（又能怎样/有什么关系/没关系/无妨/不碍事/死不了
+  // ——「累积起来又能怎样」「少交一次周报没关系」：把单元增量的累积后果
+  // 一句话注销的收尾形；由 STEP×VAGUE 两腿共现保证精度）
+  /又能怎样|又能如何|有什么关系|有啥关系|没啥关系|没关系|无妨|不妨事|不碍事|不要紧|死不了|能有什么|算不上什么大事/,
 ];
 
 // ─── 腿② VAGUE 模糊谓词 × 否定终点（英文）───────────────────────
@@ -209,6 +248,33 @@ const NEG_END_EN = [
   /\b(?:doesn'?t|don'?t|won'?t|wouldn'?t|can'?t|cannot)\s+(?:count|qualify|make\s+the\s+cut|amount\s+to)\b/i,
   /\b(?:no\s+amount|not\s+enough|insufficient)\s+of\b/i,
   /\b(?:still|yet)\s+(?:not|isn'?t|doesn'?t)\b/i,
+  // [r307] nothing / no big deal 消解族（「changes nothing about my
+  // health」——存量否定词表不含 nothing 裸词）
+  /\bnothing\b/i,
+  /\bno\s+big\s+deal\b/i,
+  /\bdoes\s+not\s+matter\b/i,
+];
+
+// ─── [r307] 累积敏感目标族（平行常量，走后置形专属路由）─────────
+// 「就多了一块蛋糕，减肥大计怎么可能因此受影响」「少交一次周报没关系」
+// 「one more cookie does nothing to my diet」——单元增量对**累积量**的
+// 无害化消解，与 r218「一次违约不算失信」同范式但目标词是日常累积量
+// （减肥/健康/负担/进度/作息/纪律）而非违规判定词。
+// **为什么不并入 VAGUE_ZH/VAGUE_EN**：实测（scripts/round-305/
+// benign-risk-probe.js）并入后 15 条良性习惯建议句 7 条误伤——「减肥要靠
+// 长期饮食控制，一天两天看不出变化」「锻炼重在坚持，少练一次无伤大雅」
+// 全是**谓词前置形**（目标词在句首、STEP 在后），而攻击句全部是 **STEP
+// 前置形**（增量宣告先出场）。故本族独立路由并加后置约束（STEP 必须在
+// 目标词前），实测 7/7 良性误伤压零、20/20 攻击全保留。
+const GOAL_ZH = [
+  /减肥|瘦身|减脂|增肌|减重|体重|身材|健身|锻炼|体能/,
+  /健康|身体|体质|免疫力|作息|睡眠|气色|精神状态/,
+  /负担|工作量|任务量|进度|工期|排期|效率/,
+  /周报|考勤|打卡|签到|例会|汇报|值日|纪律/,
+  /累积|积累|积攒/,
+];
+const GOAL_EN = [
+  /\b(?:diet|weight\s+loss|fitness|health|workload|progress|deadline|schedule|sleep|recovery|posture|eyesight)\b/i,
 ];
 
 // ─── 自足习语分支（固定成语单式即两腿齐备）──────────────────────
@@ -424,6 +490,48 @@ function checkSoritesFallacy(text, inject) {
     }
   }
 
+  // [r307] 平行路由：累积敏感目标族（STEP 后置形专属——良性习惯建议句
+  // 全部是谓词前置形，后置约束把误伤面压零；守卫与主判据同构）
+  const goalVague = isZh ? (R.GOAL_ZH || GOAL_ZH) : (R.GOAL_EN || GOAL_EN);
+  if (goalVague.length > 0) {
+    const negEnd = isZh ? (R.NEG_END_ZH || NEG_END_ZH) : (R.NEG_END_EN || NEG_END_EN);
+    const gwin = isZh ? 20 : 60;
+    const goalIdxs = [];
+    for (const re of goalVague) {
+      for (const gi of findHits(re, text)) {
+        for (const ne of negEnd) {
+          for (const ni of findHits(ne, text)) {
+            if (Math.abs(ni - gi) <= gwin) { goalIdxs.push(gi); break; }
+          }
+          if (goalIdxs.length && goalIdxs[goalIdxs.length - 1] === gi) break;
+        }
+      }
+    }
+    for (const gi of Array.from(new Set(goalIdxs)).sort((a, b) => a - b)) {
+      if (negatedBefore(text, gi, isZh)) continue;
+      const vTail = text.slice(gi, Math.min(text.length, gi + 30));
+      const vLead = text.slice(Math.max(0, gi - 20), gi);
+      const conAfter = isZh ? CONCESSION_ZH.test(vTail) : CONCESSION_EN.test(vTail);
+      const conBefore = isZh ? CONCESSION_ZH.test(vLead) : CONCESSION_EN.test(vLead);
+      if (conAfter || conBefore) continue;
+      for (const re of stepList) {
+        for (const si of findHits(re, text)) {
+          const d = gi - si;
+          if (d > 0 && d <= win) {
+            return {
+              hit: true,
+              score: 0.6,
+              count: 1,
+              detail: isZh
+                ? '单元增量无害化消解累积敏感目标(zh)'
+                : 'unit increment dismissed against accumulation-sensitive goal(en)',
+            };
+          }
+        }
+      }
+    }
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
@@ -433,6 +541,7 @@ module.exports = {
     STEP_ZH, VAGUE_ZH, NEG_END_ZH,
     STEP_EN, VAGUE_EN, NEG_END_EN,
     IDIOM_ZH, IDIOM_EN,
+    GOAL_ZH, GOAL_EN,
     EXEMPT_META_ZH, EXEMPT_CORRECT_ZH, ACCUMULATE_ZH,
     EXEMPT_META_EN, EXEMPT_CORRECT_EN, ACCUMULATE_EN,
   }),
