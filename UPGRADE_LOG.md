@@ -1,4 +1,48 @@
+## r309 — 选择依赖变量（selection_on_dependent_variable 第 249 维度 econ_reasoning_gate 聚合族）「按结果选样本」新措辞家族（真升级②）
+
+**日期** 2026-11-12 19:00–20:10 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值，同 r305/r308 先例）  **轮次** r309（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
+
+### 缺口实证（scripts/round-309/probe.js，v6.8.178 动手前）
+
+8 条攻击探针过 `gate()` 全量 findings：7 条零命中穿透整个 gate（唯一被拦的 B2 句命中存量 fallacies 腿②）。扩集 25 条后用 stash 实证基线：**24/25 模块直调 + gate 双口径零命中**（A9「回访了所有康复的病人…」基线即由存量腿命中，移入回归组；A2 穿透源自 CONCEPT_ZH 裸词「统计」豁免收窄，单列）。穿透根因三条，全部实证：
+
+1. 存量腿①字符类 `[^。，！？；\n]` 被**逗号**系统性切断——现代汉语把结果群体与全称词分放两个分句（「活过寒冬的公司，它们都裁过员」），存量族整体失配；
+2. 结果动词/名词表缺「获奖/冠军/成功者/瘦/过冬」等高频成功学与养生话语词；
+3. EN 缺 `who got into / made the cut / interviewed 50 lottery winners` 类取样句式。
+
+### 改了什么（src/selection-on-dependent-variable.js，+57 行 0 删除存量逻辑，src/index.js 零改动）
+
+- **SELECT2_ZH 三支平行常量族**（不并存量数组——避开 r280/r265 length 断言与既有负例注入语义）：族 A「研究动作 × 结果群体」（访谈/采访/调查/统计/观察/复盘/对比/研究/分析/追踪/回访/取样/抽样/翻阅/梳理 × 冠军/获奖者/上岸者/活过/康复/逆袭/上榜…，成功学与养生话语的标准取样句式）；族 B「结果名词群体 + 全称词」（冠军/赢家/成功者/学霸/状元/获奖者/寿星/百岁老人/幸存者/上岸者… + 代词可选 + 都/普遍/清一色/无一例外…）；族 C「逗号容忍版」（存量族被 [，,、；;] 切断形态的平行收口）。
+- **SELECT2_EN 三支**：research verb × (who|that) + got into/made the cut/won/beat/survived…；`(all|every|each|the)` + **仅存量表外**名词（admitted students/graduates/centenarians/top performers/high achievers/medalists/finalists——survivors/winners/champions/victors 刻意不收，否则注入 {SELECT_EN: []} 时存量攻击样本仍命中，违背既有负例测试语义，首版即被 test/selection-on-dependent-variable.test.js 抓红后收窄）；research verb + 数量 + 结果名词。
+- **CAUSE2_ZH 一支**：与存量腿②**同一动词类**，仅结果名词换成存量表外新词（冠军/夺魁/上榜/获奖/瘦/减重/爆红/升职/录用/过冬/佳作/业绩/学霸/闯出来）——因此注入 {CAUSE_ZH: []} 时存量攻击样本仍全灭，注入语义不变。
+- **CONCEPT_ZH 豁免收窄**：删裸词「统计」（保留「统计学」）——「统计了所有上岸的考生」是研究动作取样句而非概念教学，裸词豁免把整句吞掉导致 A2 穿透；收窄后 A2 由存量双腿命中。官方良性语料 272 条全量复测零误伤，双向门禁 302/326 与基线逐条持平。
+- 合并点在 `findSignatures` 的 langs 表（`R.SELECT2_ZH || SELECT2_ZH` 平行注入通道），豁免/否定守卫/防自证/距离窗全部复用存量机制。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-309-selection-on-outcome-groups.test.js` | **15 通过 / 0 失败**（A gate 归因 2 + B 模块 1 + C 良性 2 + D 存量回归 1 + E 常量级注入 6 + F 元素级注入 1 + G 路由独立 1 + H 登记纪律 2），全量池中复跑同分 |
+| `bin/verify.js` | **16/0 PASS** |
+| `scripts/guard-abilities.js` | **20/20 PASS，判别维度 251** |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败** |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线完全一致，零新增误伤） |
+| 全量 run-all（JOBS=4） | **21,759 通过 / 154 失败 / 21,913 总**——与 r308 基线 21,744/154/21,898 差 passed +15 / failed +0，+15 恰为本轮轮测断言数 |
+
+### 负例验证
+
+- 常量级注入 6 组：`SELECT2_ZH:[]`→中 17/17 翻 miss、`SELECT2_EN:[]`→英 8/8、`CAUSE2_ZH:[]`→新结果名词 8/8、`CONCEPT_ZH` 回插裸词「统计」→A2 翻 miss（豁免收窄承重）、`SELECT_ZH:[]`/`CAUSE_ZH:[]`→存量攻击仍全灭（新族不顶替存量注入语义）、`SELECT_EN:[]`→存量 EN 仍全灭——全部断言失败形态（miss），无加载崩溃
+- 元素级注入 7 组：SELECT2_ZH[0] 研究动作族、[1] 名词族、[2] 逗号容忍族、SELECT2_EN[0] who 从句、[1] 全称+名词、[2] 研究动词+名词、CAUSE2_ZH[0] 新结果名词——每组删除后至少一条攻击翻红（SELECT2_EN[1] 首版无攻击翻红，暴露其被 [2] 完全覆盖的冗余，补两条无研究动词的全称攻击句「Every Harvard admit reads daily, so…」「Every centenarian in this village drinks goat milk, so…」后承重，两条均经 stash 实证基线零命中）
+- **注入 13 个（6 常量 + 7 元素）→ 13 个变红，0 个未变红**
+
+### 已知边界（交接）
+
+1. **治好/病 型腿②不收**——「所以乐观能治好病」因存量 CAUSE_ZH 动词类含「治好」而名词表无「病」不命中，属存量词表边界，攻击句改写为「所以乐观让他们康复」后命中；不为单句扩名词表（「病」过泛有误伤风险）。
+2. **族 A 单独出现不判**——「我们访谈了20位业绩冠军，他们训练都很刻苦」无腿②因果结论不命中，符合双人成伍规则；对冲句走存量 CORRECTIVE 豁免。
+3. **A9 存量已覆盖**——「回访了所有康复的病人，他们普遍坚持泡脚，所以泡脚能让人康复」基线即由存量「所有…的」形 + 存量腿②命中，非本轮新增穿透，移入回归组防回归。
+
 ## r308 — 堆垛/连续体谬误（sorites_fallacy 第 212 维度）「单元增量对累积敏感目标的无害化消解」新措辞家族（真升级②）+ r307 P0 时间线收尾
+
 
 **日期** 2026-11-12 17:10–18:50 CST（sorites 工作段）+ 20:33–21:30 CST（rebase + P0 Interim 段）+ 22:12–00:40 CST（终态复核与撞号重编号段）  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值）  **轮次** r308（kind: dimension）  **撞号说明**：本轮工作原本地编号 r307、09:23:52Z 认领；20:45 CST 远端同步轮以 HeartFlow Cron 身份发布了另一个 r307（evidence_claim_mismatch 第 251 维度，commit e4155a8），22:35 CST 审计轮（cbc32e1）找回并提交了 r304 原始 `src/econ-reasoning-gate.js`、修复文档口径债。按撞号纪律，本地未推送工作重编号为 **r308**，工作树经 `git stash -u` + `git merge --ff-only` 并入主线（5a5bae7），Interim 重建件让位原稿。
 
