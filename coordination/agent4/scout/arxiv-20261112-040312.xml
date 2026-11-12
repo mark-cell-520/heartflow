@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/85qQWbIG5ojoI+Ig+kZ2ksWK0vs</id>
+  <title>arXiv Query: search_query=all:average OR all:marginal OR all:conflation OR all:fallacy OR all:detection OR all:rule-based&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-12T04:03:12Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:average+OR+(all:marginal+OR+(all:conflation+OR+(all:fallacy+OR+(all:detection+OR+all:rule-based))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>463660</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14518v1</id>
+    <title>Toward Foundation Detection Models via Example-Based Grounding in EM-DETR</title>
+    <updated>2026-11-10T18:59:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.14518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DeepLearning (DL)-based Computer-Aided Diagnostic (CAD) systems have shown great promise in supporting clinicians, but their performance heavily depends on the availability of large, well-annotated datasets. In medical lesion detection, the scarcity of comprehensive, stan dardized annotations and the heterogeneity of existing datasets limit the development of robust foundation models. In this work, we introduce a novel approach to building a multi-domain foundation model for le sion detection by integrating diverse medical image datasets annotated for both anatomical structures and abnormalities. We first propose a student-teacher training strategy to effectively combine datasets with heterogeneous label spaces, mitigating catastrophic forgetting, and im proving feature learning. In addition, building on our previously pro posed example-based EM-DETR framework, we adapt it to jointly learn from multiple domain-specific datasets, enabling fine-grained, example driven detection across modalities. Our model achieves state-of-the-art (SOTA) results, with image-level AUC scores exceeding previous SOTA by 1% point on four key findings in CXRs. We achieve a leading mAP50 in CXRs and mammography, surpassing EM-DETR trained on a single dataset by 2-3% points. This approach paves the way for scalable foundation models in medical imaging that leverage heterogeneous data while maintaining robust and generalizable performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:59:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheethal Bhat</name>
+    </author>
+    <author>
+      <name>Bogdan Georgescu</name>
+    </author>
+    <author>
+      <name>Awais Mansoor</name>
+    </author>
+    <author>
+      <name>Florin C. Ghesu</name>
+    </author>
+    <author>
+      <name>Sasa Grbic</name>
+    </author>
+    <author>
+      <name>Andreas Maier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14515v1</id>
+    <title>AutoScaffold: AI-Guided Scaffolding for Reinforcement Learning of Language Models</title>
+    <updated>2026-11-10T18:58:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.14515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning with verifiable rewards (RLVR) produces rich training experience, yet outcome rewards reduce each attempt to a single number and leave most of this information unused. Training-time scaffolds, such as strategies or hints added to the prompt during training, offer a natural way to turn this information into guidance, but their design and adaptation are largely left to humans and tailored to specific domains. We introduce AutoScaffold, a unified AI-for-AI framework that turns a student's training experience into adaptive scaffolds, with minimal domain-specific information and no human intervention during training. A frozen teacher periodically examines this experience, diagnoses bottlenecks, and designs scaffolds in two forms: (i) strategies shared across a class of tasks and (ii) hints for individual hard tasks, adjusting the content and amount of support as the student learns. The scaffolds are removed at evaluation. We apply the same framework to ALFWorld, search-based QA, mathematical reasoning, and GPU kernel generation. When evaluated without scaffolds, students trained with AutoScaffold outperform those trained with the corresponding RL baselines in all four domains, with gains of 7.2 points in ALFWorld success and 4.0 points in average QA exact match. On GPU kernel generation, AutoScaffold increases the fraction of tasks with a correct kernel that runs faster than the PyTorch reference by up to 5.0 points. On math, our student surpasses QuestA's reported accuracy using approximately one-third as many student training steps. Analyses show that the teacher identifies a different failure in each task class and shifts its scaffolds from step-by-step workflows to targeted fixes as the student improves, and that its revised scaffolds help the student learn more than keeping the previous scaffold or using no scaffold.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:58:46Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zijian Zhang</name>
+    </author>
+    <author>
+      <name>Rizhen Hu</name>
+    </author>
+    <author>
+      <name>Jiangweizhi Peng</name>
+    </author>
+    <author>
+      <name>Shiyang Li</name>
+    </author>
+    <author>
+      <name>Sujay Bhatt</name>
+    </author>
+    <author>
+      <name>Sihan Zeng</name>
+    </author>
+    <author>
+      <name>Mingyi Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14501v1</id>
+    <title>Mutual Linearity in Nonlinear Population Dynamics</title>
+    <updated>2026-11-10T18:51:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.14501v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14501v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mutual Linearity in Nonlinear Population DynamicsMutual linearity, the persistence of affine relations among stationary observables under arbitrarily strong changes of one transition rate, is known for Markov jump processes and chemical reaction networks. We show that generalized Lotka--Volterra dynamics form a new class of mutually linear systems, even though species can go extinct and attractors can be chaotic. Any change to one species' equation acts on the others as one effective press and keeps all abundances affinely related: piecewise across extinctions, and as time averages on chaotic attractors.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.PE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:44Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Shiling Liang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14498v1</id>
+    <title>Measuring Robustness and Efficiency in a Connectome-Constrained Fly Visual System Model: Linking an Adversarial and a Perceptual Illusion</title>
+    <updated>2026-11-10T18:51:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.14498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Biological visual systems compute reliably under tight metabolic and wiring constraints, whereas artificial vision systems consume far more energy and can be sensitive to adversarial perturbations. Whether networks with brain-like wiring are more robust at lower computational cost is unclear. We address this by benchmarking a task-optimized, continuous-time recurrent neural network of the fly visual system constrained by its synaptic connectome (FlyNet) against artificial neural networks. We compare it against CNNs, RAFT, and continuous-time recurrent neural networks without detailed connectome constraints (sCTRNN, CTRNN) on a collision-detection task within a differentiable 3D rendering pipeline. FlyNet is adversarially vulnerable but, relative to its compute, more robust to common video corruptions than RAFT, while using up to five orders of magnitude fewer FLOPs. The CTRNNs remain more robust than FlyNet across almost all tested perturbations, suggesting that connectome constraints benefit efficiency, through their low edge count, over robustness. Recurrence improves robustness to white-box attacks in RAFT and temporal context improves robustness to common corruptions. FlyNet's position and velocity representations degrade under adversarial textures but recover under counterfactual textures that restore correct classification while staying equally far from training, ruling out unfamiliar textures as the cause of failure. The reverse-phi illusion similarly disrupts these representations and inverts the same low-level motion statistic as the adversarial textures. Optimizing this input statistic alone, without access to the network, suffices to induce classification failure, attributing both perturbations to the same circuit vulnerability. Connectome-constrained models can thus surface adversarial failure mechanisms as testable hypotheses about biological perceptual vulnerabilities.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:51:31Z</published>
+    <arxiv:comment>39 pages, 24 figures, 2 tables, Accepted at 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alexandre Garcia-Duran</name>
+    </author>
+    <author>
+      <name>Alejandro Rodriguez-Garcia</name>
+    </author>
+    <author>
+      <name>Manuel Molano-Mazón</name>
+    </author>
+    <author>
+      <name>Alexandre Hyafil</name>
+    </author>
+    <author>
+      <name>Srikanth Ramaswamy</name>
+    </author>
+    <author>
+      <name>Janne K. Lappalainen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14493v1</id>
+    <title>Comparative Analysis of Agent Evaluation Frameworks: Stability, Detection, and Discovery in Enterprise Analytics Agents</title>
+    <updated>2026-11-10T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.14493v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14493v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deploying LLM-based analytics agents in enterprise settings requires evaluation frameworks that can reliably detect failures across complex, multi-tool workflows. We present a three-phase comparative study of three evaluation frameworks, each representing a distinct evaluation paradigm (trace-based LLM judging, text-only LLM judging with red-teaming, and deterministic heuristics), applied to two analytics agents in a controlled research setting using frozen execution traces. Phase 1 quantifies evaluation harness stability through repeated measurements, finding that 97% of configurations meet the stability threshold and that stability patterns are agent-independent. Phase 2 measures known risk detection on 72 ground-truth test cases, where the trace-based framework achieves the best precision-recall balance (F1=0.90) while text-only evaluation matches on recall but generates 5x more false alarms. Phase 3 evaluates unknown risk discovery, uncovering 24 novel failures with zero overlap between functional testing and security red-teaming. Our results demonstrate that (1) the information available to the evaluation harness determines evaluation quality, (2) functional and security evaluation are complementary, and (3) LLM-based evaluation harnesses surface subtle errors that human reviewers miss. We recommend a two-framework strategy: trace-based evaluation for functional assessment and adversarial red-teaming for security validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:50:06Z</published>
+    <arxiv:comment>Accepted to KDD 2026, Jeju, Korea. 9 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Howard Zhang</name>
+    </author>
+    <author>
+      <name>Chuck Arvin</name>
+    </author>
+    <author>
+      <name>Logan Brown</name>
+    </author>
+    <author>
+      <name>Mihir Bhatia</name>
+    </author>
+    <author>
+      <name>Neelu Choudhary</name>
+    </author>
+    <author>
+      <name>Lily Miao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14491v1</id>
+    <title>TimeSeek: Multi-Task and Multi-Domain Pretraining for Generalized Time Series Analytics</title>
+    <updated>2026-11-10T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.14491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time series analytics has been widely applied across various domains. While existing time series foundation models (TSFMs) have demonstrated promising results, they still face two major challenges: 1) Most TSFMs mainly rely on stacking Transformer layers to increase parameter size, lacking the ability to adaptively model complex time series patterns from multi-domain data. 2) Current TSFMs are primarily pre-trained for specific tasks, e.g., forecasting or anomaly detection, and a few models support multiple tasks, but they fail to fully leverage task specificity and commonality, resulting in suboptimal performance. To address these challenges, we propose TimeSeek, a novel generalized time series analytics model that adaptively models time series patterns from multi-domain data and unifies multiple tasks in pre-training. Conceptually, TimeSeek is guided by selective information sharing under domain and task heterogeneity. From the perspective of multi-domain data, we propose a Multi-Domain Feature Extractor that adaptively captures temporal dependencies and channel correlations based on domain-specific characteristics, including progressive multi-scale modeling and adaptive slot channel modeling. From the perspective of the diversity of tasks, we propose multi-task collaborative training, which leverages task specificity and task commonality through task customization and cross-task training, effectively unifying multiple tasks in pre-training and better adapting to diverse downstream scenarios. After pre-training on large-scale time series data, TimeSeek achieves state-of-the-art performance in forecasting, anomaly detection, and classification tasks across both few-shot learning and zero-shot situations, together with favorable inference efficiency.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:49:26Z</published>
+    <arxiv:comment>Accepted by IEEE Transactions on Pattern Analysis and MachineIntelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Peng Chen</name>
+    </author>
+    <author>
+      <name>Yihang Wang</name>
+    </author>
+    <author>
+      <name>Zhongwen Rao</name>
+    </author>
+    <author>
+      <name>Yang Shu</name>
+    </author>
+    <author>
+      <name>Yuying Qiu</name>
+    </author>
+    <author>
+      <name>Yuxuan Chen</name>
+    </author>
+    <author>
+      <name>Lujia Pan</name>
+    </author>
+    <author>
+      <name>Bin Yang</name>
+    </author>
+    <author>
+      <name>Chenjuan Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14484v1</id>
+    <title>Nonperturbative string dynamics in a (2+1)D lattice gauge theory on a superconducting quantum processor</title>
+    <updated>2026-11-10T18:45:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.14484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Electric flux strings underpin confinement in gauge theories. In two spatial dimensions, their evolution involves competing processes of charge motion, pair creation, and transverse deformation. Accessing these dynamics beyond perturbative limits challenges classical approaches, as entanglement growth restricts the times accessible to tensor-network simulations. Here we use quantum simulation to investigate a (2+1)D Z2 lattice gauge theory with dynamical matter and an explicit magnetic plaquette interaction, spanning strongly confined and nonperturbative deconfined regimes. Using 63 superconducting qubits, including 12 ancillas, we evolve initially localized strings with static or dynamical endpoint charges. Spatially resolved measurements reveal rapid charge and flux spreading in the deconfined regime, enhanced matter occupation in the string interior near the pair-creation resonance, and suppressed spreading at strong electric fields. String-path occupations further probe transverse rearrangements between configurations connected by plaquette operations. Retaining separate matter and gauge degrees of freedom makes local Gauss-law constraints directly accessible for error detection. Combining these constraints with ancilla checks and noise rescaling, we measure dynamics in circuits containing up to 15 second-order Trotter steps. Our results establish quantum simulation as a practical approach to exploring nonperturbative string dynamics in two spatial dimensions, with gauge redundancy serving as an experimental resource.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:45:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Sanziana Stelea</name>
+    </author>
+    <author>
+      <name>Anthony Gandon</name>
+    </author>
+    <author>
+      <name>Francesco Tacchino</name>
+    </author>
+    <author>
+      <name>Jad C. Halimeh</name>
+    </author>
+    <author>
+      <name>Ivano Tavernelli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14480v1</id>
+    <title>Pterodactyl: Pushing the Limits of Efficient Automated Translation Evaluation</title>
+    <updated>2026-11-10T18:41:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.14480v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14480v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we present 1020 Group's submission to the WMT26 shared task on automated quality evaluation. Our system, Pterodactyl, was engineered specifically for subtasks 2 and 3, that is, segment-level quality score prediction and the detection of error-free segments. Pterodactyl is a highly customizable, ultra-low cost system optimized for binary classification in translation triage and data curation. It is based on an LLM-as-a-judge approach, with prompt engineering and model selection guided by ROC analysis. We also developed several variants of Pterodactyl that were specifically adapted for subtasks 3.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:37Z</published>
+    <arxiv:comment>6 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Proceedings of the Eleventh Conference on Machine Translation (WMT 2026), pp. 1638-1643, 2026</arxiv:journal_ref>
+    <author>
+      <name>Evelyn Y. Garland</name>
+    </author>
+    <author>
+      <name>Carola F. Berger</name>
+    </author>
+    <arxiv:doi>10.18653/2026.wmt-main.96</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/2026.wmt-main.96" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14479v1</id>
+    <title>Learning a model of non-stationary nuisances with non-local correlations for object detection</title>
+    <updated>2026-11-10T18:41:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.14479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We tackle the problem of detecting faint objects in multivariate data corrupted by a strong and spatially correlated nuisance component in the low-sample regime. Standard covariance-based models often yield unstable or ill-conditioned estimators of the nuisance statistics, severely degrading detection performance. We propose a data-driven approach based on sparse precision matrix modeling, where the precision matrix is approximated through a pivoted sparse Cholesky factorization whose non-zeros coefficients are learned by maximum likelihood. This yields a low-complexity yet expressive statistical model of the nuisance. Building on this model, we derive a generalized likelihood ratio test for faint source detection enabling direct control of the false alarm rate. The approach is evaluated on an astrophysical application: the detection of exoplanets by high contrast imaging, where it achieves state-of-the-art performance.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:41:30Z</published>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <arxiv:journal_ref>EUSIPCO 2026</arxiv:journal_ref>
+    <author>
+      <name>Olivier Flasseur</name>
+    </author>
+    <author>
+      <name>Eric Thiébaut</name>
+    </author>
+    <author>
+      <name>Loïc Denis</name>
+    </author>
+    <author>
+      <name>Samuel Thé</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14472v1</id>
+    <title>r-Process Abundance Variations in Globular Clusters as Fossils of Turbulent Mixing</title>
+    <updated>2026-11-10T18:37:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.14472v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14472v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Several metal-poor Galactic globular clusters exhibit substantial star-to-star $r$-process abundance variations at nearly fixed [Fe/H], with the ensemble suggesting smaller variations toward increasing metallicity. We investigate whether this chemical structure can be inherited from incomplete mixing in the galactic environments in which the clusters formed. Using parsec-scale simulations of rare-element transport in a supernova-driven turbulent disk, we follow the redistribution of $r$-process ejecta and characterize the abundance structure of gas selected to trace star-forming environments. Rare enrichment events generate strong [Eu/Fe] inhomogeneities that persist across a range of physical scales. As chemical evolution proceeds, the available abundance variance decreases, while spatial averaging over larger regions reduces the differences between their characteristic abundances. The simulations provide substantial pre-collapse $r$-process variance at low [Fe/H] and show the same broad decline toward higher metallicity suggested by the globular-cluster measurements. Our results support an interpretation in which at least some of the observed $r$-process variations are inherited from pre-existing chemical structure in the natal environment, allowing globular clusters to preserve a fossil record of the mixing history between rare enrichment and star formation.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:37:09Z</published>
+    <arxiv:comment>11 pages, 5 figures, submitted to ApjL. Comments welcome</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Lailani Kenoly</name>
+    </author>
+    <author>
+      <name>Isabelle Connor</name>
+    </author>
+    <author>
+      <name>Melinda Soares-Furtado</name>
+    </author>
+    <author>
+      <name>Evan N. Kirby</name>
+    </author>
+    <author>
+      <name>Nia Imara</name>
+    </author>
+    <author>
+      <name>Enrico Ramirez-Ruiz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14469v1</id>
+    <title>C$^2$-Routing: Complementary Cropping and Compression for Efficient Vision-Language Inference</title>
+    <updated>2026-11-10T18:32:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.14469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Visual Question Answering (VQA) imposes substantial computational overhead on vision-language models (VLMs), motivating model-agnostic input reduction methods that can be readily applied across diverse VLMs, including in black-box settings. Simply enforcing a visual-token cap reduces computation, but it can discard information needed to answer the question. A single reduction strategy also struggles to accommodate different scenarios. Our key observation is that cropping and compression are complementary: cropping highlights small targets and local details, whereas whole-image compression better preserves context for large targets or distributed evidence. Based on this observation, we propose C$^2$-Routing, which adaptively selects cropping or compression according to the input image and question. Since both strategies may still discard key information, we further design a safety gate that uses the predicted joint correctness distribution under original and reduced inputs to guide fallback and protect accuracy. To accommodate consumer GPU resource constraints, all training and evaluation experiments run on RTX 3090 GPUs. To measure gains beyond token capping, we use full-image baselines with the same cap of 1,024 visual tokens. We conduct extensive evaluation on three VLMs and 18 datasets spanning local details, global scenes, scene text, and documents. With the visual budget already capped, C$^2$-Routing further reduces end-to-end FLOPs by 36.53% and visual tokens by 42.36% on average, with a mean relative task-score decrease of only 0.77%.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:32:28Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Guorui Lu</name>
+    </author>
+    <author>
+      <name>Qinyu Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14465v1</id>
+    <title>One Curve, Different Weights: AUC, the Brier Score, Decision-Weighted AUC, and the Policy Youden Index</title>
+    <updated>2026-11-10T18:29:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.14465v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14465v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AUC and the Brier score are standard summaries of a binary risk score, yet they can rank models differently. We introduce a weighted AUC, AUC$_π$, which weights each pair of observations by how differently a decision maker with probability of acting $π$ treats them. We show that all three are built on weighted averages of one curve, the Youden index $J(t) = \mathrm{TPR}(t) - \mathrm{FPR}(t)$ across cutoffs $t$, and that the averages differ in the weights they put on the cutoffs. Each weights a cutoff by how much something rises across it: for AUC, the distribution of all scores; for the Brier score, the true probability $\mathbb{E}[Y \mid S]$; for AUC$_π$, the decision maker's probability of acting. Up to normalization, AUC$_π$ is the Brier skill score of the ideal forecast with its weight moved to the cutoffs the decision maker cares about. We also show that weighting pairs by $|π(s) - π(s')|$ is, up to scale, the only pair weight fixed in advance that makes a pair-weighted AUC an average of the Youden curve for every score distribution. As a ranking measure, AUC weights every model the same way. Hand (2009) shows that it can also be read as an average over cost thresholds, and in that reading each model weights the thresholds differently. The numerator of AUC$_π$, which we call the policy Youden index, is the expected share of class 1 a fixed policy acts on minus the expected share of class 0. It judges every model by the same policy and so avoids this; the full ratio AUC$_π$ does not.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:29:50Z</published>
+    <arxiv:comment>19 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Yegor Baranovski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14463v1</id>
+    <title>A Theory of Cross-Validation Variance</title>
+    <updated>2026-11-10T18:29:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.14463v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14463v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cross-validation estimates predictive performance by repeatedly splitting the data into training and validation sets, fitting the model on the first and evaluating it on the second. Every observation influences the estimate in two roles, through its own evaluation when it is held out and through the models it helps fit when it trains. The random splits determine its weight in each role. From this representation, we prove an exact finite-sample identity for the variance of the cross-validated estimate. For a given splitting scheme with a common training set size, the variance is a function of these weights, with constants of the model, the metric, and the population. It covers metrics averaged over observations, such as mean squared error, and over case--control pairs, such as the AUC. The identity shows which schemes to use. The variance decomposes into sampling variance, which depends only on the training size, and variance due to the random fold splitting, which arises when the weights change from one draw of the splits to the next. K-fold cross-validation, whose weights are equal across observations by design, is therefore variance optimal at first order; Monte Carlo and bootstrap cross-validation are not. The first-order variance of K-fold does not depend on K, and under reasonable conditions on the model leave-one-out has the smallest variance of any K-fold scheme. For the AUC the same holds for leave-pair-out, which evaluates every case--control pair. Finally, we show the cross-validated estimate is asymptotically normal with the identity's full variance. Together, these results provide a general theoretical foundation for inference on cross-validated performance and establish principles for selecting variance-optimal cross-validation designs.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:29:42Z</published>
+    <arxiv:comment>27 pages main text, 57 pages supplementary material with 6 sections, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Nathaniel S. O'Connell</name>
+    </author>
+    <author>
+      <name>Jaime L. Speiser</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14452v1</id>
+    <title>Revisiting the centrifugal breakout scaling relationship for H$α$ emission in light of $ρ$ Oph C, the coolest B-type star with an H$α$-bright centrifugal magnetosphere</title>
+    <updated>2026-11-10T18:20:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.14452v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14452v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The corotating magnetospheres of B-type stars are strongly affected by magnetic field strength and rotational velocity, which determine both the geometry and strength of visible and radio emission; however, H$α$ emission largely disappears below a bolometric luminosity of $\log{(L / L_\odot)} \sim 2.8$. The nearby B5 V star $ρ$ Oph C (HD 147932) is the least-luminous rapidly rotating magnetic B-type star to display magnetospheric H$α$ emission. While $ρ$ Oph C's radio magnetosphere has been extensively studied, its magnetic field and H$α$ magnetosphere have been constrained only via snapshot observations. We present a new dataset of high-resolution ESPaDOnS spectropolarimetry covering the star's rotational period, which is revisited by combining Hipparcos, K2 and TESS photometry. We find that the star's magnetic field strength and geometry are consistent with the model inferred from radio data. As expected from the magnetic model, there is very little variability in H$α$. Comparison of the light curve to both equivalent width measurements from metallic lines and magnetospheric models suggests that the star's photometric variability is dominated by surface chemical abundance spots; however, there is complex rotationally modulated variability at about the mmag level which probably originates in the magnetosphere. $ρ$ Oph C is the least luminous B-type star in which magnetospheric H$α$ emission has yet been detected, and its emission is notably weaker than the predictions of the centrifugal breakout model. Its photometric eclipse depth is also much lower than predicted by the CBO model. However, its radio luminosity is consistent with CBO predictions. We speculate on this basis that $ρ$ Oph C may be a transitional object between effective temperature regimes with hydrogen-dominated and decoupled metallic winds.</summary>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:20:40Z</published>
+    <arxiv:comment>13 pages, 11 figures, accepted for publication in MNRAS</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.SR"/>
+    <author>
+      <name>M. E. Shultz</name>
+    </author>
+    <author>
+      <name>E. Alecian</name>
+    </author>
+    <author>
+      <name>I. Berry</name>
+    </author>
+    <author>
+      <name>J. Krtička</name>
+    </author>
+    <author>
+      <name>J. Labadie-Bartz</name>
+    </author>
+    <author>
+      <name>P. Leto</name>
+    </author>
+    <author>
+      <name>S. P. Owocki</name>
+    </author>
+    <author>
+      <name>A. ud-Doula</name>
+    </author>
+    <author>
+      <name>G. A. Wade</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14441v1</id>
+    <title>Nucleation of water ice under weak ionization via clustering on negative ions</title>
+    <updated>2026-11-10T18:11:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.14441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Water-ice grains are shown to form spontaneously in a cold, weakly-ionized laboratory plasma with trace water admixture when neutrals and ions are cooled below $\sim$200 K. These conditions serve as an analog of ice nucleation in cold astrophysical and atmospheric environments. The ice grains form without the presence of particulate impurities, and do not form in the absence of ionization, indicating that nucleation is induced by ions. Time-resolved ion mass spectrometry provides separate detection of clusters of water molecules on both positive and negative ions. Hydrated negative ions, mainly $\mathrm{OH^-(H_2O)_n}$, grow to $\sim$200 amu, while hydrated positive ions, mainly $\mathrm{H^+(H_2O)_n}$, remain small and short-lived. As the temperature is reduced from room temperature toward 200 K, negative ion clusters grow in size and then drop sharply in abundance, consistent with the onset of rapid growth into macroscopic ice grains below a critical temperature. This indicates that hydrated negative ions are key precursors to ice nucleation in cold, weakly ionized environments, such as the Earth's mesosphere and protoplanetary disks, providing a concrete pathway for ice formation in environments where the nucleation mechanism has remained unresolved. This negative ion pathway is estimated to dominate over ice deposition on pre-existing dust grains in protoplanetary disk locations where there is sufficient UV to partially dissociate water molecules, and in addition, where negative ions such as OH- can form readily through electron attachment at low temperature.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.plasm-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.space-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T18:11:44Z</published>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>André Nicolov</name>
+    </author>
+    <author>
+      <name>Efstratios M. Kritikos</name>
+    </author>
+    <author>
+      <name>William A. Goddard III.</name>
+    </author>
+    <author>
+      <name>Paul M. Bellan</name>
+    </author>
+  </entry>
+</feed>

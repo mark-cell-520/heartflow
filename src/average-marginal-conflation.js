@@ -72,7 +72,7 @@
  *     实证），两族互补不重叠。
  *
  * 判据（腿① 平均值 × 腿② 边际/增量参照 × 腿③ 边际侧结论，缺一
- * 不判；五形任一）：
+ * 不判；六形任一——F-5 为 [r303] 新增的速率型平均值平行族）：
  *   · 腿① AVG 平均值陈述：平均成本/平均费用/单台成本/单位成本/
  *     每台成本/摊到每/摊薄后/平均利润/单台利润/平均客单价/平均
  *     每个…赚；EN average cost / unit cost / per-unit cost / cost
@@ -100,6 +100,16 @@
  *     how expensive can … be）——用问号包装的断言仍是断言。
  *   · F-4 反向归因形：腿③ + 因为/毕竟 + 腿①（EN cheaper …
  *     because the average cost …）——先给边际结论再拿平均值当归因。
+ *   · [r303] F-5 速率型平均值 → 边际量（新增平行族）：腿①' 速率/
+ *     产量型平均值（平均每小时产出/平均亩产/平均产能/平均响应时间；
+ *     EN average output / average yield / throughput / average
+ *     response time）× 腿②' 资源形边际参照（再开一台机器/再多一个
+ *     用户/再加班一小时；EN one more machine / one more member /
+ *     the next delivery）× 腿③' 数量型边际结论（多五十件/也是两秒/
+ *     多五次登录；EN must add ten more units / 30 more clicks）。
+ *     r220 立项时只覆盖**货币型**平均值与结论，AP→MP（平均产量推
+ *     边际产量）这一最教科书形式整体缺席——scripts/round-303/
+ *     probe-module-amc.js 实测 14/14 攻击改前全 miss。
  *
  * 为什么取 VERIFY 级：单句也可能是**省略语境的正当决策陈述**（商
  * 业口述里「平均成本低所以扩产」常是「边际账已经算过」的省略），
@@ -259,6 +269,95 @@ const F3_EN = /\b(?:average|per[- ]unit|unit|on\s+average)\b[^.]{0,60}\bhow\s+(?
 
 // ─── F-4 反向归因形（英文）：边际结论 + because/since + 平均值 ─────
 const F4_EN = /\b(?:cheaper|lower|costs?\s+less|more\s+profit|profits?\s+(?:will|would)\s+(?:rise|grow|increase|thicken)|earns?\s+more|worth\s+expanding|expand\s+output|higher\s+revenue)\b[^.]{0,40}\b(?:because|since)\b[^.]{0,40}\b(?:average|per[- ]unit|unit\s+cost|on\s+average)\b/i;
+
+// ═══════════════════════════════════════════════════════════════════
+// [r303] F-5「产量/效率/速率型平均值 → 边际量」平行族
+//
+// 缺口实证（scripts/round-303/probe-module-amc.js，v6.8.174 模块直调）：
+// r220 立项时只覆盖「成本/利润/价格型平均值」（平均成本/单台利润/平均客
+// 单价…），**产量、效率、速率型平均值整体缺席**——14 条攻击全部 miss：
+//   平均每小时能生产十件，所以再加班一小时也能多产出十件
+//   每台机器平均一天产五十件，所以再开一台机器就多五十件
+//   平均亩产三吨，所以再种一亩地就能多收三吨
+//   The average output is ten units per hour, so one more hour of
+//   overtime must add ten more units.
+//   Average yield is three tons per mu, so planting one more mu of
+//   land must add three tons.
+// 根因：存量腿①（AVG_COST/AVG_RETURN）与腿③（CHEAP/PROFIT）全是
+// **货币量词汇**，而 average product / average yield / throughput
+// → marginal product 这一平均-边际混淆最教科书的形式（AP 推 MP）
+// 一条都不收。
+//
+// 设计纪律（同 r300/r301/r302）：
+//   · **不并入存量数组**——AVG_COST_ZH/AVG_RETURN_ZH/MARG_ZH/INCR_ZH/
+//     CHEAP_ZH/PROFIT_ZH 及其 EN 侧均有 r280/r265 轮 length===N 登记
+//     断言，追加会打破存量单测；也不进 avgLegs()/conclLegs()（那会
+//     同时放大 F-1/F-2a 召回面、有冲击 302 误拦基线之虞）。
+//   · F-5 是**独立并行路由**：腿①'（AVG_RATE 速率型平均）× 腿②'
+//     （RES 资源形边际参照 ∪ 存量 MARG/INCR）× 腿③'（QTY_CONCL
+//     数量型边际结论），三腿共现 + 跨度否定守卫，复用共享豁免入口
+//     （EXEMPT_META / EXEMPT_CORRECT / HEDGE 在主函数入口先判）与
+//     negatedInSpan() / allIdx() / firstIdx()。
+//   · 腿②' 刻意**新增 RES 常量**而不扩 MARG：存量 MARG_EN 只收
+//     "one more unit/item/batch"，不收 "one more hour/machine/member/
+//     rep/server/mu/impressions"——这些是本族的承重资源名词。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── F-5 腿①' AVG_RATE 产量/效率/速率型平均值（中文）──────────────
+const AVG_RATE_ZH = [
+  /平均每(?:小时|分钟|天|日|周|月|年|班|班次|秒)[^。；，]{0,14}(?:生产|产出|产|制造|加工|处理|完成|交付|下线|收|赚|卖出|签)/,
+  /平均每(?:台|人|亩|个|条|辆|架|间|位|名|户|家|单|次|件)[^。；，]{0,12}(?:产|生产|产出|处理|完成|交付|收|赚|制造|加工|贡献|带来|登录|点击|购买|付费|复购)/,
+  /每(?:台|条|个|辆)(?:机器|设备|产线|工人|员工|地|土地|门店|站点)[^。；，]{0,10}平均[^。；，]{0,10}(?:产|生产|产出|处理|收|下线)/,
+  /平均(?:亩产|单产|产能|产量|吞吐量|处理量|产出|效能|人效|时效|工时|响应时间|处理时长|交付周期|交付时间|客单价|转化率|点击率|登录数|活跃数|复购率|进店|客流|在线人数|并发)/,
+  /平均(?:每个|每位|每名|每户)?(?:用户|客户|订单|会员|买家|读者|学员|患者|工人|员工|成员|学生|农民|卖家|坐席|销售)[^。；，]{0,14}(?:生产|产出|处理|完成|交付|贡献|带来|购买|消费|点击|登录|付费|复购|签)/,
+];
+
+// ─── F-5 腿①' AVG_RATE（英文）────────────────────────────────────
+const AVG_RATE_EN = [
+  /\baverage\s+(?:output|yield|productivity|throughput|production|volume|capacity|rate|per[- ]unit\s+output)\b/i,
+  /\baverage\s+(?:response|delivery|processing|handling|turnaround|session|visit|ticket|order|cycle|lead)\s+(?:time|length)\b/i,
+  /\baverages?\s+(?:about\s+|roughly\s+|around\s+)?[\w.,]+\s+(?:units?|tickets?|orders?|items?|clicks?|visits?|sessions?|users?|customers?|deals?|requests?|impressions?|tons?|bushels?|repairs?|calls?)\s+(?:per|a|each|every)\b/i,
+  /\b(?:on\s+average|per\s+(?:hour|day|week|month|shift|unit|user|customer|order|machine|acre|worker|rep|agent|server))\b[^.]{0,40}\b(?:produc\w+|yield\w*|process\w*|handl\w+|complet\w+|deliver\w+|clos\w+|serv\w+|ship\w*)\b/i,
+  /\baverage\s+(?:clicks?|visits?|sessions?|logins?|signups?|orders?|purchases?|deals?|repairs?|calls?)\s+per\b/i,
+];
+
+// ─── F-5 腿②' RES 资源形边际参照（中文；"再多一个 X / 再开一台 X"）──
+// 存量 MARG_ZH 只收「下一台/再生产一台/每多一台」的量词形，不收
+// 「再开一台机器」「再种一亩地」「再多一个用户」「再加班一小时」
+// 这类**动词 + 资源名词**形，故本族单立。
+const RES_ZH = [
+  /(?:再|又|多)(?:开|添|加|招|种|上|增|扩|铺|设|排|安排|投入|购买|采购)[一两三四五几]?(?:台|条|个|辆|架|间|位|名|户|家|亩|批|单|次|人|小时|分钟|天|单位)/,
+  /(?:再|多)(?:加班|加时|增产|扩产|放量|加量|追加|加派|抽调)[一两三四五几]?(?:小时|分钟|天|人|班|次|台|条)/,
+  /(?:再|又|也)多(?:一|两|几)?(?:个|台|条|辆|架|间|位|名|户|家|人|亩|批|单|次|小时|分钟|天|单位)/,
+  /每多(?:一|两|几)?(?:个|台|条|位|名|户|家|人|亩|批|单|次|小时|分钟|天|单位)/,
+  /(?:再|多)来(?:一|两|几)?(?:个|位|名|户|家|人|单|批)/,
+  /下一(?:个|台|条|位|名|户|家|单|批|次)/,
+  /(?:再|多)(?:生产|产|做|造|加工|处理|交付)[一两三四五几]?(?:件|台|个|批|单|单位)/,
+];
+
+// ─── F-5 腿②' RES（英文；"one more X" 资源名词形）────────────────
+const RES_EN = [
+  /\b(?:one|1|two|2|three|3|another|an?\s+extra|an?\s+additional)\s+more\s+(?:thousand|hundred|million|[\w.,]+\s+)?(?:hour|hours|shift|day|days|week|weeks|machine|machines|server|servers|worker|workers|employee|employees|rep|reps|agent|agents|member|members|person|people|line|lines|unit|units|mu|acre|acres|batch|batches|order|orders|deal|deals|user|users|customer|customers|impression|impressions|click|clicks|request|requests|visit|visits|session|sessions|delivery|deliveries|ticket|tickets|repair|repairs|call|calls)\b/i,
+  /\b(?:the|a)\s+next\s+(?:hour|shift|day|week|machine|server|worker|rep|agent|member|person|line|unit|batch|order|deal|user|customer|impression|request|visit|session|delivery|ticket|repair|call)\b/i,
+  /\b(?:add|adding|hire|hiring|run|running|open|opening|plant|planting|buy|buying|deploy|deploying|bring|bringing|take|taking|schedule|scheduling)\s+(?:one|1|two|2|another|an?\s+extra|an?\s+additional)\s+(?:more\s+)?(?:hour|hours|shift|day|days|machine|machines|server|servers|worker|workers|rep|reps|member|members|person|people|line|lines|unit|units|acre|acres|batch|order|deal|user|customer|impression|request|session|delivery|ticket)\b/i,
+  /\b(?:one|1)\s+extra\s+(?:hour|hours|shift|day|machine|server|worker|rep|member|person|line|unit)\b/i,
+];
+
+// ─── F-5 腿③' QTY_CONCL 边际侧数量结论（中文）─────────────────────
+const QTY_CONCL_ZH = [
+  /多[\u4e00-\u9fff0-9一二三四五六七八九十百千万两]*(?:件|台|个|批|单|吨|斤|公斤|亩|人|次|份|小时|分钟|天|单位|元|块|版|条|种|位|名|户|家|辆|架|间|秒|周|月)/,
+  /[\u4e00-\u9fff0-9一二三四五六七八九十百千万两]*(?:件|台|个|批|单|吨|斤|公斤|亩|人|次|份|小时|分钟|天|单位|秒|周|月)(?:也|还|照样|同样|一定|肯定)?(?:是|有|保持|维持|不变|照旧)/,
+  /[\u4e00-\u9fff0-9一二三四五六七八九十百千万两]*(?:次|回)(?:登录|点击|访问|下单|购买|付费|签到|活跃)/,
+  /(?:也|就|还|照样|同样|一定|肯定|必然)(?:能|可|会)?(?:多)?(?:产出|生产|产|制造|加工|处理|完成|交付|收|获得|带来|卖掉|签下)/,
+];
+
+// ─── F-5 腿③' QTY_CONCL（英文）───────────────────────────────────
+const QTY_CONCL_EN = [
+  /\b(?:must|will|would|should|can|could|shall)\s+(?:also\s+|still\s+|then\s+)?(?:add|yield|produce|deliver|process|handle|close|generate|contribute|bring|serve|ship|give)\s+(?:us\s+|you\s+|them\s+)?(?:about\s+|roughly\s+|around\s+)?[\w.,]+\s*(?:more\s+)?(?:units?|tickets?|orders?|items?|clicks?|visits?|sessions?|tons?|bushels?|dollars?|yuan|hours?|minutes?|days?|deals?|requests?|repairs?|calls?|impressions?)\b/i,
+  /\b(?:adds?|adding|yields?|producing|delivering|processing|handling|closing|generating|contributing|bringing|serving|shipping|giving)\s+(?:us\s+|you\s+|them\s+)?(?:about\s+|roughly\s+|around\s+)?[\w.,]+\s*(?:more\s+)?(?:units?|tickets?|orders?|items?|clicks?|visits?|tons?|hours?|minutes?|days?|deals?|requests?|repairs?|calls?)\b/i,
+  /\b[\w.,]+\s+more\s+(?:units?|tickets?|orders?|items?|clicks?|visits?|tons?|hours?|minutes?|days?|deals?|requests?|repairs?|calls?|impressions?|sessions?)\b/i,
+  /\b(?:also|still|likewise|then)\s+(?:takes?|costs?|runs?|lasts?|needs?)\s+(?:about\s+|roughly\s+|around\s+)?[\w.,]+\s*(?:hours?|minutes?|days?|seconds?)\b/i,
+];
 
 // ─── 豁免一：教学/概念转述（讨论概念本身不是运用它）────────────────
 const EXEMPT_META_ZH = [
@@ -433,6 +532,58 @@ function findF2a(text, isZh, R) {
   return null;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// [r303] F-5「产量/效率/速率型平均值 → 边际量」平行路由
+//
+// 三腿共现（缺一不判）：
+//   腿①' AVG_RATE  —— 速率/产量型平均值（平均每小时产出/平均亩产/
+//                     average output / average yield / throughput）
+//   腿②' RES ∪ MARG ∪ INCR —— 资源形边际参照（再开一台/再多一个/
+//                     one more machine / the next delivery）+ 存量
+//                     边际/增量腿（刻意 union 而非改写存量数组）
+//   腿③' QTY_CONCL —— 边际侧**数量**结论（多五十件/也是两秒/
+//                     must add ten more units / 30 more clicks）
+//
+// 与 F-1/F-2a 的关系：完全并行。F-1/F-2a 的腿①是货币型平均值、腿③是
+// 货币型结论（更便宜/利润越滚越多）；F-5 的腿①是速率型平均值、腿③是
+// 数量型结论。两条路线互不依赖：删掉任一侧常量，另一侧仍独立命中
+// （round-303 测试带双向对照）。
+// ═══════════════════════════════════════════════════════════════════
+function f5Leg1(isZh, R) {
+  return isZh ? (R.AVG_RATE_ZH || AVG_RATE_ZH) : (R.AVG_RATE_EN || AVG_RATE_EN);
+}
+function f5Leg2(isZh, R) {
+  return isZh
+    ? (R.RES_ZH || RES_ZH).concat(R.MARG_ZH || MARG_ZH, R.INCR_ZH || INCR_ZH)
+    : (R.RES_EN || RES_EN).concat(R.MARG_EN || MARG_EN, R.INCR_EN || INCR_EN);
+}
+function f5Leg3(isZh, R) {
+  return isZh ? (R.QTY_CONCL_ZH || QTY_CONCL_ZH) : (R.QTY_CONCL_EN || QTY_CONCL_EN);
+}
+
+function findF5(text, isZh, R) {
+  const a = firstIdx(f5Leg1(isZh, R), text);
+  if (a.idx < 0) return null;
+  if (avgPreNeg(text, a, isZh, R)) return null;      // 「不是平均产量…」是对平均值陈述的否认
+  const resList = f5Leg2(isZh, R);
+  const conclList = f5Leg3(isZh, R);
+  const w1 = isZh ? W_AIC_ZH : W_AIC_EN;   // 腿①' → 腿②'
+  const w2 = isZh ? W_ICC_ZH : W_ICC_EN;   // 腿②' → 腿③'
+
+  for (const res of allIdx(resList, text)) {
+    if (res.idx < a.idx || res.idx - a.end > w1) continue;
+    // 守卫一：腿①' 结束 → 腿②'
+    if (negatedInSpan(text, a.end, res.idx, isZh, R)) continue;
+    for (const c of allIdx(conclList, text)) {
+      if (c.idx < res.idx || c.idx - res.end > w2) continue;
+      // 守卫二：腿②' 结束 → 腿③'
+      if (c.idx > res.end && negatedInSpan(text, res.end, c.idx, isZh, R)) continue;
+      return { idx: a.idx, text: 'avgRate→res→qtyConcl' };
+    }
+  }
+  return null;
+}
+
 // F-2b / F-3 / F-4：单正则形（否定已内生于结构或由豁免层负责）
 function findRegexForm(text, isZh, R, key) {
   // key ∈ {F2B, F3, F4}；实际常量名为 <key>_ZH / <key>_EN
@@ -475,7 +626,7 @@ function checkAverageMarginalConflation(text, inject) {
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
 
-  // 五形任一（F-1 推断链 / F-2a 增量决策 / F-2b 扩产建议 / F-3 反问 / F-4 反向归因）
+  // 六形任一（F-1 推断链 / F-2a 增量决策 / F-2b 扩产建议 / F-3 反问 / F-4 反向归因 / [r303] F-5 速率型平均→边际量）
   const forms = [];
   const f1 = findF1(text, isZh, R);
   if (f1) forms.push({ form: 'F-1', hit: f1 });
@@ -487,6 +638,9 @@ function checkAverageMarginalConflation(text, inject) {
   if (f3) forms.push({ form: 'F-3', hit: f3 });
   const f4 = findRegexForm(text, isZh, R, 'F4');
   if (f4) forms.push({ form: 'F-4', hit: f4 });
+  // [r303] F-5 速率型平均值 → 边际量（腿①' AVG_RATE × 腿②' RES∪MARG∪INCR × 腿③' QTY_CONCL）
+  const f5 = findF5(text, isZh, R);
+  if (f5) forms.push({ form: 'F-5', hit: f5 });
   if (forms.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
 
   return {
@@ -508,5 +662,7 @@ module.exports = {
     F2B_EN, F3_EN, F4_EN,
     EXEMPT_META_ZH, EXEMPT_CORRECT_ZH, EXEMPT_META_EN, EXEMPT_CORRECT_EN,
     HEDGE_ZH, HEDGE_EN, NEG_ZH, NEG_EN, RHET_ZH, RHET_EN,
+    // [r303] F-5 速率型平均值→边际量平行族（负例注入-删条用）
+    AVG_RATE_ZH, AVG_RATE_EN, RES_ZH, RES_EN, QTY_CONCL_ZH, QTY_CONCL_EN,
   }),
 };
