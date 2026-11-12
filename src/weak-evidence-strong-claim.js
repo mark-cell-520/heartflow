@@ -143,6 +143,27 @@
  *   · 推理否定/对冲（不代表/不意味着/推不出/未必/不一定/取决于/还要看/
  *     而不是/而非；EN does not mean / not necessarily / depends on /
  *     cannot conclude）。
+ *
+ * [r304 扩展 · 真升级②：平台/AI 中介型弱证据全新措辞家族]
+ * 探针实证（scripts/round-304/probe-module-wesc-r304.js + probe-candidates-
+ * r304.js，v6.8.174 动手前）：本族攻击在模块直调与 gate() 全量 findings
+ * 两个口径下均真零命中——存量腿①三类证据（传闻转述听说/据说/网传、个人
+ * 见证我朋友/亲测、泛称匿名 Sources say）覆盖不到「AI 模型输出」与「社交
+ * 平台视频/直播/博主内容」这两类新型不可回溯信源：
+ *   · AI 模型输出：「ChatGPT 说这款药百分百有效」「AI 说这个币肯定翻倍」
+ *     「豆包说这支股票必然会涨」「ChatGPT says this drug is guaranteed
+ *     safe for everyone」——大模型输出无具名、不可回溯、已知会幻觉，
+ *     证据强度低于任何具名信源，却常被当作权威答复引用；
+ *   · 平台视频/直播/博主：「短视频上说这家公司的股票一定翻倍」「博主说
+ *     这款面膜保证三天见效」「直播间里说这款保健品百分百有效」「A
+ *     YouTuber said this method is guaranteed…」「I saw on TikTok that
+ *     this stock will certainly double」——流量驱动的无署名内容，与
+ *     「Sources say」同构但更不可核验。
+ * 实现：新增 EVIDENCE_AI_ZH / EVIDENCE_AI_EN 平行常量（不并存量数组，
+ * 避开 r280/r265 length===N 断言），在 detect 入口与存量 EVIDENCE_* 合并，
+ * 复用既有邻近窗（ZH110/EN320）与四组豁免入口；AI 拉丁族带
+ * (?<![A-Za-z]) 边界守卫防词内误命中。维度计数不变、src/index.js 零改动、
+ * VERSION 未 bump。
  */
 
 // ─── 腿① EVIDENCE 弱证据类型标记（中文）──────────────────────
@@ -333,6 +354,56 @@ const STRENGTH_EN = [
   /\banyone\s+can\b/i,
 ];
 
+// ─── 腿①b EVIDENCE 平台/AI 中介型弱证据（r304 新增族）────────────
+// [r304 扩展 · 真升级②] 探针实证（scripts/round-304/probe-module-wesc-r304.js，
+// v6.8.174 模块直调）：本族 13/15 攻击完全零命中——存量腿①只收「听说/据说/
+// 网传」类口语传闻链、「我朋友/亲测」类个人见证、「Sources say」类泛称匿名
+// 信源，而「AI 模型输出」与「社交平台视频/直播/博主内容」这两类 2024 年后
+// 成为主流的新型不可回溯信源整族缺席。两者与存量族同构甚至更弱：大模型输出
+// 无具名、可被 prompt 诱导、已知会幻觉（"AI 说的"不可回溯核验）；短视频/
+// 直播/博主内容由流量驱动、无署名、无可追溯出处。拿它们承载「百分百/guaranteed」
+// 类绝对化断言，正是本维度「证据强度与断言强度错配」的同一结构在新信源形态上
+// 的再现。不并入存量数组（避开 r280/r265 length===N 断言），在 detect 入口
+// 与存量 EVIDENCE_* 合并，复用既有邻近窗与四组豁免入口。
+const EVIDENCE_AI_ZH = [
+  // AI 模型输出族：国内外大模型/聊天机器人 + 说/讲/告诉/认为/建议/回答。
+  // /i 标志必须带——gate() 的 _normText 归一化手段是 lowercase（trace 实证
+  // 「归一化手段: lowercase」），「ChatGPT 说」「AI 说」到判别层已变成
+  // 「chatgpt 说」「ai 说」，大小写敏感会整族失配（r304 实测：模块直调
+  // 命中但 gate 层不归因）。
+  // (?<![A-Za-z]) 边界守卫——防「GAI 说这首歌」这类拉丁词内 AI 误命中。
+  /(?<![A-Za-z])(?:ChatGPT|GPT-?[0-9o]*|Copilot|Claude|Gemini|Kimi|DeepSeek|文心一言|通义千问|通义|豆包|深度求索|元宝|智谱|星火|讯飞星火|大模型|语言模型|聊天机器人|机器人|AI)\s*(?:说|讲|告诉|提到|认为|觉得|建议|回答|算出|测出)/i,
+  // 问句锚形态：「我问过大模型了，它说…」「问了一下 AI，它建议…」——
+  // 动词与模型名之间夹「了/它/，」时靠 问/询问/请教 + 模型名锚定，
+  // 不放开任意间距（任意间距会误收「这部 AI 纪录片说…」型）。
+  /(?:问|询问|请教|咨询)(?:过|了|一下|一问)?[^。！？；;]{0,6}(?:大模型|语言模型|聊天机器人|ChatGPT|GPT-?[0-9o]*|豆包|文心一言|通义千问|Kimi|DeepSeek|元宝|星火|智谱|Copilot|Claude|Gemini|机器人|AI)/i,
+  // 平台视频/直播/博主族：短视频/视频/博主/主播/网红/达人 + 说/称/推荐/种草
+  /(?:短视频|小视频|视频)(?:上|里|中)?说/,
+  /(?:博主|up主|UP主|主播|网红|达人|大[Vv]|kol|KOL)(?:说|称|推荐|种草|带货|晒单)/,
+  /(?:直播间|直播)(?:里|中)?(?:说|称|都在说)/,
+  /(?:弹幕|评论区|评论)(?:都)?(?:在)?(?:说|夸|推荐)/,
+  // 社交平台族：小红书/抖音/快手/B站/微博/朋友圈/群/微信 + 说
+  /(?:小红书|抖音|快手|B站|b站|微博|朋友圈|群里|微信群|微信|贴吧|论坛)(?:上|里)?(?:都)?(?:在)?说/,
+  /网友(?:都)?(?:在)?说/,
+];
+
+// ─── 腿①b EVIDENCE 平台/AI 中介型弱证据（英文，r304 新增族）──────
+const EVIDENCE_AI_EN = [
+  // AI 模型输出族
+  /\bChatGPT\s+(?:says?|said|told)\b/i,
+  /\b(?:the\s+)?(?:AI|chatbot|bot|language\s+model|LLM)\s+(?:says?|said|told|claims?)\b/i,
+  /\ban?\s+AI\s+told\s+me\b/i,
+  /\bthe\s+algorithm\s+(?:says?|told|showed|shows|recommends?)\b/i,
+  /\bmy\s+feed\s+(?:showed|is\s+full\s+of)\b/i,
+  // 平台视频/直播/博主族
+  /\bI\s+saw\s+(?:it\s+)?on\s+(?:TikTok|Douyin|YouTube|Instagram|Twitter|X|Reddit|Facebook|Snapchat|Pinterest)\b/i,
+  /\ba\s+(?:TikTok|YouTube|Instagram|Douyin)\s+video\s+(?:said|says|claims?|showed)\b/i,
+  /\ba\s+(?:YouTuber|TikToker|influencer|streamer|blogger|vlogger|podcaster|creator)\s+(?:said|says|claims?|swears?)\b/i,
+  /\b(?:Reddit|Twitter|TikTok|Douyin|Instagram|YouTube)\s+(?:says?|users\s+say|claims?)\b/i,
+  /\b(?:livestream|live\s+stream)\s+(?:chat|comments)\b/i,
+  /\beveryone\s+in\s+(?:the\s+)?(?:chat|livestream|comments)\b/i,
+];
+
 // ─── 豁免一：正确响应形（标注未证实/孤证不立）────────────────
 const EXEMPT_CORRECT_ZH = [
   /未经证实|未经核实|无法核实|未能核实|未能证实/,
@@ -474,7 +545,12 @@ function checkWeakEvidenceStrongClaim(text, inject) {
   }
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
-  const evidenceList = isZh ? (R.EVIDENCE_ZH || EVIDENCE_ZH) : (R.EVIDENCE_EN || EVIDENCE_EN);
+  // [r304] 腿①合并存量族与平台/AI 中介新族（r288 存量 EVIDENCE_* 与 r304
+  // EVIDENCE_AI_* 平行登记，互不覆盖注入路径：置空存量族只杀存量腿，置空
+  // EVIDENCE_AI_* 只杀新族）。
+  const evidenceList = isZh
+    ? (R.EVIDENCE_ZH || EVIDENCE_ZH).concat(R.EVIDENCE_AI_ZH || EVIDENCE_AI_ZH)
+    : (R.EVIDENCE_EN || EVIDENCE_EN).concat(R.EVIDENCE_AI_EN || EVIDENCE_AI_EN);
   const strengthList = isZh ? (R.STRENGTH_ZH || STRENGTH_ZH) : (R.STRENGTH_EN || STRENGTH_EN);
   const win = isZh ? WIN_EVIDENCE_STRENGTH_ZH : WIN_EVIDENCE_STRENGTH_EN;
 
@@ -513,6 +589,7 @@ module.exports = {
   checkWeakEvidenceStrongClaim,
   __internals: () => ({
     EVIDENCE_ZH, STRENGTH_ZH, EVIDENCE_EN, STRENGTH_EN,
+    EVIDENCE_AI_ZH, EVIDENCE_AI_EN,
     EXEMPT_CORRECT_ZH, EXEMPT_CORRECT_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN,
     EXEMPT_SOURCED_ZH, EXEMPT_SOURCED_EN,
