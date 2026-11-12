@@ -731,6 +731,9 @@ const { checkEconReasoningGate } = require('./econ-reasoning-gate.js');
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
 // 细节见 src/dose-response-linearity.js 头注释。
 const { checkDoseResponseLinearity } = require('./dose-response-linearity.js');
+// r307：证据-断言覆盖失配（第251维 evidence_claim_mismatch）——细节见
+// src/evidence-claim-mismatch.js 头注释。
+const { checkEvidenceClaimMismatch } = require('./evidence-claim-mismatch.js');
 // [r207] 第 204 维度 might_makes_right（强权即公理：拿实力/胜负/权力
 // 当对错真理的裁量依据——实力腿×是非裁量腿两腿共现 + 邻近窗，另设自
 // 足习语分支；细节见 src/might-makes-right.js）。
@@ -2324,6 +2327,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
   const drl = checkDoseResponseLinearity(_normText);
+  // [r307] 第 251 维度 evidence_claim_mismatch（证据-断言覆盖失配 /
+  // extrinsic hallucination）计算点。同 r306 先例：六处一次接齐，漏一处
+  // gate.action 恒 pass。变量名 ecm——evidence claim mismatch 缩写，
+  // grep 0 命中无冲突。
+  const ecm = checkEvidenceClaimMismatch(_normText);
   // [r207] 第 204 维度 might_makes_right（强权即公理）计算点。同
   // r206 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 mmr。
   const mmr = _applyPedagogyRelaxation(checkMightMakesRight(_normText), "might_makes_right", pedagogyRelaxation);
@@ -3034,6 +3042,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
+    // [r307] 第 251 维度 evidence_claim_mismatch 参与判定（证据-断言覆盖
+    // 失配 / extrinsic hallucination）。同 r306 先例：dimMap 与 allDims
+    // 两处都接。
+    {score: ecm.score, name:'evidence_claim_mismatch'},
     // [r207] 第 204 维度 might_makes_right 参与判定（强权即公理）。
     // 同 r206 先例：dimMap 与 allDims 两处都接。
     {score: mmr.score, name:'might_makes_right'},
@@ -3653,6 +3665,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
+    // [r307] 第 251 维度 evidence_claim_mismatch（证据-断言覆盖失配×
+    // 证据陈述腿×越界断言腿）。
+    evidence_claim_mismatch: ecm,
     // [r207] 第 204 维度 might_makes_right（强权即公理×
     // 实力胜负腿×是非裁量腿）。
     might_makes_right: mmr,
@@ -4136,6 +4151,10 @@ function discriminate(text, evidence = [], contentMode) {
     'regression_to_the_mean': "不得把**极端值之后向均值方向的自然移动当成干预的功劳**——回归均值误归因（regression to the mean / regression fallacy）是指某指标先处于**极端值**（最差/谷底/连败/创新低，或巅峰/夺冠/历史新高——回归是**双向**的），随后**朝均值移动**（好转/回升/回到中等，或回落/退潮），文本把这次移动**归功于同期的某个干预**（吃药/贴膏药/换人/报班/换方法/请大师；EN took / hired / switched / started）：「上次考了年级最差，考前吃了巧克力，这次回到班级中等——巧克力确实有用」「他连败五场之后换了新球拍，接着就赢回来了，可见新球拍很关键」「After our worst quarter on record we hired the new consultant, and revenue bounced back — the hire fixed it.」（样本形状与负例见 test/round-195-regression-to-the-mean.js）。为什么这本身就是问题：极端值之后的下一次测量天然朝均值移动，与干预是否有效无关；没有对照组时「干预后好转」证明不了任何事，真正起作用的可能只是统计必然性。正当做法是**补上对照组**（没做这件事的同质群体是否也回归了）、**把结论降级为「观察到改善，功效待检验」**，或**点名自然回归的可能性**（极端值后的回落/回升部分是回归效应），而不是把回归直接当成干预的功劳。判据**三腿共现 + 叙事窗，缺一不判**：腿① EXTREME 极端基线陈述（双向：极端低族最差/谷底/垫底/连败/暴跌，极端高族巅峰/夺冠/历史新高/年级第一）；腿② REGRESSION 回归性变化（双向：自低处回升好转/恢复/回升/回到.{0,8}(正常|平均|中游|中等)，自高处回落回落/减退/平息/回归平淡）；腿③ ATTRIB 干预×功劳/功效归因（干预动词吃了/换了/请了/贴膏药/换帅/报班 × 功劳词多亏/全靠/幸亏/功劳/归功于 或功效词有效/见效/管用/很关键/果然/一贴就，两者 12 字窗内共现）。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的时序连接，本族不依赖时序、承重的是极端基线这个统计前提；gamblers_fallacy 管**预测下一次**结果随 streak 反转，本族管**解释已经发生的**回归；hot_hand 管把连胜势头当成下次胜率升高的根据，本族不预测未来；clustering_illusion 管随机聚集被当规律，本族管单次极端→回归的归因；base_rate_neglect 管拿单个阳性信号无视基础概率，本族管忽略「极端值必然回归」的统计必然性；pseudo_causal 管精确倍数/玄学归因白话伪因果，本族的归因对象是同期干预但缺对照组；common_cause / reverse_causation 管相关→因果与方向倒置，本族不依赖两变量共变；monocause 管多因压成单因，本族不断言唯一原因、反对的是归因本身无效。明确不判：概念/教学转述（均值回归/向均值回归/regression to the mean/统计学/教材/论文——讨论这个概念本身是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/剔除极端值/截尾/温莎化/基线校正/前瞻性/队列/元分析/纵向/自然实验/随机分组；EN randomized / controlled trial / RCT / placebo / trimmed / winsorized / longitudinal——受控设计或已对回归校正时观察经设计成为证据）、推理否定/反向承认（不能说明/不能证明/不代表/推不出/未必/不一定/很难说/不好说/说不清/难以确定/不能全归/不能单靠/有待验证/可能是自然/其实是因为回归；EN does not mean / cannot conclude / not necessarily / fails to show / may just be / natural regression——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定/有待；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）。
     'dose_response_linearity': "不得**拿「某剂量下观察到的效果」直接外推出「更大剂量效果按比例/倍数放大」**——剂量-反应线性外推（linear dose extrapolation / linear dose-response assumption / linearity extrapolation）是指文本同时给出**剂量陈述**（一片/一杯/两小时/每天一次/每周三次/一勺/一粒/一天两颗；EN one pill / a single dose / one cup / two hours / one serving / twice a day）与**按比例或倍数放大效果的断言**（加倍/翻倍/双倍/三倍/十倍/越多越好/效果翻几番/两片效果就是两倍/吃四片等于四倍；EN double / twice as / triple / ten times / the more the better / double the dose），把在低剂量下观察到的有益效果沿直线外推到任意高剂量：「每天一片维生素有效，那每天十片效果就是十倍」「他每天跑步半小时身体很好，我每天跑四个小时一定好四倍」「喝一杯咖啡能提神，那我一次喝五杯就能精神五倍」「One pill a day works, so taking ten pills will work ten times as well.」「Exercise is good for you, so exercising four hours a day must be four times as good.」（样本形状与负例见 test/round-306-dose-response-linearity.js）。为什么这本身就是问题：生物与物理系统的剂量-反应关系几乎从不是直线——普遍存在**阈值**（低于某剂量无效果）、**饱和/平台期**（效果封顶，再加剂量无增益）、**毒性反转**（超阈值后效果反向成伤害）、**倒 U 型曲线**（中等最优、两端变差）；用线性假设替代曲线形状，会把「多摄入」直接翻译成「多获益」，驱动过量服药、过量补充、过量训练的真实伤害。正当做法是**补上曲线形状证据**（临床试验的剂量-反应数据、安全上限、饱和点在哪）或**把结论限定在已验证的剂量区间**（「一片有效，加量是否更好未经检验」）。判据**两腿共现 + 邻近窗，缺一不判**：腿① DOSE 剂量陈述（数量词+剂量单位一片/一粒/一勺/一杯/一碗/一颗/一毫克/克/毫升/片剂/胶囊；EN one pill / one capsule / a single dose / one cup / one serving / N mg / N grams——含「每+时长+数量」形态每天两片/每周三次/一天一颗）；腿② EXTRAP 线性外推断言（倍数族翻倍/加倍/双倍/三倍/四倍/十倍/翻几番/效果.{0,4}倍/按比例/成正比；EN double / twice / triple / quadruple / ten times / N times as / proportional to / scales linearly；比较级族越多越好/越.{0,4}越.{0,4}（好|有效|强）/剂量越大.{0,4}（效果|越好）；EN the more the better / more is better / higher dose works better），两腿落在 60 字（EN 160 字符）邻近窗内即视为同一次「剂量→线性放大」叙述。边界：appeal_to_nature 管「天然=安全/更好」，本族不依赖天然性、承重的是剂量-效果的线性假设；percentage_overflow / statistical_misleading 管比例呈现问题，本族管的是外推方向而非数字呈现；hasty_generalization 管少数样本→普遍结论，本族的样本是**同一个体/同一剂量区间的效果被沿剂量轴放大**，外推维度是剂量而非群体规模；false_precision 管数字精度形态，本族对整数倍数同样命中（「十倍效果」）；pseudo_causal 管玄学机制白话，本族不涉及机制玄学、只判剂量-效果斜率假设；common_cause 管第三变量，本族不涉及共变。明确不判：概念/教学转述（线性外推/剂量反应/剂量-反应曲线/平台期/饱和/阈值效应/倒U型/毒理学/药理学/半数致死量/LD50；EN linear extrapolation / dose-response curve / plateau / saturation / threshold / hormesis / toxicology / LD50——讨论这个概念本身、或正确指出非线性，是正确判别）、实验/证据语境（临床试验/对照组/双盲/安慰剂/剂量爬坡/最大耐受剂量/安全上限/血药浓度/治疗窗；EN clinical trial / dose escalation / maximum tolerated dose / safety limit / therapeutic window——以受控数据立论时剂量-效果关系已被检验）、推理否定/反向承认（不能线性外推/不能按比例/不代表越多越好/超出安全剂量/过量有害/会中毒/非线性/存在平台期/达到饱和；EN does not scale linearly / not necessarily better / more is not better / toxic at higher doses / saturates / plateaus——拒绝该外推本身是正确判别）、医疗医嘱语境（遵医嘱/按处方/说明书/每次X片/每日X次；EN as prescribed / per the label / follow your doctor——权威剂量指引不是线性外推）、对冲（可能/也许/或许/大概/似乎/有待；EN maybe / perhaps / might / seems）、疑问句（含 ?/？）。",
+    // [r307] 第 251 维度 evidence_claim_mismatch（证据-断言覆盖失配 /
+    // extrinsic hallucination：证据在场，断言超出证据可支撑范围）。
+    // 判据/豁免/边界全文见 src/evidence-claim-mismatch.js 头注释。
+    'evidence_claim_mismatch': "不得**拿「研究/数据/统计/实验在场」直接给「从该证据推不出的断言」背书**——证据-断言覆盖失配（evidence-claim coverage mismatch / extrinsic hallucination）是指文本先摆出**可回溯的证据源**（研究显示/数据表明/统计显示/实验发现/调查显示/临床试验；EN the study found / data show / the trial found / research shows——含裸名词形态：研究、数据、统计、实验单独出现即命中腿①），继而给出一个**超出证据覆盖范围的断言**：证据只覆盖「部分样本/相关/单一样本」，断言却升级成「全部/因果/治愈」：「研究显示服用维生素D的志愿者冬季感冒更少，所以维生素D能预防所有呼吸道感染。」「数据表明喝咖啡的人心血管死亡率更低，可见喝咖啡可以治疗心脏病。」「统计显示冰激凌销量与溺水人数高度相关，所以吃冰激凌会导致溺水。」「在200名大学生中的实验证明了这种方法对所有人都有效。」「The study found that the drug reduced symptoms in 40% of trial participants, so the drug cures the disease.」（样本形状与负例见 test/round-307-evidence-claim-mismatch.js）。为什么这本身就是问题：**断言的确定性上限由证据的覆盖范围决定**——证据说的是「N 人中观察到 X」，结论只能说「在该样本中 X 成立」；证据说的是「A 与 B 相关」，结论只能说「A 与 B 同变」。把覆盖面从「样本内/相关」扩到「全体/因果/治愈」，是把证据链的实际承重能力夸大到它支撑不起的程度。这是 AI 输出中最典型的似是而非形态：引用了真实的研究、给出了真实的数据，结论却悄悄越过证据的边界；听众核对来源时发现来源是真的，于是更加采信那个被放大的结论。判据**两腿共现 + 邻近窗，缺一不判**：腿① EVID 证据/研究/数据标记（研究/数据/统计/实验/调查/临床试验/论文/《X》年份/机构+研究；EN the study found / data show / the trial found / based on the data / N participants）；腿② OVERREACH 超覆盖断言（O1 相关→因果：证据腿近邻出现导致/造成/引起/能治疗/治愈/根治/预防所有；O2 部分→全体：所有/全部/每个人/任何人/人人都能；O3 局部→整体：全国/全球/全省/全民/全面覆盖；O4 EN cures / treats / prevents all / works for everyone / proves that everyone），两腿落在 80 字（EN 200 字符）邻近窗内且证据腿在前即视为同一次「证据→越界解读」叙述。边界：weak_evidence_strong_claim（第245维）管**弱证据类型**×绝对化措辞（听说/据说×彻底/百分百），腿①是不可回溯的传闻转述，本维度腿①是**可回溯的强证据**，错配在覆盖范围而非证据强度；cum_hoc / post_hoc / reverse_causation / common_cause 管相关→因果/时序/方向/第三变量，腿①是**裸共变陈述**、不要求证据标记在场，本维度承重「证据在场+断言越界」这个结构；hasty_generalization 管少数样本→普遍结论，只管群体规模外推，本族同时管因果强度外推与覆盖面外推；unsupported_claim 管断言缺依据的强度，本维度前提恰恰是**证据在场**——错配不在缺席，在越界；completion_evidence 管空完成声明，与证据陈述无关。明确不判：概念/教学转述（证据/因果推断/混杂/辛普森/外推/过度概括/样本量/置信区间/逻辑谬误/统计学；EN evidence / causal inference / confounding / extrapolation / overgeneralization / statistics——讨论这个概念本身是正确判别）、证据充足性论证（证据不足/样本太小/不能证明/不足以/尚待/仍需验证/需要更大规模/相关性不等于因果；EN insufficient / too small / cannot conclude / does not prove / needs replication / correlation is not causation——主动声明证据边界是正确判别）、推理否定/反向承认（不能说明/推不出/并不意味着/不代表/未必/只是相关/只是观察；EN does not mean / not necessarily / merely correlational——拒绝该外推本身是正确判别）、对冲（可能/也许/或许/大概/似乎/有待；EN maybe / perhaps / might / seems）、疑问句（含 ?/？）、受限定的正确外推形（在…样本中/局限于/仅限于/就该…而言；EN within this sample / in this cohort / limited to——显式把结论收在证据边界内）。",
     'argument_to_moderation': "不得把**折中立场本身当成真理的依据**——诉诸中庸（argument to moderation / 中间立场谬误）是指把两个立场并置后，断言**「真相/正确答案在中间」「各打五十大板」「折中才是对的」「一个巴掌拍不响」**，用「取中」这个动作替代对双方证据的检验：「甲方乙方各有过错，真相在中间，各打五十大板才是最公道的处理」「这两种观点都太极端了，正确的答案在它们中间」「公说公有理婆说婆有理，其实折中才是对的」「关于这项政策该不该继续，支持和反对的人都走了极端，中间立场才是理性的」「Both extremes are wrong, so the truth lies somewhere in the middle.」「Let's just split the difference — the middle ground is the correct answer.」「When two sides clash, the fairest position is usually the one in between.」（样本形状与负例见 test/round-196-argument-to-moderation.js）。为什么这本身就是问题：中间立场偶尔确实更接近真相，但那要凭证据成立，不能凭「它在中间」成立——以位置取信跳过的是举证责任，两端各自的证据强度、折中结论为何比任一端更成立，都需要单独检验。正当做法是**列出两端各自的证据**并说明折中结论为何更成立，或明确「目前证据不足以在两端间定论」，而不是把「取中」当成结论本身。判据**两腿共现 + 叙事窗，缺一不判**：腿① MIDDLE 中间/折中立场表述（中间立场/中间道路/真相·答案·结论在(两者|双方)之间/折中/中庸/各打五十大板/一个巴掌拍不响/双方都有错/都太极端/走了极端/各让一步/各退一步；EN middle ground / in between / split the difference / meet in the middle / both extremes / compromise position）；腿② TRUTH 中间=正确断言（才是(对|正确|真理|正解|理性|客观|公道|合理|最优)的/(中间|折中)才是X/(都|全)不(完全)(对|错)|都不全对/把(中间|折中)当成(真理|真相|正确)/(最|才)(公平|合理)的(处理|解决|做法|方案|方式)/(正确|真正|对)的(答案|结论|真相|立场)(就)在；EN is the (correct|right|true|rational|fair|fairest|reasonable|best) answer/position/conclusion / truth lies in the middle / both sides are wrong / neither side is entirely right / middle ground is the (correct|fairest|rational) / the (fairest|correct|best) position is (the one) in between），两腿命中相距 ≤50 字（EN ≤200 字符）。边界：false_balance 管**等权并置**（「两种说法/各有道理」把未证实指控并列到已证事实旁），本族不停留在并置、而是进一步断言**中间立场才是正确的**——false_balance 说「一样重」，本族说「中间对」；false_dilemma 管**排除第三选项的二元压迫**（「要么A要么B，没有中间路线」），本族恰好相反——承认两端存在，但把**中间**封为真理，不逼人选边；false_equivalence 管两类事物的错误类比，本族不引入类比对象；sole_narrative 管口径垄断（只许一种说法），本族的主张是「只有中间那种说法对」；monocause 管多因压成单因，本族不断言原因数量，反对的是**以位置取信**而非以证据取信。明确不判：概念/教学转述（诉诸中庸/argument to moderation/中庸之道/儒家/亚里士多德/逻辑谬误/教材/论文——讨论这个概念本身是正确判别）、谈判/交易/和解语境（谈判/协商/和解/调解/协议/签约/签署/成交/报价/让步/调解员/合同；EN negotiated / deal / signed / contract / settlement / mediation / agreement——博弈中「各让一步」是关于成交的程序动作，不是真理断言）、算术/统计取中（平均值/均值/中位数/中间值/取平均；EN average / median / midpoint——取中位数是正当计算）、推理否定/反向承认（并不总是/并不等于/不等于/并不意味着/未必/不一定/推不出/不见得/不是都对也都错/是谬误；EN does not mean / not automatically / not necessarily / is not correct——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
     'completion_evidence': "不得**在没有可验证证据的情况下声明工作已完成**——空完成声明（empty completion claim / unfalsifiable completion）是把「已完成/已修复/已解决/已搞定/已交付/已推送/已提交/全部通过/确认正常/验证通过/没问题/可以了」当作事实陈述，却不附任何**可定位、可复现的完成证据**：git commit 哈希、测试通过的具体数字（16/0）、文件路径、退出码、PR 链接、被调用的具体命令。声明与证据之间的**缺口本身就是判别信号**——真正完成的工作必然留下痕迹（哈希/计数/路径/输出），「说完成了但没有任何痕迹」与「完成了」在证据上不可区分，因此空声明不可信。这是 AI agent 输出中最常见的自欺形态：汇报时把「执行了动作」等同于「达成了效果」，把「我跑了测试」等同于「测试通过了」，把「代码写完了」等同于「问题解决了」。「我已经修复了这个问题。」「全部测试都通过了。」「改动已经推送到远端。」「确认正常，可以上线了。」「Everything is done and working.」判据**声明腿 × 证据缺席腿，缺一不判**：腿① CLAIM 完成/验证声明（已完成/已修复/已解决/已搞定/已交付/已推送/已提交 + done/fixed/resolved/pushed/committed；全部通过/all tests passed/确认正常/验证通过/检查无误/checked ok/verification passed/all good；模糊收尾 可以了/好了/没问题/works fine/no problem/all set）；腿② EVIDENCE 证据在场检查——声明点 ±200 字窗口内出现 git 哈希（[0-9a-f]{7,40}）、测试计数（\\d+ passed/通过/tests）、commit 引用、PR 编号、URL、具体计数（N 个/N 条/N 处/N 项）、exit code 0、`验证:` 冒号引内容、C2/C3 的检查方法词（curl/node/python/pytest/test/git log/cat/运行/执行/查看了）。**豁免**：① 带证据的声明不判（「已修复，commit 3f2a91b，verify 16/0」有哈希有计数）；② C2/C3 附近出现具体检查方法词时是正当技术陈述（「运行 node test/run-all.js，确认正常」——方法在场）；③ C4 附近有数字时是真实汇报（「全部通过：16 passed, 0 failed」）。明确不判：转述他人的完成声明并附出处、历史陈述（「2024 年已完成迁移」是事实陈述非工作声明）、教学示例（演示本维度概念的句子）、带哈希/计数/路径/URL 任一证据的正常汇报。与 reward_hacking（BLOCK：自认式指标作弊）、bullshit（伪深度空话）边界错开：本族管的是**声明与证据的结构性缺口**，是证据纪律判别，不是文风判别。来源（真实，未编造）：内部路径——`src/completion-evidence.js` 自第 N 轮起即 require（src/index.js:194）并 module.exports 导出（src/index.js:17157），但从未进入 gate/dispatch 主路径（r274 接线前 grep 实证：模块 5 类检测 C1-C5 全部零调用），属「已加载未 dispatch」能力；判据为心虫自有纯规则实现（零 LLM 依赖）。探针 /tmp/hf-probe-r274.js。",
     'false_precision': "不得**用超出证据支撑精度的数字冒充量化证据**——伪精确断言（false precision / spurious precision / overprecision）是把**小数百分比、小数倍数、小数评分、小数年限、精确副词+数字**（37.42% / 3.7 倍 / 92.6 分 / 12.5 年 / 整整 3.7 倍 / exactly 47.83%）以**无来源、无约数、无对冲**的断言形式给出，用过分的数字精度制造「量化严谨」的假象：数字的**精度形态**本身就是证据——样本多大、怎么测的都没说，小数却给到小数点后一两位，是把随机噪声包装成测量读数，是 AI 输出中最典型的数字幻觉形态：「用户满意度达到 92.6 分，远超预期。」「性能提升了整整 3.7 倍，几乎没有代价。」「新药可延长预期寿命 12.5 年。」「该模型在测试集上的准确率达到 99.37%。」「转化率 37.42%，完播率 21.8%。」「The study shows engagement improved by exactly 47.83%.」（样本形状与负例见 test/round-192-false-precision.js）。为什么精度形态本身就是证据：可验证的数字必须同时给出**数值与精度依据**（来源、样本、测量手段）；只给数值不给依据、且精度还异常精致时，数字不可能来自真实测量——「92.6 分」的 0.6 没有出处，「12.5 年」的 0.5 没有队列。它常以汇报、测评、疗效口吻出现，是「似是而非」的典型：看起来是用数据说话，实则是用小数位说话。正当做法是**补上可验证来源**（谁测的、怎么测的、样本多大）、**把数字退回调约形态**（约 37%、大约 3.7 倍、±误差范围）或**声明测量精度**（保留几位小数、置信区间）。判据**两腿共现 + 分组豁免，缺一不判**：腿① PREC 精确数字形（**必须含小数点或精确副词**——四舍五入的整数 37% / 3 倍是约整数的合法形态，不判：小数 %/％、小数倍、小评分（92.6 分，排除分钱/分钟/分利/分贝/分米）、小数年岁（12.5 年/岁）、精确副词+数字（整整/恰好/正好/分毫不差/精确地/准确地/精准地 + ≤4 字 + 数字，含整数形——161 轮教训：副词腿收裸词形态，「准确率 92.6 分」由「准确」前缀+数字命中）；EN 小数 %、小数 x/times、小数 years/months/weeks/days/hours、exactly/precisely/accurately + 数字）；腿② CLAIM 断言/度量语境（腿①匹配点前后 ≤24 字 / EN 48 字符内任一：效果动词 提升/提高/增长/增加/降低/减少/下降/达到/高达/低至/升至/突破/改善/优化/翻番/刷新/创下；EN improves/increases/reduces/reaches/boosts/extends/achieves；度量名词 准确率/满意度/转化率/增长率/覆盖率/留存率/性能/效率/得分/评分/寿命/预期寿命/占比；EN accuracy/satisfaction/conversion/coverage/retention/performance/efficiency/life expectancy；结论标记 证明/表明/显示/说明/意味着/可见/足见；EN proves/shows/demonstrates/indicates/means——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列）。边界：perfect_error 的 S1_false_precision 管**裸**精确百分比（无度量名词、无来源，如「市场份额达到 87.3%」）且是多信号协同判定的一票（[v6.7.93] 起对度量名词语境整体豁免，本为「latency dropped 40%」这类工程读数设计），本族专打**度量名词语境下**的小数断言——正是 S1 豁免腾出的空间，且是单维专项判据、不依赖多信号叠加；statistical_misleading / percentage_overflow 管**比例数字的呈现问题**（基数隐藏/占比合计溢出），本族不管呈现结构、管**数字精度本身是否被证据支撑**；unsupported_claim / bullshit 管断言缺依据的强度，本族有数字在场但数字的**精度形态**无效。明确不判：约数/对冲（约/大约/接近/将近/左右/上下/近似/估算/预计/差不多/误差范围/容差/±/大概/可能/也许/据说；EN about/around/approximately/roughly/nearly/almost/estimated/give or take——概率化或约数化的结论精度已被声明有限）、具名来源（根据X统计局/X大学/X报告/X调查/《X》/据X统计/年报/季报/月报/财报/公报/白皮书/来源于/数据来源/转引自/参见；EN according to X report/study/survey/census/source:——有可定位出处的数字归验证流，不归伪精确）、天然精确语境（数字近邻 ≤40 字 / EN 80 字符内：日期/年份、版本号 v6.8.118、自然计数 12 个/1200 人、物理量纲与精度规格 0.01 毫米/±0.5℃/毫秒、数学常数 π/约等于、时长与历史语境 历时/持续/为期/已有/建于/成立于/研发——这些场合小数是合法精确值）、仪器读数语域（数字近邻内 监控/压测/日志/报表/看板…显示/表明——同 r437「可定位复现」边界，数据可从监控/巡检记录复现）、统计口径（同比/环比/较上期/去年同期/百分点/percentage point/year-over-year——报表变化率引用是统计惯例）、元讨论（有效数字/小数点/四舍五入/位数/保留/精度——讨论精确度本身是正确判别）、疑问句（含 ?/？）。已知边界：① 「实验组有效率为 87.3%」这类**无效果动词、度量名词未入表**的形暂不判（「有效率/完成量/满意度指数」等词可续入腿②，保守方向）；② 豁免为句级属性时，同句混合合法时长与伪精确断言会整句放过（「研发历时 2.5 年，延长预期寿命 12.5 年」——天然精确与仪器豁免已收窄为数字近邻窗，句级豁免仅留约数/来源/口径/元讨论四类真句级属性）；③ 跨段数字（上文给出口径、本段只出现小数）不判。",
@@ -5726,6 +5745,14 @@ function discriminate(text, evidence = [], contentMode) {
     // findings 的 guidance 补上曲线形状证据再采信」。射程边界：本维度
     // 只管「效果随剂量线性放大」的外推形态，不管该剂量的真实疗效。
     'dose_response_linearity',
+    // [r307] 第 251 维度 evidence_claim_mismatch（证据-断言覆盖失配）登记。
+    // verify 级——证据陈述+越界断言也可能是学术写作的正确转述与批评
+    // （「该研究不足以支撑此结论」正是本族要教的判别动作）、对冲表述、
+    // 显式承认样本局限的正确陈述，rewrite/block 会误伤。verify 的含义是
+    // 「这段文本把结论的覆盖面/因果强度放大到了证据支撑范围之外，需要
+    // 按 findings 的 guidance 补上证据覆盖范围再采信」。射程边界：本维度
+    // 只管「断言超出所引证据可支撑范围」这一族，不管该证据本身的真伪。
+    'evidence_claim_mismatch',
   ]);
   // pass：无问题通过
 
@@ -6181,6 +6208,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）。
       // 同上：八处一次接齐。
       dose_response_linearity: drl,
+      // [r307] 第 251 维度 evidence_claim_mismatch（证据-断言覆盖失配）。
+      // 同上：八处一次接齐。
+      evidence_claim_mismatch: ecm,
       // [r207] 第 204 维度 might_makes_right（强权即公理）。同上：八处一次接齐。
       might_makes_right: mmr,
       // [r208] 第 205 维度 scale_dismissal（规模 dismiss）。同上：八处一次接齐。
@@ -6318,6 +6348,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r306] 第 250 维度 dose_response_linearity 补登记（剂量-反应线性
     // 外推）。drl——dose response linearity 缩写。同上：九处一次接齐。
     dose_response_linearity: drl,
+    // [r307] 第 251 维度 evidence_claim_mismatch 补登记（证据-断言覆盖
+    // 失配）。ecm——evidence claim mismatch 缩写。同上：九处一次接齐。
+    evidence_claim_mismatch: ecm,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,

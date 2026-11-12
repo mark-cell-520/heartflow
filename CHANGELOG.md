@@ -1,5 +1,19 @@
 ---
 
+# 6.8.178 变更日志条目
+
+## [6.8.178] - 2026-11-12
+
+### Added
+- **第 251 维度 `evidence_claim_mismatch`（证据-断言覆盖失配 / extrinsic hallucination）**
+  — 新文件 `src/evidence-claim-mismatch.js`（349 行），接入 `src/index.js`（require / `const ecm` / dispatch 判定 / dimMap / VERIFY_DIMS 五处）。判据两腿共现 + 邻近窗（ZH 80 字 / EN 200 字符）：腿①证据/研究/数据在场标记，腿②超覆盖断言（相关→因果 / 部分→全体 / 局部→整体 / 疗效越界）。含裸名词形态、数量样本限定形、倒装形；四重豁免（概念教学 / 证据充足性论证 / 推理否定 / 对冲 / 疑问句 / 受限定的正确外推形）。来源：LettuceDetect（arXiv 2502.17125）extrinsic hallucination 定义。验证：verify 16/16、guard 20/20、doc 24/24、双向召回 52/52 误拦 302/326 持平、负例注入 29/29、gate 层变体矩阵攻击 7/7 命中且本维零误伤。
+- `test/round-307-evidence-claim-mismatch.js`（负例注入测试，29 断言，12 常量逐验证承重）
+
+### Changed
+- AGENTS.md / README.md / SKILL.md：维度数 250 → 251，VERIFY 层 217 → 218（三处文档同步实测值）
+
+---
+
 # 6.8.177 变更日志条目
 
 ## [6.8.177] - 2026-11-12

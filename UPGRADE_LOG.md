@@ -1,3 +1,80 @@
+## r307 — 第 251 维度 `evidence_claim_mismatch` 证据-断言覆盖失配上线（真升级①）
+
+**日期** 2026-11-12 20:26–21:10 CST  **操作方** 心虫自主升级引擎（r307 cron）  **VERSION** 6.8.177 → 6.8.178  **轮次** r307（kind: dimension）
+
+**方向** 证据充分性与幻觉检测（r299–r305 连续 7 轮经济/统计谬误族后按轮换纪律换方向；r306 刚完成 dose_response_linearity）。
+
+**来源** 论文 LettuceDetect（KRLabsOrg/LettuceDetect, arXiv 2502.17125, RAGTruth 79.22% F1）的 **extrinsic hallucination** 定义（断言内容超出所给证据可支撑范围）；代码参考 cvs-health/uqlm（1217★, JMLR 2026）与 potsawee/selfcheckgpt（635★）。搜索落盘 `/tmp/hf-scout-1794486473.txt`。
+
+**缺口实证** 探针 10 攻击 + 8 良性：攻击 7/10 被既有维度兜住，**A1/A6/A10 完全穿透**（gate=pass / verdict=可信 / score=1）；归属诊断排除 reverse_causation / common_cause / post_hoc / pseudo_causal / cherry_picking / hasty_generalization / overclaim 搭便车。与既有 `weak_evidence_strong_claim`（第245维，弱证据类型×绝对化措辞）和 `completion_evidence`（空完成声明）零重叠。
+
+**心虫裁决** `heartflow_philosophy_decision` → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions；cognitiveLoad/uncertainty 为 "unknown"，未把默认档当实质背书）。
+
+**实现** `src/evidence-claim-mismatch.js`（349 行，新建）。判据**两腿共现 + 邻近窗（ZH 80 字 / EN 200 字符），缺一不判**：腿① EVID 证据/研究/数据在场标记（研究/数据/统计/实验/调查/临床试验/论文/《X》年份/机构+研究 + EN the study found / data show / N participants——含裸名词形态与 r307 补的「N名+名词+实验」数量样本限定形、「实验数据+支持」形）；腿② OVERREACH 超覆盖断言（O1 相关→因果、O2 部分→全体、O3 局部→整体、O4 疗效越界 + EN cures / prevents all / works for everyone / nationwide）。四重豁免：概念教学 / 证据充足性论证（主动声明边界是正确判别）/ 推理否定 / 对冲 / 疑问句 / 受限定的正确外推形。A9 实证修正：限定形豁免排除大范围放大词（「在全国范围内推广」是把局部结论放大到全国，属越界断言本身，不可豁免）。V4 实证修正：倒装形不强制「证据腿在前」，方向由两腿词法类别保证。
+
+**接线** `src/index.js` 五处：require（736）、`const ecm` 计算（2334）、dispatch 判定条目（3048）、dimMap 条目（4157，含完整判据/边界文档）、VERIFY_DIMS 登记（5755）。
+
+**验证**（五门禁 + 变体矩阵）
+| 门禁 | 结果 |
+|---|---|
+| `node --check` | 通过 |
+| `bin/verify.js` | **16 passed / 0 failed** |
+| `scripts/guard-abilities.js` | **20/20**（维度登记 251 个被承认） |
+| `test/doc-numbers-accuracy.test.js` | **24 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | **召回 52/52，误拦 302/326（92.6%，与基线持平）** |
+| `test/round-307-evidence-claim-mismatch.js` 负例注入 | **29 passed / 0 failed**（12 常量逐验证承重） |
+| gate 层变体矩阵 | **攻击 7/7 全部命中且本维承重；良性 2/6 pass，4 条非 pass 均由既有基线维度承重（unsupported_claim / monocausal_attribution / reasoning_coherence），本维零误伤** |
+| 模块级单元 | **攻击 15/15，良性 0/12** |
+
+**已知边界** ① 豁免与腿②的语义冲突已修一处（大范围放大词），但「在全省范围内」之外的边缘限定形仍可能有残余歧义；② 腿②「适用于任何人」形刚补，覆盖面以矩阵 7 变体为下限，未穷尽；③ 良性样本 4 条非 pass 属既有基线噪声（长期基线 21577 passing / 145 failing），非本轮回归；④ 本环境有并发子代理（b92c7dba）在同一仓库工作，本轮 commit 仅显式添加本轮文件，未 `git add -A`。
+
+---
+
+## r306 — 第 250 维度 `dose_response_linearity` 剂量-反应线性外推上线（真升级①）
+
+**日期** 2026-11-12 18:04–18:40 CST  **操作方** 心虫自主升级引擎（r306 cron）  **VERSION** 6.8.176 → 6.8.177  **轮次** r306（kind: dimension）
+
+### 真升级判定：命中 ① 新判别维度
+
+新增独立维度 `dose_response_linearity`（第 250 维度，VERIFY 层 216→217），新文件 `src/dose-response-linearity.js`（264 行，`checkDoseResponseLinearity(text)`）。缺口实证：`scripts/round-306/probe-candidates.js`（89 行）测出候选族 F（剂量-反应线性外推）3/5 漏判最薄弱；grep src/ 全库确认既有仅 `common_cause` 顺带提「剂量反应」作证据建议，无维度判「少量有益→更多更有益/效果成倍」的线性外推结构本身 → 独立攻击族立项，与既有维度零重叠。裁决门禁 `heartflow_philosophy_decision` 返回 accelerate（confidence 0.7 / priority 40 / trigger optimal_conditions；cognitiveLoad/uncertainty 均 "unknown"，不作实质背书）。
+
+### 来源
+
+- 外部搜索全部失败（如实记录）：HN Algolia "causal inference fallacy detection" 仅命中无关语音转写条目 EdgeWhisper（pts=3）；Semantic Scholar 连续 HTTP 429 空返回；GitHub "causal inference rules engine" 最高星仅 Aryia-Behroziuan/History（知识表示历史数据集，无可复用判据）。未编造任何论文/仓库。
+- 内部路径范本：`src/regression-to-the-mean.js`（双腿判据 + 豁免表 + 负例注入测试形态）；接线按 r304 先例，`src/index.js` 九处一次接齐（require、计算点 `drl`、allDims、dimMap、VERIFY_DIMS、DIM_GUIDANCE、两处嵌套补登记）。
+
+### 判据（双腿共现 + 三重豁免）
+
+1. 腿① 剂量/受益腿：`片|粒|颗|杯|瓶|勺|小时` × `有效|有用|好|提神` / `helps|benefits`，含裸名词形态（161 轮教训自查：同族词去后缀仍命中）。
+2. 腿② 线性外推腿：`多吃|加量|翻倍|成比例` / `times as much|10x|5x` 等倍数断言；另收「任意受益名词 × 倍数」（精神/成绩/收益/状态等）与 ZH「N 倍」直接断言。
+3. 三重豁免全部负例注入承重：概念/教学转述、推理否定/反向承认（「多吃不会好得更快」「非线性、存在阈值和平台期」）、医疗医嘱语境。射程：只管「效果随剂量线性放大」的外推形态，不管该剂量真实疗效；医学/营养学教学的正确转述与批评、医嘱、显式承认非线性/平台期的正确陈述均豁免。
+
+### 实现（`src/dose-response-linearity.js`，新建 264 行；`src/index.js` +9 处接线）
+
+| 文件 | 改动 |
+|---|---|
+| `src/dose-response-linearity.js` | 新建。`checkDoseResponseLinearity(text)`：双腿常量（ZH/EN 各一套）+ 三重豁免表 + 否定前缀守卫 |
+| `src/index.js` | require `checkDoseResponseLinearity`、计算点 `const drl`、allDims `{score: drl.score, name:'dose_response_linearity'}`、dimMap、VERIFY_DIMS（含射程边界长注释）、DIM_GUIDANCE 文案、两处嵌套补登记 |
+| `scripts/round-306/variant-matrix.js` | 新建变体矩阵实测脚本（10 攻击 + 10 良性） |
+| README.md / SKILL.md / AGENTS.md | 维度 249→250、verify 216→217、测试数 21,517→21,577、口径版本戳 → v6.8.177、README changelog 补 6.8.177 条目 |
+
+### 验证（本回合真实运行）
+
+|| 项 | 结果 |
+|---|---|---|
+| `bin/verify.js` | PASS 16 passed / 0 failed |
+| `scripts/guard-abilities.js` | PASS 20/20（维度登记 250 个） |
+| `test/doc-numbers-accuracy.test.js` | PASS 24/24 |
+| `scripts/bidirectional-guard.js` | 召回 52/52（100%）+ 误拦 302/326（92.6%）不升 |
+| 变体矩阵（gate() 实测） | 攻击 10/10 非 pass（7 verify + 3 rewrite），findings 全含 `dose_response_linearity`；良性 10/10 零误伤 |
+
+矩阵修边记录（3 处，均在本轮实测中翻正）：否定豁免补「不会/并不会/反而」形（良性「两片药是常规剂量，多吃不会好得更快」由误伤转 pass）、任意受益名词 × 倍数族（「一次喝五杯就能精神五倍」miss→hit）、EN `times as much` 形（"One pill a day works, so taking ten pills will work ten times as well." miss→hit）。
+
+### 已知边界 / 下轮可继续
+
+- 跨句长距离形（剂量与倍数断言分处两句）本轮保守不收；显式非线性论证的对抗性误用（先喊「我知道不是线性」再线性外推）需更强语用判据。
+- 轮换纪律：r299–r305 连续 7 轮经济/统计谬误族，本轮 F 族探针实证最薄弱且零重叠故在经济族内立项；下一轮必须换方向（候选：证据充分性与幻觉检测 / 自我验证与纠错）。
+- 本轮为本地 commit，未 push（推送由每日 22:30 审计任务统一执行）。
 ## r305 — 锚定效应『元语言锚定陈述族』双腿族上线（真升级②）
 
 **日期** 2026-11-12 15:51–16:15 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.175 → 6.8.176  **轮次** r305（kind: dimension）
