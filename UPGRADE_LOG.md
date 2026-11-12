@@ -1,3 +1,55 @@
+## r303 — 平均≠边际（average_marginal_conflation 第 214 维度）「产量/效率/速率型平均值 → 边际量」新措辞家族（真升级②）
+
+**日期** 2026-11-12 12:5x–13:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r303（kind: dimension）
+
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。r303 认领后立即 push claim commit（撞号纪律，7e8aed6）。海外扫描如实记录（coordination/agent4/scout/README-r303.md）：arXiv OR-query 15 篇全为通用论文、定向查询连接空返（0 字节 ×3，已删临时文件）；GitHub 仓库检索 `total_count:0`、代码检索 401 需鉴权（未带凭据重试）；S2 `total=52` 仅 1 条实质命中——**"Marginal analysis vs. Average ROAS: the profit-maximization fallacy in digital advertising budget allocation"（2026, citationCount 2, paperId `687930bac015404a474210e44aea90c92ccab67f`）**——与本族结构同构（平均 ROAS 推边际 ROAS 做预算分配），可作为唯一可引海外同构文献。三源无可整合纯规则实现，选题走仓库内探针实证。
+
+### 缺口实证（scripts/round-303/probe-module-amc.js，v6.8.174 模块直调动手前）
+`average_marginal_conflation`（第 214 维度，r220 起草、r295 插件层接线）自立项起只覆盖**货币型**平均值与结论——腿① `AVG_COST_ZH/EN` + `AVG_RETURN_ZH/EN`（平均成本/单台利润/平均客单价/average cost/average profit）、腿③ `CHEAP_ZH/EN` + `PROFIT_ZH/EN`（更便宜/利润越滚越多/cheaper/higher revenue）。**产量、效率、速率型平均值整体缺席**——14 条攻击模块直调全部 `hit=false`：
+- `平均每小时能生产十件，所以再加班一小时也能多产出十件`
+- `每台机器平均一天产五十件，所以再开一台机器就多五十件`
+- `平均亩产三吨，所以再种一亩地就能多收三吨`
+- `团队平均每天处理八单，所以再加一个人就能多处理八单`
+- `平均响应时间是两秒，所以再多一个用户也还是两秒`
+- `The average output is ten units per hour, so one more hour of overtime must add ten more units.`
+- `Average yield is three tons per mu, so planting one more mu of land must add three tons.`
+- `Average throughput is 40 requests per second, so one more server will handle 40 more requests.`
+
+根因：**AP→MP（平均产量推边际产量）、平均亩产→边际亩产、平均吞吐→边际吞吐——这一平均-边际混淆最教科书的形式，存量腿①腿③全是货币量词汇，一条都不收。**
+
+### 改了什么
+- `src/average-marginal-conflation.js`（既有已接线模块，第 214 维度，**src/index.js 零改动**）：新增 6 个常量 + 1 条平行路由，**不并入存量数组**（避开 r280/r265 的 length===N 登记断言），**不进 `avgLegs()`/`conclLegs()`**（那会同时放大 F-1/F-2a 召回面、有冲击 302 误拦基线之虞）：
+  - `AVG_RATE_ZH`（5 支：平均每+时间单位+产出动词 / 平均每+量词+产出动词 / 每台机器…平均…产 / 平均+速率名词（亩产|单产|产能|吞吐量|人效|响应时间|客单价|转化率…）/ 平均+人群+产出动词）
+  - `AVG_RATE_EN`（5 支：average output/yield/productivity/throughput / average … time / averages N units per / on average…produce / average clicks per）
+  - `RES_ZH`（7 支：再开一台机器 / 再加班一小时 / 再多一个用户 / 每多一个 / 多来一个 / 下一个 / 再生产一件）——存量 `MARG_ZH` 只收「下一台/再生产一台/每多一台」量词形，不收「再开一台**机器**」「再种一**亩地**」「再多一个**用户**」「再加班一**小时**」这类**动词+资源名词**形
+  - `RES_EN`（4 支：one more + 资源名词（hour/machine/member/rep/server/mu/impressions…）/ the next + 资源名词 / add|hire|run… one more X / one extra X）
+  - `QTY_CONCL_ZH`（4 支：多+数+量词 / 数+量词+也是|不变 / 数次登录|点击|下单 / 也能产出…）
+  - `QTY_CONCL_EN`（4 支：must add N more units / adds N more units / N more units / also takes N days）
+  - 新增 `findF5()`：腿①' AVG_RATE × 腿②' `RES ∪ MARG ∪ INCR` × 腿③' QTY_CONCL，三腿共现 + 跨度否定守卫（`avgPreNeg` + `negatedInSpan` 复用存量实现，跨度沿用 F-2a 的 W_AIC/W_ICC），共享豁免入口（EXEMPT_META / EXEMPT_CORRECT / HEDGE）在主函数入口先判；`__internals` 新导出 6 个键供负例注入。**+167 行、0 删除（纯增）**。
+- `test/round-303-average-marginal-rate.test.js`（新增，**31/31**：A 插件层 dispatch 4 + B 攻击命中 3 + C 良性 2 + D 存量回归 4 + E 常量级注入 8 + F 元素级注入 3 + G 路由独立性 4 + H 登记纪律 3）
+- `scripts/round-303/{probe-candidates,probe-amc,probe-module-amc,probe-prototype,probe-prototype2,probe-corpus}-r303.js`（6 支探针留档：候选族扫描 / amc 深度探针 / 改前模块直调 14-miss / F-5 正则原型 v1 / v2（含 RES 扩形）/ 官方良性语料全量 FP 扫描）
+- `UPGRADE_LOG.md`（r303 条目）、`README.md`/`SKILL.md`（机器记账 21,517 → 21,548 passing；`data/test-count.json` 已由 run-all 自动回填 21,548/145/21,693）；报告 `coordination/reports/r303-dimension-agent4.md`（本地留档，`reports/` 自 r268 起被 gitignore 覆盖、不入链）。
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（判别维度 246）
+- node test/doc-numbers-accuracy.test.js — 24/0
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线**完全一致**，新族零新增误伤）
+- 全量 run-all.js — 21,548 通过 / 145 失败 / 21,693（基线 21,517/145/21,662，唯一 +31 即本轮新测试，失败数逐条持平）
+- 官方良性语料专项扫描（scripts/round-303/probe-corpus-r303.js）— gate-benchmark 97 + gate-benchmark-extended 106 + benign-mixed 25 + vertical-benign 150 = **378 条全量，F-5 三腿完整命中 0 条**（腿①' 词面命中 0 条）
+- 负例（注入-删条）— 8 组常量级 + 3 组元素级，注入 **11 个 → 11 个变红，0 个未变红**：
+  - `AVG_RATE_ZH:[]` → 中文攻击 8/8 翻 miss；`AVG_RATE_EN:[]` → 英文 10/10 翻 miss
+  - `QTY_CONCL_ZH:[]` → 中文 8/8 翻 miss；`QTY_CONCL_EN:[]` → 英文 10/10 翻 miss
+  - `RES_ZH:[]`（仅删 RES，MARG/INCR 保留）→ 中文 6/8 翻 miss；`RES_EN:[]` → 英文 9/10 翻 miss
+  - 全腿②中文（RES+MARG+INCR 均空）→ 中文 8/8 翻 miss；全腿②英文 → 英文 10/10 翻 miss
+  - 元素级：`AVG_RATE_ZH[0]` 删 → 中文 3 条专署翻 miss（8→5）；`AVG_RATE_ZH[3]` 删 → 3 条专署翻 miss（8→5）；`RES_EN[0]` 删 → 英文 6 条专署翻 miss（10→4）
+
+### 与存量判据的关系 / 已知窄口
+- F-5 与存量 F-1/F-2a **完全并行、互不依赖**（round-303 测试 G1–G4 双向对照实证）：把存量全部腿常量（AVG_COST/AVG_RETURN/MARG/INCR/CHEAP/PROFIT，中英两侧）全部注入置空，F-5 中文攻击仍 8/8、英文仍 10/10 命中——新族**单独由本轮新常量承重**；反向删 `AVG_RATE_ZH` 或 `QTY_CONCL_EN`，存量货币型攻击（「单台成本已经压到这么低了，说明再生产一台更便宜」类）仍 2/2 命中。
+- **注入契约已知坑（非本轮引入，交接 1 号）**：数组常量不能注入 RegExp——`R.AVG_COST_ZH = /(?!)/i` 会让 `(R.AVG_COST_ZH || AVG_COST_ZH).concat(...)` 抛 TypeError，被 `analyze` 的 try/catch 吞掉后表现为「该族消失」，测试绿但走的是崩溃路径而非删除路径。r295 的 INJECT_KEY 即此形态。本轮全部改用**空数组 `[]`** 注入（语义等价删除且不抛）。
+- **存量 `MARG_EN` 窄口，非本轮引入**：只收 "one more unit/item/batch"，不收 hour/machine/member/rep/server/mu 等资源名词；本轮以**新增 `RES_EN` 平行常量**绕过而非扩 `MARG_EN`（后者会同时放大 F-1/F-2a 召回面）。
+- 本维度经 `src/plugins/econ-reasoning-check/index.js` 在 postprocess.think 层 dispatch（r295 接线），**不在 gate 层 dimMap**，故 `gate.action` 与 `verdict` 不受本轮影响（同 r295/r296/r300/r301/r302 先例）；round-303 测试 H3 以断言形式锁死 `src/index.js` 不含该维度键。
+
 ## r302 — 小数定律（law_of_small_numbers 第 239 维度）「小样本 → 数量化总体裁定（概率/比率/均值）」新措辞家族（真升级②）
 
 **日期** 2026-11-12 09:5x–10:4x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r302（kind: dimension）
