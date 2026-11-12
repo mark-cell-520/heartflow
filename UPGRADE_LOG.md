@@ -1,3 +1,48 @@
+## r304 — 弱证据强断言错配（weak_evidence_strong_claim 第 245 维度）「AI 模型输出与社交平台视频/直播/博主作为不可回溯弱证据信源」新措辞家族（真升级②）
+
+**日期** 2026-11-12 14:5x–15:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r304（kind: dimension）
+
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。r304 认领后立即 push claim commit（撞号纪律，f331e3b）。海外扫描如实记录：arXiv OR-query 拆分为多词检索返回 15 篇全为通用论文；GitHub 仓库检索 `total_count:0`、代码检索 401 需鉴权（未带凭据重试）；S2 连续 4 次查询 3 次 429 限流（"chatbot advice gullibility heuristic" 查询经 30s sleep 后仍 429），无可用文献。三源空返，按既有形态自建，未编造命中。
+
+### 缺口实证（scripts/round-304/probe-module-wesc-r304.js + probe-candidates-r304.js，v6.8.174 动手前）
+`weak_evidence_strong_claim`（第 245 维度，r288 接线）的腿① `EVIDENCE_ZH/EN` 自立项起只收三类证据——口语传闻链（听说/据说/网传/据传）、个人见证（我朋友/亲测/我试过）、泛称匿名信源（Sources say/people say）。**「AI 模型输出」与「社交平台视频/直播/博主内容」两类新型不可回溯信源整族缺席**：模块直调 15 条攻击 13 条 `hit=false`（2 条命中系句内自带存量腿①「我朋友/亲测」）；`gate()` 全量 findings 口径下 4 条新族样本 `action=pass` 真零命中，另有 `ChatGPT 说这款药百分百有效` 被 confidence 代拦但目标维度零归因：
+- `ChatGPT 说这款药百分百有效，你赶紧买。` / `AI 说这个币下周肯定翻倍，我准备全仓。`
+- `我问过大模型了，它说这个方法一定能瘦。` / `豆包说这支股票必然会涨，你就放心买。`
+- `ChatGPT says this drug is guaranteed safe for everyone.` / `The AI says this crypto will definitely 10x before December.`
+- `A YouTuber said this method is guaranteed to make you lose ten pounds.` / `I saw on TikTok that this stock will certainly double next week.`
+- `短视频上说这家公司的股票一定翻倍。` / `博主说这款面膜保证三天见效，我已经下单了。`
+- `直播间里说这款保健品百分百有效，主播自己都在吃。` / `小红书上说这个方法一定能瘦，我亲测有效。`
+- `Everyone in the livestream says this mask works 100 percent.` / `A streamer said this supplement always works, guaranteed.`
+
+根因：大模型输出无具名、可被 prompt 诱导、已知会幻觉（"AI 说的"不可回溯核验）；短视频/直播/博主内容由流量驱动、无署名、无可追溯出处——与「Sources say」同构甚至更弱，但存量词表一条不收。
+
+### 改了什么
+- `src/weak-evidence-strong-claim.js`（既有已接线模块，第 245 维度，**src/index.js 零改动**）：新增 2 个常量，**不并入存量数组**（避开 r280/r265 的 length===N 登记断言），在 `checkWeakEvidenceStrongClaim` 入口与存量 `EVIDENCE_*` concat 合并，复用既有邻近窗（ZH110/EN320）与四组豁免入口（EXEMPT_CORRECT/META/SOURCED + HEDGE + 疑问句）：
+  - `EVIDENCE_AI_ZH`（8 支：①AI 模型输出族——ChatGPT/GPT/Copilot/Claude/Gemini/Kimi/DeepSeek/文心一言/通义千问/豆包/元宝/智谱/星火/大模型/语言模型/聊天机器人/机器人/AI + 说|讲|告诉|提到|认为|觉得|建议|回答|算出|测出，带 `/i` 标志与 `(?<![A-Za-z])` 边界守卫；②问句锚——问|询问|请教|咨询 + ≤6 字间隔 + 模型名（收「我问过大模型了，它说…」，不放开任意间距以免误收「这部 AI 纪录片说…」）；③视频族——短视频|小视频|视频+说；④博主族——博主|up主|主播|网红|达人|大V|kol + 说|称|推荐|种草|带货|晒单；⑤直播族——直播间|直播+说|称|都在说；⑥弹幕/评论区族；⑦社交平台族——小红书|抖音|快手|B站|微博|朋友圈|群里|微信|贴吧|论坛+说；⑧网友都说）
+  - `EVIDENCE_AI_EN`（11 支：①ChatGPT says|said|told；②(the) AI|chatbot|bot|language model|LLM + says|said|told|claims；③an AI told me；④the algorithm + says|told|showed|shows|recommends；⑤my feed + showed|is full of；⑥I saw (it) on TikTok|Douyin|YouTube|Instagram|Twitter|X|Reddit|Facebook|Snapchat|Pinterest；⑦a TikTok|YouTube|Instagram|Douyin video + said|says|claims|showed；⑧a YouTuber|TikToker|influencer|streamer|blogger|vlogger|podcaster|creator + said|says|claims|swears；⑨Reddit|Twitter|TikTok|Douyin|Instagram|YouTube + says|users say|claims；⑩(live)stream chat|comments；⑪everyone in (the) chat|livestream|comments）
+  - **关键坑**：AI 拉丁族必须带 `/i`——`gate()` 的 `_normText` 归一化手段是 lowercase（trace 实证「归一化手段: lowercase」），「ChatGPT 说」「AI 说」到判别层已变成「chatgpt 说」「ai 说」，大小写敏感会整族失配（r304 实测：模块直调命中但 gate 层零归因）
+  - `__internals` 新导出 2 个键供负例注入。**+63 行、0 删除（纯增）**
+- `test/round-304-weak-evidence-ai-source.test.js`（新增，**29/29**：A gate 层 dispatch 2 + B 攻击命中 3 + C 良性零误伤 3（含官方语料 378 条全量扫描）+ D 存量回归 4 + E 常量级注入 2 + F 元素级注入 10 + G 路由独立性双向 2 + H 登记纪律 3）
+- `scripts/round-304/`（7 支探针留档：候选族扫描 / 模块直调改前 13-miss / 改动后验证 / gate+corpus / debug 两条 ×2 / 存量长度实测）；`UPGRADE_LOG.md`（r304 条目）、`README.md`/`SKILL.md`（机器记账 21,548 → 21,577 passing；`data/test-count.json` 已由 run-all 自动回填 21,577/145/21,722）；报告 `coordination/reports/r304-dimension-agent4.md`（本地留档，`reports/` 自 r268 起被 gitignore 覆盖、不入链）
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（判别维度 246）
+- node test/doc-numbers-accuracy.test.js — 24/0
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线**完全一致**，新族零新增误伤）
+- 全量 run-all.js — 21,577 通过 / 145 失败 / 21,722（基线 21,548/145/21,693，唯一 +29 即本轮新测试，失败数逐条持平；失败清单全为存量类别：dispatch 族 Command failed + 缺汇总行格式 + unsupported-claim-exemption 自报失败）
+- 官方良性语料专项扫描（scripts/round-304/probe-corpus-r304.js）— gate-benchmark 97 + gate-benchmark-extended 106 + benign-mixed 25 + vertical-benign 150 = **378 条全量，新族腿①词面命中 0 条、维度命中 0 条**
+- gate 层归因（scripts/round-304/probe-gate-corpus-r304.js）— 13/13 新族攻击 `gate.action` 非 pass 且 findings 归因 `weak_evidence_strong_claim`
+- 负例（注入-删条）— 2 组常量级 + 10 组元素级，注入 **12 个 → 12 个变红，0 个未变红**：
+  - `EVIDENCE_AI_ZH:[]` → 中文新族攻击 12/12 翻 miss；`EVIDENCE_AI_EN:[]` → 英文 9/9 翻 miss
+  - 元素级（专署攻击翻 miss 数）：`EVIDENCE_AI_ZH[0]`→4、`[1]`→1、`[2]`→1、`[3]`→2、`[6]`→1、`[7]`→1；`EVIDENCE_AI_EN[0]`→2、`[5]`→1、`[7]`→2、`[10]`→1
+- 路由独立性双向：删存量 `EVIDENCE_ZH/EN` → 新族 21 条仍全命中；删新族 → 存量 r288 攻击 16 条仍全命中
+
+### 已知边界（实测记录，留交后续轮次）
+1. **EXEMPT_META_ZH 的「课程」词误吞卖课诈骗句**——`网上都在传这个课程包治百病` 被 r288 元话语豁免拦掉（豁免本为「批判性思维课程讲过」型教学转述设计），r304 实测坐实、未修（超出本轮家族范围）。
+2. **客服机器人担保句**——`我问过客服机器人了，它说今天绝对会送到` 型会被新族命中（机器人 + 绝对化），VERIFY 级语义下可辩护但值得后续实测真实业务语料面。
+3. **中英混排文本仍走单侧腿表**——isZh 只按有无汉字选一侧，`ChatGPT says 这款药 guaranteed` 型混排句中文腿不收英文动词（存量 r288 设计边界，非本轮引入）。
+
 ## r303 — 平均≠边际（average_marginal_conflation 第 214 维度）「产量/效率/速率型平均值 → 边际量」新措辞家族（真升级②）
 
 **日期** 2026-11-12 12:5x–13:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r303（kind: dimension）
