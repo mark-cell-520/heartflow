@@ -1,3 +1,38 @@
+## r311 — 显著性≠重要性（significance_effect_size）+ 心理账户（mental_accounting，econ_reasoning_gate 聚合族）「新实质性裁定 / 新来源标签 × 新消费许可」新措辞家族（真升级②）
+
+**日期** 2026-11-13 06:00–07:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值，同 r305/r308/r309/r310 先例）  **轮次** r311（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
+
+### 缺口实证（coordination/agent4/probes/r311-probe*.js，v6.8.178 动手前）
+
+- **significance_effect_size**：存量 IMPORTANCE/SUPERIOR/SCALE/MAGNITUDE 四族只认「重要/重大/突破性/明显更好/改进很大」类裁定，「p 值小于 0.05，所以影响深远/意义深远/含金量很高/价值很大/分量很足」及 EN「impactful / game changer / implications are huge / matters in practice / of great value」类**新实质性裁定** 12/12 穿透本模块（模块直调零命中）。
+- **mental_accounting**：存量 SOURCE 只收个人收入标签（奖金/意外之财/中奖/报销/卡券/红包），不收公共资金（政府补贴/课题经费/救济款）与劳务创作收入（佣金/提成/版税）；存量 SPEND 不收「没有心理负担/不用顾忌/不用计较/不用节省/犒劳自己/奢侈一把」（EN treated myself / no strings attached / without guilt / might as well enjoy / indulge a little）。探针 16 条候选 **14/16 穿透**（2 条已被存量腿代拦）。
+- 官方良性语料 378 条（gate-97 97 + extended 106 + vertical 150 + mixed 25）两模块零误命中；四门禁与 r310 基线逐条一致。
+
+### 改了什么（src/significance-effect-size.js + src/mental-accounting.js，均为平行常量 + findSignatures concat 合并，0 删除存量逻辑，src/index.js 零改动）
+
+- **significance-effect-size.js**：IMPORTANCE_ZH2（含金量高/价值很大/分量很足/很有价值/很有分量）、MAGNITUDE_ZH2（影响深远/意义深远）、IMPORTANCE_EN2（impactful / game changer / world-changing / consequential / matters in practice / has…implications / of great value）、MAGNITUDE_EN2（implications are huge / far-reaching impact / matters in the real world）四支新腿，verdicts 装配处 `(R.X || X).concat(R.X2 || X2)`。
+- **mental-accounting.js**：SOURCE_ZH2（压岁钱/公共资金/劳务创作收入三元素）、SPEND_ZH2（没有心理负担/不用顾忌·计较·节省/犒劳自己/奢侈一把四元素）、SOURCE_EN2（lucky money / red envelope / subsidy / research funding / relief money / commission / royalty / tip money 八元素）、SPEND_EN2（treated myself / rewarded myself / no strings attached / without guilt / might as well enjoy / indulge a little 六元素）四支新腿，findSignatures 同点 concat。
+- **元素瘦身**：删「效应深远」「huge implications」「花起来不心疼」「奖金池」「bonus pool」五个与存量腿冗余的元素（实测 奖金池/bonus pool 已被存量 SOURCE 腿覆盖、②-l 已被存量「不觉得可惜」腿覆盖），保证 38 个新元素逐一删除均有攻击翻红（元素级注入零冗余）。
+- 存量键注入语义不变（数组注入=整体替换；存量键注入永假正则时 `.concat` 抛 TypeError，与存量行为一致，聚合层 _safeDetect 兜底）；存量测试 significance-effect-size 18/18、mental-accounting 12/12 复跑同分。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-311-sig-verdict-ma-legs.test.js` | **21 通过 / 0 失败**（A gate 归因 1 + B 模块 1 + C 良性 2 + D 存量回归 2 + E 常量级注入 10 + F 元素级注入 1 + G 路由独立 1 + H 登记纪律 3；A/B 组共 41 条新攻击，F 组内含 38 元素逐一断言） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 PASS，判别维度 251**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，零新增误伤） |
+| 全量 run-all（JOBS=4） | **21,798 通过 / 154 失败 / 21,952 总**——与 r310 基线 21,777/154/21,931 差 passed +21 / failed +0，+21 恰为轮测断言数 |
+| 官方良性语料 | 378 条两模块直调零误命中 |
+| 负例 | 注入 52 个（8 常量级 + 38 元素级 + 4 豁免删除 + 2 存量语义）→ 全部按设计变红/失效，0 个未变红 |
+| 海外扫描 | arXiv/GitHub/S2 三源空返（既有形态噪声），按既有形态自建，无编造命中 |
+
+### 归一化 artifact（先于本轮存在，已列交接）
+
+text-normalizer 的 de_leet 会把紧邻形「p<0.05」还原成「p<o.05」，导致 gate 管道内 sig 腿整体失配（存量 IMPORTANCE 等腿同样受影响）。轮测攻击句因此一律采用「p 值小于 0.05」「p < 0.05」带间隔形式；该 artifact 本身不在本轮范围（未动归一化器）。
+
 ## r310 — 峰终定律（peak_end_rule 第 246 维度 econ_reasoning_gate 聚合族）「事件日锚点 × 过程痛苦 × 指示词整体裁定」新措辞家族（真升级②）
 
 **日期** 2026-11-12 20:55–21:15 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值，同 r305/r308/r309 先例）  **轮次** r310（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 246 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
