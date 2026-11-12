@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.177**. Not marketing copy.
+Measured on this repository at **v6.8.178**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.178 | 2026-11-12 | r307：**第 251 维度 `evidence_claim_mismatch`（证据-断言覆盖失配）上线** — 判别「断言内容超出所给证据可支撑范围」的外延幻觉结构：腿① EVID 证据/研究/数据在场标记（研究/数据/统计/实验/调查/临床试验/论文/《X》年份/机构+研究 + EN the study found / data show / N participants，含「N名+名词+实验」数量样本限定形），腿② OVERREACH 超覆盖断言（相关→因果 / 部分→全体 / 局部→整体 / 疗效越界 + EN cures / prevents all / works for everyone / nationwide），两腿共现 + 邻近窗（ZH 80 字 / EN 200 字符），缺一不判；四重豁免：概念教学、证据充足性论证、推理否定、对冲/疑问句/受限定的正确外推形。来源：LettuceDetect（arXiv 2502.17125, RAGTruth 79.22% F1）extrinsic hallucination 定义。与 `weak_evidence_strong_claim`（第245维）和 `completion_evidence` 零重叠。验证：verify 16/16、guard 20/20@251、双向召回 52/52 + 误拦 302/326 不升、doc 24/24、轮测 29/29、gate 层攻击 7/7 非 pass 且本维承重、模块级攻击 15/15 良性 0/12。 |
 | 6.8.177 | 2026-11-12 | r306：**第 250 维度 `dose_response_linearity`（剂量-反应线性外推）上线** — 新文件 `src/dose-response-linearity.js`。缺口实证（scripts/round-306/probe-candidates.js）：候选族 F（把「一片有效→十片十倍效果」「跑半小时好→跑四小时好四倍」的剂量-反应关系当成线性外推）探针 3/5 漏判最薄弱；grep src/ 确认既有仅 `common_cause` 顺带提「剂量反应」作证据建议，无维度判线性外推结构本身 → 独立攻击族立项。判据为双腿共现：腿① 剂量/受益腿（片/粒/颗/杯/瓶/勺/小时 × 有效/有用/好/提神/benefits/helps，含裸名词形态），腿② 线性外推腿（多吃/加量/翻倍/成比例/times as much/10x 等倍数断言）。三重豁免全部负例注入承重：概念教学转述、推理否定/反向承认（「多吃不会好得更快」「非线性、存在阈值和平台期」）、医疗医嘱语境。射程：只管「效果随剂量线性放大」的外推形态，不管该剂量真实疗效。验证：verify 16/16、guard 20/20@250、双向召回 52/52 + 误拦 302/326 不升、doc 24/24、gate 层变体矩阵攻击 10/10 非 pass 且 findings 全含 dose_response_linearity、良性 10/10 零本维误伤（3 条修边记录：否定豁免补「不会/反而」形、任意受益名词×倍数族、EN times as much 形）。已知边界：跨句长距离形与显式非线性论证的对抗性误用本轮保守不收。 |
 | 6.8.176 | 2026-11-12 | r305：`anchoring_effect`（第 214 维度）新增『元语言锚定陈述族』双腿族（真升级②）——`src/anchoring-effect.js` 补 `META_ANCHOR`（腿① 元语言锚点命名）× `META_DOM`（腿② 元语言支配断言）ZH+EN 各一套 + `numRequired=false` 平行路由（新腿判「把锚的存在说出来」的语言行为，句中常无显式数字，故豁免旧族数字在场约束），经 `src/econ-reasoning-gate.js`（第 249 维度聚合）进 gate 路径，`src/index.js` 零改动；探针实证旧判据下元语言攻击 3/10 承重、基线对比零新增误伤（2 条误伤归因于基线维度 unsupported_claim/appeal_to_authority 与 normalization_of_deviance），补腿后 8/10；新单测 29/29 + 负例注入 8/8 翻 miss；四门禁 verify 16/0、guard 20/20@249、双向 52/52+302/326 不升、doc 24/24；文档口径 248→249、verify 215→216 |
 | 6.8.175 | 2026-11-12 | r302：`regression_to_the_mean` 干预负向功效断言族上线（真升级②）——`src/regression-to-the-mean.js` 新增独立两腿路由 `negZh`/`negEn`（干预主体 × 负向功效断言，含补习班/辅导班/课程/教材/题库/秘笈/攻略 与 buyback/restructuring/promotion/layoffs 等名词族），把自然回落归罪于干预之过；维度 248 不变、`src/index.js` 零改动；轮测 11/11、变体矩阵攻击 8/8 非 pass、良性 7/7 clean；四门禁 verify 16/0、guard 20/20@248、双向 52/52+302/326、doc 24/24 |

@@ -1,3 +1,40 @@
+## 审计修复 — 每日审计·修复轮（r296–r307 审计，P1×2 + P2×2 修复）
+
+**日期** 2026-11-12 22:30–23:10 CST  **操作方** 心虫每日审计 cron（22:30 任务）  **VERSION** 6.8.178（不变，零引擎逻辑改动）
+
+### 审计范围
+过去 24 小时 commit：r296–r307 共 12 轮（git log --since='24 hours ago' 实测 26 个 commit，含 agent-4 的 claim/docs/test/dimension 分工子提交）。UPGRADE_LOG 12 条目与 commit 一一对应（含已知 r303 双条目——两个不同 agent 的同号记录，非重复，UPGRADE_LOG 127 行已注明）。
+
+### 问题清单
+| 级别 | 问题 | 实测证据 |
+|---|---|---|
+| **P1** | `src/econ-reasoning-gate.js`（第249维度聚合器）未入 git，而 `src/index.js:729` 顶层硬 require 它——**remote main clone 即 MODULE_NOT_FOUND 整库崩** | `git cat-file -e HEAD:src/econ-reasoning-gate.js` 失败；`git status` 显示 `?? src/econ-reasoning-gate.js`；r304/r305 两轮接线均依赖它（index.js 2325/3039 gate 路径调用 checkEconReasoningGate） |
+| **P1** | r296–r307 共 8 个轮测文件未入 git（round-297/298/299/301/302/305×2/307 + regression-mean-r302-negative），remote 上丢失全部轮测资产 | `git status --porcelain` 实测 8 个 `?? test/` |
+| **P1** | doc 门禁 3 失败：README/SKILL 规格表口径戳停在 v6.8.177、README changelog 缺 6.8.178 行（r307 上线漏同步） | `node test/doc-numbers-accuracy.test.js` 修复前 **21 通过 / 3 失败** |
+| P2 | r296–r307 共 45 个探针/诊断脚本未入 git（scripts/round-*/）——历轮升级产出无入库，审计不可追溯 | `git status --porcelain` 实测 |
+| P2 | r306 维度探针复测：攻击「一杯咖啡有益→十杯更好」「一杯红酒健康→五杯五倍健康」2/4 穿透 pass | 本轮 `/tmp/probe-r306.js` 实测（A1/A2 命中 dose_response_linearity，A0/A3 pass）——覆盖面边界，非本轮引入，如实记录 |
+| P3 | r307 维度探针复测：攻击 5/7 本维承重（A2/A4 由既有维度代拦）；良性 2/3 pass（1 条 unsupported_claim 代拦，属长期基线噪声） | 本轮 `/tmp/probe-r307.js` 实测 |
+
+### 修复内容
+1. **P1 remote-clone 崩溃修复**：显式 `git add src/econ-reasoning-gate.js`（349 行聚合模块，连同 8 个轮测与 45 个探针脚本一并显式入库，共 57 文件，未用 `git add -A`）
+2. **P1 文档口径修复**：README 规格表戳 v6.8.177→v6.8.178；SKILL 两处戳（正文 + Engine version 表格行）同步；README Version history 补 6.8.178（r307）行
+3. **P2/P3 未修（如实记录）**：r306/r307 探针穿透形属覆盖面边界，修判据有回归风险且非本轮引入，按「不硬修」纪律留待升级轮处理
+
+### 验证（本轮真实运行）
+| 门禁 | 修复前 | 修复后 |
+|---|---|---|
+| `bin/verify.js` | 16/16 | 16/16 |
+| `scripts/guard-abilities.js` | 20/20 | 20/20 |
+| `test/doc-numbers-accuracy.test.js` | **21/3 失败** | **24/24 通过** |
+| `scripts/bidirectional-guard.js` | 52/52 召回 + 302/326 误拦 | 52/52 + 302/326（持平） |
+| MCP 运行态 | v6.8.178 / 164 模块 / running=true | 同前（与磁盘一致） |
+| measure-claimed-numbers | 251 维度 / 164 模块 / 190 工具 / 1341 路由 | 与 AGENTS.md 声称全部一致 |
+
+### 推送状态
+HEAD = e4155a8e（r307）+ 本轮审计 commit；remote main = ecfbf76c（r306），待推 2 条。**本审计轮不执行 git push**——推送由 22:45「心虫每日推送兜底」脚本负责。
+
+---
+
 ## r307 — 第 251 维度 `evidence_claim_mismatch` 证据-断言覆盖失配上线（真升级①）
 
 **日期** 2026-11-12 20:26–21:10 CST  **操作方** 心虫自主升级引擎（r307 cron）  **VERSION** 6.8.177 → 6.8.178  **轮次** r307（kind: dimension）
