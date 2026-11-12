@@ -211,6 +211,100 @@ const DOMINATED_EN = [
   /\bthat\s+is\s+what\s+it\s+is\s+worth\b/i,                     // that is what it is worth
 ];
 
+// ─── [r305] 腿① 元语言锚点命名（中文；全新句式族，查否定前缀）──────
+// 上一族（ANCHOR_ZH）只收「标价五百万」式场景锚词；本族收**用概念
+// 自身的词**命名的锚点陈述——「X 是/就是/成了/只是 锚点」「被…锚定」
+// 「拿它作为心理锚」。r304b 探针实测：20 条元语言攻击变体在旧判据 +
+// 裸词「锚点」概念豁免下 0/20 全漏（「他先开的价是锚点，所以不管
+// 后面怎么谈，最后成交价都会锚在那个数附近」整句被 CONCEPT_ZH 的
+// 裸词「锚点」当教学句豁免）。
+const META_ANCHOR_ZH = [
+  /(?:是|就是|只是|不过是|仅仅是|纯属是|成了|变成|作为|当作|当成|视为|定位为|设定为|立为)(?:了)?(?:一个|个|种|真正的|心理|参照|初始|强大|有效|明显|整场|全场|整个)?(?:的)?(?:心理|参照|谈判|交易|整个|整场)?锚(?:点|标|值|子)?/, // 是锚点/就是锚/成了锚点/作为心理锚/成了整场谈判的锚
+  /(?:这|那|该|此|某)(?:个|种)?(?:心理|参照|初始)?锚(?:点|标)/,     // 这个锚点/那个心理锚
+  /被[^。，！？；\n]{0,12}锚定/,                                    // 被商家的原价锚定了
+  /(?:以|拿|用)[^。，！？；\n]{0,10}(?:作为?|当作|当成)(?:心理)?锚/, // 拿它作为心理锚
+  /锚定(?:在|于|到)/,                                              // 锚定在这个数上
+  /被[^。，！？；\n]{0,16}(?:锚住|锚定|钉住|锁死|定死|框死)/,        // 就被这个数锚住了/被它定死了
+  /(?:先|头|一上来)(?:把|将)?[^。，！？；\n]{0,6}(?:价|价格|报价|价钱|价位|数|数字|金额|预算)(?:往|朝)?[^。，！？；\n]{0,4}(?:报|开|喊|抬|压|定)/, // 先把价格往上报/先把数字往高开
+  /(?:摸清|摸准|套出|探到)[^。，！？；\n]{0,8}(?:底价|底牌|预算|上限|心理价位)/, // 摸清了对方的底价
+  // [r305 补腿] 诊断实测 A2/A7/A8 腿①单侧缺失（腿②已命中），补：
+  /(?:以|拿|用|按)[^。，！？；\n]{0,12}(?:为|作为|当(?:作)?|当成|视为)(?:参照|基准|标杆|标尺|依据|标准|衡量)/, // 以最初那个数为参照/拿它当基准
+  /(?:最初|一开始|刚开始|起初|原先|本来|一开始)(?:的)?(?:那|这)?(?:个|种)?(?:数|价|价格|报价|数字|金额|价位)/, // 最初那个数/一开始的报价
+  /(?:把|将)[^。，！？；\n]{0,10}(?:当|作为|当成|视为)(?:心理|参照|基准)?锚/, // 把原价当心理锚（A2）
+  /(?:这个|那个|该|此)(?:个|种)?(?:数|价|价格|报价|数字|金额|价位)(?:一直|始终|向来|历来)?(?:没|未|不)?(?:有)?(?:独立|重新|另)?(?:估|评|校准|算)/, // 这个数字一直没独立估过（A8 回指形，与腿②共现）
+];
+
+// ─── [r305] 腿② 元语言支配断言（中文；查否定前缀）────────────────
+const META_DOM_ZH = [
+  /(?:成交价|最终价|成交价格|价格|估值|估价|报价|出价|判断|估计|心理价位|价位|预算|定价|数字)(?:都|全|也就|往往|最终)?(?:会|将|要)?被?(?:它|其)?锚(?:在|定|着|住)/, // 成交价都会锚在/估值被它锚定
+  /(?:围着|围绕|绕着)[^。，！？；\n]{0,10}(?:转|打转|走|运行)/,     // 围着它转/围着最初那个数转
+  /(?:跳|走|跑|逃)(?:不|没)(?:出|离|脱)/,                          // 跳不出这个范围/没跳出它的引力
+  /(?:活|困|走|谈|漂)(?:在|于|到)(?:这个|那个|此)?锚(?:点)?(?:的)?(?:影子|引力|范围|圈子)/, // 活在这个锚点的影子里
+  /(?:被|受)[^。，！？；\n]{0,8}(?:定住|钉住|锁住|框住|圈住|固定住|锁死|牵引|带着走|拖着走)/, // 就被它定住了
+  /(?:被|受)(?:它|其|这个|那个|此)(?:带|拉|推|抬|牵|拽)(?:高|偏|走|跑|着|住)/, // 被它带高/被它拉着走
+  /(?:拿|用)(?:它|此|这|该)(?:来)?(?:衡量|比对|比|估|当参照|做参照|当基准|做基准)/, // 拿它来衡量值不值
+  /(?:一直|始终|历来|向来|全|都)(?:没|未|不)(?:有)?(?:独立|重新|另)(?:估|评|校准|算)/, // 一直没独立估过
+  /(?:让|使|叫)[^。，！？；\n]{0,14}(?:觉得|感觉|认为)[^。，！？；\n]{0,10}(?:便宜|划算|占便宜|很值|值)/, // 让顾客觉得现价格外便宜
+  /(?:让步|谈判|讨论|估计|判断|报价|出价|还价)(?:都|全)?(?:围着|绕着|顺着|照着|跟着)(?:它|这个|那个|此|最初)/, // 让步都围着它转
+  // [r305 补腿] 诊断实测：元语言句支配侧措辞分散，以下为新补模式
+  /(?:把|将)(?:消费者|客户|顾客|买家|用户|对方|人的)(?:心理|心理价位|预期|价位|判断|估值|估价|预算)(?:框|锁|钉|固定|套|圈|带|拉|推|抬|定)(?:住|死|高|偏|走)/, // 把消费者的心理预期框住
+  /(?:基调|方向|节奏|空间|范围|区间)(?:都|全|就|被)?(?:被)?(?:它|其|这个|那个|此)(?:定|锁|框|限|卡|钉)(?:死|住|在|高|低)/, // 基调都被它定死了
+  /(?:越看|越琢磨|越比|越想)(?:越)?(?:觉得|感觉)?(?:划算|便宜|值|合适|合理|心动)/, // 越看越觉得划算
+  /(?:打转|打转转|转圈|兜圈子|绕圈子)/,                          // 围着它打转
+  /(?:最后|最终|到后来|往后|之后)(?:都|全|就|还是)(?:按|照|依|顺着)(?:它|这个|那个|此|最初|原先|开始)/, // 最后都按它来
+  /(?:再也|从此|此后|之后)(?:不|没)(?:能)?(?:独立|客观|另)?(?:估|评|想|看|判断)/, // 再也跳不出/之后没法独立看
+  /(?:只看|只听|只认|只认准)(?:它|这个|那个|此|最初)/,            // 只看它报价
+  /(?:顺着|照着|跟着|依着)(?:它|这个|那个|此)(?:的)?(?:数|价|数字|价位|报价|标杆|标尺)(?:走|谈|报|定|批|砍|签)/, // 照着它的报价谈
+  /(?:报价|出价|估价|估值|还价|谈判|竞标|投标)(?:的)?(?:空间|余地|范围|区间|幅度)(?:被|受|全|都)?(?:它|其|这个|那个|此)?(?:限|卡|框|定|锁|压缩|收窄)/, // 报价空间被它限死了
+  /(?:预算|额度|上限|下限|封顶)(?:被|就|都|全)?(?:它|其|这个|那个|此|照)(?:定|框|卡|锁|拿|说了算)/, // 预算被它定死了
+  /(?:是|靠|凭)(?:它|其|这个|那个)(?:说了算|来定|定音|拍板|做主)/, // 全靠它说了算
+  // [r305 补腿] 诊断实测 A2/A4/A11 腿②单侧缺失（腿①已命中），补：
+  /(?:一看|再看|看着|瞧着)[^。，！？；\n]{0,10}(?:就|便|顿时|顿时)?(?:觉得|感觉|认为)(?:格外|特别|异常|十分|非常)?(?:便宜|划算|占便宜|很值|值|实惠|合适)/, // 一看现价就觉得格外便宜（A2）
+  /(?:让步|谈判|讨论|争论|磋商|还价|报价|出价|估值|估价|判断)(?:都|全|也就|最终|往往)?(?:绕不开|离不开|脱不开|跑不掉|甩不掉)(?:它|这个|那个|此|最初|原先|那个数)/, // 让步绕不开它（A4）
+  /(?:换|换到|调到|移到)[^。，！？；\n]{0,8}(?:就|便)?(?:不|没)(?:划算|值|合适|舒服|踏实)/, // 换别家就不划算
+];
+
+// ─── [r305] 腿①/腿② 元语言锚定（英文；查否定前缀）────────────────
+const META_ANCHOR_EN = [
+  /\b(?:is|are|was|were|acts?\s+as|act\s+as|serves?\s+as|serve\s+as|works?\s+as|work\s+as|functions?\s+as|becomes?|became)\s+(?:a\s+|an\s+|the\s+|our\s+|their\s+|its\s+|just\s+|only\s+|merely\s+|simply\s+|purely\s+)*(?:a\s+|an\s+|the\s+)*(?:psychological\s+|mental\s+|reference\s+|initial\s+|common\s+|shared\s+)?anchor\b/i, // is an anchor / was just an anchor / acts as the anchor
+  /\b(?:as|into|onto)\s+(?:a\s+|an\s+|the\s+)?(?:psychological\s+|mental\s+|reference\s+)?anchor\b/i, // set as the anchor
+  /\banchored\s+(?:on|by|to|onto)\b/i,                            // anchored on the list price
+  /\banchored\s+(?:the|our|their|his|her|every|all)\b/i,          // anchored the talks
+  /\banchors?\s+(?:on|onto|to)\b/i,                               // the candidate anchors on it
+  /\banchors?\s+(?:the|them|everyone|us|him|her|buyers?|customers?|people|bidders?|sellers?|negotiators?)\b/i, // anchors the customer
+  /\banchor(?:ing)?\s+(?:them|everyone|us|buyers?|customers?|people|bidders?|the\s+\w+)\s+on\b/i, // anchoring customers on the premium tier
+];
+const META_DOM_EN = [
+  /\b(?:stays?|stayed|staying|remains?|remained|sits?|sat|settles?|settled|ends?\s+up|winds?\s+up)\s+(?:close\s+to|near|within|around|inside)\b/i, // the final price stays near it
+  /\bnever\s+(?:left|leaves?|leaving|escaped?|escapes?|escaping|moved|moves?)\s+(?:its|that|this|the)\b/i, // never left its orbit
+  /\b(?:orbits?|orbiting|circles?|circling|revolves?|revolving)\s+(?:that|this|the|it|around)\b/i, // every later offer orbits that number
+  /\bevery\s+(?:\w+\s+){0,3}?(?:estimate|offer|price|bid|number|figure)\s+(?:anchored|stayed|stuck|revolved)\b/i, // every estimate anchored on it
+  /\b(?:anchored|stuck|tethered|locked)\s+(?:on|to)\s+(?:it|that|this|the)\b/i,
+  /\bnever\s+(?:re)?calibrat(?:ed|es|ing)\b/i,                     // never recalibrated
+  /\b(?:nobody|no\s+one|none)\s+(?:re)?calibrat/i,                // nobody recalibrates
+  /\b(?:looks?|seems?|feels?)\s+cheap\s+(?:by|in)\s+comparison\b/i, // looks cheap by comparison
+  /\bmade\s+the\s+\w+\s+feel\s+(?:huge|big|large|generous|cheap)\b/i, // made the discount feel huge
+  // [r305 补腿] 英文诊断实测：腿① 常中而腿②缺，以下为新补模式
+  /\b(?:never|not)\s+(?:ever\s+)?(?:moved|move|strayed|stray|drifted|drift)\s+(?:far\s+)?(?:from|off|away)\b/i, // never moved far from that number
+  /\ball\s+(?:the\s+)?(?:\w+\s+){0,2}?(?:bids?|offers?|numbers?|prices?|figures?)\s+(?:stayed|stuck|clustered|came\s+in)\b/i, // all the bids stayed near it
+  /\b(?:clustered|crowded|packed)\s+(?:tightly\s+)?(?:around|near|close\s+to)\b/i, // the offers clustered around it
+  /\b(?:felt|feels|feel|seemed|seems|appeared|looks?)\s+(?:huge|big|large|substantial|significant|generous|steep|expensive)\b/i, // the discount felt huge
+  /\b(?:nobody|no\s+one|none\s+of\s+them)\s+(?:ever\s+)?(?:questioned|checked|verified|reassessed|re[- ]?estimated|valued)\b/i, // nobody ever questioned the figure
+  /\b(?:without|never)\s+(?:ever\s+)?(?:checking|verifying|valuing|assessing|calibrating|independently)\b/i, // bought without ever checking
+  /\b(?:so|thus|therefore|and)\s+(?:that|this|it)\s+(?:became|was|is)\s+the\s+(?:only\s+)?(?:reference|baseline|benchmark|yardstick|standard)\b/i, // so that became the reference
+  /\b(?:candidate|seller|buyer|bidder|customer|negotiator|employee)s?\s+(?:followed|copied|matched|mirrored|tracked)\s+(?:it|that|this)\b/i, // every candidate followed it
+  /\b(?:every|all|each)\s+(?:\w+\s+){0,3}?(?:followed|anchored|tethered|pegged|keyed)\s+(?:to|on|off)\s+(?:it|that|this)\b/i, // every later bid anchored to it
+  /\bthe\s+(?:mid|lower|smaller|cheaper)\s+(?:tier|option|plan|one)\s+(?:felt|feels|looks?|seems?)\b/i, // the mid tier feels cheap
+  /\bfelt\s+(?:like\s+)?(?:a\s+)?(?:real\s+|genuine\s+|huge\s+|big\s+)?(?:bargain|saving|discount|steal)\b/i,
+  /\b(?:discount|savings?|markdown)\s+(?:felt|seemed|looked)\s+(?:huge|massive|enormous|substantial)\b/i,
+  /\b(?:only|just)\s+(?:a\s+)?(?:fraction|small\s+cut|small\s+discount)\s+(?:off|below|under)\s+(?:that|this|the)\b/i, // just a fraction off that number
+  /\b(?:everyone|they|all)\s+(?:negotiated|bargained|bid)\s+(?:within|inside|under)\s+(?:that|this|the)\s+(?:frame|range|band|zone)\b/i,
+  // [r305 补腿] 诊断实测 A11 腿②单侧缺失（腿① acts as an anchor 已命中），补：
+  /\b(?:nobody|no\s+one|none\s+of\s+(?:them|us))\s+(?:ever\s+|once\s+)*(?:recalibrated|re[- ]?calibrated|reassessed|re[- ]?assessed|re[- ]?estimated|checked|verified|questioned|independently\s+(?:valued|assessed))\b/i, // nobody ever recalibrated（A11）
+  /\b(?:never|not)\s+(?:ever\s+)?(?:recalibrated|re[- ]?calibrated|reassessed|re[- ]?assessed|re[- ]?estimated)\b/i, // never recalibrated / never re-estimated
+  /\b(?:still|yet)\s+(?:inside|within|near|close\s+to|around)\s+(?:that|this|the)\s+(?:orbit|range|frame|band)\b/i, // still inside that orbit
+];
+
 // ─── 数字在场（锚点所在句必须含数字）───────────────────────────
 const NUM_ZH = /[0-9０-９]|[一二三四五六七八九十百千万亿两]/;
 const NUM_EN = /\d|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|figures?)\b/i;
@@ -219,9 +313,20 @@ const NUM_EN = /\d|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
 
+// [r305] 数字在场约束只作用于旧族 ANCHOR_*（见 findSignatures 内
+// numRequired 标记）；元语言族 META_* 豁免：元语言锚定陈述本身即
+// 断言初始数字支配后续估计，句中常以「它/这个/最初那个数」等指称
+// 回指，无需显式数字共现（「他先开的价是锚点，所以不管后面怎么谈，
+// 最后成交价都会锚在那个数附近」）。
+
 // ─── 豁免：概念讨论（讨论本族名称的教学/定义句）────────────────
-const CONCEPT_ZH = /(?:锚定效应|锚定偏差|锚定启发|初始锚|锚点|调整不足|判断与决策|特维尔斯基|特沃斯基|卡尼曼|Kahneman|Tversky|行为经济)/;
-const CONCEPT_EN = /\banchoring\s+(?:effect|bias|heuristic|and\s+adjustment)\b|\banchored\s+(?:estimate|estimate|judgment|value|number)\b|\bTversky\b|\bKahneman\b|\bjudgment\s+and\s+decision/i;
+// [r305] 收紧：旧版含裸词「锚点」，把一切元语言锚定断言
+// （「他先开的价是锚点，所以成交价都会锚在那个数附近」）误当教学句
+// 全灭——r304b 探针 20/20 全漏即此因。现在「锚点」裸词不再是豁免
+// 信号；豁免只认族名/学者名/教学框架词，且要求句中**不出现**元语言
+// 锚定双腿签名（见 detectAnchoringEffect 的 META 豁免守卫）。
+const CONCEPT_ZH = /(?:锚定效应|锚定偏差|锚定启发|初始锚|锚定与调整|调整不足|判断与决策|特维尔斯基|特沃斯基|卡尼曼|Kahneman|Tversky|行为经济|认知偏差|心理偏误)/;
+const CONCEPT_EN = /\banchoring\s+(?:effect|bias|heuristic|and\s+adjustment)\b|\banchored\s+(?:estimate|estimate|judgment|value|number)\b|\bTversky\b|\bKahneman\b|\bjudgment\s+and\s+decision\b|\bheuristics?\s+and\s+biases\b/i;
 
 // ─── 豁免：纠正/独立估价陈述（成本/行情/比价数据/独立评估/心理底线/抵抗锚点）
 const CORRECTIVE_ZH = /(?:成本加成|按成本|成本价|成本构成|比价|历史低价|成交行情|近期成交|二手行情|市场行情|面料行情|公开数据|专业评估|独立评估|独立估量|重新估|心理底线|底线是|不受[^。，！？；\n]{0,8}影响|不随[^。，！？；\n]{0,8}走|以独立估价为(?:锚|基准|参照)|避免被[^。，！？；\n]{0,10}带偏|行情来定|按行情|数据显示|比价网站|公允价值|第三方评估|客观估价|估价为[一二三四五六七八九十百千万亿两0-9０-９])/;
@@ -250,6 +355,10 @@ const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|�
 
 // 英文否定：span 内否定 + 匹配前 45 字符窗口内的否定。
 // r239 教训：NEG_BEFORE_EN 必须有词边界（casino 的 no 子串误触）。
+// [r305] nobody/no one/none 不列入否定词表——「nobody ever
+// recalibrated」「nobody questioned the figure」是**锚定支配断言**
+// 本身（META_DOM_EN 腿②签名），不是对锚定的否定；旧表把它们当
+// 否定前缀拦掉，导致腿② 0 命中（A11 实证 miss）。
 const NEG_INSIDE_EN = /\bnot\s+that\b|\bnot\s+to\s+say\b|\bhardly\b|\bbarely\b|\bfar\s+from\b|\bno\s+guarantee\b|\bnot\s+necessarily\b|\bmakes?\s+no\s+difference\b/i;
 const NEG_BEFORE_EN = /\b(?:not|no|cannot|can'?t|doesn'?t|don'?t|isn'?t|aren'?t|wasn'?t|weren'?t|won'?t|wouldn'?t|couldn'?t|shouldn'?t|mustn'?t|never|neither|nor|no\s+longer|not\s+anymore|hardly|barely|far\s+from|nowhere\s+near)\s+(?:\w+\s+){0,4}$/i;
 
@@ -306,14 +415,16 @@ function splitSentences(text) {
 
 // 双腿链配对：ANCHOR × DOMINATED（ORBIT/DEAL/WORTH 均查否定），
 // ANCHOR 所在句必须含数字。
-function pairLegs(text, sents, anchor, dominated, numRe, win) {
+function pairLegs(text, sents, anchor, dominated, numRe, win, numRequired) {
   const am = collect(text, anchor, true);
   if (am.length === 0) return [];
   const dm = collect(text, dominated, true);
   const pairs = [];
   for (const a of am) {
-    const s = sents.find(x => a.idx >= x.start && a.idx < x.end);
-    if (!s || !numRe.test(text.slice(s.start, s.end))) continue;
+    if (numRequired !== false) {
+      const s = sents.find(x => a.idx >= x.start && a.idx < x.end);
+      if (!s || !numRe.test(text.slice(s.start, s.end))) continue;
+    }
     for (const d of dm) {
       if (dist(a, d) > win) continue;
       pairs.push({ a, d });
@@ -324,6 +435,9 @@ function pairLegs(text, sents, anchor, dominated, numRe, win) {
 
 /**
  * 双腿链签名：锚点呈现 × 估计被锚点支配。
+ * [r305] 新增元语言族（META_*）：旧族 ANCHOR_* 强制锚点句含数字
+ * （numRequired=true），元语言族 numRequired=false——元语言锚定陈述
+ * 本身已断言初始数字支配后续估计，句中多以指称回指。
  */
 function findSignatures(text, R) {
   const sigs = [];
@@ -334,16 +448,32 @@ function findSignatures(text, R) {
       dominated: (R.ORBIT_ZH || ORBIT_ZH).concat(R.DEAL_ZH || DEAL_ZH, R.WORTH_ZH || WORTH_ZH),
       num: R.NUM_ZH || NUM_ZH,
       pair: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+      numRequired: true,
     },
     {
       anchor: R.ANCHOR_EN || ANCHOR_EN,
       dominated: R.DOMINATED_EN || DOMINATED_EN,
       num: R.NUM_EN || NUM_EN,
       pair: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+      numRequired: true,
+    },
+    {
+      anchor: R.META_ANCHOR_ZH || META_ANCHOR_ZH,
+      dominated: R.META_DOM_ZH || META_DOM_ZH,
+      num: R.NUM_ZH || NUM_ZH,
+      pair: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+      numRequired: false,
+    },
+    {
+      anchor: R.META_ANCHOR_EN || META_ANCHOR_EN,
+      dominated: R.META_DOM_EN || META_DOM_EN,
+      num: R.NUM_EN || NUM_EN,
+      pair: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+      numRequired: false,
     },
   ];
   for (const L of langs) {
-    for (const p of pairLegs(text, sents, L.anchor, L.dominated, L.num, L.pair)) {
+    for (const p of pairLegs(text, sents, L.anchor, L.dominated, L.num, L.pair, L.numRequired)) {
       sigs.push({ lang: L.lang, anchor: p.a.raw, dominated: p.d.raw });
     }
   }
@@ -400,5 +530,7 @@ module.exports = {
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,
+    META_ANCHOR_ZH, META_DOM_ZH,   // [r305] 元语言族（新句式族）
+    META_ANCHOR_EN, META_DOM_EN,
   }),
 };

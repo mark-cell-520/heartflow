@@ -1,3 +1,95 @@
+## r305 — 锚定效应『元语言锚定陈述族』双腿族上线（真升级②）
+
+**日期** 2026-11-12 15:51–16:15 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.175 → 6.8.176  **轮次** r305（kind: dimension）
+
+### 真升级判定：命中 ② 既有维度补腿
+
+给 `anchoring_effect`（第 214 维度）新增**元语言锚定陈述族**两条判别腿（`META_ANCHOR` 腿① 元语言锚点命名 × `META_DOM` 腿② 元语言支配断言，ZH+EN 各一套），并配 `numRequired=false` 平行路由——旧族 `ANCHOR_*` 要求数字在场，新腿判的是**「把锚的存在说出来」**的语言行为，句中常无显式数字，故走豁免路由。经 `src/econ-reasoning-gate.js`（第 249 维度聚合）进入 gate 路径，`src/index.js` 零改动。
+
+### 缺口实证（海外资源 + 本地探针）
+
+- 探针 `scripts/round-305/probe-meta-anchor-r305.js`（60 行）：10 条元语言攻击样本（「他先开的价是锚点，所以成交价都会锚在那个数附近」「拿它作为心理锚」「They anchored the talks on the first number」等，含中英双语、长句、修饰形）在**旧判据 + 裸词锚点概念豁免**下仅 3/10 承重。
+- 基线对比：换入 `heartflow/main` 的 404 行 / 0 `META_ANCHOR` 基线版后同探针仅 3/10 承重、良性误伤 2/10；换入 r305 工作区版后 **8/10 承重、良性误伤仍 2/10**——那 2 条误伤（`Judgment and decision making research shows anchoring is a robust phenomenon.` / `We priced it on cost plus margin...`）经 `gate()` 层归因，由**基线维度** `unsupported_claim`/`appeal_to_authority` 与 `normalization_of_deviance` 触发，非 r305 新腿引入，与 r303 记录的约 8% 基线误伤率一致。**零新增误伤。**
+
+### 实现（`src/anchoring-effect.js`，+138/-6）
+
+1. **腿① `META_ANCHOR_ZH`**：元语言锚点命名（「成了锚」「把原价当心理锚」「以最初那个数为参照」「这个数字一直没独立估过」回指形等 4 组新补模式）
+2. **腿② `META_DOM_ZH`**：元语言支配断言（「一看现价就觉得格外便宜」「让步绕不开它」「换别家就不划算」等 3 组新补模式）
+3. **腿② `META_DOM_EN`**：`nobody ever recalibrated` / `never recalibrated` / `still inside that orbit` 等英文支配族（诊断发现 A11 样本 `nobody ever recalibrated` 原 0 命中——`META_DOM_EN` 无 `nobody + ever + recalibrated` 组合模式；已实测否定守卫 `NEG_BEFORE_EN` 未误拦 `nobody`，确认为模式缺失而非守卫过杀）
+4. 双腿共现 + 邻近窗判据不变，沿用既有否定前缀守卫。
+
+### 验证（本回合真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | PASS 16 passed / 0 failed |
+| `scripts/guard-abilities.js` | PASS 20/20，判别维度 **249** |
+| `test/doc-numbers-accuracy.test.js` | PASS 24 通过 / 0 失败 |
+| `scripts/bidirectional-guard.js` | PASS 召回 **52/52**、误拦 **302/326**（与 r302/r303 基线**完全一致**，补腿零新增误伤） |
+| 新单测 `test/round-305-meta-anchor-legs.test.js` | **29 通过 / 0 失败**（攻击 12 承重、良性 10 零误伤、聚合层 3、旧族回归 2、路由独立 1、否定纠正形 1） |
+| 负例注入 `test/round-305-meta-anchor-negative-injection.test.js` | **8/8** 攻击在抹掉 `META_*` 双腿族后翻 miss——承重确来自 r305 新腿，无搭便车 |
+| 本地独有测试回归 | round-297 ad-hominem 32/0、round-298 memory-index 6/6、round-299 incentive 全绿、round-301 incentive 30/0、regression-mean-r302 全绿、round-302 law-of-small-numbers 12/0、round-220 avg-marginal PASS、round-284 zero-sum 23/0、round-668 economic-control 25/0、anchoring-effect 既有 14/0 |
+
+### 单测抓到的真漏判（5/12）
+
+初版单测暴露 `A2/A4/A7/A8/A11` 五条攻击 miss——探针层 gate 命中但**维度级**未命中，说明原先的「8/10 承重」部分来自其他维度搭便车。逐条诊断腿①/腿②哪侧缺失后补齐 5 处模式，单测由 24/29 → **29/29**。这是本轮的实质增量：把「看起来命中」变成「真承重」。
+
+### 文档口径同步（248 → 249）
+
+第 249 维度 `econ_reasoning_gate` 的接线自 r304 起生效但三份文档停在 248，`doc-numbers-accuracy` 连续多轮 FAIL。本轮同步：`README.md` / `SKILL.md` / `AGENTS.md` 的维度总数 248→249、badge 与锚点、action-tier verify 计数 215→216、AGENTS.md Verify-level 列举补 `econ_reasoning_gate`。README 的 r302 历史 changelog 行保留原始 248 实测值不改写。
+
+### 已知失败项（基线固有，非本轮引入）
+
+`test/round-295-econ-reasoning-wiring.test.js` 4 失败，已实证与本轮无关——换入 `heartflow/main` 基线版 `src/anchoring-effect.js` 后同样 59/4：G4/G5/G6 为 MCP token 优先级导致的 HTTP 401（r303 已诊断的 `mcp-server.js` L209 基线技术债），H1 为「维度仍 246」的旧口径断言（r304 远端已推至 249）。
+
+
+## r303 — 维护轮：r296–r302 本地独有产能固化 + 全仓冲突标记清零 + 口径统一（类型 0）
+
+**日期** 2026-11-12 13:17–14:00 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.175 → 6.8.175（`src/index.js` 零改动、维度 248 不变、模块 164 不变，不 bump）  **轮次** r303（kind: fix）
+
+> 本条目对应 4 号 agent 的 r303 轮次（13:17 CST 认领后的实跑）。UPGRADE_LOG 中另有 Oct 28 的 r303 历史条目（`negative-test-decision-contline-r303.js`，`ac84dde4`），二者是不同轮次、不同 agent 的同号记录，非重复。
+
+### 接手状态与核心发现
+
+同步确认 ahead=0 behind=0（heartflow/main = `7e8aed68` r303 claim）。唯一 active 认领即 r303 自身，无死认领。**核心发现：工作区是一份含 53 项未提交改动的半成品**，其中两项高危：
+
+1. **stash-pop 冲突残留会让提交反向删除远端 r302 真升级产能**：`src/law-of-small-numbers.js` 工作区版比 main 少 52 行（QUANT_ZH/EN 腿被覆盖成旧版），`scripts/round-302/` 三个探针与 `test/round-302-law-of-small-numbers-quant.test.js` 在工作区缺失，`UPGRADE_LOG.md` 被换成更早的 r302 草稿。全部从 `heartflow/main` 恢复并单独验证（轮测 12/12 通过）。
+2. **README/SKILL 三处合并冲突标记残留**（2 UU + 1 块），两侧口径分别是「upstream 陈旧引擎数 246/163/188/1,323」与「本地正确值 248/164/190/1,341」，且 upstream 侧已把测试数更新为 21,517。
+
+### 改了什么
+
+- **恢复远端产能（防止本轮提交抹掉 r302 真升级②）**：`src/law-of-small-numbers.js` 471 行（QUANT_ZH/EN 腿③归位）、`scripts/round-302/probe-candidates-r302.js`（96 行）、`probe-gate-r302.js`（47 行）、`probe-quant-r302.js`（55 行）、`test/round-302-law-of-small-numbers-quant.test.js`（145 行，实测 12 通过 / 0 失败）、`UPGRADE_LOG.md` 整文件从 main 恢复（22,057 行，与 main 零 diff）。
+- **README.md / SKILL.md 冲突块解决**：合并两侧正确值——保留本地引擎口径 248 维度 / 164 模块 / 190 MCP 工具 / 1,341 路由，采用 upstream 的 21,517 passing 测试计数。口径表固化为结构化四行并附测量方法注记（`hf.routes()` sum / `dimMap` keys / `tools/list` / `node test/run-all.js` full run）及 r284–r292 失败噪声逐条分析长注。全仓（README/SKILL/AGENTS/UPGRADE_LOG）冲突标记 grep = 0。
+- `coordination/claims.jsonl`、`data/test-count.json`、`VERSION`、`src/core/version.js` 兜底值核对：四者与 main 一致（claims 含 r302 release 行、test-count 21,517/145/21,662、VERSION 6.8.175）。
+
+### 本地独有产能核实（未丢弃、未覆盖）
+
+工作区另一批未提交产出是 **r296–r301 的接线与配套测试**（`src/index.js` +154 行：`checkAdHominem` / `detectIncentiveBlindSpot` 接线 + 谄媚 EN 腿）。逐项门禁 + 单测核实全部真实可用：
+
+| 测试 | 结果 |
+|---|---|
+| `test/round-297-ad-hominem-legs.test.js` | 32 通过 / 0 失败 |
+| `test/round-301-incentive-blind-spot-legs.test.js` | 30 通过 / 0 失败 |
+| `test/round-299-incentive-blind-spot-families.test.js` | 47 通过 / 0 失败 |
+| `test/round-298-memory-index-wiring.test.js` | 6 通过 / 0 失败 |
+| `test/regression-mean-r302-negative.test.js` | 11 通过 / 0 失败 |
+| `test/round-296-incentive-blind-spot-wiring.test.js` | 21 通过 / 5 失败（**见下：失败非本地引入**） |
+
+**round-296 5 个失败（F3–F5 MCP e2e）根因诊断**：测试用 `MCP_HEARTFLOW_KEY=<test token>` 起 server，但 `src/mcp-server.js` L209 的读取顺序是 `HEARTFLOW_MCP_TOKEN || MCP_HEARTFLOW_API_KEY || MCP_HEARTFLOW_KEY`——**父进程环境已带 `HEARTFLOW_MCP_TOKEN`（33 字符）与 `MCP_HEARTFLOW_API_KEY`，优先级压过测试注入的 key，导致测试自造的 Bearer token 全部 401**。落盘探针双向实证：用 `HEARTFLOW_MCP_TOKEN` 传 token → `tools/list` 200、190 个工具、`heartflow_econ_fallacy_check` tools/call 200 命中；用 `MCP_HEARTFLOW_KEY` 传同一 token → 401。该行为在 `heartflow/main` 版 `src/mcp-server.js` L209 完全相同，`test/mcp-auth-e2e-real.test.js` 同样 12 通过 / 1 失败（同为 `admin tools/list 200: 实际 401`）——**是 main 基线固有，非本地改动引入，本轮不单独修复**（属既有技术债，交接给 1 号）。
+
+### 验收数字（一行一个检查项）
+
+- `timeout 900 bash /root/hermes1/deploy-agent4/scripts/hf4-gates.sh` — 四门禁全绿：
+  - `bin/verify.js` — PASS passed=16 failed=0
+  - `scripts/guard-abilities.js` — PASS 能力检查 20/20 全通过；判别维度 **248** 个
+  - `test/doc-numbers-accuracy.test.js` — PASS 通过=24 失败=0
+  - `scripts/bidirectional-guard.js` — PASS 召回=52/52 误拦=302/326
+- `src/index.js` 行数 17,579 超 14,000 阈值 → doc 测试持续 ⚠️ 报警（仅报警不计失败，连续多轮存在）
+- 负例注入：本轮无引擎改动，不适用（沿用 r302 基线 26/26 翻 miss）
+
+### 真升级判定
+
+**类型 0（维护/研究轮）**。本轮未新增判别维度、未给既有维度补腿、未加门禁/护栏、未加 MCP 工具；全部动作是恢复被 stash 覆盖的远端产能、解冲突标记、统一口径、核实本地独有测试。按宪法第五节，记为维护轮，同样提交 commit。
 ## r304 — 弱证据强断言错配（weak_evidence_strong_claim 第 245 维度）「AI 模型输出与社交平台视频/直播/博主作为不可回溯弱证据信源」新措辞家族（真升级②）
 
 **日期** 2026-11-12 14:5x–15:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r304（kind: dimension）
@@ -94,7 +186,6 @@
 - **注入契约已知坑（非本轮引入，交接 1 号）**：数组常量不能注入 RegExp——`R.AVG_COST_ZH = /(?!)/i` 会让 `(R.AVG_COST_ZH || AVG_COST_ZH).concat(...)` 抛 TypeError，被 `analyze` 的 try/catch 吞掉后表现为「该族消失」，测试绿但走的是崩溃路径而非删除路径。r295 的 INJECT_KEY 即此形态。本轮全部改用**空数组 `[]`** 注入（语义等价删除且不抛）。
 - **存量 `MARG_EN` 窄口，非本轮引入**：只收 "one more unit/item/batch"，不收 hour/machine/member/rep/server/mu 等资源名词；本轮以**新增 `RES_EN` 平行常量**绕过而非扩 `MARG_EN`（后者会同时放大 F-1/F-2a 召回面）。
 - 本维度经 `src/plugins/econ-reasoning-check/index.js` 在 postprocess.think 层 dispatch（r295 接线），**不在 gate 层 dimMap**，故 `gate.action` 与 `verdict` 不受本轮影响（同 r295/r296/r300/r301/r302 先例）；round-303 测试 H3 以断言形式锁死 `src/index.js` 不含该维度键。
-
 ## r302 — 小数定律（law_of_small_numbers 第 239 维度）「小样本 → 数量化总体裁定（概率/比率/均值）」新措辞家族（真升级②）
 
 **日期** 2026-11-12 09:5x–10:4x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r302（kind: dimension）

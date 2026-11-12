@@ -1,3 +1,17 @@
+---
+
+# 6.8.177 变更日志条目
+
+## [6.8.177] - 2026-11-12
+
+### 第 250 维度 `dose_response_linearity` 剂量-反应线性外推上线（真升级①，r306）
+- **`src/dose-response-linearity.js`**（新增，264 行，模块 164 不变、维度 249→250、VERIFY 216→217）：`checkDoseResponseLinearity(text)`。缺口实证：候选族 F（把「一片有效→十片十倍效果」「跑半小时好→跑四小时好四倍」的剂量-反应关系当成线性外推）探针 3/5 漏判最薄弱；grep src/ 全库确认既有仅 `common_cause` 顺带提「剂量反应」作证据建议，无维度判线性外推结构本身 → 独立攻击族立项，与既有维度零重叠。两腿共现：腿① 剂量/受益腿（片|粒|颗|杯|瓶|勺|小时 × 有效|有用|好|提神 / helps|benefits，含裸名词形态）+ 腿② 线性外推腿（多吃|加量|翻倍|成比例 / times as much|10x|5x、任意受益名词×倍数、ZH「N 倍」直接断言）。三重豁免负例注入承重：概念/教学转述、推理否定/反向承认（「多吃不会好得更快」「非线性、存在阈值和平台期」）、医疗医嘱语境。射程：只管线性放大外推形态，不管真实疗效。
+- **`src/index.js`**（+9 处接线）：require、计算点 `drl`、allDims、dimMap、VERIFY_DIMS（射程边界长注释）、DIM_GUIDANCE 文案、两处嵌套补登记。
+- **`scripts/round-306/variant-matrix.js`**（新增）：变体矩阵强制项——攻击 10/10 非 pass（7 verify + 3 rewrite，findings 全含 dose_response_linearity）、良性 10/10 零误伤。
+- **README.md / SKILL.md / AGENTS.md**：维度 249→250、verify 216→217、测试数 21,517→21,577、口径版本戳 v6.8.177、README changelog 补条目。
+- **来源**：外部搜索全部失败（HN 仅无关条目 / Semantic Scholar 429 / GitHub 无可复用高星），如实记录；形态范本取内部 `src/regression-to-the-mean.js`。
+
+---
 
 ---
 
