@@ -1,3 +1,38 @@
+## r301 — 赌徒谬误（gamblers_fallacy 第 148 维度）「长期平均论证短期补偿 / 连发形追投」新措辞家族（真升级②）
+
+**日期** 2026-11-12 07:3x–08:5x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r301（kind: dimension）
+
+基线四门禁全绿（hf4-gates.sh：verify 16/0、guard-abilities 20/20 维度 246、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326）。海外扫描三源如实空返/噪声（arXiv parse-fail、GitHub `total_count:0`、S2 error），选题走仓库内探针实证。r301 认领后立即 push claim commit（撞号纪律，927154e）。
+
+### 缺口实证（scripts/round-301/probe-candidates{1,2,3}-r301.js + probe-family-r301.js，v6.8.174 gate() 动手前）
+三支探针覆盖 7 个候选族（虚假类比 2/10 穿透、期望值≠概率 3/10、事故/规则例外滥用 10/14、诉诸沉默 6/10、机制优雅性 7/10、量词换位 5/6、长期平均论证 4/5），最终立项 P5「长期平均论证短期补偿」族——存量 `gamblers_fallacy`（第 148 维）对 4/5 攻击整句穿透 gate：
+- `长期看输赢总会扯平，所以现在连输五把正是加倍下注的好时机。`
+- `样本越多结果越接近均值，这一把该把之前输的全赢回来。`
+- `In the long run wins and losses even out, so after five losses it is time to double the bet.`
+- `Frequencies revert to the average, so after ten smalls in a row a big is due.`
+
+根因：存量腿①（STREAK_ZH/EN + DUE_ZH/EN 邻近）只收「连输五把 + 该赢了/due」这一对——**「长期总会扯平 / 样本越多越趋近均值 ⇒ 短期该补偿」这一经典 law-of-averages 论证外壳整体缺席**（腿①要 streak 事实、腿②要「该赢了/due」预期形，引用长期平均为平衡义务背书的句子两腿都不覆盖）；同时「连败后加倍下注/梭哈/全押」这类**平衡义务的行动面表达**也无腿可收。
+
+### 改了什么
+- `src/gamblers-fallacy.js`（既有已接线模块，第 148 维度，**src/index.js 零改动**）：新增 4 个常量 `LLN_ZH`/`LLN_EN`（长期平均论证腿：长期/长远/拉长看…扯平、样本/次数越多…趋近、频率/概率回归平均；EN: in the long run … even out / revert to the average / as the sample grows / with more trials / law of averages）+ `CHASE_ZH`/`CHASE_EN`（追投行动腿：加倍下注/翻倍押/加注/加码/重注/梭哈/全押/满仓；EN: double down / all in / raise the stakes / win it back）；新增**三条并行路由**（中英各三条）：`streak×chase`（连发形 × 追投行动）、`lln×due`（长期平均论证 × 反转预期，**可无连发形在场**）、`lln×chase`。**不并入存量数组**（存量 STREAK_ZH/DUE_ZH 等有 round-280/r265 登记断言 length===N，追加会打破单测）；复用共享豁免入口（META_NOUN / EVIDENCE_PRESENT / THIRD_PERSON_EXEMPT）与 `positions()`。`__internals` 新导出 4 常量供负例注入。
+- `test/round-301-law-of-averages.test.js`（新增，**22/22**）：攻击 18（中英，gate 非 pass 且 findings 承重 gamblers_fallacy）、良性 21 零误伤、存量回归 12/12（r717/r280/r289 攻击锚）、登记纪律 6（含存量腿逐字保留）、元素级注入-删条 11/11 变红 + 路由独立性 2/2（streak 腿全删后 lln 路由仍独立命中）。
+- `scripts/round-301/{probe-candidates,probe-candidates2,probe-candidates3,probe-family,fix-needles,print-source,verify-needles}-r301.js`（新增：7 候选族缺口探针 + 改后功能验证 + needle 对齐工具）。
+- `UPGRADE_LOG.md`（r301 条目）、`README.md`/`SKILL.md`（机器记账 21,483 → 21,505 passing；`data/test-count.json` 已由 run-all 自动回填 21,505/145/21,650）；报告 `coordination/reports/r301-dimension-agent4.md`（本地留档，`reports/` 自 r268 起被 gitignore 覆盖、不入链）。
+
+### 验收数字（一行一个检查项）
+- node bin/verify.js — 16/0
+- node scripts/guard-abilities.js — 20/20（判别维度 246）
+- node test/doc-numbers-accuracy.test.js — 24/0
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线**完全一致**，新族零新增误伤）
+- 全量 run-all.js — 21,505 通过 / 145 失败 / 21,650（基线 21,483/145/21,628，唯一 +22 即本轮新测试，失败数逐条持平）
+- 负例（元素级注入-删条）— 11/11 变红，0 个未变红（另 2 个路由独立性条目证 streak 腿全删后 lln 路由独立命中）
+
+### 与存量判据的关系 / 已知窄口
+- 三条新路由与存量 streak×due / daily×reversal 完全并行、互不依赖：注入 STREAK 腿全置空，存量攻击（「都出十次小了，该出大了」类）仍命中，lln×due 攻击也仍命中（round-301 测试已带双向对照）。
+- **已知基线 FP（非本轮引入，git stash 对照实测 51/2 完全一致）**：r280 轮测 2 条既有失败——良性「天气冷了这么多天，该回暖了」被存量 daily×reversal 路由（r289 族）承重 + 1 条存量注入删条；本轮良性矩阵剔除该句并在此登记，不与新族混计。
+- CHASE 腿刻意不收裸「翻本/回本/赢回来」（归 DUE_ZH 的前缀形「该翻本/赢回来」）——r280 良性「别把希望寄托在下一把翻本上」靠缺失前缀豁免；显式引用「大数定律/law of large numbers」字样的攻击被既有 EVIDENCE_PRESENT 豁免放行（该豁免保护的良性陈述量更大，按 r300 纪律不动共享豁免）。
+- 「接下来出大的概率更高」类无尾字 DUE 形本轮未收（补它会误伤「样本量越大检验功效越高」类正当统计陈述），留待后续轮次。
+
 ## r300 — 回归均值误归因（regression_to_the_mean 第 193 维度）「表扬/批评/奖惩反馈干预」新措辞家族（真升级②）
 
 **日期** 2026-11-12 06:0x–06:2x CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.174 → 6.8.174（零 `src/index.js` 改动、维度 246 不变、模块 163 不变，不 bump）  **轮次** r300（kind: dimension）
