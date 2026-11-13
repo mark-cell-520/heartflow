@@ -286,7 +286,56 @@ const C_EN3 = [
   /\b(?:improves?|improved|raises?|raised|boosts?|boosted|increases?|increased)\s+(?:the\s+)?(?:team'?s?|our|their)\s+(?:odds|chances)\b/i,
 ];
 
-// 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内，腿②控制行为是桥）
+// ─── [r323] 现代游戏/抽奖场域控制幻觉族（纯随机游戏新措辞家族）────────
+// 零命中探针 scripts/round-323/probe-candidates.js：存量腿（经典赌博
+// 选号/掷骰 + r315 体育幸运仪式）对「老虎机探节奏×按停吐分 / 抽卡开
+// 箱养号垫刀玄学×提高爆率 / 盲盒隐藏款掉率」7/7 全穿透，良性零误伤。
+// 平行常量 + concat 合并不动存量腿。核心判别：腿③必须含显式控制/提升
+// 动词（提高/掌控/控制 + 爆率/吐分），纯动作描述（吐分前按停是常见操
+// 作）不计——良性靠此与否定守卫双重拦截。
+// 腿①现代纯随机游戏锚点（中文）
+const A_ZH4 = [
+  /(?:老虎机|吃角子|拉霸|爆分|吐分|出分|拉老虎|电子机)/,
+  /(?:抽卡|开箱|爆率|出金|出货|掉率|金卡|SSR|保底|奖池|祈愿|十连|单抽)/,
+  /(?:盲盒|潮玩|隐藏款|端盒)/,
+];
+// 腿①现代纯随机游戏锚点（英文）
+const A_EN4 = [
+  /\b(?:slot\s+machines?|slots?|one[- ]armed\s+bandit|fruit\s+machine|video\s+slot|payout|jackpot)\b/i,
+  /\b(?:gacha|loot\s+box(?:es)?|pull\s+rate|drop\s+rate|SSR|rare\s+pull|pity\s+system|ten[- ]pull|single\s+pull|summon)\b/i,
+  /\b(?:blind\s+box(?:es)?|mystery\s+box)\b/i,
+];
+// 腿②现代主观控制行为（中文）——探节奏/养号垫刀玄学/按停
+const B_ZH4 = [
+  /(?:小注试探|押注节奏|盯着滚|盯着转|盯着屏|(?:探|摸|试|找|寻)(?:到|出|清|准|透|明白)?(?:它的|一下)?(?:节奏|规律|门道))/,
+  /(?:感觉要爆|要爆了|快爆了|手感来了|手感对|手感准)/,
+  /(?:垫刀|垫抽|垫几[发抽]|垫上几|养号|养个号|玄学|拜一拜|拜拜|开过光)/,
+  /(?:按停|抢停|提前停|及时停|刹住|见好就收)/,
+];
+// 腿②现代主观控制行为（英文）
+const B_EN4 = [
+  /\b(?:feel|feeling|read|reading|probe|testing|sense|sensing)\s+(?:the\s+)?(?:rhythm|pattern|cycle|streak|tempo|reels?)\b/i,
+  /\b(?:bet\s+small|start\s+small|small\s+bets?)\b[^.]{0,40}\b(?:feel|sense|probe|watch|read)\b/i,
+  /\b(?:about\s+to\s+(?:hit|pay|drop)|feels?\s+like\s+it'?s\s+about\s+to)\b/i,
+  /\b(?:prim\w*|warm\w*\s+up|salt\w*|seed\w*)\s+(?:the\s+)?(?:account|pool|gacha|luck)\b/i,
+  /\b(?:superstitious|ritual\s+before|lucky\s+(?:draw|pull|summon|gacha))\b/i,
+  /\b(?:stop|stops|stopping|halt|brake|braking)\s+(?:it\s+)?(?:right\s+)?before\s+it\s+(?:pays|hits|lands)\b/i,
+];
+// 腿③现代影响断言（中文）——控制/提升动词 × 爆率/吐分；看我按停时机
+const C_ZH4 = [
+  /(?:提高|提升|拉升|拉高|堆高|锁定|掌控|控制|拿捏|左右|决定|影响|带动)[^。，！？；\n]{0,6}(?:爆率|出金率|出货率|掉率|中奖率|爆分|吐分|出金|开奖|大奖|结果|节奏)/,
+  /(?:吐分|爆分|出金|开奖)[^。，！？；\n]{0,6}(?:前|之前)[^。，！？；\n]{0,8}(?:把它|将其|就能|可以|能够|看我|由我|我说了算)/,
+  /(?:看我|由我|全凭我|我说了算|凭我)[^。，！？；\n]{0,6}(?:按停|停|刹|收手|时机|掌控|控制|拿捏)/,
+  /(?:我能|我可以|我能够|我就能)[^。，！？；\n]{0,8}(?:控制|掌控|拿捏|左右|决定|影响)/,
+];
+// 腿③现代影响断言（英文）
+const C_EN4 = [
+  /\b(?:raise|raises|raised|improve|improves|improved|boost|boosts|boosted|increase|increases|control|controls|steer|steers|influence|influences)\w*\s+(?:\w+\s+){0,3}?(?:drop\s+rate|pull\s+rate|payout|jackpot|SSR|odds)\b/i,
+  /\bcontrol\s+when\s+(?:it|the\s+\w+)\s+(?:pays|comes|lands|hits|drops)\b/i,
+  /\bcontrol\s+(?:the\s+)?(?:payout|drop|jackpot|outcome|reels?)\b/i,
+];
+
+// ─── 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内，腿②控制行为是桥）
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
 
@@ -380,6 +429,15 @@ function findSignatures(text, R) {
       a: R.A_EN3 || A_EN3, b: R.B_EN3 || B_EN3, c: R.C_EN3 || C_EN3,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r323] 现代游戏/抽奖场域控制幻觉族（新措辞家族，独立链）
+    {
+      a: R.A_ZH4 || A_ZH4, b: R.B_ZH4 || B_ZH4, c: R.C_ZH4 || C_ZH4,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      a: R.A_EN4 || A_EN4, b: R.B_EN4 || B_EN4, c: R.C_EN4 || C_EN4,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { a, b, c, win, lang } of langs) {
     const am = collect(text, a, true);
@@ -444,6 +502,7 @@ module.exports = {
   __internals: () => ({
     A_ZH, A_EN, B_ZH, B_EN, C_ZH, C_EN,
     A_ZH3, A_EN3, B_ZH3, B_EN3, C_ZH3, C_EN3,
+    A_ZH4, A_EN4, B_ZH4, B_EN4, C_ZH4, C_EN4,
     CONCEPT_ZH, CONCEPT_EN,
     PAIR_ZH, PAIR_EN,
   }),
