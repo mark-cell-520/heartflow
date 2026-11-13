@@ -243,6 +243,93 @@ const ENDORSE_EN = [
   /\bpaid\s+out\s+(?:in\s+full|as\s+usual|like\s+clockwork)\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r320] 「专业与公共部门按计数考核滋生数量压倒质量的反向行为」新措辞家族
+// （平行常量，不动存量三腿与 r236 逻辑）
+//
+// 缺口实证（scripts/round-320/probe-perverse-domains.js + probe-leg-diagnosis.js，
+// v6.8.179 基线）：存量三腿只收悬赏捕蛇/计件工资/按次罚款/按结案数等经典
+// 域，医疗按量考核、执法罚款配额、学术唯论文数等现代公共服务域 11/11 完全
+// 穿透（mod=false、gate=pass、econ_reasoning_gate 归因 0），良性零误伤。
+// 根因是三腿均缺这些域的专业措辞：
+//   · 腿① 缺 按门诊量/手术台次/床位使用率/就诊量/拘留人数/论文数/立项数/
+//     影响因子点数 + 计酬/发奖/考核/排名/评职称；
+//   · 腿② 缺 小病大开/过度医疗/能保守也开刀/能出院也留/专挑外地车牌/
+//     能调解也统统拘留/反复驱赶/拆成几篇灌水/一稿多投/专挑好发的/包装成多个项目；
+//   · 腿③ 缺 数字上去了/产量激增/立项数创新高/办案数量节节高/遥遥领先。
+// 设计纪律（同 r309–r319）：平行常量 + findSignatures concat，存量三腿与
+// 豁免层一字不动；新腿走存量 collectLegs(…, useNeg) 否定守卫；窗距沿用 60/180。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r320] 腿① 专业/公共部门按计数考核（中文）──────────────────
+const INCENTIVE_ZH2 = [
+  // 按门诊量/手术台次/床位使用率/就诊量/例数 + 计酬/发奖/拿补贴/考核/排名/挂钩
+  /按[^。，！？；\n]{0,6}(?:量|台次|例数|人次|使用率|周转|手术量|门诊量)[^。，！？；\n]{0,6}(?:计酬|计费|发奖金|发奖|拿补贴|拿奖金|算绩效|评优|排名|考核|提成|兑现|挂钩|分成)/,
+  // 按论文数/立项数/项目数/课题数/发文量 + 评职称/考核/算绩效/发奖金
+  /按[^。，！？；\n]{0,6}(?:论文数|立项数|项目数|课题数|发文量|申请数|专利数|引用数)[^。，！？；\n]{0,6}(?:评|考核|算|发|计|奖|排名|评审|兑现)/,
+  // 按影响因子/点数/积分/工分 + 发/奖/算
+  /按[^。，！？；\n]{0,6}(?:影响因子|点数|积分|工分|分值)[^。，！？；\n]{0,4}(?:发|奖|算|计|评)/,
+  // 罚单/罚款/查处/办案/拘留 数量/件数/人数 + 发补贴/考核/排名（存量 ①-b2 未收的连用形）
+  /(?:罚单|罚款|查处|办案|结案|拘留|处罚|罚没)[^。，！？；\n]{0,4}(?:数量|件数|人数|单数|指标)[^。，！？；\n]{0,4}(?:发|奖|考核|排名|补贴|提成|兑现|分成)/,
+];
+
+// ─── [r320] 腿② 数量压倒质量的反向行为（中文）────────────────────
+const GAMING_ZH2 = [
+  // 医疗：小病大开/多开检查/过度医疗/能保守也开刀/能出院也留
+  /(?:小病|小症|轻微|本可|能|可)[^。，！？；\n]{0,4}(?:保守|药物|门诊)[^。，！？；\n]{0,4}(?:也|被|都)?[^。，！？；\n]{0,3}(?:拉去|送去|安排)?(?:开刀|手术)/,
+  /(?:小病|小毛病|轻微症状)[^。，！？；\n]{0,4}(?:也|都|给|让)?[^。，！？；\n]{0,3}(?:大开|大治|多开|滥开|开一堆|多做检查|多开检查|过度检查|过度治疗)/,
+  /(?:过度医疗|过度检查|过度治疗|大处方|分解住院|挂床|能出院的也(?:留|住|继续))/,
+  // 执法：专挑外地车牌/能调解也统统拘留/反复驱赶
+  /专挑[^。，！？；\n]{0,5}(?:外地|外市|外省|过境|大车|货车)车牌/,
+  /(?:能|本可|可以|得以)[^。，！？；\n]{0,3}(?:调解|和解|劝|教育)[^。，！？；\n]{0,4}(?:也|都)?[^。，！？；\n]{0,2}(?:统统|一律|全都|全部)?(?:拘留|罚款|处罚|抓捕|抓起来)/,
+  /反复[^。，！？；\n]{0,3}(?:驱赶|罚款|查处|整治|检查)/,
+  // 学术：拆成几篇灌水/一稿多投/专挑好发的/包装成多个项目申报
+  /(?:把|将)[^。，！？；\n]{0,6}拆成[^。，！？；\n]{0,4}(?:几|数|多|好几)?(?:个|篇|项)/,
+  /(?:一稿多投|拆分发表|最小可发表|灌水|论文注水)/,
+  /专挑[^。，！？；\n]{0,4}(?:好发|容易|简单|短平快)[^。，！？；\n]{0,3}(?:的)?(?:小课题|课题|方向|选题)/,
+  /(?:包装成|拆成|分成|拼成)[^。，！？；\n]{0,4}(?:好几|多个|几个|数个)?(?:个)?(?:项目|课题)(?:申报|立项|申请)/,
+];
+
+// ─── [r320] 腿③ 数量政绩/创新高式认可（中文）────────────────────
+const ENDORSE_ZH2 = [
+  /(?:数字|数量|件数|人数|产量|发文量|立项数|专利数|通报数|办案数量|论文数|处罚数|罚没|引用数)[^。，！？；\n]{0,4}(?:上去|创新高|节节高|遥遥领先|猛涨|激增|暴涨|翻倍|再攀新高|屡创新高)/,
+  /(?:创新高|节节高|遥遥领先|再攀新高|屡创新高|一路飙升|节节攀升)/,
+];
+
+// ─── [r320] 腿① 专业/公共部门按计数考核（英文）──────────────────
+const INCENTIVE_EN2 = [
+  /\b(?:paid|pay|pays|paying)\s+(?:per|by\s+the)\s+(?:visit|procedure|surgery|operation|patient|admission|bed|case|paper|publication|project|grant|arrest|citation|fine)\b/i,
+  /\b(?:bonus|pay|incentive|compensation|salary)\s+(?:tied|linked|pegged|based|keyed)\s+(?:to|on)\s+(?:the\s+)?(?:number|count|volume)\s+of\s+(?:visits?|procedures?|surgeries|papers?|publications?|arrests?|citations?|fines?|cases?|projects?)\b/i,
+  /\b(?:assessed|evaluated|judged|ranked|measured|rewarded|promoted)\s+(?:on|by)\s+(?:the\s+)?(?:number|count|volume)\s+of\s+(?:papers?|publications?|citations?|arrests?|fines?|cases?|projects?|grants?|visits?|procedures?)\b/i,
+  /\b(?:arrest|fine|citation|ticket|stop)\s+quotas?\b/i,
+  /\bper[- ](?:visit|procedure|surgery|operation|patient|admission|paper|publication|arrest|citation|fine|case)\b/i,
+];
+
+// ─── [r320] 腿② 数量压倒质量的反向行为（英文）────────────────────
+const GAMING_EN2 = [
+  // 医疗：过度诊疗/能不做手术也开刀/能出院也留
+  /\bover[- ]?(?:treated|treatment|prescrib\w+|medicat\w+|order\w+|diagnos\w+|test\w+|operat\w+|admit\w+|hospitaliz\w+)\b/i,
+  /\b(?:order|ordered|ordering|prescrib\w+|ran|perform\w+|do|did)\s+(?:a\s+)?(?:batter(?:y|ies)|bunch|series|string|tons?)\s+of\s+(?:tests?|scans?|procedures?|surgeries)\b/i,
+  /\b(?:operat\w+|surgery)\s+(?:on\s+)?(?:patients?|people)?\s*(?:anyway|regardless|who\s+(?:do|did)(?:n'?t|\s+not)\s+need|when\s+conservative\s+care)\b/i,
+  /\b(?:keep|kept|extend|extended)\s+(?:patients?|them)\s+(?:hospitalized|in\s+the\s+hospital|longer\s+than\s+needed)\b/i,
+  /\b(?:admit|admitted|admitting|hospitaliz\w+)\s+(?:patients?|people)?\s*(?:who\s+(?:do|did)(?:n'?t|\s+not)\s+need|unnecessarily)\b/i,
+  // 执法：专挑外地车/能警告也拘留/罚款配额
+  /\b(?:target(?:ed|ing)?|pick(?:ed|ing)?\s+out|stopping|pulling\s+over)\s+(?:out[- ]of[- ](?:town|state)|passing|tourist|foreign)\s+(?:cars?|drivers?|plates?|vehicles?)\b/i,
+  /\b(?:arrested|detained|fined|impounded|booked)\s+(?:people|them|folks)?\s*(?:who\s+could\s+(?:have\s+been\s+)?(?:warned|let\s+off|talked\s+down)|just\s+to\s+(?:hit|meet|boost|pad))\b/i,
+  /\b(?:ticket|ticketing|fine|fining|citation|arrest)\s+(?:quota|drive)\b/i,
+  // 学术：一研究拆多篇/重复投稿/一项目包装成多个
+  /\b(?:split|sliced|salami[- ]sliced|padded|fragmented|chopped)\s+(?:one|a\s+single|the\s+same)\s+(?:study|experiment|dataset|paper|finding)\s+into\s+(?:several|multiple|many|five|three)\s+(?:papers?|publications?)\b/i,
+  /\b(?:duplicate|double|triple)[- ]submi(?:t|ssion|tted)\b/i,
+  /\bsalami\s+(?:slicing|publication)\b/i,
+  /\b(?:packaged|split|framed|carved)\s+(?:one|a\s+single|the\s+same)\s+(?:project|proposal|grant|idea)\s+as\s+(?:several|multiple|many)\s+(?:projects?|grants?|proposals?)\b/i,
+];
+
+// ─── [r320] 腿③ 数量政绩/创新高式认可（英文）────────────────────
+const ENDORSE_EN2 = [
+  /\b(?:numbers?|counts?|totals?|volume|revenue|profits?|income|sales|output|arrests?|fines?|citations?|publications?|papers?|procedures?)\s+(?:doubled|tripled|quadrupled|shot|soared|skyrocketed|climbed|surged|jumped)\b/i,
+  /\b(?:hit|reached|broke|set)\s+(?:a\s+)?(?:record\s+high|all[- ]time\s+high|new\s+high)\b/i,
+];
+
 // 双腿距离窗
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -337,11 +424,11 @@ function findSignatures(text, R) {
   const sigs = [];
   const langs = [
     {
-      f: R.INCENTIVE_ZH || INCENTIVE_ZH, g: R.GAMING_ZH || GAMING_ZH, e: R.ENDORSE_ZH || ENDORSE_ZH,
+      f: (R.INCENTIVE_ZH || INCENTIVE_ZH).concat(R.INCENTIVE_ZH2 || INCENTIVE_ZH2), g: (R.GAMING_ZH || GAMING_ZH).concat(R.GAMING_ZH2 || GAMING_ZH2), e: (R.ENDORSE_ZH || ENDORSE_ZH).concat(R.ENDORSE_ZH2 || ENDORSE_ZH2),
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
-      f: R.INCENTIVE_EN || INCENTIVE_EN, g: R.GAMING_EN || GAMING_EN, e: R.ENDORSE_EN || ENDORSE_EN,
+      f: (R.INCENTIVE_EN || INCENTIVE_EN).concat(R.INCENTIVE_EN2 || INCENTIVE_EN2), g: (R.GAMING_EN || GAMING_EN).concat(R.GAMING_EN2 || GAMING_EN2), e: (R.ENDORSE_EN || ENDORSE_EN).concat(R.ENDORSE_EN2 || ENDORSE_EN2),
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -409,6 +496,8 @@ module.exports = {
   detectPerverseIncentive,
   __internals: () => ({
     INCENTIVE_ZH, INCENTIVE_EN, GAMING_ZH, GAMING_EN, ENDORSE_ZH, ENDORSE_EN,
+    // [r320] 专业与公共部门按计数考核新措辞家族（平行常量，负例注入-删条用）
+    INCENTIVE_ZH2, INCENTIVE_EN2, GAMING_ZH2, GAMING_EN2, ENDORSE_ZH2, ENDORSE_EN2,
     PROBLEM_ZH, PROBLEM_EN, META_ZH, META_EN,
     PAIR_ZH, PAIR_EN,
   }),
