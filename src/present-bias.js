@@ -36,6 +36,29 @@
  * 现在的自己是同一个主体，时间距离不改变后果的归属，「打八折
  * 的未来」不是削减代价而是拒绝承认代价）。
  *
+ * [r314 新措辞家族] 立项探针 scripts/round-314/probe-candidates.js
+ * （v6.8.178 模块直调 + gate 层双路实测）：存量 NOW/LATER 四族
+ * 只收「痛快吃了/以后再说」标准双曲贴现措辞，25 条日常拖延-
+ * 即时满足候选 20 条穿透模块、gate 层 20/25 pass 无维度代拦。
+ * 落地三组平行腿（NOW_ZH2/NOW_EN2/LATER_ZH2/LATER_EN2，findSignatures
+ * concat 合入，存量腿一字不动）：
+ *   拖延许可腿（LATER_ZH2/LATER_EN2）：下次一定/改天再说/过几天
+ *     再说/晚点再说/等双十一买完再开始/过完这阵再说/到时候再说/
+ *     I'll start tomorrow/starting Monday/next time for sure/
+ *     I'll save after/who cares what happens tomorrow；
+ *   活在当下宣言腿（NOW_ZH2/NOW_EN2）：今朝有酒今朝醉/能玩一天
+ *     是一天/趁还年轻及时行乐/先舒服了再说/YOLO/you only live
+ *     once/live for today/seize the day/might as well enjoy/
+ *     this weekend…party；
+ *   未来自我料理腿（LATER_ZH2/LATER_EN2）：车到桥头自然直/船到
+ *     桥头自然直/相信后人的智慧/儿孙自有儿孙福/we'll cross that
+ *     bridge when we come to it/my future self can handle。
+ * 三类结构同一语义换皮：未来代价整体外包（再说/后人/桥头）× 当下
+ * 满足许可证开到最大（一天是一天/及时行乐/only live once）。
+ * 官方良性语料 369 条（gate-97 97 + extended 97 + vertical 150 +
+ * mixed 25，四文件分计）两腿零误命中；存量豁免（CORRECTIVE 先完成
+ * 再玩/CONCEPT 双曲贴现教学）对新腿先生效，无需扩表。
+ *
  * 辨别的族：现时偏差（present bias / 双曲贴现 hyperbolic
  * discounting）——**现在即时满足**（今晚先痛快吃了/凌晨的快乐是
  * 现在就有的/先刷卡住进想要的房子；EN the pleasure is right here
@@ -162,6 +185,93 @@ const LATER_EN = [
   /\b(?:几十|many)\s+years\s+from\s+now\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r314] 「拖延许可 × 活在当下宣言」新措辞家族（平行常量，不并入存量腿）
+//
+// 缺口实证（scripts/round-314/probe-candidates.js，v6.8.178 模块直调）：
+// 存量 NOW/LATER 四族只收「痛快吃了/以后再说」这类标准双曲贴现措辞，
+// 三类日常拖延-即时满足结构整体 miss（25 条候选 20 条穿透模块、
+// gate 层 20/25 pass 无任何维度代拦）：
+//   拖延许可腿：下次一定/改天再说/过几天再说/等双十一买完再开始/
+//               年后再说/过完这阵再说/到时候再说
+//   活在当下宣言腿：今朝有酒今朝醉/能玩一天是一天/趁年轻及时行乐/
+//                   YOLO/you only live once/live for today/
+//                   starting Monday/I'll start tomorrow
+//   未来自我料理腿：车到桥头自然直/相信后人的智慧/儿孙自有儿孙福/
+//                   we'll cross that bridge when we come to it
+// 这三类结构都是同一语义的换皮：把未来代价整体外包（再说/后人/桥头），
+// 把当下满足许可证开到最大（一天是一天/及时行乐/only live once）。
+//
+// 设计纪律（同 r309/r310/r311）：
+//   · **平行常量 + findSignatures concat**，存量 NOW_ZH/NOW_EN/
+//     LATER_ZH/LATER_EN 一字不动（存量注入语义与轮测登记保持）；
+//   · 新腿一律走存量 matchAlive 否定守卫（下次一定 not because…）；
+//   · 窗距沿用存量 PAIR_ZH 60 / PAIR_EN 180；
+//   · 豁免层不动：CORRECTIVE（先完成再玩）与 CONCEPT（双曲贴现教学）
+//     对新腿同样先生效。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r314] 腿① 活在当下宣言（中文）──────────────────────────────
+// 瘦身纪律：候选「今朝有酒今朝醉」谚语形被存量 NOW_ZH 正则①
+// （时间词+≤8字+享乐动词，「今朝有酒」的酒即在动词表内）代拦，
+// 整元素删除；保留四个承重元素。
+const NOW_ZH2 = [
+  // 「X一天是一天」族（能玩一天是一天/开心一天是一天/活一天是一天/混一天是一天）
+  /(?:玩|开心|快活|乐|享乐|享受|活|过|混|熬|潇洒)[^。，！？；\n]{0,6}一天是一天/,
+  // 趁现在/趁年轻/趁来得及 + 及时行乐团（趁还年轻及时行乐/趁现在活得痛快）
+  /趁[^。，！？；\n]{0,8}(?:及时行乐|活得痛快|好好享受|先享受|玩个痛快|使劲玩|多吃点|多玩点|该享受|享受一|放纵一|潇洒一)/,
+  // 先舒服/先快活/先自在/先惬意/先犒劳（存量动词表未收「舒服/快活/自在/惬意/乐呵/犒劳」；
+  // 无主语前缀形，与下条「时间词+先…」窗口形分工）
+  /先(?:舒服|快活|自在|惬意|乐呵|犒劳|奖赏|款待|瘫一|躺平一|享受一|痛快一)(?:了|一把|一回|一天|一晚|一顿|一下)?(?:吧|再说|去)?/,
+  // 现在/眼前 + 先自己舒服/先惬意着（带主语前缀的窗口形）
+  /(?:现在|当下|眼前|此刻|眼下)[^。，！？；\n]{0,6}先(?:自己|咱|咱们)?(?:舒服|快活|自在|惬意|犒劳)(?:了|着|一把|一下)?/,
+];
+
+// ─── [r314] 腿② 拖延许可/未来外包（中文）────────────────────────
+const LATER_ZH2 = [
+  // 拖延口头禅「动词版」：今后再开始/往后再存/日后再说（时间词+再/又+动词）
+  /(?:下次|下回|今后|往后|日后|年后|年中)(?:再|又)(?:说|讲|开始|弄|办|搞|做|干|整|补|修|还|存|攒|戒|努力|减肥|学习|锻炼|体检|面对|处理|考虑|想办法|安排|计划|买|换|改|调整)/,
+  // 拖延口头禅「光秃版」：下次一定/下个月一定/改天再说/过几天再说/晚点再说
+  /(?:下次|下回|下个月|下周|明年|来年|改天|过几天|过两天|晚点|迟点)(?:一定|定然|肯定|再说|再讲)/,
+  // 等/挨/熬/忙/过 X 再 Y 族（等双十一买完再开始/过完这阵再说/忙完这阵再说/熬到年底再说）
+  /(?:等|挨|拖|熬|扛|忙|过)(?:到|过|完)?[^。，！？；\n]{0,8}(?:再|之后|过后)(?:说|讲|开始|弄|办|搞|做|干|整|补|修|还|存|攒|戒|努力|减肥|学习|锻炼|体检|面对|处理|考虑|想办法|安排|计划|买|换|改|调整)/,
+  // 车到桥头自然直/船到桥头自然直/车到山前必有路（未来自理会）
+  /(?:车|船)(?:到|至)(?:桥头|山前)(?:自然直|必有路|自有路)/,
+  // 相信后人的智慧/指望子孙的办法（未来自我料理）
+  /(?:相信|依靠|指望)(?:后人|后来人|子孙|后代|下一代)(?:的)?(?:智慧|办法|能力|安排)/,
+  // 儿孙自有儿孙福
+  /儿孙自有儿孙福/,
+  // 到时候再说/到时再想办法（存量时间词表未收「到时候」）
+  /到时候(?:再)?(?:说|讲|想办法|总会有办法|自然有办法)/,
+];
+
+// ─── [r314] 腿① 活在当下宣言（英文）──────────────────────────────
+const NOW_EN2 = [
+  /\b(?:you\s+only\s+live\s+once|YOLO)\b/i,                     // you only live once
+  /\blive\s+for\s+today\b/i,                                     // live for today
+  /\bseize\s+the\s+day\b/i,                                      // seize the day
+  /\bcarpe\s+diem\b/i,                                           // carpe diem
+  /\benjoy\s+(?:it|life|myself|yourself|things)\s+while\s+(?:I|we|you)\s+(?:can|still\s+can|are\s+young|'?re\s+young)\b/i, // enjoy it while I can
+  /\bwhile\s+(?:I'?m|I\s+am|we'?re|we\s+are|you'?re|you\s+are)\s+(?:still\s+)?young\b/i,   // while we're young / while we are young
+  /\bmight\s+as\s+well\s+(?:enjoy|indulge|treat|live|party)\b/i, // might as well enjoy
+  // this weekend + 享乐动词（存量时间词表未收 this weekend/the evening）
+  /\b(?:this|the)\s+(?:weekend|evening|holiday|vacation|break)\b[^.]{0,40}\b(?:party|celebrate|relax|indulge|have\s+fun|enjoy)\b/i,
+];
+
+// ─── [r314] 腿② 拖延许可/未来外包（英文）──────────────────────────
+const LATER_EN2 = [
+  // I'll start tomorrow / starting Monday / starting next week（存量无「开始类推迟」）
+  /\bI'?ll\s+(?:start|begin|quit|save|save\s+up|exercise|study|diet|train|run|read|take\s+care)\s+(?:tomorrow|next\s+(?:week|month|year)|on\s+Monday|later|another\s+day)\b/i,
+  /\bstarting\s+(?:tomorrow|next\s+(?:week|month|year)|Monday)\b/i,
+  /\bnext\s+time\s+(?:for\s+sure|I\s+will|I'?ll)\b/i,             // next time for sure
+  // I'll save after / quit once（事件后置许可）
+  /\bI'?ll\s+(?:save|quit|start|begin|exercise|study|diet|train|run|read)\s+(?:after|once|when|as\s+soon\s+as)\b/i,
+  // who cares what happens tomorrow（未来整体外包）
+  /\bwho\s+cares\s+(?:what\s+happens\s+)?(?:tomorrow|about\s+tomorrow|in\s+the\s+future)\b/i,
+  // we'll cross that bridge when we come to it（桥头谚语英式；覆盖 will 与 'll 两形）
+  /\bwe(?:'?ll|\s+will)\s+cross\s+that\s+bridge\s+when\s+we\s+come\s+to\s+it\b/i,
+];
+
 // ─── 距离窗（腿①×腿②）──────────────────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -234,8 +344,8 @@ function dist(a, b) {
 function findSignatures(text, R) {
   const sigs = [];
   const langs = [
-    { now: R.NOW_ZH || NOW_ZH, later: R.LATER_ZH || LATER_ZH, win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh' },
-    { now: R.NOW_EN || NOW_EN, later: R.LATER_EN || LATER_EN, win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
+    { now: (R.NOW_ZH || NOW_ZH).concat(R.NOW_ZH2 || NOW_ZH2), later: (R.LATER_ZH || LATER_ZH).concat(R.LATER_ZH2 || LATER_ZH2), win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh' },
+    { now: (R.NOW_EN || NOW_EN).concat(R.NOW_EN2 || NOW_EN2), later: (R.LATER_EN || LATER_EN).concat(R.LATER_EN2 || LATER_EN2), win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
   ];
   for (const L of langs) {
     const nm = collect(text, L.now, true);
@@ -297,6 +407,8 @@ module.exports = {
   __internals: () => ({
     NOW_ZH, NOW_EN,
     LATER_ZH, LATER_EN,
+    // [r314] 拖延许可×活在当下宣言新族（平行常量，负例注入-删条用）
+    NOW_ZH2, NOW_EN2, LATER_ZH2, LATER_EN2,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,

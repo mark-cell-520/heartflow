@@ -32,6 +32,27 @@
  * Knetsch & Thaler 1990：所有权附着使持有物估值偏离市场价，
  * 受偿意愿（WTA）系统性地高于支付意愿（WTP），拒绝按市场价交易）。
  *
+ * [r314 新措辞家族] 立项探针 scripts/round-314/probe-candidates.js
+ * （v6.8.178 模块直调）：存量 OWN/INFLATE 两组只收标准受偿意愿措辞，
+ * 12 条候选 6 条穿透模块（含全部 3 条英文穿透），良性 6/6 零误伤。
+ * 落地两组平行腿（OWN_ZH2/OWN_EN2/INFLATE_ZH2/INFLATE_EN2，
+ * findSignatures concat 合入，存量腿一字不动）：
+ *   估值腿：不是钱的事/情义无价/感情无价/千金不换/万金不换/
+ *     拿什么我都换不来/什么都替代不了/不是钱能衡量的 +
+ *     not for all the money in the world / cannot put a price on /
+ *     wouldn't trade it for anything / irreplaceable to me /
+ *     no price could ever be enough / money cannot replace；
+ *   所有权腿：亲手做的/咱家的/自己家的/我看着长大的/
+ *     祖祖辈辈传下来的 + built it from nothing / I watched it grow up。
+ * 同一语义换皮：「它是我的」升级为「它与我的身份/情感绑定」，
+ * 「给多少钱都不卖」升级为「钱这个尺度本身不适用」。其中
+ * 「不是钱的事/不是钱能衡量的/not for all the money/cannot put
+ * a price on」自身含否定词（其否定正是「拒绝以钱衡量」语义的
+ * 一部分），与存量 REFUSE_ZH/EN 同构走 useNeg=false 腿③收集，
+ * 否则会被 NEG_INSIDE 的「不是」自毙。交易框架（TXN）检查
+ * 不变——「这是我的底线，免谈」仍不判；官方良性语料 369 条
+ * 零误命中（改前改后均实测）。
+ *
  * 辨别的族：禀赋效应（endowment effect）——**所有权锚点**（我的/
  * 我们的/陪了我…/是我一手做起来的；EN my / our / it is mine /
  * has been in my family / worth to us）× **交易框架内的估值推高或
@@ -202,6 +223,86 @@ const REFUSE_EN = [
   /\bnot\s+parting\s+with\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r314] 「情义无价 × 我的就是更好的」新措辞家族（平行常量，不动存量腿）
+//
+// 缺口实证（scripts/round-314/probe-candidates.js，v6.8.178 模块直调）：
+// 存量 OWN/INFLATE 两组只收「我的旧车/低于这个价免谈」标准受偿意愿
+// 措辞，12 条候选 6 条穿透模块（含全部 3 条英文穿透），良性 6/6 零误伤：
+//   估值腿新措辞：不是钱的事/情义无价/感情无价/千金不换/万金不换/
+//                  拿什么我都换不来/什么都替代不了/不是钱能衡量的
+//                  not for all the money in the world /
+//                  cannot put a price on / wouldn't trade it for anything /
+//                  irreplaceable to me / no price could ever be enough
+//   所有权腿新措辞：亲手做的/咱家的/自己家的/我看着长大的/
+//                  祖祖辈辈传下来的/built it from nothing/I watched it grow
+// 同一语义换皮：把「它是我的」升级为「它与我的身份/情感绑定」，
+// 把「给多少钱都不卖」升级为「钱这个尺度本身不适用」。
+//
+// 设计纪律（同 r309/r310/r311/r314 present_bias）：
+//   · 平行常量 + findSignatures concat，存量 OWN/INFLATE/REFUSE 不动；
+//   · INFLATE2 走存量 matchAlive 否定守卫；REFUSE 族本轮不新增；
+//   · 交易框架检查（TXN）不变——「这是我的底线，免谈」仍不判；
+//   · 官方良性语料 369 条零误命中（改前改后均实测）。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r314] 腿① 新所有权锚点（中文）──────────────────────────────
+const OWN_ZH2 = [
+  /(?:亲手|亲自)(?:做|建|盖|写|画|带|养|种|栽|绣|缝|搭|酿)(?:出来|起来|的|下的)?/, // 亲手做的/亲手盖起来的
+  /(?:咱|自己)(?:家|自家)的/,                                                     // 咱家的/自己家的
+  /我(?:看着|瞧着|望着)(?:他|她|它)?(?:一点点)?(?:长大|长大起来|长大的)/,          // 我看着长大的
+  /(?:祖祖|祖上|世世代代|一辈一辈|老一辈|太爷爷|太奶奶)(?:辈辈)?(?:传下来|传下来的|留下来的|住过的|用过的)/, // 祖祖辈辈传下来的
+];
+
+// ─── [r314] 腿① 新所有权锚点（英文）──────────────────────────────
+const OWN_EN2 = [
+  /\b(?:built|raised|grew|watched|nurtured|carried)\s+(?:it|this|that|him|her|them)\s+from\s+nothing\b/i, // built it from nothing
+  /\bfrom\s+scratch\b/i,                                        // from scratch（存量 built up 不收 from scratch 形）
+  /\b(?:I|we)\s+(?:watched|raised|nurtured|grew)\s+(?:it|this|that|him|her|them)\s+(?:grow\s+)?up\b/i, // I watched it grow up
+];
+
+// ─── [r314] 腿② INFLATE 新估值推高族（中文；查否定前缀）────────────
+// 瘦身纪律：候选中的「情义无价/感情无价」被存量 INFLATE_ZH 的「无价」
+// 代拦、「拿/给什么都换不来」被存量 INFLATE_ZH 的「换不来/买不走」
+// 代拦，逐项删除后保留两个承重元素（千金不换/什么都替代不了）。
+const INFLATE_ZH2 = [
+  // 千金不换/万金不换（存量无此谚语形）
+  /(?:千|万|千百)金不换/,
+  // 什么都替代不了/啥都换不来（存量收换不来/买不走，不收「替代不了」）
+  /(?:什么|啥|任何东西)(?:都)?(?:替代不了|换不来|买不回来|比不上|抵不上)/,
+];
+
+// ─── [r314] 腿③ REFUSE 新「钱尺度不适用」族（中文；不过挂否定检查）──
+// 与存量 REFUSE_ZH 同构设计：自身含否定词，其否定正是「拒绝以钱
+// 衡量」语义的一部分（「不是钱的事」= 钱这个尺度不适用），故走
+// useNeg=false 收集，否则会被 NEG_INSIDE 的「不是」自毙。
+const REFUSE_ZH2 = [
+  // 不是钱的事/不是钱的问题（存量正则只收「钱的问题」整串，「事」形 miss）
+  /(?:不是|绝不是|绝非|不算|并非是)(?:金钱|钱)(?:的)?(?:事|问题)/,
+  // 不是钱能衡量的/不是钱能买得到的/不是钱能算得清的
+  /(?:不是|绝不是|绝非|哪是)(?:钱|金钱)(?:能|可以)(?:衡量|衡量得了|计算|算得清|估量|买得到|换得来)的/,
+];
+
+// ─── [r314] 腿② INFLATE 新估值推高族（英文；查否定前缀）────────────
+// 瘦身纪律：候选 money cannot buy 被存量 INFLATE_EN[6] 代拦，整元素删除；
+// 保留两个承重元素。
+const INFLATE_EN2 = [
+  // irreplaceable to me / to us（存量 priceless/beyond price 不收 to-me 人称形）
+  /\birreplaceable\s+to\s+(?:me|us)\b/i,
+  // no price could ever be enough / no amount would ever be enough
+  /\bno\s+(?:price|amount|sum|offer)\s+(?:\w+\s+){0,2}?(?:could|would|can|will)\s+(?:ever\s+)?be\s+enough\b/i,
+];
+
+// ─── [r314] 腿③ REFUSE 新「钱尺度不适用」族（英文；不过挂否定检查）──
+const REFUSE_EN2 = [
+  // not for all the money in the world
+  /\bnot\s+for\s+all\s+the\s+money\s+in\s+the\s+world\b/i,
+  // wouldn't trade it for anything
+  /\b(?:wouldn'?t|would\s+not|couldn'?t|could\s+not)\s+trade\s+(?:it|this|that|them)\s+for\s+(?:anything|anything\s+else|the\s+world)\b/i,
+  // cannot put a price on
+  /\b(?:cannot|can'?t|could\s+not)\s+put\s+a\s+price\s+on\b/i,
+];
+
 // ─── 交易框架锚点（腿②必须落在交易框架内）─────────────────────
 const TXN_ZH = /(?:价|价钱|价格|价位|钱|款|卖|买|收购|报价|出价|行情|拍卖|成交|转让|典当|赎|补偿|估价|估值|标价|售价|买价|卖价|价值)/;
 const TXN_EN = /\b(?:price|priced|prices|cost|money|sell|sold|sale|selling|buy|bought|buying|offer|offered|bid|auction|acquisition|acquire|purchase|market\s+value|appraised|appraisal|value|worth|compensation|transaction|exchange|deal)\b/i;
@@ -321,14 +422,14 @@ function findSignatures(text, R) {
   const sents = splitSentences(text);
   const langs = [
     {
-      own: R.OWN_ZH || OWN_ZH,
-      inflate: R.INFLATE_ZH || INFLATE_ZH, refuse: R.REFUSE_ZH || REFUSE_ZH,
+      own: (R.OWN_ZH || OWN_ZH).concat(R.OWN_ZH2 || OWN_ZH2),
+      inflate: (R.INFLATE_ZH || INFLATE_ZH).concat(R.INFLATE_ZH2 || INFLATE_ZH2), refuse: (R.REFUSE_ZH || REFUSE_ZH).concat(R.REFUSE_ZH2 || REFUSE_ZH2),
       txn: R.TXN_ZH || TXN_ZH,
       pair: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
-      own: R.OWN_EN || OWN_EN,
-      inflate: R.INFLATE_EN || INFLATE_EN, refuse: R.REFUSE_EN || REFUSE_EN,
+      own: (R.OWN_EN || OWN_EN).concat(R.OWN_EN2 || OWN_EN2),
+      inflate: (R.INFLATE_EN || INFLATE_EN).concat(R.INFLATE_EN2 || INFLATE_EN2), refuse: (R.REFUSE_EN || REFUSE_EN).concat(R.REFUSE_EN2 || REFUSE_EN2),
       txn: R.TXN_EN || TXN_EN,
       pair: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
@@ -390,6 +491,8 @@ module.exports = {
     OWN_ZH, OWN_EN,
     INFLATE_ZH, INFLATE_EN,
     REFUSE_ZH, REFUSE_EN,
+    // [r314] 情义无价×我的就是更好的新族（平行常量，负例注入-删条用）
+    OWN_ZH2, OWN_EN2, INFLATE_ZH2, INFLATE_EN2, REFUSE_ZH2, REFUSE_EN2,
     TXN_ZH, TXN_EN,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
