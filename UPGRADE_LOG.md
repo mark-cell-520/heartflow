@@ -1,3 +1,33 @@
+## r321 — 公地悲剧（tragedy_of_commons，econ_reasoning_gate 聚合族）「现代过度取用」新措辞家族（真升级②）
+
+**日期** 2026-11-14 02:25–03:10 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r320 先例）  **轮次** r321（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "tragedy of the commons overuse overfishing overtourism antibiotic commons dilemma" → arXiv parse-fail / GitHub 0 条 / S2 限流——空返，按既有形态自建
+
+### 缺口实证（scripts/round-321/probe-candidates.js，v6.8.179 pristine 基线，动手前）
+
+- 存量 tragedy_of_commons 三腿（A×B×C 共现，窗 PAIR_ZH=60/EN=180）只收经典草渔林水 + r315 数字公地/免费额度域；**现代过度取用 5 域**（过度旅游 overtourism / 抗生素耐药 / 一次性餐具外卖包装 / 平台流量掠夺 / 免费道路拥堵）探针 17 条攻击候选（ZH 11 + EN 6）**完全穿透**（detectTragedyOfCommons.hit=false、gate 层 econ_reasoning_gate 归因 0），良性 10/10 零误伤。
+- 腿诊断：现代域三腿均缺新措辞——景点/景区/海岛/抗生素/一次性餐具/公共流量池/免费马路 等现代公共资源锚点不在存量；蜂拥打卡/踏平挤爆/动不动就输液/能多X就多X/抢话题蹭热度/顺手多薅 等现代过度取用行为不在存量；来都来了/耐药大家一起遭殃/垃圾全社会承担/信息质量大家一起烂/反正公费 等现代搭便车合理化不在存量。
+
+### 改了什么（第六平行常量 + findSignatures concat 合并，存量三腿+r315 数字域零改动）
+
+- **A_ZH4/A_EN4**（腿① 现代公共资源/公共品锚点，5+5 元素）：旅游景点域（旅游景点/风景名胜/古城古镇/网红景点 + 景点免费开放/海岛谁都可以进）；公费药域（抗生素是公费的/消炎药人人能吃 + EN antibiotics are covered）；一次性餐具域（一次性餐具/外卖包装 + EN disposable cutlery）；平台流量/免费道路域（公共热搜/公共流量池/免费马路/马路免费通行 + EN trending topic/free highway）。
+- **B_ZH4/B_EN4**（腿② 现代过度取用行为，6+6 元素）：蜂拥打卡/踏平踩光/挤爆（EN floods in/trample/crush）；动不动就输液打针/能多X就多X/顺手多薅/多包（EN over-prescribe/pressures the doctor for more prescriptions/grabs extra）；抢话题蹭热度/灌水/刷榜（EN chases/jumps on the trend）。
+- **C_ZH4/C_EN4**（腿③ 现代搭便车合理化，5+5 元素）：来都来了/不X白不X（EN might as well trample/everyone's here anyway）；耐药/垃圾/拥堵/信息质量 + 大家一起/全社会/所有人 + 遭殃/买单/扛（EN we all share the resistance/falls on the whole city）；反正公费/免费（EN if it is free take as much as you can）。
+- findSignatures langs 数组新增 2 条独立链（A_ZH4×B_ZH4×C_ZH4 win=60；A_EN4×B_EN4×C_EN4 win=180），存量四链零改动；`__internals` 暴露 6 新键。登记 **32 个**元素（A 5+5 / B 6+6 / C 5+5）。精炼期两处稳健性修正：C_EN4[1] 兼容 ASCII ' 与 U+2019 右单引号；B_EN4[3] 放宽中间名词（pressures the doctor for more prescriptions）。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-321-modern-overuse-commons.test.js` | **166 通过 / 0 失败**（A gate 归因 econ 20 + B 模块命中+存量回归 16 + C 良性 13 + 官方语料 378 零误命中 + D 存量豁免注入 4 + E 元素级注入 96 + F 入口双路 8 + G 登记 8） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24/0 PASS**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，新家族零新增误拦） |
+| 攻击探针（最终收敛代码复跑） | 落地样本 ZH 7 + EN 3 共 **10/10** 模块命中、econ 归因 **10/10**；立项宽扫描改前 17/17 穿透 → 改后 15/17 被新族补上（2 条为额外变体，记边界） |
+| 良性 | 本轮新增 ZH 6 + EN 3 零误命中 + 存量良性 4 + 官方良性语料 378 全量零误命中 |
+| 负例 | 注入 **32 个**元素 → **32 个全部变红，0 个未变红** |
+| 元素级最小样本自检 | 32 个新元素逐条删除均配「仅该元素承重」最小样本，scripts/round-321/selfcheck-module.js（真实模块 `__internals` + `detectTragedyOfCommons(text, inject)` 真实注入）**32/32 PASS** |
+
 ## r320 — 激励反噬（perverse_incentive，econ_reasoning_gate 聚合族）「专业与公共部门按计数考核滋生数量压倒质量的反向行为」新措辞家族（真升级②）
 
 **日期** 2026-11-14 00:26–01:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r319 先例）  **轮次** r320（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "perverse incentive Goodhart law cobra effect metric gaming unintended consequences" → arXiv parse-fail / GitHub 0 条 / S2 限流——无直接对应纯规则方案，按既有形态自建
