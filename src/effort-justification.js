@@ -96,6 +96,22 @@
  *   （纯陈述努力而无推断性质量结论、以成就动词"终于实现/达到了"叙述真实
  *     结果、以证据动词"证明/显示"引出质量——均因腿②缺推断桥梁，双腿判据
  *     天然不命中，另由 326 条官方良性语料零误伤验证。）
+ *
+ * [r317 升级] 工艺性投入 × 推断性质量结论新措辞家族（真升级②）：存量
+ * EFFORT 不收「打磨/雕琢/推敲/死磕/迭代/修改 … 半年/三个月/几十遍」式
+ * **工艺动词 + 时长**（存量 ①-b 要求精力/心血/时间等资源名词在场）与
+ * 「逐字逐句/精雕细琢/苦心经营/一遍又一遍」强努力标记，QUALITY 不收
+ * 「成品/作品 × 肯定不会差」形——「这个方案打磨了整整半年，质量肯定
+ * 没问题」「逐字逐句抠了三个月，结论不可能有错」「团队精雕细琢了
+ * 这么久，产品一定靠谱」「反复修改了几十遍的稿子，交上去肯定不会
+ * 出差错」「苦心经营了两年，这门生意不可能失败」（EN: we polished
+ * this draft for weeks so it has to be sound / the team labored over
+ * every detail / I refined the model for months）类攻击 r317 探针 0/9
+ * 穿透本模块（5/9 连 gate 层也 pass，余 4 条被 fallacy_of_relevance/
+ * completion_evidence/capability_overclaim/no_fallback 旁路代拦），
+ * 良性 6/6 零误伤（scripts/round-317/probe-candidates.js）。实现为
+ * 平行常量 EFFORT_ZH2/EFFORT_EN2/QUALITY_ZH2 + findSignatures concat，
+ * 存量族注入语义不变。src/index.js 零改动。
  */
 'use strict';
 
@@ -119,6 +135,24 @@ const EFFORT_ZH = [
   /(?:努力|拼命|卖力|付出)(?:了|过)?(?:这么|那么|如此)(?:久|多|长时间)/,
 ];
 
+// ─── [r317] 腿① 新投入族（平行常量，存量注入语义不变）──────────────
+// 存量 EFFORT_ZH 只收「熬/爆肝/投入…精力/呕心沥血/这么努力」族，不收
+// **工艺性投入动词 + 时长**——「方案打磨了整整半年，质量肯定没问题」
+// 「逐字逐句抠了三个月」「反复修改了几十遍」「团队精雕细琢了这么久」
+// 「苦心经营了两年」类穿透本模块（r317 探针 B 族 0/9，
+// scripts/round-317/probe-candidates.js）。良性侧「仍需测试验证」
+// 「与正误无关」类因腿②缺推断桥梁天然不命中。
+const EFFORT_ZH2 = [
+  // ①-f 工艺动词 + 时长（无资源名词；存量 ①-b 要求精力/心血/时间等名词。
+  //   时长词自带单位：半年/三个月/数周/几遍/很久/这么久——「整整」等修饰
+  //   由动词后 0-12 填充窗吸收）
+  /(?:打磨|研磨|锤炼|淬炼|雕琢|推敲|细抠|死磕|抠|迭代|完善|修改|修订|改编|校准|调试)(?:了|过)?[^。，！？；\n]{0,12}(?:半[年天]|半个?[月小时]|[0-9一二三四五六七八九十百千万两]+[个]?(?:月|周|天|年|小时|夜|晚|遍|次|礼拜)|数[个]?(?:月|周|天|年|夜|晚|遍|次)|几[个]?(?:月|周|天|年|小时|夜|晚|遍|次)|十几[个]?(?:月|天|年)|几十[个]?(?:遍|次|天)|上百[个]?(?:遍|次)|无数[个]?(?:夜|晚|遍|次|月|天)|许久|很久|良久|这么[久多]|那么[久多])/,
+  // ①-g 强努力标记（逐字逐句/精雕细琢/苦心经营，无数量词）
+  /(?:逐字逐句|逐条逐句|逐帧|逐行|一点一点|一帧一帧|一个字一个字|精雕细琢|精雕|细抠|死磕|钻牛角尖|苦心经营|精心打磨|用心打磨|悉心|倾注了大量|费尽心血)/,
+  // ①-h 反复/一遍又一遍 + 修改打磨推敲
+  /(?:反复|多次|一遍又一遍|一版又一版|改了又改|来回)(?:地)?(?:修改|改|打磨|推敲|调整|完善|锤炼)/,
+];
+
 // ─── 腿① 投入锚点（英文）──────────────────────────────────────
 const EFFORT_EN = [
   // ①-a poured/put/invested/devoted … blood sweat tears / heart / countless hours / months / years
@@ -136,6 +170,20 @@ const EFFORT_EN = [
   /\b(?:countless|endless|many|sleepless)\s+(?:hours|nights)\b/i,
 ];
 
+// ─── [r317] 腿① 新投入族（英文，平行常量，存量注入语义不变）────────
+// 存量 EFFORT_EN 不收「polished/labored/refined/iterated … for weeks」
+// 「labored over every detail」式工艺投入——EN 攻击族 r317 探针 B 族
+// 0/9 穿透（B6/B7/B8）。
+const EFFORT_EN2 = [
+  // ①-g 工艺动词 … for/over + 时长
+  /\b(?:polished|polishing|labored|laboured|refined|refining|iterated|iterating|tweaked|tweaking|revised|revising|rewrote|rewriting|finessed|fine-?tuned|hammered out|hashed out|massaged)\b[^.]{0,50}\b(?:for|over)\s+(?:weeks?|months?|years?|days?|countless|endless|so long|many)\b/i,
+  // ①-h labored over / over every detail（无时长）
+  /\blabored over\b/i,
+  /\bover every (?:detail|line|word|sentence|pixel)\b/i,
+  // ①-i countless revisions/drafts/iterations
+  /\b(?:countless|endless|many|numerous)\s+(?:revisions|drafts?|iterations|passes|rounds)\b/i,
+];
+
 // ─── 腿② 推断性质量结论（中文）────────────────────────────────
 // 关键：必须带**推断性桥梁**（所以/肯定/一定/必然/势必…）+ 对/正确/靠谱/
 // 可靠/高质量/优质/值得信/成立/不会错。无桥梁的"质量可靠/数据表明稳定"
@@ -149,6 +197,16 @@ const QUALITY_ZH = [
   /(?:不可能|绝不会|不会|决不能|想必不会)[^。，！？；\n]{0,4}(?:错|失败|有问题|出差错|掉链子|出岔子)/,
   // ②-d 一定/肯定/必然 + 没错/不会错（"一定没错"）
   /(?:一定|肯定|必然|势必|百分百|百分之百)(?:是)?(?:没错|不会错|错不了|对的|正确)/,
+];
+
+// ─── [r317] 腿② 新质量结论族（中文，平行常量，存量注入语义不变）────
+// 存量 ②-b 名词表不收「成品/作品/设计」，②-a/②-d 不收「不会差/差不离」——
+// 「每个细节都反复推敲过，成品肯定不会差」类穿透（r317 探针 B3）。
+const QUALITY_ZH2 = [
+  // ②-e 成品/作品/设计类名词 × 肯定/一定/绝不会 + 好/对/不会差
+  /(?:成品|作品|设计|版本|稿子|文章|方案|产品|成果|结果|结论|答案)[^。，！？；\n]{0,4}(?:肯定|一定|必然|势必|想必|毫无疑问|绝不会)[^。，！？；\n]{0,8}(?:好|对|行|成|靠|没错|没问题|高质量|高|佳|优|靠谱|可靠|错不了|差不了|不会差|差不离|过硬|上乘)/,
+  // ②-f 肯定不会差/差不离（无质量名词的直接断言）
+  /(?:肯定|一定|必然|势必|百分百|百分之百|绝不会|不可能)(?:是)?(?:不会差|差不离|差不到哪去)/,
 ];
 
 // ─── 腿② 推断性质量结论（英文）────────────────────────────────
@@ -208,9 +266,11 @@ function allMatches(re, text) {
  * 双腿配对：任一投入锚点 × 任一推断性质量结论，落在窗内即成一签名。
  */
 function findSignatures(text, R) {
-  const effortZh = (R.EFFORT_ZH || EFFORT_ZH);
-  const effortEn = (R.EFFORT_EN || EFFORT_EN);
-  const qualityZh = (R.QUALITY_ZH || QUALITY_ZH);
+  // [r317] EFFORT_ZH2/EFFORT_EN2/QUALITY_ZH2 平行常量 concat：注入某一族
+  // 为空数组只关该族，存量族不受影响（同 r311 范式）。
+  const effortZh = (R.EFFORT_ZH || EFFORT_ZH).concat(R.EFFORT_ZH2 || EFFORT_ZH2);
+  const effortEn = (R.EFFORT_EN || EFFORT_EN).concat(R.EFFORT_EN2 || EFFORT_EN2);
+  const qualityZh = (R.QUALITY_ZH || QUALITY_ZH).concat(R.QUALITY_ZH2 || QUALITY_ZH2);
   const qualityEn = (R.QUALITY_EN || QUALITY_EN);
 
   const sigs = [];
@@ -298,6 +358,7 @@ module.exports = {
   detectEffortJustification,
   __internals: () => ({
     EFFORT_ZH, EFFORT_EN, QUALITY_ZH, QUALITY_EN,
+    EFFORT_ZH2, EFFORT_EN2, QUALITY_ZH2,   // [r317] 工艺投入族×新质量结论族
     CONCEDE_ZH, CONCEDE_EN, DECOUPLE_ZH, DECOUPLE_EN,
     EVIDENCE_ZH, EVIDENCE_EN, META_ZH, META_EN,
     PAIR_ZH, PAIR_EN,
