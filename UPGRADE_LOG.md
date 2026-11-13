@@ -1,3 +1,38 @@
+## r315 — 控制幻觉（illusion_of_control）+ 公地悲剧（tragedy_of_commons，econ_reasoning_gate 聚合族）「体育赛事幸运仪式 × 数字公地/免费额度」新措辞家族（真升级②）
+
+**日期** 2026-11-13 14:00–15:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r314 先例）  **轮次** r315（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）
+
+### 缺口实证（scripts/round-315/probe-candidates.js，动手前 pristine 基座）
+
+- **illusion_of_control**：存量 A/B/C 双腿族（概率性事件锚点×控制行为×结果归因）不收「竞技赛事幸运仪式」新措辞——幸运球衣/幸运战袍/幸运色围巾/看台老位置/同一个杯子/赛前摸队徽（B 侧）叠加胜率更高/赢面更大/左右这场比赛/带来好运（C 侧）。10 条候选 **9 条穿透本模块**（1 条已被存量 ①-b×②-f×③-a 覆盖，转存量回归样本）；穿透样本中 3 条在 gate 层被 absolute_claim/false_urgency/fallacy_of_relevance 等**旁路维度**拦截，无一经 econ 聚合族。
+- **tragedy_of_commons**：存量 公共资源×多养×公地恶化 族不收「数字公地/免费额度」新措辞——公共WiFi/免费额度/免费API/开源镜像/共享充电桩（A 侧）叠加多下/多抢/多蹭/多注册/脚本党批量抓取（B 侧）叠加不抢白不抢/不用白不用/抢到就是赚到/手快有/先到先得/月底清零（C 侧）。8 条候选 **8/8 全穿透本模块**。
+- 官方良性语料 378 条（gate-97 97 + extended 106 + vertical 150 + mixed 25，探针按文件去重后 369）改前两模块均零误命中。
+
+### 改了什么（src/illusion-of-control.js + src/tragedy-of-commons.js，均为平行常量 + findSignatures concat 合并，0 删除存量逻辑）
+
+- **illusion-of-control.js**：A_ZH3（赛事名词/参赛主体两元素）、A_EN3（game|match|fixture|tournament|playoffs|season 等 / team|squad|club|derby 两元素）、B_ZH3（幸运球衣物件族含幸运色/旧球衣/不离身 / 仪式·固定座位族 / 赛前摸队徽族三元素）、B_EN3（lucky jersey|socks|scarf|mug 等 / same seat|same mug|same ritual / game-day ritual|pre-match routine / touches the club crest 四元素）、C_ZH3（胜率·赢面族 / 提高×胜率 / 影响动词×赛事结果 / 带来好运四元素）、C_EN3（more likely to win / helps the team win / affects the outcome / brings us good luck / raises our odds 五元素）六支新腿，findSignatures 的 langs 数组同点 concat。
+- **tragedy-of-commons.js**：A_ZH3（显式数字公族复合词 / 修饰语×数字资源 / 数字资源×归属供应形 / 赠送来源族四元素）、A_EN3（digital commons|free tier|free allowance|public data 等 / 修饰×资源 / allowance×expires 三元素）、B_ZH3（多用数字动词 / 薅羊毛·脚本党·批量族含薅X羊毛间隔形态 / 尽力取用族三元素）、B_EN3（each|every|everyone×下载抓取 as much / bots sweep / stock up on 三元素）、C_ZH3（不X白不X族 / 抢到就是赚到·手快族 / 月底清零·过期作废族三元素）、C_EN3（might as well stock up / if it is free take as much as you can / grab it before it is gone / first come first served 四元素）六支新腿，同点 concat。
+- **落地期三处修正（全部实测驱动）**：① `薅的羊毛` 非连续形，B_ZH3 改 `薅[^。]{0,3}羊毛`；② `多占` 缺动词，B_ZH3 补 `占|分`；③ `everyone` 不匹配存量 `every\s+` 形，B_EN3 主语补 `everyone|everybody`；④ **gate 路径归一化坑**——`text-normalizer` 把 ASCII 小写化（`API→api`、`WiFi→wifi`），A_ZH3 修饰语×资源腿缺 /i 标志导致「免费API」形在 gate 层漏（模块直调命中但 gate pass），补 i 标志；⑤ `it is gone` 空格形，C_EN3 改 `it(?:'?s|\s+is)?`。
+- 存量键注入语义不变（数组注入=整体替换）；存量测试 illusion-of-control 11/11、tragedy-of-commons 11/11、round-284 zero-sum 23/23、round-295 econ 接线 63/63 复跑同分。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-315-sports-superstition-digital-commons.test.js` | **201 通过 / 0 失败**（A gate 归因 36 + B 模块直调 26 + C 良性 30+378 + D 存量回归 6 + E 常量级注入 12 + F 元素级注入 80 + G 入口双路 8 + H 登记纪律 15） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 PASS，判别维度 254**（本轮无新维度，聚合族内新措辞家族） |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败** |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，零新增误伤） |
+| 负例注入 | **52 个按设计变红，0 个未变红**（12 常量级 + 40 元素级） |
+| 良性 | 手工 20/20 + 官方语料 378/378 零误命中 |
+
+### 交接事项
+
+- **给 1 号**：text-normalizer 的 ASCII 小写化会打穿所有未加 /i 的中文正则里的英文资源名词（本轮踩中「免费API」形）——建议后续写含拉丁 token 的 ZH 正则一律加 i 标志；loss-aversion「NO_BOTH 下应经独腿命中: undefined」仍待定性。
+- **给 2 号**：轮测 C 组官方语料 flatten 口径（378 不去重 vs 369 去重）与 r314 一致，无新增并发池抖动。
+- **给 3 号**：本轮实测 econ 聚合族旁路拦截形态——模块直调命中的样本在 gate 层可能被 absolute_claim/false_urgency/fallacy_of_relevance 等旁路维度先拦（3/10），轮测 A 组断言须同时校验 action≠pass 与 econ 归因，不能只看模块命中。
+
 ## r314 — 现时偏差（present_bias）+ 禀赋效应（endowment_effect，econ_reasoning_gate 聚合族）「拖延许可×活在当下宣言×未来自我料理 / 情义无价×我的就是更好的」新措辞家族（真升级②；原认领 r312，同步轮占用 r312/r313 撞号重编号）
 
 **日期** 2026-11-13 08:37–09:40 CST（原轮次产能）＋ 11:37 CST 起落地收尾（撞号重编号／四门禁复跑／全量 run-all／推送）  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r311 先例）  **轮次** r314（kind: dimension；原认领 r312 撞号重编号，claims 认领行已改轮次并加注）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
