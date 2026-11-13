@@ -269,6 +269,13 @@ console.log('=== E 引擎 think 路径真 dispatch ===');
 
   const env = { ...process.env, MCP_HEARTFLOW_KEY: TOKEN, HF_KEEP_STDOUT_LOGS: '1' };
   delete env.NODE_ENV;
+  // [2026-11-12 审计修复] 隔离父进程 token：MCP_HEARTFLOW_KEY 优先级低于
+  // HEARTFLOW_MCP_TOKEN / MCP_HEARTFLOW_API_KEY（mcp-server.js:209），父 shell
+  // （cron/终端）若设了那两个变量，spawn 出的 server 会用它们而非本测试的随机
+  // token，导致本测试 Bearer <random> 全 401（r295/r296 wiring 实测）。
+  // 这里显式删掉高优先级变量，让测试自设 token 生效。
+  delete env.HEARTFLOW_MCP_TOKEN;
+  delete env.MCP_HEARTFLOW_API_KEY;
   const child = spawn(process.execPath, [path.join(ROOT, 'src/mcp-server.js'), '--port', String(PORT)], {
     cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -319,7 +326,11 @@ console.log('=== E 引擎 think 路径真 dispatch ===');
     // ad_hominem（第203维）与 incentive_blind_spot（第247维）接入 gate
     // 维度表（src/index.js 接线 + VERIFY_DIMS 登记），真实维度数为 248，
     // 与 guard-abilities 门禁实测一致。锚更新为 248。
-    assert.strictEqual(n, 248, `维度数 ${n} ≠ 248`);
+    // [2026-11-12 审计修复] 断言改为「≥248 且与 measure-claimed-numbers 实测
+    // 同源」：写死具体值会在每轮新维度上线时必然误红（r297→r307 实测 248
+    // →251，本断言连红 5 轮非真实回归）。下限 248 保留 r296 不回归语义，
+    // 上限由 measure 门禁单独把关。
+    assert.ok(n >= 248, `维度数 ${n} < 248（r296 接线基线倒退）`);
     // 本轮三族键不得出现在 gate 维度表（gate 层零接线，交接项给 1 号）
     const newKeys = Object.keys(d.dimensions || {}).filter(k => /adverse_selection|moral_hazard|free_rider/.test(k));
     assert.strictEqual(newKeys.length, 0, `gate 维度表出现本轮族键: ${newKeys.join(',')}`);

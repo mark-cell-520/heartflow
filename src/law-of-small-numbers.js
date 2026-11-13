@@ -127,6 +127,13 @@ const SMALL_N_ZH = [
   /[一二两三四五六七八九十]\s*(?:个|位|名|条|例|只|家|次|回|批|组|份|人|任|例|台|件|辆|栋|间|款|种)(?:\s*样本|\s*案例|\s*例子|\s*数据|\s*实验|\s*试点|\s*病人|\s*患者|\s*客户|\s*用户|\s*股票|\s*股|评论|反馈|问卷|访谈|观察|连号|硬币|试验|记录)?/,
   // 几个/三两/数几/头几/前几/头一批
   /(?:几个|三两|数几|几例|几番|几回|几次|几人|几条|头几|前几|头一批|头几批|开头几|头几只|三五个)/,
+  // [r303 新增] 抽样/检验动词形锚点——「抽检了3台」「抽查了几批」「试用了
+  //   两回」「回访了几个客户」：r279 量词族只收「数字+量词」的组合形，
+  //   「动词+了+数字」的抽样叙述形整族穿透（r303 探针实测：抽检3台→全部
+  //   合格 MISS）。动词本身即声明了「这是一次小规模抽样」。
+  /(?:抽检|抽测|抽查|抽验|试用|试驾|试吃|试玩|体验|回访|随访|走访|调研|访谈|问过|问了|观察|看了|测了|试了)[了过]?[一二两三四五六七八九十\d]+\s*(?:个|位|名|条|例|只|家|次|回|批|组|份|人|台|件|辆|款|种)/,
+  // [r303 新增] 「抽检/抽查/试用 + 了 + 几个/少量」形（无具体数字）
+  /(?:抽检|抽测|抽查|抽验|试用|试驾|试吃|试玩|体验|回访|随访|走访|调研|访谈|问过|问了|观察|看了|测了|试了)[了过]?(?:几个|三两|数几|几例|几回|几次|几条|三五个|少量|几十个|十几)/,
   // 十几个/数十
   /(?:十几|数十)/,
   // 隐式窄范围：身边/周围/熟人/亲戚/朋友圈/我认识的/手头
@@ -142,6 +149,11 @@ const SMALL_N_ZH = [
 const SMALL_N_EN = [
   // 数目 + 样本性名词（允许中间隔 1-2 个词）
   /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a few|a couple(?:\s+of)?|a handful of|several|just a few|a small number of|two or three|three or four)\s+(?:\w+\s){0,2}(?:times|cases|people|persons|samples|examples|instances|patients|clients|customers|users|reviews|data points|respondents|participants|observations|trials|runs|stocks|reports|complaints|comments|friends|colleagues|neighbors|interviews|flips|rolls|draws)\b/i,
+  // [r312 补] 频次裸词 twice / thrice / a couple of times——枚举腿漏收的裸
+  // 名词形态（161 轮教训同型）：「I tried the product twice and it worked」
+  // 的 twice 是高频小样本锚点，但不含任何样本性名词，上一条整条漏判。
+  /\b(?:tried|used|tested|sampled|surveyed|asked|checked|observed|watched|ran|tried out)\s+(?:it|them|the\s+\w+|this\s+\w+)?\s*(?:twice|thrice|a couple of times|a few times|two times|three times)\b/i,
+  /\b(?:twice|thrice)\b(?=[^.]{0,80}(?:so|therefore|thus|which means|meaning))/i,
   // the first few/five/three/...
   /\bthe\s+(?:first|last)\s+(?:few|five|four|three|two|couple|handful)\b/i,
   // small/tiny sample 裸词（小样本主张）
@@ -276,6 +288,49 @@ const QUANT_EN = [
   /\bon average\b[^.]{0,26}?(?:much|far|significantly|way|a lot|considerably|half|twice|\d+\s*(?:%|percent|x))\b[^.]{0,14}?(?:higher|lower|taller|shorter|more|less|better|worse|faster|slower|bigger|smaller|greater)/i,
 ];
 
+// ─── 腿④ 永续/全称限定词（有限观测 → 无时间限定/无例外范围的结论）──
+// [r303 新增 · 真升级②] 腿②b UNIVERSAL 只收「定性裁定」词（铁律/肯定
+// 有效/这里养人/都一个样），腿③ QUANT 只收「数值化裁定」（概率七成/
+// 率九成），两族都漏收**用有限观测直接推出一个无例外、无时间边界的
+// 永续结论**——而这正是小数定律最经典的教科书形态：抛了三次硬币都
+// 是正面，这枚硬币**永远是正面**；观察了十次日出，太阳**永远从东边
+// 升起**；问了三个朋友没人遇到问题，这个方案**永远不会有风险**；
+// 五个村民活过百岁，这里的水土**能让人长寿**。r303 候选探针
+// （scripts/round-303/probe-candidates-r303.js，v6.8.178 gate() 动手前
+// 实测）实证 4/4 此类攻击整句穿透（gate.action=pass 且零维度承重）、
+// 良性对照干净、双向守卫良性基线零含此类词的样本。
+// 本腿与腿①小样本锚点近距共现即判，与腿②b/腿③平行成路由，**不并入
+// 存量 UNIVERSAL/QUANT 数组**（避开 r280/r265 的 length===N 注入断言），
+// 复用共享豁免入口与 dist()。裸名词形态收录（161 轮教训：同族词去
+// 后缀仍命中——「太阳永远从东边升起」不含任何裁定词面）。
+const PERPETUAL_ZH = [
+  // 永远/永久/始终/从来都 + 结论动词（太阳永远从东边升起 / 这个方法永远有效）
+  /(?:永远|永久|始终|一向|从来都|从无例外|无一例外|万世)[^。，！？；\n]{0,10}(?:从|是|有|能|会|要|该|这么|那么|如此|成立|有效|正确|对)/,
+  // 结论 + 永续后缀（能让人长寿 / 保证长命百岁 / 包治百病 / 永不复发）
+  /(?:能|可以|足以|保证|确保|包|准)[^。，！？；\n]{0,6}(?:让人|使人|令人)?[^。，！？；\n]{0,4}(?:长寿|长命|百岁|不死|不老|永生|包治|根治|断根|除根|彻底好|永不复发|永不再犯|再无问题|毫无风险|零风险|不出问题|不会出错)/,
+  // [r303 新增] 永续后缀的动词前置形——「这款产品包治百病」「这个方法毫无
+  //   风险」：上一条要求「能/保证+…+永续词」的链条形，产品/方法直接作
+  //   主语的「包治/根治 + 百病/一切」与「毫无/毫无悬念」的零风险形整族
+  //   穿透（r303 探针实测）。裸名词形态收录（161 轮教训）。
+  /(?:包治|根治|断根|除根|根治了)[^。，！？；\n]{0,4}(?:百病|一切病|所有病|一切问题|所有问题|一切毛病)/,
+  /(?:毫无|毫无半点|一点都没有|完全没有|零)[^。，！？；\n]{0,3}(?:风险|隐患|问题|副作用|后患|遗漏|遗漏|差错|出错)/,
+  // 全体范围裸名词（所有用户/每个人/任何情况 都 满足/适用/成立）
+  /(?:所有|任何|每)(?:用户|客户|人|情况|场景|时候|时候|条件下|环境下|机型|设备|批次|样本)[^。，！？；\n]{0,6}(?:都|全|一律|统统)?(?:满足|适用|成立|有效|一样|通过|合格|喜欢|认同|支持|遇到|出现|有)/,
+  // 全部/整批 + 完成态（抽检了三台都没问题所以这批一万台全部合格）
+  /(?:全部|整批|整批|所有|统统一律)[^。，！？；\n]{0,4}(?:合格|达标|通过|没问题|有效|成立|适用|一样)/,
+];
+const PERPETUAL_EN = [
+  // guarantees / ensures + 永续结论（quitting smoking guarantees longevity）
+  /\b(?:guarantee|guarantees|guaranteed|ensure|ensures|ensured|will always|always will|permanently|forever|for good)\b[^.]{0,30}?\b(?:longevity|long life|work|works|worked|success|succeed|succeeds|last|lasts|hold|holds|be safe|be fine|never fail|no risk|risk-free|survive|heal|cure|cures|be cured)\b/i,
+  // so it always / so it will never（a few friends quit and lived long, so quitting guarantees longevity）
+  /\bso\s+(?:it|this|that|they|the)\s+(?:\w+\s){0,3}(?:guarantee|guarantees|always|never|forever|permanently|mean|means)\b/i,
+  // applies to everyone / works for everyone / true in every case
+  /\b(?:applies?|works?|holds?|true|valid|effective)\s+(?:to|for|in)\s+(?:everyone|every|all|any)\b/i,
+  // all users / every customer / no exceptions
+  /\b(?:all|every|each)\s+(?:user|users|customer|customers|client|clients|case|cases|situation|situations|device|devices|batch|batches)\s+(?:are|is|will|pass|qualify|work|works)\b/i,
+  /\bno\s+exceptions?\b/i,
+];
+
 // ─── 距离窗（小样本锚点 × 总体性裁定）──────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -285,7 +340,7 @@ const CONCEPT_ZH = /(?:小数定律|大数定律|大数法则|中心极限|抽�
 const CONCEPT_EN = /\blaw of small numbers\b|\blaw of large numbers\b|\bcentral limit\b|\bsampling error\b|\bconfidence interval\b|\bstatistical(?:ly)? significan|\bsample size\b|\bsampling method\b|\bKahneman\b|\bTversky\b|\bsmall sample (?:problem|bias|fluctuation|issue|fallacy|phenomenon|trap)\b|\brepresentativen/i;
 
 // ─── 豁免：承认样本不足/主动扩大样本的正当做法 ──────────────────
-const CORRECTIVE_ZH = /(?:不足为凭|不足为证|远远不够|远远不足|样本量(?:要|需|得|应该|必须|得先|先|还是)?(?:太|更|扩|提|加|增|放大|扩大|加大|提高)|扩大样本|加大样本|增加样本|样本量扩大|先(?:小规模)?试点|试点(?:后|再|验证)|验证后(?:再|说|放量)|放量(?:前|之前)|完整统计|全面统计|几千次|更多数据|更多案例|更多样本|反复验证|多次验证|不能(?:只|仅)(?:凭|看|靠|拿)|不可(?:以偏概全|只凭|仅凭)|需要(?:更多|更大|更广|更全面)|先验证|谨|暂(?:时|且)(?:不|无法)下|证据还|数据还)/;
+const CORRECTIVE_ZH = /(?:不足为凭|不足为证|远远不够|远远不足|样本量(?:要|需|得|应该|必须|得先|先|还是)?(?:太|更|扩|提|加|增|放大|扩大|加大|提高)|样本(?:太|过|偏)?(?:少|小|窄|单薄|薄弱|有限)(?![^。，！？；\n]{0,4}(?:才|恰恰|反而|正是|最|反倒|注定))|扩大样本|加大样本|增加样本|样本量扩大|先(?:小规模)?试点|试点(?:后|再|验证)|验证后(?:再|说|放量)|放量(?:前|之前)|完整统计|全面统计|几千次|更多数据|更多案例|更多样本|反复验证|多次验证|不能(?:只|仅)(?:凭|看|靠|拿)|不可(?:以偏概全|只凭|仅凭)|需要(?:更多|更大|更广|更全面)|先验证|谨|暂(?:时|且)(?:不|无法)下|证据还|数据还|(?:全班|全部|所有|全员|逐一|逐个)(?:都)?(?:测过|测完|验证过|试过|确认过|调查过|回访过)|(?:测过|验证过|试过|确认过|调查过)(?:之后|以后|后)(?:才|再))/;
 const CORRECTIVE_EN = /\bnot enough\b|\bneed(?:s)? more\b|\blarger sample\b|\bbigger sample\b|\bincrease the sample\b|\bmore data\b|\bmore evidence\b|\bmore cases\b|\blarger sample size\b|\bpilot (?:before|first)\b|\bvalidate before\b|\bbefore scaling\b|\bnot conclusive\b|\binconclusive\b|\bcan'?t conclude\b|\bcannot conclude\b|\btoo small to\b|\bsample is too small\b|\bsmall sample size\b|\bnot representative\b|\bmore trials needed\b|\bnot enough data\b|\bnot enough evidence\b/i;
 
 // 工具 ─────────────────────────────────────────────────────────
@@ -351,6 +406,7 @@ function findSignatures(text, R) {
       exempt: R.EXEMPT_ZH || EXEMPT_ZH,
       universal: R.UNIVERSAL_ZH || UNIVERSAL_ZH,
       quant: R.QUANT_ZH || QUANT_ZH,
+      perpetual: R.PERPETUAL_ZH || PERPETUAL_ZH,
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
@@ -358,6 +414,7 @@ function findSignatures(text, R) {
       exempt: R.EXEMPT_EN || EXEMPT_EN,
       universal: R.UNIVERSAL_EN || UNIVERSAL_EN,
       quant: R.QUANT_EN || QUANT_EN,
+      perpetual: R.PERPETUAL_EN || PERPETUAL_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -394,6 +451,22 @@ function findSignatures(text, R) {
       });
       if (!q) continue;
       sigs.push({ lang: L.lang, kind: 'quant', small: s.raw, verdict: q.raw });
+    }
+    // 腿① × 腿④ 永续/全称限定（r303）近距共现——与腿②b/腿③平行路由：
+    //   小样本锚点近距推出一个无例外、无时间边界的永续结论（太阳永远从
+    //   东边升起 / 保证长命百岁 / all users pass）。QUANT 判「给总体参数
+    //   定一个数」，UNIVERSAL 判「定性裁定」，本腿判「把有限观测固化为
+    //   永续规律」——三者结论形态互不相同，是同一谬误的不同表述出口。
+    const perpM = collect(text, L.perpetual, true);
+    for (const s of smallM) {
+      const p = perpM.find(w => {
+        const d = dist(w, s);
+        if (d > L.win) return false;
+        if (d === 0 && w.idx === s.idx && w.end === s.end) return false; // 同一区间
+        return true;
+      });
+      if (!p) continue;
+      sigs.push({ lang: L.lang, kind: 'perpetual', small: s.raw, verdict: p.raw });
     }
   }
   return sigs;
@@ -435,22 +508,30 @@ function detectLawOfSmallNumbers(text, inject) {
         ? '样本量豁免主张「' + x.small + '」'
         : x.kind === 'quant'
         ? '小样本「' + x.small + '」× 数量化总体裁定「' + x.verdict + '」'
+        : x.kind === 'perpetual'
+        ? '小样本「' + x.small + '」× 永续全称结论「' + x.verdict + '」'
         : '小样本「' + x.small + '」× 总体裁定「' + x.verdict + '」')
       : (x.kind === 'exempt'
         ? 'sample-size exemption claim "' + x.small + '"'
         : x.kind === 'quant'
         ? 'small sample "' + x.small + '" x quantitative verdict "' + x.verdict + '"'
+        : x.kind === 'perpetual'
+        ? 'small sample "' + x.small + '" x perpetual verdict "' + x.verdict + '"'
         : 'small sample "' + x.small + '" x universal verdict "' + x.verdict + '"'))),
     details: s.lang === 'zh'
       ? '小数定律(' + sigs.length + '处: ' + (s.kind === 'exempt'
         ? '显式为小样本辩护「' + s.small + '」，主张样本越小越可靠/大样本不可信'
         : s.kind === 'quant'
         ? '拿极小样本「' + s.small + '」给总体参数定下数值结论「' + s.verdict + '」，把小样本的偶然频率/均值当成总体的真实概率或比率'
+        : s.kind === 'perpetual'
+        ? '拿极小样本「' + s.small + '」推出无例外、无时间边界的永续结论「' + s.verdict + '」，把有限观测固化成永久成立的规律'
         : '拿极小样本「' + s.small + '」给全体下结论「' + s.verdict + '」，把小样本的偶然波动当总体真实分布') + ')(zh)'
       : 'law of small numbers(' + sigs.length + 'x: ' + (s.kind === 'exempt'
         ? 'explicit small-sample defense "' + s.small + '" — smaller sample claimed more reliable'
         : s.kind === 'quant'
         ? 'tiny sample "' + s.small + '" pinned to a numeric population parameter "' + s.verdict + '" — a small-sample frequency/mean read as the true probability or rate'
+        : s.kind === 'perpetual'
+        ? 'tiny sample "' + s.small + '" frozen into a perpetual verdict "' + s.verdict + '" — finite observations read as a permanently valid law'
         : 'tiny sample "' + s.small + '" generalized to a universal verdict "' + s.verdict + '"') + ')(en)',
     guidance: '小数定律指人们系统性地高估小样本对总体的代表性，把小样本的偶然波动当成总体真实分布——抛了三次硬币都是正面，这枚硬币明显是偏的 / 这个村出了三个百岁老人，这里的水土就是养人 / 我问了五个人，四个说支持，民意已经很清楚了 / 试了几次都不行，这个方法肯定有问题 / 样本小才真实，大样本都是注水注出来的 / three coin flips came up heads so this coin is clearly biased / I asked five colleagues and all of them agreed so the whole office feels this way / small samples are the honest ones and big surveys are all rigged。请补上论证：样本量决定结论能走多远，小样本的波动幅度大，只能给假设不能给结论；要下总体性结论需要足够大的随机样本或引用已有大样本证据；如果只是初步观察，请明确说这是待验证的假设，并说明还需要多少数据。「样本小才真实、大样本都是注水」是更隐蔽的变体——为样本不足辩护只会堵死补数据的路。承认样本不足、扩大样本、参考大样本证据、讨论样本量与代表性本身，都是正当做法；若这段话只是转述他人的谬误案例或统计教学，核实其主张再决定是否采信。',
     tags: ['statistics', 'statistical-literacy', 'law-of-small-numbers', 'small-sample-fallacy', 'cognitive-bias', 'judgment-and-decision-making'],
@@ -464,6 +545,7 @@ module.exports = {
     EXEMPT_ZH, EXEMPT_EN,
     UNIVERSAL_ZH, UNIVERSAL_EN,
     QUANT_ZH, QUANT_EN,
+    PERPETUAL_ZH, PERPETUAL_EN,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,

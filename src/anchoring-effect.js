@@ -152,6 +152,12 @@ const ANCHOR_EN = [
   /\bsaid\s+[\w\s-]{0,24}first\b/i,                              // said ten thousand first
   /\bnamed\s+the\s+[\w\s-]{0,24}\b/i,                            // named the six-figure salary
   /\bstarted\s+(?:at|with)\s+[\w\s-]{0,20}\d/i,                  // started at 500
+  // [r309] listed it at 40k / priced at 5k：list/priced 动词形态——
+  // 原「list price」只收名词组合，漏「They listed it at forty thousand」
+  // 「It was priced at five thousand」式动词呈现（探针 C3/C6 双腿皆缺/腿①缺）
+  /\blisted\s+(?:it|them|the\s+\w+)?\s*(?:at|for)\s+[\w\s-]{0,20}\d/i, // listed it at 40 / listed for 12000
+  /\bpriced\s+(?:it\s+)?at\s+[\w\s-]{0,20}\d/i,                 // priced at five thousand
+  /\b(?:salary|pay|budget|floor)\s+(?:was\s+)?(?:set|fixed|placed)\s+at\s+[\w\s-]{0,20}\d/i, // salary floor was set at eighty
 ];
 
 // ─── 腿② ORBIT 围绕锚点族（中文；查否定前缀）───────────────────
@@ -209,6 +215,26 @@ const DOMINATED_EN = [
   // WORTH：估值即锚点
   /\b(?:is\s+)?worth\s+(?:about\s+)?(?:that|this)\s+(?:much|price|amount)\b/i, // worth that much
   /\bthat\s+is\s+what\s+it\s+is\s+worth\b/i,                     // that is what it is worth
+  // [r309] INDEP 独立估值缺位族（全新腿②措辞族）——存量 ORBIT/DEAL/WORTH
+  // 三族只收「围绕锚点转 / 觉得划算 / 就值这个价」式**支配表达**，漏
+  // 「without ever valuing it independently」「without checking
+  // comparable prices」「without reassessing the value」式**独立校准
+  // 缺位陈述**。r308 探针实测这族 7 条形态中 4 条 gate 层 pass 真穿透
+  // （C1/C2/C3/C7）、2 条被 perfect_error/normalization_of_deviance
+  // 代拦零归因（C4/C6）。语义同族：锚点在场 × 从未独立估值/比价/重估。
+  // 查否定前缀——「without 前有 not」式双重否定由 matchAlive 处理。
+  /\bwithout\s+(?:ever\s+)?(?:valuing|valuated|valuing\s+it)\b/i,          // without ever valuing it independently
+  /\bwithout\s+(?:ever\s+)?(?:independently\s+)?(?:valuing|checking|verifying|researching|comparing)\b/i, // without independently estimating / without checking comparable prices
+  /\bwithout\s+(?:ever\s+)?(?:checking|consulting|looking\s+at|reviewing)\s+(?:the\s+)?(?:comparable|comparables|market|comps|recent\s+sales|price\s+data)\b/i, // without checking comparable prices
+  /\bwithout\s+(?:ever\s+)?(?:reassessing|revaluating|reappraising|second-guessing)\b/i, // without reassessing the value ourselves
+  /\bwithout\s+(?:ever\s+)?(?:independently\s+)?(?:estimating|calculating|working\s+out|pinning\s+down)\b/i, // without independently estimating my market value
+  /\bnever\s+(?:even\s+)?(?:valued|estimated|checked|verified|reassessed|priced)\b/i,   // never valued it independently / never checked comparables
+  // never left the orbit of — 限定先行词为**锚点**（that/the opening/the asking/
+  // the sticker/the quoted/the first/his/their），不收「our own analysis」
+  // 式反锚定语境（r309 良性负例实测误伤）。
+  /\bnever\s+(?:left|leaves|leaving)\s+the\s+orbit\s+of\s+(?:that|this|those|these|the\s+(?:opening|asking|sticker|quoted|listed|posted|first|initial|original|anchor|list)|his|her|their|its)\b/i,
+  /\bstayed\s+inside\s+the\s+orbit\s+of\b/i,                               // 已在 ORBIT 族首行，此处为冗余保险（不改语义）
+  /\bnever\s+questioned\s+(?:whether|if)\s+it\s+was\s+worth\b/i,           // never questioned whether it was worth
 ];
 
 // ─── [r305] 腿① 元语言锚点命名（中文；全新句式族，查否定前缀）──────

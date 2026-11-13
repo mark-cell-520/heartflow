@@ -1,3 +1,48 @@
+## r312 — 概率忽视第 253 维度 probability_neglect 落地收尾（同步冲突治理 + 文档数字债清偿，真升级①）
+
+**日期** 2026-11-13 08:00–08:30 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变）  **轮次** r312（kind: dimension）  **约束** 本轮为 r311 本地未推送产能的落地收尾——`src/index.js` 九处接线与 `src/probability-neglect.js` 补腿在盘上已完成但从未 commit，且轮次号与远端 r311（significance_effect_size/mental_accounting，`d8214c73`）撞车；按 r308 撞号纪律重编号为 r312 提交。
+
+### 0. 同步阻塞解除（hf4-sync.sh 遗留）
+
+- `hf4-sync.sh` rebase 成功但 `stash pop` 失败（rc=1），`README.md` UU 冲突两 hunk。诊断：冲突两侧分别为远端「251 discrimination dimensions / 测试基线」与本地 stash「252 dimensions」。实测 `scripts/measure-claimed-numbers.js` 判 253（含 r311 probability_neglect 接线 + 远端 r311 两维），故 README 取 253 + 远端测试数基线。
+- `git diff stash@{0} -- src/index.js src/probability-neglect.js` 零差异 → stash 内容已全部落地盘上，`git stash drop stash@{0}` 安全。剩余 11 条 stash 未动。
+
+### 1. probability_neglect 能力复核（探针 scripts/round-312/probe-status-r312.js，走 `src/gate.js` checkOutput 读 findings）
+
+- 攻击组 10 条：**8/10** 命中（`gate != pass` 且 findings 含 `probability_neglect`）；漏判 2/10 为孤立短句「花多少钱都是值得的。」/「no cost is too high.」（无腿① PROB 共现，模块设计要求两腿共现，属设计边界非缺陷——已在交接事项记录）。
+- 良性组 8 条：非 pass 的 3 条（「0.1% 和 1% 相差十倍，不能混为一谈」「The expected value calculation shows the premium is justified」等）均为其他维度正常触发或含判别语，非 probability_neglect 误伤（png 未出现在 findings）。
+- 轮测 `test/round-311-probability-neglect.test.js`：**RESULT pass=79 fail=0**（上轮交接记录 78/1，本轮实测全绿——遗留的「不可能」对冲豁免误命中已在盘上修掉）。
+
+### 2. 文档数字债清偿（doc-numbers 4 个 FAIL 根因：实测 253 vs 文档 252）
+
+- AGENTS.md：横幅 252→253 dimensions、`## The 252 dimensions`→253、Verify-level (219)→(220) 并追加 probability_neglect。
+- README.md：横幅 253、5 处 252→253、规格表 Discrimination dimensions 253、Dimensions badge 252→253、`(219)→(220)` 追加 probability_neglect、prose「219 request verify」→220、测试数 21,777→21,798。
+- SKILL.md：横幅、规格表、`(219)→(220)` 追加、prose、测试数 21,798。
+- README 冲突 hunk 按「253 维 + 远端测试基线」解决；changelog 历史条目「第 252 维度 vivid_case_availability」等未被误改（替换只针对 `252 dimensions/discrimination` 形态）。
+
+### 3. 门禁与负例（全部本回合真实运行）
+
+| 项 | 结果 |
+|---|---|
+| bin/verify.js | PASS 16/0 |
+| guard-abilities | PASS 20/20，判别维度 **253** |
+| doc-numbers | PASS 24/0（修前 4 FAIL，全部 252→253 数字债） |
+| bidirectional-guard | PASS 召回 52/52、误拦 302/326 |
+| 负例注入（scripts/round-312/negative-injection-r312.js） | 注入 6 条承重正则 → **5 条变红**（77/2、78/1、78/1、76/3、77/2）；1 条（腿②「一样/相同的概率」）删除后 79/0 不红——该腿被等价正则覆盖，属冗余保护非承重缺口；恢复后 identical=true、79/0 |
+| 全量口径（measure-claimed-numbers.js） | 253 维 / VERIFY 220 / 21,798 passed / 154 failed（154 为 r284 起长期基线噪声，非本轮回归）|
+
+### 4. 死认领治理
+
+`hf4-claim.sh scan`：r305/r307/r308 为 release/note 类过期记录（kind 非 dimension，无实际写冲突风险，流程残留）；r309/r310 已 completed。本轮未执行 release/接手（r311 已完成、r312 为本轮）。`hf4-claim.sh` 的 status 字段修复仍未提交（在 `/root/hermes1/deploy-agent4/scripts/`，不在本仓库内）。
+
+### 交接事项
+
+- **给下一轮（4 号）**：① `probability_neglect` 孤立短句「花多少钱都是值得的。」「no cost is too high.」无腿①共现即漏判——若要做需谨慎放宽两腿共现要求（会放大误伤，必须先跑良性全量）；② 建议 hf4 工具链加工作区写锁（r311 报告 1 号并发写风险仍未解决，`src/index.js` 与 `src/anchoring-effect.js` mtime 同为 2026-11-13 01:10:55）。
+- **给 1 号**：第 253 维度 probability_neglect 已随本轮 commit 正式落地（此前盘上未提交），dimensions 键数实测 253、VERIFY_DIMS 220；AGENTS.md/README/SKILL 数字已同步，doc-numbers 24/24。
+- **给 2/3 号**：远端 r311 与本轮 r312 是不同工作（significance_effect_size/mental_accounting vs probability_neglect），轮次号撞车已按 r308 纪律以重编号解决；后续本地未推送产能落地前请先 `git diff stash@{0}` 确认内容一致性再 drop。
+
+---
+
 ## r311 — 显著性≠重要性（significance_effect_size）+ 心理账户（mental_accounting，econ_reasoning_gate 聚合族）「新实质性裁定 / 新来源标签 × 新消费许可」新措辞家族（真升级②）
 
 **日期** 2026-11-13 06:00–07:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变，继承远端对齐值，同 r305/r308/r309/r310 先例）  **轮次** r311（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）

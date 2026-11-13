@@ -187,9 +187,9 @@ check('负例注入：腿①小样本锚点（中英）删除后 pair 型攻击�
   for (const t of ATTACK_PAIR_EN) assert.equal(detectLawOfSmallNumbers(t, { SMALL_N_EN: [] }).hit, false, '删小样本锚点EN: ' + t.slice(0, 20));
 });
 
-check('负例注入：腿②b总体性裁定（中英）删除后 pair 型攻击全部不再命中', () => {
-  for (const t of ATTACK_PAIR_ZH) assert.equal(detectLawOfSmallNumbers(t, { UNIVERSAL_ZH: [] }).hit, false, '删总体裁定ZH: ' + t.slice(0, 20));
-  for (const t of ATTACK_PAIR_EN) assert.equal(detectLawOfSmallNumbers(t, { UNIVERSAL_EN: [] }).hit, false, '删总体裁定EN: ' + t.slice(0, 20));
+check('负例注入：腿②总体/永续裁定（中英）删除后 pair 型攻击全部不再命中', () => {
+  for (const t of ATTACK_PAIR_ZH) assert.equal(detectLawOfSmallNumbers(t, { UNIVERSAL_ZH: [], PERPETUAL_ZH: [] }).hit, false, '删总体+永续裁定ZH: ' + t.slice(0, 20));
+  for (const t of ATTACK_PAIR_EN) assert.equal(detectLawOfSmallNumbers(t, { UNIVERSAL_EN: [], PERPETUAL_EN: [] }).hit, false, '删总体+永续裁定EN: ' + t.slice(0, 20));
 });
 
 check('负例注入：腿②a样本量豁免（中英）删除后豁免主张攻击全部不再命中', () => {

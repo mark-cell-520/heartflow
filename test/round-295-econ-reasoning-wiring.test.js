@@ -258,6 +258,11 @@ console.log('=== F 引擎 think 路径真 dispatch ===');
 
   const env = { ...process.env, MCP_HEARTFLOW_KEY: TOKEN, HF_KEEP_STDOUT_LOGS: '1' };
   delete env.NODE_ENV;
+  // [2026-11-12 审计修复] 隔离父进程 token（同 r296 修复）：MCP_HEARTFLOW_KEY
+  // 优先级低于 HEARTFLOW_MCP_TOKEN / MCP_HEARTFLOW_API_KEY，父 shell 设了后
+  // spawn server 用父 token，本测试 Bearer <random> 全 401。
+  delete env.HEARTFLOW_MCP_TOKEN;
+  delete env.MCP_HEARTFLOW_API_KEY;
   const child = spawn(process.execPath, [path.join(ROOT, 'src/mcp-server.js'), '--port', String(PORT)], {
     cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -310,9 +315,15 @@ console.log('=== F 引擎 think 路径真 dispatch ===');
     const { discriminate } = require(path.join(ROOT, 'src/index.js'));
     const d = discriminate('neutral baseline text');
     const n = Object.keys(d.dimensions || {}).length;
-    assert.strictEqual(n, 246, `维度数 ${n} ≠ 246`);
+    // [2026-11-12 审计修复] 原断言 strictEqual(n, 246) 写死 r295 锚点，r297 起
+    // ad_hominem 等族进 gate 维度表、r305→r307 又 +3（实测 251），连红 6 轮非
+    // 真实回归。改为「≥246 下限保持」+ 上限交 measure 门禁把关。
+    assert.ok(n >= 246, `维度数 ${n} < 246（r295 接线基线倒退）`);
     // 本轮 18 族键不得出现在 gate 维度表（gate 层零接线，交接项给 1 号）
-    const econKeys = Object.keys(d.dimensions || {}).filter(k => /anchoring|endowment|disposition|mental_accounting|perverse|winners_curse|tragedy|illusion_of_control|present_bias|peak_end|effort_justification|budget_value|average_marginal|p_hacking|inverse_gamblers|significance_effect|selection_on_dependent|ad_hominem/.test(k));
+    // [2026-11-12 审计修复] 排除 ad_hominem：r297 已正式把它接入 gate 维度表
+    // （第203维，UPGRADE_LOG r297），属后续轮次的有意接线而非本断言要防的
+    // 「意外接入」。其余 17 族仍须保持零接线。
+    const econKeys = Object.keys(d.dimensions || {}).filter(k => /anchoring|endowment|disposition|mental_accounting|perverse|winners_curse|tragedy|illusion_of_control|present_bias|peak_end|effort_justification|budget_value|average_marginal|p_hacking|inverse_gamblers|significance_effect|selection_on_dependent/.test(k));
     assert.strictEqual(econKeys.length, 0, `gate 维度表出现本轮族键: ${econKeys.join(',')}`);
   });
   T('H2 analyze 对同一输入确定性（无随机/无状态泄漏）', () => {
