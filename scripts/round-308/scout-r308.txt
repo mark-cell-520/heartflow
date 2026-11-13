@@ -1,0 +1,14 @@
+# r308 外部搜索记录（2026-11-13）
+S1 HN Algolia "argument mapping reasoning fallacy" -> 空
+S1 HN Algolia "reasoning verification" -> 60 hits, 全无关（量子/硬件安全/AgentThreads）
+S1 HN Algolia "self-correction LLM" -> 仅 1 条 yubblegum 自述帖，无可用
+S2 Semantic Scholar "logical fallacy detection" -> 空
+S2 Semantic Scholar "uncertainty quantification" -> HTTP 429
+S3 GitHub "fallacy detection rules" -> 0/0 星（debate-analysis-summary / mediasanitar）
+S3 GitHub "causal inference fallacy" -> 0 星 joshinh/causal-fallacies
+S3 GitHub "hallucination detection" -> 1217 cvs-health/uqlm / 1140 EdinburghNLP/awesome-hallucination-detection / 635 potsawee/selfcheckgpt —— 全为 LLM 依赖方案，心虫纯规则引擎不引入 LLM 依赖，不适用
+S3 GitHub "symbolic reasoning rules engine" -> 最高 7 星 Aryia-Behroziuan/History（知识表示历史数据集）
+S3 GitHub "critical thinking fallacy rules engine" -> 空
+S3 GitHub "goal drift agent monitoring" -> 0/0 星
+结论：外部无可用来源（贴合纯规则引擎、且心虫尚未覆盖的能力缺口）。
+转阶段2b 内部路径：find src/core 最小模块，找存根/已加载未 dispatch/骨架代码。
