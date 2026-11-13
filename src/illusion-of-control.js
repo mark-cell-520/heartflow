@@ -228,6 +228,64 @@ const C_EN = [
   /\b(?:increase|improve|raise|boost)s?\s+(?:your|his|her|their)\s+chance\s+of\b/i,
 ];
 
+// ─── [r315] 体育赛事幸运仪式族（竞技/观赛迷信新措辞家族）────────────
+// 零命中探针 scripts/round-315/probe-candidates.js：存量腿对
+// 「幸运球衣/老位置/赛前摸队徽 × 胜率更高/左右比赛/带来好运」9/10
+// 全穿透（余 1 条已被存量 ①-b×②-f×③-a 覆盖，转回归样本），良性
+// 10/10 零误伤。平行常量 + concat 合并不动存量腿。
+// 腿①赛事锚点（中文）——比赛/球队等概率性竞技结果
+const A_ZH3 = [
+  // ①-c1 赛事名词
+  /(?:比赛|球赛|赛事|决赛|半决赛|联赛|赛季|世界杯|欧冠|奥运|亚运|全运)/,
+  // ①-c2 参赛主体/进程
+  /(?:夺冠|冠军|赢球|球队|主队|客场|主场|赛程|赛果|球员|队友|场上|赛前)/,
+];
+
+// 腿①赛事锚点（英文）
+const A_EN3 = [
+  /\b(?:game|games|match|matches|fixture|final|finals|tournament|league|playoffs?|world\s+cup|season|title\s+race)\b/i,
+  /\b(?:team|squad|club|derby)\b/i,
+];
+
+// 腿②观赛幸运仪式/固定动作（中文）
+const B_ZH3 = [
+  // ②-h1 幸运球衣物件族（含幸运色/旧球衣/不离身）
+  /(?:幸运球衣|幸运战袍|幸运队服|幸运T恤|幸运围巾|幸运手绳|幸运手环|幸运色|战袍|那件旧球衣|旧队服|不离身的?(?:球衣|队服))/,
+  // ②-h2 仪式/固定座位族（老位置/同一个位置/每次比赛都穿）
+  /(?:助威仪式|观赛仪式|看球仪式|赛前仪式|固定座位|老位置|同一个位置|同一位置|比赛日(?:固定|专属)|每次(?:比赛|球赛|决赛)[^。，！？；\n]{0,8}(?:都)?(?:穿|坐|带|戴))/,
+  // ②-h3 赛前触碰队徽族
+  /(?:摸(?:了|一下)?队徽|亲吻队徽|赛前摸|进场前摸)/,
+];
+
+// 腿②观赛幸运仪式/固定动作（英文）
+const B_EN3 = [
+  /\blucky\s+(?:jersey|shirt|socks?|scarf|hat|seat|mug|coin|pen|boxers?|underwear)\b/i,
+  /\b(?:same|identical)\s+(?:lucky\s+)?(?:jersey|shirt|seat|spot|mug|routine|ritual)\b/i,
+  /\b(?:game[- ]day|pre[- ]?match|pre[- ]?game)\s+(?:ritual|routine|superstition)|\bsuperstitious\s+(?:ritual|routine|habit)\b/i,
+  /\b(?:touch(?:es|ed|ing)?|kiss(?:es|ed|ing)?)\s+the\s+(?:club\s+)?crest\b/i,
+];
+
+// 腿③赛事结果影响/概率断言（中文）
+const C_ZH3 = [
+  // ③-i1 胜率/赢面族
+  /(?:胜率|赢面|夺冠概率|获胜概率|赢球的?几率)(?:会|就|更|往往|通常|自然)?(?:高|大|好)(?:一些|一点|不少|得多|很多)?/,
+  // ③-i2 提升动词×胜率（提高球队的胜率）
+  /(?:提高|提升|增加|拉高|抬高)(?:了)?(?:球队|主队|全队|咱们队|我队|夺冠|获胜|赢球)?的?(?:胜率|赢面|机会|概率)/,
+  // ③-i3 影响动词×赛事结果（左右这场比赛）
+  /(?:影响|左右|决定|带动|感染)(?:到)?[^。，！？；\n]{0,8}(?:比赛|赛果|胜负|赢球|夺冠|冠军|发挥|状态)/,
+  // ③-i4 带来好运族
+  /(?:带来|招来|引来|攒下|攒够)(?:了)?(?:好运|手气|运势|胜利|运气)/,
+];
+
+// 腿③赛事结果影响/概率断言（英文）
+const C_EN3 = [
+  /\bmore\s+likely\s+to\s+(?:win|roll|draw|get|land|hit|come\s+up|take\s+the\s+title|win\s+it\s+all)\b/i,
+  /\b(?:helps?|helped)\s+(?:you\s+|them\s+|us\s+|the\s+team\s+|his\s+|her\s+|the\s+side\s+)?win\b/i,
+  /\b(?:affects?|affected|influences?|influenced|sways?|decides?|decided)\s+(?:the\s+)?(?:game|match|outcome|result|final)\b/i,
+  /\b(?:brings?|brought|attracts?|attracted)\s+(?:us\s+|the\s+team\s+|me\s+)?(?:good\s+)?(?:luck|fortune)\b/i,
+  /\b(?:improves?|improved|raises?|raised|boosts?|boosted|increases?|increased)\s+(?:the\s+)?(?:team'?s?|our|their)\s+(?:odds|chances)\b/i,
+];
+
 // 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内，腿②控制行为是桥）
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -313,6 +371,15 @@ function findSignatures(text, R) {
       a: R.A_EN || A_EN, b: R.B_EN || B_EN, c: R.C_EN || C_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r315] 体育赛事幸运仪式族（新措辞家族，独立链）
+    {
+      a: R.A_ZH3 || A_ZH3, b: R.B_ZH3 || B_ZH3, c: R.C_ZH3 || C_ZH3,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      a: R.A_EN3 || A_EN3, b: R.B_EN3 || B_EN3, c: R.C_EN3 || C_EN3,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { a, b, c, win, lang } of langs) {
     const am = collect(text, a, true);
@@ -376,6 +443,7 @@ module.exports = {
   detectIllusionOfControl,
   __internals: () => ({
     A_ZH, A_EN, B_ZH, B_EN, C_ZH, C_EN,
+    A_ZH3, A_EN3, B_ZH3, B_EN3, C_ZH3, C_EN3,
     CONCEPT_ZH, CONCEPT_EN,
     PAIR_ZH, PAIR_EN,
   }),

@@ -236,6 +236,66 @@ const C_EN = [
   /\bit\s+(?:makes|made)\s+sense\s+for\s+(?:each|every)\b/i,
 ];
 
+// ─── [r315] 数字公地/免费额度族（现代共享资源新措辞家族）────────────
+// 零命中探针 scripts/round-315/probe-candidates.js：存量腿对
+// 「免费额度/公共WiFi/开源镜像/共享充电桩 × 多抢多薅多蹭批量抓取 ×
+// 不抢白不抢/抢到就是赚到/手快有手慢无」8/8 全穿透，良性 10/10
+// 零误伤。平行常量 + concat 合并不动存量腿。
+// 腿①数字/现代共享资源锚点（中文）
+const A_ZH3 = [
+  // ①-f1 显式数字公族复合词
+  /(?:数字公地|网络公地|信息公地|数据公地|公共数据|公共平台|开源社区|共享经济|免费额度|限免额度|公益额度|公共带宽|公共算力|免费接口|公共接口|公共充电桩|免费停车场|公共停车场)/,
+  // ①-f2 修饰语×数字资源（免费额度/开源镜像/共享充电桩；API/WiFi 大小写不敏感——
+  // gate 路径的 _normText 会把 ASCII 小写化，缺 i 标志会漏「免费API」形）
+  /(?:免费|限免|公益|开放|公共|共享|开源|白给)[^。，！？；\n]{0,8}(?:额度|流量|宽带|网速|算力|接口|API|镜像|数据库|网盘|充电桩|WiFi|wifi|无线网|车位|名额|带宽)/i,
+  // ①-f3 数字资源×归属/供应形（额度每月清零前不限量/带宽是共享的）
+  /(?:额度|流量|宽带|算力|接口|镜像|网盘|数据库|充电桩)[^。，！？；\n]{0,6}(?:是|属于|归)?(?:免费|白给|白拿|不要钱|大家共用|共享|公共|开放|人人|谁都可以|不限量|无限量|管够|管饱)/,
+  // ①-f4 赠送来源族（每月赠送的免费流量/注册送的额度）
+  /(?:每月|每天|每周|会员|注册|签到|邀请|新用户)(?:赠送|送|赠|领|可得|白给)(?:的)?[^。，！？；\n]{0,4}(?:额度|流量|时长|积分|券)/,
+];
+
+// 腿①数字/现代共享资源锚点（英文）
+const A_EN3 = [
+  /\b(?:digital\s+commons|data\s+commons|information\s+commons|public\s+data|open[- ]source\s+community|shared\s+economy|free\s+(?:tier|allowance|quota|credits?|API|Wi-?Fi|parking|charging))\b/i,
+  /\b(?:free|public|shared|open|unlimited)\b[^.]{0,30}\b(?:allowance|quota|credits?|bandwidth|API|endpoint|mirror|database|storage|compute|Wi-?Fi|parking|charging|tier)\b/i,
+  /\b(?:allowance|quota|credits?|data|minutes|bandwidth)\b[^.]{0,30}\b(?:expires?|expired|roll\s+over|use\s+it\s+or\s+lose\s+it)\b/i,
+];
+
+// 腿②数字过度取用行为（中文）
+const B_ZH3 = [
+  // ②-g1 多用数字动词（多下/多抢/多刷/多蹭/多领/多囤/多薅/多占/多分）
+  /多(?:下|抢|刷|蹭|领|囤|薅|注册|申请|爬|抓|调用|瓜分|占|分)(?!人)/,
+  // ②-g2 薅羊毛/脚本族（含秒杀/抢券/批量注册/爬虫/黄牛；薅X羊毛允许间隔≤3字）
+  /(?:薅羊毛|薅[^。，！？；\n]{0,3}羊毛|抢券|秒杀|脚本抢|脚本刷|脚本党|机器人(?:抢|刷|薅|注册)|批量(?:注册|申请|领取|抢|爬|调用|薅|抓取)|外挂(?:抢|刷|薅)|黄牛|刷单|刷量|爬虫|抓取)/,
+  // ②-g3 尽力取用族（拼命抢/想方设法薅/轮着请求）
+  /(?:拼命|想方设法|变着法|使劲|全力|轮着)(?:地)?(?:抢|薅|囤|刷|蹭|领|申请|请求|调用|占)/,
+];
+
+// 腿②数字过度取用行为（英文）
+const B_EN3 = [
+  /\b(?:each|every|all|everyone|everybody)\s+(?:\w+\s+){0,4}(?:downloads?|downloaded|scrapes?|calls?|requests?|hoards?|stockpiles?|grabs?|grabbed|takes?|took|uses?|used|draws?|drew)\s+(?:as\s+)?(?:much|many)\b/i,
+  /\b(?:bot|bots|script|scripts|scraper|scrapers|macro)\s+(?:sweep|sweeps|swept|grab|grabs|grabbed|clean|cleans|cleaned|drain|drains|drained)\b/i,
+  /\b(?:stock|stocks|stocked|bulk|batch)\s+up\s+on\b/i,
+];
+
+// 腿③数字公地合理化断言（中文）
+const C_ZH3 = [
+  // ③-d1 不X白不X族（含存量动词的复刻，独立链需要自足）
+  /(?:不蹭白不蹭|不领白不领|不抢白不抢|不薅白不薅|不囤白不囤|不刷白不刷|不下载白不下载|不用白不用|不占白不占)/,
+  // ③-d2 抢到赚到/手快族
+  /(?:抢到就是赚到|薅到就是赚到|手快有|先到先得|能薅一毛是一毛|薅一分是一分)/,
+  // ③-d3 清零作废族（月底清零/过期作废/不用作废）
+  /(?:月底清零|过期作废|额度清零|清零作废|不用作废|到期作废|免费不用)/,
+];
+
+// 腿③数字公地合理化断言（英文）
+const C_EN3 = [
+  /\bmight\s+as\s+well\s+(?:stock|grab|take|hoard)\s+up\b/i,
+  /\bif\s+it(?:'?s|\s+is)?\s+free\s*,?\s+(?:so\s+)?(?:take|grab|use)\s+(?:as\s+much\s+)?(?:as\s+you\s+can|all\s+you\s+can|all\s+of\s+it)\b/i,
+  /\b(?:grab|take|get)\s+it\s+before\s+(?:it(?:'?s|\s+is)?\s+)?gone\b/i,
+  /\bfirst\s+come\s*,?\s+first\s+served\b/i,
+];
+
 // 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内）
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -323,6 +383,15 @@ function findSignatures(text, R) {
       a: R.A_EN || A_EN, b: R.B_EN || B_EN, c: R.C_EN || C_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r315] 数字公地/免费额度族（新措辞家族，独立链）
+    {
+      a: R.A_ZH3 || A_ZH3, b: R.B_ZH3 || B_ZH3, c: R.C_ZH3 || C_ZH3,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      a: R.A_EN3 || A_EN3, b: R.B_EN3 || B_EN3, c: R.C_EN3 || C_EN3,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { a, b, c, win, lang } of langs) {
     const am = collect(text, a, true);
@@ -386,6 +455,7 @@ module.exports = {
   detectTragedyOfCommons,
   __internals: () => ({
     A_ZH, A_EN, B_ZH, B_EN, C_ZH, C_EN,
+    A_ZH3, A_EN3, B_ZH3, B_EN3, C_ZH3, C_EN3,
     CONCEPT_ZH, CONCEPT_EN,
     PAIR_ZH, PAIR_EN,
   }),
