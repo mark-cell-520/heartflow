@@ -221,9 +221,10 @@ const SIGNIF_ZH = [
 // 保证「活动圆满成功」类单一陈述不命中。
 const SIGNIF_ZH3 = [
   /成功/,
-  /符合预期/, /达到预期/, /超出预期/,
-  /如愿/, /达到预设/, /达成预设/,
-  /跑通/, /跑出来了/,
+  /(?:符合|达到|超出)预期/,
+  /如愿/,
+  /(?:达到|达成)预设/,
+  /跑通|跑出来了/,
 ];
 
 // ─── 腿② 只报告赢家（英文挑选标记）────────────────────────────────
@@ -262,13 +263,12 @@ const SIGNIF_EN = [
 ];
 
 // ─── [r317] 腿② 新显著性标记族（英文，平行常量，存量注入语义不变）────
-// 存量 SIGNIF_EN 不收「winning / positive results / came out
-// significant」式结果标记——「only the winning segment was written
-// up」式穿透（r317 探针 D4）。
+// 存量 SIGNIF_EN 不收「winning / positive results / succeeded」式结果
+// 达标标记——「only the winning segment was written up」「only reported
+// the positive results」式穿透（r317 探针 D4/D1-EN）。
 const SIGNIF_EN3 = [
   /\bwinning\b/i,
   /\bpositive (?:results?|findings?|outcomes?)\b/i,
-  /\bcame out (?:significant|positive|on top)\b/i,
   /\bsucceeded\b/i,
 ];
 

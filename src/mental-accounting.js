@@ -264,7 +264,6 @@ const SOURCE_EN3 = [
   /\binterest (?:income|payments?)\b/i,
   /\binvestment (?:income|returns?)\b/i,
   /\bside (?:income|money|hustle|gig)\b/i,
-  /\bextra (?:cash|income|money)\b/i,
 ];
 
 // ─── [r317] 腿②-A 新消费许可族（英文，平行常量）────────────────────
