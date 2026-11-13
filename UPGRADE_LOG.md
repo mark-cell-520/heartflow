@@ -1,3 +1,35 @@
+## r317 — 心理账户（mental_accounting）+ 努力正当化（effort_justification）+ p_hacking（p_hacking，econ_reasoning_gate 聚合族）「日常进项标签 × 工艺性投入 × 选择性报告」新措辞家族（真升级②）
+
+**日期** 2026-11-13 18:00–19:25 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r316 先例）  **轮次** r317（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "anchoring effect effort justification p-hacking cognitive bias" → arXiv/GitHub/S2 三源各返结果（coordination/agent4/scout/20261113-100120），四候选中择优落地三族
+
+### 缺口实证（scripts/round-317/probe-candidates.js，动手前 pristine 基座）
+
+- **mental_accounting**：存量 来源标签×消费许可 双腿族（含 r311 补充族）不收「闲钱/零花钱/私房钱/副业收入/分红/利息/理财收益/房租收入」这类**非薪资日常口语进项标签**，SPEND 不收「不碍事/无伤大雅/没什么大不了/不影响生活质量」轻放任族与 EN「spend it however I like」式任意处置许可。13 条候选 **12 条穿透本模块**（余 1 条「股票分红等于白给的×奢侈一把」已被存量 ①-i×②-k 代拦）；其中 7 条 ZH 连 gate 层也 pass，4 条 EN 被 fallacy_of_relevance/perfect_error 旁路代拦。
+- **effort_justification**：存量 EFFORT 只收「熬/爆肝/投入…精力/呕心沥血」族（①-b 要求资源名词在场），不收**工艺动词 + 时长**（打磨/雕琢/推敲/死磕/迭代/修改 × 半年/三个月/几十遍）与「逐字逐句/精雕细琢/苦心经营/一遍又一遍」强努力标记；QUALITY 不收「成品/作品 × 肯定不会差」形。9 条候选 **0/9 穿透本模块**（5/9 连 gate 层也 pass，余 4 条被 fallacy_of_relevance/completion_evidence/capability_overclaim/no_fallback 旁路代拦）。
+- **p_hacking**：存量 WINNER 只收「终于/其中一种/挑出」式偶然性标记，不收**选择性报告动作本身**（只报告/只汇报/只写进/其余略过，EN only reported / only the winning / the rest were omitted）；SEARCH_ZH 量化词不收中文数字（三十次）与「很多组」，SEARCH_EN 名词表不收 slices/buckets/windows/variants 与 ran N trials；SIGNIF 不收「成功/符合预期/winning/positive results」达标标记。5 条候选 **3/5 连 gate 层 pass**（余 2 条由 researcher_degrees_of_freedom 第 213 维代拦——该维度管「分析流程被结果反向决定」，本族管「大量尝试×选择性报告」，两者共存不互斥）。
+- 第四候选 anchoring_effect「默认值/预设值/模板默认」新锚点域：探针 C 族 4/6 穿透（1/6 模块命中），**本轮未落地，留作后续轮缺口**（如实记录）。
+- 官方良性语料 378 条（去重 369）改前三模块均零误命中；三模块本轮新增良性 20 条亦零误命中。
+
+### 改了什么（三个 src 模块均为平行常量 + findSignatures concat 合并，0 删除存量逻辑）
+
+- **src/mental-accounting.js**（r311 平行常量范式续用）：SOURCE_ZH3（闲钱/零用钱、零花钱、私房钱、副业/兼职收入、股票分红、利息、理财/基金投资收益、房租/租金八元素）、SPEND_ZH3（不碍事/不妨事、无伤大雅、没什么大不了、不影响生活质量、添预算五元素）、SOURCE_EN3（stipend/pocket money/petty cash/allowance/dividends/passive income/rental income/interest income/investment returns/side income 十元素——「extra cash/income/money」元素经查与存量 ①-g `(?:found|free|easy|bonus|extra|gift|surplus|windfall)\s+(?:money|cash|income|funds?)` 完全重合，落地时删除免冗余）、SPEND_EN3（spend it however/as、any way I like/please、no strings 三元素）；findSignatures 四条常量 concat 追加新族，存量四组与 r311 两组注入语义不变。
+- **src/effort-justification.js**：EFFORT_ZH2（工艺动词+时长、强努力标记、反复/一遍又一遍+修改打磨推敲三元素）、EFFORT_EN2（polished/labored/refined…for weeks、labored over、over every detail、countless revisions 四元素）、QUALITY_ZH2（成品/作品/设计×肯定不会差、肯定会差两元素）；findSignatures concat 追加。**落地期修正**：① ①-f 时长模式原要求量词后跟单位，漏「半年/半个月」自带单位形，改为时长词自带单位表（半年/三个月/数周/几遍/很久/这么久）；② ①-h「反复推敲」完成态要求（过/了）——存量边界测试 OVERDIST 样本中段有「反复推敲、精益求精」过程描述，不带完成态则默认窗误命中，收紧后存量 11/11 复绿，攻击样本「反复推敲过」不受影响。
+- **src/p-hacking.js**：SEARCH_ZH2（动词+中文数字+量词、动词+很多/好些+量词两元素）、SEARCH_EN3（out of [a/an/the] N slices/buckets/windows/variants、N slices tested、ran N trials 三元素）、WINNER_ZH3（只+报告类动词、唯独/仅仅+选取、其余略过、略过其余四元素）、WINNER_EN3（only reported、only the winning、the rest were omitted、omitted the rest 四元素）、SIGNIF_ZH3（成功、符合/达到/超出预期、如愿、达到预设、跑通五元素）、SIGNIF_EN3（winning、positive results、succeeded 三元素——「came out significant」经查与存量 `\bsignifican\w+` 重合，落地时删除免冗余）；findSignatures 六条 concat 追加。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-317-money-label-craft-effort-selective-report.test.js` | **84 通过 / 0 失败**（A gate 归因 1 + B 模块直调 3 + C 良性 2 + D 存量回归 3 + E 常量级注入 13 + F 元素级注入 44 + G 入口双路 1 + H 登记纪律 5） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24/0 PASS**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致） |
+| 良性语料 | 官方 369 条（去重）三模块零误命中 + 本轮新增 20 条零误命中 |
+| 存量复跑 | mental-accounting 12/12、effort-justification 11/11、p-hacking 11/11、winners-curse 11/11、disposition-effect 12/12、illusion-of-control 11/11、tragedy-of-commons 11/11、incentive-blind-spot 12/12、perverse-incentive 11/11、money-illusion 19/19、round-284 zero-sum 23/23、round-295 econ 接线 63/63、round-296 incentive 26/26、round-299 47/47、round-301 30/30 |
+| 负例 | 注入 57 个（13 常量级 + 44 元素级）→ **57 个按设计变红，0 个未变红** |
+| gate 归因 | 27 条攻击全部 action != pass 且 econ_reasoning_gate 承重 |
+
 ## r316 — 赢家诅咒（winners_curse）+ 处置效应（disposition_effect，econ_reasoning_gate 聚合族）「抢地/牌照/打新/评标竞价胜利 × 回本即退/翻红就抛/亏损死扛 slang」新措辞家族（真升级②）
 
 **日期** 2026-11-13 16:35–17:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r315 先例）  **轮次** r316（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）
