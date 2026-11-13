@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-254-blueviolet.svg)](#what-it-catches-254-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-255-blueviolet.svg)](#what-it-catches-255-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-254 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
+255 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
 ×  1,341 dispatch routes  ×  15,934 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 254 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 255 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (254 dimensions) -> gate
+scope-check -> premise-check -> discriminate (255 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (254 dimensions)
+## What it catches (255 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **221 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **222 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.181**. Not marketing copy.
+Measured on this repository at **v6.8.182**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 164 |
 | Module init errors | 0 |
 | Dispatch routes | 1,341 |
-| Discrimination dimensions | 254 |
+| Discrimination dimensions | 255 |
 | MCP tools | 190 |
 | Test suite | 15,934 passing / 155 failing | `node test/run-all.js` (full run 2026-11-13 ~719s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293；r301 接续 r300 基线（21,483/145/21,628），唯一 +22 即本轮新测试 round-301-law-of-averages.test.js（gamblers_fallacy 第148维『长期平均论证短期补偿/连发形追投』新措辞家族，22 断言单独 mount 实测 22/22 全过、池中自报同格式可解析），失败数 145 逐条持平；r302 接续 r301 基线（21,505/145/21,650），唯一 +12 即 round-302-law-of-small-numbers-quant.test.js（law_of_small_numbers 第239维『小样本→数量化总体裁定（概率/比率/均值）』新措辞家族，12 断言单独 mount 12/12 全过、池中自报同格式可解析），失败数 145 逐条持平；r303 接续 r302 基线（21,517/145/21,662），唯一 +31 即 round-303-average-marginal-rate.test.js（31 断言单独 mount 31/31）；r304 接续 r303 基线（21,548/145/21,693），唯一 +29 即 round-304-weak-evidence-ai-source.test.js（29 断言单独 mount 29/29）；r305–r308：r305 轮测 round-305-meta-anchor-legs 29/29 + negative-injection 通过 + noncultivation-r305 21/21（远端轮次，本机复测）；r306（dose_response_linearity 第250维，远端轮次）无专属轮测入库；r307 轮测 round-307-evidence-claim-mismatch 本机复测 44 通过/4 失败（4 条 ALL EXEMPT 注入断言属远端轮次自身形态，计入基线噪声）；r308 唯一 +75 即 round-308-sorites-goal-dismissal.test.js 单独 mount 75/75 全过；r309（selection_on_dependent_variable 第249维 econ_reasoning_gate 聚合族『按结果选样本』新措辞家族，4 号本轮）唯一 +15 即 round-309-selection-on-outcome-groups.test.js 单独 mount 15/15 全过、全量池中通过；r314 接续 r313 基线（远端 254 维/v6.8.179）：落地 present_bias/endowment_effect 新措辞家族轮测 round-314-procrastination-inflate-legs.test.js（263 断言，单独 mount 263/263、全量池中通过），并修复 r309/r310/r311 三个既有轮测被远端 6.8.179/254 维同步打红的 5 条 VERSION/维度数硬编码断言（r284 先例，修复前后全量失败清单逐条 diff 恰为这 5 条、单独 mount 复测 15/15、18/18、21/21）；r322 rebase 轮（本机）：本地 r322 成果 rebase 到远端 r321 之上后重跑 doc-numbers 门禁——本机 `data/test-count.json` 实测 passed 15934/failed 155（远端全量测量 22,003 为远端机器环境口径，两机测试池解析口径不同，门禁以本机 data/test-count.json 为唯一真源），故本机文档口径以 15,934 对齐，与远端 22,003 的差异是环境口径差而非回退） |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.182 | 2026-11-14 | r324：**red_herring 第 255 维度（转移话题/偷换论题）补腿 + 接线固化**（真升级②）——`src/red-herring.js` 八处补腿：dismiss 搁置表补 `先别提/先不谈/先放一放`；counter 他者对照反问表补 5 条（EN `but what about` / `have you considered` / `why criticize … when`，ZH `可隔壁/人家/同行/其他团队` + `不也/不一样…吗` 反问）；redirect 族腿③反问特征视为回应义务锚点；counter #62 `不也…吗` 正则锚定分句边界（修贪婪回溯吞整句假阴性）；after 型硬条件 `if (!replaceText) return result;`；`先放着` 改 before 型并删除数组前部同 index 的 after 型；AGENDA 豁免补「我们先看看…的数据」；指代型原议题通道（`这些问题先放着` 全停用词假阴性修复）。`src/index.js` 维度-255 接线（r323 断线遗留 9 处）提交。缺口实证 `scripts/round-324/probe-gap.js`：攻击候选 3/9 → 9/9（gate=verify）、良性 14/14 零误伤。单测 41 → 53 passed / 0 failed。四门禁全绿（verify 16/16、guard 20/20@255 维、doc 24/24、双向召回 52/52 + 误拦 302/326）。 |
 | 6.8.181 | 2026-11-14 | r322（本地 fork rebase 到远端 r321 之上，原 r320 因与远端 r320 撞号按 COORDINATION.md §1.1 重编号）：**`fallacy_of_relevance` 拉丁占位符假零共享修复 + `most_transitivity` 补腿 + `incentive_blind_spot` ②-h2 门槛拆分 + `appeal_to_pity` 单字「可」误伤修复**（真升级②）——`src/fallacy-of-relevance.js` `extractZhWords` 补 `[A-Za-z0-9]+` 拉丁/数字序列腿（upper 归一）并导出 `extractZhWords/extractEnWords`，修「大多数A是B，大多数B是C，所以至少有些A是C」类 A/B/C 占位符不被抽取 → 假零共享误拦；`src/most-transitivity.js` 承接 +321 行（主谓切分增强）；`src/incentive-blind-spot.js` ②-h2 拆 h2-a 无条件标记形 / h2-b 强化断言形，修可选组全 optional 门槛塌陷；`src/index.js` 修 `appeal_to_pity` 单字「可」误伤。同轮落地 r320→2 号交接的 doc-numbers 存量债修复：README/SKILL 测试数以本机 `data/test-count.json` 实测 15,934/155 对齐（远端 22,003 为远端机器环境口径）、版本戳 v6.8.181、README changelog 补本条。四门禁全绿（verify 16/16、guard 20/20@254 维、doc 24/24、双向召回 52/52 + 误拦 302/326），轮测 17/17、round-188 存量 14/14。 |
 | 6.8.180 | 2026-11-13 | r316-c（承接撞号未推送产能重编号）：**`reverse_causation` 因果倒置 EN 倒装族补腿 + ZH 倒装归因新判据 C-2**（真升级②）——`src/reverse-causation.js` 修三层根因：① 腿① `nearAny(CAUSE, RESP, text, 120)` 单向窗 → `nearAny(CAUSE, RESP, text, 60, true)` 双向窗，覆盖「Districts with more surveillance cameras see more property crime, so the cameras seem to attract it」类 RESP 前置倒装；② 新增 `nearFromBefore` 辅助，腿② EN 侧补结果名词在因果动词左侧的倒装形；③ `EXEMPT_HEDGE_EN` 精确化——删除裸 `seems?|appears?`（`seem to attract` 是伪 hedge 真断言，整句进判据前被豁免），改为仅与弱判断/不确定性词搭配时豁免（注入实测 9 良性零误伤、无承重损失）。ZH 侧新增判据 C-2：结果前置 + 应对行为后置 + 有显式归因动词 + 方向锚（`firstIdx(RESULT) < firstIdx(RESP_ACTION)`），配套 `firstIdx` 辅助、`RESP_ACTION_ZH` 窄化表（只收纯应对行为词，排除 `RESP_ZH` 首条「处境名词+报告」族以修方向锚污染）、`INV_LINK_ZH` 加「可见/说明/足以证明/表明」收束词、`hasResultFirst` 结果名词补病例/阳性/死亡/伤亡/自杀/受伤/感冒/发热/头痛/辍学/停产/下滑/开除/停职。同时补 `RESP_ZH`（登记/报备/完成态族/失窃报告族）、`RESULT_ZH`（阳性/病例流行病学族）、`CAUSE_ZH`（损害/招致族 + `drew`）召回腿，新增 `ALLOC_ZH` 资源配置豁免（C/C-2 共用，区分「应对说成原因」的攻击句与「按疫情密度调配」的正确同向陈述）。同轮修 r315 遗留的注入穿透缺陷（第 581/582/584 行 `anyHit(RESULT_ZH/RESP_ZH/CAUSE_ZH, text)` 误用模块常量而非 `R.` 注入）。另 `src/whole-part-transfer.js` 删 WHOLE_EN 抢先词 `menu`（修「容器词抢先整体词」缺陷族，r266 报告 roster/catalogue-list 同类问题仍在）。四门禁全绿（verify 16/16、guard 20/20@254 维、doc 24/24、双向召回 52/52 + 误拦 302/326），存量轮测 round-266-reverse-causation 25/25、round-299 46/46、whole-part-transfer 37/37 全过。 |
 | 6.8.179 | 2026-11-13 | r309：**第 252 维度 vivid_case_availability（生动个案可得性偏差）接线** — 模块自 r307 前已存在但从未 dispatch（grep 零接线实证）。修复三重缺陷后接八处：① EN 正则双重转义（\s/\b 永不命中）修为单层；② VIVID_ZH 补「亲眼看到/就在现场/有个+个体」句式族与「邻居/同事」裸主语熟人转述腿；③ SKEW_ZH 补「所以玩手机没问题/学习不重要/不用恐慌」偏斜腿，SKEW_EN 补「is full of crime/crawling with thieves」场所充斥腿；④ 模块补 DIMENSION_NAME/SEVERITY/guidance 标准导出（round-308 测试期望接口）。判据两腿共现 + 邻近窗（ZH 120 字 / EN 240 字符）+ 四组豁免。接线：require + 计算点 + allDims + dimMap + 补登记×2 + VERIFY_DIMS + DIM_GUIDANCE 共八处（变量名 vca）。模块级攻击 12/12 命中、良性 8/8 零误伤；gate 层实测攻击 3/3 verify 且本维承重、良性 1/1 pass。 |

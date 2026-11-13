@@ -1,3 +1,14 @@
+## r324 — red_herring 第 255 维度补腿（他者对照反问族 + 搁置复合形，真升级②）
+
+- **背景**：r323 立项的 red_herring 第 255 维度（`src/red-herring.js`）接线遗留本地未提交（r323 断线产能），单测 38/41——3 条攻击样本（dismiss 搁置 + 反问复合形态）漏判。方向「形式谬误·话题操纵族」满足轮换纪律（r318→r323 连续 6 轮 econ-reasoning-gate 后换向）。
+- **红队漏判证据**：`scripts/round-324/probe-gap.js` 基线 3/9 攻击候选穿透 gate=pass、良性 14/14 零误伤 → 满足真升级 ②。
+- **补腿**（`src/red-herring.js`）：① dismiss 搁置表补 `先别提/先不谈/先放一放`；② counter 他者对照反问表补 5 条（EN `but (?:look at|look what|consider|see)` / `but what about` / `have you (?:seen|considered|stopped to think)` / `why (?:criticize|blame|single out|pick on) … when`，ZH `可(?:是)?(?:隔壁|人家|同行|其他|别人|外界)` + `(?:隔壁|人家|同行|其他)(?:公司|团队|部门|单位|企业|国家|人)`）；③ redirect 族腿③反问特征视为回应义务锚点；④ counter #62 `不也…吗` 正则锚定分句边界（原贪婪回溯吞整句假阴性）；⑤ after 型硬条件 `if (!replaceText) return result;`；⑥ `先放着` 改 before 型并删除数组前部同 index 的 after 型（best 严格小于致 before 型永无机会）；⑦ AGENDA 豁免补「我们先看看…的数据」（正当议程推进）；⑧ 指代型原议题通道（`这些问题先放着` 全停用词假阴性修复）。
+- **接线固化**：`src/index.js` 维度-255 接线（r323 断线遗留 9 处）随本轮提交；文档口径同步 254→255、verify 221→222（AGENTS.md/README.md/SKILL.md 共 16 处）。
+- **单测**：`test/round-323-red-herring.js` **41 → 53 passed / 0 failed**；探针 A 组攻击 **3/9 → 9/9**（gate=verify）、B 组良性 **14/14 零误伤**。
+- **VERSION**：6.8.181 → 6.8.182
+- **四门禁**：verify 16/16、guard-abilities 20/20（判别维度 **255**）、doc-numbers 24/24（修前 8 失败全为口径债）、bidirectional-guard 召回 52/52、误拦 302/326
+- **已知边界**：counter 族只做前向（他者主语在前、反问在后），倒装形保守不收；`src/index.js` 已 17,787 行超阈值（14,000），拆分建议专项轮。
+
 ## r322 — rebase 轮：本地 fork 上 r321 主线 + 原 r320 重编号落地 + doc-numbers 存量口径债修复（真升级②+维护）
 
 - **背景**：`hf4-sync.sh` exit 4（`UPGRADE_LOG.md` rebase 冲突）。本地 2 个未推送提交（`c6214ccb` 原 r320、`905f2fab` r316-c）需 rebase 到远端 8 个提交（r321/v6.8.179）之上。原 r320 与远端 r320（激励反噬专业配额族）撞号，按 COORDINATION.md §1.1 硬规则 2「轮次号全局唯一禁止复用」重编号为 **r322**。
