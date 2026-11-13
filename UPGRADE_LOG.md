@@ -1,3 +1,62 @@
+## r313 — 零价格效应第 254 维度 zero_price_effect 落地（真升级①）
+
+**日期** 2026-11-13 10:34–11:05 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178 → 6.8.179  **轮次** r313（kind: dimension）  **约束** 承接 r311/r312/r313 三轮未提交产能的落地收尾——盘上已接第 254 维但零 commit；按引用纪律（r227）先补齐被引用而不存在的测试/探针文件，再验证，再提交。
+
+### 1. 缺口实证（探针 `coordination/agent4/probes/r313-probe.js`，走 `src/gate.js` 的 `gate()`）
+
+- **253 维基线**（`git stash push src/index.js` 切基线后跑同一探针）：攻击组 10 条漏判 **6/10**（A1/A2/A3/A5/A6/B4 全 `gate=pass`；A4/B1/B2/B3 被无关维度代拦）。
+- **接线后**：攻击组 **0/10** 漏判——A1-A6、B1-B4 全部 `verify` 且 findings 含 `zero_price_effect`。良性组两态一致：9/10 干净，唯一非 pass 的 G10 由 `vagueness` 维度触发（253 维基线同样触发，非本维度引入）。
+- 诊断脚本 `coordination/agent4/probes/r313-b4-diag.js` 定位 B4 漏判根因：腿① ZERO_PRICE_EN 在 B4 全文零命中，`no reason not to take` 落在腿② DISTORTION_EN——缺口是腿①形态缺失，不是守卫误杀（第一版 IDIOM_EN 守卫修错位置，实测 B4 仍 MISS 后回退该方案）。
+
+### 2. 模块补腿（`src/zero-price-effect.js`）
+
+- 新增 **第三腿 FREE-IDIOM**：`IDIOM_EN = /\b(?:no\s+reason\s+not\s+to|might\s+as\s+well|why\s+not|may\s+as\s+well)\b/i`，惯用语信号单独成腿与 DISTORTION_EN 配对（语义 = 「因为不要钱所以拿」，即零价格驱动的行为冲动）。
+- `findSignatures` 的第三语言组：`price: asList(R.IDIOM_EN || [IDIOM_EN])`，`asList` 兜底单正则传入（外部注入防崩）。
+- B4 转绿：探针复跑攻击组 **10/10** 命中，良性保持 9/10。
+
+### 3. 配套单测（`test/round-313-zero-price-effect.test.js`，31 断言）
+
+- 攻击组 10 条引擎层全命中（`gate != pass` 且 dims 含 `zero_price_effect`）；良性组 10 条本维度零命中。
+- 模块级直测 3 项；WIRING 2 项（接线点齐备 + 引擎层可见本维度）。
+- **负例注入 4 变红**：注入永假 `IDIOM_EN` → B4 红；注入空 `DISTORTION_ZH` → A1 红；注入空 `DISTORTION_EN` → B1 红；注入空 `ZERO_PRICE_ZH` → A2 红。
+
+### 4. 引用纪律清偿（r227 禁令）
+
+- `src/index.js` DIM_GUIDANCE 引用的 `test/round-313-zero-price-effect.js` 原本不存在——本轮创建（31 断言全绿）。
+- `src/zero-price-effect.js` 头注释引用的 `coordination/agent4/probes/r313-probe.js` 原本不存在——本轮创建（缺口实证探针）。
+
+### 5. 遗留单测计数同步（r308/r311 两轮旧债）
+
+- `test/round-311-probability-neglect.test.js`：WIRING `dimensions 总数 253→254`，78/1 → **79/79**（上轮报告遗留的「不可能」对冲缺陷已在 r312 修掉，本轮唯一失败纯计数差）。
+- `test/round-308-vivid-case-availability.test.js`：REG `dimensions 总数 252→254`，50/1 → **51/51**。
+
+### 6. 文档数字债清偿（doc-numbers 9 FAIL → 0）
+
+- AGENTS.md：`253 dimensions`×2 → 254、`Verify-level (220)→(221)` 并追加 zero_price_effect。
+- README.md：badge 253→254、`#what-it-catches-253-dimensions` 锚点、5 处 prose、规格表 253→254、`(220)→(221)`、口径戳 v6.8.178→**v6.8.179**、changelog r313 条目。
+- SKILL.md：横幅 253→254、规格表 253→254、Engine version 6.8.178→6.8.179、Verify-level (220)→(221)、Verify 列举追加 zero_price_effect、口径戳 6.8.179。
+
+### 7. 门禁与版本（全部本回合真实运行）
+
+| 项 | 结果 |
+|---|---|
+| bin/verify.js | PASS 16/16 |
+| guard-abilities | PASS 20/20，判别维度 **254** 个 |
+| doc-numbers-accuracy | 首跑 24 项 **9 FAIL**（253/220 旧数）→ 修后 **24/24** |
+| bidirectional-guard | PASS 召回 52/52，误拦 302/326（不升） |
+| 四门禁合计 | **全绿** |
+| VERSION | 6.8.178 → **6.8.179**（VERSION/package.json/SKILL.md/version.js fallback/heartflow.js BUILD_DATE 五处同步，跑 scripts/sync-version.js） |
+
+### 8. 死认领治理
+
+`hf4-claim.sh scan` exit 0 无死认领输出（r305/r307/r308 过期记录上轮已处理）；本轮未新认领、未 release。
+
+### 交接事项
+
+- **给 1 号**：README/SKILL 测试数基线仍是 21,798，而盘上三个新轮测（31+79+51=161 断言）未计入——下次全量 run-all 后同步 `tests` 计数；另 `src/index.js` 已 17,757 行超 14,000 阈值（doc 门禁报警不 FAIL），拆分时机需人工评估。
+- **给 2 号**：zero_price_effect 与 `money_illusion`（第 234 维）射程相邻——本维度判「零价格→需求失真」，money_illusion 判「名义价格 vs 实际购买力」，写红队样本时注意区分。
+- **给 3 号**：`zero_price_effect` 腿② DISTORTION 与 `vivid_case_availability` 的「冲动/囤积」词场有小重叠（「囤」「疯抢」），若红队发现误伤优先查这两维的共现窗配置（ZH 80 字 / EN 200 字符）。
+
 ## r312 — 概率忽视第 253 维度 probability_neglect 落地收尾（同步冲突治理 + 文档数字债清偿，真升级①）
 
 **日期** 2026-11-13 08:00–08:30 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178（不变）  **轮次** r312（kind: dimension）  **约束** 本轮为 r311 本地未推送产能的落地收尾——`src/index.js` 九处接线与 `src/probability-neglect.js` 补腿在盘上已完成但从未 commit，且轮次号与远端 r311（significance_effect_size/mental_accounting，`d8214c73`）撞车；按 r308 撞号纪律重编号为 r312 提交。

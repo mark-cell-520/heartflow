@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-253-blueviolet.svg)](#what-it-catches-253-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-254-blueviolet.svg)](#what-it-catches-254-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-253 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  190 MCP tools
+254 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  190 MCP tools
 ×  1,341 dispatch routes  ×  21,798 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 253 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 254 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (253 dimensions) -> gate
+scope-check -> premise-check -> discriminate (254 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (253 dimensions)
+## What it catches (254 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **220 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **221 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.178**. Not marketing copy.
+Measured on this repository at **v6.8.179**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 164 |
 | Module init errors | 0 |
 | Dispatch routes | 1,341 |
-| Discrimination dimensions | 253 |
+| Discrimination dimensions | 254 |
 | MCP tools | 190 |
 | Test suite | 21,798 passing / 154 failing | `node test/run-all.js` (full run 2026-11-13 ~719s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293；r301 接续 r300 基线（21,483/145/21,628），唯一 +22 即本轮新测试 round-301-law-of-averages.test.js（gamblers_fallacy 第148维『长期平均论证短期补偿/连发形追投』新措辞家族，22 断言单独 mount 实测 22/22 全过、池中自报同格式可解析），失败数 145 逐条持平；r302 接续 r301 基线（21,505/145/21,650），唯一 +12 即本轮新测试 round-302-law-of-small-numbers-quant.test.js（law_of_small_numbers 第239维『小样本→数量化总体裁定（概率/比率/均值）』新措辞家族，12 断言单独 mount 实测 12/12 全过、池中自报同格式可解析），失败数 145 逐条持平；r303 接续 r302 基线（21,517/145/21,662），唯一 +31 即本轮新测试 round-303-average-marginal-rate.test.js（average_marginal_conflation 第214维『产量/效率/速率型平均值→边际量』新措辞家族，31 断言单独 mount 实测 31/31 全过、池中自报行同 round-290 形态因 JOBS=4 交错未被解析器按序捕获、非真实失败），失败数 145 逐条持平；r304 接续 r303 基线（21,548/145/21,693），唯一 +29 即本轮新测试 round-304-weak-evidence-ai-source.test.js（weak_evidence_strong_claim 第245维『AI 模型输出与社交平台视频/直播/博主作为不可回溯弱证据信源』新措辞家族，29 断言单独 mount 实测 29/29 全过、池中自报同格式可解析），失败数 145 逐条持平；r305–r308 接续 r304 基线：r305（anchoring_effect 第214维『元语言锚定陈述族』，远端轮次）轮测 round-305-meta-anchor-legs.test.js 本机复测 29/29 + round-305-meta-anchor-negative-injection 通过 + pseudo-profundity-bside-noncultivation-r305 21/21（+50 计数口径内）；r306（dose_response_linearity 第250维，远端轮次）无专属轮测入库（审计轮追回的 8 个轮测不含 r306，其验证为 commit message 所载 gate 层变体矩阵攻击 10/10）；r307（evidence_claim_mismatch 第251维，远端轮次）轮测 round-307-evidence-claim-mismatch.test.js 本机复测 44 通过/4 失败（4 条均为 ALL EXEMPT emptied 负例注入断言——豁免全清后样本仍未命中，属远端轮次自身测试形态，计入基线噪声）；r308（sorites_fallacy 第212维『单元增量对累积敏感目标的无害化消解』新措辞家族，4 号本轮）唯一 +75 即 round-308-sorites-goal-dismissal.test.js 单独 mount 实测 75/75 全过、全量池中通过；r309（selection_on_dependent_variable 第249维 econ_reasoning_gate 聚合族『按结果选样本』新措辞家族，4 号本轮）唯一 +15 即 round-309-selection-on-outcome-groups.test.js 单独 mount 实测 15/15 全过、全量池中通过；头条本轮实测 21,759/154/21,913（JOBS=4）——与 r308 基线 21,744/154/21,898 差 passed +15 / failed +0，+15 恰为本轮轮测断言数，失败清单逐条持平；因约百个文件自报行不被解析器计数，passed 差与轮次断言合计有 ±2 口径差，不逐条编造） |
 | Capability guard | 20 / 20 checks |
@@ -383,6 +383,7 @@ duplicate the log.
 | Version | Date | Change |
 |--------|-------|--------|
 | 6.8.179 | 2026-11-13 | r309：**第 252 维度 vivid_case_availability（生动个案可得性偏差）接线** — 模块自 r307 前已存在但从未 dispatch（grep 零接线实证）。修复三重缺陷后接八处：① EN 正则双重转义（\s/\b 永不命中）修为单层；② VIVID_ZH 补「亲眼看到/就在现场/有个+个体」句式族与「邻居/同事」裸主语熟人转述腿；③ SKEW_ZH 补「所以玩手机没问题/学习不重要/不用恐慌」偏斜腿，SKEW_EN 补「is full of crime/crawling with thieves」场所充斥腿；④ 模块补 DIMENSION_NAME/SEVERITY/guidance 标准导出（round-308 测试期望接口）。判据两腿共现 + 邻近窗（ZH 120 字 / EN 240 字符）+ 四组豁免。接线：require + 计算点 + allDims + dimMap + 补登记×2 + VERIFY_DIMS + DIM_GUIDANCE 共八处（变量名 vca）。模块级攻击 12/12 命中、良性 8/8 零误伤；gate 层实测攻击 3/3 verify 且本维承重、良性 1/1 pass。 |
+| 6.8.179 | 2026-11-13 | r313：**第 254 维度 zero_price_effect（零价格效应）上线**（真升级①）——判别「价格降到零时需求非线性跃升」的结构：价格为零 × 需求/价值失真两腿共现。腿① ZERO_PRICE ZH/EN（免费/0元/不花钱/白送/不要钱 free / zero price / cost nothing），腿② DISTORTION 需求与价值失真（蜂拥/疯抢/搬空/囤/不看质量/失去判断 grabbed more than needed / stockpile / never checked quality / cleared it out），邻近窗 ZH 80 字 / EN 200 字符，缺一不判。三语言组：ZH 常规、EN 常规、**EN 第三腿 FREE-IDIOM**（r313 实测补腿——B4「There was no reason not to take it — people swarmed the booth and cleared it out.」腿①全文零命中，其零价格信号是惯用语形态 no reason not to take / might as well / why not，单列第三腿配对失真腿；守卫由 IDIOM_EN 豁免负责，no...not 是强调不是否定）。四重豁免：概念教学（零价格效应是行为经济学概念）、理性评估（按效用而非价格）、非免费陈述、公共服务（疫苗/救灾免费发放）。缺口实证：253 维基线攻击组漏判 6/10，接线后 0/10（探针 coordination/agent4/probes/r313-probe.js，git stash 切基线对照）。验证：四门禁全绿（verify 16/16、guard 20/20@254、doc 24/24、双向 52/52 + 误拦 302/326 不升）、轮测 31/31、负例注入 4 变红（删 IDIOM 第三腿→B4 红、删 DISTORTION_ZH→A1 红、删 DISTORTION_EN→B1 红、删 ZERO_PRICE_ZH→A2 红）。 |
 | 6.8.178 | 2026-11-12 | r307：**第 251 维度 `evidence_claim_mismatch`（证据-断言覆盖失配）上线** — 判别「断言内容超出所给证据可支撑范围」的外延幻觉结构：腿① EVID 证据/研究/数据在场标记（研究/数据/统计/实验/调查/临床试验/论文/《X》年份/机构+研究 + EN the study found / data show / N participants，含「N名+名词+实验」数量样本限定形），腿② OVERREACH 超覆盖断言（相关→因果 / 部分→全体 / 局部→整体 / 疗效越界 + EN cures / prevents all / works for everyone / nationwide），两腿共现 + 邻近窗（ZH 80 字 / EN 200 字符），缺一不判；四重豁免：概念教学、证据充足性论证、推理否定、对冲/疑问句/受限定的正确外推形。来源：LettuceDetect（arXiv 2502.17125, RAGTruth 79.22% F1）extrinsic hallucination 定义。与 `weak_evidence_strong_claim`（第245维）和 `completion_evidence` 零重叠。验证：verify 16/16、guard 20/20@251、双向召回 52/52 + 误拦 302/326 不升、doc 24/24、轮测 29/29、gate 层攻击 7/7 非 pass 且本维承重、模块级攻击 15/15 良性 0/12。 |
 | 6.8.177 | 2026-11-12 | r306：**第 250 维度 `dose_response_linearity`（剂量-反应线性外推）上线** — 新文件 `src/dose-response-linearity.js`。缺口实证（scripts/round-306/probe-candidates.js）：候选族 F（把「一片有效→十片十倍效果」「跑半小时好→跑四小时好四倍」的剂量-反应关系当成线性外推）探针 3/5 漏判最薄弱；grep src/ 确认既有仅 `common_cause` 顺带提「剂量反应」作证据建议，无维度判线性外推结构本身 → 独立攻击族立项。判据为双腿共现：腿① 剂量/受益腿（片/粒/颗/杯/瓶/勺/小时 × 有效/有用/好/提神/benefits/helps，含裸名词形态），腿② 线性外推腿（多吃/加量/翻倍/成比例/times as much/10x 等倍数断言）。三重豁免全部负例注入承重：概念教学转述、推理否定/反向承认（「多吃不会好得更快」「非线性、存在阈值和平台期」）、医疗医嘱语境。射程：只管「效果随剂量线性放大」的外推形态，不管该剂量真实疗效。验证：verify 16/16、guard 20/20@250、双向召回 52/52 + 误拦 302/326 不升、doc 24/24、gate 层变体矩阵攻击 10/10 非 pass 且 findings 全含 dose_response_linearity、良性 10/10 零本维误伤（3 条修边记录：否定豁免补「不会/反而」形、任意受益名词×倍数族、EN times as much 形）。已知边界：跨句长距离形与显式非线性论证的对抗性误用本轮保守不收。 |
 | 6.8.176 | 2026-11-12 | r305：`anchoring_effect`（第 214 维度）新增『元语言锚定陈述族』双腿族（真升级②）——`src/anchoring-effect.js` 补 `META_ANCHOR`（腿① 元语言锚点命名）× `META_DOM`（腿② 元语言支配断言）ZH+EN 各一套 + `numRequired=false` 平行路由（新腿判「把锚的存在说出来」的语言行为，句中常无显式数字，故豁免旧族数字在场约束），经 `src/econ-reasoning-gate.js`（第 249 维度聚合）进 gate 路径，`src/index.js` 零改动；探针实证旧判据下元语言攻击 3/10 承重、基线对比零新增误伤（2 条误伤归因于基线维度 unsupported_claim/appeal_to_authority 与 normalization_of_deviance），补腿后 8/10；新单测 29/29 + 负例注入 8/8 翻 miss；四门禁 verify 16/0、guard 20/20@249、双向 52/52+302/326 不升、doc 24/24；文档口径 248→249、verify 215→216 |
