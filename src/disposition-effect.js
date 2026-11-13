@@ -70,6 +70,17 @@
  *   · future_faking 管**关系语境空头承诺**（wait for it to come
  *     back 在英文投资句里会被它偶发误拦）；本族有明确双腿链。
  *
+ * [r316 扩展] 零命中探针 scripts/round-316/probe-candidates.js：存量腿对
+ * 「基金刚回本我就想赎回，亏着的那个反而一直拿着 / 股票翻红就抛，绿着
+ * 就装死 / 盈利单拿不住，亏损单扛得住 / 涨了点就落袋，跌了还稳稳拿着 /
+ * turn green×cash out×the red ones×keep holding / sell my winners×hold
+ * my losers / profitable×closed early×losing×held」7/7 全穿透——存量
+ * WIN_STATE 无「回本」（参考点恢复）、WIN_DISP 无「抛」、LOSE_STATE 无
+ * 「亏着/绿着/red ones」进行时态、LOSE_DISP 无「扛得住/稳稳拿着/亏了
+ * 反倒不动」、CTX 无「盈利单/亏损单/winners/losers」俚语域锚点。本轮
+ * 以**存量腿追加元素**方式补齐（非平行新链）：注入语义不变——
+ * {CTX_ZH:[]} 等既有负例注入仍整腿删除（含新元素），存量测试断言不动。
+ *
  * 判据（双腿链共现 + 领域锚点，缺一不判）：
  *   ① 腿① CTX 领域锚点——股票/个股/持仓/仓位/基金/交易/炒股/止损/
  *     止盈/被套/解套/楼市/房价；EN stock / position / trade / invest /
@@ -120,16 +131,22 @@
 // ─── 腿① 领域锚点：证券投资/交易语境（中文）────────────────────
 const CTX_ZH = [
   /(?:股票|个股|该股|这股|这只股|这只票|那只票|的票|持仓|仓位|基金|ETF|标的|组合|账户|头寸|期货|币圈|比特币|理财|证券|筹码|炒股|炒币|交易|建仓|加仓|补仓|减仓|清仓|抄底|解套|割肉|翻倍|红盘|绿盘|翻红|翻绿|牛市|熊市|入市|散户|操盘|盘面|K线|均线|涨幅|跌幅|止盈|止损|回本|定投|券商|大盘|行情|收益|盈亏|本金|楼市|房产|房源|房子|房价)/,
+  // [r316] 盈利/亏损单口语域锚点（「盈利单拿不住，亏损单扛得住」式对仗句）
+  /(?:盈利|亏损)(?:单|仓|头寸)?/,
 ];
 
 // ─── 腿① 领域锚点（英文）──────────────────────────────────────
 const CTX_EN = [
   /\b(?:stock|stocks|shares?|position|positions|portfolio|portfolios|fund|funds|ETF|ticker|tickers|trade|trades|trading|invest\w*|investor|investors|market|brokerage|account|accounts|crypto|bitcoin|futures|options|securities|P&L|paper\s+(?:gain|loss|profit)|cash(?:ing)?\s+out|break[- ]even|gains?|profits?|losses?|returns?)\b/i,
+  // [r316] winners/losers 交易俚语域锚点（「sell my winners / hold my losers」式）
+  /\b(?:winners?|losers?)\b/i,
 ];
 
 // ─── 腿② 盈利侧状态（中文）──────────────────────────────────────
 const WIN_STATE_ZH = [
   /(?:涨了|上涨|涨幅|大涨|涨得|翻红|翻倍|红了|见红|浮盈|盈利|获利|赚了|小赚|赚到|赚钱的|挣了|跑赢|红盘|正收益|有赚|赚翻)/,
+  // [r316] 回本族（参考点即退出触发：刚回本/回了本/一回本就想撤）
+  /(?:刚?回本|回了本|一回本|回到成本价|解了套)/,
 ];
 
 // ─── 腿② 盈利侧过早处置（中文，动词族）──────────────────────────
@@ -150,11 +167,17 @@ const WIN_DISP_ZH = [
   /(?:就想卖|想卖出|想赎回)/,
   // 利润跑了族
   /(?:利润|盈利|收益)[^。，！？；\n]{0,4}(?:跑|飞|没)/,
+  // [r316] 抛族（翻红就抛/涨了点就抛出——处置动词新形）
+  /(?:一?涨|翻红|翻倍|大涨)[^。，！？；\n]{0,6}就(?:想)?(?:抛|抛出|卖掉|卖|赎回|清仓|平仓|落袋)/,
+  // [r316] 回本就跑族（刚回本我就想赎回/回本就走）
+  /(?:刚?回本|回了本)[^。，！？；\n]{0,6}(?:就|便)[^。，！？；\n]{0,4}(?:跑|走|赎回|卖|撤|溜)/,
 ];
 
 // ─── 腿③ 亏损侧状态（中文）──────────────────────────────────────
 const LOSE_STATE_ZH = [
   /(?:跌了|下跌|跌幅|大跌|跌得|翻绿|绿了|亏损|浮亏|亏了|赔了|被套|套牢|深套|套着|绿盘|碧绿|亏钱的|赔钱的|亏麻|腰斩|回撤|缩水|发绿|一片绿|亏起来)/,
+  // [r316] 亏着/绿着进行时族（「亏着的那个反而一直拿着」「绿着就装死」）
+  /(?:亏着|赔着|套着|绿着|浮亏着|深套着)/,
 ];
 
 // ─── 腿③ 亏损侧拖延处置（中文，动词族——持有/拖延离场）───────────
@@ -173,6 +196,12 @@ const LOSE_DISP_ZH = [
   /(?:放着|放放|躺平|装死)/,
   // 会涨回来族
   /(?:总能涨回来|会涨回来|还能涨回来|涨回来)/,
+  // [r316] 扛得住族（亏损单扛得住/扛住/顶得住）
+  /(?:扛得住|扛住|顶得住|熬得住)/,
+  // [r316] 稳稳拿着族（稳稳/一直/死死拿着、捂着、不动）
+  /(?:稳稳|一直|死死|牢牢|始终|仍旧|仍在|照样)[^。，！？；\n]{0,3}(?:拿着|持有|攥着|捂着|留在|不动|没动)/,
+  // [r316] 亏了反倒不动族（亏了反倒不动/反而拿着/却不卖）
+  /(?:亏|浮亏|跌)[^。，！？；\n]{0,8}(?:反倒|反而|却|也|还)[^。，！？；\n]{0,4}(?:不动|不卖|拿着|捂着|留着|没动)/,
 ];
 
 // ─── 腿③ 亏损侧「否定式退出」族（中文）──────────────────────────
@@ -190,17 +219,25 @@ const LOSE_DISP_NEG_ZH = [
 // ─── 腿② 盈利侧状态（英文）──────────────────────────────────────
 const WIN_STATE_EN = [
   /\b(?:winners?|winning|gains?|profits?|in\s+the\s+green|in\s+profit|profitable|up\s+\d|turns?\s+green|green)\b/i,
+  // [r316] 回本族（back to break even = 参考点恢复，退出触发）
+  /\b(?:back\s+to|at|back\s+at)\s+break[- ]even\b/i,
 ];
 
 // ─── 腿② 盈利侧过早处置（英文，动词族）──────────────────────────
 const WIN_DISP_EN = [
   /\b(?:sold|sells?|selling|cash(?:ed|ing)?\s+out|bank(?:ed|ing)?|lock(?:ed|ing)?\s+in|realiz(?:e|ed|ing)|monetiz\w+|book(?:ed|ing)?|liquidat\w+|trim(?:med|ming)?)\b/i,
   /\b(?:tak(?:e|ing)|took|taken)\s+(?:my\s+|the\s+|your\s+|his\s+|her\s+)?(?:profits?|gains?|money)\b/i,
+  // [r316] 过早平仓族（closed early / closed my position too fast）
+  /\b(?:closed?|closing)\b[^.]{0,20}\b(?:early|too\s+(?:fast|soon|quickly)|right\s+away|immediately)\b/i,
+  // [r316] 退出族（exit my position/trade/winner）
+  /\bexit(?:ed|ing)?\s+(?:my\s+|the\s+|that\s+)?(?:position|trade|winner|winning)\b/i,
 ];
 
 // ─── 腿③ 亏损侧状态（英文）──────────────────────────────────────
 const LOSE_STATE_EN = [
   /\b(?:losers?|losing|loss(?:es)?|in\s+the\s+red|underwater|red\s+positions?|paper\s+loss|down\s+\d)\b/i,
+  // [r316] red ones 口语亏损态（the red ones I just keep holding）
+  /\b(?:the\s+)?red\s+ones?\b/i,
 ];
 
 // ─── 腿③ 亏损侧拖延处置（英文，动词族）──────────────────────────

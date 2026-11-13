@@ -65,6 +65,19 @@
  *   · hot_hand 管随机序列的热手谬信；本族句中可无任何序列，
  *     锚点是单次竞价事件。
  *
+ * [r316 扩展] 零命中探针 scripts/round-316/probe-candidates.js：存量腿对
+ * 「抢到新地王×说明值这个价/竞拍价创新高×市场很认/打新中签×有潜力/
+ * 评标第一×专家组认报价/采矿权竞得价远超起拍价×值钱」及对应英文
+ * （won the spectrum auction×proves the market values / outbidding×
+ * shows the client agrees / IPO allotment×confirms a good one）10/11
+ * 全穿透——存量 WIN 只认「中标/竞得/拍得/出价赢/排名第一」标准竞价词，
+ * VALUE 只认「值这个价/被低估/性价比/物有所值」标准价值词，对土地
+ * 招拍挂的「抢地/地王」、牌照/矿权/频谱竞价、打新中签、评标评分
+ * 第一、创纪录竞价等共同价值场景，及「值钱/有潜力/市场很认这个价」
+ * 等口语化价值推断零覆盖。新增 WIN_ZH3/EN3×VALUE_ZH3/EN3 平行常量
+ * 独立链（findSignatures 第四、五链），存量腿不动。良性 7/7 零误伤，
+ * 官方良性语料 378 条复测零误命中（见 scripts/round-316）。
+ *
  * 判据（双腿共现，缺一不判）：
  *   ① 腿① WIN 竞价/招标/拍卖胜利——中标/竞得/拍得/拍下/夺标/
  *     标王/竞标成功/投标成功/(竞标|投标|招标|竞拍|拍卖)×(赢|
@@ -176,6 +189,63 @@ const VALUE_EN = [
   /\b(?:market|seller|client|counterparty|owner)\s+(?:recognized|accepted|validated)\s+(?:the|this|our)\s+(?:price|value|valuation|offer|cost)\b/i,
 ];
 
+// ─── [r316] 竞价胜利新形：抢地/牌照/打新/评标/创纪录竞价（中文）─────
+// 零命中探针 scripts/round-316/probe-candidates.js：存量腿对
+// 「抢到新地王×说明值这个价 / 竞拍价创新高×市场很认 / 打新中签×有潜力 /
+// 评标第一×专家组认报价 / 竞得价远超起拍价×值钱」10/11 全穿透（余 1 条
+// 已被存量 winning bid×worth it 覆盖转回归），良性 7/7 零误伤。
+// 平行常量 + findSignatures 独立链，不动存量腿。
+const WIN_ZH3 = [
+  // ①-g 抢地/摘地族（抢到/夺得/拿下 × 地王/矿权/牌照）
+  /(?:抢到|抢下|夺得|拿下|摘得|斩获|收入囊中)[^。，！？；\n]{0,6}(?:地王|地块|宅地|商住地|土地|矿权|采矿权|牌照|频谱|执照|特许|车指标)/,
+  // ①-g2 抢地大战赢族（抢地/拿地 × 大战/争夺 × 赢/胜）
+  /(?:抢地|夺地|拿地|争地|土地争夺)[^。，！？；\n]{0,8}(?:大战|争夺|鏖战|厮杀)?[^。，！？；\n]{0,6}(?:我们|我方|我司)?(?:赢|胜|胜出|拿下|凯旋)/,
+  // ①-h 被动竞得族（地王/矿权/牌照 × 被/由 × 竞得/拿下）
+  /(?:地王|地块|矿权|采矿权|牌照|频谱|特许)[^。，！？；\n]{0,12}(?:被|归|由)[^。，！？；\n]{0,10}(?:我们|我司|本公司|对手|对方)?(?:拿下|夺得|竞得|摘得|拍得|收入囊中)/,
+  // ①-i 打新中签/获配族
+  /(?:打新|申购|认购|新股|新债)[^。，！？；\n]{0,8}(?:中签|中购|获配|配售|中了|命中)/,
+  // ①-j 竞得价/成交价创新高族（创纪录竞价）
+  /(?:竞得|竞拍|成交|出让|中标)[^。，！？；\n]{0,4}(?:价|总价|单价|楼面价)[^。，！？；\n]{0,10}(?:创|刷新|破)[^。，！？；\n]{0,6}(?:新高|纪录|记录)/,
+  // ①-k 竞得价远超评估/起拍族
+  /(?:竞得价|成交价|出让价|中标价|楼面价)[^。，！？；\n]{0,8}(?:远超|高出|高于|大幅超过|显著高于)[^。，！？；\n]{0,10}(?:起拍价|评估价|底价|保留价|账面)/,
+  // ①-l 评标/评审/投标评分第一族
+  /(?:评标|评选|评比|评审|专家|投标|招标)[^。，！？；\n]{0,8}(?:综合)?(?:评分|得分|分数|排名|名次)[^。，！？；\n]{0,4}(?:第一|首位|榜首|头名|最高|居首|夺魁)/,
+];
+
+// ─── [r316] 竞价胜利新形（英文）────────────────────────────
+const WIN_EN3 = [
+  // ①-g3 won the spectrum/mining/land/IPO auction
+  /\bw(?:on|inning)\s+(?:the\s+)?(?:spectrum|mining|land|plot|IPO|license|licence|broadcast|airwave)\s+auction\b/i,
+  // ①-g4 outbid 全族（含 outbidding/outbids，存量 ①-c 仅 \boutbid\b）
+  /\boutbid(?:ding|s)?\b/i,
+  // ①-g5 winning bid (was) far above the reserve
+  /\b(?:winning|win)\s+(?:bid|offer)\s+(?:was\s+|is\s+)?(?:far\s+)?(?:above|over|beyond)\s+(?:the\s+)?(?:reserve|asking|starting)\b/i,
+  // ①-g6 record bid/price
+  /\brecord\s+(?:bid|price)\b/i,
+  // ①-g7 got/received the IPO allotment
+  /\b(?:got|received|landed|secured)\s+(?:the\s+)?(?:IPO|share|stock)\s+allotment\b/i,
+  // ①-g8 (top|highest|first)-(rated|ranked|scored) × bid/proposal/tender
+  /\b(?:top|highest|first)[- ](?:rated|ranked|scored)\b[^.]{0,40}\b(?:bid|proposal|tender|offer)\b|\b(?:bid|proposal|tender|offer)\b[^.]{0,40}\b(?:top|highest|first)[- ](?:rated|ranked|scored)\b/i,
+];
+
+// ─── [r316] 价值/判断力推断新形（中文）──────────────────────
+const VALUE_ZH3 = [
+  // ②-f 值钱/有潜力族（说明×值钱/有潜力/是好货/就这么值）
+  /(?:说明|证明|意味着|表明|可见|足以证明|反映出|证明得了)[^。，！？；\n]{0,14}(?:值钱|有价值|有潜力|有前途|有含金量|是好东西|是好货|确实好|真的好|就这么值|真的值|值回了|物有所值)/,
+  // ②-g 市场/客户很认价族（市场已经很认可这个价格/专家组都很认我们的报价）
+  /(?:市场|客户|业主|买家|对方|专家组|专家|评委|招标方|甲方|评标委员会|监管)[^。，！？；\n]{0,4}(?:已经|也|都|很|十分|非常|相当|普遍)?(?:认可|认同|接受|认|买账)[^。，！？；\n]{0,6}(?:这个|该|此|我们的|它的)?(?:价格|价|报价|成本|估值|价钱|价位)/,
+  // ②-h 抢手/挤破头反推族（挤破头/抢着要×说明值/优质）
+  /(?:挤破头|抢破头|抢着要|抢手|疯抢|争相)[^。，！？；\n]{0,10}(?:说明|证明|意味着|可见|表明)[^。，！？；\n]{0,10}(?:值|好|优质|有眼光|有潜力)/,
+];
+
+// ─── [r316] 价值/判断力推断新形（英文）──────────────────────
+const VALUE_EN3 = [
+  // ②-f2 (confirms|proves|shows|...)×（values|worth|quality|potential|a good one）
+  /\b(?:confirms?|proves?|shows?|means?|demonstrates?|suggests?|indicates?)\b[^.]{0,55}\b(?:values?|valued|is\s+worth|has\s+value|quality|potential|promise|a\s+good\s+(?:one|buy|deal))\b/i,
+  // ②-g2 (market|client|...) (values|recognizes|accepts|agrees) ... (price|value|offer)
+  /\b(?:market|client|customer|seller|buyer|owner|panel|board)\b[^.]{0,30}\b(?:values?|valued|recognizes?|recognized|accepts?|accepted|agrees?)\b[^.]{0,30}\b(?:price|value|valuation|offer|cost|worth)\b/i,
+];
+
 // 双腿距离窗
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -261,6 +331,15 @@ function findSignatures(text, R) {
       w: R.WIN_EN || WIN_EN, v: R.VALUE_EN || VALUE_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r316] 抢地/牌照/打新/评标/创纪录竞价 × 市场认价/值钱/有潜力（独立链）
+    {
+      w: R.WIN_ZH3 || WIN_ZH3, v: R.VALUE_ZH3 || VALUE_ZH3,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      w: R.WIN_EN3 || WIN_EN3, v: R.VALUE_EN3 || VALUE_EN3,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { w, v, win, lang } of langs) {
     const { wm, vm } = collectLegs(text, w, v, true);
@@ -317,6 +396,7 @@ module.exports = {
   detectWinnersCurse,
   __internals: () => ({
     WIN_ZH, WIN_EN, VALUE_ZH, VALUE_EN,
+    WIN_ZH3, WIN_EN3, VALUE_ZH3, VALUE_EN3,
     CURSE_ZH, CURSE_EN,
     PAIR_ZH, PAIR_EN,
   }),

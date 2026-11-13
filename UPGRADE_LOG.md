@@ -1,3 +1,32 @@
+## r316 — 赢家诅咒（winners_curse）+ 处置效应（disposition_effect，econ_reasoning_gate 聚合族）「抢地/牌照/打新/评标竞价胜利 × 回本即退/翻红就抛/亏损死扛 slang」新措辞家族（真升级②）
+
+**日期** 2026-11-13 16:35–17:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r315 先例）  **轮次** r316（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）
+
+### 缺口实证（scripts/round-316/probe-candidates.js，动手前 pristine 基座）
+
+- **winners_curse**：存量 竞价胜利×价值推断 双腿族不收「非标准竞价胜利新形」——抢到/夺得地王、抢地大战赢、地块被竞得、打新中签、竞得价创新高/远超起拍、投标评分第一（WIN 侧）叠加值钱/有潜力/市场很认这个价/专家组都认报价（VALUE 侧）。11 条候选 **10 条穿透本模块**（余 1 条「这么多人排队抢，说明房子值这个价」无竞价胜利腿，属 appeal_to_popularity 领地，留作族外边界样本）。
+- **disposition_effect**：存量 盈亏状态×处置动词 双腿族不收「回本即退/翻红就抛/亏损死扛」交易 slang——基金刚回本我就想赎回、股票翻红就抛、绿着就装死、盈利单拿不住亏损单扛得住、涨了点就落袋跌了还稳稳拿着（ZH）及 turn green×cash out×the red ones×keep holding / sell my winners×hold my losers / profitable×closed early×losing×held（EN）。7 条候选 **7/7 全穿透本模块**。
+- 官方良性语料 378 条（去重 369）改前两模块均零误命中；两模块本轮新增良性 12 条亦零误命中。
+
+### 改了什么（src/winners-curse.js 平行常量独立链 + src/disposition-effect.js 存量腿追加元素，均 0 删除存量逻辑）
+
+- **winners-curse.js**（r315 平行常量 + findSignatures 独立链范式续用）：WIN_ZH3（抢地族/抢地大战赢族/被动竞得族/打新中签族/竞得价创新高族/竞得价远超族/评标第一族七元素）、WIN_EN3（won the spectrum/mining/land/IPO auction / outbid 全族含 outbidding / winning bid far above the reserve / record price / IPO allotment / top-rated 六元素）、VALUE_ZH3（值钱·有潜力族 / 市场很认价族 / 抢手反推族三元素）、VALUE_EN3（values·potential 族 / market agrees 族两元素）四支新腿，findSignatures 的 langs 数组新增第四（ZH）、第五（EN）两条独立链，存量两链零改动。
+- **disposition-effect.js**（存量腿追加元素，非平行新链——17 条穿透样本新旧元素混配，且需保 `{CTX_ZH:[]}` 等既有负例注入语义不变）：CTX_ZH 追加盈利/亏损单族、CTX_EN 追加 winners/losers 俚语锚点、WIN_STATE_ZH 追加回本族、WIN_DISP_ZH 追加抛族+回本就跑族、LOSE_STATE_ZH 追加亏着/绿着进行时族、LOSE_DISP_ZH 追加扛得住族+稳稳拿着族+亏了反倒不动族、WIN_STATE_EN 追加 back to break-even 族、WIN_DISP_EN 追加 closed early 族+exit 族、LOSE_STATE_EN 追加 red ones 族，共 13 个新元素（ZH 9 / EN 4）。
+- **落地期两处修正（实测驱动）**：① 评标第一族前缀缺「投标」，导致「投标综合评分第一」形漏判，补 `投标|招标`；② 处置候选「涨了两个点就赶紧落袋，跌了百分之二十还稳稳拿着」缺领域锚点（按族双腿链设计须带 CTX），样本改「这只票…」——模块不动。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-316-auction-victory-break-even-exit.test.js` | **56 通过 / 0 失败**（A gate 归因 1 + B 模块直调 2 + C 良性 381 + D 存量回归 2 + E 常量级注入 13 + F 元素级注入 31 + G 入口双路 1 + H 登记纪律 4） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24/0 PASS**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致） |
+| 存量复跑 | winners-curse 11/11、disposition-effect 12/12、illusion-of-control 11/11、tragedy-of-commons 11/11、round-284 zero-sum 23/23、round-295 econ 接线 63/63、round-296 incentive 26/26 |
+| 负例 | 注入 44 个（13 常量级 + 31 元素级）→ **44 个按设计变红，0 个未变红** |
+| gate 归因 | 17 条攻击全部 action != pass 且 econ_reasoning_gate 承重（2 条兼被 fallacy_of_relevance 旁路拦截，r315 交接事项 2 号现象复现） |
+
 ## r315 — 控制幻觉（illusion_of_control）+ 公地悲剧（tragedy_of_commons，econ_reasoning_gate 聚合族）「体育赛事幸运仪式 × 数字公地/免费额度」新措辞家族（真升级②）
 
 **日期** 2026-11-13 14:00–15:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r314 先例）  **轮次** r315（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）
