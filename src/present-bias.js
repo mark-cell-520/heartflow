@@ -63,18 +63,22 @@
  * （v6.8.179 模块直调 + gate 层双路实测）：存量四腿 + r314 新族只收
  * 「痛快吃了/以后再说」类标准双曲贴现措辞，先用后付（BNPL）域 9 条
  * 候选 8 条穿透模块、其中 6 条穿透整个 gate 无维度代拦。落地双腿
- * 平行常量（NOW_ZH3/NOW_EN3/LATER_ZH3/LATER_EN3，findSignatures
- * concat 合入，存量腿与 r314 腿一字不动）：
+ * 平行常量（NOW_ZH3/NOW_EN3/LATER_ZH3，findSignatures concat 合入，
+ * 存量腿与 r314 腿一字不动）：
  *   当下无痛化腿（NOW_ZH3/NOW_EN3）：先用后付/先享后付/零首付/
  *     分期 + 无压力/没几块钱/四舍五入等于不要钱/等于白送/平摊到
  *     每天没感觉；buy now pay later/zero down payment/split into
  *     four payments/barely costs anything/four interest-free；
- *   未来自我贴现腿（LATER_ZH3/LATER_EN3）：账单是未来的我在头疼/
- *     月供让以后的自己去还/先享受了再说/下个月的事下个月再说；
- *     my future self can handle/deal with the bill later。
+ *   未来自我贴现腿（LATER_ZH3）：账单是未来的我在头疼/
+ *     月供让以后的自己去还/先享受了再说（EN 侧未来腿存量
+ *     LATER_EN 已覆盖 future self/deal with it later，见 r319
+ *     设计注，不新增冗余族）。
  * 同一语义换皮：未来代价从健康/学业换成下个月账单，贴现被包装成
  * 支付工具话术（四舍五入/平摊/无压力）。存量豁免与否定守卫对新腿
  * 先生效；官方良性语料 369 条两腿零误命中（改前改后均实测）。
+ * [r319 复检] LATER_ZH3 原第 4 元素「下个月的事」与 LATER_EN3 整族
+ * 经注入实测被存量腿完整遮蔽（探针 A[1] 基线即由 NOW_ZH[2]×
+ * LATER_ZH[0] 命中），按诚实数字原则删除，未登记轮测。
  *
  * 辨别的族：现时偏差（present bias / 双曲贴现 hyperbolic
  * discounting）——**现在即时满足**（今晚先痛快吃了/凌晨的快乐是
@@ -338,10 +342,13 @@ const LATER_ZH3 = [
   // 让/交给/留给 + 未来的我/以后的自己（月供让以后的自己去还）
   /(?:让|交给|留给|归|扔给|推给|丢给)(?:未来的我|以后的我|将来的我|日后的我|以后的自己|未来的自己|下个月的自己)/,
   // 先 + 满足动词 + 再说（先享受了再说/先买下来再说，BNPL 场景版）
-  /先[^。，！？；\n]{0,6}(?:爽|享受|痛快|乐|快乐|花|玩|买|拿|用|刷卡|氪金)(?:了|完|一把|一顿|下来|下)?(?:再说|再想|后说|之后说)/,
-  // 下个月的事下个月再说（存量时间词表未收「下个月的事」整串）
-  /下个月的事(?:下个月再说|以后再说|往后说|回头再说)/,
+  /先[^。，！？；\n]{0,6}(?:爽|享|享受|痛快|乐|快乐|花|玩|买|拿|用|刷卡|氪金)(?:了|完|一把|一顿|下来|下)?(?:再说|再想|后说|之后说)/,
 ];
+// [r319 设计注] 曾拟「下个月的事下个月再说」形，实测被存量 LATER_ZH[0]
+// （/到?(?:明天|下周|下个月|…)(?:再)?(?:说|…)/）完整遮蔽——探针 A[1]
+// 「分期无压力，这个月先爽了，下个月的事下个月再说」在 v6.8.179 基线
+// 即由存量 NOW_ZH[2]（先爽了）× LATER_ZH[0]（下个月再说）命中，非缺口，
+// 按诚实数字原则删除该元素，不登记轮测。
 
 // ─── [r319] 腿① 先用后付/BNPL 当下无痛化（英文）────────────────
 const NOW_EN3 = [
@@ -352,14 +359,12 @@ const NOW_EN3 = [
   /\b(?:four|4|three|3)\s+interest[- ]free\s+payments?\b/i,               // four interest-free payments
 ];
 
-// ─── [r319] 腿② 未来自我贴现新形（英文）──────────────────────
-const LATER_EN3 = [
-  // my future self can handle / deal with（存量 future me 不收 future self+handle 连用）
-  /\b(?:my|our)\s+future\s+self\s+(?:can|could|will)\s+(?:handle|deal|figure|take\s+care|worry|sort)\b/i,
-  /\b(?:future\s+me|future\s+self)\s+(?:can|could|will)\s+(?:deal|handle|figure|take\s+care|sort|worry)\s+(?:with\s+)?(?:it|that|this|things|the\s+bill|the\s+payments?)\b/i,
-  // deal with the bill later（存量无「账单类名词 + later」连用）
-  /\b(?:deal|handle|figure|sort|worry)\s+with\s+(?:it|that|this|the\s+bill|the\s+payments?|the\s+cost)\s+(?:later|tomorrow|next\s+month)\b/i,
-];
+// [r319 设计注] 曾拟 LATER_EN3（my future self can handle / deal with
+// the bill later），探针 + 注入实测三元素全被存量 LATER_EN 遮蔽：
+// LATER_EN[1] /\bfuture\s+(?:me|self|version)\b/ 已收 future self，
+// LATER_EN[2] 已收 deal/handle/... + it/that/...。A[6]/A[7]/A[8] 的
+// EN 侧增益全部来自 NOW_EN3（BNPL 话术腿①），按诚实数字原则删除
+// LATER_EN3 整族，不登记轮测。
 
 // ─── 距离窗（腿①×腿②）──────────────────────────────────────
 const PAIR_ZH = 60;
@@ -434,7 +439,7 @@ function findSignatures(text, R) {
   const sigs = [];
   const langs = [
     { now: (R.NOW_ZH || NOW_ZH).concat(R.NOW_ZH2 || NOW_ZH2, R.NOW_ZH3 || NOW_ZH3), later: (R.LATER_ZH || LATER_ZH).concat(R.LATER_ZH2 || LATER_ZH2, R.LATER_ZH3 || LATER_ZH3), win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh' },
-    { now: (R.NOW_EN || NOW_EN).concat(R.NOW_EN2 || NOW_EN2, R.NOW_EN3 || NOW_EN3), later: (R.LATER_EN || LATER_EN).concat(R.LATER_EN2 || LATER_EN2, R.LATER_EN3 || LATER_EN3), win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
+    { now: (R.NOW_EN || NOW_EN).concat(R.NOW_EN2 || NOW_EN2, R.NOW_EN3 || NOW_EN3), later: (R.LATER_EN || LATER_EN).concat(R.LATER_EN2 || LATER_EN2), win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
   ];
   for (const L of langs) {
     const nm = collect(text, L.now, true);
@@ -499,7 +504,7 @@ module.exports = {
     // [r314] 拖延许可×活在当下宣言新族（平行常量，负例注入-删条用）
     NOW_ZH2, NOW_EN2, LATER_ZH2, LATER_EN2,
     // [r319] 先用后付/BNPL × 未来自我贴现新族（平行常量，负例注入-删条用）
-    NOW_ZH3, NOW_EN3, LATER_ZH3, LATER_EN3,
+    NOW_ZH3, NOW_EN3, LATER_ZH3,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,

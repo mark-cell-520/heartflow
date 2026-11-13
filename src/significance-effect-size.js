@@ -148,11 +148,14 @@
  * the significance threshold / barely significant」（SIG_EN3）。
  * 裁定侧补：ZH「改进是真实存在的」（SUPERIOR_ZH3）、「可以/值得
  * 推广」无强化词形（SCALE_ZH3）；EN「the treatment works /
- * the drug is effective」（SUPERIOR_EN3）。探针 7 条候选 6 条穿透
+ * the new method is effective」（SUPERIOR_EN3，drug/app 形与存量
+ * 测试注入样本冲突，r319 复检收敛名词表）。探针 7 条候选 6 条穿透
  * 模块、其中 2 条穿透整个 gate 无维度代拦（scripts/round-319/
  * probe-candidates.js D 族）；官方良性语料零误命中。平行常量 +
  * findSignatures concat 合并，存量腿与 r311 腿注入语义不变。
  * src/index.js 零改动。
+ * [r319 复检] SIG_EN3 原含 "p = 0.0x" 的 "=" 形，与存量 SIG_EN
+ * /\bp\s*=\s*0?\.0[0-4]/ 重合且破坏存量负例注入语义，已删除。
  */
 'use strict';
 
@@ -290,7 +293,10 @@ const SIG_ZH3 = [
 // ─── [r319] 腿① 踩线显著族（英文）────────────────────────────
 const SIG_EN3 = [
   // p came out at 0.049 / p was 0.05（存量 p=0.0x 形不收 came out at）
-  /\bp(?:\s*[-–]?value)?\s+(?:came\s+out\s+at|was|is|of|=|at)\s*0?\.\d+/i,
+  // [r319 复检] 原含 "=" 备选，实测与存量 SIG_EN /\bp\s*=\s*0?\.0[0-4]/ 重合
+  // （存量测试负例注入 "删 SIG_EN 后 p = 0.02 攻击全部失配" 被新腿代拦），
+  // 按诚实数字原则删除 "="，只保留存量不收的动词形。
+  /\bp(?:\s*[-–]?value)?\s+(?:came\s+out\s+at|was|is|of|at)\s*0?\.\d+/i,
   // just/barely crossed the significance threshold
   /\b(?:just|barely|only\s+just|narrowly)\s+(?:crossed|cross|crossing|passed|passed\s+the|cleared)\s+(?:the\s+)?(?:significance|significance\s+threshold|threshold)/i,
 ];
@@ -307,8 +313,11 @@ const SCALE_ZH3 = [
 
 // ─── [r319] 腿② 新裁定（英文）────────────────────────────────
 const SUPERIOR_EN3 = [
-  // the treatment works / the drug is effective（存在-有效族）
-  /\b(?:treatment|drug|intervention|method|approach|app|therapy|program)\s+(?:works|worked|is\s+effective)\b/i,
+  // the treatment works / the new method is effective（存在-有效族）
+  // [r319 复检] 名词表原含 drug/app，实测 "the drug works" 命中存量测试
+  // ATTACK_EN 样本（其负例注入 "删裁定族后攻击失配" 被新腿代拦），按
+  // 诚实数字原则收敛名词表，drug 形留待有专样本的后续轮次。
+  /\b(?:treatment|intervention|method|approach|therapy|program)\s+(?:works|worked|is\s+effective)\b/i,
 ];
 
 // ─── 推断标记（结论由显著性推出，而非并列陈述）─────────────────

@@ -1,3 +1,38 @@
+## r319 — 现时偏差（present_bias）+ 峰终定律（peak_end_rule）+ 禀赋效应（endowment_effect）+ 显著性≠重要性（significance_effect_size，econ_reasoning_gate 聚合族）「先用后付/BNPL×未来自我贴现 / 过程无所谓宣言×新裁定词 / 祖传所有权×卖方溢价 / 踩线显著×新裁定」四子族新措辞家族（真升级②×4）
+
+**日期** 2026-11-13 21:57 CST 立项 · 2026-11-14 00:30 CST 收尾  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值）  **轮次** r319（kind: dimension）  **约束** `src/index.js` 零改动（四子族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** arXiv 两次查询 parse-fail / GitHub 2 条（QHD 元分析/模型，0 star）/ S2 429 限流——无直接对应纯规则方案，按既有形态自建
+
+### 缺口实证（scripts/round-319/probe-candidates.js，v6.8.179 pristine 基线，动手前）
+
+- econ-reasoning_gate 聚合族四个**此前未碰子族**的全新措辞家族，探针四域 32 条攻击候选：present_bias BNPL 域 9、peak_end_rule 过程宣言域 8、endowment_effect 祖传所有权/卖方溢价域 8、significance 踩线显著/新裁定域 7。基线模块命中 present_bias 1/9、peak_end 1/8、endowment 3/8、significance 1/7，多数穿透整个 gate 无维度代拦。
+
+### 改了什么（四模块平行常量 + findSignatures concat 合并，0 删除存量逻辑；落地期复检删除冗余候选）
+
+- **present_bias**（src/present-bias.js）：NOW_ZH3/NOW_EN3（先用后付/先享后付/零首付/分期 + 无压力/没几块钱/四舍五入等于不要钱/等于白送/平摊到每天没感觉；buy now pay later / zero down payment / split into four payments / barely costs anything / interest-free）+ LATER_ZH3（账单是未来的我在头疼/月供让以后的自己去还/先享受了再说）。登记 3 常量 14 元素。
+- **peak_end_rule**（src/peak-end-rule.js）：WHOLE_VERDICT_ZH3/EN3（只要结局是好的就算成功/结尾漂亮就够了/整件事封神了/年度最佳/值得N刷/yyds；as long as the ending is great / GOAT / peak cinema / masterpiece，裁定词带 `(?<![不没未无莫])` 否定守卫）+ DURATION_ZH3/EN3（过程再怎么折腾都无所谓/中间吃了多少苦不重要/不管过程多难/受的罪都会忘掉/全程都在踩坑；the process does not matter / regardless of the struggle / suffering along the way is forgotten）。登记 4 常量 14 元素。
+- **endowment_effect**（src/endowment-effect.js）：OWN_ZH3（我伺候了这么多年/咱家三代人住过的）+ INFLATE_EN3（no price is enough / selling it would take a big premium / lowball offer is insulting）。登记 2 常量 5 元素。
+- **significance_effect_size**（src/significance-effect-size.js）：SIG_ZH3/EN3（擦线/踩线/压线/勉强显著/p 卡在 0.05 关口；p came out at 0.049 / just crossed the significance threshold）+ SUPERIOR_ZH3/EN3（改进是真实存在的/the treatment works）+ SCALE_ZH3（可以/值得推广）。登记 5 常量 7 元素。
+- **诚实数字·落地期复检删除（未登记轮测）**：三个候选元素经注入实测被存量腿完整遮蔽后删除——present-bias LATER_ZH3「下个月的事」（存量 LATER_ZH[0] 已收）、LATER_EN3 整族（存量 LATER_EN[1]/[2] 已收）、endowment OWN_EN3（存量 OWN_EN[3]/[4] 已收）；significance SIG_EN3 的「p = 0.0x」= 形与存量 SIG_EN 重合、SUPERIOR_EN3 的 drug/app 名词形撞存量测试注入样本，均已收敛。最终登记 **40 个**（14/14/5/7）。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-319-bnpl-process-sell-margin-significance.test.js` | **133 通过 / 0 失败**（A gate 归因 29 + B 模块直调 29 + C 良性 8 + D 存量回归 7 + E 常量级注入 14 + F 元素级注入 40 + F 登记口径 1 + G 入口双路 1 + H 登记纪律 4） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24/0 PASS**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，未增误拦） |
+| 攻击探针（最终收敛代码复跑） | present_bias 6/9、peak_end 7/8、endowment 6/8、significance 7/7 模块命中；gate 层 econ_reasoning_gate 归因承重（改前 1/9、1/8、3/8、1/7） |
+| 良性 | 官方语料 369 条（去重）四模块零误命中 + 探针良性族 20 条模块级零误命中（仅「先用后付只是支付工具」1 条 gate 被存量 monocausal_attribution verify，模块层 mod=false、基线同现）+ 本轮新增 42 条零误命中 |
+| 存量复跑 | significance 18/0、present-bias 14/0、endowment 14/0、peak-end 16/0、r310 18/0、r314 263/0 全绿 |
+| 负例 | 注入 **54 个**（14 常量级 + 40 元素级）→ **54 个全部变红，0 个未变红** |
+| 元素级最小样本自检 | 40 个新元素逐条删除均配「仅该元素承重」最小样本；收尾阶段拦截 2 处并修复（PE DURATION_ZH3[3] 原样本「煎熬」被存量 DURATION_ZH[0] 直收、「过程受的」又撞 DURATION_ZH3[1] → 改用探针实证的「这次创业吃的苦都会忘掉」；PE WHOLE_VERDICT_EN3[2] 原样本 "the whole journey" 命中存量 CORRECTIVE_EN 豁免表 → 改用 "the entire experience"），scripts/round-319/probe-fix-two-samples.js 实证后落盘，轮测 131→133 转绿 |
+
+### 存量红（非本轮引入）
+
+r311 轮测 mental_accounting 段 2 个 SPEND_EN2 注入断言在 6e49f21 基线 commit 已红（git worktree 实证），r319 轮测锁定「恰好 2 条存量红、sig 段无新增红」。
+
 ## r318 — 锚定效应（anchoring_effect，econ_reasoning_gate 聚合族）「默认值/预设值/模板默认/初始参数」新锚点域新措辞家族（真升级②，r317 探针 C 族缺口落地）
 
 **日期** 2026-11-13 20:10–20:50 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r317 先例）  **轮次** r318（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "anchoring effect default value numeric anchor decision" → arXiv 403 条 XML（空返命中）/ GitHub / S2 各返结果（coordination/agent4/scout/20261113-122835），按既有形态自建
