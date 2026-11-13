@@ -47,6 +47,21 @@
  *     I felt I was getting a great deal.
  *   The first price I heard was two hundred, and every offer after
  *     that stayed inside the orbit of that number.
+ * [r318 升级] 新增**默认值/预设值锚点域**（选择架构 default
+ * effect）：系统默认值/表单默认预算/模板默认/初始参数/预填值/
+ * 缺省项（EN default value / preset / prefilled / template
+ * default / initial parameters / out-of-the-box configuration）
+ * 充当起估参照，当事人未独立估价即围绕它展开估计（「默认预算
+ * 五千块没动过就直接报了」/「估计也就照着它来了」/「The
+ * default value was never changed, so the estimate just built on
+ * it」/「The template default became the baseline for all our
+ * projections」）。与价格锚词同构：默认项同样是**任意设定的
+ * 起始数字**（系统/模板预置，不携带标的真实价值信息），把未经
+ * 独立校准的估计包装成有依据的判断。存量 ANCHOR_ZH 只收价格
+ * 锚词、META_ANCHOR_ZH 只收元语言命名，默认值域 17/18 穿透
+ * （r317/r318 探针实测）——本族补上这一锚点呈现域，腿② concat
+ * 存量支配族，默认锚点亦可与「觉得划算/围着转」等存量支配措辞
+ * 配对。
  *
  * 为什么这是判别者的核心缺口（对齐「判断是非」）：估值应当由独立
  * 信息决定——成本、行情、可比成交、专业评估。锚定效应把**任意
@@ -331,6 +346,71 @@ const META_DOM_EN = [
   /\b(?:still|yet)\s+(?:inside|within|near|close\s+to|around)\s+(?:that|this|the)\s+(?:orbit|range|frame|band)\b/i, // still inside that orbit
 ];
 
+// ─── [r318 升级] 腿① 默认值/预设值锚点域（中文；全新锚点呈现族）──────
+// ANCHOR_ZH 只收「标价五百万/开价八千」式**价格锚词**场景；META_ANCHOR_ZH
+// 只收「是锚点/被锚定」式元语言命名。两类都不收「默认值/系统默认/预设
+// 参数/模板默认/初始参数/缺省项」式**选择架构默认项**锚点。r317 探针 C
+// 组 6 条 + r318 探针 18 条实测：默认值域攻击 17/18 穿透（存量仅
+// 「初始参数×拿它当基准」1 条命中，6 条 gate 非 pass 全部由 fallacy_of_
+// relevance / perfect_error 代拦、econ 归因为 0）。语义同族：默认项即
+// 初始参照数字，估计围绕它展开而未独立校准（选择架构 default effect：
+// 系统预置的默认值/预填值/模板默认/初始参数充当起估参照，当事人未独立
+// 估价即以其为基准——与「标价五百万」同构，都是任意起始数字支配估计）。
+const DEFAULT_ANCHOR_ZH = [
+  /(?:默认|缺省)(?:值|预算|参数|选项|设置|配置|档位|路径|方案|数字|数目|金额|数量|阈值|上限|下限|基准)/, // 默认值/默认预算/缺省参数
+  /(?:系统|软件|表单|模板|程序|平台|后台|出厂|自带|内置)(?:的)?(?:默认|缺省|预设|预置|设置|参数)/, // 系统默认/表单默认/出厂设置
+  /(?:预设|预置)(?:值|参数|选项|数字|金额|阈值|上限|下限|基准|档位)/, // 预设值/预置参数
+  /(?:初始|原始|起始)(?:参数|设置|配置|数值|版本)/,                   // 初始参数/起始设置
+  /(?:默认|缺省)(?:就|已|被|向来|一直)?(?:是|为|设|填|定)/,           // 默认就是/默认设为
+  /(?:默认项|缺省项|预选项|默认选项|默认档|缺省档)/,                 // 默认选项/默认档
+  /(?:开箱|出厂)(?:即|默认|预设)/,                                  // 开箱默认
+];
+
+// ─── [r318 升级] 腿② 未独立调整/估计围绕默认项（中文；查否定前缀）────
+// 存量 ORBIT/DEAL/WORTH 三族只收「围着这个价转/觉得划算/就值这个价」式
+// 支配表达，META_DOM_ZH 只收元语言锚定断言；均不收「没动过/照着它来了/
+// 直接采用/拿它当基准」式**默认项未独立调整**陈述。语义同族：默认锚点
+// 在场 × 估计未经独立校准即围绕默认项展开。
+const DEFAULT_DOM_ZH = [
+  /(?:一直|始终|向来|历来|压根|根本|完全|从头到尾|后来|至今)?(?:没|未|不曾|从未)(?:人)?(?:有)?(?:再|重新|独立)?(?:动|改|调整|变动|更动|重设|校准|重算|另算|另做|碰|更新|变更|改动|更改|核算|估算|估价|评估)(?:过)?/, // 没动过/一直没改/没人重新核算过
+  /(?:原封不动|一成不变|照单全收|全盘接收|如数接收)/,             // 原封不动/照单全收
+  /(?:照|按|顺着|沿着|跟着)(?:它|这个|那个|此|默认|默认值|预设值)(?:来|报|填|写|定|算|估|走|谈|批)/, // 照着它来了/照默认报
+  /(?:估计|测算|推算|预测|估值|核算|预算)(?:也)?(?:就|全|都)?(?:是|按)?(?:照|围绕|基于|依托)(?:它|这个|那个|默认)/, // 估计也就照着它来了
+  /(?:拿|用)(?:它|这个|那个|此|默认值|默认数|预设值)(?:当|作为|当成|视为)(?:基准|参照|标杆|标尺|依据|起点|标准|底数)/, // 拿它当基准
+  /(?:直接|干脆|索性|随手|顺手|不假思索)(?:采用|用了|填了|报了|定了|拿来|沿用|套用|接手|接收)/, // 直接采用/直接报了
+  /(?:沿用|套用|借用|袭用)(?:了)?(?:默认|预设|模板|初始|系统)/,     // 沿用了默认
+  /(?:就这么|就此)(?:定|报|交|用|算|填)/,                        // 就这么报了
+  /(?:沿用|套用|袭用|借用)(?:至今|到现在|到今|到底)/,             // 沿用至今
+];
+
+// ─── [r318 升级] 腿①/腿② 默认值锚点域（英文；查否定前缀）────────────
+const DEFAULT_ANCHOR_EN = [
+  /\bdefault\s+(?:value|setting|option|budget|number|figure|parameter|configuration|threshold|amount|level|choice)\b/i, // default value
+  /\b(?:system|software|form|template|factory)\s+(?:defaults?|settings?)\b/i, // template default / factory setting
+  /\b(?:prefilled|pre[- ]?populated|preset|predefined)\s+(?:value|values|number|numbers|figure|figures|option|field|amount|parameter|parameters|budget)\b/i, // prefilled number / preset value
+  /\b(?:initial|starting|original)\s+(?:parameters?|settings?|values?|configuration)\b/i, // initial parameters
+  /\bdefault\s+(?:was|is|were|are)\s+(?:set|left|kept|prefilled)\b/i, // the default was set
+  /\b(?:default|preset)\s+(?:tier|plan|mode)\b/i,                // default tier
+  /\bout[- ]of[- ]the[- ]box\s+(?:configuration|settings?|preset)\b/i, // out-of-the-box configuration
+  /\b(?:shipped|comes?|came)\s+(?:with\s+)?(?:default|preset)\s+(?:settings?|values?|parameters?)\b/i, // shipped with default settings
+  /\bthe\s+default\s+(?:assumptions?|values?|settings?|parameters?|options?|budget|figures?|numbers?)\b/i, // the default assumptions
+  /\bthe\s+(?:default|preset)\s+(?:and|but|so|then)\b/i, // went with the default and …（裸默认项回指）
+];
+const DEFAULT_DOM_EN = [
+  /\b(?:was|were|is|are|been)\s+never\s+(?:changed|adjusted|touched|modified|updated|revised|revisited|recalibrated)\b/i, // was never changed
+  /\bnever\s+(?:changed|adjusted|touched|modified|revisited|recalibrated|re[- ]?estimated)\s+(?:it|them|that|this|the\s+\w+)\b/i, // never changed it / never revisited the assumptions
+  /\bkept\s+the\s+(?:prefilled|default|preset|predefined)\b/i,   // kept the prefilled
+  /\b(?:estimate|estimates|projection|projections|forecast|forecasts|budget|model|analysis|figures?|numbers?)\s+(?:\w+\s+){0,2}?(?:built|based|rested)\s+on\s+(?:it|that|this|them|the\s+(?:default|preset))\b/i, // estimate just built on it / forecast was based on it
+  /\b(?:became|becomes|become)\s+the\s+(?:baseline|benchmark|reference|yardstick)\s+for\b/i, // became the baseline for
+  /\bstuck\s+with\s+(?:it|that|this|the\s+(?:default|preset|prefilled))\b/i, // stuck with the default / stuck with it
+  /\b(?:took|take|used|use|treated|treat)\s+(?:the\s+)?(?:prefilled|default|preset|initial|template|it|that|this|them)\s*(?:[\w-]+\s+){0,2}?as\s+(?:given|the\s+baseline|a\s+baseline|the\s+reference|our\s+reference|the\s+starting\s+point)\b/i, // took it as given / took the prefilled amount as given
+  /\bleft\s+(?:it|them|the\s+[\w-]+(?:\s+[\w-]+)?|as\s+is|untouched|alone)\b/i, // left it as is / left untouched
+  /\bwent\s+with\s+the\s+(?:default|preset|prefilled)\b/i,        // went with the default
+  /\bevery\s+(?:later|subsequent|following|future)\s+(?:\w+\s+){0,2}?(?:figure|number|estimate|offer|bid|price)\s+(?:orbited|revolved|built\s+on|rested\s+on)\b/i, // every later figure orbited
+  /\b(?:served|serves|serve)\s+as\s+the\s+(?:baseline|benchmark|reference|yardstick|starting\s+point)\s+for\b/i, // served as the reference for
+  /\b(?:built|based|rested)\s+(?:the\s+)?(?:\w+\s+){0,2}?(?:model|estimate|estimates|forecast|budget|analysis|projection|figures?|numbers?)\s+on\s+(?:it|that|this|them|the\s+(?:default|preset))\b/i, // built the whole model on it
+];
+
 // ─── 数字在场（锚点所在句必须含数字）───────────────────────────
 const NUM_ZH = /[0-9０-９]|[一二三四五六七八九十百千万亿两]/;
 const NUM_EN = /\d|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|figures?)\b/i;
@@ -497,6 +577,27 @@ function findSignatures(text, R) {
       pair: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
       numRequired: false,
     },
+    // [r318 升级] 默认值/预设值锚点域（选择架构 default effect）：
+    // 腿① 默认项呈现 × 腿② 未独立调整。numRequired=false 同 META 族
+    // 先例——默认值域陈述常以「它/默认值」指称回指，无需显式数字共现；
+    // 腿② concat 存量支配族（ORBIT/DEAL/WORTH/META_DOM）使默认锚点
+    // 亦可与存量支配措辞配对（「系统默认价八千，我觉得占了便宜」）。
+    {
+      anchor: R.DEFAULT_ANCHOR_ZH || DEFAULT_ANCHOR_ZH,
+      dominated: (R.DEFAULT_DOM_ZH || DEFAULT_DOM_ZH).concat(
+        R.ORBIT_ZH || ORBIT_ZH, R.DEAL_ZH || DEAL_ZH, R.WORTH_ZH || WORTH_ZH, R.META_DOM_ZH || META_DOM_ZH),
+      num: R.NUM_ZH || NUM_ZH,
+      pair: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+      numRequired: false,
+    },
+    {
+      anchor: R.DEFAULT_ANCHOR_EN || DEFAULT_ANCHOR_EN,
+      dominated: (R.DEFAULT_DOM_EN || DEFAULT_DOM_EN).concat(
+        R.DOMINATED_EN || DOMINATED_EN, R.META_DOM_EN || META_DOM_EN),
+      num: R.NUM_EN || NUM_EN,
+      pair: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+      numRequired: false,
+    },
   ];
   for (const L of langs) {
     for (const p of pairLegs(text, sents, L.anchor, L.dominated, L.num, L.pair, L.numRequired)) {
@@ -558,5 +659,7 @@ module.exports = {
     PAIR_ZH, PAIR_EN,
     META_ANCHOR_ZH, META_DOM_ZH,   // [r305] 元语言族（新句式族）
     META_ANCHOR_EN, META_DOM_EN,
+    DEFAULT_ANCHOR_ZH, DEFAULT_DOM_ZH,   // [r318] 默认值/预设值锚点域
+    DEFAULT_ANCHOR_EN, DEFAULT_DOM_EN,
   }),
 };
