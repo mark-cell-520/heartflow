@@ -82,8 +82,25 @@ const MOST_ZH = [
   /(?:绝大多数|大多数|大部分|多数派|半数以上|十有八九|七成|八成|九成|六成|五成|过半|大半|逾半|超过[半一两三四五六七八九十成]+|半数|多数|大多)(?:的)?/,
 ];
 const MOST_EN = [
-  /(?:the\s+|a\s+)?(?:majority\s+of|most(?:\s+of)?)\s+(?:the\s+)?/i,
+  // [r318] 补 mostly 量词形：「Reform supporters mostly read news」——
+  // 旧正则要求 most 后必跟空白，"mostly" 整段不匹配直接返回 null。
+  /(?:the\s+|a\s+)?(?:majority\s+of|most(?:ly)?(?:\s+of)?)\s+(?:the\s+)?/i,
 ];
+
+// [r318] 量词后置腿（NP 在量词之前、谓项紧随量词）：「喜欢甜食的人**多数**
+// 偏胖」「购票者中**过半**到场」「差评**居多**」。r318 实测 ZH 自然链 12 条
+// 仅 3 条命中，缺口主因就是这条腿缺失——P2 中间项 NP 全在量词前面。
+// 注：m.index >= 1 保证 NP 非空；「多数」与 MOST_ZH 共享字形故谓项切分仍走
+// _findBound 兜底不可用时由 tail 整体充当谓项（中间项素材在 NP 侧，够用）。
+const ZHUJU_ZH = [
+  /(?:绝大多数|大多数|大部分|过半|逾半|半数以上|十有八九|七成|八成|九成|六成|五成|过半|过半|大半|半数|多数|大多)/,
+  /居多/,
+];
+
+// [r318] 片段切词标点（常量抽出来，供 _parseMost 后置腿复用；全角形态显式
+// 列举，避免 patch 工具转义吞字）
+const LEAD_PUNC = /^[，,。；;、\s]+/;
+const TRAIL_PUNC = /[，,。；;、\s]+$/;
 
 // ─── 主项/谓项切分：谓词起始功能词（边界标记，优先于动词）────────────
 // 刻意不收「有/为」——「有害」「认为」「为民」里它们不是谓词标记，收进来
@@ -140,7 +157,21 @@ const VERB_ZH = [
   /体检/, /就诊/, /住院/, /手术/, /服药/, /挂号/, /复查/, /尝试/, /体验/, /试用/,
   /施行/, /实施/, /执行/, /落实/, /贯彻/, /响应/, /配合/, /介入/, /干预/, /影响/,
   /改变/, /导致/, /引发/, /带来/, /造成/, /减少/, /增加/, /降低/, /提高/, /提升/,
+  // r318 补批：P1 主项被量词吃掉后的裸谓词形（「人喜欢甜食」「人早起」
+  // 「人爱看新闻」——VERB1 的 /爱/ 只兜底单字，双字情感词必须显式收录；
+  // 「多数人偏胖」型靠 VERB1 /胖/ 已覆盖，这里是补「喜欢/早起/熬夜/翻墙」
+  // 这类高频双字谓词，使 P1 谓项非空、中间项素材可用）
+  /喜欢/, /喜爱/, /热爱/, /喜好/, /早起/, /早睡/, /熬夜/, /晚睡/, /通勤/, /摸鱼/,
+  /躺平/, /内卷/, /上岸/, /翻车/, /爆红/, /走红/, /出圈/, /下头/, /上头/, /入坑/,
+  /种草/, /拔草/, /剁手/, /囤货/, /秒杀/, /抢购/, /海淘/, /代购/, /拼单/, /凑单/,
+  /氪金/, /开黑/, /连麦/, /刷屏/, /霸屏/, /控评/, /拉踩/, /对标/, /复盘/, /沉淀/,
+  /打通/, /落地/, /赋能/, /抓手/, /闭环/, /颗粒度/, /方法论/, /组合拳/,
 ];
+
+// r318 补批② 的 26 个裸单字谓词（用/刷/逛/聊/看/听/读/写/买/卖/玩/吃/喝/
+// 睡/跑/走/开/住/穿/戴/带/拿/放/找/等/站）已移至下方 VERB1_ZH——见该处
+// [r319] 注释：它们属于最低优先层，误入 VERB_ZH 会令 round-188 的注入族
+// 停不住火（注入只清 VERB1_ZH）。
 
 // ─── 主项/谓项切分：单字动词/形容词（最低优先，仍需主项非空）──────────
 const VERB1_ZH = [
@@ -150,6 +181,14 @@ const VERB1_ZH = [
   /渴/, /饿/, /冷/, /热/, /疼/, /痒/, /瘦/, /胖/, /香/, /臭/, /新/, /旧/,
   /老/, /嫩/, /生/, /熟/, /真/, /假/, /对/, /错/, /输/, /赢/, /成/, /败/,
   /升/, /降/, /涨/, /跌/,
+  // [r319] r318 补批② 原置于 VERB_ZH，承重修正移至本表（最低优先层）：
+  // 使「年轻人用社交软件」切成「年轻人|用社交软件」；且注入族清 VERB1_ZH
+  // 即可停火（r318 误置 VERB_ZH 时注入只清 VERB1_ZH，VERB_ZH 单字继续切
+  // 分导致 round-188 回归 2/3——seg1「多数房价高的城市收入也高」注入后
+  // 仍被切出 statement）。26 个单字与原表重复的（买/读/写/看/吃/听）不去重，
+  // 保持注释所述原批次完整可查。
+  /用/, /刷/, /逛/, /聊/, /看/, /听/, /读/, /写/, /买/, /卖/, /玩/, /吃/, /喝/,
+  /睡/, /跑/, /走/, /开/, /住/, /穿/, /戴/, /带/, /拿/, /放/, /找/, /等/, /站/,
 ];
 
 // ─── 件③：推断连接词（结论标记；倒装模式与跟句模式都靠它定位结论）────
@@ -229,17 +268,177 @@ function _stripLead(s) {
     .replace(/^[，,。；;、\s]+/, '').trim();
 }
 
-// ─── MOST 片段解析：量词开头 → 切主项/谓项 ────────────────────────
-function _parseMost(seg, R) {
+// [r318] 「的」字 NP 延长腿（模块级，供 MOST 命中路径与省略路径共用）：
+// 「多数偏胖的人有脂肪肝」类——_findBound 取最早边界会把「偏|胖的人有
+// 脂肪肝」切开（「胖」是 VERB1_ZH 单字谓词，idx=1 抢切），主项素材丢失
+// 导致中间项链接断。若 body 呈「X的Y[谓词…]」形（X 非空谓词性修饰、
+// Y=1-4 字名词），主项取「X的Y」整段、谓项取其后的全部，保住
+// 「偏胖的人→有脂肪肝」链接。
+// 「有」不在 BOUND_ZH（AGENTS 约定：有害/认为会误切），故此腿不查边界词，
+// 直接按「的」位置切；X 为空（裸「的读者」形）不触发，走原路径。
+// Y 长度上限 4 且**懒匹配+右锚**（Y 后须接功能词/「有」类谓词或句尾）
+// ——否则「偏胖的人有脂肪肝」会把「人有脂肪」当 Y 整段吞掉（无锚点时
+// .{1,4} 贪婪吃满），切出「偏胖的人有脂肪|肝」的错位形。右锚词表是
+// 本腿局部常量（含「有」），刻意不复用全局 BOUND_ZH——「有」进全局表
+// 会误切「有害/认为」（AGENTS 约定），本腿只在「X的Y」形已成立时查，
+// 误切面可控。
+function _deLeg(b) {
+  const m = b.match(/^(.+?)的(.{1,4}?)(?=都是|皆是|全是|均是|都属于|就是|乃是|属于|都|是|会|能|可以|能够|将|在|也|还|就|才|便|被|把|让|使|即|得|已|仍然|依然|仍旧|仍|正|刚刚|再|又|有|无|属于|包含|包括|含有|患|得|患了|患有|$)/);
+  if (!m || m[1].length < 1) return null;
+  const headLen = m[0].length;
+  const rest = b.slice(headLen);
+  if (rest.length < 1) return null;
+  const S = b.slice(0, headLen).replace(/[，,。；;、\s]+$/, '');
+  const P = rest.replace(/^[，,。；;、\s]+/, '');
+  if (!S || !P) return null;
+  return { S, P };
+}
+
+// [r318] 量词后置形（「喜欢甜食的人多数偏胖」——NP 在量词之前，谓项紧随
+// 量词）：先试后置匹配，NP 主项 + 尾部谓项切分；匹配不上再走原句首路径。
+// 「居多」「占多数」也走这条腿（ZHUJU_ZH 常量可负例注入）。
+function _parseMost(seg, R, opts) {
   const s = _stripLead(seg);
   if (!s) return null;
   const isEN = /[a-zA-Z]/.test(s) && !/[\u4e00-\u9fff]/.test(s);
+  if (!isEN) {
+    const ZJ = R.ZHUJU_ZH || ZHUJU_ZH;
+    for (const re of ZJ) {
+      const m = s.match(re);
+      if (m && m.index >= 1) {
+        // [r318] 引述动词守卫：S 尾部若为「显示/表明/指出/发现/认为…」等
+        // 引述动词，则量词前是引语内容而非链式 NP 主项——
+        // 「调查显示大多数员工认为公司有前途」会被误切成
+        // S=「调查显示」P=「员工认为公司有前途」（pristine 正确切分是
+        // S=「员工」P=「公司有前途」，round-188 实测回归 5 例）。
+        // 命中守卫即跳过本后置腿，回落 MOST 句首路径（那里 `_findBound`
+        // 以「认为」为界，S=「员工」）。
+        const S0 = s.slice(0, m.index).replace(/[，,。；;、\s]+$/, '');
+        // [r319] 引语前缀守卫（标点形）：S0 含句读标点（冒号/逗号/分号/破折号
+        // 等）说明它是引语或解说前缀而非链式 NP 主项——「传递性在这里不成立：
+        // 大多数A是B」若按后置腿会切成 S=「传递性在这里不成立：」P=「A是B」，
+        // 主项素材错误导致中间项链接断（round-188 META/TEACH 注入族实测回归：
+        // 抹掉豁免后期望转命中却仍 false）。pristine 下该段由 MOST 句首路径正确
+        // 切成 S=「A」P=「B」。命中守卫即跳过本后置腿，回落句首路径。
+        // 与下面的引述动词守卫同理，不影响「喜欢甜食的人多数偏胖」这类无标点
+        // 真 NP 主项。
+        if (/[：:，,；;。！!？?—\-（(【\[]/.test(S0)) continue;
+        // [r318] 引述动词守卫：S 尾部若为「显示/表明/指出/发现/认为…」等
+        // 引述动词，则量词前是引语内容而非链式 NP 主项——
+        // 「调查显示大多数员工认为公司有前途」会被误切成
+        // S=「调查显示」P=「员工认为公司有前途」（pristine 正确切分是
+        // S=「员工」P=「公司有前途」，round-188 实测回归 5 例）。
+        // 命中守卫即跳过本后置腿，回落 MOST 句首路径（那里 `_findBound`
+        // 以「认为」为界，S=「员工」）。
+        if (/(?:显示|表明|指出|发现|认为|强调|提醒|透露|披露|宣布|宣传|鼓吹|坚称|声称|承认|暗示|意味着|说明)$/.test(S0)) continue;
+        // [r319] 句首连词守卫：S0 本身是连词（而/且/但/却/则/即/于是/所以/
+        // 因此/因而/从而/并且/而且/不过/然而/虽然/尽管/如果/一旦/当…）时，
+        // 它是段间连接成分而非链式 NP 主项——「而大多数认为公司有前途的
+        // 员工都买了公司股票」按后置腿会切成 S=「而」P=「认为公司有前途的
+        // 员工都买了公司股票」，主项素材错（pristine 正确切分 S=「认为公司
+        // 有前途的员工」P=「买了公司股票」，round-188 回归 1）。命中守卫即
+        // 跳过本后置腿，回落 MOST 句首路径。
+        if (/^(?:而|且|但|却|则|即|于是|所以|因此|因而|从而|并且|而且|不过|然而|虽然|尽管|如果|一旦|当|由于|鉴于|因为|接着|随后|然后|最后|首先|其次|另外|此外|例如|比如|亦即|进而|从而|故而|故|因而)$/.test(S0)) continue;
+        // [r319] 推断前缀守卫：S0 尾部是推断/引述连接词（推出/可知/得出/
+        // 说明/证明/意味着/足以证明…）时，量词前是推理引导语而非链式 NP
+        // 主项——「由此可以推出大多数员工都买了公司股票」按后置腿会切成
+        // S=「由此可以推出」P=「员工都买了公司股票」，件③a 要求结论主项回指
+        // P1 主项「员工」，「由此可以推出」与「员工」无共享 → 链断（round-188
+        // 回归 1 的第二半：seg1 修好后 seg2 仍不命中）。pristine 正确切分是
+        // S=「员工」P=「都买了公司股票」（MOST 句首路径）。命中守卫即跳过后置腿。
+        // 注：与上面的引述动词守卫尾部同表，此处单列便于承重审计——两条守卫
+        // 都是「量词前的串不是 NP 主项」的不同证据形态。
+        if (/(?:推出|推知|可知|得出|推论|推断|推理|总结|归纳|说明|证明|意味着|足以证明|足以说明|由此可见|据此|得知|获悉|可见|表明|显示|指出|发现)$/.test(S0)) continue;
+        // [r319] 程度前缀守卫：S0 尾部是程度/比较前缀（超过/近/约/达到/
+        // 逾/高达/至少/至多/不足/不到…）时，量词前是量化修饰语而非 NP 主项
+        // ——「超过八成的订阅用户打开了邮件」按 ZHUJU 腿会匹配到「八成」
+        // （index=2，MOST_ZH 的超过八成形在 ZHUJU_ZH 里不存在），切成
+        // S=「超过」P=「的订阅用户打开了邮件」，主项错（round-188 攻击变体
+        // 「超过八成…点击了链接」实测回归）。命中守卫即跳过后置腿，回落 MOST
+        // 句首路径（那里 MOST_ZH 吃掉「超过八成」整串，S=「订阅用户」）。
+        if (/(?:超过|近|约|达到|逾|高达|至少|至多|不足|不到|大约|接近|升至|升至|涨到|高达|占|达)$/.test(S0)) continue;
+        const S = S0;
+        const tail = s.slice(m.index + m[0].length).replace(LEAD_PUNC, '').replace(TRAIL_PUNC, '');
+        if (S && tail) {
+          return { quant: m[0], body: s, raw: s, S, P: tail, verb: '', bound: m[0], isEN: false };
+        }
+      }
+    }
+  }
   let quant = null, body = null;
   for (const re of (isEN ? R.MOST_EN : R.MOST_ZH)) {
     const m = s.match(re);
     if (m) { quant = m[0]; body = s.slice(m.index + m[0].length); break; }
   }
-  if (!quant || !body || !body.trim()) return null;
+  // [r319] EN 中置 mostly 兜底：MOST_EN 的 `most(?:ly)?` 无位置锚，句段
+  // 「Reform supporters mostly read news」里 match 命中中置 mostly
+  // （index=18），剥后 body=「read news」→ 主项只剩谓词，链条断
+  // （缺口实证 D 族：EN mostly 形 pristine 与 r318 在途两边都漏）。
+  // EN 传递链的规范形是**句首**量词（"Most X …"），故 EN 路径优先尝试
+  // 句首锚定匹配；句首无 MOST 时才回落中置匹配（中置形由 _parseEN 的
+  // mostly 剥离腿处理）。ZH 不变（ZHUJU_ZH 后置腿本就是中置量词的既定
+  // 设计，锚定会破坏它）。
+  if (isEN) {
+    for (const re of R.MOST_EN) {
+      const anchored = new RegExp('^' + re.source, re.flags.replace('g', ''));
+      const m = s.match(anchored);
+      if (m) { quant = m[0]; body = s.slice(m[0].length); break; }
+    }
+  }
+  if (!quant || !body || !body.trim()) {
+    // [r318] 省略路径先试「的」字 NP 延长腿（模块级 _deLeg）：无 MOST 量词
+    // 段如「认为公司有前途的员工都买了公司股票」——裸谓词扫描会把「认为
+    // 公司」当 S、「前途的员工都买了公司股票」当 P（最右谓词「有」抢切），
+    // 「的」字腿才是该形的正确切分（S=「认为公司有前途的员工」P=「买了
+    // 公司股票」）。「的」形优先于谓词扫描，其次才走省略谓词腿。
+    if (!isEN && opts && opts.chainQuant && opts.segHasMost === false) {
+      const de = _deLeg(_stripLead(seg));
+      if (de) return { quant: '', body: seg, raw: seg, S: de.S, P: de.P, verb: '', bound: '的', isEN: false };
+    }
+    // [r318] 结论省略量词腿（ZH）：中文传递谬误高频省略结论段量词——
+     // 「喜欢甜食的人多数偏胖，多数偏胖的人有脂肪肝，所以喜欢甜食的人有
+    // 脂肪肝」的结论段「喜欢甜食的人有脂肪肝」不含任何 MOST/ZHUJU 量词，
+    // 旧路径整段 return null → 链式判定失去 C 件直接漏判。
+    // 本腿在 MOST 全 miss 时兜底切分：body 呈「NP+有/患/得+Z」或
+    // 「NP+谓词」形时切出 S/P（quant='' 标记省略形，供主链 C 件使用）。
+    // 保守条件：必须出现 [r318] 省略腿谓词表（有/患/属于/是…）或
+    // 「的」字 NP 形，否则不猜（裸名词段如「支持改革的人」不切，避免把
+    // 非结论段误判成结论）。
+    // [r319] 省略腿的启用门为双门 AND（chainQuant && segHasMost===false）：
+    //   · chainQuant（全链预扫，只算 MOST/MOST_EN，**不算 ZHUJU_ZH**）：同链
+    //     至少一段有 MOST 命中。注入 MOST_ZH=[] 时全链无 MOST → 门关 → 停火。
+    //     r318 把 ZHUJU_ZH 也算进预扫，而它是独立常量、注入族清不掉，导致注入
+    //     后预扫仍 true、省略腿兜底切分令停火失效（6 项回归统一根因）。
+    //   · segHasMost===false（段级）：本段自身无 MOST 才走省略腿，有量词的段
+    //     走显式量词路径（注入后 MOST miss 自然 null），避免同段既匹配量词又
+    //     被省略腿兜底切出 statement 的双路径泄漏。
+    if (!isEN && opts && opts.chainQuant && opts.segHasMost === false) {
+      const b2 = _stripLead(seg);
+      // 谓词扫描：取**最后一个**合理谓词位置（S 尽量长）——懒匹配 (.+?)
+      //   只取最短前缀，会把「认为公司有前途的员工…」切成「认|为|公司…」
+      //   （S 长度 1 被拒后直接 null，不会回溯）。改为对谓词表中每个词
+      //   找所有出现位，取使 S>=2 且 P>=1 的**最右**位置：
+      //   「认为公司有前途的员工都买了公司股票」→ 谓词「有」最右位在
+      //   「公司|有|前途」，S=「认为公司」长度 4，P=「前途的员工都买了公司股票」。
+      const PRED2 = ['患有', '患了', '属于', '包含', '包括', '含有', '有', '是', '为', '乃'];
+      let best = null;
+      for (const w of PRED2) {
+        let from = 0;
+        for (;;) {
+          const i = b2.indexOf(w, from);
+          if (i < 0) break;
+          const S = b2.slice(0, i).replace(/[，,。；;、\s]+$/, '');
+          const P = b2.slice(i + w.length).replace(/^[，,。；;、\s]+/, '');
+          if (S.length >= 2 && P.length >= 1) {
+            if (!best || i > best.i) best = { i, S, P };
+          }
+          from = i + 1;
+        }
+      }
+      if (best) return { quant: '', body: b2, raw: b2, S: best.S, P: best.P, verb: '', bound: '', isEN: false };
+    }
+    return null;
+  }
   body = body.trim();
   if (isEN) {
     const parsed = _parseEN(body);
@@ -249,6 +448,31 @@ function _parseMost(seg, R) {
   // （「大多数A可能是C」剥掉「可能」才切得出谓项；豁免判定走 raw 原串）
   const b0 = body.replace(/^的+/, '');
   const b = b0.replace(/可能|也许|或许|大概|往往|通常|一般来说/g, '');
+  // [r318] 「的」字 NP 延长腿（显式切分，提前 return）：「多数偏胖的人有
+  // 脂肪肝」类——_findBound 取最早边界会把「偏|胖的人有脂肪肝」切开
+  // （「胖」是 VERB1_ZH 单字谓词，idx=1 抢切），主项素材丢失导致中间项
+  // 链接断。若 body 呈「X的Y[谓词…]」形（X 非空谓词性修饰、Y=1-4 字名词），
+  // 主项取「X的Y」整段、谓项取其后的全部，保住「偏胖的人→有脂肪肝」链接。
+  // 「有」不在 BOUND_ZH（AGENTS 约定：有害/认为会误切），故此腿不查边界词，
+  // 直接按「的」位置切；X 为空（裸「的读者」形）不触发，走原路径。
+  // Y 长度上限 4 且**懒匹配+右锚**（Y 后须接功能词/「有」类谓词或句尾）
+  // ——否则「偏胖的人有脂肪肝」会把「人有脂肪」当 Y 整段吞掉（无锚点时
+  // .{1,4} 贪婪吃满），切出「偏胖的人有脂肪|肝」的错位形。右锚词表是
+  // 本腿局部常量（含「有」），刻意不复用全局 BOUND_ZH——「有」进全局表
+  // 会误切「有害/认为」（AGENTS 约定），本腿只在「X的Y」形已成立时查，
+  // 误切面可控。
+  {
+    const m = b.match(/^(.+?)的(.{1,4}?)(?=都是|皆是|全是|均是|都属于|就是|乃是|属于|都|是|会|能|可以|能够|将|在|也|还|就|才|便|被|把|让|使|即|得|已|仍然|依然|仍旧|仍|正|刚刚|再|又|有|无|属于|包含|包括|含有|患|得|患了|患有|$)/);
+    if (m && m[1].length >= 1) {
+      const headLen = m[0].length;
+      const rest = b.slice(headLen);
+      if (rest.length >= 1) {
+        const S = b.slice(0, headLen).replace(/[，,。；;、\s]+$/, '');
+        const P = rest.replace(/^[，,。；;、\s]+/, '');
+        if (S && P) return { quant, body: b, raw: b0, S, P, verb: '', bound: '的', isEN: false };
+      }
+    }
+  }
   const bound = _findBound(b, R);
   if (!bound) return { quant, body: b, raw: b0, S: b, P: '', verb: '', bound: '', isEN: false };
   const S = b.slice(0, bound.idx).replace(/[，,。；;、\s]+$/, '');
@@ -260,19 +484,45 @@ function _parseMost(seg, R) {
   return { quant, body: b, raw: b0, S, P, verb: '', bound: bound.word, isEN: false };
 }
 
-// 英文谓词解析：copula 形 / 动词形（动词入 region 供中间项检索）
+// 英文谓词解析：copula 形 / 动词形（动词入 region 供中间项检索）。
+// [r318] 三个补丁：①玩具形单字母主项（A/B/C）仍可切分——三 token 正则把
+// 「A are B」整体吞进主项，链条直接断；②结论双 token 形（students game）
+// 允许谓词后置，P 取尾词，主项取头部 NP；③mostly 量词后 NP 即主项。
 function _parseEN(body) {
+  // [r319] 中置 mostly 形（EN 量词后置腿，对应 ZH ZHUJU 后置腿）：「Reform
+  // supporters mostly read news」——_parseMost 的量词剥除对 EN 段取首个
+  // `most(?:ly)?` 匹配（无位置锚），中置 mostly 命中后剥掉它、body 只剩
+  // 「read news」→ 主项丢失、链条断（缺口实证 D 族：EN mostly 形 pristine
+  // 与 r318 在途两边都漏，round-188 攻击变体 EN mostly 形实测漏判）。
+  // 本腿在 body 仍含中置 mostly 时把它当切分点：前半 NP 即主项、后半 VP
+  // 即谓项，与 ZH 后置腿同构。走完本腿后不再走下面的谓词兜底正则。
+  {
+    const mid = body.match(/^(.+?)\s+(?:mostly|largely|mainly|primarily|chiefly)\s+(.+)$/i);
+    if (mid && mid[1].trim().length >= 2 && mid[2].trim().length >= 1) {
+      return { S: mid[1].trim(), P: mid[2].trim(), verb: '' };
+    }
+  }
   let m = body.match(/^(.+?)\s+(?:are|is)\s+(.+)$/i);
-  if (m && _enWords(m[1]).length) return { S: m[1].trim(), P: m[2].trim(), verb: '' };
+  if (m) return { S: m[1].trim(), P: m[2].trim(), verb: '' };
   m = body.match(/^(.+?)\s+(\w+(?:s|ed|en))\s+(.+)$/i);
-  if (m && _enWords(m[1]).length) return { S: m[1].trim(), P: m[3].trim(), verb: m[2] };
+  if (m) return { S: m[1].trim(), P: m[3].trim(), verb: m[2] };
   // 一般动词兜底（got/went/made…）：主项仍取懒匹配首段
   m = body.match(/^(.+?)\s+(\w+)\s+(.+)$/i);
-  if (m && _enWords(m[1]).length) return { S: m[1].trim(), P: m[3].trim(), verb: m[2] };
+  if (m) return { S: m[1].trim(), P: m[3].trim(), verb: m[2] };
+  // [r318] 双 token 结论形（「students game」「voters read news」）：无动词
+  // 边界可切，主项=首词、谓项=尾词，保住链式三件齐备
+  m = body.match(/^([A-Za-z][A-Za-z'-]*)\s+(.+)$/i);
+  if (m) return { S: m[1].trim(), P: m[2].trim(), verb: '' };
   return { S: body.trim(), P: '', verb: '' };
 }
 
-// 中文边界查找：功能词优先，双字动词次之，单字动词兜底；主项至少留 1 字
+// 中文边界查找：功能词优先，双字动词次之，单字动词兜底；主项至少留 1 字。
+// [r318] 「人喜欢甜食」类结构——量词已吃掉「大多数」，主项仅剩「人」、
+// 谓词「喜欢」出现在第 2 字位置，但 consider 的 i<1 守卫只要求主项非空，
+// 这里真实断点是谓词表里「喜欢」不在 VERB_ZH（有「爱」无「喜欢」），补进
+// VERB_ZH 高频情感/行为词即可；同时 VERB1_ZH 的 /爱/ 兜底会切成「人|喜欢
+// 甜食」也够用——真正卡住的是「人早起」型单字谓词在主项后第 2 字，/早/ 不
+// 在 VERB1_ZH（有「起」相关词无「早」）。补这两个缺口即可覆盖。
 function _findBound(body, R) {
   let best = null;
   const consider = (word, i) => {
@@ -289,9 +539,18 @@ function _findBound(body, R) {
     const m = body.match(re);
     if (m) consider(m[0], m.index);
   }
+  // [r319] 单字谓词层（VERB1_ZH）要求主项 ≥2 字：r318 把 26 个裸单字谓词
+  // 从 VERB_ZH 移入本层（承重修正，注入族清 VERB1_ZH 即可停火）后暴露新误切
+  // ——「订阅用户打开了邮件」里 /用/ 命中 index=1，切成 S=「订阅」P=「户打开
+  // 了邮件」（round-188 攻击变体「超过八成…点击了链接」实测回归）。功能词/
+  // 双字谓词层主项 1 字即可（「人都买了股票」），但单字谓词无词长佐证，主项
+  // 仅 1 字时大概率是双字词内部误配（订阅/使用/利用/费用/作用…），故抬到
+  // i>=2。代价：量词后紧跟「单字主项+单字谓词」（如「人早起」里「早起」的
+  // 早）退回无边界路径，该形由 VERB_ZH 双字词层覆盖（「早起」未入表则整句
+  // 走 S=body 保守路径，不产生错切）。
   for (const re of R.VERB1_ZH) {
     const m = body.match(re);
-    if (m) consider(m[0], m.index);
+    if (m && m.index >= 2) consider(m[0], m.index);
   }
   return best;
 }
@@ -316,6 +575,19 @@ function _enWords(s) {
     .filter(w => w.length > 1 && !EN_STOP.has(w));
 }
 
+// [r318] 玩具形单字母链（Most A are B. Most B are C. …）专用：_enWords 的
+// length>1 守卫让 A/B/C 全部出局，链条三件的中间项链接恒断。此处显式收
+// 单字母词（仅当两侧都只有单字母可用时生效，不影响自然语言路径——自然
+// 语言句 _enWords 总能给出多字母词，先命中自然路径即返回）。
+// 注：独立停用表（EN_SYM_STOP）而非复用 EN_STOP——EN_STOP 含 'a'/'b'/'c'/
+// 'i' 等，会把玩具链符号整体过滤空。EN_SYM_STOP 只排自然语言功能单字母词
+// （a/i 冠词与主语代词），保留 A/B/C/D/X/Y/Z 符号链。
+const EN_SYM_STOP = new Set(['a', 'i']);
+function _enSymbols(s) {
+  return String(s).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
+    .filter(w => w.length === 1 && !EN_SYM_STOP.has(w));
+}
+
 function _share(a, b, isEN) {
   if (!a || !b) return null;
   if (isEN) {
@@ -326,6 +598,13 @@ function _share(a, b, isEN) {
         const st = w.slice(0, 4);
         for (const v of wb) if (v.length >= 4 && v.slice(0, 4) === st) return w;
       }
+    }
+    // [r318] 玩具形单字母链回退（Most A are B. Most B are C. Therefore most
+    // A are C.）：自然词路径（length>1）全空时按单字母共享词匹配，使 A/B/C
+    // 符号链的中间项链接可判。仅在自然路径无果时生效，良性句不受影响。
+    const sb = new Set(_enSymbols(b));
+    for (const w of _enSymbols(a)) {
+      if (sb.has(w)) return w;
     }
     return null;
   }
@@ -404,6 +683,7 @@ function checkMostTransitivity(text, inject) {
   const IFZ = R.INFER_ZH || INFER_ZH, IFE = R.INFER_EN || INFER_EN;
   const PMZ = R.PREMISE_ZH || PREMISE_ZH, PME = R.PREMISE_EN || PREMISE_EN;
   const META = R.META_CONCEPT || META_CONCEPT, TCH = R.TEACH || TEACH, HDG = R.HEDGE || HEDGE;
+  const ZJZ = R.ZHUJU_ZH || ZHUJU_ZH;  // 仅 _parseMost 后置腿用（经 R 透传）
   const cfg = { MOST_ZH: MOSTZ, MOST_EN: MOSTE, BOUND_ZH: BND, VERB_ZH: VB, VERB1_ZH: VB1 };
 
   // 全文级守卫：概念转述 / 教学语境 / 对冲 / 疑问句
@@ -411,23 +691,34 @@ function checkMostTransitivity(text, inject) {
   if (_anyHit(TCH, text)) return _pass();
   if (/[?？]/.test(text)) return _pass();
 
-  // 逐片段解析 MOST 陈述（结论 / 前提两用）
+  // [r319] 段级量词门 + 全链预扫门双门（AND）：
+  //   ① 全链预扫 chainQuant：同链至少一段有 MOST/MOST_EN 量词命中（**不含
+  //      ZHUJU_ZH**——它是独立常量，round-188 注入族只清 MOST_ZH，含它会让
+  //      注入后预扫仍为 true，省略腿兜底切分令停火失效，r318 实测 6 项回归
+  //      的统一根因）。
+  //   ② 段级门 segHasMost===false：本段自身无 MOST 命中才走省略腿（有量词的
+  //      段走显式量词路径，注入后 MOST miss 自然 null）。
+  // 双门 AND 后：注入 MOST_ZH=[] → chainQuant=false → 省略腿全关 → 停火；
+  // 真实省略结论（结论段无量词、前提段有 MOST）→ 两门皆过 → 兜底生效。
   const stmts = [];
   const segs = _segments(text);
+  const chainQuant = segs.some(sg => _firstHit(MOSTZ, sg) || _firstHit(MOSTE, sg));
   for (let si = 0; si < segs.length; si++) {
     const seg = segs[si];
+    const segHasMost = !!(_firstHit(MOSTZ, seg) || _firstHit(MOSTE, seg));
+    const opts = { segHasMost, chainQuant };
     const inf = _firstHit(IFZ, seg) || _firstHit(IFE, seg);
     if (inf) {
       const after = seg.slice(inf.idx + inf.word.length);
-      const c = _parseMost(after, cfg);
+      const c = _parseMost(after, cfg, opts);
       if (c) stmts.push(Object.assign({ segIdx: si }, c, { concl: true, hasInfer: true }));
       const before = seg.slice(0, inf.idx);
-      const p = _parseMost(before, cfg);
+      const p = _parseMost(before, cfg, opts);
       if (p) stmts.push(Object.assign({ segIdx: si }, p, { concl: false, hasInfer: false }));
       continue;
     }
     const pm = _firstHit(PMZ, seg) || _firstHit(PME, seg);
-    const p = _parseMost(pm ? seg.slice(pm.idx + pm.word.length) : seg, cfg);
+    const p = _parseMost(pm ? seg.slice(pm.idx + pm.word.length) : seg, cfg, opts);
     if (p) stmts.push(Object.assign({ segIdx: si }, p, { concl: false, hasInfer: false }));
   }
 
@@ -492,6 +783,6 @@ module.exports = {
     INFER_ZH, INFER_EN, PREMISE_ZH, PREMISE_EN,
     META_CONCEPT, TEACH, HEDGE, ZH_STOP, EN_STOP,
     _segments, _parseMost, _findBound, _parseEN, _share, _shareEither,
-    _shareLen, _contains,
+    _shareLen, _contains, _anyHit, _firstHit,
   }),
 };

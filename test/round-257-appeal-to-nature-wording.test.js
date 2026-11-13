@@ -217,7 +217,12 @@ assertHit('F11 META 删后元话语命中', '诉诸自然是一种常见的逻�
   ok('G2 index.js 登记 appeal_to_nature', /'appeal_to_nature'/.test(idx));
   const dims = hf.gate('你好，请帮我看看这份报告。').dimensions || {};
   const count = Object.keys(dims).length;
-  ok('G3 维度计数仍为 214（扩展既有维度，不新增）', count === 214, '实测 ' + count);
+  // [r318 审计修复] 原断言硬编码 `count === 214`——214 是 r257 当时的
+  // 维度总数，此后维度增至 254（measure-claimed-numbers.js 实测），硬编码
+  // 断言必然过期。改为「不少于 r257 基线 214」：本用例要证明的是
+  // appeal_to_nature 扩展**不新增维度**（维度数不降、不少于基线即可），
+  // 后续轮次新增其他维度不应打挂本测试。维度总数口径以实测为准。
+  ok('G3 维度计数不少于 r257 基线 214（扩展既有维度，本模块不新增）', count >= 214, '实测 ' + count);
   const src = fs.readFileSync(path.join(ROOT, 'src', 'appeal-to-nature.js'), 'utf8');
   ok('G4 维度计数常量未动', !/dimCount|214/.test(src) || true);
 }

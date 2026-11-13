@@ -201,6 +201,17 @@ function extractZhWords(text) {
       }
     }
   }
+  // [r320] 拉丁字母/数字序列腿：中文句里的论题占位符（「大多数A是B，大多数B
+  // 是C，所以至少有些A是C」的 A/B/C；「x1→x2→x3」链；「R1、R2」编号）是承载
+  // 主题的符号，旧正则只抽汉字 → 占位符两侧各零实词 → 假「零共享」→ 良性特称
+  // 结论被误推到 rewrite（round-188 存量债，pristine 同败）。统一 upper 归一
+  // （「A」与「a」视为同一符号），不过停用表（占位符不是虚词）。
+  // 安全边界：攻击句「所以大多数A是C」在汉字侧本就共享「大多数」，拉丁腿不
+  // 改变其族归属——该形由 most_transitivity 判 verify，本维度零共享判据只管
+  // 主题不相干，占位符句主题显然相干，放行是正确方向。
+  for (const w of text.match(/[A-Za-z0-9]+/g) || []) {
+    out.add(w.toUpperCase());
+  }
   return out;
 }
 
@@ -610,4 +621,4 @@ function checkFallacyOfRelevance(text) {
   };
 }
 
-module.exports = { checkFallacyOfRelevance };
+module.exports = { checkFallacyOfRelevance, extractZhWords, extractEnWords };

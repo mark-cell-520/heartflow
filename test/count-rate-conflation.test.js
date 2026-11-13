@@ -180,7 +180,13 @@ check('豁免族：概念教学（中英 2 条）', () => {
 check('边界锁：单腿/邻接/否定前缀/超距/方向反置不判', () => {
   for (const [k, t] of BOUNDARY) assert.equal(detectCountRateConflation(t).hit, false, '误判[' + k + ']: ' + t);
   assert.equal(detectCountRateConflation(OVERDIST).hit, false, '默认邻近窗超距不命中');
-  assert.equal(detectCountRateConflation(REVERSED).hit, false, '裁定在计数锚点之前（方向约束）不命中');
+  // [r318 审计修复] r269 起腿②方向约束已从「裁定须在计数锚点之后」改为
+  // 双侧均收（src/count-rate-conflation.js r269 注释：倒装族「结论前置+
+  // 证据后置」是同一谬误的另一语序，靠 PAIR2 近距窗保证同链）。原断言
+  // `REVERSED.hit === false` 是 r269 前的过期口径，已按现行设计更新：
+  // 反置句（裁定在前、计数在后）现应命中——下面第 240 行的承重证明
+  // 同步改用「同链近距窗」而非「方向」。
+  assert.equal(detectCountRateConflation(REVERSED).hit, true, 'r269 设计：裁定前置的倒装句应收录（双侧均收）');
 });
 
 check('中英混排与多签名加分档', () => {
@@ -237,10 +243,13 @@ check('负例注入：概念教学豁免删除后豁免句变红（承重证明�
   assert.equal(detectCountRateConflation(EXEMPT_CONCEPT[1], { CONCEPT_EN: NEVER, CORRECTIVE_EN: NEVER }).hit, true, '删概念教学EN');
 });
 
-check('负例注入：方向约束承重（放开「裁定须在后」后反置句命中）', () => {
-  // 用 PAIR2_ZH=0 + 反向句无法命中；改用构造验证：反置句在默认约束下不命中，
-  // 而把同句倒装成「计数在前」即命中——证明约束真实承重。
-  assert.equal(detectCountRateConflation(REVERSED).hit, false, '反置句默认不命中');
+check('负例注入：腿①×腿②同链近距窗承重（反置句默认命中，PAIR2 收紧到 0 后不命中）', () => {
+  // [r318 审计修复] 原用例名为「方向约束承重」，验证的是「裁定须在后」。
+  // r269 已取消方向约束（倒装族要收录），承重证明随之改为真正的同链
+  // 近距窗：反置句默认靠 PAIR2 窗命中；把窗收紧到 0 后同句不命中——
+  // 证明收录反置句的不是全文任意共现，而是近距同链约束。
+  assert.equal(detectCountRateConflation(REVERSED).hit, true, '反置句默认命中（r269 双侧均收）');
+  assert.equal(detectCountRateConflation(REVERSED, { PAIR2_ZH: 0 }).hit, false, 'PAIR2_ZH=0 后反置句不命中（窗承重）');
   assert.equal(detectCountRateConflation('我们市癌症病例全国第一，所以这里明显更差').hit, true, '同成分正置句命中');
 });
 

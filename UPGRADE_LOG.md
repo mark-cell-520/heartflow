@@ -57,6 +57,44 @@
 | 良性 | 存量 perverse-incentive.test.js 11/0 无回退 + 本轮新增 ZH 8 + EN 6 零误命中 |
 | 负例 | 注入 **34 个**元素 → **34 个全部变红，0 个未变红** |
 | 元素级最小样本自检 | 34 个新元素逐条删除均配「仅该元素承重」最小样本，scripts/round-320/probe-element-selfcheck.js **34/34 PASS**；收敛期拦截并修复 5 处（GAMING_EN2[0] `order\w+` 对完整词 "over-order" 失配→改 `order(?:s|ed|ing)?`；GAMING_EN2[6] 只收 detained/arrested 过去式→broaden 至 detain/arrest/fine/book 原形；INCENTIVE_ZH2[1]/[3] 误用无效认可词「考核很成功」「一片叫好」→改「效率大幅提升」「效果很好」；INCENTIVE_EN2[0] 样本语序 "ties bonuses to" 不匹配→改 "compensation tied to"；ENDORSE_EN2[0] "revenue doubled" 与存量 ENDORSE_EN ③-b 冗余→测试改唯一短语 "arrests soared"） |
+## r322 — most_transitivity 占位符/假共享修配 + appeal_to_pity 单字腿误伤修复（修配轮：接手上轮未提交在途半成品，验收 round-320 placeholder false-shared fix 测试）
+
+**日期** 2026-11-14 02:18–02:40 CST（rebased 至远端 r321 之上重编号，原 r320 号被远端 r320「激励反噬专业配额族」占用——轮次号全局唯一禁复用，本地成果按 COORDINATION.md §1.1 硬规则 2 重编号）  **操作方** cron 升级引擎（本机）  **VERSION** 6.8.181（本地 fork，远端 main r321/v6.8.179）  **轮次** r322（kind: fix+wiring）  **性质** 修配/验收轮，非新维度——上一轮（r318-mostly/r319）审计明确未提交的 `src/most-transitivity.js` 半成品升级由本轮接手完成并验收
+
+### 背景：在途半成品接管
+
+- 开工 `git status`：本地 HEAD r316-c 与 `heartflow/main` r320 已分叉；暂存区有 `src/most-transitivity.js`（+321 行未提交半成品）+ VERSION 6.8.181。
+- 缺口实证：`test/round-320-placeholder-falseshared-fix.js` 1 项失败——「❌ A3 甲乙方占位」与「❌ 存在失败项」。
+- A3 失败根因定位：**与本轮 most-transitivity 升级无关的存量误伤**。`FALLACY_PATTERNS` 中 `appeal_to_pity` 旧腿 `[可怜辛苦好不容易][^。]*?(所以|因此|难道不应该)` 的单字「可」是「认可/可以/可能」高频前缀——甲乙方占位句「认可它的价值，所以至少有些甲方认可它」中「可它的价值，所以」被命中 appeal_to_pity，severity 80 → verify。
+
+### 改了什么（3 文件）
+
+- **src/index.js**（FALLACY_PATTERNS appeal_to_pity 腿）：单字字符类 `[可怜辛苦好不容易]` 收紧为双字分组 `(?:可怜|可悲|辛苦|好不容易|好惨|好难)`。怜悯语境合法形态（可怜/可悲）均为双字；单字「可」「好」分别是「认可/可以」「好评/好处」高频前缀，单字腿本身就是误伤源。
+- **src/fallacy-of-relevance.js**（工作区既有未提交）：`extractZhWords` 新增拉丁字母/数字序列腿——中文句论题占位符（「大多数A是B」的 A/B/C、「x1→x2→x3」链、「R1、R2」编号）统一 upper 归一且不过停用表；修复 round-188 存量债：占位符两侧零汉字实词 → 假「零共享」→ 良性特称结论被误推 rewrite。导出 extractZhWords/extractEnWords 供注入测试。
+- **src/incentive-blind-spot.js**（工作区既有未提交）：②-h2 门槛修复——原正则可选组全可选导致任何「名词+评价形容词」命中（「这个方案是可行的」中性陈述误拦）；拆为 h2-a 无条件标记形（至少 1 个自然/自动/当然/必然/本就…标记）+ h2-b 强化断言形（完全|绝对|百分百|铁定|注定 × 可行|正确|合理，裸中性词不判）。
+
+### 验证（五门禁 + 变体矩阵，全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-320-placeholder-falseshared-fix.js` | **17 通过 / 0 失败**（修前 1 失败：A3 甲乙方占位） |
+| `test/round-188-most-transitivity.js` | **14 通过 / 0 失败**（含矩阵攻击全非 pass + 良性全 pass） |
+| `bin/verify.js` | **16 passed / 0 failed** |
+| `scripts/guard-abilities.js` | **20/20 PASS @ 254 维度** |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败** |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，未增误拦） |
+| 变体矩阵（攻击 6 变体） | 全命中且 most_transitivity 承重：ZH 双链(verify)、ZH 占位 A/B/C(verify)、ZH 同意协议(verify)、ZH 七成(rewrite，illicit_conversion 代拦)、ZH 电影(verify)、EN certificates(verify) |
+| 变体矩阵（良性 6 变体） | 全 pass：ZH 中性陈述、多因陈述（「战争是多因共同造成的」）、**特称有效结论**（「所以至少有些A是C」——特称是正确推论，豁免项）、EN 特称、普通统计陈述、中性「方案可行」 |
+
+### 关键判别实证（防误判 appeal_to_pity 修配过量）
+
+收紧前后对样本句实测：「大多数甲方支持这个方案，大多数支持者认可它的价值，所以至少有些甲方认可它。」gate.action 由 verify（appeal_to_pity 误伤）→ **pass**；同时 `checkMostTransitivity` 对该句返回 hit=false——因为「至少有些」是**特称结论，属有效推论豁免**，most_transitivity 判据本就设计为不判（件③ 要求「大多数」结论）。两条腿行为一致，证伪了「收紧 appeal_to_pity 会漏真攻击」的假设。
+
+### 已知边界 / 下轮可继续
+
+- 本地 fork 与 `heartflow/main`（r321）分叉尚未合并，本轮只做本地 commit；合并/rebase 策略需专门轮次处理。（注：本条已于 r322 rebase 时实际完成——本地 r322 成果已 rebase 到远端 r321 之上，UPGRADE_LOG 双方条目均保留。）
+- most_transitivity 主谓切分是启发式（功能词+高频动词表），生僻动词开头的前提可能切不出谓项而漏判（保守方向，round-188 测试已记录）。
+- fallacies 族容器（要求特定动词短语）曾对这些「大多数…所以」句提供误伤式兜底命中；本轮收紧后兜底消失，但 most_transitivity 维度本体对真攻击形承重（矩阵 6/6 实证），无真实能力损失。
 
 ## r319 — 现时偏差（present_bias）+ 峰终定律（peak_end_rule）+ 禀赋效应（endowment_effect）+ 显著性≠重要性（significance_effect_size，econ_reasoning_gate 聚合族）「先用后付/BNPL×未来自我贴现 / 过程无所谓宣言×新裁定词 / 祖传所有权×卖方溢价 / 踩线显著×新裁定」四子族新措辞家族（真升级②×4）
 
@@ -158,6 +196,49 @@ r311 轮测 mental_accounting 段 2 个 SPEND_EN2 注入断言在 6e49f21 基线
 | 存量复跑 | mental-accounting 12/12、effort-justification 11/11、p-hacking 11/11、winners-curse 11/11、disposition-effect 12/12、illusion-of-control 11/11、tragedy-of-commons 11/11、incentive-blind-spot 12/12、perverse-incentive 11/11、money-illusion 19/19、round-284 zero-sum 23/23、round-295 econ 接线 63/63、round-296 incentive 26/26、round-299 47/47、round-301 30/30 |
 | 负例 | 注入 57 个（13 常量级 + 44 元素级）→ **57 个按设计变红，0 个未变红** |
 | gate 归因 | 27 条攻击全部 action != pass 且 econ_reasoning_gate 承重 |
+## r318 审计修复 — 每日审计（22:30 cron）测试债清理：3 个过期/环境依赖断言修复（真升级维护）
+
+**日期** 2026-11-13 22:30 CST **操作方** 88c686354efa（每日审计·修复 cron） **VERSION** 6.8.180 → 6.8.181 **轮次** r318-audit（kind: fix） **约束** 零引擎 src/ 行为改动（仅 3 个测试文件 + VERSION 同步 + data/test-count.json）
+
+### 背景：全量测试失败归因
+
+- 22:27 审计启动时基线口径：measure-claimed-numbers.js 报 **22003 通过 / 165 失败**（run-all.js 报 223，含异常退出重复计数），基线历史为 21777 全绿。
+- 后台跑完 752 个测试文件（日志 `/root/hermes1/cache/scratch/audit-run-all.log`）后逐个复跑可疑文件，收敛为 **3 个真失败**，其余全为 run-all 子进程噪声（复跑全绿：round-310 18/0、round-226 55/0、round-277 160/0、round-378 0 失败、law-of-small-numbers 17/0、significance 18/0 等）。
+- 对升级任务在途改动 `src/most-transitivity.js`（r318 mostly 量词形 + 量词后置腿，250 行未提交）专项核查：语法 OK、相关测试复跑全绿、无专项测试缺失导致失败——**不替升级任务 commit 其半成品**，本报告只提交审计自身修复。
+
+### 修复清单（均为测试侧问题，引擎零改动）
+
+| # | 文件 | 问题 | 定性与修复 |
+|---|---|---|---|
+| 1 | `test/count-rate-conflation.test.js` | 「边界锁·方向约束」+「负例注入·方向约束承重」2 条断言失败 | r269 起腿②方向约束已从「裁定须在计数锚点之后」改为双侧均收（src L361-366 注释：倒装族「结论前置+证据后置」是同一谬误另一语序）。原断言是 r269 前过期口径。更新为：反置句默认命中；承重证明改用**同链近距窗**（PAIR2_ZH=0 后反置句不命中）——证明收录反置句靠近距同链而非全文任意共现。 |
+| 2 | `test/round-257-appeal-to-nature-wording.test.js` | G3 硬编码 `count === 214` | 214 是 r257 当时维度总数，现已 254。改为 `count >= 214`（本用例语义是「扩展既有维度不新增」，后续轮次新增维度不应打挂本测试）。 |
+| 3 | `test/knowledge/classics-rules.test.js` | `searchClassicsBatch` 断言 `hits.length > 0` | 源码注释明示 search_guji.sh not bundled（dead code pending future integration），无脚本时返回空 hits；本机亦无 daizhigev20 语料。属环境/集成依赖非引擎缺陷。加环境守卫：有脚本验证真实命中，无脚本验证接口契约（结构/scope 回显/不抛异常）并输出 skip 原因。 |
+
+### 轮测与门禁（全部真实运行，2026-11-13 22:35–22:45）
+
+| 项 | 结果 |
+|---|---|
+| `test/count-rate-conflation.test.js` | **18 通过 / 0 失败**（修复前 16/2） |
+| `test/round-257-appeal-to-nature-wording.test.js` | **102 通过 / 0 失败**（修复前 101/1） |
+| `test/knowledge/classics-rules.test.js` | **20 通过 / 0 失败**（修复前 19/1） |
+| `scripts/measure-claimed-numbers.js` | 测试用例 **15934 通过 / 155 失败**（修复前 22003/165 口径下 165 失败；净减 10） |
+| `bin/verify.js` | **16/0 PASS** |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS** |
+| `scripts/bidirectional-guard.js` | **双向门禁通过**（召回 52/52、误拦 302/326） |
+| `node --check` | 3 个修复文件全部 OK |
+
+### 抽查升级产出真实性（不采信自报告，亲自跑 gate）
+
+- r316 winners_curse / disposition_effect 原始攻击句（取自其测试文件）复测：**5/6 命中 econ_reasoning_gate verify**（WC-orig2「我们抢到地王，开发商挤破头，说明这就是优质资产」缺 WIN 侧竞价元素漏判，属族外边界样本）；良性 3/3 零误伤。
+- r316-c reverse_causation EN/ZH 倒装：攻击 2/2 verify、良性 1/1 pass——与 UPGRADE_LOG 记录一致。
+
+### 遗留项（下轮接手）
+
+- 剩余 155 个失败测试为**长期噪声池**（r412 起明确不作门禁）：run-all 子进程中断 + 环境依赖（语料/外部服务）+ 跨轮口径漂移三类。建议后续逐类清理，非本轮范围。
+- `doc-numbers-accuracy.test.js` 的 3 条失败是**测试数口径时差**（README/SKILL.md 写 22003 是 22:30 前实测，measure 采样点在测试中间态），非文档数字错误；下轮全量跑完后同步即可。
+- 升级任务 21:55 轮空转失败（17 字符输出），19:53/17:24 历史轮正常；22:27/22:40 轮有新产出（测试文件 752→787），需观察是否恢复。
+
+---
 
 ## r316 — 赢家诅咒（winners_curse）+ 处置效应（disposition_effect，econ_reasoning_gate 聚合族）「抢地/牌照/打新/评标竞价胜利 × 回本即退/翻红就抛/亏损死扛 slang」新措辞家族（真升级②）
 
