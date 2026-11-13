@@ -303,61 +303,85 @@ const C_EN3 = [
 // 良性 10/10 零误伤。第六平行常量 + findSignatures concat 合并不动存量腿。
 // 腿① 现代公共资源/公共品锚点（中文）
 const A_ZH4 = [
-  // ④-a 显式现代公族复合词
-  /(?:旅游景点|风景名胜|名胜古迹|古城古镇|热门景区|网红景点|公共景区|开放式景区|公共海滩|公共海域|公共步道|公共设施|公共服务|公共医疗|公费医疗|公费药|免费药|公共药品|一次性餐具|外卖餐具|一次性筷子|公共热搜|推荐流量|公共流量池|免费道路|免费马路|公共道路|公共场所|公立医院)/,
-  // ④-b 现代资源名词×归属/供应形（景点免费开放/景区免门票/抗生素是公费的/餐具免费自取/马路免费通行）
-  /(?:景点|景区|海岛|古城|古镇|海滩|海域|步道|抗生素|消炎药|退烧药|药品|医保药|餐具|筷子|餐盒|包装|流量|热搜|马路|道路|设施|场所)[^。，！？；\n]{0,6}(?:免费|免门票|对外?开放|敞开|公费|医保|人人|谁都可以|谁都能|公共|白给|不要钱|自取|不限量|管够)/,
+  // ④-a 旅游景点域复合词
+  /(?:旅游景点|风景名胜|名胜古迹|古城古镇|热门景区|网红景点|开放式景区|公共景区)/,
+  // ④-b 景点开放供给形（景点免费开放/景区免门票/海岛谁都可以进）
+  /(?:景点|景区|海岛|海滩|步道|古城)[^。，！？；\n]{0,4}(?:免费|免门票|对外开放|敞开|谁都可以|谁都能|人人)/,
+  // ④-c 公费药域（抗生素是公费的/消炎药人人能吃）
+  /(?:抗生素|消炎药|退烧药|处方药)[^。，！？；\n]{0,6}(?:公费|医保|免费|人人|敞开|不限量|谁都能开|不要钱)/,
+  // ④-d 一次性餐具域复合词
+  /(?:一次性餐具|一次性筷子|外卖餐具|外卖包装|免费餐具|公共餐具|一次性餐盒)/,
+  // ④-e 平台流量/免费道路域（流量复合词 + 免费马路 + 马路×免费/公共）
+  /(?:公共热搜|推荐流量|公共流量池|公共车位|热搜池|免费马路|免费道路|公共道路|(?:马路|道路|车道|公路)[^。，！？；\n]{0,4}(?:免费|公共|敞开|谁都可以|不限量))/,
 ];
 // 腿①（英文）
 const A_EN4 = [
-  /(?:tourist\s+(?:site|spot|attraction|trap)|heritage\s+site|historic\s+site|old\s+town|scenic\s+(?:area|spot|site)|resort\s+island|diving\s+reef|public\s+beach|public\s+trail|antibiotics?|prescriptions?|over[- ]the[- ]counter|disposable\s+cutlery|takeout|single[- ]use\s+(?:cutlery|utensils?|packaging)|trending\s+topics?|recommendation\s+feed|public\s+traffic|free\s+highway|public\s+road)/i,
-  /\b(?:is|are|was|were)\s+(?:free|open)\s+(?:to\s+)?(?:anyone|all|everyone|the\s+public|visitors?|divers?|take|enter|drivers?)\b/i,
-  /\b(?:covered|funded|paid)\s+(?:for\s+)?(?:by\s+)?(?:everyone|the\s+public|public|insurance|the\s+state)\b/i,
+  // ④-a 旅游景点域资源
+  /(?:tourist\s+(?:site|spot|attraction)|heritage\s+site|historic\s+site|old\s+town|scenic\s+(?:area|spot)|resort\s+island|diving\s+reef)/i,
+  // ④-b 景点开放供给形（reef is open to all divers）
+  /\b(?:site|town|reef|island|beach|trail|spot)s?\s+(?:is|are)\s+(?:free|open)\s+(?:to\s+)?(?:anyone|all|everyone|visitors?|divers?)\b/i,
+  // ④-c 公费药覆盖形（Antibiotics are covered）
+  /(?:antibiotics?|prescriptions?|pills?|medication)\s+(?:are|is)\s+(?:covered|funded|paid)\b/i,
+  // ④-d 一次性餐具域资源
+  /(?:disposable\s+cutlery|single[- ]use\s+(?:cutlery|utensils?|packaging)|plastic\s+cutlery|takeout\s+packaging)/i,
+  // ④-e 平台流量/免费道路域资源
+  /(?:trending\s+topics?|recommendation\s+feed|free\s+highway|public\s+road|front\s+page|free\s+to\s+drive)/i,
 ];
 // 腿② 现代过度取用行为（中文）
 const B_ZH4 = [
-  // ④-c 蜂拥/扎堆/踏平/挤爆×取用
-  /(?:蜂拥|蜂涌|涌[入往]|扎堆|人潮汹涌|人山人海)[^。，！？；\n]{0,8}(?:打卡|下海|拍照|涌入|涌进|挤|踏|踩|攻|涌|玩)/,
-  /(?:挤[爆垮满]|踏平|踩[光平坏]|攻[陷占]|碾平|踏[坏光]|挤垮)/,
-  // ④-d 医药滥用域
-  /(?:动不动就|动辄)[^。，！？；\n]{0,6}(?:输液|打针|吃药|塞药|用药|开药|抗生素|消炎药|挂水|挂瓶)/,
-  /(?:滥用|当饭吃|当万能药|当灵丹妙药)/,
-  // ④-e 能多X就多X 过度取用通用
+  // ④-a 蜂拥/扎堆×打卡/下海/拍照
+  /(?:蜂拥|蜂涌|人潮汹涌|人山人海)[^。，！？；\n]{0,8}(?:打卡|拍照|涌入|下海|涌进)/,
+  // ④-b 踏平/踩光/挤爆
+  /(?:挤[爆垮满]|踏平|踩[光平]|攻[陷占]|碾平|挤垮)/,
+  // ④-c 医药滥用（动不动就输液/打针/开药）
+  /(?:动不动就|动辄)[^。，！？；\n]{0,6}(?:输液|打针|吃药|塞药|用药|开药|挂水)/,
+  // ④-d 能多X就多X 过度取用通用
   /能多[^。，！？；\n]{0,4}就多[^。，！？；\n]{0,4}/,
-  // ④-f 餐具包装过度 + 平台流量掠夺
-  /(?:顺手[多拿薅]|多薅|多拿几套|多包|越[套包]越|多套)/,
-  /(?:蹭|抢话题|蹭热度|蹭流量|灌水|刷榜|抢热点)[^。，！？；\n]{0,4}(?:热度|流量|话题|榜|热点|一波|几个)?/,
-  /(?:能蹭就蹭|蹭一波是一波|能拿几套是几套)/,
+  // ④-e 餐具包装过度（顺手多薅/多包/越套越）
+  /(?:顺手[多拿薅]|多薅|多拿几套|多包|越[套包]越)/,
+  // ④-f 平台流量掠夺（抢话题/蹭热度/灌水/刷榜）
+  /(?:蹭|抢话题|蹭热度|蹭流量|灌水|刷榜)[^。，！？；\n]{0,4}(?:热度|流量|话题|榜|一波)?/,
 ];
 // 腿②（英文）
 const B_EN4 = [
-  /\b(?:floods?|flooding|swarms?|pours?|stampedes?|crams?|piles?)\s+(?:in|into|on)\b/i,
-  /\b(?:trample|trampling|crush|crushing|wear(?:ing)?\s+down|strip|stripping)\b/i,
+  // ④-a 蜂拥涌入（floods in / swarms into）
+  /\b(?:floods?|swarms?|pours?|stampedes?|crams?)\s+(?:in|into)\b/i,
+  // ④-b 踏平/碾（trample / crush / wear down）
+  /\b(?:trample|trampling|crush|crushed|crushing|wear(?:ing)?\s+down)\b/i,
+  // ④-c 过度开药（over-prescribe）
   /\bover[- ]?prescrib(?:e|es|ing)\b/i,
-  /\b(?:demands?|demanding|pressures?|pressuring|pushes?|pushing)\s+(?:for\s+)?(?:more|extra|additional)\s+(?:\w+\s+){0,3}(?:prescriptions?|pills?|medication|antibiotics?|drugs?)\b/i,
-  /\b(?:grabs?|grabbed|takes?|took|hoards?|stockpiles?)\s+(?:extra|as\s+many|as\s+much|more)\b/i,
-  /\b(?:over[- ]?packag\w+|chases?|chasing|rides?\s+the\s+trend|jumps?\s+on)\b/i,
-  /\btake\s+as\s+much\s+as\s+you\s+can\b/i,
+  // ④-d 要求多开药（pressures the doctor for more prescriptions）
+  /\b(?:demands?|pressures?|pushes?)(?:\s+\w+){0,3}\s+(?:for\s+)?(?:more|extra)\s+(?:\w+\s+){0,3}(?:prescriptions?|pills?|medication)\b/i,
+  // ④-e 多拿 extra（grabs extra sets / takes as much）
+  /\b(?:grabs?|takes?|hoards?)\s+(?:extra|as\s+many|as\s+much)\b/i,
+  // ④-f 追热点蹭（chases / jumps on the trend）
+  /\b(?:chases?|chasing|jumps?\s+on|rides?\s+the\s+trend)\b/i,
 ];
 // 腿③ 现代合理化/成本扩散（中文）
 const C_ZH4 = [
-  // ④-g 来都来了 / 不X白不X
-  /(?:来都来了|都来了|来一趟|来都)/,
-  /不[玩踩蹭拿开用塞包趟]白不[玩踩蹭拿开用塞包趟]/,
-  // ④-h 现代成本扩散/搭便车
-  /(?:耐药|抗药性|超级细菌|垃圾|拥堵|堵车|生态|环境|内容质量|信息质量|设施|资源)[^。，！？；\n]{0,12}(?:大家一起|大家|全体|全社会|所有人|人人|全村|全市|谁)[^。，！？；\n]{0,4}(?:遭殃|买单|承担|扛|烂|崩|受不|受损|受害|倒楣|倒霉|吃亏|撑)/,
-  // ④-i 拍照发圈/公费白用合理化
-  /(?:拍照|打卡|发[圈友]|发朋友圈)[^。，！？；\n]{0,4}(?:要紧|再说|别的|其他|顾不了|管不了|谁管|最大)/,
+  // ④-a 来都来了
+  /(?:来都来了|来都|都来了)/,
+  // ④-b 不X白不X
+  /不[玩踩蹭拿开用塞包]白不[玩踩蹭拿开用塞包]/,
+  // ④-c 现代成本扩散/搭便车（耐药/垃圾/拥堵/信息质量 + 大家一起/全社会 + 遭殃/买单/扛）
+  /(?:耐药|抗药性|超级细菌|垃圾|拥堵|堵车|生态|环境|内容质量|信息质量)[^。，！？；\n]{0,12}(?:大家一起|大家|全体|全社会|所有人|人人|谁)[^。，！？；\n]{0,4}(?:遭殃|买单|承担|扛|烂|崩|受害|吃亏)/,
+  // ④-d 拍照发圈要紧
+  /(?:拍照|打卡|发[圈友]|发朋友圈)[^。，！？；\n]{0,4}(?:要紧|再说|顾不了|管不了|谁管|最大)/,
+  // ④-e 反正公费/免费
   /(?:反正|说到底|横竖)[^。，！？；\n]{0,6}(?:不要钱|不花钱|公费|免费|白给)/,
 ];
 // 腿③（英文）
 const C_EN4 = [
+  // ④-a might as well（trample/touch/crush）
   /\bmight\s+as\s+well\s+(?:trample|touch|take|crush|use)\b/i,
-  /\beveryone'?s?\s+(?:here|visiting|doing\s+it)\s+anyway\b/i,
-  /\bwe\s+all\s+(?:share|carry|bear)\s+(?:the\s+)?(?:resistance|superbugs?|cost|burden|consequences)\b/i,
+  // ④-b everyone's here anyway（兼容 ASCII ' 与 U+2019）
+  /\beveryone['\u2019]?s?\s+(?:here|visiting|doing\s+it)\s+anyway\b/i,
+  // ④-c we all share（the resistance / superbugs / cost）
+  /\bwe\s+all\s+(?:share|carry|bear)\s+(?:the\s+)?(?:resistance|superbugs?|cost|burden)\b/i,
+  // ④-d falls on the whole（city/society/world）
   /\bfalls?\s+on\s+the\s+whole\s+(?:city|society|country|world)\b/i,
-  /\b(?:if|since)\s+it(?:'?s|is)?\s+(?:free|covered|funded)\s*,?\s+(?:so\s+)?(?:take|grab|use|get)\s+as\s+much\s+as\s+you\s+can\b/i,
-  /\bsnap(?:ping|ped)?\s+(?:the\s+)?(?:photo|photos|picture|pictures|selfie|selfies)\s+(?:is\s+)?(?:what|all\s+that)\s+matters?\b/i,
+  // ④-e if it is free take as much as you can
+  /\b(?:if|since)\s+it(?:'?s|\s+is)?\s+(?:free|covered|funded)\s*,?\s+(?:so\s+)?(?:take|grab|use)\s+as\s+much\s+as\s+you\s+can\b/i,
 ];
 
 // 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内）
