@@ -1,0 +1,390 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/yX/9tUpDoNkBf9nfM+XNWFxe5XE</id>
+  <title>arXiv Query: search_query=all:tragedy OR all:of OR all:the OR all:commons OR all:overuse OR all:overfishing OR all:overtourism OR all:antibiotic OR all:commons OR all:dilemma&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-13T18:28:43Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:tragedy+OR+(all:of+OR+(all:the+OR+(all:commons+OR+(all:overuse+OR+(all:overfishing+OR+(all:overtourism+OR+(all:antibiotic+OR+(all:commons+OR+all:dilemma))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>116702</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17334v1</id>
+    <title>Unbundling Multimodal Vision Encoding</title>
+    <updated>2026-11-12T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17334v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17334v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How multimodal language models should encode visual input remains up for debate. Most models use a pretrained vision encoder, while some recent recipes train the encoder from scratch with the language model or remove it entirely. Vision encoders bundle together three design choices: a visual prior from upstream pretraining, dedicated vision capacity, and pre-fusion placement of that capacity (i.e., before the multimodal backbone). Because published models also differ in data, architecture, and compute, comparing them cannot isolate the effect of each choice. We disentangle these choices via a controlled framework where we pretrain all models from scratch on common data and compare them on visual question answering and language benchmarks at matched lifetime compute. We find that the visual prior is not necessary; an encoder trained jointly from scratch is on par with a pretrained one, without a separate training stage. What matters instead is dedicated vision capacity: an encoder-free model trails on visual understanding even when its backbone is enlarged by the encoder's parameter count. Yet that capacity need not precede multimodal fusion, as vision-only modules added in-fusion to early backbone layers perform comparably to a pre-fusion encoder and can lower time to first token. These results also hold across backbone sizes, when encoder pretraining is treated as free, and when starting from a pretrained language model. Overall, our findings favor dedicated vision capacity trained jointly with the backbone and placed early within it.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:54Z</published>
+    <arxiv:comment>Project page: https://unbundling.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ellis Brown</name>
+    </author>
+    <author>
+      <name>Chris Hoang</name>
+    </author>
+    <author>
+      <name>Shengyi Qian</name>
+    </author>
+    <author>
+      <name>Shang-Wen Li</name>
+    </author>
+    <author>
+      <name>Mike Lewis</name>
+    </author>
+    <author>
+      <name>Marjan Ghazvininejad</name>
+    </author>
+    <author>
+      <name>Luke Zettlemoyer</name>
+    </author>
+    <author>
+      <name>Lucas Beyer</name>
+    </author>
+    <author>
+      <name>Mengye Ren</name>
+    </author>
+    <author>
+      <name>Jakob Verbeek</name>
+    </author>
+    <author>
+      <name>Saining Xie</name>
+    </author>
+    <author>
+      <name>Hu Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17318v1</id>
+    <title>Spatial Foundry: A Multimodal Dataset for Spatial Intelligence</title>
+    <updated>2026-11-12T18:58:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.17318v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17318v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spatial intelligence requires connecting visual observations to the geometry, objects, and persistent state of an environment. Images alone leave these relationships implicit, while disconnected annotations make it difficult to study appearance, camera motion, and scene changes under a common reference. We introduce Spatial Foundry, a collection of 5,280 furnished residential 3D scene configurations with editable assets and aligned visual, geometric, and temporal data. Its modalities include floor plans, perspective and panoramic RGB, metric depth, point clouds, meshes, instance-level 3D bounding boxes, and camera trajectories paired with video. Shared scene coordinates link observations across views and time; editable source scenes enable additional camera paths and controlled object changes. We describe the data representation and construction workflow, and discuss applications in floor-plan-conditioned 3D generation, geometric reconstruction, instance-level perception, camera-conditioned video generation, shared world modeling, and scene editing. Controlled camera and scene variations support spatial perception and world-model research. The public project page provides videos and an interactive colored point-cloud preview.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:36Z</published>
+    <arxiv:comment>Project Page: https://ranolabs.com/Blog/spatial-foundry</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ethan Lin</name>
+    </author>
+    <author>
+      <name>Yang Song</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17294v1</id>
+    <title>Metal Sandbox: Isolated Execution and Command Scheduling for GPU Coding Agents on Apple Silicon</title>
+    <updated>2026-11-12T18:54:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.17294v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17294v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-device inference requires kernels that make effective use of local accelerators. Efficient training and evaluation of models that generate Apple Metal kernels benefit from native macOS tools and concurrent agent sessions. These sessions alternate between model requests, development commands, and GPU execution, leaving GPU capacity idle for much of a rollout. We present Metal Sandbox, infrastructure that combines restricted per-instance file access, native command execution, and command-level scheduling across interconnected Macs. Each agent retains its workspace and private development environment. Parallel commands can run concurrently, while serial commands share one execution slot per node; eligible waiting commands can migrate to available Macs and return results to the original agent. Integration with Harbor supports task execution, automatic verification, and rollout collection through a common workflow. Controlled experiments on four Mac mini M4 nodes achieve $1.68\times$--$2.05\times$ gains in command throughput under concentrated demand. Sixteen static agent traces give an estimated $2.14\times$ sustained-throughput gain for four sessions per node versus one, assuming continuously replenished sessions and unchanged mean durations. Replaying these measured traces under dynamic scheduling reduces mean tool waiting by 18.8% and batch elapsed time by 22.3%, assuming unchanged phase durations. Metal Sandbox and its Harbor integration are open-source on GitHub.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:42Z</published>
+    <arxiv:comment>16 pages, 7 figures, 5 tables. Code available at https://github.com/WangHaoZhe/metal-sandbox and https://github.com/WangHaoZhe/harbor</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Haozhe Wang</name>
+    </author>
+    <author>
+      <name>Lina Chen</name>
+    </author>
+    <author>
+      <name>Fanqi Wan</name>
+    </author>
+    <author>
+      <name>Qi Han</name>
+    </author>
+    <author>
+      <name>Yinmin Zhang</name>
+    </author>
+    <author>
+      <name>Zheng Ge</name>
+    </author>
+    <author>
+      <name>Daxin Jiang</name>
+    </author>
+    <author>
+      <name>Junchi Yan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17278v1</id>
+    <title>Active-space construction in single-fragment coupled-cluster embedding for chemical reactions</title>
+    <updated>2026-11-12T18:50:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.17278v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17278v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We benchmark single-fragment quantum embedding, in which electron correlation---at the level of coupled-cluster theory with single, double, and perturbative triple excitations [CCSD(T)]---is restricted to orbitals associated with a chosen molecular fragment, and the remaining orbitals are frozen at the Hartree-Fock level. We compare several methods for constructing fragment active spaces, and we test their performance on 60 organic reaction energies and three reaction profiles. A common fragment projection operator is used to relate several of the tested orbital constructions. Regional embedding, based on density matrix embedding theory, is shown to give accurate and robust performance when used for both the occupied and virtual active orbitals. For virtual orbitals, fragment-centered projected atomic orbitals and fragment natural orbitals (defined by eigenvectors of a fragment MP2 density matrix) also perform well, but the latter typically retains larger virtual spaces. Composite MP2 corrections yield the largest improvement: combined with fragment natural orbitals, they give average reaction energy errors below 0.3 kcal/mol relative to full-system CCSD(T), with all individual errors below 1 kcal/mol. Reaction profiles show that accurate endpoint energies can conceal substantial barrier errors, emphasizing the importance of approximating omitted correlation.</summary>
+    <category term="physics.chem-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:50:36Z</published>
+    <arxiv:comment>10 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="physics.chem-ph"/>
+    <author>
+      <name>Ardavan Farahvash</name>
+    </author>
+    <author>
+      <name>Timothy C. Berkelbach</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17252v1</id>
+    <title>Sowing the Seeds of Intractability: Kalah is PSPACE-complete</title>
+    <updated>2026-11-12T18:38:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.17252v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17252v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Kalah is a classic two-player game in the mancala family of sowing games. Computers have solved several standard-size starting positions, but the complexity of the game on boards of growing size has remained open. We study the natural generalization in which the number of pits per side is part of the input and an arbitrary position is given, with the stone counts given in unary. We show that deciding whether a designated player can force a win from such a position is PSPACE-complete. The hard positions have Alice to move first and both stores initially empty. The same positions are hard under either common convention for capture opposite an empty pit, and with or without the bonus rule, which gives a player another turn when the last stone is sown into their own store.
+  We introduce Line Kalah as an intermediate problem, a game on a line in which stones that leave the line effectively disappear and Alice must save each of her target pits before Bob captures it, and we reduce quantified Boolean formulas to it. The reduction uses a set of sequential timer piles whose last stones approach a group of targets, forcing Alice to choose between two captures in order to set the truth value of a variable, and a final capture gadget to test a clause chosen by Bob (only one is needed adversarially).
+  Since either player may move any pile at any time, the stages are placed so that premature timer firings protect earlier potential targets. For a true formula, Alice's strategy against arbitrary opposing play either gains enough time to save the remaining targets (after Bob deviates from the intended play) or reaches the final test with a correctly encoded, protected input. Finally, the line positions are embedded in Kalah with both stores empty. A separate Bob pit holds the score adjustment, so the winner takes a strict majority of the stones.</summary>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:38:34Z</published>
+    <arxiv:comment>55 pages, 6 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CC"/>
+    <author>
+      <name>Ethan Dickey</name>
+    </author>
+    <author>
+      <name>Ethan Mader</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17240v1</id>
+    <title>Objects as Addresses: Instance Binding in Vision Transformer Attention</title>
+    <updated>2026-11-12T18:27:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.17240v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17240v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Humans naturally parse visual scenes into coherent individual objects rather than scattered features, a capability cognitive science calls object binding. While recent work shows that pretrained Vision Transformers (ViTs) intrinsically acquire this ability, how native self-attention computations mechanistically keep object instances separate remains unresolved. By studying this across eight pretrained ViTs, we found that instance separation is expressed more strongly in attention routing than in token content: selected query-key relations distinguish individual objects more reliably than value similarity or residual representations. Inside heads, patches belonging to one individual tend to read from a common image region, which we term their attention address. Visually distinct parts of one person share an address, whereas identical duplicated instances receive separate, movable addresses. These shared destinations arise in part because query interactions with the spatial structure of keys direct attention toward consistent regions for one object and elsewhere for another. In DINOv2 and most other backbones we tested, editing this query component at the selected head redirects its attention address toward another individual. Grouping patches by this query component separates same-category instances, reaching .615 FG-ARI versus .289 for the same clustering of final-layer features, which tend to merge them.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:27:11Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Khalil Sabri</name>
+    </author>
+    <author>
+      <name>Guillaume-Alexandre Bilodeau</name>
+    </author>
+    <author>
+      <name>Nicolas Saunier</name>
+    </author>
+    <author>
+      <name>Wassim Bouachir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17239v1</id>
+    <title>When Both Sides Adapt: The Challenges of Evaluating Interactive LLM Systems</title>
+    <updated>2026-11-12T18:26:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17239v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17239v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In interactive systems where users engage with LLMs, users are adaptive and, after observing LLM responses, can change their prompting strategy, as well as the type and difficulty of subsequent tasks. Thus model responses can influence the set of prompts on which the model is subsequently evaluated. We study the implications of this user adaptivity and prompt endogeneity for the evaluation of LLMs. We define two classes of estimands for comparing models: the common-distribution effect, which compares model performance on the same distribution of prompts, and the induced-distribution effect, which compares each model on the prompt distribution generated through user interaction. We show that offline benchmark evaluation and live A/B testing target different quantities, with the standard difference-in-means estimators for the two methods converging to the common-distribution effect and the induced-distribution effect, respectively. This distinction can affect decision-making: the two comparisons can rank models differently and lead to discrepancies in deployment recommendations. We characterize when such ranking reversals occur and provide a sufficient condition under which the rankings are guaranteed to agree. This result provides a practical heuristic for assessing whether offline evaluation is sufficient to reproduce the decision suggested by a live experiment. Third, we show, in a stylized linear model of interactions, that user adaptivity can increase variance in estimation. Finally, we discuss implications of user adaptivity for the interpretation of experiments and show that adaptivity creates a common mechanism leading to common evaluation challenges, such as reward hacking and novelty effects. Together, this work highlights the necessity of measuring both model performance as well as changes in the user behavior that the model induces.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:26:51Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Hannah Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17234v1</id>
+    <title>Mean-field Fluctuations for First-Passage Percolation with Symmetric Kernels</title>
+    <updated>2026-11-12T18:23:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.17234v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17234v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study first-passage percolation on finite weighted graphs whose normalized Weibull edge hazards form a symmetric Markov kernel on $N$ vertices. We prove that a uniform absolute spectral gap and an $O(N^{-1})$ bound on a fixed even-step return probability imply the stochastic mean-field passage-time limit and an independent Gaussian hopcount limit. Jointly with these quantities, the entire geodesic from an arbitrary source to an independent uniform target is approximated in total variation by an independent Markov chain stopped at the hopcount. This comparison yields laws of large numbers for fixed-length path segments and joint central limit theorems for bounded additive observables. The results extend to edge laws with a uniform relative hazard error $o(1/\log N)$, including common noise distributions with a power-law hazard and a positive-power error near zero. Applications include integrable singular torus kernels, macroscopic spread-out graphs, non-transitive regular graphs, finite groups, and discretizations of symmetric continuum kernels.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:23:33Z</published>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Partha S. Dey</name>
+    </author>
+    <author>
+      <name>Daecheol Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17233v1</id>
+    <title>Assessing the Reliability of Longitudinal Bibliometric Rankings under Incomplete Citation Histories</title>
+    <updated>2026-11-12T18:23:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.17233v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17233v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Longitudinal bibliometric analyses rely on annual citation histories, yet missing annual observations are frequently difficult to distinguish from true zero-citation years. We present a reproducible case-study framework for auditing citation-history gaps, tracing retrieval provenance, and quantifying the sensitivity of longitudinal indicators and rankings to explicit missing-data assumptions. The case study comprises 595 consolidated publications derived from 616 Google Scholar article records, and examines the completed calendar years 2024-2025. Three scenarios are compared: strictly observed annual counts (A), hypothetical zeros for internal gaps only (B), and hypothetical zeros for all missing years within a valid publication interval (C). The number of publications with computable growth and acceleration indicators increases from 196 (A) to 257 (B) and 490 (C); the corresponding counts for a revival indicator are 131, 152, and 177. Although the ordering of publications eligible under both compared scenarios is unchanged (Spearman and Kendall correlations equal to 1.0), complete-ranking positions and Top-K membership may change markedly. In particular, acceleration exhibits a Jaccard overlap of 0.563 at K=50 between A and C, while revival exhibits 0.667 at K=10. These findings demonstrate that unchanged indicator values and perfect correlations on a common subset do not guarantee stable rankings when eligibility changes. The zero assignments are hypothetical sensitivity assumptions, not evidence of provider semantics. The results are descriptive and based on a single researcher profile. A reusable Google Scholar Tracker software workflow supports the audit and sensitivity analysis; version 1.8.5 is publicly available on GitHub and archived on Zenodo (DOI: 10.5281/zenodo.24170285).</summary>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:23:11Z</published>
+    <arxiv:comment>20 pages, 2 figures. Software available at https://doi.org/10.5281/zenodo.24170285</arxiv:comment>
+    <arxiv:primary_category term="cs.DL"/>
+    <author>
+      <name>João Paulo Papa</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17214v1</id>
+    <title>Introducing Feedback Delays to Non-Delayed Adversarial MDPs: Optimal $\sqrt S$ and $\sqrt K$ Dependencies in Tabular and Linear AMDPs</title>
+    <updated>2026-11-12T18:10:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.17214v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17214v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study regret minimization in episodic Adversarial Markov Decision Processes (AMDPs) with unknown transitions and bandit feedback. In tabular AMDPs with $S$ states, $A$ actions, and horizon $H$, the best known $K$-episode regret is $\tilde O(HS\sqrt{AK})$, whose $\sqrt S$ gap to the $Ω(H\sqrt{SAK})$ lower bound has long remained open. In linear AMDPs with $d$-dimensional features, after a five-year line of improvements starting from $K^{14/15}$, computationally efficient algorithms without a simulator or exploratory assumptions still only attain $\tilde O(K^{3/4})$ regret.
+  A common challenge in both settings is to estimate the Q-function of a changing policy: past data comes from earlier policies that differ from (and are correlated with) the current one, while freezing the policy for future episodes worsens the dependency on $K$. We instead propose a general technique called introduced feedback delays: we estimate the Q-function of the policy using future episodes while still updating the policy, as if the feedback were delayed. While feedback delays are usually an obstacle imposed by the environment, here they are introduced voluntarily and, perhaps surprisingly, come at no extra cost. We develop Geometric Resampling with Rejection (GRR) to account for policy changes during the delay, and threshold the visitation probabilities to avoid long delays on rarely visited state-action pairs.
+  With this unified technique, our policy optimization algorithms achieve, with high probability, $\tilde O(\text{poly}(H)\sqrt{SAK})$ regret in tabular AMDPs, resolving the open problem; and $\tilde O(\text{poly}(d,H)\sqrt K)$ regret in linear AMDPs, giving the first efficient algorithm optimal in $K$. They also naturally extend to delayed AMDPs with a total feedback delay $\mathfrak D$, yielding the first bounds optimal in $S$ and $\mathfrak D$ (tabular) and in $K$ and $\mathfrak D$ (linear).</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:10:46Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aarush Kulkarni</name>
+    </author>
+    <author>
+      <name>Khang Nguyen</name>
+    </author>
+    <author>
+      <name>William Chang</name>
+    </author>
+    <author>
+      <name>Yan Dai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17206v1</id>
+    <title>PACER: GPU Excursion Management for ML Workloads</title>
+    <updated>2026-11-12T18:06:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17206v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17206v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Variability is an inherent characteristic of modern GPU systems, arising from a combination of process variation, dynamic environmental conditions, and power management decisions. Prior work has characterized inter-GPU variability and found consistent performance differences across GPUs. However, we observe that modern workloads, particularly large language models (LLMs), exhibit significant intra-GPU variability. Their short-running kernels interact poorly with the coarse granularity of dynamic power management mechanisms, leading to unpredictable performance.
+  A key source of this intra-GPU transient variability is power excursions, also referred to as electrical design power peaks (EDP$_{p}$), where power temporarily exceeds the GPU's rated power limits. While power management mechanisms are designed to ensure reliable operation despite the presence of EDP$_{p}$ sustained power peaks cause throttling that detrimentally impacts overall application performance. To the best of our knowledge, our work is the first to characterize the magnitude and frequency of EDP$_{p}$, showing that frequent, significant power overshoots are especially common in ML workloads, which combine high power draw, short kernels, and rapidly changing compute demands. To address this, we design and leverage hardware and firmware mechanisms to provide consistent power management behavior that reduces intra-GPU variability due to EDP$_{p}$ and improves overall performance. We evaluate our techniques across a range of popular workloads. Our approach improves performance by 3-12% over state-of-the-art GPU power management and comes within 3% of an oracular solution.</summary>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:06:53Z</published>
+    <arxiv:primary_category term="cs.DC"/>
+    <author>
+      <name>Rutwik Jain</name>
+    </author>
+    <author>
+      <name>Nathaniel Morris</name>
+    </author>
+    <author>
+      <name>Yiwei Jiang</name>
+    </author>
+    <author>
+      <name>Shidhartha Das</name>
+    </author>
+    <author>
+      <name>Gary Kao</name>
+    </author>
+    <author>
+      <name>Indrani Paul</name>
+    </author>
+    <author>
+      <name>Shivaram Venkataraman</name>
+    </author>
+    <author>
+      <name>Srilatha Manne</name>
+    </author>
+    <author>
+      <name>Matthew D. Sinclair</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17178v1</id>
+    <title>Covariant Wigner--Weyl calculus, non-dissipative transport and the chiral anomaly in inhomogeneous systems with nontrivial momentum-space topology</title>
+    <updated>2026-11-12T17:48:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.17178v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17178v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We review, systematize and extend the covariant Wigner--Weyl calculus for fermions in non-Abelian gauge fields and its applications to systems inhomogeneous in coordinate space with nontrivial momentum-space topology: the non-Abelian chiral separation and quantum Hall effects, their stability under interactions, the Fermi-surface invariant of inhomogeneous systems and the non-elliptic models that carry it, with their equilibrium chiral magnetic effect, the factorization of the chiral anomaly into the instanton number and the momentum-space invariant $N_3$, and the noncommutative-geometric form of the invariants. Previous results are brought to common conventions, with hypotheses stated and notions defined. New results: the characterization of the operators whose covariant symbol is gauge-field independent and the ordering independence of the integrated anomaly; the anomaly factorization on a closed four-manifold without the homotopy hypothesis, the factorization into instanton number and $N_3$ holding exactly when the untwisted index vanishes; the Luttinger--Ward identity behind the renormalized-velocity current and the continuum conditions replacing the compactness of the Brillouin zone in the non-renormalization theorems; the identification of the Moyal $N_3$ of the chiral separation effect with the fibre degree of the principal symbol; the residue evaluation of the Fermi-surface invariant of the non-elliptic models, in the continuum and on a lattice, and the equilibrium current of the conserved charge along the magnetic field that it implies -- a chiral magnetic effect permitted by the non-Hamiltonian form of these models -- which the model with spherical Fermi surfaces trades for a chiral separation effect and a single-Weyl anomaly, and a modification of it restores at the price of the anomaly; and the index-pairing form of the chiral separation invariant.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:48:29Z</published>
+    <arxiv:comment>Latex, 65 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>M. A. Zubkov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17159v1</id>
+    <title>Inner Product Regularization for Imitation Learning</title>
+    <updated>2026-11-12T17:38:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.17159v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17159v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robots that learn from demonstrations should extrapolate their policy despite state perturbations such as sensor noise, scene variation, and compounding errors. One approach to this robustness is regularization. Prior regularizers consider each state on its own and limit how sensitive the policy is to any perturbation at that state. By contrast, we explore how the policy's output shifts when given the same perturbation at different states. Our insight is that, locally, the robot should respond to state perturbations in a consistent manner: e.g., if changing an irrelevant object position does not impact the policy at one state, that same change should not shift the policy output at a nearby state. Applying this insight, we develop inner product regularization (InneR). We show that the inner product on action space induces an inner product on state space through the policy Jacobian (the Fisher information for stochastic policies), and that the null space of this inner product governs which state perturbations have a first-order effect on the policy. By clustering states whose inner products are aligned, averaging the inner products within each cluster, and minimizing the smallest eigenvalues of that average, InneR shapes the learned policy so that nearby states share a common null space. InneR enforces consistent responses to perturbations without limiting policy expressiveness, and can be appended to existing imitation learning pipelines for deterministic or stochastic policies. In simulated experiments, InneR makes learned policies more robust to irrelevant state dimensions and shifts between training and test distributions, whereas norm penalties often perform worse than behavior cloning. On a real robot arm performing three manipulation tasks, InneR raises the average success rate of a diffusion policy from 18% to 57% without additional data.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:38:48Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Benjamin A. Christie</name>
+    </author>
+    <author>
+      <name>Tianyu Qiu</name>
+    </author>
+    <author>
+      <name>Amy H. Choi</name>
+    </author>
+    <author>
+      <name>David Fridovich-Keil</name>
+    </author>
+    <author>
+      <name>Dylan P. Losey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17077v1</id>
+    <title>SALT: State-Aligned Low-Rank Transfer for Single-Temporal Cross-Dataset Structural Localization in Remote Sensing</title>
+    <updated>2026-11-12T16:47:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.17077v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17077v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Change detection in remote sensing conventionally relies on spatially aligned bi-temporal imagery, which may be unavailable or unreliable in practical scenarios. Recent single-temporal approaches address this limitation by learning structural evidence, such as building regions, from a labeled source dataset and transferring it to unseen target imagery using only the current image. However, adaptation to the source dataset can over-specialize pretrained features and reduce their cross-dataset generalization, a risk that this paper argues is higher when the feature adaptation is parameterized independently of the states used for prediction. To address this issue, the current study introduces SALT, a State-Aligned Low-Rank Transfer framework. SALT keeps a DINOv3 backbone frozen and learns negative and positive structural states that both score each patch and, through State-Aligned Low-Rank Adaptation (SALA), span the rank-2 subspace in which patch features are corrected. Directional State Alignment supervises these corrections to raise the evidence of positive patches and lower that of negative ones, while Geometry Preservation limits changes to the pairwise relations among pretrained patch features. Experiments on LEVIR-CD and the WHU aerial building dataset show that, at the pixel level and in both transfer directions, SALT outperforms four baselines reproduced under a common source-only protocol, improving over the strongest reproduced baselines by 9.45 and 5.79 points in pixel-level AP and by 27.69 and 14.25 points in IoU (LEVIR-CD to WHU and WHU to LEVIR-CD, respectively), with only 0.068M trainable parameters and 40.2 ms per image. In order to facilitate reproducibility and further research, the source code of SALT is available at https://github.com/gthpapadopoulos/SALT</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T16:47:59Z</published>
+    <arxiv:comment>Accepted at the Third Workshop on Computer Vision for Geospatial Image Analysis (GeoCV), IEEE/CVF WACV 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aggelos Psiris</name>
+    </author>
+    <author>
+      <name>Georgios Angelidis</name>
+    </author>
+    <author>
+      <name>Giorgos Sfikas</name>
+    </author>
+    <author>
+      <name>Maria Vakalopoulou</name>
+    </author>
+    <author>
+      <name>Thomas Lagkas</name>
+    </author>
+    <author>
+      <name>Panagiotis Sarigiannidis</name>
+    </author>
+    <author>
+      <name>Georgios Th. Papadopoulos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16957v1</id>
+    <title>Ramsey numbers of loose triangles versus cliques</title>
+    <updated>2026-11-12T15:29:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.16957v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16957v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An $r$-uniform loose triangle $C_3$ consists of three edges that intersect pairwise in exactly one vertex and have no vertex common to all three. For graphs, this is the usual triangle, and the Ramsey number $R(C_3,K_t)$ has order of magnitude $t^2/\log t$ by celebrated results of Ajtai, Komlós, and Szemerédi and of Kim.
+  Kostochka, Mubayi, and Verstraëte proved that $R(C_3,K_t^{(r)})=O_r(t^{3/2})$ for every fixed $r\ge3$ and showed that this bound is sharp up to a logarithmic factor. Motivated by the logarithmic saving in the graph case, they conjectured in 2013 that the upper bound could be improved to $o(t^{3/2})$.This conjecture has since received significant attention and has been reiterated in several papers. We prove the conjecture by showing that, for every fixed $r\ge3$, \[
+  R(C_3,K_t^{(r)})
+  =O_r\left(\frac{t^{3/2}}{\sqrt{\log\log t}}\right). \]</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T15:29:00Z</published>
+    <arxiv:comment>22 pages</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Ayush Basu</name>
+    </author>
+    <author>
+      <name>Abhishek Dhawan</name>
+    </author>
+    <author>
+      <name>Abhishek Methuku</name>
+    </author>
+  </entry>
+</feed>

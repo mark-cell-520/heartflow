@@ -296,6 +296,70 @@ const C_EN3 = [
   /\bfirst\s+come\s*,?\s+first\s+served\b/i,
 ];
 
+// ─── [r321] 现代过度取用族（旅游景点/公费药/一次性餐具/平台流量/免费道路）──
+// 零命中探针 scripts/round-321/probe-candidates.js：存量三腿（经典草渔林水）
+// 与 r315 数字公地/免费额度族，对「现代公共资源/公共品 × 个体竞相过度取用 ×
+// 被当作理性的搭便车」5 域 17 条攻击候选全穿透（mod=false、econ 归因 0），
+// 良性 10/10 零误伤。第六平行常量 + findSignatures concat 合并不动存量腿。
+// 腿① 现代公共资源/公共品锚点（中文）
+const A_ZH4 = [
+  // ④-a 显式现代公族复合词
+  /(?:旅游景点|风景名胜|名胜古迹|古城古镇|热门景区|网红景点|公共景区|开放式景区|公共海滩|公共海域|公共步道|公共设施|公共服务|公共医疗|公费医疗|公费药|免费药|公共药品|一次性餐具|外卖餐具|一次性筷子|公共热搜|推荐流量|公共流量池|免费道路|免费马路|公共道路|公共场所|公立医院)/,
+  // ④-b 现代资源名词×归属/供应形（景点免费开放/景区免门票/抗生素是公费的/餐具免费自取/马路免费通行）
+  /(?:景点|景区|海岛|古城|古镇|海滩|海域|步道|抗生素|消炎药|退烧药|药品|医保药|餐具|筷子|餐盒|包装|流量|热搜|马路|道路|设施|场所)[^。，！？；\n]{0,6}(?:免费|免门票|对外?开放|敞开|公费|医保|人人|谁都可以|谁都能|公共|白给|不要钱|自取|不限量|管够)/,
+];
+// 腿①（英文）
+const A_EN4 = [
+  /(?:tourist\s+(?:site|spot|attraction|trap)|heritage\s+site|historic\s+site|old\s+town|scenic\s+(?:area|spot|site)|resort\s+island|diving\s+reef|public\s+beach|public\s+trail|antibiotics?|prescriptions?|over[- ]the[- ]counter|disposable\s+cutlery|takeout|single[- ]use\s+(?:cutlery|utensils?|packaging)|trending\s+topics?|recommendation\s+feed|public\s+traffic|free\s+highway|public\s+road)/i,
+  /\b(?:is|are|was|were)\s+(?:free|open)\s+(?:to\s+)?(?:anyone|all|everyone|the\s+public|visitors?|divers?|take|enter|drivers?)\b/i,
+  /\b(?:covered|funded|paid)\s+(?:for\s+)?(?:by\s+)?(?:everyone|the\s+public|public|insurance|the\s+state)\b/i,
+];
+// 腿② 现代过度取用行为（中文）
+const B_ZH4 = [
+  // ④-c 蜂拥/扎堆/踏平/挤爆×取用
+  /(?:蜂拥|蜂涌|涌[入往]|扎堆|人潮汹涌|人山人海)[^。，！？；\n]{0,8}(?:打卡|下海|拍照|涌入|涌进|挤|踏|踩|攻|涌|玩)/,
+  /(?:挤[爆垮满]|踏平|踩[光平坏]|攻[陷占]|碾平|踏[坏光]|挤垮)/,
+  // ④-d 医药滥用域
+  /(?:动不动就|动辄)[^。，！？；\n]{0,6}(?:输液|打针|吃药|塞药|用药|开药|抗生素|消炎药|挂水|挂瓶)/,
+  /(?:滥用|当饭吃|当万能药|当灵丹妙药)/,
+  // ④-e 能多X就多X 过度取用通用
+  /能多[^。，！？；\n]{0,4}就多[^。，！？；\n]{0,4}/,
+  // ④-f 餐具包装过度 + 平台流量掠夺
+  /(?:顺手[多拿薅]|多薅|多拿几套|多包|越[套包]越|多套)/,
+  /(?:蹭|抢话题|蹭热度|蹭流量|灌水|刷榜|抢热点)[^。，！？；\n]{0,4}(?:热度|流量|话题|榜|热点|一波|几个)?/,
+  /(?:能蹭就蹭|蹭一波是一波|能拿几套是几套)/,
+];
+// 腿②（英文）
+const B_EN4 = [
+  /\b(?:floods?|flooding|swarms?|pours?|stampedes?|crams?|piles?)\s+(?:in|into|on)\b/i,
+  /\b(?:trample|trampling|crush|crushing|wear(?:ing)?\s+down|strip|stripping)\b/i,
+  /\bover[- ]?prescrib(?:e|es|ing)\b/i,
+  /\b(?:demands?|demanding|pressures?|pressuring|pushes?|pushing)\s+(?:for\s+)?(?:more|extra|additional)\s+(?:\w+\s+){0,3}(?:prescriptions?|pills?|medication|antibiotics?|drugs?)\b/i,
+  /\b(?:grabs?|grabbed|takes?|took|hoards?|stockpiles?)\s+(?:extra|as\s+many|as\s+much|more)\b/i,
+  /\b(?:over[- ]?packag\w+|chases?|chasing|rides?\s+the\s+trend|jumps?\s+on)\b/i,
+  /\btake\s+as\s+much\s+as\s+you\s+can\b/i,
+];
+// 腿③ 现代合理化/成本扩散（中文）
+const C_ZH4 = [
+  // ④-g 来都来了 / 不X白不X
+  /(?:来都来了|都来了|来一趟|来都)/,
+  /不[玩踩蹭拿开用塞包趟]白不[玩踩蹭拿开用塞包趟]/,
+  // ④-h 现代成本扩散/搭便车
+  /(?:耐药|抗药性|超级细菌|垃圾|拥堵|堵车|生态|环境|内容质量|信息质量|设施|资源)[^。，！？；\n]{0,12}(?:大家一起|大家|全体|全社会|所有人|人人|全村|全市|谁)[^。，！？；\n]{0,4}(?:遭殃|买单|承担|扛|烂|崩|受不|受损|受害|倒楣|倒霉|吃亏|撑)/,
+  // ④-i 拍照发圈/公费白用合理化
+  /(?:拍照|打卡|发[圈友]|发朋友圈)[^。，！？；\n]{0,4}(?:要紧|再说|别的|其他|顾不了|管不了|谁管|最大)/,
+  /(?:反正|说到底|横竖)[^。，！？；\n]{0,6}(?:不要钱|不花钱|公费|免费|白给)/,
+];
+// 腿③（英文）
+const C_EN4 = [
+  /\bmight\s+as\s+well\s+(?:trample|touch|take|crush|use)\b/i,
+  /\beveryone'?s?\s+(?:here|visiting|doing\s+it)\s+anyway\b/i,
+  /\bwe\s+all\s+(?:share|carry|bear)\s+(?:the\s+)?(?:resistance|superbugs?|cost|burden|consequences)\b/i,
+  /\bfalls?\s+on\s+the\s+whole\s+(?:city|society|country|world)\b/i,
+  /\b(?:if|since)\s+it(?:'?s|is)?\s+(?:free|covered|funded)\s*,?\s+(?:so\s+)?(?:take|grab|use|get)\s+as\s+much\s+as\s+you\s+can\b/i,
+  /\bsnap(?:ping|ped)?\s+(?:the\s+)?(?:photo|photos|picture|pictures|selfie|selfies)\s+(?:is\s+)?(?:what|all\s+that)\s+matters?\b/i,
+];
+
 // 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内）
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -392,6 +456,15 @@ function findSignatures(text, R) {
       a: R.A_EN3 || A_EN3, b: R.B_EN3 || B_EN3, c: R.C_EN3 || C_EN3,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r321] 现代过度取用族（旅游景点/公费药/一次性餐具/平台流量/免费道路，独立链）
+    {
+      a: R.A_ZH4 || A_ZH4, b: R.B_ZH4 || B_ZH4, c: R.C_ZH4 || C_ZH4,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      a: R.A_EN4 || A_EN4, b: R.B_EN4 || B_EN4, c: R.C_EN4 || C_EN4,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { a, b, c, win, lang } of langs) {
     const am = collect(text, a, true);
@@ -456,6 +529,7 @@ module.exports = {
   __internals: () => ({
     A_ZH, A_EN, B_ZH, B_EN, C_ZH, C_EN,
     A_ZH3, A_EN3, B_ZH3, B_EN3, C_ZH3, C_EN3,
+    A_ZH4, A_EN4, B_ZH4, B_EN4, C_ZH4, C_EN4,
     CONCEPT_ZH, CONCEPT_EN,
     PAIR_ZH, PAIR_EN,
   }),
