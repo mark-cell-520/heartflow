@@ -58,6 +58,23 @@
  *
  * 判据（三要素近距共现，缺一不判；等价于双腿链：腿①峰终锚点，
  * 腿②整体正面裁定×时长折让须共现，防单个褒义词冒充裁定）：
+ *
+ * [r319 新措辞家族] 立项探针 scripts/round-319/probe-candidates.js
+ * （v6.8.179 模块直调 + gate 层双路实测）：存量三腿 + r310 新族收
+ * 「搬家那天很开心所以值了」类事件日锚点结构，「过程无所谓宣言」
+ * 族 8 条候选 7 条穿透模块、其中 3 条穿透整个 gate 无维度代拦。
+ * 落地双腿平行常量（WHOLE_VERDICT_ZH3/EN3 + DURATION_ZH3/EN3，
+ * findSignatures concat 合入，存量腿与 r310 腿一字不动）：
+ *   新裁定腿（WHOLE_VERDICT_*3）：只要结局是好的就算成功/结尾
+ *     漂亮就够了/整件事封神了/年度最佳/值得N刷/yyds；as long as
+ *     the ending is great / GOAT / peak cinema / the whole thing
+ *     was a masterpiece；
+ *   新时长折让腿（DURATION_*3）：过程再怎么折腾都无所谓/中间吃了
+ *     多少苦不重要/不管过程多难/受的罪都会忘掉/全程都在踩坑；
+ *     the process does not matter / regardless of the struggle /
+ *     suffering along the way is forgotten。
+ * 裁定词前加 (?<![不没未无莫]) 守卫（同 WHOLE_VERDICT_ZH2 先例）。
+ * 官方良性语料 369 条三腿零误命中（改前改后均实测）。
  *   ① 峰终锚点——峰值或结尾时刻被单独点出（r310 补：事件日锚点，
  *      搬家/上线/发证/答辩…那天、那晚、当天）；
  *   ② 整体正面裁定——对「整趟/整场/整体/全程/这趟/这场/the whole/
@@ -181,6 +198,75 @@ const DURATION_EN2 = [
   /\b(?:fought|fights|fighting|argued|arguing|chaos|chaotic|nightmare|sleepless|unpleasant|fraught|tumultuous|rocky|turbulent|constant\s+arguments?|we\s+fought)\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r319] 「过程无所谓宣言 × 新裁定词」新措辞家族（平行常量，不动存量腿）
+//
+// 缺口实证（scripts/round-319/probe-candidates.js，v6.8.179 基线）：
+// 存量三腿 + r310 新族收「搬家那天很开心所以值了/全程踩坑但收官惊艳」
+// 类事件日锚点结构，但「过程无所谓宣言」族整体 miss：8 条候选 7 条
+// 穿透模块，其中 3 条穿透整个 gate 无维度代拦。根因：
+//   · DURATION_* 只收「过程被刻画为又长又闷/煎熬」的形容词族，不收
+//     「过程被**宣告**无所谓/不重要/会被忘掉」的元陈述族（过程再怎么
+//     折腾都无所谓/中间吃了多少苦不重要/受的罪都会忘掉/the process
+//     does not matter/suffering along the way is forgotten）；
+//   · WHOLE_VERDICT_ZH2 的裁定词表（值/没白费/不枉…）不收「结局好
+//     就算成功/结尾漂亮就够了/整件事封神了/yyds」族，裁定指示词也
+//     不收「只要结局…」无指示词条件形。
+//
+// 设计纪律（同 r309-r318）：
+//   · 平行常量 + findSignatures concat，存量三腿与 r310 新族一字
+//     不动（存量注入语义与轮测登记保持）；
+//   · WHOLE_VERDICT_ZH3 裁定词前加 (?<![不没未无莫]) 守卫（同 r310
+//     WHOLE_VERDICT_ZH2 先例：「这件事不封神」不判）；
+//   · 新腿走存量 collect(…, true) 否定守卫；窗距沿用 PAIR 60/180；
+//   · 豁免层不动：CORRECTIVE（不能只看结尾/综合时长）与 CONCEPT
+//     （峰终教学）对新腿先生效。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r319] 腿②a3 新整体裁定（中文）──────────────────────────
+const WHOLE_VERDICT_ZH3 = [
+  // 只要结局好就算成功（无指示词条件形裁定）
+  /(?:只要|若是|假如|如果)[^。，！？；\n]{0,10}(?:结局|结尾|结果|收尾|收官|最后)[^。，！？；\n]{0,8}(?:好的|美好|漂亮|精彩|圆满|完美|高能|惊艳|神|炸)[^。，！？；\n]{0,6}(?:就算|就是|便是|等于|即是)(?:成功|值了|完美|圆满|封神|神作)/,
+  // 结局/结尾…就够了/就好（结尾漂亮就够了）
+  /(?:结局|结尾|收官|收尾|最后|结果)[^。，！？；\n]{0,8}(?:好的|美好|漂亮|精彩|圆满|完美|高能|惊艳|炸裂|神)[^。，！？；\n]{0,4}(?:就够了|就够|即可|就好|就行|就成)/,
+  // 封神/yyds/年度最佳/N刷 族（整件事封神了）
+  /(?:整件事|整场|整个过程|全程|这部剧|这部|这趟|这一年|这一切|全部|所有|点点滴滴|日日夜夜|整段)[^。，！？；\n]{0,12}(?<![不没未无莫])(?:封神|封了神|成了神作|算神作|年度最佳|值得N刷|值得二刷|值得三刷|yyds|永远的神|直接封神)/,
+];
+
+// ─── [r319] 腿②b3 过程被宣告无所谓/会被忘掉（中文）────────────
+const DURATION_ZH3 = [
+  // 过程再怎么折腾都无所谓（过程 + 痛苦词 + 无所谓/不重要/不算什么）
+  /(?:过程|中间|过程中|全程|途中|一路上)(?:再怎么|再怎样|多么|有多|到底)?(?:折腾|难|苦|累|艰|坎坷|曲折|煎熬|吃苦|受罪|踩坑|崩溃|疲|烦|乱|吵|磨难|波折)[^。，！？；\n]{0,6}(?:都)?(?:无所谓|不重要|不算什么|没关系|会被忘|忘掉|忘记|忘了|淡忘|烟消云散|不必在意|不用管|无须在意)/,
+  // 中间吃了多少苦不重要（吃/受 + 苦/罪/累 + 不重要/会忘）
+  /(?:过程|中间|途中|一路上)(?:吃|受)[^。，！？；\n]{0,4}(?:苦|罪|累|委屈|磨难)[^。，！？；\n]{0,4}(?:都)?(?:不重要|无所谓|不算什么|没关系|会忘|忘掉|忘记|忘了|淡忘|不必在意)/,
+  // 不管/不论/无论 + 过程多难（条件让步形）
+  /(?:不管|不论|无论|甭管)[^。，！？；\n]{0,6}过程[^。，！？；\n]{0,6}(?:多|再)?(?:难|苦|累|艰|坎坷|曲折|折腾|煎熬|磨)/,
+  // 受的罪都会忘掉（痛苦经历 + 忘掉/淡忘/烟消云散）
+  /(?:受|吃)(?:的)?(?:罪|苦|累|煎熬|委屈)[^。，！？；\n]{0,8}(?:都会|全都会|通通|全都|终究|注定)?(?:忘掉|忘记|忘了|淡忘|烟消云散|成为过去|没人记得)/,
+  // 全程都在踩坑/救火（过程劳务 + 被结尾救赎）
+  /(?:全程|一路上|整个过程|途中|那段时间)(?:都)?在?(?:踩坑|填坑|救火|擦屁股|收拾残局|补窟窿)/,
+];
+
+// ─── [r319] 腿②a3 新整体裁定（英文）──────────────────────────
+const WHOLE_VERDICT_EN3 = [
+  // as long as the ending is great（无指示词条件形裁定）
+  /\bas\s+long\s+as\s+the\s+(?:ending|finale|result|outcome|conclusion)\s+(?:is|was|turns?\s+out)\s+(?:great|good|perfect|amazing|beautiful|strong|wonderful)\b/i,
+  // yyds / GOAT / peak cinema（网络裁定词族）
+  /\byyds\b|\bgoat\b|\bthe\s+greatest\s+of\s+all\s+time\b|\bpeak\s+(?:cinema|storytelling|fiction|television)\b/i,
+  // the whole thing was a masterpiece / flawless（整体杰作裁定）
+  /\b(?:the\s+)?(?:whole|entire)\s+(?:thing|ordeal|experience|journey|process)\s+(?:was\s+)?(?:a\s+)?(?:masterpiece|perfect|flawless|incredible|amazing|phenomenal)\b/i,
+];
+
+// ─── [r319] 腿②b3 过程被宣告无所谓/会被忘掉（英文）────────────
+const DURATION_EN3 = [
+  // the process does not matter（元陈述族）
+  /\bthe\s+(?:process|journey|suffering|struggle|hardship|ordeal)\s+(?:does\s+not|doesn'?t|didn'?t)\s+(?:matter|count)\b/i,
+  // regardless of / no matter how much + the struggle（条件让步形）
+  /\b(?:regardless\s+of|no\s+matter\s+(?:how\s+much|what))\s+(?:the\s+)?(?:process|struggle|suffering|hardship|pain)\b/i,
+  // suffering along the way is forgotten（痛苦经历被宣告遗忘）
+  /\b(?:suffering|struggle|hardship|pain|toil|turmoil|chaos)\s+(?:along\s+the\s+way|throughout|all\s+along)\s+(?:is|are|gets?|got)?\s*(?:forgotten|erased|a\s+distant\s+memory|washed\s+away)\b/i,
+];
+
 // ─── 豁免：概念讨论（本族名称/创始人/学科术语的教学定义句）────
 const CONCEPT_ZH = /(?:峰终|峰值.?终[值点]|持续时间忽视|时长忽视|忽视(?:持续|时长|过程)|体验评价|卡尼曼|卡恩曼|卡尼曼|弗雷德里克|雷德梅尔|延伸性拟人|结局偏见|终点定律|峰终法则)/;
 const CONCEPT_EN = /\bpeak[- ]end\b|\bduration\s+neglect\b|\bduration\s+(?:is\s+)?(?:ignored|neglected|overlooked)\b|\bKahneman\b|\bFredrickson\b|\bKahneman,? Wakker,? and Sarin\b|\bexperiencing\s+self\b|\bremembering\s+self\b/i;
@@ -262,14 +348,14 @@ function findSignatures(text, R) {
       // 存量键注入永假正则时 .concat 抛 TypeError（与存量行为一致，
       // gate 聚合层 _safeDetect 与插件层 try/catch 兜底）。
       peak: (R.PEAK_END_ZH || PEAK_END_ZH).concat(R.PEAK_END_ZH2 || PEAK_END_ZH2),
-      verdict: (R.WHOLE_VERDICT_ZH || WHOLE_VERDICT_ZH).concat(R.WHOLE_VERDICT_ZH2 || WHOLE_VERDICT_ZH2),
-      dur: (R.DURATION_ZH || DURATION_ZH).concat(R.DURATION_ZH2 || DURATION_ZH2),
+      verdict: (R.WHOLE_VERDICT_ZH || WHOLE_VERDICT_ZH).concat(R.WHOLE_VERDICT_ZH2 || WHOLE_VERDICT_ZH2, R.WHOLE_VERDICT_ZH3 || WHOLE_VERDICT_ZH3),
+      dur: (R.DURATION_ZH || DURATION_ZH).concat(R.DURATION_ZH2 || DURATION_ZH2, R.DURATION_ZH3 || DURATION_ZH3),
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
       peak: (R.PEAK_END_EN || PEAK_END_EN).concat(R.PEAK_END_EN2 || PEAK_END_EN2),
-      verdict: (R.WHOLE_VERDICT_EN || WHOLE_VERDICT_EN).concat(R.WHOLE_VERDICT_EN2 || WHOLE_VERDICT_EN2),
-      dur: (R.DURATION_EN || DURATION_EN).concat(R.DURATION_EN2 || DURATION_EN2),
+      verdict: (R.WHOLE_VERDICT_EN || WHOLE_VERDICT_EN).concat(R.WHOLE_VERDICT_EN2 || WHOLE_VERDICT_EN2, R.WHOLE_VERDICT_EN3 || WHOLE_VERDICT_EN3),
+      dur: (R.DURATION_EN || DURATION_EN).concat(R.DURATION_EN2 || DURATION_EN2, R.DURATION_EN3 || DURATION_EN3),
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -344,6 +430,9 @@ module.exports = {
     PEAK_END_ZH2, PEAK_END_EN2,
     WHOLE_VERDICT_ZH2, WHOLE_VERDICT_EN2,
     DURATION_ZH2, DURATION_EN2,
+    // [r319] 过程无所谓宣言 × 新裁定词新族（平行常量，负例注入-删条用）
+    WHOLE_VERDICT_ZH3, WHOLE_VERDICT_EN3,
+    DURATION_ZH3, DURATION_EN3,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     NEGATIVE_VERDICT_ZH, NEGATIVE_VERDICT_EN,
