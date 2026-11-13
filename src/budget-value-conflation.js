@@ -184,7 +184,88 @@ const RHET_EN = [
 // ─── F-4 反向归因形（英文）：worth-leg + because/since + budget-leg ─
 const REV_EN = /\b(?:not\s+worth\w*|isn'?t\s+worth\w*|unimportant|of\s+little\s+value|does\s?n[o']t\s+matter)\b[^.]{0,30}\b(?:because|since)\b[^.]{0,30}\b(?:can'?t\s+afford|cannot\s+afford|budget\s+(?:is|was)\s+(?:too\s+(?:tight|small|limited)|never\s+enough|not\s+enough)|beyond\s+our\s+(?:means|budget)|not\s+enough\s+(?:budget|money|funds)|could\s?n[o']t\s+pay)\b/i;
 
-// ─── 豁免一：教学/概念转述（讨论概念本身不是运用它）────────────────
+// ─── [r324] 现代资金/预算话语域新措辞家族（平行常量，存量注入语义不变）──
+// 真升级②：存量腿只收第一人称「买不起/预算不够/负担不起」式**可负担性约束**
+// （我付不出这个价 → 所以不值得），不收「投入/分配/报酬金额小」式**第三方
+// 分配信号**——「项目预算才批了二十万，说明它不重要」「月薪低说明这活没
+// 技术含量」「没人愿意投钱说明没价值」「研发预算占比低说明不重视创新」
+// 类现代预算/薪酬/注资话语 9/9 穿透本模块、良性 0 误伤
+// （scripts/round-324/probe-candidates.js）。家族同构：把**分配金额**
+// （budget allocation size）当成价值/重要性/含金量的度量衡——与存量
+// 「可负担性→价值」共享同一混淆内核（用钱给事物的重要性定罪），但触发
+// 词是分配额/报酬额/注资有无（"批得少/月薪低/没人投"），不是「买不起」。
+// 实现为平行常量 BUDGET_*4/WORTH_*4 + GEN/RHET/REV_*4，各 find*Leg
+// concat 合并；存量四形与存量族注入语义不变（注入 *_4=[] 只关新族，
+// 注入 BUDGET_ZH=[] 仍整腿禁用存量预算腿——新族不含「预算不够」字样）。
+
+// 腿① 分配/报酬金额小（中文）
+const BUDGET_ZH4 = [
+  // ①-a 预算/经费/拨款 + 才/只/仅仅 + 批/给/拨/划/投（"只批/才批"=分配金额小）
+  /(?:预算|经费|拨款|资金|财力|研发|投入|开销|成本|资源)[^。；，！？]{0,4}(?:才|只|仅仅)[^。；，！？]{0,2}(?:批|给|拨|划|投|筹|申|要|争)/,
+  // ①-b 预算/经费/拨款/投入 + 这么/那么/才/只 + 少/低/一点点（分配金额小）
+  /(?:预算|经费|拨款|资金|财力|研发|投入|开销|成本|资源)[^。；，！？]{0,6}(?:才|只|仅仅|就这么点|少得可怜|如此|这么|那么)[^。；，！？]{0,4}(?:少|低|小|一点点|一丁点|微不足道|有限|寒酸)/,
+  // ①-c 占比/比例 + 这么/很/偏 + 低/小（预算占比低）
+  /(?:预算|经费|投入|研发|资金|资源)?占比[^。；，！？]{0,4}(?:这么|那么|很|非常|偏|较|一直)?(?:低|小|少|不高)/,
+  // ①-d 月薪/薪水/工资/待遇 + 才/这么/偏 + 低/少/小（报酬低）
+  /(?:月薪|薪水|工资|薪资|报酬|薪酬|待遇|咨询费|专家费|出场费)[^。；，！？]{0,6}(?:才|只|仅仅|这么|那么|很|非常|偏|一直)?(?:低|少|小|有限|不高|寒酸)/,
+  // ①-e 才/只/仅仅 + 给/发/批/拨/付 + 数目 + 月薪/工资/钱/经费（只给了X月薪）
+  /(?:才|只|仅仅)(?:给|发|批|拨|付|开)[^。；，！？]{0,8}(?:月薪|薪水|工资|薪资|报酬|待遇|钱|经费|预算|拨款)/,
+  // ①-f 没人(愿意)投钱/出资/注资/买单/付费（无人注资；含「免费/开源…没人投钱」子情形）
+  /没人(?:愿意)?(?:投钱|出资|注资|买单|付费|肯投|乐意投)/,
+];
+
+// 腿① 分配/报酬金额小（英文）
+const BUDGET_EN4 = [
+  // ①-a2 budget/funding/grant/allocation is tiny/small/meager/paltry（分配金额小）
+  /\b(?:budget|funding|grant|grants|allocation|investment)\b[^.]{0,25}\b(?:is|was|are|were)\s+(?:tiny|small|minimal|meager|paltry|modest|low|negligible)\b/i,
+  // ①-b2 (a|the|only) (small|tiny|minimal|meager|paltry) (grant|budget|allocation)
+  /\b(?:a|the|only)\s+(?:small|tiny|minimal|meager|paltry|modest|low)\s+(?:grant|budget|allocation|funding|investment)\b/i,
+  // ①-c2 salary/pay/wage/compensation is low/small/meager（报酬低）
+  /\b(?:salary|pay|wage|wages|compensation|remuneration)\b[^.]{0,20}\b(?:is|was|are|were)\s+(?:low|small|meager|paltry|minimal|modest)\b/i,
+  // ①-c3 (poorly|low)-(paid|funded)（报酬/注资低——现代 labor 常用标签）
+  /\b(?:poorly|low)[- ]?(?:paid|funded)\b/i,
+  // ①-d2 nobody/no one funds/invests/backs/pays for（无人注资；含「free…nobody funds」子情形）
+  /\b(?:nobody|no\s+one)\s+(?:funds?|funded|invests?|invested|backs?|backed|pays?\s+for|sponsors?)\b/i,
+];
+
+// 腿② 价值/重要性/含金量否定（中文）
+const WORTH_ZH4 = [
+  // ②-a [不没] + ≤5字 + 当回事（口语化"不重要/不在乎"；"不能不"由 lookbehind 挡）
+  /(?<![能可乏])[不没][^。；，！？]{0,5}当回事/,
+  // ②-b [不没] + 可选强化 + 重视（对某对象的价值态度否定；"不能不重视"由 lookbehind 挡）
+  /(?<![能可])[不没](?:多|太|怎么|很|大|够)?重视/,
+  // ②-c 没什么/没啥/没有/谈不上 + 技术含量/含金量/专业性（对技能/价值的内在否定；
+  //    用"没什么X"而非裸"X低"——裸"X低"易与"工资低是因为门槛低"式反向因果混淆）
+  /(?:没什么|没啥|没有|谈不上|缺乏|缺少)[^。；，！？]{0,4}(?:技术含量|含金量|专业性)/,
+];
+
+// 腿② 价值/重要性/含金量否定（英文）
+const WORTH_EN4 = [
+  // ②-a2 not (be/really/very/all that/particularly) + important/valuable/significant
+  /\bnot\s+(?:(?:be|really|very|all\s+that|particularly|especially)\s+){1,3}(?:important|valuable|significant|meaningful)\b/i,
+  // ②-b2 not require/demand/take (much) (real) skill/expertise/talent（对技能价值的否定）
+  /\bnot\s+(?:require|demand|take|need)\s+(?:much\s+|any\s+|a\s+lot\s+of\s+)?(?:real\s+|actual\s+)?(?:skill|expertise|talent|ability)\b/i,
+  // ②-c2 (little|no) (real) skill/expertise/merit/substance
+  /\b(?:little|no)\s+(?:real\s+|actual\s+)?(?:skill|expertise|merit|substance)\b/i,
+];
+
+// F-2 泛化形新措辞（中文）：分配少的X都/注定 + 价值否定（腿①复用 BUDGET_ZH4 锚点）
+const GEN_ZH4 = /(?:月薪低|工资低|薪水低|报酬低|没人投钱|没人愿意投|钱少|预算少|经费少|拨款少|投入少|给得少)[^。；，]{0,10}(?:的)?[^。；，]{0,8}(?:都|注定|必然|一律|统统)[^。；，]{0,8}(?:不重要|没多大价值|没什么价值|不值得|无关紧要|没技术含量|没啥含金量|不当回事|不重视)/;
+// F-3 反问形新措辞（中文）：分配少 + 能算什么/能是什么 + 重要/价值/含金量
+const RHET_ZH4 = /(?:预算|经费|拨款|投入|钱|月薪|工资)[^。？]{0,6}(?:才|只|这么|那么)?(?:少|低)[^。？]{0,14}(?:能算什么|算什么|能是什么|岂能算|称得上)[^。？]{0,8}(?:重要|关键|价值|技术含量|含金量)/;
+// F-4 反向归因形新措辞（中文）：价值否定 + 因为/毕竟 + 分配少
+const REV_ZH4 = /(?:没技术含量|没啥含金量|含金量低|不当回事|不当一回事|不重视|没什么技术含量|意义不大)[^。；，]{0,2}[，,]?\s*(?:因为|毕竟|是由于|就在于)[^。；，]{0,12}(?:预算|经费|拨款|投入|钱|工资|月薪)[^。；，]{0,6}(?:少|低|才|只)/;
+
+// F-2 泛化形新措辞（英文）：poorly-paid/low-funded X never/don't matter
+const GEN_EN4 = /\b(?:poorly|low)[- ]?(?:paid|funded)\b[^.]{0,30}\b(?:never|don'?t|does\s?n[o']t|cannot|can'?t)\s+(?:really\s+|truly\s+)?(?:matter|matters|important|worth\w*)/i;
+// F-3 反问形新措辞（英文）
+const RHET_EN4 = [
+  /\b(?:budget|funding|grant|salary|pay)\b[^.]{0,30}\b(?:tiny|small|low|meager|minimal)\b[^.]{0,40}\bhow\s+(?:important|valuable|skilled)\s+can\b/i,
+];
+// F-4 反向归因形新措辞（英文）
+const REV_EN4 = /\b(?:not\s+(?:very\s+)?(?:important|valuable|skilled)|little\s+(?:real\s+)?(?:skill|value)|no\s+real\s+(?:skill|value))\b[^.]{0,30}\b(?:because|since)\b[^.]{0,30}\b(?:budget|funding|grant|salary|pay)\b[^.]{0,20}\b(?:tiny|small|low|meager|minimal)\b/i;
+
+// 豁免一：教学/概念转述（讨论概念本身不是运用它）────────────────
 const EXEMPT_META_ZH = [
   /教材|课堂|教科书|讲座|论文|文献|称为|定义为|概念|所谓|是指|悖论|理论上|学术|研讨|误区|谬误|认知偏误|思维陷阱|经济学里|经济学家|有人说|常言道|俗语说|推理题/,
 ];
@@ -268,7 +349,9 @@ function negatedInSpan(text, from, to, isZh, R) {
 
 // 腿①首次命中位置与结束位置
 function findBudgetLeg(text, isZh, R) {
-  const list = isZh ? (R.BUDGET_ZH || BUDGET_ZH) : (R.BUDGET_EN || BUDGET_EN);
+  const list = isZh
+    ? (R.BUDGET_ZH || BUDGET_ZH).concat(R.BUDGET_ZH4 || BUDGET_ZH4)
+    : (R.BUDGET_EN || BUDGET_EN).concat(R.BUDGET_EN4 || BUDGET_EN4);
   for (const re of list) {
     const m = re.exec(text);
     if (m) return { idx: m.index, end: m.index + m[0].length };
@@ -280,7 +363,9 @@ function findBudgetLeg(text, isZh, R) {
 // 说明它不值得」是对推断的否认，「不是买不起」是对约束的否认；腿①
 // 起点前 12 字/28 字符亦查否定）
 function findChainLeg(text, isZh, R) {
-  const worths = isZh ? (R.WORTH_ZH || WORTH_ZH) : (R.WORTH_EN || WORTH_EN);
+  const worths = isZh
+    ? (R.WORTH_ZH || WORTH_ZH).concat(R.WORTH_ZH4 || WORTH_ZH4)
+    : (R.WORTH_EN || WORTH_EN).concat(R.WORTH_EN4 || WORTH_EN4);
   const inferRe = isZh ? pickRe(R.INFER_ZH, INFER_ZH) : pickRe(R.INFER_EN, INFER_EN);
   const winBI = isZh ? WIN_BI_ZH : WIN_BI_EN;
   const winIW = isZh ? WIN_IW_ZH : WIN_IW_EN;
@@ -313,16 +398,22 @@ function findChainLeg(text, isZh, R) {
 
 // F-2 泛化形（不做否定守卫：否定内生于谓语）
 function findGenLeg(text, isZh, R) {
-  const re = isZh ? pickRe(R.GEN_ZH, GEN_ZH) : pickRe(R.GEN_EN, GEN_EN);
-  const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
-  const m = reG.exec(text);
-  return m ? { idx: m.index, text: m[0] } : null;
+  const list = isZh
+    ? [pickRe(R.GEN_ZH, GEN_ZH)].concat(R.GEN_ZH4 || GEN_ZH4)
+    : [pickRe(R.GEN_EN, GEN_EN)].concat(R.GEN_EN4 || GEN_EN4);
+  for (const re of list) {
+    const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+    const m = reG.exec(text);
+    if (m) return { idx: m.index, text: m[0] };
+  }
+  return null;
 }
 
 // F-3 反问形（不做否定守卫：问号包装的断言，否定已内生于结构）
 function findRhetLeg(text, isZh, R) {
   const raw = isZh ? (R.RHET_ZH || RHET_ZH) : (R.RHET_EN || RHET_EN);
-  const list = Array.isArray(raw) ? raw : [raw];
+  const add = isZh ? (R.RHET_ZH4 || RHET_ZH4) : (R.RHET_EN4 || RHET_EN4);
+  const list = (Array.isArray(raw) ? raw : [raw]).concat(add);
   for (const re of list) {
     const m = re.exec(text);
     if (m) return { idx: m.index, text: m[0] };
@@ -334,10 +425,15 @@ function findRhetLeg(text, isZh, R) {
 // 「不是不值得」双重否定；worth 腿结束→连接词 的跨度查否定；预算腿
 // 自带的否定（买不起/never enough）是谓语固有成分，不查）
 function findRevLeg(text, isZh, R) {
-  const re = isZh ? pickRe(R.REV_ZH, REV_ZH) : pickRe(R.REV_EN, REV_EN);
-  const worths = isZh ? (R.WORTH_ZH || WORTH_ZH) : (R.WORTH_EN || WORTH_EN);
+  const revList = isZh
+    ? [pickRe(R.REV_ZH, REV_ZH)].concat(R.REV_ZH4 || REV_ZH4)
+    : [pickRe(R.REV_EN, REV_EN)].concat(R.REV_EN4 || REV_EN4);
+  const worths = isZh
+    ? (R.WORTH_ZH || WORTH_ZH).concat(R.WORTH_ZH4 || WORTH_ZH4)
+    : (R.WORTH_EN || WORTH_EN).concat(R.WORTH_EN4 || WORTH_EN4);
   const connRe = isZh ? /因为|毕竟|是由于|就在于/ : /\b(?:because|since)\b/i;
   const negRe = isZh ? ((R && R.NEG_ZH) || NEG_ZH) : ((R && R.NEG_EN) || NEG_EN);
+  for (const re of revList) {
   const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
   let m;
   while ((m = reG.exec(text)) !== null) {
@@ -355,6 +451,7 @@ function findRevLeg(text, isZh, R) {
     // 否定守卫二：worth 腿结束 → 连接词 的跨度
     if (negatedInSpan(text, worthEnd, connAbs, isZh, R)) continue;
     return { idx: m.index, text: m[0] };
+  }
   }
   return null;
 }
@@ -420,5 +517,8 @@ module.exports = {
     BUDGET_ZH, WORTH_ZH, INFER_ZH, GEN_ZH, RHET_ZH, REV_ZH,
     BUDGET_EN, WORTH_EN, INFER_EN, GEN_EN, RHET_EN, REV_EN,
     EXEMPT_META_ZH, EXEMPT_CORRECT_ZH, EXEMPT_META_EN, EXEMPT_CORRECT_EN, NEG_ZH, NEG_EN,
+    // [r324] 现代资金/预算话语域新措辞家族平行常量（负例注入自检用）
+    BUDGET_ZH4, WORTH_ZH4, GEN_ZH4, RHET_ZH4, REV_ZH4,
+    BUDGET_EN4, WORTH_EN4, GEN_EN4, RHET_EN4, REV_EN4,
   }),
 };
