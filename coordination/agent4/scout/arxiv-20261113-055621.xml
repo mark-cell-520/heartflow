@@ -1,0 +1,385 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/N1sCyeurJsJ8SmcjaNbtSKtbVEA</id>
+  <title>arXiv Query: search_query=all:illusion OR all:of OR all:control OR all:overconfidence OR all:disposition OR all:effect OR all:behavioral OR all:economics OR all:wording&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-13T05:56:21Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:illusion+OR+(all:of+OR+(all:control+OR+(all:overconfidence+OR+(all:disposition+OR+(all:effect+OR+(all:behavioral+OR+(all:economics+OR+all:wording)))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1125416</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16697v1</id>
+    <title>Efficient Standard Siren Cosmological Inference with Posterior Reuse</title>
+    <updated>2026-11-12T12:13:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.16697v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16697v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Standard siren cosmology depends on several modelling assumptions, including the underlying source population, galaxy catalogue, and detection selection function. Quantifying the effect of each choice typically requires a full, independent analysis. As gravitational-wave catalogs grow incrementally, much computational effort is spent re-analysing largely overlapping datasets. We apply the recently developed ASPIRE (Accelerated Sequential Posterior Inference via Reuse) sampler to the joint estimation of cosmological and population parameters with dark sirens. ASPIRE updates existing posterior samples into the posterior under a new hypothesis without restarting from the prior. It combines normalising flows with a sequential Monte Carlo (SMC) scheme to produce accurate posteriors and unbiased evidence estimates. Applying ASPIRE to a number of dark siren analysis cases with GWTC-5.0, we recover posteriors consistent with nested sampling, while recording a performance improvement of between 6-28 times over the set of analyses when using an existing posterior. This enables efficient exploration of modelling choices and rapid updates as catalogs grow, without duplicating existing computational effort.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T12:13:17Z</published>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Alexander Papadopoulos</name>
+    </author>
+    <author>
+      <name>Michael J. Williams</name>
+    </author>
+    <author>
+      <name>Christian E. A. Chapman-Bird</name>
+    </author>
+    <author>
+      <name>Rachel Gray</name>
+    </author>
+    <author>
+      <name>Christopher Messenger</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16694v1</id>
+    <title>When Expert Disagreement Hurts: Prestige and Selectivity in LLM Decision Revision</title>
+    <updated>2026-11-12T12:11:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.16694v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16694v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When language models revise a decision after another agent disagrees, neither reversal counts nor final accuracy shows whether they are fixing mistakes or abandoning correct answers. We introduce a controlled two-pass audit that holds the question, the evidence, and the model's initial answer fixed and varies only the revision context: neutral reflection, anonymous disagreement, or disagreement attributed to a domain expert. For binary decisions the accounting is exact: revision raises accuracy only if it is selective enough, reversing wrong answers more than $a/(1-a)$ times as often as correct ones, where $a$ is initial accuracy (nine times at 90%). Across five models and 1,989 evidence-grounded decisions in medicine, science, and law, no model clears this bar under expert disagreement, and accuracy falls by up to 16.1 points. The expert label, a prestige cue, adds reversals for four of the five models, yet its effect on accuracy ranges from a 5.2-point loss to a 2.4-point gain, so reversal counts are a poor proxy for harm. With identical arguments from both sources, the label still raises reversal for three proprietary models and in a pooled analysis of four newer models. Models also respond to stated source reliability. Revision pipelines should therefore be evaluated with paired, conditional metrics, per model and protocol.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T12:11:03Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 38 pages, 7 figures, 36 tables. Code and data: https://github.com/yupengtang/when-expert-disagreement-hurts</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yupeng Tang</name>
+    </author>
+    <author>
+      <name>Mingfeng Lin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16693v1</id>
+    <title>MobileProbe: Adaptive Security Evaluation of Mobile Agents via Trajectory-Aware Injection</title>
+    <updated>2026-11-12T12:08:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.16693v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16693v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mobile GUI agents read the screen of a phone and operate apps on a user's behalf to complete multi-step tasks such as online shopping or messaging. Because the agent acts on whatever the screen shows, an attacker can embed malicious instructions into ordinary UI content and redirect its actions. We refer to this threat as environmental injection attack (EIA). Existing benchmarks measure this risk by pinning hand-crafted payloads to a fixed step of a fixed task. This approach faces two limitations. First, each payload is bound to one task in one app and does not transfer without manual redesign. Second, agents given the same task may follow different routes, so an agent that never reaches the injected page is recorded as safe without being tested. This insufficient test coverage can cause fixed-point benchmarks to underestimate the security risk of deployed mobile agents.
+  In this work, we propose MobileProbe, a trajectory-aware red-teaming framework that evaluates mobile agents adaptively. MobileProbe discovers attacker-controllable content surfaces through automated pentesting, localizes vulnerable decision points along the agent's trajectory, and iteratively refines context-aware payloads through a surrogate-filtered evolutionary loop. We construct a benchmark of 83 long-horizon attack instances spanning 12 mobile applications. Each is annotated with a Confidentiality, Integrity, or Availability (CIA) attack goal to cover the principal categories of security threats facing mobile agents. On three representative agent architectures, MobileProbe attains higher attack success rates than human-written, zero-shot LLM, and prior automated red-teaming baselines adapted to the mobile domain. MobileProbe can serve as a pre-deployment auditing tool to systematically uncover vulnerabilities and inform security hardening of mobile agents.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T12:08:43Z</published>
+    <arxiv:comment>Accepted at NDSS 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Yingbin Jin</name>
+    </author>
+    <author>
+      <name>Ji'an Wang</name>
+    </author>
+    <author>
+      <name>HaoYang Chai</name>
+    </author>
+    <author>
+      <name>Hanjun Luo</name>
+    </author>
+    <author>
+      <name>Li Hu</name>
+    </author>
+    <author>
+      <name>Xinfeng Li</name>
+    </author>
+    <author>
+      <name>Huadi Zheng</name>
+    </author>
+    <author>
+      <name>PeiZhao Hu</name>
+    </author>
+    <author>
+      <name>Qingqing Ye</name>
+    </author>
+    <author>
+      <name>Haibo Hu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16690v1</id>
+    <title>Hilbert's 17th problem for symmetric functions: undecidability and a counterexample</title>
+    <updated>2026-11-12T12:07:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.16690v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16690v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study inequalities between symmetric functions that hold in every number of variables. First, we prove that it is undecidable whether a symmetric function with rational coefficients is nonnegative in all dimensions, answering a question posed by Acevedo, Blekherman, Debus and Riener. As a consequence, the validity of dimension-free moment criteria for entanglement in quantum information is undecidable. Second, we present a homogeneous symmetric function of degree 8 which is positive definite in every dimension but admits no sum of squares multiplier that is uniform in the number of variables. Consequently, Artin's solution of Hilbert's 17th problem and the Krivine-Stengle Positivstellensatz have no any-dimensional analog and any-dimensional Positivstellensätze asked for by Levin and Chandrasekaran cannot hold in general.</summary>
+    <category term="math.AG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T12:07:33Z</published>
+    <arxiv:comment>17 pages, comments welcome</arxiv:comment>
+    <arxiv:primary_category term="math.AG"/>
+    <author>
+      <name>Sebastian Debus</name>
+    </author>
+    <author>
+      <name>Robin Schabert</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16683v1</id>
+    <title>Geometric Theory of Quasiperiodically Driven Systems</title>
+    <updated>2026-11-12T11:58:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.16683v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16683v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quasiperiodically driven systems give rise to a rich set of physical phenomena in contemporary quantum physics, with applications ranging from nonequilibrium dynamics to Hamiltonian engineering and control. However, unlike periodically driven (Floquet) systems, their study is hindered by the absence of a generic theory to describe their evolution using an effective time-independent Hamiltonian and its eigenstates. Based on counterdiabatic driving, we construct a general framework to identify and determine the dynamically invariant spaces of arbitrary quasiperiodic drives (i.e., the generalization of Floquet states). We decompose their unitary evolution using the exact effective average-energy operator Æ and the corresponding gauge potential, which we compute via a variational principle in frequency-lattice operator space. We then formulate a four-fold taxonomy of quasiperiodic drives based on the geometry and topology of their dynamically invariant spaces into (non)abelian and (un)twisted classes. The abelian untwisted class admits a direct extension of Floquet's theorem to incommensurate quasiperiodic drives; going beyond, we derive a nonabelian generalization of Floquet theory. Finally, we propose a concept of ergodicity whose onset is marked by coalescing dynamically invariant eigenspaces, in direct analogy to the emergence of ergodicity in a mixed classical phase space. The effective mathematical framework, variational principle, and nonabelian ergodicity we put forward apply beyond quasiperiodic drives.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:58:22Z</published>
+    <arxiv:comment>22 + 28 pages, 12 + 19 figures, 1 algorithm</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Chengzhi Ye</name>
+    </author>
+    <author>
+      <name>Marin Bukov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16681v1</id>
+    <title>Dislocation Arrays Hosting Topological Bound States in Epitaxial Tetragonal FeSe Films</title>
+    <updated>2026-11-12T11:56:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.16681v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16681v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Topological defects in real space can host robust, localized quantum states for quantum information processing and sensing, yet deterministic control over their formation in crystalline materials remain challenging.</summary>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:56:00Z</published>
+    <arxiv:primary_category term="cond-mat.mtrl-sci"/>
+    <author>
+      <name>Huimin Zhang</name>
+    </author>
+    <author>
+      <name>Basu Oli</name>
+    </author>
+    <author>
+      <name>Zhengfei Wang</name>
+    </author>
+    <author>
+      <name>Michael Weinert</name>
+    </author>
+    <author>
+      <name>Lian Li</name>
+    </author>
+    <arxiv:doi>10.1021/acsnano.6c11893</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1021/acsnano.6c11893" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16678v1</id>
+    <title>Edge-Gradient Augmentation under Reinforcement Learning for Temporal Graph</title>
+    <updated>2026-11-12T11:53:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.16678v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16678v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Temporal link prediction is critical for understand- ing dynamic interactions in evolving networks, informing appli- cations ranging from social network analysis to recommendation systems. Existing methods typically rely on raw temporal graph data, often neglecting explicit edge-change information that can significantly improve predictive performance. To address this gap, we propose edge-gradient reinforced learning (EG-RL), a framework that explicitly encodes edge-gradient events (edge births and deaths) through dedicated node and link encoding modules. EG-RL uses a policy-driven reinforcement-learning mechanism to dynamically select and augment the most infor- mative edge snapshots, guided by critic-based feedback to opti- mize prediction accuracy. The model comprises distinct modules for node encoding, link encoding, token mixing, and channel mixing, integrated through global pooling and followed by a two-layer multilayer perceptron classifier. Extensive experiments on multiple dynamic graph datasets demonstrate substantial gains in area under the receiver operating characteristic curve and average precision. Ablation studies further confirm the necessity of adaptive edge-gradient augmentation and validate the effectiveness of the proposed encoding and reinforcement- learning mechanisms.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:53:35Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yongqing Zhou</name>
+    </author>
+    <author>
+      <name>Jiawei Chen</name>
+    </author>
+    <author>
+      <name>Wenjun Wang</name>
+    </author>
+    <author>
+      <name>Xinyu Wang</name>
+    </author>
+    <author>
+      <name>Wei Yu</name>
+    </author>
+    <author>
+      <name>Qiyao Peng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16677v1</id>
+    <title>Manifold Attracting Flow Matching: Physics-Constrained Sampling via Continuous Geometric Dynamics</title>
+    <updated>2026-11-12T11:53:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.16677v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16677v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generating scientific data under previously unseen equality constraints requires satisfying the prescribed constraints without destroying the physical structure learned from data. Existing inference-time approaches often enforce physical constraints by repeatedly correcting predicted endpoints, but such discrete corrections can distort learned generative structure and introduce unstable feedback. In this work, we propose Manifold Attracting Flow Matching (MAFM), which continuously evolves a persistent anchor through an ODE whose dynamics drive it analytically toward the constraint manifold. Specifically, its geometric correction preserves model-guided tangent motion while prescribing the normal motion to contract constraint violations toward the manifold. This construction separates model tracking from constraint attraction and provides theoretical guarantees for residual contraction and local feedback stabilization. Experiments across geometric and partial differential equation benchmarks demonstrate improved generation quality over variant constraint-guided baselines while maintaining low constraint residuals. MAFM provides a flexible framework for coordinating learned physical structure and explicit constraints through controllable sampling dynamics, without retraining the underlying generative model.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:53:28Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Guanyu Chen</name>
+    </author>
+    <author>
+      <name>Jinchen Wang</name>
+    </author>
+    <author>
+      <name>Shengze Xu</name>
+    </author>
+    <author>
+      <name>Xingyu Ren</name>
+    </author>
+    <author>
+      <name>Tieyong Zeng</name>
+    </author>
+    <author>
+      <name>Antonios Armaou</name>
+    </author>
+    <author>
+      <name>Dong Ni</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16675v1</id>
+    <title>Infectious Disease Horizon in Emerging Infectious Diseases</title>
+    <updated>2026-11-12T11:50:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.16675v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16675v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Emerging infectious diseases often spread freely before an outbreak is detected, yet the duration of this free-transmission period and the infection size accumulated during this period are difficult to quantify. These quantities directly affect forecasts of subsequent transmission dynamics, estimates of infection size, and decisions regarding prevention and control measures. In this study, we propose and compute the infectious disease horizon (IDH)-the time span from when an infectious disease begins spreading to when it is first detected-and examine its antecedents and consequences. First, based on the SEAIR free-transmission model, we derive transmission characteristics, including the generation interval, the serial interval, the basic reproduction number, and the effective reproduction number, and describe the incidence using a renewal equation. Second, by considering two detection routes, we further obtain the distribution and mean of the IDH under different detection settings and quantify the infection size at the time of outbreak detection. Third, intervention measures are incorporated to derive a post-detection transmission model with generally distributed stage durations, followed by the derivation of the corresponding model under exponentially distributed stage durations and the determination of the final infection size. Finally, under the exponential-distribution assumption, the model is applied to the COVID-19 outbreak in Xi'an. The unified framework developed in this study provides a theoretical basis for evaluating early surveillance capacity for emerging infectious diseases, optimizing testing strategies, and determining the intensity of prevention and control measures after outbreak detection.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:50:21Z</published>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Miaomiao Lv</name>
+    </author>
+    <author>
+      <name>Juan Zhang</name>
+    </author>
+    <author>
+      <name>Zhen Jin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16670v1</id>
+    <title>Exact Fourier Coupling Relations for the Method of Auxiliary Sources on Elliptic Cylinders</title>
+    <updated>2026-11-12T11:45:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.16670v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16670v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Method of Auxiliary Sources has been extensively studied in the case of cylindrical geometries. In this article, the authors provide analysis elements for the elliptical geometry case. Based on a Mathieu functions expansion, the impedance matrix is projected into a reduced diagonal matrix. At the same time, the matrix is studied in the Fourier domain. A checkerboard structure is found and a relation between the different elements of the matrix is proven. Numerical simulations confirm the theoretical results. We additionally identify an exact finite-grid parity rule, an aliasing identity connecting the discrete and continuous Fourier representations, and controlled near-circular Fourier-band localization. These results are mostly independent of a small-$q$ truncation of radial Mathieu functions.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:45:53Z</published>
+    <arxiv:comment>12 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Prisca Le Dily</name>
+    </author>
+    <author>
+      <name>Arnaud Coatanhay</name>
+    </author>
+    <author>
+      <name>Marie Kintzinger</name>
+    </author>
+    <author>
+      <name>Yves-Marie Scolan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16667v1</id>
+    <title>People prefer AI to human advice in multi-turn conversations but neither changes incentivised behaviour</title>
+    <updated>2026-11-12T11:42:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.16667v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16667v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>People increasingly ask AI chatbots for advice, yet large language models (LLMs) are sycophantic, overconfident, and can amplify human cognitive biases. In this article, we investigate how people perceive advice from humans versus LLMs and whether AI advice reshapes incentive-compatible donation decisions. Using Carrier, a new experimental platform, we designed an experiment where participants made a donation decision after discussing it with an AI chatbot advisor, another human, or receiving no advice. Participants judged LLM advisors to be significantly more rational, trustworthy, convincing, and sycophantic than human advisors. Analysis of chatlogs showed that LLMs were more engaged than human advisors: they shared more facts and more often stated their opinion and justified their recommendations. Despite this, donation decisions did not vary across conditions.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:42:54Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Maximilian Maier</name>
+    </author>
+    <author>
+      <name>Tsz Kwan Emmy Wong</name>
+    </author>
+    <author>
+      <name>Jiahao Eric Yang</name>
+    </author>
+    <author>
+      <name>Falk Lieder</name>
+    </author>
+    <author>
+      <name>Vanessa Cheung</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16665v1</id>
+    <title>Proof of the Quasi Riemann Hypothesis using $\mathbb Q[i]$</title>
+    <updated>2026-11-12T11:41:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.16665v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16665v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Using quartic Gauss sums in place of the cubic Gauss sums in OpenAI's original proof, we prove that the Dedekind $ζ$-function $ζ_{\mathbb Q(i)}(s)$ of $\mathbb Q(i)$ has no zeros in the half-plane $\Re s&gt;599/600$, thereby obtaining the same zero-free half-plane for the Riemann $ζ$-function.We obtain the upper bound for the smoothed sum by applying Poisson summation twice and using the functional equation of the quartic Kubota series of angular weight $1$.In the Mellin representation, a zero-density bound for the family of quartic characters controls the terms from nonprincipal characters,and a residue and a lattice average over fourth powers give the main term.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:41:03Z</published>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Xin Hang Ji</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16663v1</id>
+    <title>A Derivative-Free Bellman Equation for Dynamic Time-to-Collision: Two-Sided Certificates and Explicit ReLU Approximation</title>
+    <updated>2026-11-12T11:39:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.16663v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16663v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Dynamic time-to-collision (TTC) is the first contact time of a prediction flow and defines a feedback map implicitly. We study its capped value function $\VV$ for Carathéodory dynamics with bounded, measurable forcing. A self-contained argument establishes local Lipschitz continuity on the transversal collision domain. A derivative-free stopped-step Bellman equation then characterizes $\VV$ uniquely: it advances the prediction for a fixed duration or until contact and adds the elapsed time. A two-sided error bound uses only the candidate's residual along complete stopped trajectories and its error at their endpoints. Exact continuum iteration recovers $\VV$ after finitely many sweeps, including one additional sweep for initializations that violate the boundary condition. We also characterize an optional-duration infimum operator: its fixed points are the dynamic-programming subsolutions, so its residual alone does not identify $\VV$. Finally, on compact subsets of the transversal domain, an optimization-free ReLU construction has explicit size, controlled local residual, and robustness to errors in its nodal TTC values. The optimal velocity model provides the running application.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:39:16Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Hossein Nick Zinat Matin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16661v1</id>
+    <title>Reducing Batch Makespan for LLM Agent Workloads through Inference-Environment Coordination</title>
+    <updated>2026-11-12T11:38:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.16661v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16661v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Efficient batch execution of agent tasks is critical to LLM training and development workflows, including benchmark evaluation, synthetic-data generation, and RL rollouts. Since these tasks alternate between LLM inference and environment interaction, we present coordinated optimizations to reduce batch makespan, the time required to complete all tasks in a batch. For hybrid LLMs, a workload-based resource model guides GPU-memory allocation between key-value (KV) cache and recurrent state and provides a reference sample concurrency to exploit parallelism while limiting recomputation. Trajectory-aware routing and scheduling promote cache reuse while balancing worker load. Under constrained environment capacity, we decouple sample admission from environment execution and introduce Chain-Advancing Action Scheduling (CAAS), which prioritizes long chains using observed progress to shorten the batch tail. Controlled replay combines actual inference with recorded environment responses and durations for ablations of individual optimizations. Live evaluations with Ling-3.0-Flash and Ling-3.1-Flash on the BFCL, SWE-bench Multilingual, WideSearch, and MCP-Atlas benchmarks demonstrate makespan reductions of 10.4% to 65.0%, while evaluation scores remain aligned. Furthermore, these methods have been successfully applied to training and evaluation workflows for the Ling-3.x model series, accelerating the model-development cycle.</summary>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:38:21Z</published>
+    <arxiv:comment>26 pages, 12 figures. Technical report</arxiv:comment>
+    <arxiv:primary_category term="cs.DC"/>
+    <author>
+      <name>Wei Feng</name>
+    </author>
+    <author>
+      <name>Meiling Chen</name>
+    </author>
+    <author>
+      <name>Boxiao Chen</name>
+    </author>
+    <author>
+      <name>Lu Liu</name>
+    </author>
+    <author>
+      <name>Bin Zi</name>
+    </author>
+    <author>
+      <name>Libin Ye</name>
+    </author>
+    <author>
+      <name>Xingyu Lu</name>
+    </author>
+    <author>
+      <name>Lei Xu</name>
+    </author>
+    <author>
+      <name>Jun Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16658v1</id>
+    <title>Automatic O(a) Improvement for Wilson Twisted Mass Fermions in the Hamiltonian Formulation</title>
+    <updated>2026-11-12T11:33:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.16658v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16658v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We apply the recently developed Symanzik effective Hamiltonian framework to Wilson twisted mass fermions. The effective Hamiltonian is constructed solely based on the symmetries of the lattice Hamiltonian without recourse to the Symanzik effective action in Euclidean space-time. We use it to prove automatic $O(a)$ improvement at maximal twist, as well as $O(a)$ improvement via so-called mass and Wilson average. Moreover, we derive the structure of $O(a)$ counterterms pre-requisite for clover on-shell improvement of Wilson fermions. We show how to remove on-shell redundant contributions using canonical transformations, and find that the well known clover term in isotropic Euclidean space time splits into two terms with independent coefficients.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T11:33:21Z</published>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Carsten Urbach</name>
+    </author>
+  </entry>
+</feed>
