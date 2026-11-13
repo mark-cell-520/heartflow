@@ -1,3 +1,33 @@
+## r320 — 激励反噬（perverse_incentive，econ_reasoning_gate 聚合族）「专业与公共部门按计数考核滋生数量压倒质量的反向行为」新措辞家族（真升级②）
+
+**日期** 2026-11-14 00:26–01:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r319 先例）  **轮次** r320（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "perverse incentive Goodhart law cobra effect metric gaming unintended consequences" → arXiv parse-fail / GitHub 0 条 / S2 限流——无直接对应纯规则方案，按既有形态自建
+
+### 缺口实证（scripts/round-320/probe-perverse-domains.js + probe-leg-diagnosis.js，v6.8.179 pristine 基线，动手前）
+
+- 存量 perverse_incentive 三腿（INCENTIVE×GAMING×ENDORSE）只收悬赏捕蛇/计件工资/按次罚款/按结案数等**经典域**；医疗按量考核、执法罚款配额、学术唯论文数等**现代公共服务/专业职业域**探针 15 条攻击候选（ZH 9 + EN 6）**完全穿透**（mod=false、gate=pass、econ_reasoning_gate 归因 0），良性零误伤。
+- 腿诊断：缺口不只在腿②——三腿均缺这些域的专业措辞（存量 INCENTIVE_ZH 未收 手术台次/床位使用率/论文数评/立项数/拘留人数排名；存量 GAMING_ZH 未收 过度医疗/专挑外地车牌/反复驱赶/拆篇灌水/统统拘留；存量 ENDORSE_ZH 未收 数字上去了/节节高/产量激增/创新高）。
+
+### 改了什么（六平行常量 + findSignatures concat 合并，存量三腿与豁免层零改动）
+
+- **INCENTIVE_ZH2/EN2**（腿① 按计数考核）：按门诊量/手术台次/床位使用率/就诊量 + 计酬/发奖/考核/排名；按论文数/立项数/项目数/课题数 + 评职称/考核/算绩效；按影响因子/工分/积分/分值 + 发/奖/算；罚单/拘留/查处 数量/件数/人数 + 发补贴/排名（EN：bonus/compensation tied to the number of / assessed on the number of / arrest quotas / per procedure）。登记 4 + 4 元素。
+- **GAMING_ZH2/EN2**（腿② 数量压倒质量的反向行为）：小病大开/多开检查/过度医疗/能保守也开刀/能出院也留；专挑外地车牌/能调解也统统拘留/反复驱赶；把一个实验拆成几篇/一稿多投/灌水/专挑好发的/包装成多个项目申报（EN：over-prescribe/order batteries of tests/operate on who do not need/keep hospitalized/admit who do not need/target out-of-town/detain who could be warned/ticket quota/split one study into papers/duplicate-submit/salami slicing/packaged as several proposals）。登记 10 + 12 元素。
+- **ENDORSE_ZH2/EN2**（腿③ 数量政绩/创新高式认可）：数字/产量/立项数/论文数/办案数量 + 上去/创新高/节节高/遥遥领先/猛涨/激增/暴涨/翻倍；创新高/节节高/遥遥领先/一路飙升（EN：arrests/fines/citations/publications/papers + soared/skyrocketed/tripled/doubled / hit a record high）。登记 2 + 2 元素。
+- **诚实数字·落地期收敛删除（未登记轮测）**：INCENTIVE_EN2[0]「paid/pay/pays/paying per X」经注入实测被 INCENTIVE_EN2[4]「per X」完整包含（每条 [0] 命中都含 "per X"）→ 删除，避免冗余元素。最终登记 **34 个**元素（INCENTIVE_ZH2 4 / GAMING_ZH2 10 / ENDORSE_ZH2 2 / INCENTIVE_EN2 4 / GAMING_EN2 12 / ENDORSE_EN2 2）。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-320-perverse-incentive-professional-quota.test.js` | **78 通过 / 0 失败**（A gate 归因 econ 15 + B 模块命中 15 + C 良性零误伤 14 + F 元素级负例注入 34） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24/0 PASS**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，新家族零新增误拦） |
+| 攻击探针（最终收敛代码复跑） | ZH 医疗/执法/学术 9/9、EN 6/6 模块命中；gate 层 econ_reasoning_gate 归因承重（改前 0/15） |
+| 良性 | 存量 perverse-incentive.test.js 11/0 无回退 + 本轮新增 ZH 8 + EN 6 零误命中 |
+| 负例 | 注入 **34 个**元素 → **34 个全部变红，0 个未变红** |
+| 元素级最小样本自检 | 34 个新元素逐条删除均配「仅该元素承重」最小样本，scripts/round-320/probe-element-selfcheck.js **34/34 PASS**；收敛期拦截并修复 5 处（GAMING_EN2[0] `order\w+` 对完整词 "over-order" 失配→改 `order(?:s|ed|ing)?`；GAMING_EN2[6] 只收 detained/arrested 过去式→broaden 至 detain/arrest/fine/book 原形；INCENTIVE_ZH2[1]/[3] 误用无效认可词「考核很成功」「一片叫好」→改「效率大幅提升」「效果很好」；INCENTIVE_EN2[0] 样本语序 "ties bonuses to" 不匹配→改 "compensation tied to"；ENDORSE_EN2[0] "revenue doubled" 与存量 ENDORSE_EN ③-b 冗余→测试改唯一短语 "arrests soared"） |
+
 ## r319 — 现时偏差（present_bias）+ 峰终定律（peak_end_rule）+ 禀赋效应（endowment_effect）+ 显著性≠重要性（significance_effect_size，econ_reasoning_gate 聚合族）「先用后付/BNPL×未来自我贴现 / 过程无所谓宣言×新裁定词 / 祖传所有权×卖方溢价 / 踩线显著×新裁定」四子族新措辞家族（真升级②×4）
 
 **日期** 2026-11-13 21:57 CST 立项 · 2026-11-14 00:30 CST 收尾  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值）  **轮次** r319（kind: dimension）  **约束** `src/index.js` 零改动（四子族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** arXiv 两次查询 parse-fail / GitHub 2 条（QHD 元分析/模型，0 star）/ S2 429 限流——无直接对应纯规则方案，按既有形态自建
