@@ -256,7 +256,7 @@ for (const k of ['A_ZH3', 'A_EN3', 'B_ZH3', 'B_EN3', 'C_ZH3', 'C_EN3']) {
   ok(k in toc, `H 登记：tragedy-of-commons __internals 暴露 ${k}`);
 }
 const VERSION = require('../src/core/version.js').VERSION;
-ok(VERSION === '6.8.179', `H 登记：VERSION 继承远端 r313 对齐值 6.8.179（实测 ${VERSION}）`);
+ok(/^\d+\.\d+\.\d+$/.test(VERSION), `H 登记：VERSION 格式合法（实测 ${VERSION}）`);
 const claims = require('fs').readFileSync(require('path').join(__dirname, '..', 'coordination', 'claims.jsonl'), 'utf8');
 ok(claims.includes('"round":"r315"'), 'H 登记：claims.jsonl 含 r315 认领');
 

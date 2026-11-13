@@ -417,11 +417,11 @@ check('G 路由独立：聚合层 + 插件层 analyze 双路可达（sig + ma �
 });
 
 // ─── H. 登记纪律 ────────────────────────────────────────────────────────
-check('H VERSION / package.json 两点一致（6.8.179，r314 落地随远端 r313 同步）', () => {
+check('H VERSION / package.json 两点一致（版本号动态，r316-c 起不写死）', () => {
   const pkg = require(path.join(ROOT, 'package.json'));
-  assert.strictEqual(pkg.version, '6.8.179');
   const v = require('node:fs').readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  assert.strictEqual(v, '6.8.179');
+  assert.ok(/^\d+\.\d+\.\d+$/.test(v), 'VERSION 格式非法: ' + v);
+  assert.strictEqual(pkg.version, v);
 });
 
 check('H 接线在位：index.js require econ-reasoning-gate + 维度计数仍 254', () => {

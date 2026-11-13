@@ -28,6 +28,9 @@ const WRITE_TOOLS = [
   'heartflow_self_heal',
   // [r298] memoryIndex 写工具（WRITE_TOOLS 收口新增项，同步进抽样清单）
   'heartflow_memory_index_write',
+  // [r314] self_benchmark 的 assess 落盘 / safe_fetch 出网（WRITE_TOOLS 收口新增项，同步进抽样清单）
+  'heartflow_self_benchmark',
+  'heartflow_safe_fetch',
 ];
 
 const READ_TOOLS = [
@@ -43,6 +46,8 @@ function argsFor(tool) {
   if (tool === 'heartflow_think') return { input: 'test' };
   if (tool === 'heartflow_check_output') return { text: 'test' };
   if (tool === 'heartflow_memory_index_write') return { action: 'addSkill', payload: { name: 'perm-test-probe', level: 'probe' } };
+  if (tool === 'heartflow_self_benchmark') return { action: 'assess' };
+  if (tool === 'heartflow_safe_fetch') return { action: 'preflight', text: 'perm-test-probe' };
   if (tool === 'heartflow_memory_index_read') return { action: 'healthCheck' };
   return { action: 'stats' };
 }

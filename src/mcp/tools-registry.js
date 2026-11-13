@@ -444,6 +444,18 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"all（默认，跑全部 5 族）/ 单一族 key：p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem"}},"required":["text"]}
   },
 
+  {
+    name: 'heartflow_safe_fetch',
+    description: "出域内容安全预检（safeFetch，r314 接线）——把 v6.7.1 起已实例化但全库 0 条 dispatch 路由的出域防护能力首次暴露为可调用入口。此前 src/safe-fetch.js 的 preflightCheck/batchCheck 只被内部 safeFetch 包装调用，外部 agent 无法在发请求前判别内容；handler（HANDLERS.heartflow_safe_fetch）与 WRITE_TOOLS 收口均已就位，唯 tools/list 缺定义——本轮补三处同步最后一处。能力：对即将离开系统的文本跑 checkOutbound 出站闸门，返回 allowed / action（pass·rewrite·block）/ reason / text（脱敏后）；block 表示含高密级敏感信息禁止发出，rewrite 返回脱敏替换文本，pass 直接放行。带 TTL+大小限制的缓存（context+classification+前64字为键）。action: preflight（默认，单条）/ batch（texts 数组批量，逐条返回 index+结果）。写操作：会发起网络请求的场景，user 角色。零 LLM 依赖、只读不改原文。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待预检的出域文本（原文）"},"texts":{"type":"array","items":{"type":"string"},"description":"batch 模式的文本数组"},"action":{"type":"string","description":"preflight（默认，单条）/ batch（批量）"},"context":{"type":"string","description":"可选上下文（对话历史/任务背景）"},"classification":{"type":"string","description":"内容级别，默认「内部」"}},"required":[]}
+  },
+
+  {
+    name: 'heartflow_self_benchmark',
+    description: "自评基准（SelfBenchmark，r314 接线）——把 src/cortex/self-benchmark.js 的 assess() 自评能力首次暴露为可调用入口。此前该模块只被内部实例化，外部 agent 拿不到「心虫现在自评多少分」的可量化报告。防自欺设计（v6.8.88 起）：有外部锚时 score=0.4×内部+0.6×外部；无外部锚时内部分打 0.7 折并标 verified:false、附 guardNote「UNVERIFIED: 分数未经验证，勿据此自我激励」——心虫不得拿自评分高自我激励。评估维度：自进化循环触发率/闭环率/复用率、教训库总量与近期量/平均置信度、自愈成功率、模块覆盖率。返回 id / score / label / verified / guardNote / 各维度 stats / details。每次 assess 落盘一条 benchmark 记录（data/self-benchmark.json，上限 MAX_BENCHMARKS 条滚动）。写操作：assess 落盘，user 角色；getStats 纯读不拦。零 LLM 依赖。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"assess（默认，跑一轮全维自评并落盘）/ getStats（纯读，读累计统计不落盘）"}},"required":[]}
+  },
+
 ];
 
 // [AUDIT-FIX 2026-10-11] 并入运行时验证过的只读工具集（86 个）。

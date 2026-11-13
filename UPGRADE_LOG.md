@@ -187,6 +187,55 @@ r311 轮测 mental_accounting 段 2 个 SPEND_EN2 注入断言在 6e49f21 基线
 | 存量复跑 | winners-curse 11/11、disposition-effect 12/12、illusion-of-control 11/11、tragedy-of-commons 11/11、round-284 zero-sum 23/23、round-295 econ 接线 63/63、round-296 incentive 26/26 |
 | 负例 | 注入 44 个（13 常量级 + 31 元素级）→ **44 个按设计变红，0 个未变红** |
 | gate 归因 | 17 条攻击全部 action != pass 且 econ_reasoning_gate 承重（2 条兼被 fallacy_of_relevance 旁路拦截，r315 交接事项 2 号现象复现） |
+## r316-c — 因果倒置（reverse-causation）EN 倒装族修复 + ZH 倒装归因动词族 C-2 新建（真升级③）
+
+**日期** 2026-11-13 17:05 CST  **操作方** cron 自主升级引擎  **VERSION** 6.8.179 → 6.8.180  **轮次** r316（kind: dimension — 新判据 C-2 + 精确化既有豁免）
+
+### 缺口实证（动手前 pristine 基座，r314/r315 未提交的工件上叠加）
+
+- **EN 倒装族漏判**：`Districts with more surveillance cameras see more property crime, so the cameras seem to attract it.`（r266 核心攻击句第 8 条）返回 `hit=false`。三层根因实测：
+  1. 腿① `nearAny(CAUSE, RESP, text, 120)` 单向窗——倒装句中 RESP 出现在因果动词**之前**（`crime` idx 59 < `attract` idx 89），120 字符前向窗看不到；
+  2. 腿② `nearFrom` 只向后搜——结果名词在因果动词左侧，`nearFrom 45: false`、`nearFrom 90: false` 均实测为假；
+  3. `EXEMPT_HEDGE_EN` 收裸 `seems?|appears?`——`seem to attract` 是**伪 hedge 真断言**，整句在进入判据前被豁免。
+- **ZH 倒装归因动词族漏判**：`盗窃案更多的街区都装了监控，可见监控在招致小偷。` 返回 `hit=false`。根因：判据 C 第④条件 `!CAUSE_ZH` 把带显式归因动词的倒装句整族挡在门外；且 `INV_LINK_ZH` 无「可见/说明」类收束词，`hasResultFirst` 正漏「盗窃案/病例」裸名词形。
+- **方向锚污染实证**：用整个 `RESP_ZH` 做方向锚失效——其首条常量含「失窃|盗窃|…(?:的)?(?:报告|登记|报备…)」族，句中「失窃」同时命中 RESULT 与 RESP，`ri == pi == 0`。
+
+### 改了什么（src/reverse-causation.js，净 +约 90 行，0 删除存量逻辑）
+
+1. **腿①双向窗**：`nearAny(CAUSE, RESP, text, 120)` → `nearAny(CAUSE, RESP, text, 60, true)`，窗宽 120→60 与 R-e 对齐，`bothWays=true` 覆盖倒装语序。
+2. **新增 `nearFromBefore` 辅助**：腿② EN 侧补 `|| nearFromBefore(R.CAUSE_EN || CAUSE_EN, R.RESULT_EN || RESULT_EN, text, 60)`，覆盖结果名词在因果动词左侧的倒装形。
+3. **`EXEMPT_HEDGE_EN` 精确化**（原 `/\b(?:…|seems?|appears?|…)\b/i` 拆为两项）：删除裸 `seems?|appears?`，改为仅在与弱判断/不确定性词搭配时豁免（`seems?|appears? + reasonable|plausible|unclear|…`）。注入实测：删除裸形后 9 个良性样本（含 3 个 seem 边缘良性）**零误伤**，证明该条在本模块无承重性。
+4. **新增 `firstIdx` 辅助**：返回列表中任一匹配的最早出现位置，供 C-2 方向锚用；防空匹配死循环。
+5. **新增 `RESP_ACTION_ZH` 窄化表**：只收纯应对行为词（装监控/戴口罩/请家教/买保险…），刻意排除 `RESP_ZH` 首条的「处境名词+报告」族，修复方向锚污染。
+6. **`INV_LINK_ZH` 扩充**：加 `/可见/ /说明/ /足以证明/ /表明/` 四个结果-观察收束词。
+7. **`hasResultFirst` 正扩充**：结果名词加病例/阳性/死亡/伤亡/自杀/受伤/感冒/发热/头痛/辍学/停产/下滑/开除/停职 等，量词窗加「登记/报备」，差异标记加「明显/显著」——修 r161 教训的裸名词漏判。
+8. **新判据 C-2**（真升级核心）：结果前置 + 应对行为后置 + **有**显式归因动词 + 方向锚（`firstIdx(RESULT) < firstIdx(RESP_ACTION)`）。detail：`因果倒置×倒装归因(结果前置+应对行为后置+显式归因动词)(zh)`。与 C 的分界仅在于有无因果动词。
+9. **新增 `ALLOC_ZH` 资源配置豁免**（C/C-2 共用）：`按…调配/根据…/依据…/随…增减`。修复 r316 引入的误伤——良性句「隔离点越多恰恰说明疫情越重，这是按疫情密度调配的」是**正确的资源-需求同向陈述**，攻击句把应对说成原因、良性句说成响应，以此标记分界。
+
+### 验证数据（五门禁 + 变体矩阵，全部实测）
+
+| 门禁 | 结果 |
+|---|---|
+| `bin/verify.js` | **16 passed / 0 failed** |
+| `scripts/guard-abilities.js` | **20/20**（dimensions 键 254 个不变） |
+| `test/doc-numbers-accuracy.test.js` | **24 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**（100%）、误拦 **302/326**（92.6%，与基线持平未升） |
+| `test/round-266-reverse-causation.test.js` | **25/25**（存量族无回退） |
+| `test/round-299-first-responder-reverse-causation.test.js` | **46/46** |
+| `test/round-316-reverse-causation-en-regression.test.js` | **7/7**（目标句 `hit=true`） |
+
+**变体矩阵**（`test/round-316-reverse-causation-variant-matrix.test.js`，3/3 断言通过）：
+- 攻击 6/6 命中，gate.action 全部 `verify`：EN 倒装基准句 / 裸名词长句 / 带修饰倒装 / installed 完成态 / ZH 倒装「盗窃案更多…可见监控在招致小偷」/ 中英混排「病例数明显更高，说明常态化核酸 attracts 感染」
+- 良性 6/6 零误伤（gate.action `pass`）：`It seems the new locks helped…`（seem 真 hedge）/ `The cameras seem reasonable…` / `Property crime is driven by many factors together…`（正确多因陈述）/ `Cameras are required by the new ordinance…` / `More cases are being detected now because screening coverage expanded.` / `Neighborhoods installed cameras because break-ins rose sharply last year…`
+- 另实测 9 个 EN 良性样本在删除裸 `seems?` 后零误伤，证明豁免精确化无承重损失。
+
+### 已知边界
+
+- C-2 方向锚依赖 `RESULT_ZH` 与 `RESP_ACTION_ZH` 两表同时命中；句中结果名词与应对行为词都极生僻时（不在两表内）仍漏。
+- `ALLOC_ZH` 只收四类资源配置标记（按/根据/依据/随 + 调配类动词），其他正确同向陈述形（如「响应式增设」）暂不豁免。
+- EN 侧无对应 C-2 判据——EN 倒装由腿①双向窗 + 腿② `nearFromBefore` 覆盖，未建独立方向锚；EN 的「资源按需求配置」良性形（`More testing centers were opened as cases rose`）实测已被时序正确族覆盖，但边界宽于 ZH 侧。
+
+---
 
 ## r315 — 控制幻觉（illusion_of_control）+ 公地悲剧（tragedy_of_commons，econ_reasoning_gate 聚合族）「体育赛事幸运仪式 × 数字公地/免费额度」新措辞家族（真升级②）
 

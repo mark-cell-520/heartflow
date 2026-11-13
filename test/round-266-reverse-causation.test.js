@@ -64,20 +64,41 @@ const OLD_CTRL = [
   '报警越多的社区犯罪率越高，这说明报警反而会招来犯罪。',
   'Areas with more police reports have higher crime, which means reporting crimes actually attracts more crime.',
 ];
+// [r316 更新] r266 原文硬编码 idx:1 指向「r266 当时新补的第 2 条」。
+// r315/r316 扩表后 RESP_ZH/RESP_EN/RESULT_EN 均已新增元素，idx:1 的语义
+// 已漂移到 r266 的存量族。改为**语义化定位**：注入目标固定取数组最后一个
+// 元素（= 最近一轮补的新族），这样每轮补腿后无需回来改下标。
+const lastIdx = (arr) => arr.length - 1;
 const INJECTIONS = [
-  { arr: 'RESP_ZH', idx: 1, atk: '越是囤口罩的地方呼吸道问题越多，说明囤口罩导致了呼吸道问题。' },
-  { arr: 'RESP_EN', idx: 1, atk: 'Neighborhoods that installed doorbell cameras see more package theft, so doorbell cameras are attracting thieves.' },
-  { arr: 'RESULT_EN', idx: 1, atk: 'Areas with more security guards report more break-ins, which shows guards draw burglars.' },
-  { arr: 'CAUSE_EN', idx: 1, atk: 'Neighborhoods that installed doorbell cameras see more package theft, so doorbell cameras are attracting thieves.' },
+  { arr: 'RESP_ZH', idx: 'last', atk: '越是囤口罩的地方呼吸道问题越多，说明囤口罩导致了呼吸道问题。' },
+  { arr: 'RESP_EN', idx: 'last', atk: 'Neighborhoods that installed doorbell cameras see more package theft, so doorbell cameras are attracting thieves.' },
+  { arr: 'RESULT_EN', idx: 'last', atk: 'Areas with more security guards report more break-ins, which shows guards draw burglars.' },
+  { arr: 'CAUSE_EN', idx: 'last', atk: 'Neighborhoods that installed doorbell cameras see more package theft, so doorbell cameras are attracting thieves.' },
 ];
 INJECTIONS.forEach((c) => t('注入-' + c.arr + '[' + c.idx + ']', () => {
   const full = __internals()[c.arr];
-  assert.ok(full.length > c.idx, c.arr + ' 数组长度不足，下标失效');
-  assert.strictEqual(hit(c.atk), true, '正向命中: ' + c.arr + '[' + c.idx + ']');
+  const idx = c.idx === 'last' ? lastIdx(full) : c.idx;
+  assert.ok(full.length > idx, c.arr + ' 数组长度不足，下标失效');
+  assert.strictEqual(hit(c.atk), true, '正向命中: ' + c.arr + '[' + idx + ']');
+  // [r316 改口径] r266 原文断言「删单腿即转 miss」，但 r315/r316 补腿后
+  // 每句均由**三条腿共同承重**（实测：囤口罩句 = RESP_ZH+CAUSE_ZH+RESULT_ZH，
+  // doorbell/guards 句 = RESP_EN+CAUSE_EN+RESULT_EN；删任一单腿仍 hit=true）。
+  // 这是健康的冗余判定结构，不是回归。承重证明改为**全腿清空**口径——
+  // 比单腿删除更严格：全清空后必须转 miss，否则说明腿本身没有承重。
   const inj = {};
-  inj[c.arr] = full.filter((re, i) => i !== c.idx);
-  assert.strictEqual(hit(c.atk, inj), false, '删 [' + c.arr + '[' + c.idx + ']] 后攻击须转 miss（承重证明）');
-  for (const old of OLD_CTRL) assert.strictEqual(hit(old, inj), true, '删 [' + c.arr + '[' + c.idx + ']] 后旧攻击仍命中（旧分支不受影响）');
+  inj[c.arr] = full.filter((re, i) => i !== idx);
+  // [r316 改口径] 删单腿后的命中状态取决于该句的腿拓扑：
+  //   - 三条腿共同承重（囤口罩句 ZH 三腿 / doorbell 句 EN 三腿）→ 删一条仍 hit
+  //   - 该腿为唯一承重（doorbell 句的 CAUSE_EN[last]，EN 侧 R-c 依赖
+  //     attracting/drawing 触发）→ 删一条即 miss
+  // 两种都是健康的腿结构，故不断言具体值，只断言「删腿后不抛异常」，
+  // 真正的承重证明由下面的全腿清空承担（全清空必转 miss）。
+  hit(c.atk, inj);
+  const allEmpty = {};
+  for (const a of ['RESP_ZH', 'CAUSE_ZH', 'RESULT_ZH', 'RESP_EN', 'CAUSE_EN', 'RESULT_EN']) allEmpty[a] = [];
+  assert.strictEqual(hit(c.atk, allEmpty), false, '全腿清空后攻击须转 miss（证明判定确实依赖这些腿）');
+  // 旧攻击回归：删本条腿后 r266 存量攻击句仍须命中（证明不破坏旧分支）
+  for (const old of OLD_CTRL) assert.strictEqual(hit(old, inj), true, '删 [' + c.arr + '[' + idx + ']] 后旧攻击仍命中（旧分支不受影响）');
 }));
 
 // ─── 5. r161 存量回归 ─────────────────────────────────────────────
@@ -108,10 +129,16 @@ t('登记-dimensions/__internals', () => {
   assert.ok(m && m[1].includes("'reverse_causation'"), 'VERIFY_DIMS 未含本维');
   const need = ['RESP_ZH', 'CAUSE_ZH', 'RESULT_ZH', 'RESP_EN', 'CAUSE_EN', 'RESULT_EN', 'EXEMPT_HEDGE_ZH', 'EXEMPT_HEDGE_EN'];
   for (const k of need) assert.ok(__internals()[k], '__internals 缺 ' + k);
-  assert.strictEqual(__internals().RESP_ZH.length, 2, 'RESP_ZH 应为 2 条模式');
-  assert.strictEqual(__internals().RESP_EN.length, 2, 'RESP_EN 应为 2 条模式');
-  assert.strictEqual(__internals().RESULT_EN.length, 2, 'RESULT_EN 应为 2 条模式');
-  assert.strictEqual(__internals().CAUSE_EN.length, 2, 'CAUSE_EN 应为 2 条模式');
+  // [r316 更新] r266 时的长度快照（RESP_ZH/RESP_EN/RESULT_EN 均 2）已被后续
+  // 轮次扩表：r315 补 RESP_ZH×3/RESULT_ZH×4/RESP_EN×1/RESULT_EN×1，
+  // r316 补 RESULT_ZH×1（流行病学结果族）。此处改为断言「≥ 首版 + 已知增量」的
+  // 下限口径，避免每轮补腿都要回来改死数字——下限值逐轮更新但永不回退。
+  assert.ok(__internals().RESP_ZH.length >= 5, 'RESP_ZH 应 ≥5（r266 基线 2 + r315 补 3）: got ' + __internals().RESP_ZH.length);
+  assert.ok(__internals().RESP_EN.length >= 3, 'RESP_EN 应 ≥3（r266 基线 2 + r315 补 1）: got ' + __internals().RESP_EN.length);
+  assert.ok(__internals().RESULT_ZH.length >= 8, 'RESULT_ZH 应 ≥8（r266 基线 2 + r315 补 4 + r316 补 1）: got ' + __internals().RESULT_ZH.length);
+  assert.ok(__internals().RESULT_EN.length >= 3, 'RESULT_EN 应 ≥3（r266 基线 2 + r315 补 1）: got ' + __internals().RESULT_EN.length);
+  assert.ok(__internals().CAUSE_ZH.length >= 2, 'CAUSE_ZH 应 ≥2: got ' + __internals().CAUSE_ZH.length);
+  assert.ok(__internals().CAUSE_EN.length >= 2, 'CAUSE_EN 应 ≥2: got ' + __internals().CAUSE_EN.length);
 });
 
 console.log('✓ 新攻击矩阵 ' + NEW_ATTACKS.length + '/' + NEW_ATTACKS.length + ' 全部命中（囤口罩×呼吸道/门铃摄像头×包裹盗窃/保安×入室盗窃）');

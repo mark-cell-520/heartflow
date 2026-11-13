@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-254 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  190 MCP tools
+254 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
 ×  1,341 dispatch routes  ×  22,003 passing tests  ×  2 npm dependencies
 ```
 
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.179**. Not marketing copy.
+Measured on this repository at **v6.8.180**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.180 | 2026-11-13 | r316-c（承接撞号未推送产能重编号）：**`reverse_causation` 因果倒置 EN 倒装族补腿 + ZH 倒装归因新判据 C-2**（真升级②）——`src/reverse-causation.js` 修三层根因：① 腿① `nearAny(CAUSE, RESP, text, 120)` 单向窗 → `nearAny(CAUSE, RESP, text, 60, true)` 双向窗，覆盖「Districts with more surveillance cameras see more property crime, so the cameras seem to attract it」类 RESP 前置倒装；② 新增 `nearFromBefore` 辅助，腿② EN 侧补结果名词在因果动词左侧的倒装形；③ `EXEMPT_HEDGE_EN` 精确化——删除裸 `seems?|appears?`（`seem to attract` 是伪 hedge 真断言，整句进判据前被豁免），改为仅与弱判断/不确定性词搭配时豁免（注入实测 9 良性零误伤、无承重损失）。ZH 侧新增判据 C-2：结果前置 + 应对行为后置 + 有显式归因动词 + 方向锚（`firstIdx(RESULT) < firstIdx(RESP_ACTION)`），配套 `firstIdx` 辅助、`RESP_ACTION_ZH` 窄化表（只收纯应对行为词，排除 `RESP_ZH` 首条「处境名词+报告」族以修方向锚污染）、`INV_LINK_ZH` 加「可见/说明/足以证明/表明」收束词、`hasResultFirst` 结果名词补病例/阳性/死亡/伤亡/自杀/受伤/感冒/发热/头痛/辍学/停产/下滑/开除/停职。同时补 `RESP_ZH`（登记/报备/完成态族/失窃报告族）、`RESULT_ZH`（阳性/病例流行病学族）、`CAUSE_ZH`（损害/招致族 + `drew`）召回腿，新增 `ALLOC_ZH` 资源配置豁免（C/C-2 共用，区分「应对说成原因」的攻击句与「按疫情密度调配」的正确同向陈述）。同轮修 r315 遗留的注入穿透缺陷（第 581/582/584 行 `anyHit(RESULT_ZH/RESP_ZH/CAUSE_ZH, text)` 误用模块常量而非 `R.` 注入）。另 `src/whole-part-transfer.js` 删 WHOLE_EN 抢先词 `menu`（修「容器词抢先整体词」缺陷族，r266 报告 roster/catalogue-list 同类问题仍在）。四门禁全绿（verify 16/16、guard 20/20@254 维、doc 24/24、双向召回 52/52 + 误拦 302/326），存量轮测 round-266-reverse-causation 25/25、round-299 46/46、whole-part-transfer 37/37 全过。 |
 | 6.8.179 | 2026-11-13 | r309：**第 252 维度 vivid_case_availability（生动个案可得性偏差）接线** — 模块自 r307 前已存在但从未 dispatch（grep 零接线实证）。修复三重缺陷后接八处：① EN 正则双重转义（\s/\b 永不命中）修为单层；② VIVID_ZH 补「亲眼看到/就在现场/有个+个体」句式族与「邻居/同事」裸主语熟人转述腿；③ SKEW_ZH 补「所以玩手机没问题/学习不重要/不用恐慌」偏斜腿，SKEW_EN 补「is full of crime/crawling with thieves」场所充斥腿；④ 模块补 DIMENSION_NAME/SEVERITY/guidance 标准导出（round-308 测试期望接口）。判据两腿共现 + 邻近窗（ZH 120 字 / EN 240 字符）+ 四组豁免。接线：require + 计算点 + allDims + dimMap + 补登记×2 + VERIFY_DIMS + DIM_GUIDANCE 共八处（变量名 vca）。模块级攻击 12/12 命中、良性 8/8 零误伤；gate 层实测攻击 3/3 verify 且本维承重、良性 1/1 pass。 |
 | 6.8.179 | 2026-11-13 | r313：**第 254 维度 zero_price_effect（零价格效应）上线**（真升级①）——判别「价格降到零时需求非线性跃升」的结构：价格为零 × 需求/价值失真两腿共现。腿① ZERO_PRICE ZH/EN（免费/0元/不花钱/白送/不要钱 free / zero price / cost nothing），腿② DISTORTION 需求与价值失真（蜂拥/疯抢/搬空/囤/不看质量/失去判断 grabbed more than needed / stockpile / never checked quality / cleared it out），邻近窗 ZH 80 字 / EN 200 字符，缺一不判。三语言组：ZH 常规、EN 常规、**EN 第三腿 FREE-IDIOM**（r313 实测补腿——B4「There was no reason not to take it — people swarmed the booth and cleared it out.」腿①全文零命中，其零价格信号是惯用语形态 no reason not to take / might as well / why not，单列第三腿配对失真腿；守卫由 IDIOM_EN 豁免负责，no...not 是强调不是否定）。四重豁免：概念教学（零价格效应是行为经济学概念）、理性评估（按效用而非价格）、非免费陈述、公共服务（疫苗/救灾免费发放）。缺口实证：253 维基线攻击组漏判 6/10，接线后 0/10（探针 coordination/agent4/probes/r313-probe.js，git stash 切基线对照）。验证：四门禁全绿（verify 16/16、guard 20/20@254、doc 24/24、双向 52/52 + 误拦 302/326 不升）、轮测 31/31、负例注入 4 变红（删 IDIOM 第三腿→B4 红、删 DISTORTION_ZH→A1 红、删 DISTORTION_EN→B1 红、删 ZERO_PRICE_ZH→A2 红）。 |
 | 6.8.178 | 2026-11-12 | r307：**第 251 维度 `evidence_claim_mismatch`（证据-断言覆盖失配）上线** — 判别「断言内容超出所给证据可支撑范围」的外延幻觉结构：腿① EVID 证据/研究/数据在场标记（研究/数据/统计/实验/调查/临床试验/论文/《X》年份/机构+研究 + EN the study found / data show / N participants，含「N名+名词+实验」数量样本限定形），腿② OVERREACH 超覆盖断言（相关→因果 / 部分→全体 / 局部→整体 / 疗效越界 + EN cures / prevents all / works for everyone / nationwide），两腿共现 + 邻近窗（ZH 80 字 / EN 200 字符），缺一不判；四重豁免：概念教学、证据充足性论证、推理否定、对冲/疑问句/受限定的正确外推形。来源：LettuceDetect（arXiv 2502.17125, RAGTruth 79.22% F1）extrinsic hallucination 定义。与 `weak_evidence_strong_claim`（第245维）和 `completion_evidence` 零重叠。验证：verify 16/16、guard 20/20@251、双向召回 52/52 + 误拦 302/326 不升、doc 24/24、轮测 29/29、gate 层攻击 7/7 非 pass 且本维承重、模块级攻击 15/15 良性 0/12。 |

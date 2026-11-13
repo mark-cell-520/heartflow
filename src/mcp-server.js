@@ -268,6 +268,8 @@ const WRITE_TOOLS = new Set([
   // 响应拦截 / 出网
   'heartflow_response_intercept',
   'heartflow_safe_fetch',
+  // [r314] self_benchmark 的 assess 每次落盘 data/self-benchmark.json，收口到 user 角色
+  'heartflow_self_benchmark',
   // 熔断（action:'trip' 可手动停引擎）
   'heartflow_circuit_breaker',
   // 经验/课程库写入
@@ -4848,6 +4850,11 @@ const HANDLERS = {
     try {
       const { SelfBenchmark } = require('./cortex/self-benchmark.js');
       const inst = new SelfBenchmark({ silent: true, rootPath: HF_DIR });
+      // [r314] getStats 纯读不落盘（assess 每次落盘一条 benchmark 记录）
+      const action = args?.action || 'assess';
+      if (action === 'getStats' && typeof inst.getStats === 'function') {
+        return { result: inst.getStats(), timestamp: Date.now() };
+      }
       const r = inst.assess ? inst.assess() : inst.getStats();
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }

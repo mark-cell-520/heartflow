@@ -87,13 +87,38 @@ function estimateClassification(text) {
 
 // ── PII 扫描 ──────────────────────────────────────────
 function scanPII(text) {
-  const findings = [  // 邮箱
+  // [r314-FIX] 预置 3 条 finding 原先无条件 push 进数组，导致 piiFindings.length
+  // 恒 ≥3——所有文本都被判 rewrite（密级敏感时全量 block），且这 3 条缺 id/name
+  // 显示为 undefined(undefined)。safe_fetch 本轮接线后暴露此缺陷：良性文本
+  // 「The deployment window is scheduled…」实测被判 rewrite。改为匹配才入列。
+  const candidates = [  // 邮箱
   { pattern: /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, type: 'email', level: '内部' },
   // 信用卡 16位
   { pattern: /\b[4-6]\d{15}\b/g, type: 'credit_card', level: '机密' },
   // 护照
   { pattern: /\b[PEG]\d{8}\b/g, type: 'passport', level: '机密' },
 ];
+  const findings = [];
+  for (const c of candidates) {
+    c.pattern.lastIndex = 0;
+    const m = c.pattern.exec(text);
+    if (m) {
+      findings.push({
+        id: c.type,
+        name: c.type,
+        severity: 'medium',
+        match: typeof m[0] === 'string' ? m[0].substring(0, 12) + '…' : 'pattern-hit',
+        position: m.index,
+      });
+      // 同模式多处命中全部收齐
+      c.pattern.lastIndex = m.index + 1;
+      let extra;
+      while ((extra = c.pattern.exec(text)) !== null) {
+        findings.push({ id: c.type, name: c.type, severity: 'medium', match: extra[0].substring(0, 12) + '…', position: extra.index });
+        if (extra.index === c.pattern.lastIndex) c.pattern.lastIndex++;
+      }
+    }
+  }
   for (const [ruleId, rule] of Object.entries(PII_RULES)) {
     let m;
     const re = rule.pattern.global ? rule.pattern : new RegExp(rule.pattern.source, 'g');

@@ -99,7 +99,7 @@ const PART_QUANT_ZH = [
 const PART_QUANT_EN = [
   /\b(?:every|each|all)\s+(?:(?:one|single)\s+)?(?:of\s+(?:the|these|those|its|our|their)\s+)?(?:\w+\s+){0,2}?(?:parts?|components?|members?|players?|employees?|students?|engineers?|scientists?|officials?|citizens?|soldiers?|modules?|elements?|ingredients?|individuals?|musicians?|staff|workers?|people|persons?|singers?|actors?|athletes?|developers?|designers?|managers?|volunteers?|customers?|users?|researchers?|lawyers?|doctors?|teachers?|artists?|writers?|departments?|teams?)\b/i,
   // [r266 新增族] 内容/产品部分名词（episodes/chapters/dishes/models…）
-  /\b(?:every|each|all)\s+(?:(?:one|single)\s+)?(?:of\s+(?:the|these|those|its|our|their)\s+)?(?:\w+\s+){0,2}?(?:episodes?|chapters?|scenes?|dishes?|plates?|models?|variants?|trims?|tracks?|songs?|meals?|courses?|items?|listings?|cabins?|seats?|lessons?|sessions?|stages?|levels?|rooms?|floors?|posts?|shots?|angles?|ingredients?)\b/i,
+  /\b(?:every|each|all)\s+(?:(?:one|single)\s+)?(?:of\s+(?:the|these|those|its|our|their)\s+)?(?:\w+\s+){0,2}?(?:episodes?|chapters?|scenes?|dish(?:es)?|plates?|models?|variants?|trims?|tracks?|songs?|meals?|courses?|items?|listings?|cabins?|seats?|lessons?|sessions?|stages?|levels?|rooms?|floors?|posts?|shots?|angles?|ingredients?)\b/i,
 ];
 
 // ─── 腿④ WHOLE 整体名词（中文，限定词形 + 裸名词形两条）─────────────
@@ -108,8 +108,8 @@ const WHOLE_ZH = [
   // 裸整体名词（r161 教训：只收带限定词形会导致裸名词整句漏判）
   /(?:团队|球队|乐队|乐团|公司|企业|国家|民族|政府|军队|部队|社会|学校|院系|系统|设备|机器|整机|群体|班子|队伍|剧组|社团|社区|村庄|城市|地区|行业|圈层|圈子|家庭|家族|单位|组织|机构|整体|全局|产品|作品|项目|品牌|平台|软件|网站|程序|算法|模型|引擎|阵容|联盟|帝国|王朝|文明|舰队)/,
   // [r266 新增族] 内容/产品整体名词（店/书/车系/剧集/菜单…，限定词形+裸名词形）
-  /(?:这|那|该|本|全|整|某)(?:家|间|个|部|套|场|届|种)?(?:店|饭店|门店|书店|餐馆|酒店|书|书系|车系|系列|产品线|菜单|剧集|剧|影片|电影|楼盘|航线|专栏|课程|套餐|套装|机队|编队|阵容|品类|组合|合辑|专辑|栏目|版面|榜单|排行榜|歌单)/,
-  /(?:店|饭店|门店|书店|餐馆|酒店|书|书系|车系|系列|产品线|菜单|剧集|剧|影片|电影|楼盘|航线|专栏|课程|套餐|套装|机队|编队|品类|组合|合辑|专辑|栏目|版面|榜单|排行榜|歌单)/,
+  /(?:这|那|该|本|全|整|某)(?:家|间|个|部|套|场|届|种)?(?:店|饭店|门店|书店|餐馆|酒店|书|书系|车系|系列|产品线|剧集|剧|影片|电影|楼盘|航线|专栏|课程|套餐|套装|机队|编队|阵容|品类|组合|合辑|专辑|栏目|版面|榜单|排行榜|歌单)/,
+  /(?:店|饭店|门店|书店|餐馆|酒店|书|书系|车系|系列|产品线|剧集|剧|影片|电影|楼盘|航线|专栏|课程|套餐|套装|机队|编队|品类|组合|合辑|专辑|栏目|版面|榜单|排行榜|歌单)/,
 ];
 
 // ─── 腿④ WHOLE 整体名词（英文）─────────────────────────────────────
@@ -120,8 +120,8 @@ const WHOLE_EN = [
   // 注：刻意不收 roster/catalogue-list 形——花名册/清单是「部分的总和」而非
   // 涌现整体，且会在「Every player on the roster…」句中抢先于 the team 命中，
   // 把存量分支的 whole 定位点抢走（r266 实测回归翻转，已移除）。
-  /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:series|book|novel|film|movie|season|menu|lineup|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
-  /\b(?:series|book|novel|film|movie|season|menu|lineup|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
+  /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:series|book|novel|film|movie|season|lineup|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
+  /\b(?:series|book|novel|film|movie|season|lineup|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
 ];
 
 // ─── 腿②/⑤ QUALITY 涌现性质量词（中文）────────────────────────────

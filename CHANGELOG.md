@@ -1,5 +1,20 @@
 ---
 
+# 6.8.180 变更日志条目
+
+## [6.8.180] - 2026-11-13
+
+### 因果倒置（reverse-causation）倒装族能力增长（r316）
+
+- **EN 倒装族修复**：腿① `nearAny(CAUSE, RESP, …)` 改双向窗（`bothWays=true`，窗宽 120→60），腿②新增 `nearFromBefore` 覆盖结果名词在因果动词左侧的倒装语序。修复 `Districts with more surveillance cameras see more property crime, so the cameras seem to attract it.` 长期 `hit=false`。
+- **`EXEMPT_HEDGE_EN` 精确化**：删除裸 `seems?|appears?`，改为仅在与弱判断/不确定性词搭配时豁免——`seem to attract` 是伪 hedge 真断言。注入实测 9 个良性样本零误伤。
+- **新判据 C-2（ZH）**：结果前置 + 应对行为后置 + 显式归因动词 + 方向锚（`firstIdx(RESULT) < firstIdx(RESP_ACTION)`）。新增 `firstIdx` 辅助与 `RESP_ACTION_ZH` 窄化表（修复 `RESP_ZH` 首条「失窃报告」族对方向锚的污染）。
+- **`INV_LINK_ZH` 扩充**：加「可见/说明/足以证明/表明」四个结果-观察收束词；`hasResultFirst` 补裸名词形（病例/阳性/死亡/伤亡…）与「登记/报备」量词窗、「明显/显著」差异标记。
+- **新增 `ALLOC_ZH` 资源配置豁免**（C/C-2 共用）：「按…调配/根据…/依据…/随…增减」——良性资源-需求同向陈述不判。
+- 验证：verify 16/16、guard 20/20、doc 24/24、双向 52/52 + 误拦 302/326、r266 25/25、r299 46/46、r316 回归 7/7、变体矩阵攻击 6/6 命中 + 良性 6/6 零误伤。
+
+---
+
 # 6.8.178 变更日志条目
 
 ## [6.8.178] - 2026-11-12
