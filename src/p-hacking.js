@@ -106,6 +106,21 @@
  *   · 显著性否定式（没有显著/未发现相关/毫无规律/no significant
  *     difference）——腿②的显著性命中若带否定前缀则该命中作废
  *     （在腿②匹配时逐条剔除，非全局豁免）。
+ *
+ * [r317 升级] 选择性报告动作新措辞家族（真升级②）：存量 WINNER 只收
+ * 「终于/其中一种/挑出」式偶然性标记与 EN finally/until/one of，不收
+ * **选择性报告动作本身**——「跑了三十次模拟，只报告了成功的那次」
+ * 「只把p值小的那组写进了论文」「其余的略过不提」（EN: we ran fifty
+ * trials and only reported the significant one / out of a hundred
+ * slices, only the winning segment was written up）类攻击 r317 探针
+ * 3/5 连 gate 层 pass（余 2 条由 researcher_degrees_of_freedom 第
+ * 213 维代拦——该维度管「分析流程被结果反向决定」，本族管「大量尝试
+ * × 选择性报告」，两者共存不互斥）；SEARCH_EN 名词表补 slices/
+ * buckets/windows/variants 与 ran N trials 形，SIGNIF 补「成功/符合
+ * 预期/winning/positive results」达标标记。良性 5/5 零误伤
+ * （scripts/round-317/probe-candidates.js）。实现为平行常量
+ * SEARCH_EN3/WINNER_ZH3/WINNER_EN3/SIGNIF_ZH3/SIGNIF_EN3 +
+ * findSignatures concat，存量族注入语义不变。src/index.js 零改动。
  */
 'use strict';
 
@@ -129,6 +144,17 @@ const SEARCH_ZH = [
   /(?:\d+|一|两|几|数|数十|几十|上百|成百|许许多多|众多|若干|各种|不同|多样)[种个组类][^。，！？；]{0,10}(?:中|里|之内|当中)/,
 ];
 
+// ─── [r317] 腿① 新搜索量词族（中文，平行常量，存量注入语义不变）────
+// 存量 SEARCH_ZH ①-a 量化词只收 一二两几数数十几十十几/上百/成百/
+// 许许多多/众多/若干，不收**中文数字**（三十/五十/二十五）与「很多/
+// 好些」——「跑了三十次模拟」「测了很多组参数」式穿透（r317 探针 D0/D2）。
+const SEARCH_ZH2 = [
+  // ①-a3 动词 + 中文数字 + 量词（跑了三十次/试了五十种/翻了二十五遍）
+  /(?:试|测试|尝试|试遍|换了|换过|调整|反复调整|扫描|切|跑|运行|跑了|分析|调研|研究|比较|对比|翻|穷尽|重复|复查|回溯|试了|试过|测|测了|做了|做过)[^。，！？；\n]{0,4}[一二两三四五六七八九十百千万]+[种个组次刀轮遍回类]/,
+  // ①-b2 动词 + 很多/好些/大量 + 量词（测了很多组参数）
+  /(?:试|测试|尝试|试遍|换了|换过|调整|反复调整|扫描|切|跑|运行|跑了|分析|调研|研究|比较|对比|翻|穷尽|重复|复查|回溯|试了|试过|测|测了|做了|做过)[^。，！？；\n]{0,4}(?:很多|好些|大量|好些个|许许多多)[种个组次刀轮遍回类]/,
+];
+
 // ─── 腿① 大量尝试/反复搜索（英文）────────────────────────────────
 // 数量词（数字/英文数词/约数词）——①②③ 共用
 const EN_NUM = '(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|dozens|hundreds|scores|numerous|several|various|many|different)';
@@ -141,12 +167,43 @@ const SEARCH_EN = [
   new RegExp('\\b' + EN_NUM + '\\s+(?:\\w+\\s+){0,2}(?:cities|groups|subgroups|cohorts|samples|segments)\\s+(?:surveyed|tested|examined|analyzed|checked|reviewed|compared)\\b', 'i'),
 ];
 
+// ─── [r317] 腿① 新搜索名词族（英文，平行常量，存量注入语义不变）────
+// 存量 SEARCH_EN ①-b/①-c 名词表不收 slices/buckets/cuts/windows/variants，
+// ①-a 不收 trials/runs/simulations/experiments——「Out of a hundred
+// slices」「We ran fifty trials」式穿透（r317 探针 D3/D4）。
+const SEARCH_EN3 = [
+  // ①-b2 out of [a/an/the] N + 切片/桶/窗口/变体名词（存量 ①-b 不收冠词形
+  //   且名词表不收 slices/buckets/windows/variants）
+  new RegExp('\\bout\\s+of\\s+(?:a\\s+|an\\s+|the\\s+)?' + EN_NUM + '\\s+(?:\\w+\\s+){0,2}(?:slices|buckets|cuts|windows|variants|specifications|configurations|setups|scenarios|filters|thresholds|periods|ranges|seeds)\\b', 'i'),
+  // ①-c2 数量名词 + 切片/桶/窗口 + 过去分词
+  new RegExp('\\b' + EN_NUM + '\\s+(?:\\w+\\s+){0,2}(?:slices|buckets|cuts|windows|variants|scenarios|thresholds|trials|runs)\\s+(?:surveyed|tested|examined|analyzed|checked|reviewed|compared|tried|run)\\b', 'i'),
+  // ①-a2 动词 + 数量 + trials/runs/simulations/experiments（存量 ①-a 名词表不收）
+  new RegExp('\\b(?:ran|run|reran|re-?ran|tested|testing|tried|trying|repeated|iterated|simulated)\\s+(?:\\w+\\s+){0,2}' + EN_NUM + '\\s+(?:\\w+\\s+){0,2}(?:trials?|runs?|iterations|attempts|replications|simulations?|experiments?|seeds?)\\b', 'i'),
+];
+
 // ─── 腿② 只报告赢家（中文挑选标记）────────────────────────────────
 const WINNER_ZH = [
   /终于/, /才发现/, /方才发现/, /恰好/, /凑巧/,
   /其中一(?:种|个|组|类|次|回)/, /有一(?:种|个|组|类|批|次|回)/,
   /挑出/, /挑到/, /逮到/, /锁定/,
   /找到那/, /找到/, /呈现出/, /显示出/, /出现/, /浮现/,
+];
+
+// ─── [r317] 腿② 新赢家标记族（中文，平行常量，存量注入语义不变）────
+// 存量 WINNER_ZH 只收「终于/其中一种/挑出」式偶然性标记，不收**选择性
+// 报告动作**本身——「跑了三十次模拟，只报告了成功的那次」「只把p值小的
+// 那组写进了论文」「其余的略过不提」式穿透（r317 探针 D 族 3/5 连 gate
+// 层 pass；D1/D2 由 researcher_degrees_of_freedom（第213维）代拦——
+// 该维度管「分析流程被结果反向决定」，本族管「大量尝试×选择性报告」，
+// 边界见模块头注释）。
+const WINNER_ZH3 = [
+  // 只 + （至多 8 字宾语）+ 报告类动词
+  /只[^。，！？；\n]{0,8}(?:报告|汇报|展示|呈现|列出|贴出|写入|写进|提|公布|发布|宣传|留下|保留|提交|上交|发表)/,
+  // 唯独/仅仅/单单 + 选取
+  /(?:唯独|仅仅|单单|只是)[^。，！？；\n]{0,10}(?:写|报|提|列|留|选|用|拿)/,
+  // 其余/其他 + 略过不提类
+  /(?:其余|其他|剩下)(?:的)?(?:都|全)?(?:略过|不提|不说|忽略|舍弃|丢弃|排除|剔除|略去)/,
+  /(?:略过|不提|不说|忽略|舍弃|排除|剔除|略去)[^。，！？；\n]{0,6}(?:其余|其他|剩下)/,
 ];
 
 // ─── 腿② 显著性/证明标记（中文）──────────────────────────────────
@@ -156,6 +213,17 @@ const SIGNIF_ZH = [
   /效应/, /转化率/, /规律/, /模式/,
   /证明/, /有效/, /成立/, /作为证据/, /支持结论/, /支撑结论/,
   /明显(?:高|低|好|强|多|少)/, /更高/, /更低/,
+];
+
+// ─── [r317] 腿② 新显著性标记族（中文，平行常量，存量注入语义不变）────
+// 存量 SIGNIF_ZH 不收「成功/符合预期/达到预期」式结果达标标记——
+// 「只报告了成功的那次」式穿透（r317 探针 D0）。腿①的大量尝试结构
+// 保证「活动圆满成功」类单一陈述不命中。
+const SIGNIF_ZH3 = [
+  /成功/,
+  /符合预期/, /达到预期/, /超出预期/,
+  /如愿/, /达到预设/, /达成预设/,
+  /跑通/, /跑出来了/,
 ];
 
 // ─── 腿② 只报告赢家（英文挑选标记）────────────────────────────────
@@ -170,12 +238,38 @@ const WINNER_EN = [
   /\bwe\s+found\s+(?:one|a)\b/i, /\bfound\s+one\b/i,
 ];
 
+// ─── [r317] 腿② 新赢家标记族（英文，平行常量，存量注入语义不变）────
+// 存量 WINNER_EN 不收「only reported / only the winning / the rest
+// were omitted」式选择性报告动作——「We ran fifty trials and only
+// reported the significant one」「Out of a hundred slices, only the
+// winning segment was written up」式穿透（r317 探针 D3/D4）。
+const WINNER_EN3 = [
+  // only + 报告类动词
+  /\bonly\s+(?:reported|reports|reporting|presented|presenting|showed|showing|included|wrote|wrote up|kept|published|disclosed|highlighted|mentioned)\b/i,
+  // only the winning/significant/successful
+  /\bonly\s+(?:the\s+)?(?:winning|significant|successful|positive|best[- ]performing)\b/i,
+  // 其余被略过（主动+被动两向）
+  /\b(?:the\s+)?(?:rest|remaining|others?)\s+(?:were|was)?\s*(?:left out|omitted|discarded|dropped|ignored|excluded|shelved)\b/i,
+  /\b(?:left out|omitted|discarded|dropped|excluded)\s+(?:the\s+)?(?:rest|remaining|others?|failures|non[- ]?significant)\b/i,
+];
+
 // ─── 腿② 显著性/证明标记（英文）──────────────────────────────────
 const SIGNIF_EN = [
   /\bsignifican\w+/i, /\bp\s*<\s*0?\.\d+/i, /\bp-?value\b/i,
   /\bcorrelat\w+/i, /\beffect\b/i, /\bspike\b/i, /\bjump\b/i,
   /\bproof\b/i, /\bproves\b/i, /\beffective\b/i, /\bvalid\b/i,
   /\bhigher\b/i, /\blower\b/i, /\bdifference\b/i,
+];
+
+// ─── [r317] 腿② 新显著性标记族（英文，平行常量，存量注入语义不变）────
+// 存量 SIGNIF_EN 不收「winning / positive results / came out
+// significant」式结果标记——「only the winning segment was written
+// up」式穿透（r317 探针 D4）。
+const SIGNIF_EN3 = [
+  /\bwinning\b/i,
+  /\bpositive (?:results?|findings?|outcomes?)\b/i,
+  /\bcame out (?:significant|positive|on top)\b/i,
+  /\bsucceeded\b/i,
 ];
 
 // 双腿距离窗
@@ -276,12 +370,14 @@ function allMatches(re, text) {
  * 且该显著性命中不带否定前缀；两腿落在窗内即成一签名。
  */
 function findSignatures(text, R) {
-  const searchZh = (R.SEARCH_ZH || SEARCH_ZH);
-  const searchEn = (R.SEARCH_EN || SEARCH_EN);
-  const winZh = (R.WINNER_ZH || WINNER_ZH);
-  const winEn = (R.WINNER_EN || WINNER_EN);
-  const sigZh = (R.SIGNIF_ZH || SIGNIF_ZH);
-  const sigEn = (R.SIGNIF_EN || SIGNIF_EN);
+  // [r317] SEARCH_EN3/WINNER_ZH3/WINNER_EN3/SIGNIF_ZH3/SIGNIF_EN3 平行
+  // 常量 concat：注入某一族为空数组只关该族，存量族不受影响（同 r311 范式）。
+  const searchZh = (R.SEARCH_ZH || SEARCH_ZH).concat(R.SEARCH_ZH2 || SEARCH_ZH2);
+  const searchEn = (R.SEARCH_EN || SEARCH_EN).concat(R.SEARCH_EN3 || SEARCH_EN3);
+  const winZh = (R.WINNER_ZH || WINNER_ZH).concat(R.WINNER_ZH3 || WINNER_ZH3);
+  const winEn = (R.WINNER_EN || WINNER_EN).concat(R.WINNER_EN3 || WINNER_EN3);
+  const sigZh = (R.SIGNIF_ZH || SIGNIF_ZH).concat(R.SIGNIF_ZH3 || SIGNIF_ZH3);
+  const sigEn = (R.SIGNIF_EN || SIGNIF_EN).concat(R.SIGNIF_EN3 || SIGNIF_EN3);
 
   const sigs = [];
   const winPairZh = R.WIN_PAIR_ZH != null ? R.WIN_PAIR_ZH : WIN_PAIR_ZH;
@@ -394,6 +490,7 @@ module.exports = {
   detectPHacking,
   __internals: () => ({
     SEARCH_ZH, SEARCH_EN, WINNER_ZH, WINNER_EN, SIGNIF_ZH, SIGNIF_EN,
+    SEARCH_ZH2, SEARCH_EN3, WINNER_ZH3, WINNER_EN3, SIGNIF_ZH3, SIGNIF_EN3,   // [r317] 选择性报告新措辞族
     EXEMPT_PREREG_ZH, EXEMPT_PREREG_EN, EXEMPT_CORRECTION_ZH, EXEMPT_CORRECTION_EN,
     EXEMPT_REPLICATION_ZH, EXEMPT_REPLICATION_EN, EXEMPT_DISAVOW_ZH, EXEMPT_DISAVOW_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN,
