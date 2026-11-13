@@ -140,6 +140,19 @@
  * 存量四族注入语义不变（新键注入 [] 整体替换新腿；存量键注入永假
  * 正则时 .concat 抛 TypeError，与存量行为一致，聚合层 _safeDetect
  * 兜底）。src/index.js 零改动。
+ *
+ * [r319 升级] 腿①踩线显著族 × 腿②新裁定族（真升级②）：存量 SIG
+ * 表收「p 值 0.049/统计显著/显著优于」标准形，不收 p 值贴着 0.05
+ * 关口被当成确证证据的陈述——ZH「擦线达到显著/勉强显著/p 卡在
+ * 0.05 关口」（SIG_ZH3）；EN「p came out at 0.049 / just crossed
+ * the significance threshold / barely significant」（SIG_EN3）。
+ * 裁定侧补：ZH「改进是真实存在的」（SUPERIOR_ZH3）、「可以/值得
+ * 推广」无强化词形（SCALE_ZH3）；EN「the treatment works /
+ * the drug is effective」（SUPERIOR_EN3）。探针 7 条候选 6 条穿透
+ * 模块、其中 2 条穿透整个 gate 无维度代拦（scripts/round-319/
+ * probe-candidates.js D 族）；官方良性语料零误命中。平行常量 +
+ * findSignatures concat 合并，存量腿与 r311 腿注入语义不变。
+ * src/index.js 零改动。
  */
 'use strict';
 
@@ -243,6 +256,61 @@ const MAGNITUDE_EN2 = [
   /\b(?:matters|mattered)\s+(?:a\s+great\s+deal\s+)?in\s+the\s+real\s+world\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r319] 「踩线显著族 × 新裁定族」新措辞家族（平行常量，不动存量腿）
+//
+// 缺口实证（scripts/round-319/probe-candidates.js，v6.8.179 基线）：
+// 存量 SIG 表收「p 值 0.049/统计显著/显著优于」标准形，不收「踩线
+// 显著」族——p 值贴着 0.05 关口被当成确证证据的陈述（擦线达到显著/
+// 勉强显著/p 卡在 0.05 关口/barely significant/just crossed the
+// threshold）：7 条候选 6 条穿透模块，其中 2 条穿透整个 gate 无维度
+// 代拦（D 族 gate pass 2/7；其余被 fallacy_of_relevance /
+// monocausal_attribution 代拦）。裁定侧缺口：SCALE_ZH 不收「可以
+// 推广」无强化词形、SUPERIOR_* 不收「改进是真实存在的/治疗有效」
+// 存在-有效族。
+//
+// 设计纪律（同 r309-r318）：
+//   · 平行常量 + findSignatures concat，存量 SIG/SUPERIOR/SCALE 与
+//     r311 新族一字不动（存量注入语义与轮测登记保持）；
+//   · 新 SIG 腿走存量 collect(…, true) 否定守卫；推断标记存活判定
+//     （RESTRICTIVE_BEFORE）不变——「只说明」不构成推断；
+//   · 豁免层不动：CORRECTIVE（效应量/置信区间/踩线显著不能说明问题）
+//     与 CONCEPT（显著性≠重要性教学）对新腿先生效；
+//   · 官方良性语料 369 条零误命中（改前改后均实测）。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r319] 腿① 踩线显著族（中文）────────────────────────────
+const SIG_ZH3 = [
+  // 擦线/踩线/压线 + 达到/跨过 + 显著（擦线达到显著/踩线显著）
+  /(?:擦线|踩线|卡线|压线|勉强|刚刚|刚好|险些|差点)(?:达到|跨过|越过|进入)?(?:显著|显著性|统计显著)/,
+  // p 值卡在/压在 0.05 关口（p 卡在 0.05 关口）
+  /p\s*(?:值)?[^。，！？；\n]{0,4}(?:卡在|压在|踩在|停在|挂在)\s*0?\.\d+/,
+];
+
+// ─── [r319] 腿① 踩线显著族（英文）────────────────────────────
+const SIG_EN3 = [
+  // p came out at 0.049 / p was 0.05（存量 p=0.0x 形不收 came out at）
+  /\bp(?:\s*[-–]?value)?\s+(?:came\s+out\s+at|was|is|of|=|at)\s*0?\.\d+/i,
+  // just/barely crossed the significance threshold
+  /\b(?:just|barely|only\s+just|narrowly)\s+(?:crossed|cross|crossing|passed|passed\s+the|cleared)\s+(?:the\s+)?(?:significance|significance\s+threshold|threshold)/i,
+];
+
+// ─── [r319] 腿② 新裁定：真实存在/推广/有效（中文）──────────────
+const SUPERIOR_ZH3 = [
+  // 改进/效果…是真实存在的（存在族裁定）
+  /(?:改进|提升|效果|疗效|改善|差异|变化|作用)(?:是|确实|的|是确实)?(?:真实|真正)(?:存在|的)/,
+];
+const SCALE_ZH3 = [
+  // 可以/值得推广（无强化词形；存量 SCALE_ZH 只收全面/大力推广等强化形）
+  /(?:可以|可|能够|值得|应当|应该|建议)(?:被)?(?:推广|推行|铺开|上线|采用|普及)/,
+];
+
+// ─── [r319] 腿② 新裁定（英文）────────────────────────────────
+const SUPERIOR_EN3 = [
+  // the treatment works / the drug is effective（存在-有效族）
+  /\b(?:treatment|drug|intervention|method|approach|app|therapy|program)\s+(?:works|worked|is\s+effective)\b/i,
+];
+
 // ─── 推断标记（结论由显著性推出，而非并列陈述）─────────────────
 const INFER_ZH = /(?:所以|因此|据此|可见|说明|证明|意味着|足以|当然|显然|肯定|一定|反映出|体现出|足见|充分说明|充分证明|足以表明|足以证明|结论就是|就是说|毋庸置疑|毫无疑问|分明|据此可以|就可以|可以说)/;
 const INFER_EN = /\b(?:so|therefore|thus|hence|which\s+means|which\s+proves|that\s+means|proves|shows\s+that|indicates\s+that|means\s+that|it\s+follows|this\s+shows|this\s+proves|clearly|obviously)\b/i;
@@ -341,11 +409,11 @@ function findSignatures(text, R) {
   const sigs = [];
   const langs = [
     {
-      sig: R.SIG_ZH || SIG_ZH,
+      sig: (R.SIG_ZH || SIG_ZH).concat(R.SIG_ZH3 || SIG_ZH3),
       verdicts: {
         importance: (R.IMPORTANCE_ZH || IMPORTANCE_ZH).concat(R.IMPORTANCE_ZH2 || IMPORTANCE_ZH2),
-        superior: R.SUPERIOR_ZH || SUPERIOR_ZH,
-        scale: R.SCALE_ZH || SCALE_ZH,
+        superior: (R.SUPERIOR_ZH || SUPERIOR_ZH).concat(R.SUPERIOR_ZH3 || SUPERIOR_ZH3),
+        scale: (R.SCALE_ZH || SCALE_ZH).concat(R.SCALE_ZH3 || SCALE_ZH3),
         magnitude: (R.MAGNITUDE_ZH || MAGNITUDE_ZH).concat(R.MAGNITUDE_ZH2 || MAGNITUDE_ZH2),
       },
       infer: R.INFER_ZH || INFER_ZH,
@@ -353,10 +421,10 @@ function findSignatures(text, R) {
       lang: 'zh',
     },
     {
-      sig: R.SIG_EN || SIG_EN,
+      sig: (R.SIG_EN || SIG_EN).concat(R.SIG_EN3 || SIG_EN3),
       verdicts: {
         importance: (R.IMPORTANCE_EN || IMPORTANCE_EN).concat(R.IMPORTANCE_EN2 || IMPORTANCE_EN2),
-        superior: R.SUPERIOR_EN || SUPERIOR_EN,
+        superior: (R.SUPERIOR_EN || SUPERIOR_EN).concat(R.SUPERIOR_EN3 || SUPERIOR_EN3),
         scale: R.SCALE_EN || SCALE_EN,
         magnitude: (R.MAGNITUDE_EN || MAGNITUDE_EN).concat(R.MAGNITUDE_EN2 || MAGNITUDE_EN2),
       },
@@ -436,6 +504,10 @@ module.exports = {
     MAGNITUDE_ZH, MAGNITUDE_EN,
     MAGNITUDE_ZH2, MAGNITUDE_EN2,
     IMPORTANCE_ZH2, IMPORTANCE_EN2,
+    // [r319] 踩线显著族 × 新裁定族（平行常量，负例注入-删条用）
+    SIG_ZH3, SIG_EN3,
+    SUPERIOR_ZH3, SUPERIOR_EN3,
+    SCALE_ZH3,
     INFER_ZH, INFER_EN,
     W_ZH, W_EN,
     CONCEPT_ZH, CONCEPT_EN,
