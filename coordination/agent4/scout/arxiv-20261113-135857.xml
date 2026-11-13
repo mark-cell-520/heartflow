@@ -1,0 +1,382 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/FO8xJ2enh1j2mAZjOf2T6xcJksA</id>
+  <title>arXiv Query: search_query=all:present OR all:bias OR all:hyperbolic OR all:discounting OR all:peak-end OR all:rule OR all:endowment OR all:effect OR all:significance OR all:effect OR all:size&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-13T13:58:58Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:present+OR+(all:bias+OR+(all:hyperbolic+OR+(all:discounting+OR+(all:peak-end+OR+(all:rule+OR+(all:endowment+OR+(all:effect+OR+(all:significance+OR+(all:effect+OR+all:size)))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1605457</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17337v1</id>
+    <title>The full Gaia colour-magnitude diagram with white dwarfs reveals a declining Milky Way star formation history</title>
+    <updated>2026-11-12T18:59:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17337v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17337v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>White dwarfs (WDs) provide a fossil record of the Milky Way star formation history (SFH) through the combined effects of stellar evolution and cooling. They have, however, generally been modelled in isolation from the non-degenerate population, so that no single self-consistent set of Galactic assumptions has been required to reproduce both. We present CALOMERA, a semi-analytic chemo-dynamical population synthesis framework in which the vertical density profiles of mono-age subpopulations are computed self-consistently with the Galactic potential and coupled to modern WD cooling sequences, metallicity-dependent progenitor lifetimes and synthetic photometry. We calibrate 18 parameters describing the initial mass function, SFH, initial-final mass relation and WD population against a Gaia DR3 sample of $7.98\times10^{6}$ stars within 1 kpc, including $1.1\times10^{5}$ WDs. The calibrated model reproduces the star counts in each colour-magnitude diagram region to within 3% and the total number count to within 0.5%, compared with the 81% excess in the predicted WD count obtained with the previous main-sequence-only calibration. The recovered SFH peaks early, declines exponentially thereafter, and includes two recent bursts, located at $τ\approx2.4$ and $0.5$ Gyr. Three cooling libraries (Montréal, BaSTI and LPCODE) yield comparably good fits, with differences confined to ${\rm M_G}\gtrsim15$ mag. The predicted luminosity function is in reasonable agreement with the 100 pc Gaia WD sample. We further predict the Galactic WD distribution and differential number counts for surveys of varying depth. Extending the framework to the substellar regime using ATMO models, we predict the Galactic L, T, and Y dwarf populations and their contribution to the deep JWST fields.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:56Z</published>
+    <arxiv:comment>Submitted to MNRAS, 20 pages main text + 4 pages appendix, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>K. Sysoliatina</name>
+    </author>
+    <author>
+      <name>Akash Vani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17336v1</id>
+    <title>Back to Pixels: Lifting Latent Video Diffusion into Pixel Space</title>
+    <updated>2026-11-12T18:59:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.17336v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17336v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier video generation models work in a VAE latent space that compresses video in both space and time. This compression made training tractable, but now limits high-resolution, controllable, and interactive generation -- doubling resolution quadruples token count, conditions apply to groups of frames rather than individual ones, and each response must wait for the rest of its multi-frame block. We present PixVid, a simple yet effective method that lifts a pretrained latent video model to directly generate every frame in pixel space. PixVid keeps the diffusion transformer and replaces the VAE decoder with a convolutional head that renders its outputs into pixels. We find that predicting clean video rather than velocity, together with a larger noise shift, is key to quality. Finetuned from Wan2.1-14B, PixVid is competitive with the latent baseline within $\sim 1.3$M training clips. Working framewise in pixels, it generates at $2\times$ higher resolution with the same per-frame token count, keeps depth-conditioned video editing aligned under fast motion, and responds to each action at the next frame. Project page: https://chenshuo20.github.io/PixVid/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:55Z</published>
+    <arxiv:comment>Project Page: https://chenshuo20.github.io/PixVid/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yanke Song</name>
+    </author>
+    <author>
+      <name>Shuo Chen</name>
+    </author>
+    <author>
+      <name>Chris Rockwell</name>
+    </author>
+    <author>
+      <name>Guande He</name>
+    </author>
+    <author>
+      <name>Nan Liu</name>
+    </author>
+    <author>
+      <name>Desai Xie</name>
+    </author>
+    <author>
+      <name>Tianpei Gu</name>
+    </author>
+    <author>
+      <name>Yong-Hyun Park</name>
+    </author>
+    <author>
+      <name>Aryan V S</name>
+    </author>
+    <author>
+      <name>Dennis Yuren Menn</name>
+    </author>
+    <author>
+      <name>Ming-Hsuan Yang</name>
+    </author>
+    <author>
+      <name>Xun Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17334v1</id>
+    <title>Unbundling Multimodal Vision Encoding</title>
+    <updated>2026-11-12T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17334v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17334v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How multimodal language models should encode visual input remains up for debate. Most models use a pretrained vision encoder, while some recent recipes train the encoder from scratch with the language model or remove it entirely. Vision encoders bundle together three design choices: a visual prior from upstream pretraining, dedicated vision capacity, and pre-fusion placement of that capacity (i.e., before the multimodal backbone). Because published models also differ in data, architecture, and compute, comparing them cannot isolate the effect of each choice. We disentangle these choices via a controlled framework where we pretrain all models from scratch on common data and compare them on visual question answering and language benchmarks at matched lifetime compute. We find that the visual prior is not necessary; an encoder trained jointly from scratch is on par with a pretrained one, without a separate training stage. What matters instead is dedicated vision capacity: an encoder-free model trails on visual understanding even when its backbone is enlarged by the encoder's parameter count. Yet that capacity need not precede multimodal fusion, as vision-only modules added in-fusion to early backbone layers perform comparably to a pre-fusion encoder and can lower time to first token. These results also hold across backbone sizes, when encoder pretraining is treated as free, and when starting from a pretrained language model. Overall, our findings favor dedicated vision capacity trained jointly with the backbone and placed early within it.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:54Z</published>
+    <arxiv:comment>Project page: https://unbundling.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ellis Brown</name>
+    </author>
+    <author>
+      <name>Chris Hoang</name>
+    </author>
+    <author>
+      <name>Shengyi Qian</name>
+    </author>
+    <author>
+      <name>Shang-Wen Li</name>
+    </author>
+    <author>
+      <name>Mike Lewis</name>
+    </author>
+    <author>
+      <name>Marjan Ghazvininejad</name>
+    </author>
+    <author>
+      <name>Luke Zettlemoyer</name>
+    </author>
+    <author>
+      <name>Lucas Beyer</name>
+    </author>
+    <author>
+      <name>Mengye Ren</name>
+    </author>
+    <author>
+      <name>Jakob Verbeek</name>
+    </author>
+    <author>
+      <name>Saining Xie</name>
+    </author>
+    <author>
+      <name>Hu Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17333v1</id>
+    <title>Discrete Time Crystals from Anti-Unitary Floquet Driving and Dynamical Freezing</title>
+    <updated>2026-11-12T18:59:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17333v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17333v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show anti-unitary periodic drive paves a direct path for stabilizing a Discrete Time-Crystal by Dynamical Freezing (DF). The magnetization appears as an emergent conserved operator, and an exact pairing of two-cycle quasi-energies pins the subharmonic response. DF keeps the effective Hamiltonian $\textit{quasi-local}$; infinite-chain simulations show no detectable decay for a generic state with any finite magnetization. We outline an experimental realization of the anti-unitary drive.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:53Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Anirban Das</name>
+    </author>
+    <author>
+      <name>Asmi Haldar</name>
+    </author>
+    <author>
+      <name>Arnab Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17330v1</id>
+    <title>ProtoVis-Nav: Prototypical Visual Imagination for Visual-Spatial Aligned UAV Navigation</title>
+    <updated>2026-11-12T18:59:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.17330v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17330v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision language navigation (VLN) is very challenging for Unmanned Aerial Vehicles (UAVs) since small errors in 3D motion prediction can lead to navigation errors and collisions. Unable to fathom execution outcomes in 3D environments, existing methods often struggle to predict accurate navigation waypoints from language instructions. To solve this, we introduce the Prototypical Visual Imagination framework, shortened as ProtoVis-Nav, which forces the model to imagine an outcome-associated local visual representation for the intended next UAV movement. Specifically, we predict feature prototypes and use their linear combination to estimate the visual feature of the target region. In this manner, the VLN model first imagines the local visual representation of the next intended location, and then uses predicted prototypes as context for generating the final action, promoting alignment between visual context and waypoint outputs. Extensive experiments demonstrate the effectiveness of the ProtoVis-Nav framework and show substantial improvements over existing baselines.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:49Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Guangyuan Sui</name>
+    </author>
+    <author>
+      <name>Yunzhong Hou</name>
+    </author>
+    <author>
+      <name>Chi Harold Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17329v1</id>
+    <title>Internalizing Investment Mandates: A Neurosymbolic RL Approach to Portfolio Allocation</title>
+    <updated>2026-11-12T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.17329v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17329v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Institutional portfolios operate under investment policy statements that specify asset allocation constraints, often conditioned on market regime information. Deep reinforcement learning has been shown to optimize financial performance but typically does not enforce rule compliance, making it unsuitable for real-world deployment. Existing neurosymbolic methods such as Probabilistic Logic Policy Gradient (PLPG) offer constraint-satisfying reinforcement learning (RL) via differentiable symbolic supervision but assume a finite, discrete action space. We present a PLPG-inspired continuous allocation method that estimates the probability that the policy's own executed action satisfies the investment mandate, using reparameterized Monte Carlo sampling, and adds it to the training objective. No post-hoc enforcement mechanism intercepts actions at inference time and compliance is learned by the agent. Audited directly on deterministic mean actions with no correction, the policy reduces violations of a six-rule regime-conditional mandate from 96-98% for unconstrained RL and 33.4% for a reward-penalty baseline to 4.8%, showing that a continuous-action neurosymbolic policy can substantially internalize a symbolic mandate.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:37Z</published>
+    <arxiv:comment>Accepted at ICAIF '26</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zeynep Yıldız</name>
+    </author>
+    <author>
+      <name>Satchit Chatterji</name>
+    </author>
+    <author>
+      <name>Ercan Atam</name>
+    </author>
+    <author>
+      <name>Erman Acar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17326v1</id>
+    <title>A hyperbolic area proof of the Kahn-Lyubich Covering Lemma and its generalization</title>
+    <updated>2026-11-12T18:59:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.17326v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17326v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Covering Lemma of J. Kahn and M. Lyubich is a fundamental analytic tool for controlling conformal moduli of annuli under branched coverings of finite degree. In the last several decades, it has played a crucial role in establishing rigidity of multicritical polynomial and rational maps. The classical proof uses the Near-Degenerate Regime as the main mechanism. In this short note, we prove this lemma using hyperbolic area and the Dirichlet energy. We also establish a version of the Covering Lemma for holomorphic maps of infinite degree.
+  Our argument is inspired by recent applications of the hyperbolic area method to the study of wandering domains in rational and transcendental dynamics.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:23Z</published>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Kostiantyn Drach</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17324v1</id>
+    <title>K2V: Generative Keyframing For Physically Plausible Video Generation</title>
+    <updated>2026-11-12T18:59:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.17324v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17324v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Video diffusion models are able to generate samples with high-quality appearance and textural qualities. However, content produced by these methods is known to exhibit significant physical errors. This is because, in a classical video generation setting, all physical reasoning must take place simultaneously and exclusively within the diffusion process.We propose to resolve these issues by redistributing the task of physical reasoning onto a language model-backed keyframe generation module, which allows for explicit reasoning in language, and fine-grained control over the appearance of the video at important moments in the video. We then condition a video generation model with these keyframes, reducing the role of the diffusion model to the simpler task of interpolating between physically-correct intermediate states, rather than inferring an entire sequence with diffusion. Results demonstrate that our approach significantly outperforms existing approaches, achieving state-of-the-art performance on the Physics-IQ Verified benchmark and PhyGenBench.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:09Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Felix O'Mahony</name>
+    </author>
+    <author>
+      <name>Daniel Olmeda Reino</name>
+    </author>
+    <author>
+      <name>Roberto Cipolla</name>
+    </author>
+    <author>
+      <name>Ayush Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17321v1</id>
+    <title>BrickFlow: Connectivity-Guided Brick Reconstruction</title>
+    <updated>2026-11-12T18:58:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17321v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17321v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Given a set of LEGO parts and an image of an assembled object, our task is to infer the pose of each part to assemble the object. In contrast with traditional 3D reconstruction, doing so requires satisfying discrete physical constraints, which provide structure but render the problem combinatorial and highly sensitive to small pose errors. To learn a prior over how parts fit together, we train a set-conditioned SE(3) flow model on procedurally generated assemblies. We then finetune this model to inject image conditioning, using 1% as much data. However, while the learned flow captures global structure, it does not enforce connectivity. To address this, we introduce an analytic connectivity-field guidance to pull predictions toward connected assemblies at test time. Through this, we demonstrate improved build quality with model size, pretraining, and guidance. We make our models and data available for research purposes at https://kulits.github.io/BrickFlow/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:51Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Peter Kulits</name>
+    </author>
+    <author>
+      <name>Cordelia Schmid</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17320v1</id>
+    <title>Learning When Diffusion Language Models Should Regenerate</title>
+    <updated>2026-11-12T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.17320v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17320v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Remasking allows diffusion language models to revisit generated text, but effective correction requires knowing when and what to revise. Our diagnosis on Sudoku reveals two gaps. Hidden states contain error information that token confidence does not reliably expose, and remasking an isolated error usually reproduces it when the surrounding context remains fixed. These findings motivate DiVR , a verifier that predicts whether a partially generated sequence will reach a correct answer. Trained on the final correctness of the model's own trajectories, DiVR decides when to regenerate a block and which alternative to retain, while the generator itself stays unchanged. On five reasoning benchmarks with LLaDA-8B-Base, DiVR raises the average accuracy of the fine-tuned generator from 35.3\% to 43.4\% at $1.9$-$3.5\times$ the cost of greedy decoding, above search baselines that use $3.8$-$7.4\times$. It also complements post-training such as supervised fine-tuning and reinforcement learning, and generalizes to other generators, including Dream.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:50Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Minhae Oh</name>
+    </author>
+    <author>
+      <name>Jeonghye Kim</name>
+    </author>
+    <author>
+      <name>Jinwoo Koo</name>
+    </author>
+    <author>
+      <name>Yeongoon Kim</name>
+    </author>
+    <author>
+      <name>Jimin Seo</name>
+    </author>
+    <author>
+      <name>Minsik Seol</name>
+    </author>
+    <author>
+      <name>Jungwoo Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17319v1</id>
+    <title>The Cauchy problem for skew-torsion-parallel spinors with applications to supergravity</title>
+    <updated>2026-11-12T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.17319v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17319v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We solve the Cauchy problem for an irreducible real spinor parallel with respect to a metric connection with skew-symmetric torsion on a globally hyperbolic Lorentzian four-manifold, proving that it is well-posed modulo an obstruction that we identify explicitly, and obtaining an initial-data characterization of such spinors. Our proof relies on the theory of spinorial forms, which we use to explicitly integrate the coupled flow for the spinor and underlying metric via a rotated pull-back action of the flow generated by a vector field on the Cauchy hypersurface $Σ$. We characterize the corresponding constraint equations as an explicit exterior differential system and describe all its solutions in terms of contact structures and flat foliations, obtaining a complete classification in the compact case. In particular, we conclude that every oriented compact three-manifold arises as the Cauchy hypersurface of a globally hyperbolic Lorentzian four-manifold equipped with a skew-torsion parallel spinor. Building on these results, we study the interaction between the four-dimensional Neveu-Schwarz supergravity evolution flow on an abelian bundle gerbe and the spinorial evolution flow determined by its supersymmetric conditions, which we prove to be well-posed and compatible. This establishes the well-posedness of the supersymmetric Neveu-Schwarz system in four dimensions and provides an initial-data characterization of supersymmetry. Furthermore, we obtain a strong rigidity result stating that every globally hyperbolic supersymmetric Neveu-Schwarz solution with a compact Cauchy hypersurface is flat and has vanishing bundle-gerbe curvature.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:38Z</published>
+    <arxiv:comment>65 pages. Comments welcome!</arxiv:comment>
+    <arxiv:primary_category term="math.DG"/>
+    <author>
+      <name>C. S. Shahbazi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17312v1</id>
+    <title>The Tournament Equilibrium Set Is PSPACE-Complete, Even under Hereditary Uniqueness</title>
+    <updated>2026-11-12T18:57:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.17312v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17312v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The tournament equilibrium set (TEQ), proposed by Schwartz in 1990, is a classical voting rule based on pairwise majority comparisons. Its definition is recursive: an alternative is judged by the alternatives that beat it, called its dominators, and by which of those dominators TEQ itself selects. Deciding whether a given alternative belongs to TEQ was known to be NP-hard and to lie in PSPACE. We close this gap by proving that the problem is PSPACE-complete. To our knowledge, this is the first PSPACE-completeness result for membership in a tournament solution.
+  The hardness persists even when every nonempty subtournament has a unique minimal retentive set, the property conjectured by Schwartz to hold for all tournaments. Moreover, every such subtournament in our hard instances contains an alternative with at most three dominators. We prove that a single alternative with at most four dominators suffices both to guarantee uniqueness and to find a TEQ winner in $O(N^2)$ time. Thus, on our hard instances, finding one winner is efficient even though recognizing a specified winner is PSPACE-complete.
+  We also study how the complexity changes with the dominator bound. If every nonempty subtournament has an alternative with at most one dominator, the entire TEQ can be computed in quadratic time; allowing two dominators makes membership NP-hard. Under the same condition with four dominators, all $t$ winners can be computed in $O(2^t N^2)$ time, where $N$ is the number of alternatives.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:05Z</published>
+    <arxiv:comment>51 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Ethan Dickey</name>
+    </author>
+    <author>
+      <name>Athina Terzoglou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17311v1</id>
+    <title>Integer Programming with Polyhedral Constraints on the Image</title>
+    <updated>2026-11-12T18:56:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.17311v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17311v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We generalize integer programming to the setting in which the image $A \mathbf{x}$ is restricted to an explicitly given rational polyhedron $P$. That is, we solve $\min\{\mathbf{c}^{\mathsf T}\mathbf{x}:A\mathbf{x}\in P, \mathbf{x}\in\mathbb{Z}_{\geq 0}^n\}$, where $A\in\mathbb{Z}^{d\times n}$ and $P$ is an explicitly given rational polyhedron. We present a randomized algorithm running in time $(dΔ)^{O(d)}\operatorname{poly}(L)$ in this regime, where $Δ:= \|A\|_\infty$ and $L$ is the binary input length. This running time matches that of the best-known parameterized algorithms for integer programming, due to Eisenbrand and Weismantel and to Jansen and Rohwedder, and improves on the $O(d^2)$ exponent achieved by Dadush, Léonard, Rohwedder, and Verschae in a more general setting.
+  This result enables several applications, including exact algorithms for integer programming and unbounded knapsack in which the consumed resources $A\mathbf{x}$ must satisfy arbitrary additional linear constraints. We also obtain a randomized fixed-parameter algorithm for Unbounded Subset Sum parameterized by the doubling constant, resolving an open problem of Randolph and Węgrzycki. For integer programs with $m$ constraints and bounded row doubling, we obtain an $f(C,m)n^{O(m)}\operatorname{poly}(L)$-time algorithm and show that the dependence on $m$ in the exponent of $n$ is necessary under $\mathsf{W[1]}\ne\mathsf{FPT}$.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:58Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Anubhav Dhar</name>
+    </author>
+    <author>
+      <name>Tim Randolph</name>
+    </author>
+    <author>
+      <name>Karol Węgrzycki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17310v1</id>
+    <title>Quantum Metrology and Quantum Battery in a Hyperfine-Coupled Spin System</title>
+    <updated>2026-11-12T18:56:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.17310v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17310v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate multiparameter quantum metrology and the energetic properties of an effective electron--proton spin system inspired by the hyperfine structure of the hydrogen atom. Considering the external magnetic field $\mathcal B$ and the hyperfine coupling strength $Λ$ as unknown parameters, we derive the quantum Fisher information matrix and establish the corresponding quantum Cramér--Rao bounds for their simultaneous estimation. We analyze the estimation precision and the correlations between the two parameters, showing that the weak-commutativity condition is satisfied despite the noncommutativity of the associated symmetric logarithmic derivatives. Independently, we explore the energetic properties of the system under a unitary charging protocol, characterizing its ergotropy, anti-ergotropy, storage capacity, and energy-basis coherence. We investigate the dependence of these quantities on the magnetic field, hyperfine coupling, temperature, and charging time. Our results provide a comprehensive characterization of the metrological properties and energetic performance of a hyperfine spin-based quantum system, highlighting its potential as a platform for quantum sensing and energy storage.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:57Z</published>
+    <arxiv:comment>14 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Omar Bachain</name>
+    </author>
+    <author>
+      <name>Mohamed Amazioug</name>
+    </author>
+    <author>
+      <name>Rachid Ahl Laamara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17308v1</id>
+    <title>Quantifying structural stability of transparent models for general insurance pricing</title>
+    <updated>2026-11-12T18:56:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17308v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17308v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The short duration of general insurance contracts leads to rapid distributional shifts in the data, warranting regular model updates. This process may yield a post-update model that differs considerably from the pre-update model in both predictions and structure. Structural stability is upstream of predictive stability, yet existing structural stability metrics are mostly restricted to simple decision trees. Thus, we first introduce the notion of functional transparency, characterising models with a prediction function that can be expressed as a sum of univariate functions for main effects and bivariate functions for pairwise interactions. Then, we propose the Mean Squared Shape function distance, a metric to quantify the structural stability of functionally transparent models, which are particularly relevant in actuarial science. Using three public auto insurance datasets, we present a benchmark study to demonstrate the usefulness of our metric in identifying a stable and accurate transparent model. Generalised linear models with centred numerical covariates are stable, and explainable boosting machines (EBMs) offer a compromise between stability and performance. We also find that stabilisation strategies, such as sequential modelling and fixed hyperparameters, can substantially improve stability for both EBM and XGBoost models, with negligible impact on performance.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:54Z</published>
+    <arxiv:comment>16 tables and 9 figures</arxiv:comment>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Félix Côté</name>
+    </author>
+    <author>
+      <name>Marie-Pier Côté</name>
+    </author>
+  </entry>
+</feed>

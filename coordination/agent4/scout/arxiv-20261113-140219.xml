@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/5C8+G1f3oeYghIGvkAuaIEK/85E</id>
+  <title>arXiv Query: search_query=all:present-bias-hyperbolic-discounting&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-13T14:02:19Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:present-bias-hyperbolic-discounting&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>9</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2607.19586v1</id>
+    <title>Examining User Behavior and Cognitive Biases in Personal Password Security</title>
+    <updated>2026-07-21T21:28:35Z</updated>
+    <link href="https://arxiv.org/abs/2607.19586v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.19586v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Despite increasing awareness of cybersecurity risks, users continue to engage in insecure password practices, such as reusing passwords, choosing weak credentials, and neglecting security recommendations. The study explores the behavioral and cognitive factors that influence password decision-making by integrating insights from behavioral economics, particularly hyperbolic discounting, status quo bias, and present bias. We conducted a survey to analyze how people create, store and manage their passwords, examining whether security habits have improved over time in response to greater awareness. Our findings reveal that immediate convenience often outweighs long-term security considerations, leading users to prioritize memorability over strength. Additionally, we identify key psychological biases that contribute to security procrastination and resistance to adopting more secure authentication practices, such as password managers and multi-factor authentication. The study contributes to human-centered security by bridging the gap between security awareness and action, offering practical insights to design user-friendly authentication policies that align with real-world decision-making tendencies.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-21T21:28:35Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Evelyn Crowe</name>
+    </author>
+    <author>
+      <name>Patralika Ghosh</name>
+    </author>
+    <author>
+      <name>Shreyas Kumar</name>
+    </author>
+    <author>
+      <name>Rebecca Schlegel</name>
+    </author>
+    <author>
+      <name>Rebecca Ward</name>
+    </author>
+    <author>
+      <name>Guofei Gu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2507.07286v1</id>
+    <title>Identifying Present-Biased Discount Functions in Dynamic Discrete Choice Models</title>
+    <updated>2025-07-09T21:10:25Z</updated>
+    <link href="https://arxiv.org/abs/2507.07286v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2507.07286v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the identification of dynamic discrete choice models with sophisticated, quasi-hyperbolic time preferences under exclusion restrictions. We consider both standard finite horizon problems and empirically useful infinite horizon ones, which we prove to always have solutions. We reduce identification to finding the present-bias and standard discount factors that solve a system of polynomial equations with coefficients determined by the data and use this to bound the cardinality of the identified set. The discount factors are usually identified, but hard to precisely estimate, because exclusion restrictions do not capture the defining feature of present bias, preference reversals, well.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-07-09T21:10:25Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Jaap H. Abbring</name>
+    </author>
+    <author>
+      <name>Øystein Daljord</name>
+    </author>
+    <author>
+      <name>Fedor Iskhakov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2410.18240v1</id>
+    <title>Periodic portfolio selection with quasi-hyperbolic discounting</title>
+    <updated>2024-10-23T19:34:45Z</updated>
+    <link href="https://arxiv.org/abs/2410.18240v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.18240v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce an infinite-horizon, continuous-time portfolio selection problem faced by an agent with periodic S-shaped preference and present bias. The inclusion of a quasi-hyperbolic discount function leads to time-inconsistency and we characterize the optimal portfolio for a pre-committing, naive and sophisticated agent respectively. In the more theoretically challenging problem with a sophisticated agent, the time-consistent planning strategy can be formulated as an equilibrium to a static mean field game. Interestingly, present bias and naivety do not necessarily result in less desirable risk taking behaviors, while agent's sophistication may lead to excessive leverage (underinvestement) in the bad (good) states of the world.</summary>
+    <category term="q-fin.PM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.MF" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-23T19:34:45Z</published>
+    <arxiv:primary_category term="q-fin.PM"/>
+    <author>
+      <name>Yushi Hamaguchi</name>
+    </author>
+    <author>
+      <name>Alex S. L. Tse</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2409.11225v1</id>
+    <title>A Continuous-time Tractable Model for Present-biased Agents</title>
+    <updated>2024-09-17T14:18:28Z</updated>
+    <link href="https://arxiv.org/abs/2409.11225v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2409.11225v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Present bias, the tendency to overvalue immediate rewards while undervaluing future ones, is a well-known barrier to achieving long-term goals. As artificial intelligence and behavioral economics increasingly focus on this phenomenon, the need for robust mathematical models to predict behavior and guide effective interventions has become crucial. However, existing models are constrained by their reliance on the discreteness of time and limited discount functions. This study introduces a novel continuous-time mathematical model for agents influenced by present bias. Using the variational principle, we model human behavior, where individuals repeatedly act according to a sequence of states that minimize their perceived cost. Our model not only retains analytical tractability but also accommodates various discount functions. Using this model, we consider intervention optimization problems under exponential and hyperbolic discounting and theoretically derive optimal intervention strategies, offering new insights into managing present-biased behavior.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-09-17T14:18:28Z</published>
+    <arxiv:comment>22 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Yasunori Akagi</name>
+    </author>
+    <author>
+      <name>Hideaki Kim</name>
+    </author>
+    <author>
+      <name>Takeshi Kurashima</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2407.14955v4</id>
+    <title>Temptation: Immediacy and certainty</title>
+    <updated>2024-08-26T18:27:51Z</updated>
+    <link href="https://arxiv.org/abs/2407.14955v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2407.14955v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Is an option especially tempting when it is both immediate and certain? I test the effect of risk on the present-bias factor given quasi-hyperbolic discounting. In my experiment workers allocate about thirty to fifty minutes of real-effort tasks between two weeks. I study dynamic consistency by comparing choices made two days in advance of the workday with choices made when work is imminent. My novel design permits estimation of present bias using a decision with a consequence that is both immediate and certain. I find greater present bias when the consequence is certain. This finding has implications for any economic decision involving a present-biased decision-maker, including labor contracting and consumer good pricing. I offer a methodological remedy for experimental economists.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-07-20T18:24:14Z</published>
+    <arxiv:comment>The manuscript includes 26 pages with 2 tables and 3 figures; the supplement includes 20 pages with 5 tables and 15 figures. This revision makes minor changes to notation for clarity</arxiv:comment>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>J. Lucas Reddinger</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.11072v1</id>
+    <title>Awareness of self-control</title>
+    <updated>2024-02-16T20:57:27Z</updated>
+    <link href="https://arxiv.org/abs/2402.11072v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.11072v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Economists modeled self-control problems in decisions of people with the time-inconsistence preferences model. They argued that the source of self-control problems could be uncertainty and temptation. This paper uses an experimental test offered to individuals instantaneous reward and future rewards to measure awareness of self-control problems in a tempting condition and also measure the effect of commitment and flexibility cost on their welfare. The quasi-hyperbolic discounting model with time discount factor and present bias at the same time was used for making a model for measuring awareness and choice reversal conditions. The test showed 66% awareness of self-control (partially naive behaviors) in individuals. The welfare implication for individuals increased with commitment and flexibility costs. The result can be useful in marketing and policy-making fields design precisely offers for customers and society.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-16T20:57:27Z</published>
+    <arxiv:comment>23 pages, 8 Tables, 2 figures</arxiv:comment>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Mohammad Mehdi Mousavi</name>
+    </author>
+    <author>
+      <name>Mahdi Kohan Sefidi</name>
+    </author>
+    <author>
+      <name>Shirin Allahyarkhani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2304.11213v2</id>
+    <title>Understanding the householder solar panel consumer: A Markovian model and its societal implications</title>
+    <updated>2026-01-24T18:05:50Z</updated>
+    <link href="https://arxiv.org/abs/2304.11213v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2304.11213v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Household adoption of rooftop photovoltaic (PV) systems is central to the green energy transition, yet diffusion depends on social influence and behavioral biases, as well as payback economics. This study develops a parsimonious Markovian model in which households move sequentially from being unengaged (Carbon) to informed, to planning, and finally to adoption (Green). Transition rates are micro-founded by two mechanisms: (i) social contagion/communication, proxied by the current share of adopters, and (ii) economic profitability, proxied by payback time computed from a Net Present Value framework. Novel to this diffusion setting, bounded rationality is introduced via hyperbolic discounting, creating a procrastination loop that delays adoption even when PV is economically attractive in a long-run perspective. Calibrated on the Italian residential PV diffusion path (2006-2020) and assessed in national and regional applications, the model reproduces observed trajectories and enables forward-looking scenario analysis (2020-2026). Results show that policies yielding similar payback improvements can produce different outcomes once present bias is accounted for and that behaviorally informed intervention are stronger. The findings contribute a micro-to-macro bridge between behavioral economics and technology diffusion modeling and imply that effective policy portfolios (and PV business models) should complement incentives with commitment devices and social-norm peer strategies to accelerate PV uptake and its spillover emissions benefits.</summary>
+    <category term="physics.soc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-04-21T18:52:21Z</published>
+    <arxiv:comment>52 pages, 27 figures</arxiv:comment>
+    <arxiv:primary_category term="physics.soc-ph"/>
+    <arxiv:journal_ref>Technological Forecasting and Social Change, 225, 124555 (2026)</arxiv:journal_ref>
+    <author>
+      <name>Marta Leocata</name>
+    </author>
+    <author>
+      <name>Giulia Livieri</name>
+    </author>
+    <author>
+      <name>Silvia Morlacchi</name>
+    </author>
+    <author>
+      <name>Fausto Corvino</name>
+    </author>
+    <author>
+      <name>Franco Flandoli</name>
+    </author>
+    <author>
+      <name>Alberto Eugenio Ermenegildo Pirni</name>
+    </author>
+    <arxiv:doi>10.1016/j.techfore.2026.124555</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.techfore.2026.124555" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2111.10721v4</id>
+    <title>Identifying Dynamic Discrete Choice Models with Hyperbolic Discounting</title>
+    <updated>2024-10-31T03:24:13Z</updated>
+    <link href="https://arxiv.org/abs/2111.10721v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2111.10721v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study identification of dynamic discrete choice models with hyperbolic discounting. We show that the standard discount factor, present bias factor, and instantaneous utility functions for the sophisticated agent are point-identified from observed conditional choice probabilities and transition probabilities in a finite horizon model. The main idea to achieve identification is to exploit variation in the observed conditional choice probabilities over time. We present the estimation method and demonstrate a good performance of the estimator by simulation.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-11-21T03:05:46Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Taiga Tsubota</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1604.01819v1</id>
+    <title>Aggregating time preferences with decreasing impatience</title>
+    <updated>2016-04-06T21:46:10Z</updated>
+    <link href="https://arxiv.org/abs/1604.01819v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1604.01819v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>It is well-known that for a group of time-consistent decision makers their collective time preferences may become time-inconsistent. Jackson and Yariv (2014) demonstrated that the result of aggregation of exponential discount functions always exhibits present bias. We show that when preferences satisfy the axioms of Fishburn and Rubinstein (1982), present bias is equivalent to decreasing impatience (DI). Applying the notion of comparative DI introduced by Prelec (2004), we generalize the result of Jackson and Yariv (2014). We prove that the aggregation of distinct discount functions from comparable DI classes results in the collective discount function which is strictly more DI than the least DI of the functions being aggregated. We also prove an analogue of Weitzman's (1998) result, for hyperbolic rather than exponential discount functions. We show that if a decision maker is uncertain about her hyperbolic discount rate, then long-term costs and benefits will be discounted at a rate which is the probability-weighted harmonic mean of the possible hyperbolic discount rates.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2016-04-06T21:46:10Z</published>
+    <arxiv:comment>33 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Nina Anchugina</name>
+    </author>
+    <author>
+      <name>Matthew Ryan</name>
+    </author>
+    <author>
+      <name>Arkadii Slinko</name>
+    </author>
+  </entry>
+</feed>
