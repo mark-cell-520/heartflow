@@ -338,20 +338,20 @@ check('G 路由独立：econ_reasoning_gate 聚合层 + 插件层 analyze 双路
 });
 
 // ─── H. 登记纪律 ────────────────────────────────────────────────────────
-check('H VERSION / package.json / 兜底三点一致（6.8.178，本轮不 bump）', () => {
+check('H VERSION / package.json / 兜底三点一致（6.8.179，r314 落地随远端 r313 同步）', () => {
   const pkg = require(path.join(ROOT, 'package.json'));
-  assert.strictEqual(pkg.version, '6.8.178');
+  assert.strictEqual(pkg.version, '6.8.179');
   const v = require('node:fs').readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  assert.strictEqual(v, '6.8.178');
+  assert.strictEqual(v, '6.8.179');
 });
 
-check('H 接线在位：index.js require econ-reasoning-gate + 维度计数仍 251', () => {
+check('H 接线在位：index.js require econ-reasoning-gate + 维度计数仍 254', () => {
   const src = require('node:fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
   assert.ok(/require\('\.\/econ-reasoning-gate\.js'\)/.test(src), 'index.js 缺 econ-reasoning-gate 接线');
   assert.ok(/econ_reasoning_gate/.test(src), 'index.js 缺 econ_reasoning_gate 维度键');
   const { discriminate } = require(path.join(ROOT, 'src', 'index.js'));
   const d = discriminate('neutral baseline text');
-  assert.strictEqual(Object.keys(d.dimensions || {}).length, 251, '维度数变化（应仍 251）');
+  assert.strictEqual(Object.keys(d.dimensions || {}).length, 254, '维度数变化（应仍 254）');
 });
 
 check('H __internals 暴露 6 新腿常量 + 2 新豁免常量', () => {
