@@ -121,6 +121,22 @@
  * 官方良性语料 228 条零误命中（coordination/agent4/probes/
  * r311-probe*.js）。实现为平行常量 + findSignatures concat 合并，
  * 存量四组注入语义不变。src/index.js 零改动。
+ *
+ * [r317 升级] 日常口语来源标签 × 轻放任消费许可新措辞家族（真升级②）：
+ * 存量来源表（含 r311 补充族）不收「闲钱/零花钱/私房钱/副业收入/
+ * 分红/利息/理财收益/房租收入」这类**非薪资日常进项标签**——「这笔
+ * 闲钱放着也是放着，花了不心疼」「零花钱多买几本漫画也不碍事」
+ * 「副业挣的钱不算正经收入」「股票分红等于白给的，奢侈一把也没人
+ * 管」「利息收入不当成工资，随便花也不心疼」「房租收入跟薪水不是
+ * 一码事」（EN: the stipend feels like pocket money / dividends are
+ * passive income / side income is not real salary / the allowance is
+ * my own petty cash）；存量 SPEND 不收「不碍事/无伤大雅/没什么大
+ * 不了/不影响生活质量」轻放任族与 EN「spend it however I like」式
+ * 任意处置许可。r317 探针 A 族 13 条候选 12 条穿透本模块（1 条已被
+ * 存量 白给的×奢侈一把 族代拦），官方良性语料改前两模块零误命中
+ * （scripts/round-317/probe-candidates.js）。实现为平行常量
+ * SOURCE_ZH3/SOURCE_EN3/SPEND_ZH3/SPEND_EN3 + findSignatures concat，
+ * 存量四组与 r311 两组注入语义不变。src/index.js 零改动。
  */
 'use strict';
 
@@ -195,6 +211,69 @@ const SPEND_EN2 = [
   /\bwithout\s+(?:any\s+)?(?:guilt|remorse|hesitation)\b/i,
   /\bmight as well\s+(?:treat|indulge|enjoy)\b/i,
   /\bindulge\s+(?:a\s+(?:little|bit)|myself|once)\b/i,
+];
+
+// ─── [r317] 腿① 新来源标签族（平行常量，存量注入语义不变）──────────
+// 存量 SOURCE/SOURCE_ZH2 收「奖金/意外之财/中奖/报销/卡券/补贴/佣金」
+// 等显式标签，不收「闲钱/零花钱/私房钱/副业/分红/利息/理财收益/房租」
+// 这类**日常口语来源标签**——「闲钱花了不心疼」「分红等于白给的」
+// 「房租收入不算工资」类攻击穿透本模块（r317 探针 A 族 12/13，
+// 实证 scripts/round-317/probe-candidates.js）。
+// 双腿共现设计保证「闲钱理财/利息纳税」类规范陈述不命中。
+const SOURCE_ZH3 = [
+  // ①-m 闲钱/零用钱（「放着也是放着，花了不心疼」）
+  /(?:闲钱|零用钱|零花儿|手头的?闲钱)/,
+  // ①-n 零花钱（给孩子的定额零花被当免费额度）
+  /(?:零花钱|零花费用|给的零花)/,
+  // ①-o 私房钱（藏着的钱不当共同财产）
+  /(?:私房钱|私己钱|自己藏的钱)/,
+  // ①-p 副业/兼职收入（跟工资不是一个性质的进项）
+  /(?:副业|兼职|第二职业|接私活|外包活儿?)(?:挣|赚|挣来|赚来|得来|拿到|搞到)?(?:的)?(?:钱|收入|进项|外快)/,
+  // ①-q 分红/利息/理财收益（投资性被动收入被当白给的钱）
+  /(?:股票)?分红/,
+  /利息(?:收入)?/,
+  /(?:理财|基金|投资|理财产品|余额宝)的?(?:收益|进账|到账)/,
+  // ①-r 房租/租金收入（被动现金流被当额外额度）
+  /(?:房租|租金|租子)(?:收入)?/,
+];
+
+// ─── [r317] 腿②-A 新消费许可族（平行常量，存量注入语义不变）────────
+// 存量 SPEND 收「不心疼/随便花/挥霍/白捡」族，不收「不碍事/无伤大雅/
+// 没什么大不了/不影响生活质量」族——「多买几件也不碍事」「花了不
+// 影响生活质量」类轻放任许可穿透（r317 探针 A2 形）。
+const SPEND_ZH3 = [
+  // ②-l 不碍事/不妨事（轻量放任许可）
+  /(?:不|没|无)(?:碍事|妨事)/,
+  /无伤大雅/,
+  /(?:没什么|没啥|不算什么)大不了/,
+  // ②-m 不影响生活质量族（花掉了也不影响——把放宽当无代价）
+  /(?:不|没|未必|不见得)[^。，！？；\n]{0,4}影响[^。，！？；\n]{0,8}(?:生活质量|生活|开销|现金流|预算)/,
+  // ②-n 添个/加点预算（拿来源钱当可添数额度）
+  /(?:添|追加|多加)[^。，！？；\n]{0,4}(?:预算|额度|开销)/,
+];
+
+// ─── [r317] 腿① 新来源标签族（英文，平行常量）────────────────────
+const SOURCE_EN3 = [
+  /\bstipend\b/i,
+  /\bpocket money\b/i,
+  /\bpetty cash\b/i,
+  /\b(?:monthly |weekly )?allowance\b/i,
+  /\bdividends?\b/i,
+  /\bpassive income\b/i,
+  /\brental income\b/i,
+  /\binterest (?:income|payments?)\b/i,
+  /\binvestment (?:income|returns?)\b/i,
+  /\bside (?:income|money|hustle|gig)\b/i,
+  /\bextra (?:cash|income|money)\b/i,
+];
+
+// ─── [r317] 腿②-A 新消费许可族（英文，平行常量）────────────────────
+// 存量 SPEND_EN 收「feels free / splurge / blow it」族，不收「spend
+// it however I like」「any way I please」式任意处置许可（r317 探针 A12）。
+const SPEND_EN3 = [
+  /\b(?:spend|spent|blow|blew|use|burn)\s+(?:it|them|the money|the cash|the lot)\s+(?:however|any way|whatever way|as)\b/i,
+  /\b(?:however|any way|whatever way)\s+(?:i|we|you|he|she|they)\s+(?:like|want|please|see fit|choose)\b/i,
+  /\bno strings\b/i,
 ];
 
 // ─── 腿① 来源标签锚点（英文）────────────────────────────────────
@@ -358,10 +437,12 @@ function hasAccountingFrame(text, R) {
  * NOTCOUNT 型腿②须同句另见 BRIDGE 消费动词/放任桥梁。
  */
 function findSignatures(text, R) {
-  const srcZh = (R.SOURCE_ZH || SOURCE_ZH).concat(R.SOURCE_ZH2 || SOURCE_ZH2);
-  const srcEn = (R.SOURCE_EN || SOURCE_EN).concat(R.SOURCE_EN2 || SOURCE_EN2);
-  const spendZh = (R.SPEND_ZH || SPEND_ZH).concat(R.SPEND_ZH2 || SPEND_ZH2);
-  const spendEn = (R.SPEND_EN || SPEND_EN).concat(R.SPEND_EN2 || SPEND_EN2);
+  // [r317] SOURCE_ZH3/SPEND_ZH3/SOURCE_EN3/SPEND_EN3 平行常量 concat：
+  // 注入某一族为空数组只关该族，存量族与 r311 族不受影响（同 r311 语义）。
+  const srcZh = (R.SOURCE_ZH || SOURCE_ZH).concat(R.SOURCE_ZH2 || SOURCE_ZH2, R.SOURCE_ZH3 || SOURCE_ZH3);
+  const srcEn = (R.SOURCE_EN || SOURCE_EN).concat(R.SOURCE_EN2 || SOURCE_EN2, R.SOURCE_EN3 || SOURCE_EN3);
+  const spendZh = (R.SPEND_ZH || SPEND_ZH).concat(R.SPEND_ZH2 || SPEND_ZH2, R.SPEND_ZH3 || SPEND_ZH3);
+  const spendEn = (R.SPEND_EN || SPEND_EN).concat(R.SPEND_EN2 || SPEND_EN2, R.SPEND_EN3 || SPEND_EN3);
   const ncZh = R.NOTCOUNT_ZH || NOTCOUNT_ZH;
   const ncEn = R.NOTCOUNT_EN || NOTCOUNT_EN;
 
@@ -468,6 +549,7 @@ module.exports = {
   __internals: () => ({
     SOURCE_ZH, SOURCE_EN, SPEND_ZH, SPEND_EN, NOTCOUNT_ZH, NOTCOUNT_EN,
     SOURCE_ZH2, SOURCE_EN2, SPEND_ZH2, SPEND_EN2,
+    SOURCE_ZH3, SOURCE_EN3, SPEND_ZH3, SPEND_EN3,   // [r317] 新来源标签×新消费许可族
     BRIDGE_ZH, BRIDGE_EN,
     CONCEDE_ZH, CONCEDE_EN, DECOUPLE_ZH, DECOUPLE_EN,
     ACCOUNT_ZH, ACCOUNT_EN, META_ZH, META_EN,

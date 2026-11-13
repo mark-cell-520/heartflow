@@ -1,0 +1,450 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/EdEefPeb9NhAlw/H9WIyWp8vYjM</id>
+  <title>arXiv Query: search_query=all:anchoring OR all:effect OR all:effort OR all:justification OR all:p-hacking OR all:cognitive OR all:bias&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-13T10:01:22Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:anchoring+OR+(all:effect+OR+(all:effort+OR+(all:justification+OR+(all:p-hacking+OR+(all:cognitive+OR+all:bias)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>807541</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17337v1</id>
+    <title>The full Gaia colour-magnitude diagram with white dwarfs reveals a declining Milky Way star formation history</title>
+    <updated>2026-11-12T18:59:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17337v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17337v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>White dwarfs (WDs) provide a fossil record of the Milky Way star formation history (SFH) through the combined effects of stellar evolution and cooling. They have, however, generally been modelled in isolation from the non-degenerate population, so that no single self-consistent set of Galactic assumptions has been required to reproduce both. We present CALOMERA, a semi-analytic chemo-dynamical population synthesis framework in which the vertical density profiles of mono-age subpopulations are computed self-consistently with the Galactic potential and coupled to modern WD cooling sequences, metallicity-dependent progenitor lifetimes and synthetic photometry. We calibrate 18 parameters describing the initial mass function, SFH, initial-final mass relation and WD population against a Gaia DR3 sample of $7.98\times10^{6}$ stars within 1 kpc, including $1.1\times10^{5}$ WDs. The calibrated model reproduces the star counts in each colour-magnitude diagram region to within 3% and the total number count to within 0.5%, compared with the 81% excess in the predicted WD count obtained with the previous main-sequence-only calibration. The recovered SFH peaks early, declines exponentially thereafter, and includes two recent bursts, located at $τ\approx2.4$ and $0.5$ Gyr. Three cooling libraries (Montréal, BaSTI and LPCODE) yield comparably good fits, with differences confined to ${\rm M_G}\gtrsim15$ mag. The predicted luminosity function is in reasonable agreement with the 100 pc Gaia WD sample. We further predict the Galactic WD distribution and differential number counts for surveys of varying depth. Extending the framework to the substellar regime using ATMO models, we predict the Galactic L, T, and Y dwarf populations and their contribution to the deep JWST fields.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:56Z</published>
+    <arxiv:comment>Submitted to MNRAS, 20 pages main text + 4 pages appendix, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>K. Sysoliatina</name>
+    </author>
+    <author>
+      <name>Akash Vani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17336v1</id>
+    <title>Back to Pixels: Lifting Latent Video Diffusion into Pixel Space</title>
+    <updated>2026-11-12T18:59:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.17336v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17336v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier video generation models work in a VAE latent space that compresses video in both space and time. This compression made training tractable, but now limits high-resolution, controllable, and interactive generation -- doubling resolution quadruples token count, conditions apply to groups of frames rather than individual ones, and each response must wait for the rest of its multi-frame block. We present PixVid, a simple yet effective method that lifts a pretrained latent video model to directly generate every frame in pixel space. PixVid keeps the diffusion transformer and replaces the VAE decoder with a convolutional head that renders its outputs into pixels. We find that predicting clean video rather than velocity, together with a larger noise shift, is key to quality. Finetuned from Wan2.1-14B, PixVid is competitive with the latent baseline within $\sim 1.3$M training clips. Working framewise in pixels, it generates at $2\times$ higher resolution with the same per-frame token count, keeps depth-conditioned video editing aligned under fast motion, and responds to each action at the next frame. Project page: https://chenshuo20.github.io/PixVid/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:55Z</published>
+    <arxiv:comment>Project Page: https://chenshuo20.github.io/PixVid/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yanke Song</name>
+    </author>
+    <author>
+      <name>Shuo Chen</name>
+    </author>
+    <author>
+      <name>Chris Rockwell</name>
+    </author>
+    <author>
+      <name>Guande He</name>
+    </author>
+    <author>
+      <name>Nan Liu</name>
+    </author>
+    <author>
+      <name>Desai Xie</name>
+    </author>
+    <author>
+      <name>Tianpei Gu</name>
+    </author>
+    <author>
+      <name>Yong-Hyun Park</name>
+    </author>
+    <author>
+      <name>Aryan V S</name>
+    </author>
+    <author>
+      <name>Dennis Yuren Menn</name>
+    </author>
+    <author>
+      <name>Ming-Hsuan Yang</name>
+    </author>
+    <author>
+      <name>Xun Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17334v1</id>
+    <title>Unbundling Multimodal Vision Encoding</title>
+    <updated>2026-11-12T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17334v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17334v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How multimodal language models should encode visual input remains up for debate. Most models use a pretrained vision encoder, while some recent recipes train the encoder from scratch with the language model or remove it entirely. Vision encoders bundle together three design choices: a visual prior from upstream pretraining, dedicated vision capacity, and pre-fusion placement of that capacity (i.e., before the multimodal backbone). Because published models also differ in data, architecture, and compute, comparing them cannot isolate the effect of each choice. We disentangle these choices via a controlled framework where we pretrain all models from scratch on common data and compare them on visual question answering and language benchmarks at matched lifetime compute. We find that the visual prior is not necessary; an encoder trained jointly from scratch is on par with a pretrained one, without a separate training stage. What matters instead is dedicated vision capacity: an encoder-free model trails on visual understanding even when its backbone is enlarged by the encoder's parameter count. Yet that capacity need not precede multimodal fusion, as vision-only modules added in-fusion to early backbone layers perform comparably to a pre-fusion encoder and can lower time to first token. These results also hold across backbone sizes, when encoder pretraining is treated as free, and when starting from a pretrained language model. Overall, our findings favor dedicated vision capacity trained jointly with the backbone and placed early within it.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:54Z</published>
+    <arxiv:comment>Project page: https://unbundling.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ellis Brown</name>
+    </author>
+    <author>
+      <name>Chris Hoang</name>
+    </author>
+    <author>
+      <name>Shengyi Qian</name>
+    </author>
+    <author>
+      <name>Shang-Wen Li</name>
+    </author>
+    <author>
+      <name>Mike Lewis</name>
+    </author>
+    <author>
+      <name>Marjan Ghazvininejad</name>
+    </author>
+    <author>
+      <name>Luke Zettlemoyer</name>
+    </author>
+    <author>
+      <name>Lucas Beyer</name>
+    </author>
+    <author>
+      <name>Mengye Ren</name>
+    </author>
+    <author>
+      <name>Jakob Verbeek</name>
+    </author>
+    <author>
+      <name>Saining Xie</name>
+    </author>
+    <author>
+      <name>Hu Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17333v1</id>
+    <title>Discrete Time Crystals from Anti-Unitary Floquet Driving and Dynamical Freezing</title>
+    <updated>2026-11-12T18:59:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17333v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17333v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show anti-unitary periodic drive paves a direct path for stabilizing a Discrete Time-Crystal by Dynamical Freezing (DF). The magnetization appears as an emergent conserved operator, and an exact pairing of two-cycle quasi-energies pins the subharmonic response. DF keeps the effective Hamiltonian $\textit{quasi-local}$; infinite-chain simulations show no detectable decay for a generic state with any finite magnetization. We outline an experimental realization of the anti-unitary drive.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:53Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Anirban Das</name>
+    </author>
+    <author>
+      <name>Asmi Haldar</name>
+    </author>
+    <author>
+      <name>Arnab Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17330v1</id>
+    <title>ProtoVis-Nav: Prototypical Visual Imagination for Visual-Spatial Aligned UAV Navigation</title>
+    <updated>2026-11-12T18:59:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.17330v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17330v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision language navigation (VLN) is very challenging for Unmanned Aerial Vehicles (UAVs) since small errors in 3D motion prediction can lead to navigation errors and collisions. Unable to fathom execution outcomes in 3D environments, existing methods often struggle to predict accurate navigation waypoints from language instructions. To solve this, we introduce the Prototypical Visual Imagination framework, shortened as ProtoVis-Nav, which forces the model to imagine an outcome-associated local visual representation for the intended next UAV movement. Specifically, we predict feature prototypes and use their linear combination to estimate the visual feature of the target region. In this manner, the VLN model first imagines the local visual representation of the next intended location, and then uses predicted prototypes as context for generating the final action, promoting alignment between visual context and waypoint outputs. Extensive experiments demonstrate the effectiveness of the ProtoVis-Nav framework and show substantial improvements over existing baselines.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:49Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Guangyuan Sui</name>
+    </author>
+    <author>
+      <name>Yunzhong Hou</name>
+    </author>
+    <author>
+      <name>Chi Harold Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17320v1</id>
+    <title>Learning When Diffusion Language Models Should Regenerate</title>
+    <updated>2026-11-12T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.17320v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17320v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Remasking allows diffusion language models to revisit generated text, but effective correction requires knowing when and what to revise. Our diagnosis on Sudoku reveals two gaps. Hidden states contain error information that token confidence does not reliably expose, and remasking an isolated error usually reproduces it when the surrounding context remains fixed. These findings motivate DiVR , a verifier that predicts whether a partially generated sequence will reach a correct answer. Trained on the final correctness of the model's own trajectories, DiVR decides when to regenerate a block and which alternative to retain, while the generator itself stays unchanged. On five reasoning benchmarks with LLaDA-8B-Base, DiVR raises the average accuracy of the fine-tuned generator from 35.3\% to 43.4\% at $1.9$-$3.5\times$ the cost of greedy decoding, above search baselines that use $3.8$-$7.4\times$. It also complements post-training such as supervised fine-tuning and reinforcement learning, and generalizes to other generators, including Dream.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:50Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Minhae Oh</name>
+    </author>
+    <author>
+      <name>Jeonghye Kim</name>
+    </author>
+    <author>
+      <name>Jinwoo Koo</name>
+    </author>
+    <author>
+      <name>Yeongoon Kim</name>
+    </author>
+    <author>
+      <name>Jimin Seo</name>
+    </author>
+    <author>
+      <name>Minsik Seol</name>
+    </author>
+    <author>
+      <name>Jungwoo Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17316v1</id>
+    <title>CoReMem: Cost-Internalizing Memory for Successive Coding Tasks with Prospective Valuation</title>
+    <updated>2026-11-12T18:58:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17316v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17316v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents tackle successive tasks on an evolving repository, carrying forward edits and writing memory before the next task is known. Selecting memory for unknown next tasks requires balancing future usefulness against the costs of writing and reading it. The actor must also decide when acting on available memory saves effort as the task unfolds. We introduce Coding-Repository Memory (CoReMem), a cost-internalizing framework that guides memory design and actor adaptation through measured memory value on the next task. Prospective segment valuation compares runs of the next task with and without individual trajectory segments from the same inherited repository state, guiding a compact memory built around anchors: repository locations and executable checks. Actor adaptation estimates on-policy memory value within rollout groups with and without memory, using a reward that prioritizes resolution and penalizes step count in successful runs. Provenance-gated value credit assigns the additional value term to steps identified as using memory-supplied anchors, while every step retains outcome credit. On ChainSWE, CoReMem raises the 27B actor's resolve rate from 21.0% to 25.7%, with 17% fewer steps and 11% fewer total cache-aware tokens, including memory-module calls, relative to the untrained actor model without memory.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:22Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peiwen Li</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Harshit Verma</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Sophia Zhou</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Haiwen Wang</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Ngoc Bui</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Heng Chang</name>
+      <arxiv:affiliation>Tsinghua University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Fei Fei</name>
+      <arxiv:affiliation>Goodvision AI</arxiv:affiliation>
+    </author>
+    <author>
+      <name>David van Dijk</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Rex Ying</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17310v1</id>
+    <title>Quantum Metrology and Quantum Battery in a Hyperfine-Coupled Spin System</title>
+    <updated>2026-11-12T18:56:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.17310v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17310v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate multiparameter quantum metrology and the energetic properties of an effective electron--proton spin system inspired by the hyperfine structure of the hydrogen atom. Considering the external magnetic field $\mathcal B$ and the hyperfine coupling strength $Λ$ as unknown parameters, we derive the quantum Fisher information matrix and establish the corresponding quantum Cramér--Rao bounds for their simultaneous estimation. We analyze the estimation precision and the correlations between the two parameters, showing that the weak-commutativity condition is satisfied despite the noncommutativity of the associated symmetric logarithmic derivatives. Independently, we explore the energetic properties of the system under a unitary charging protocol, characterizing its ergotropy, anti-ergotropy, storage capacity, and energy-basis coherence. We investigate the dependence of these quantities on the magnetic field, hyperfine coupling, temperature, and charging time. Our results provide a comprehensive characterization of the metrological properties and energetic performance of a hyperfine spin-based quantum system, highlighting its potential as a platform for quantum sensing and energy storage.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:57Z</published>
+    <arxiv:comment>14 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Omar Bachain</name>
+    </author>
+    <author>
+      <name>Mohamed Amazioug</name>
+    </author>
+    <author>
+      <name>Rachid Ahl Laamara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17308v1</id>
+    <title>Quantifying structural stability of transparent models for general insurance pricing</title>
+    <updated>2026-11-12T18:56:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17308v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17308v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The short duration of general insurance contracts leads to rapid distributional shifts in the data, warranting regular model updates. This process may yield a post-update model that differs considerably from the pre-update model in both predictions and structure. Structural stability is upstream of predictive stability, yet existing structural stability metrics are mostly restricted to simple decision trees. Thus, we first introduce the notion of functional transparency, characterising models with a prediction function that can be expressed as a sum of univariate functions for main effects and bivariate functions for pairwise interactions. Then, we propose the Mean Squared Shape function distance, a metric to quantify the structural stability of functionally transparent models, which are particularly relevant in actuarial science. Using three public auto insurance datasets, we present a benchmark study to demonstrate the usefulness of our metric in identifying a stable and accurate transparent model. Generalised linear models with centred numerical covariates are stable, and explainable boosting machines (EBMs) offer a compromise between stability and performance. We also find that stabilisation strategies, such as sequential modelling and fixed hyperparameters, can substantially improve stability for both EBM and XGBoost models, with negligible impact on performance.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:54Z</published>
+    <arxiv:comment>16 tables and 9 figures</arxiv:comment>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Félix Côté</name>
+    </author>
+    <author>
+      <name>Marie-Pier Côté</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17304v1</id>
+    <title>Where LLM Agents Get Stuck Debugging Databases: Access More Than Reasoning</title>
+    <updated>2026-11-12T18:56:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17304v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17304v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) coding agents are increasingly asked not only to write code but to debug running systems from live runtime data. We report a field observation of one such agent (Claude Code) as it diagnosed eight database incidents in a production message-dispatch engine. In every incident whose root cause depended on runtime concurrency, the agent announced a cause, shipped a fix, and later walked it back, and each wrong guess cost a deploy-and-observe cycle. Mapping each incident to what the agent lacked, we find that access to production state was the most pervasive bottleneck. The missing access included live lock views, untruncated deadlock reports, read-only execution, and an explicit environment context. An access gap was present in all five concurrency-dependent incidents: alone in one, and in four combined with a reasoning error such as anchoring on an early cause, incomplete exploration of the configuration, or a misreading of the code's transaction semantics. The three incidents that did not depend on concurrency needed nothing beyond what the agent already had. Within the incidents, the agent's wrong hypotheses were consistent with the evidence it could see; they were not fabrications. We argue that the next step for production-debugging agents is a forensics layer that gives the agent the access it lacks inside existing security controls. Such a layer would combine a safe interrogation API, a lock-and-deadlock flight recorder, and a production replay harness.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:22Z</published>
+    <arxiv:comment>12 pages, 2 figures, 2 tables. Submitted to the Journal of Systems and Software</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Gustavo Pinto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17301v1</id>
+    <title>DiSKO: Distribution Steering for Nonlinear Systems using the Koopman Operator</title>
+    <updated>2026-11-12T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17301v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17301v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper studies the problem of data-driven covariance steering for stochastic, nonlinear dynamical systems. We utilize Koopman operator theory to learn, directly from data, an approximate linear representation of the nonlinear dynamics in a lifted space of observable functions of the state. By exploiting this linear model, we design controllers for the mean and covariance of the underlying nonlinear system by utilizing linear distribution steering algorithms. To account for approximation errors in the learned dynamics and the ambiguity in the disturbance distribution induced in the lifted space, we formulate the problem as a distributionally robust covariance steering problem. Furthermore, we leverage a deep neural network (DNN) to simultaneously learn the Koopman observables and the linear model parameters, thus eliminating the need for manual observables basis selection while also reducing the dimensionality of the lifted representation. Additionally, we can promote desirable model properties, such as stability, during DNN training. We demonstrate the effectiveness of the proposed framework via numerical simulations.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:31Z</published>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Dimitrios Moustroufis</name>
+    </author>
+    <author>
+      <name>Panagiotis Tsiotras</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17299v1</id>
+    <title>Simulation-Based Priors and BAO Shifts from the Lyman-$α$ Forest at the Field Level</title>
+    <updated>2026-11-12T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17299v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17299v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an analytic forward model for the Lyman-alpha (Ly-alpha) forest flux field based on cubic-order large-scale structure perturbation theory (effective field theory) calculations. We validate our cubic model on two sets of hydrodynamic simulations spanning $2 \leq z \leq 4$: the small-volume CAMELS suite, which spans a wide range of cosmological and astrophysical parameters, and the large-volume, high-resolution Sherwood simulations. We find qualitatively similar results for both at the power-spectrum level. The perturbative model reproduces the three-dimensional flux power spectrum of the simulations to $\sim 5\%$ down to $k \simeq 1$-$1.5\,h\,{\rm Mpc}^{-1}$, depending on the redshift. This improves compared to previous quadratic perturbative forward models by up to 40%. Exploiting cosmic-variance cancellation in the field-level approach, we carry out precision measurements of the Lyman-alpha forest bias parameters from the CAMELS simulation suite. We use these measurements to analytically predict the shifts in the Baryon Acoustic Oscillations (BAO) scaling parameters induced by nonlinearities in the three-dimensional Lyman-alpha forest clustering as a function of cosmological parameters. We find sub-percent shifts in both the radial and transverse directions with a noticeable dependence on cosmology and redshift. Finally, from the field-level fits we construct simulation-based priors that can be used for cosmological analyses of the Lyman-alpha forest with the currently observing Dark Energy Spectroscopic Instrument (DESI). In addition, our cubic model captures the connected four-point function (trispectrum) of the forest, which opens up novel opportunities for accurate covariance matrix estimation for DESI and its successor, DESI-II.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:10Z</published>
+    <arxiv:comment>16+15 pages, 8+3 figures, 0+2 tables (main text + appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Divij Sharma</name>
+    </author>
+    <author>
+      <name>Roger de Belsunce</name>
+    </author>
+    <author>
+      <name>Mikhail M. Ivanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17294v1</id>
+    <title>Metal Sandbox: Isolated Execution and Command Scheduling for GPU Coding Agents on Apple Silicon</title>
+    <updated>2026-11-12T18:54:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.17294v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17294v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-device inference requires kernels that make effective use of local accelerators. Efficient training and evaluation of models that generate Apple Metal kernels benefit from native macOS tools and concurrent agent sessions. These sessions alternate between model requests, development commands, and GPU execution, leaving GPU capacity idle for much of a rollout. We present Metal Sandbox, infrastructure that combines restricted per-instance file access, native command execution, and command-level scheduling across interconnected Macs. Each agent retains its workspace and private development environment. Parallel commands can run concurrently, while serial commands share one execution slot per node; eligible waiting commands can migrate to available Macs and return results to the original agent. Integration with Harbor supports task execution, automatic verification, and rollout collection through a common workflow. Controlled experiments on four Mac mini M4 nodes achieve $1.68\times$--$2.05\times$ gains in command throughput under concentrated demand. Sixteen static agent traces give an estimated $2.14\times$ sustained-throughput gain for four sessions per node versus one, assuming continuously replenished sessions and unchanged mean durations. Replaying these measured traces under dynamic scheduling reduces mean tool waiting by 18.8% and batch elapsed time by 22.3%, assuming unchanged phase durations. Metal Sandbox and its Harbor integration are open-source on GitHub.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:42Z</published>
+    <arxiv:comment>16 pages, 7 figures, 5 tables. Code available at https://github.com/WangHaoZhe/metal-sandbox and https://github.com/WangHaoZhe/harbor</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Haozhe Wang</name>
+    </author>
+    <author>
+      <name>Lina Chen</name>
+    </author>
+    <author>
+      <name>Fanqi Wan</name>
+    </author>
+    <author>
+      <name>Qi Han</name>
+    </author>
+    <author>
+      <name>Yinmin Zhang</name>
+    </author>
+    <author>
+      <name>Zheng Ge</name>
+    </author>
+    <author>
+      <name>Daxin Jiang</name>
+    </author>
+    <author>
+      <name>Junchi Yan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17279v1</id>
+    <title>On stimulated scattering including harmonic generation in an unmagnetized pair plasma for arbitrary pump strengths</title>
+    <updated>2026-11-12T18:50:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17279v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17279v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A fully nonlinear analysis for the growth rate of the stimulated backscatter instability of an intense electromagnetic (EM) wave with arbitrary polarization in an unmagnetized pair plasma is presented. The connection of this instability to the FEL process is discussed and utilized. An intense EM wave causes an initially stationary pair plasma to drift forward with a speed near the speed of light. The resulting distribution function for both cold and warm pair plasmas is presented. It is shown that the frequency of the reflected light is thus Doppler downshifted from that of the incident wave. For a linearly polarized EM wave there is also an additional contribution to the forward drift at its second harmonic which leads to backscattered light at all odd harmonics of the Doppler downshifted frequency for sufficiently cold pair plasmas. Fully nonlinear particle-in-cell simulations confirm the theoretical growth rates and show how the instability depends on the pair plasma temperature. The effect of the intensity profile of the incoming EM wave as well as implications for astrophysical pair plasmas is discussed.</summary>
+    <category term="physics.plasm-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:50:51Z</published>
+    <arxiv:primary_category term="physics.plasm-ph"/>
+    <author>
+      <name>Vijay Patel</name>
+    </author>
+    <author>
+      <name>Thomas Grismayer</name>
+    </author>
+    <author>
+      <name>Samuel Sebastian</name>
+    </author>
+    <author>
+      <name>Xinlu Xu</name>
+    </author>
+    <author>
+      <name>John Palastro</name>
+    </author>
+    <author>
+      <name>Paulo Alves</name>
+    </author>
+    <author>
+      <name>Warren B. Mori</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17268v1</id>
+    <title>Observation of Genuine Multi-Time Quantum Memory</title>
+    <updated>2026-11-12T18:46:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.17268v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17268v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Memory effects in open quantum systems do not by themselves imply quantum memory, since non-Markovian dynamics can often be reproduced by classical-memory models. Known criteria certify the presence of quantum memory in the environment by comparing the evolution of the system at two different times. We show that quantum memory can remain hidden from all such pairwise tests and become detectable only when three or more times are considered jointly. We derive an analytical three-time witness and use it to certify quantum memory in a minimal qubit example in which every pair of times has a classical-memory explanation, thus establishing a strict hierarchy of quantum memory effects. Genuine multi-time quantum memory does not rely on fine-tuned time-dependent Hamiltonians or gate-based evolution. We experimentally demonstrate the hierarchy of quantum memory in a time-continuous realization on a superconducting-qubit platform with time-independent couplings.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:46:04Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Konstantin Beyer</name>
+    </author>
+    <author>
+      <name>Valentin Link</name>
+    </author>
+    <author>
+      <name>Surihan Sean Borjigin</name>
+    </author>
+    <author>
+      <name>Qian Cao</name>
+    </author>
+    <author>
+      <name>Orion Lee</name>
+    </author>
+    <author>
+      <name>Kater Murch</name>
+    </author>
+    <author>
+      <name>Igor Pikovski</name>
+    </author>
+    <author>
+      <name>Philip Taranto</name>
+    </author>
+  </entry>
+</feed>
