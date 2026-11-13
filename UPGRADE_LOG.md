@@ -1,3 +1,44 @@
+## r314 — 现时偏差（present_bias）+ 禀赋效应（endowment_effect，econ_reasoning_gate 聚合族）「拖延许可×活在当下宣言×未来自我料理 / 情义无价×我的就是更好的」新措辞家族（真升级②；原认领 r312，同步轮占用 r312/r313 撞号重编号）
+
+**日期** 2026-11-13 08:37–09:40 CST（原轮次产能）＋ 11:37 CST 起落地收尾（撞号重编号／四门禁复跑／全量 run-all／推送）  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r311 先例）  **轮次** r314（kind: dimension；原认领 r312 撞号重编号，claims 认领行已改轮次并加注）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate，插件层 `src/plugins/econ-reasoning-check/index.js` 同模块双路可达）
+
+### 撞号重编号与基线门禁（fix 性质，非升级）
+
+同步轮（HeartFlow Cron）在本轮认领活跃期（claim_at 2026-11-13T00:38:24Z，6h 有效期）内占用了 r312/r313 两个轮次号：d80edf6「r312 land probability_neglect(253)/vivid_case_availability(252) wiring + law-of-small-numbers perpetual leg + doc debt」与 d786367+5c1af72「r313 zero_price_effect 第 254 维度，VERSION 6.8.178→6.8.179」。按掉线恢复铁律与撞号纪律（r277→r278 先例：重编号本地未推送工作），本轮七个未推送 commit 全部重编号为 r314：test/round-312-*→test/round-314-*、scripts/round-312/→scripts/round-314/（探针目录被 .gitignore `scripts/round-31*/` 覆盖，按 r308/r309 先例 `git add -f` 入库）、claims 认领行改轮次并加注、UPGRADE_LOG 本条改号；原 fix commit（ce8dcb9：README/SKILL 测试数 21,777→21,798 补正）的实质已由远端 d80edf6/5c1af72 的文档数字债清偿完成（远端现值 254 维 / 21,798 passing / v6.8.179），不再重复提交，其未竟事项——README/SKILL/缓存未反映盘上 r313 三轮测（31+79+51）与 r314 轮测（263）——由本轮全量 run-all 实测后统一同步（见落地收尾段）。另：工作树遗留两处同步轮未提交痕迹（src/dev-exemptions.js 删除第 191 轮 RESTORE_DEFER_TALK 否决闸的未提交 diff、src/.r191-defer-talk-probe.js 未跟踪探针），已分别恢复至 HEAD 与移出仓库，HEAD 与远端对该文件内容一致，无信息损失。
+
+### 缺口实证（scripts/round-314/probe-candidates.js，v6.8.178 动手前）
+
+- **present_bias**：存量 NOW/LATER 双腿族不收「拖延许可×活在当下宣言×未来自我料理」新措辞——「下次一定/改天再说/等双十一买完再开始/车到桥头自然直/相信后人的智慧/儿孙自有儿孙福」（LATER 侧）与「能玩一天是一天/趁年轻及时行乐/YOLO/live for today/seize the day/might as well enjoy/I'll start tomorrow/starting Monday/cross that bridge」（NOW 侧）。25 条候选 **20 条穿透本模块**（5 条被存量腿代拦：从下个月再开始+今天这根、今朝有酒+以后再说、趁现在活得痛快+谁管明天、can wait+right now、deal with it later）。
+- **endowment_effect**：存量 OWN/INFLATE/REFUSE 族不收「亲手做的/咱家的/我看着长大的/祖祖辈辈传下来的」（OWN 侧）、「千金不换/什么都替代不了/irreplaceable to me/no price could ever be enough」（INFLATE 侧）、「不是钱的事/不是钱能衡量的/not for all the money/would not trade it/cannot put a price on」（REFUSE 侧）。12 条候选 **6 条穿透**（3 条英文全穿透，3 条中文穿透）。
+- 官方良性语料 378 条（gate-97 97 + extended 106 + vertical 150 + mixed 25，探针按文件去重后 369）两模块改前改后均零误命中。
+
+### 改了什么（src/present-bias.js + src/endowment-effect.js，均为平行常量 + findSignatures concat 合并，0 删除存量逻辑，src/index.js 零改动）
+
+- **present-bias.js**：NOW_ZH2（一天是一天族/趁X及时行乐/先X了无前缀形/时间词+先自己X 四元素）、NOW_EN2（YOLO/live for today/seize the day/carpe diem/enjoy it while I can/while we are young/might as well/this weekend party 八元素）、LATER_ZH2（拖延口头禅动词版/光秃版/等X再Y/车到桥头/相信后人/儿孙福/到时候 七元素）、LATER_EN2（I'll start tomorrow/Starting Monday/next time for sure/I'll save after/who cares/cross that bridge 六元素）四支新腿，findSignatures 的 langs 数组同点 concat。
+- **endowment-effect.js**：OWN_ZH2（亲手做的/咱家的·自己家的/我看着长大的/祖祖辈辈传下来的）、OWN_EN2（built it from nothing/from scratch/I watched it grow up）、INFLATE_ZH2（千金不换/什么都替代不了）、INFLATE_EN2（irreplaceable to me/no price could ever be enough）、REFUSE_ZH2（不是钱的事/不是钱能衡量的，与存量 REFUSE 同构走 useNeg=false，否则被 NEG_INSIDE 的「不是」自毙）、REFUSE_EN2（not for all the money/would not trade it/cannot put a price on）六支新腿，findSignatures 同点 concat。
+- **元素瘦身**（三批，全部实测删除后无攻击翻红才删）：① 今朝有酒今朝醉谚语形被存量 NOW_ZH 正则①（今朝+≤8字+享乐动词「酒」）代拦；② 情义无价/感情无价被存量 INFLATE_ZH「无价」代拦、拿/给什么都换不来被存量「换不来/买不走」代拦、money cannot buy 被存量 INFLATE_EN[6] 代拦；③ OWN_EN2 from nothing 与 built from nothing 重叠改 from scratch 专项、LATER_EN2 my future self can handle 被存量 future me|self 代拦、拖延口头禅动词版/光秃版拆两元素、NOW_ZH2 先X族拆无前缀形/时间词窗口形两元素。最终 **41 个新元素**（PB 25 + EE 16）逐一有隔离样本。
+- 存量键注入语义不变（数组注入=整体替换）；存量测试 present-bias 14/14、endowment-effect 14/14、loss-aversion 18/19（1 失败为存量负例注入断言 NO_BOTH 形，r314 未触碰该模块，待 1 号定性）复跑同分。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-314-procrastination-inflate-legs.test.js` | **263 通过 / 0 失败**（A gate 归因 70 + B 模块直调 66 + C 良性 34 + D 存量回归 8 + E 常量级注入 10 + F 元素级注入 83 + G 入口双路 8 + H 登记纪律 15；F 组含 41 元素逐一隔离断言） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 PASS，判别维度 251**（原轮次实测；r314 落地基座为远端 254 维，落地复跑见落地收尾段） |
+| `test/doc-numbers-accuracy.test.js` | **24 通过 / 0 失败**（r314 落地收尾后复绿，见落地收尾段） |
+| `scripts/bidirectional-guard.js` | **召回=52/52 误拦=302/326**（与基线逐条一致，零新增误伤） |
+| 全量 run-all（JOBS=4） | 见落地收尾段（r314 当日补记；输出整段重定向到文件，杜绝 tail 管道截断） |
+| 官方良性语料 | 378 条两模块直调零误命中（探针去重 369） |
+| 负例 | 注入 51 个（10 常量级 + 41 元素级）→ 51 个按设计变红，0 个未变红；另 2 个存量注入（NOW_ZH=[]/OWN_ZH=[]）存量攻击按设计翻红 |
+| 海外扫描 | arXiv/GitHub/S2 三源空返（既有形态噪声），按既有形态自建，无编造命中 |
+
+### 踩坑（三条）
+
+1. **旧贮藏误弹**：调试存量行为时运行了 `git stash pop`，把 r308 时期有意保留的 `stash@{0}: On main: r308-superseded-worktree` 弹进工作树，造成 6 个文档文件 UU 冲突。已用 `git checkout HEAD --` 逐文件恢复（`git reset --hard` 在 cron 模式被审批拦截），r308 贮藏条目保留未动。教训：本共享工作树里**绝不运行裸 `git stash pop`**——stash 列表先 `git stash list` 核对。
+2. **候选元素与存量腿冗余必须逐个实证**：三轮瘦身共删 6 个候选元素，全部靠「删除后实测无攻击翻红 + element-fire.js 逐条归因」确认，不靠肉眼看正则像不像。最典型的是「今朝有酒今朝醉」——肉眼看是新谚语形，存量 NOW_ZH 正则①的「今朝+有酒（酒即享乐动词）」早已代拦。
+3. **REFUSE2 腿的否定语义**：「不是钱的事/不是钱能衡量的」自身含否定词，其否定正是「拒绝以钱衡量」语义的组成部分，与存量 REFUSE 同构走 useNeg=false，否则被 NEG_INSIDE 的「不是」自毙。
+
 ## r313 — 零价格效应第 254 维度 zero_price_effect 落地（真升级①）
 
 **日期** 2026-11-13 10:34–11:05 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.178 → 6.8.179  **轮次** r313（kind: dimension）  **约束** 承接 r311/r312/r313 三轮未提交产能的落地收尾——盘上已接第 254 维但零 commit；按引用纪律（r227）先补齐被引用而不存在的测试/探针文件，再验证，再提交。
