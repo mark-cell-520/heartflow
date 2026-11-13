@@ -298,7 +298,6 @@ const ENDORSE_ZH2 = [
 
 // ─── [r320] 腿① 专业/公共部门按计数考核（英文）──────────────────
 const INCENTIVE_EN2 = [
-  /\b(?:paid|pay|pays|paying)\s+(?:per|by\s+the)\s+(?:visit|procedure|surgery|operation|patient|admission|bed|case|paper|publication|project|grant|arrest|citation|fine)\b/i,
   /\b(?:bonus|pay|incentive|compensation|salary)\s+(?:tied|linked|pegged|based|keyed)\s+(?:to|on)\s+(?:the\s+)?(?:number|count|volume)\s+of\s+(?:visits?|procedures?|surgeries|papers?|publications?|arrests?|citations?|fines?|cases?|projects?)\b/i,
   /\b(?:assessed|evaluated|judged|ranked|measured|rewarded|promoted)\s+(?:on|by)\s+(?:the\s+)?(?:number|count|volume)\s+of\s+(?:papers?|publications?|citations?|arrests?|fines?|cases?|projects?|grants?|visits?|procedures?)\b/i,
   /\b(?:arrest|fine|citation|ticket|stop)\s+quotas?\b/i,
@@ -308,14 +307,14 @@ const INCENTIVE_EN2 = [
 // ─── [r320] 腿② 数量压倒质量的反向行为（英文）────────────────────
 const GAMING_EN2 = [
   // 医疗：过度诊疗/能不做手术也开刀/能出院也留
-  /\bover[- ]?(?:treated|treatment|prescrib\w+|medicat\w+|order\w+|diagnos\w+|test\w+|operat\w+|admit\w+|hospitaliz\w+)\b/i,
+  /\bover[- ]?(?:treated|treatment|prescrib\w+|medicat\w+|order(?:s|ed|ing)?|diagnos\w+|test\w+|operat\w+|admit\w+|hospitaliz\w+)\b/i,
   /\b(?:order|ordered|ordering|prescrib\w+|ran|perform\w+|do|did)\s+(?:a\s+)?(?:batter(?:y|ies)|bunch|series|string|tons?)\s+of\s+(?:tests?|scans?|procedures?|surgeries)\b/i,
   /\b(?:operat\w+|surgery)\s+(?:on\s+)?(?:patients?|people)?\s*(?:anyway|regardless|who\s+(?:do|did)(?:n'?t|\s+not)\s+need|when\s+conservative\s+care)\b/i,
   /\b(?:keep|kept|extend|extended)\s+(?:patients?|them)\s+(?:hospitalized|in\s+the\s+hospital|longer\s+than\s+needed)\b/i,
   /\b(?:admit|admitted|admitting|hospitaliz\w+)\s+(?:patients?|people)?\s*(?:who\s+(?:do|did)(?:n'?t|\s+not)\s+need|unnecessarily)\b/i,
   // 执法：专挑外地车/能警告也拘留/罚款配额
   /\b(?:target(?:ed|ing)?|pick(?:ed|ing)?\s+out|stopping|pulling\s+over)\s+(?:out[- ]of[- ](?:town|state)|passing|tourist|foreign)\s+(?:cars?|drivers?|plates?|vehicles?)\b/i,
-  /\b(?:arrested|detained|fined|impounded|booked)\s+(?:people|them|folks)?\s*(?:who\s+could\s+(?:have\s+been\s+)?(?:warned|let\s+off|talked\s+down)|just\s+to\s+(?:hit|meet|boost|pad))\b/i,
+  /\b(?:arrest|arrested|detain|detained|fine|fined|impound|impounded|book|booked)\s+(?:people|them|folks|drivers?|suspects?|residents?)?\s*(?:who\s+could\s+(?:have\s+been\s+)?(?:warned|let\s+off|talked\s+down)|just\s+to\s+(?:hit|meet|boost|pad))/i,
   /\b(?:ticket|ticketing|fine|fining|citation|arrest)\s+(?:quota|drive)\b/i,
   // 学术：一研究拆多篇/重复投稿/一项目包装成多个
   /\b(?:split|sliced|salami[- ]sliced|padded|fragmented|chopped)\s+(?:one|a\s+single|the\s+same)\s+(?:study|experiment|dataset|paper|finding)\s+into\s+(?:several|multiple|many|five|three)\s+(?:papers?|publications?)\b/i,
