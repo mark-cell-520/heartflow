@@ -1,3 +1,37 @@
+## r318 — 锚定效应（anchoring_effect，econ_reasoning_gate 聚合族）「默认值/预设值/模板默认/初始参数」新锚点域新措辞家族（真升级②，r317 探针 C 族缺口落地）
+
+**日期** 2026-11-13 20:10–20:50 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r317 先例）  **轮次** r318（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "anchoring effect default value numeric anchor decision" → arXiv 403 条 XML（空返命中）/ GitHub / S2 各返结果（coordination/agent4/scout/20261113-122835），按既有形态自建
+
+### 缺口实证（scripts/round-317/probe-candidates.js C 族 + scripts/round-318/probe-default-anchor.js，动手前 pristine 基座）
+
+- 存量 `anchoring_effect` 双腿族：ANCHOR_ZH/EN 只收**价格锚词**（标价/挂牌价/原价/开价/list price/sticker），META_ANCHOR_ZH/EN（r305）只收**元语言命名**（锚点/anchor），均不收**选择架构 default effect 域**：系统默认值/表单默认预算/模板默认/软件初始参数/预填值/缺省项/出厂设置/默认档充当起估参照。r317 探针 C 族 6 条 **4 条穿透本模块**（1/6 模块命中）。
+- r318 探针扩为 18 条攻击（A0–A17：8 ZH + 10 EN）+ 12 条良性，**动手前基座实测模块命中 1/18、gate 非 pass 6/18**——且这 6 条全部被无关维度代拦（fallacy_of_relevance/percentage_overflow/affirming_the_consequent/pseudo_profundity/no_fallback），econ_reasoning_gate 归因 0。默认值域确认是真缺口。
+
+### 改了什么（src/anchoring-effect.js 平行常量 + findSignatures concat 合并，0 删除存量逻辑）
+
+- **DEFAULT_ANCHOR_ZH**（腿① 7 元素）：默认值/默认预算/缺省参数（含「默认的X」形）、系统|软件|表单|模板|程序|平台|后台|出厂|自带|内置 + 默认|缺省|预设|预置|设置|参数、预设值/预置的上限、初始|原始|起始 + 参数|设置|配置|数值|版本、默认就是/默认设为/默认为、默认项/缺省项/预选项/默认选项/默认档、开箱默认。
+- **DEFAULT_DOM_ZH**（腿② 9 元素）：没动过/一直没改/没人重新核算过（否定前缀族，动词表覆盖动/改/调整/校准/核算/估价等 20 个）、原封不动/照单全收、照着它来了/照默认报（含「着」形）、估计也就照着它来了（口语动词族）、拿默认值当基准、直接采用/直接报了、沿用了默认、就这么定了、沿用至今。
+- **DEFAULT_ANCHOR_EN**（10 元素）：default value/setting/option/budget…、system|software|form|template|factory + defaults?|settings?、prefilled|pre-populated|preset|predefined + 名词、initial|starting|original parameters|settings、default was set|left|kept|prefilled、default tier|plan|mode|config、out-of-the-box configuration|setup|settings、shipped with default settings、the default assumptions|figures|numbers|budget（落地期与 [0] 去重：values?/settings?/parameters?/options? 删）、the default and|but|so|then（窄形）。
+- **DEFAULT_DOM_EN**（12 元素）：was never changed/adjusted/revised/revisited/recalibrated/validated、never changed it|them|that|this|the X、kept the prefilled/preset X、estimate|forecast|model|projection|budget just built|based|rested on it、became the baseline for、stuck with it、took … as given、left as is|untouched、went with the default、every later figure/number orbited that starting point、served as the reference for、built the whole model on the default|preset。
+- **findSignatures** 新增两个 `numRequired: false` 双腿入口（zh/en），腿② `DEFAULT_DOM.concat(ORBIT/DEAL/WORTH/META_DOM)`——默认域陈述可用任意存量支配措辞配（「系统默认价八千，我觉得占了便宜」同构成立）。numRequired: false 依据：META 族先例——默认域陈述常用照应指代（「照着它来了」）而无显式共现数字。
+- **落地期修正（check-f-elements.js 自检驱动）**：① DEFAULT_ANCHOR_ZH[2] 补「的」形（预置的上限 vs 预置上限）、[0] 同样补；② DEFAULT_DOM_ZH[2] 补「着」形（照着它来了）；③ DEFAULT_ANCHOR_EN[8] 删与 [0] 完全重合的 values?/settings?/parameters?/options?（r317 冗余教训的标准动作延续）。
+- `__internals` 导出四常量；头注记补 r318 默认值域说明（含 EN 例句）。
+
+### 轮测与门禁（全部真实运行）
+
+| 项 | 结果 |
+|---|---|
+| `test/round-318-default-value-anchor.test.js` | **99 通过 / 0 失败**（A gate 归因 18 + B 模块直调 18 + C 良性 2 + D 存量回归 9 + E 常量级注入 8 + F 元素级注入 38 + 登记口径 1 + G 入口双路 1 + H 登记纪律 4） |
+| `bin/verify.js` | **16/0 PASS**（与基线一致） |
+| `scripts/guard-abilities.js` | **20/20 @ 254 维度 PASS**（与基线一致） |
+| `test/doc-numbers-accuracy.test.js` | **24/0 PASS**（与基线一致） |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 302/326**（与基线逐条一致，未增误拦） |
+| 攻击探针 | 18/18 模块命中、18/18 gate 非 pass 且 econ_reasoning_gate 承重（改前 1/18、econ 归因 0） |
+| 良性 | 官方语料 369 条（去重）零误命中 + 本轮新增 12 条零误命中（12/12 模块级干净） |
+| 存量复跑 | anchoring-effect 14/14、round-305 元语言双腿 29/29、round-305 负例注入通过、round-309 EN 腿 23/23、round-295 econ 接线 63/63、round-317 三模块 84/84、round-284/296/299/301 全绿 |
+| 负例 | 注入 46 个（8 常量级 + 38 元素级）→ **46 个按设计变红，0 个未变红** |
+| 元素级冗余自检 | 38 个新元素逐条删除均配「仅该元素承重」最小样本（check-f-elements.js ① 全绿），良性误伤 0 |
+
 ## r317 — 心理账户（mental_accounting）+ 努力正当化（effort_justification）+ p_hacking（p_hacking，econ_reasoning_gate 聚合族）「日常进项标签 × 工艺性投入 × 选择性报告」新措辞家族（真升级②）
 
 **日期** 2026-11-13 18:00–19:25 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r316 先例）  **轮次** r317（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "anchoring effect effort justification p-hacking cognitive bias" → arXiv/GitHub/S2 三源各返结果（coordination/agent4/scout/20261113-100120），四候选中择优落地三族
