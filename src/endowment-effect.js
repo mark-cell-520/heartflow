@@ -53,6 +53,21 @@
  * 不变——「这是我的底线，免谈」仍不判；官方良性语料 369 条
  * 零误命中（改前改后均实测）。
  *
+ * [r319 新措辞家族] 立项探针 scripts/round-319/probe-candidates.js
+ * （v6.8.179 模块直调 + gate 层双路实测）：存量三腿 + r314 新族
+ * 收「我的旧车/低于这个价免谈/千金不换」标准受偿意愿措辞，两个
+ * 新域 8 条候选 5 条穿透模块、其中 4 条穿透整个 gate 无维度代拦。
+ * 落地双腿平行常量（OWN_ZH3/OWN_EN3 + INFLATE_EN3，findSignatures
+ * concat 合入，存量腿与 r314 腿一字不动）：
+ *   新所有权腿（OWN_ZH3/OWN_EN3）：我伺候了这么多年/咱家三代人
+ *     住过的（长期照管/世代居住锚点）；building this shop from
+ *     nothing（存量 built…from nothing 不收进行时）；
+ *   新估值腿（INFLATE_EN3）：no price is enough（无模态动词形）/
+ *     selling it would take a big premium（溢价门槛形）/
+ *     lowball offers are insulting（低价羞辱形）。
+ * 交易框架（TXN）检查不变；官方良性语料 369 条零误命中（改前改后
+ * 均实测）。
+ *
  * 辨别的族：禀赋效应（endowment effect）——**所有权锚点**（我的/
  * 我们的/陪了我…/是我一手做起来的；EN my / our / it is mine /
  * has been in my family / worth to us）× **交易框架内的估值推高或
@@ -303,6 +318,54 @@ const REFUSE_EN2 = [
   /\b(?:cannot|can'?t|could\s+not)\s+put\s+a\s+price\s+on\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r319] 「祖传所有权 × 卖方溢价族」新措辞家族（平行常量，不动存量腿）
+//
+// 缺口实证（scripts/round-319/probe-candidates.js，v6.8.179 基线）：
+// 存量 OWN/INFLATE/REFUSE + r314 新族收「我的旧车/低于这个价免谈/
+// 千金不换」标准受偿意愿措辞，两个新域整体 miss：8 条候选 5 条穿透
+// 模块，其中 4 条穿透整个 gate 无维度代拦。根因：
+//   · OWN_ZH2 只收「亲手做的/祖祖辈辈传下来的」，不收「我伺候了
+//     这么多年/咱家三代人住过的」这类**长期照管/世代居住**锚点；
+//   · OWN_EN2 只收 built/raised/grew…from nothing，不收
+//     building…from nothing（进行时）与低价羞辱域；
+//   · INFLATE_EN 收 no offer…can reflect / would have to be
+//     insultingly high，不收 no price is enough（无模态动词形）、
+//     selling it would take a big premium（溢价门槛形）、
+//     lowball offers are insulting（低价羞辱形）。
+//
+// 设计纪律（同 r309-r318）：
+//   · 平行常量 + findSignatures concat，存量 OWN/INFLATE/REFUSE 与
+//     r314 新族一字不动（存量注入语义与轮测登记保持）；
+//   · INFLATE 新族走存量 matchAlive 否定守卫；REFUSE 本轮不新增；
+//   · 交易框架检查（TXN）不变——「这是我的底线，免谈」仍不判；
+//   · 官方良性语料 369 条零误命中（改前改后均实测）。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r319] 腿① 新所有权锚点（中文）──────────────────────────
+const OWN_ZH3 = [
+  // 我伺候/打理/照料了这么多年（存量动词表未收照管类动词）
+  /我(?:伺候|打理|照料|经手|拾掇|操持|照看|守着|看护)(?:了)?(?:这么多|十几|几|十多|\d+|这么|大半)?(?:年|个?月|载)/,
+  // 咱家三代人住过的/世代居住（存量 OWN_ZH2 只收「传下来」不收购住过）
+  /(?:咱|自己)(?:家|自家)?(?:三代|几代|两代|世代|几辈)(?:人)?(?:住过|用过|传下来|传下来的|生活过|待过)/,
+];
+
+// ─── [r319] 腿① 新所有权锚点（英文）──────────────────────────
+const OWN_EN3 = [
+  // building this shop from nothing（存量 built…from nothing 不收进行时）
+  /\b(?:building|builds)\s+(?:this|that|it|the)\s+\w+\s+from\s+nothing\b/i,
+];
+
+// ─── [r319] 腿② INFLATE 新估值推高族（英文；查否定前缀）────────
+const INFLATE_EN3 = [
+  // no price is enough（存量 no price…could ever be enough 缺无模态形）
+  /\b(?:no|any)\s+(?:price|amount|sum|offer|bid)\s+(?:is|was|would\s+be|could\s+be)?\s*(?:ever\s+)?enough\b/i,
+  // selling it would take a big premium（溢价门槛形）
+  /\b(?:selling|parting\s+with|letting\s+go\s+of)\s+(?:it|this|that)\s+(?:would|will)\s+(?:take|need|require)\s+(?:a\s+)?(?:big|large|huge|serious|real|significant|fat|hefty)?\s*(?:premium|markup|overpayment)\b/i,
+  // lowball offers are insulting（低价羞辱形）
+  /\b(?:low[- ]?ball|lowball)\s+(?:offer|bid|price|number)s?\s+(?:are|is)\s+(?:an?\s+)?(?:insult|insulting|offensive|joke|disrespect)\b/i,
+];
+
 // ─── 交易框架锚点（腿②必须落在交易框架内）─────────────────────
 const TXN_ZH = /(?:价|价钱|价格|价位|钱|款|卖|买|收购|报价|出价|行情|拍卖|成交|转让|典当|赎|补偿|估价|估值|标价|售价|买价|卖价|价值)/;
 const TXN_EN = /\b(?:price|priced|prices|cost|money|sell|sold|sale|selling|buy|bought|buying|offer|offered|bid|auction|acquisition|acquire|purchase|market\s+value|appraised|appraisal|value|worth|compensation|transaction|exchange|deal)\b/i;
@@ -422,14 +485,14 @@ function findSignatures(text, R) {
   const sents = splitSentences(text);
   const langs = [
     {
-      own: (R.OWN_ZH || OWN_ZH).concat(R.OWN_ZH2 || OWN_ZH2),
+      own: (R.OWN_ZH || OWN_ZH).concat(R.OWN_ZH2 || OWN_ZH2, R.OWN_ZH3 || OWN_ZH3),
       inflate: (R.INFLATE_ZH || INFLATE_ZH).concat(R.INFLATE_ZH2 || INFLATE_ZH2), refuse: (R.REFUSE_ZH || REFUSE_ZH).concat(R.REFUSE_ZH2 || REFUSE_ZH2),
       txn: R.TXN_ZH || TXN_ZH,
       pair: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
-      own: (R.OWN_EN || OWN_EN).concat(R.OWN_EN2 || OWN_EN2),
-      inflate: (R.INFLATE_EN || INFLATE_EN).concat(R.INFLATE_EN2 || INFLATE_EN2), refuse: (R.REFUSE_EN || REFUSE_EN).concat(R.REFUSE_EN2 || REFUSE_EN2),
+      own: (R.OWN_EN || OWN_EN).concat(R.OWN_EN2 || OWN_EN2, R.OWN_EN3 || OWN_EN3),
+      inflate: (R.INFLATE_EN || INFLATE_EN).concat(R.INFLATE_EN2 || INFLATE_EN2, R.INFLATE_EN3 || INFLATE_EN3), refuse: (R.REFUSE_EN || REFUSE_EN).concat(R.REFUSE_EN2 || REFUSE_EN2),
       txn: R.TXN_EN || TXN_EN,
       pair: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
@@ -493,6 +556,8 @@ module.exports = {
     REFUSE_ZH, REFUSE_EN,
     // [r314] 情义无价×我的就是更好的新族（平行常量，负例注入-删条用）
     OWN_ZH2, OWN_EN2, INFLATE_ZH2, INFLATE_EN2, REFUSE_ZH2, REFUSE_EN2,
+    // [r319] 祖传所有权×卖方溢价新族（平行常量，负例注入-删条用）
+    OWN_ZH3, OWN_EN3, INFLATE_EN3,
     TXN_ZH, TXN_EN,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
