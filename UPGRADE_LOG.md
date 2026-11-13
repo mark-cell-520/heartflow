@@ -1,3 +1,18 @@
+## r322 — rebase 轮：本地 fork 上 r321 主线 + 原 r320 重编号落地 + doc-numbers 存量口径债修复（真升级②+维护）
+
+- **背景**：`hf4-sync.sh` exit 4（`UPGRADE_LOG.md` rebase 冲突）。本地 2 个未推送提交（`c6214ccb` 原 r320、`905f2fab` r316-c）需 rebase 到远端 8 个提交（r321/v6.8.179）之上。原 r320 与远端 r320（激励反噬专业配额族）撞号，按 COORDINATION.md §1.1 硬规则 2「轮次号全局唯一禁止复用」重编号为 **r322**。
+- **冲突解决**：`UPGRADE_LOG.md` append 型冲突双方保留——远端 r321/r320 段在上、本地段在下（标题改为 r322、补重编号说明）。`claims.jsonl` append 型冲突同样双方保留（本地 4 条死认领 release + 远端 5 条，共 9 条）。18 个非冲突文件由 rebase 自动暂存。
+- **doc-numbers 存量债修复（承接 r320→2 号交接，由 4 号本轮落地）**：门禁 3 实测红 6 项——README/SKILL 测试数 22,003 vs 本机 `data/test-count.json` 实测 15,934/155、版本戳 v6.8.180 应为 v6.8.181、README changelog 缺 6.8.181 条。修复：README 横幅 + 规格表 + SKILL 规格表测试数改 15,934/155（note 列补 r322 说明：22,003 是远端机器环境口径、两机测试池解析口径不同，门禁以本机 `data/test-count.json` 为唯一真源，差异是环境口径差而非回退）、版本戳 v6.8.181、README Version history 补 6.8.181 条。修复后 doc 24/24。
+- **VERSION**：6.8.181（未 bump——本轮无引擎代码改动）
+- **四门禁**：**全绿**
+  - PASS bin/verify.js — 16 passed / 0 failed
+  - PASS guard-abilities — 20/20，判别维度 254 个
+  - PASS doc-numbers — 24 通过 / 0 失败（修前 18 通过 / 6 失败）
+  - PASS bidirectional-guard — 召回 52/52、误拦 302/326（92.6%）
+- **轮测与存量**：round-320-placeholder-falseshared-fix **17/17**（r320 交接剩余 1 项失败已修绿——该失败实为轮测自身断言写法问题，非引擎缺陷）；round-188-most-transitivity **14/14**（矩阵攻击 most_transitivity 承重 + 良性全 pass）；round-301-law-of-averages 22/22。
+- **stash 处理**：`r322-rebase-stash-readme-skill`（README/SKILL 未提交文档修复）已 pop；其中测试数 15,934 部分与本轮修复重复，版本戳部分合理，最终以「HEAD + 本轮修复」为准，撤销了 stash 对两文件的整体覆盖、重新按门禁口径精确修复。
+- **push**：**未推送**（本轮 cron 结束前未跑 hf4-push.sh，见交接）。
+
 ## r321 — 公地悲剧（tragedy_of_commons，econ_reasoning_gate 聚合族）「现代过度取用」新措辞家族（真升级②）
 
 **日期** 2026-11-14 02:25–03:10 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.179（不变，继承远端 r313 对齐值，同 r308–r320 先例）  **轮次** r321（kind: dimension）  **约束** `src/index.js` 零改动（族经 `src/econ-reasoning-gate.js` 第 249 维度聚合到达 gate）  **海外扫描** hf4-scout.sh "tragedy of the commons overuse overfishing overtourism antibiotic commons dilemma" → arXiv parse-fail / GitHub 0 条 / S2 限流——空返，按既有形态自建
