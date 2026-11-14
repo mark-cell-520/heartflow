@@ -124,9 +124,8 @@
  * 斩获）×数字标的（关键词/广告位/流量/坑位/主播/明星/域名/NFT）、
  * 被动归属形、竞价语境×数字标的、签约竞价族（天价/重金/斥资×
  * 签下/挖到）；EN won the keyword/ad/slot/influencer auction、
- * outbid … for the keyword/slot/streamer、(signed|landed|secured)
- * the streamer/influencer/creator、数字标的×(went to|awarded to)
- * us/the highest bidder。腿②推断动词×(市场|平台|广告主)?认可×
+ * (signed|signing|landed|secured) the streamer/influencer/creator、
+ * 数字标的×(went to|awarded to) us/the highest bidder。腿②推断动词×(市场|平台|广告主)?认可×
  * (流量|商业|变现)?价值、数字标的×值这个价/花得值/没白花、推断
  * 动词×价值名词；EN (confirms|proves|shows)×(market|platform|
  * advertisers)(recognized|accepted|validated)×(traffic|
@@ -307,10 +306,10 @@ const WIN_EN4 = [
   // 0 修饰词的 won the auction 由存量 ①-a 覆盖）
   /\bw(?:on|inning)\s+(?:the\s+)?(?:[a-z][\w-]*\s+){1,2}?(?:auction|bidding)\b/i,
   // ①-m4 outbid everyone for the keyword/slot/streamer（为数字标的竞价胜出）
-  /\boutbid\w*\b[^.]{0,40}\b(?:for|on)\s+(?:the\s+)?(?:keyword|ad|ads|slot|placement|traffic|streamer|influencer|creator)\b/i,
-  // ①-m5 (signed|signing|landed|landing|secured|securing|snapped up|snapping up|won) the streamer/influencer/creator
+  // ——已删除：存量 ①-c \boutbid\b 为其全集超集（注入实证全包含，r320 纪律）
+  // ①-m4 (signed|signing|landed|landing|secured|securing|snapped up|snapping up|won) the streamer/influencer/creator
   /\b(?:signed|signing|landed|landing|secured|securing|snapped\s+up|snapping\s+up|won|winning)\s+(?:the\s+)?(?:star\s+|top\s+|influential\s+)?(?:streamer|influencer|creator|talent|anchor)\b/i,
-  // ①-m6 数字标的 × (went to|awarded to) us/the highest bidder（被动归属形）
+  // ①-m5 数字标的 × (went to|awarded to) us/the highest bidder（被动归属形）
   /\b(?:keyword|ad\s+slot|slot|placement|traffic|streamer|influencer|sponsorship)\b[^.]{0,40}\b(?:went\s+to|awarded\s+to|given\s+to)\s+(?:us|our|the\s+highest\s+bidder)\b/i,
 ];
 
@@ -370,14 +369,19 @@ const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|�
 const NEG_INSIDE_EN = /\bnot\s+that\b|\bnot\s+to\s+say\b|\bhardly\b|\bbarely\b|\bfar\s+from\b|\bno\s+guarantee\b|\bnot\s+necessarily\b/i;
 const NEG_BEFORE_EN = /(?:not|no|cannot|can'?t|doesn'?t|don'?t|isn'?t|aren'?t|wasn'?t|weren'?t|hardly|barely|far\s+from|nowhere\s+near)\s+(?:\w+\s+){0,4}$/i;
 
-// 单条匹配是否有效（否定前缀/内部否定均拦下；ZH 与 EN 均查）
-function matchAlive(text, x, useNeg) {
+// 单条匹配是否有效（否定前缀/内部否定均拦下；ZH 与 EN 均查）。
+// NEG_* 四个常量支持 R 注入（负例测试用），默认取模块级常量。
+function matchAlive(text, x, useNeg, R) {
   if (!useNeg) return true;
-  if (NEG_INSIDE.test(x.raw) || NEG_INSIDE_EN.test(x.raw)) return false;
+  const negInside = (R && R.NEG_INSIDE) || NEG_INSIDE;
+  const negBefore = (R && R.NEG_BEFORE) || NEG_BEFORE;
+  const negInsideEn = (R && R.NEG_INSIDE_EN) || NEG_INSIDE_EN;
+  const negBeforeEn = (R && R.NEG_BEFORE_EN) || NEG_BEFORE_EN;
+  if (negInside.test(x.raw) || negInsideEn.test(x.raw)) return false;
   const before = text.slice(Math.max(0, x.idx - 8), x.idx);
-  if (NEG_BEFORE.test(before)) return false;
+  if (negBefore.test(before)) return false;
   const beforeEn = text.slice(Math.max(0, x.idx - 45), x.idx);
-  return !NEG_BEFORE_EN.test(beforeEn);
+  return !negBeforeEn.test(beforeEn);
 }
 
 // 去重叠（同族多模式命中同一片段只留最长/最先者）
@@ -392,13 +396,13 @@ function dedupeOverlap(arr) {
 }
 
 // 收集某语言侧两腿的全部有效匹配
-function collectLegs(text, wList, vList, useNeg) {
+function collectLegs(text, wList, vList, useNeg, R) {
   let wm = [], vm = [];
   for (const re of wList) for (const x of allMatches(re, text)) {
-    if (matchAlive(text, x, useNeg)) wm.push(x);
+    if (matchAlive(text, x, useNeg, R)) wm.push(x);
   }
   for (const re of vList) for (const x of allMatches(re, text)) {
-    if (matchAlive(text, x, useNeg)) vm.push(x);
+    if (matchAlive(text, x, useNeg, R)) vm.push(x);
   }
   return { wm: dedupeOverlap(wm), vm: dedupeOverlap(vm) };
 }
@@ -444,7 +448,7 @@ function findSignatures(text, R) {
     },
   ];
   for (const { w, v, win, lang } of langs) {
-    const { wm, vm } = collectLegs(text, w, v, true);
+    const { wm, vm } = collectLegs(text, w, v, true, R);
     for (const a of wm) {
       let best = null;
       for (const b of vm) {
@@ -502,5 +506,6 @@ module.exports = {
     WIN_ZH4, WIN_EN4, VALUE_ZH4, VALUE_EN4,
     CURSE_ZH, CURSE_EN,
     PAIR_ZH, PAIR_EN,
+    NEG_BEFORE, NEG_INSIDE,
   }),
 };
