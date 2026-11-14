@@ -66,6 +66,14 @@ const NEW_FAMILIES = [
   'apology_concession',
 ];
 
+// r329 四族：EN 侧仅前三族（pathos_capture 暂只有 ZH 腿）
+const R329_FAMILIES = [
+  'commitment_lock',
+  'rival_deflation',
+  'responsibility_offload',
+  'pathos_capture',
+];
+
 /** 攻击样本：必须命中指定新族，且 score ≥ 0.3（medium 风险档） */
 function assertCaught(family, text) {
   const r = analyze(text);
@@ -262,16 +270,28 @@ check('r293: 存量七族回归（每族至少 1 支攻击仍命中）', () => {
 
 // ─── 插件元数据 ─────────────────────────────────────────────
 
-check('r293: 插件元数据（版本 2.3.0 / EN+ZH 各 11 族 / 权重齐全）', () => {
+check('r293+r329: 插件元数据（版本 2.4.0 / EN 14 族 / ZH 15 族 / 权重齐全）', () => {
   const mod = require('../src/plugins/sycophancy-check/index.js');
-  assert.strictEqual(mod.version, '2.3.0', '插件版本不是 2.3.0');
+  assert.strictEqual(mod.version, '2.4.0', '插件版本不是 2.4.0');
+  assert.strictEqual(Object.keys(mod.EN_SIGNALS).length, 14, 'EN_SIGNALS 族数不是 14');
+  assert.strictEqual(Object.keys(mod.ZH_SIGNALS).length, 15, 'ZH_SIGNALS 族数不是 15');
   for (const lang of ['EN_SIGNALS', 'ZH_SIGNALS']) {
-    assert.strictEqual(Object.keys(mod[lang]).length, 11, `${lang} 族数不是 11`);
     for (const f of NEW_FAMILIES) {
       assert(Array.isArray(mod[lang][f]) && mod[lang][f].length === 2,
         `${lang}.${f} 模式数不是 2`);
       assert(typeof WEIGHTS[f] === 'number' && WEIGHTS[f] > 0,
         `WEIGHTS.${f} 缺失或非正数`);
+    }
+  }
+  // r329 四族：ZH 全 4 族、EN 除 pathos_capture（仅 ZH 腿）外 3 族
+  for (const f of R329_FAMILIES) {
+    assert(Array.isArray(mod.ZH_SIGNALS[f]) && mod.ZH_SIGNALS[f].length >= 2,
+      `ZH_SIGNALS.${f} 模式数少于 2`);
+    assert(typeof WEIGHTS[f] === 'number' && WEIGHTS[f] > 0,
+      `WEIGHTS.${f} 缺失或非正数`);
+    if (f !== 'pathos_capture') {
+      assert(Array.isArray(mod.EN_SIGNALS[f]) && mod.EN_SIGNALS[f].length >= 2,
+        `EN_SIGNALS.${f} 模式数少于 2`);
     }
   }
   // 其余五语种不得被本轮改动波及（仍为 7 族）

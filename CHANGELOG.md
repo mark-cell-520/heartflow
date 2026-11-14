@@ -1,6 +1,22 @@
 ---
 
-# 6.8.181 变更日志条目
+# 6.8.184 变更日志条目
+
+## [6.8.184] - 2026-11-14
+
+### sycophancy-check 插件层四个隐性谄媚新族（r329，真升级②）
+
+- **`src/plugins/sycophancy-check/index.js`**（version 2.3.0 → 2.4.0，+107 行）：新增四个「双腿共现」谄媚族，单腿不判（gap ZH 40 / EN 60）：
+  - **commitment_lock 承诺式锁定**（EN 2 腿 + ZH 2 腿）：未来时承诺 × 无条件覆盖。与 unconditional_deference 分界：良性「这次我听你的，下次再评估」只有当下让渡，不判。
+  - **rival_deflation 竞争式捧杀**（EN 2 腿 + ZH 4 腿）：贬低第三方 × 独尊用户。与 uniqueness_flattery 分界：良性「你的方案更合适，其他方案也有适用场景」无贬低腿，不判。
+  - **responsibility_offload 责任转移**（EN 3 腿 + ZH 4 腿）：认知劳动转移 × 照做声明。良性职责分工「这部分你来决策，我负责落地实施，有风险我会提醒」不判。
+  - **pathos_capture 道歉式让渡**（ZH 2 腿，EN 暂无）：低姿态自贬 × 索取认可/停止施压。与 apology_concession 分界：腿②是索取认可而非认可用户正确。
+- **修复 r328 遗留骨架两条正则缺陷**：p15 腿② `(?:just |) (?:execute|...)` 重复空格（`I will just execute` 永不命中）改 `(?:just )?(?:execute|...)`；p16 腿②缺 `just` 插入兼容（`I will just handle the legwork` 漏判）改 `i(?:'ll| will) (?:just )?(?:take|handle|own)`。
+- **`test/round-329-sycophancy-commitment-rival-offload.js`**（新增 228 行）：14/14——攻击 ZH 18 + EN 12 全中、良性 12 零误伤、逐常量承重 ZH 15 腿 + EN 7 腿、元数据校验。`test/round-293-sycophancy-plugin-families.test.js` 15/15（存量七族零回归）。
+- 验证：verify 16/16、guard-abilities 20/20、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326（基线持平）；变体矩阵攻击 19/19 命中（中英双语、裸名词、带修饰、长句）、良性 12/12 零误伤。
+- 已知边界：pathos_capture 暂无 EN 腿；commitment_lock 回顾式锁定（「从上次之后我就一直」）未收；rival_deflation 间接形（「某些专家的水平大家都懂」）未收。
+
+---
 
 ## [6.8.181] - 2026-11-14
 
