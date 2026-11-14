@@ -187,6 +187,63 @@
  *   · 严谨设计在场（随机对照/盲法/倾向评分匹配）：起点口径通常已被设计约束；
  *   · 中性时间陈述（起点锚在场但无起点错位路径、且无疗效结论）；
  *   · 起点差异纯流程描述（排班/账期/工期起点不同，无生存期或疗效语义）。
+ *
+ * [r335 扩展] Will Rogers 现象/分期迁移（stage migration / reclassification
+ * artifact）子家族——把对象**重新分类到别的组别**（晚期病人划入中期/差生
+ * 分出去/低风险档上调/B级客户升A级/重症转病区），于是**两组的指标同向
+ * 改善**（早期中期生存率都上升/两个池子赔付率都下降/快慢班平均分都提
+ * 高），却没有一个个体真的变好，却被当作「新标准/改革/模型有效」的证
+ * 据。Will Rogers 现象的账面改善来自**成员构成变化**（把「差」的挪走
+ * 后两组均值同时上移），与路径 (a)(b)(c) 起点错位、(d) 确诊提前、(e)
+ * 病例构成（筛查选出的病程不同）、(f) 过度诊断（本不会发病被计入）
+ * 错位来源各不相同，闭环为同一检测器的**路径 (g)**（维度计数 256 不
+ * 变、src/index.js 零改动，与 r328/r331 各轮同形态）。立项探针实证
+ * （scripts/round-335/r335-probe-candidates.js，集成树 v6.8.185）：
+ * 8 条攻击样本 4 条完全穿引擎（gate.action=pass、findings 无归因：
+ * 「新分期标准…早期和中期生存率都上升了，说明新标准显著改善了预后」
+ * 「新评级模型…A级和B级的违约率都下降了」及两条 EN 对应句），其余
+ * 被 pseudo_causal/confidence 泛维度代拦（findings 无本维度归因）。
+ *
+ * 辨别的族（子家族）：Will Rogers 现象（stage migration / 分期迁移/
+ * 重新分类效应）——**成员在组间被重新分类**后，两组的统计指标同向
+ * 改善，据此断言分类标准/干预/改革本身产生了真实改善：
+ *   新的分期标准把一部分晚期患者重新划入中期，早期和中期生存率都
+ *   上升了，说明新标准显著改善了预后。
+ *   把重症病人转到合作病区后，ICU 死亡率明显下降，可见本院救治水平很高。
+ *   Under the new staging criteria some advanced cases were reclassified
+ *   as intermediate, and survival rates rose in both groups — proof the
+ *   new protocol works.
+ *
+ * 与既有维度的边界（r335 归因）：
+ *   · simpsons_paradox（第 206 维）判**聚合层与子群层方向相悖**（必
+ *     须有相反方向），本族两组方向**相同**（同升/同降），错在成员重
+ *     新分类而非聚合混合；
+ *   · selection_bias(168) 管「受限样本 → 总体推广」；本族是比较内部
+ *     的组间成员搬移，不涉及向总体推广；
+ *   · statistical_misleading(58) 管小基数百分比；本族不涉及基数；
+ *   · survivor_time_bias(226) 管两组病程长度结构不同；本族两组构成
+ *     被主动搬移，错位来源是分类动作本身。
+ *
+ * 判据（路径 g，三腿共现 + 跨腿邻近窗 + 豁免，缺一不判）：
+ *   腿① RECLASS 重新分类动作在场（重新划入/分到/调到/转入/移出/
+ *      上调到/单独组班/新分期标准；EN reclassified as / moved to /
+ *      transferred to / re-bucketed into / restaged as）
+ *   腿② BOTH_UP 两组指标同向变动在场（都上升/都下降/都提高/都改善；
+ *      EN both groups … rose / fell in both / in both tiers）
+ *   腿③ CLAIM 成效结论在场（说明/证明/可见…改善/有效/成功/水平；
+ *      EN proof … works / shows excellent / so the new … works）
+ *   三腿首匹配跨度 ≤ WIN_LEAD（中 160 字 / 英 400 字符）
+ *   豁免 EXEMPT_WR：偏误点名（Will Rogers/分期迁移偏误/统计假象/
+ *      没有一个…真的…变好/stage migration bias / reclassification
+ *      artifact）/ 谨慎解读否定（不能/并不/不代表…说明/改善）/ 总体
+ *      无变化（总生存期没有变化/overall unchanged）
+ *   疑问形守卫同路径 (d)(e)(f)：整句以问号收尾不判。
+ *
+ * 为什么取 VERIFY 级：单句可能是统计学课堂反例（「两组生存率同升而
+ * 没有一个病人活得更久，这是 Will Rogers 现象」正是本族要教的判别
+ * 动作）、对医院排名营销话术的批评转述、新闻概括。verify 的含义是
+ * 「这个成效结论可能来自重新分类造成的账面改善，需要核对总体终点
+ * （总生存期/总违约数）或对齐分类口径再采信」。
  */
 'use strict';
 
@@ -562,6 +619,92 @@ const EXEMPT_LEN_EN = [
   /\b(?:overall|all[- ]?cause|total|disease[- ]specific)\s+mortality\b[^.]{0,36}\b(?:endpoint|primary\s+outcome|unchanged|no\s+difference)\b/i,
 ];
 
+// ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
+// 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
+// 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
+// *政策*名词形（新分期标准/修订后的分级方案——分类标准本身被更换即
+// 成员可能被重划）。升级/降级限两类上下文防误伤（带对象名词，或带
+// 级/档/池/班/组/期/层/类 后缀）——「升级到新版本」「下调准备金率」
+// 类软件/金融操作不触发。
+const RECLASS_ZH = [
+  /重新(?:划入|划归|归类|分类|编班|编组|分组|分层|划分|编排|分班|分流|归入|洗牌)/,
+  /(?:调到|调入|调出|调至|调回|转入|转到|转移到|搬到|挪到|移至|划到|分到|归到|编入|隔离到|剔除|剔出|剥离|剥出|移出|转出|分流到|分出去|分出来|单独组班|另组|另编|重新划分|换到)/,
+  /(?:客户|用户|患者|病人|学生|员工|病例|账号|账户|投保人|借款人|商家|人员|对象|孩子)[^。！？]{0,8}(?:上调|下调|升级|降级)(?:至|到|入|进)/,
+  /(?:上调|下调|升级|降级|升入|降入)(?:至|到|入|进)[^。！？]{0,8}(?:级|档|池|班|组|期|层|类|区|部)/,
+  /(?:新|修订|更新|调整|改革)(?:后|的)?(?:分期|分档|分级|分层|分类|编班|分组|分流)(?:标准|方案|规则|模型|体系|办法|政策|新政)/,
+];
+// 腿①（英文）：reclassified as / moved to / transferred to / re-bucketed
+// into / restaged as / promoted to（成员在组间搬移的显式动词；直间形
+// moved to 与带宾语形 moving … to a separate class 分列，分词与过去式
+// 同收）
+const RECLASS_EN = [
+  /\breclassif(?:ied|ication|y|ies)\s+(?:as|into|to)\b/i,
+  /\bre-?bucket(?:ed|ing|s)?\b[^.]{0,40}\b(?:into|to)\s+(?:a\s+)?(?:new|different|separate|another|higher|lower|earlier|later|better|worse)\b/i,
+  /\b(?:mov(?:e|ed|ing)|transfer(?:red|ring)?|shift(?:ed|ing)?|promot(?:e|ed|ing)|demot(?:e|ed|ing)|reassign(?:ed|ing)?|upgrad(?:e|ed|ing)|downgrad(?:e|ed|ing)|migrat(?:e|ed|ing)|restag(?:e|ed|ing))\s+(?:to|into|from)\b/i,
+  /\b(?:mov(?:e|ed|ing)|transfer(?:red|ring)?|shift(?:ed|ing)?|promot(?:e|ed|ing)|demot(?:e|ed|ing)|reassign(?:ed|ing)?|upgrad(?:e|ed|ing)|downgrad(?:e|ed|ing)|migrat(?:e|ed|ing)|restag(?:e|ed|ing))\s+[^.]{0,50}\b(?:to|into)\s+(?:a|an|the|its|their)?\s*(?:new|different|separate|another|partner|preferred|prime|subprime|elite|higher|lower|earlier|later|better|worse|top|bottom)\b/i,
+];
+
+// 腿② BOTH_UP 两组指标同向变动：Will Rogers 的账面签名——「都」量化
+// 词 + 方向变动动词（上升/下降/提高/降低/改善/好转）。方向双向收
+// （生存率上升与死亡率下降都是账面改善，极性由指标决定），组别上下文
+// 由腿①建立。
+const BOTH_UP_ZH = [
+  /(?:都|均|皆)[^。！？]{0,10}(?:上升|下降|提高|降低|改善|好转|提升|上涨|走低|变得更好|好看起来)/,
+  /(?:上升|下降|提高|降低|改善|好转|提升|上涨|走低)[^。！？]{0,8}(?:都|均|皆)/,
+  /(?:双双|一齐|一并|两个都|两边都|同期|同时)[^。！？]{0,12}(?:上升|下降|提高|降低|改善|好转|提升)/,
+];
+// 腿②（英文）：both groups … rose / fell in both / in both tiers /
+// across both groups / each group saw（两组同向变动的显式形）
+const BOTH_UP_EN = [
+  /\bboth\s+(?:groups?|tiers?|stages?|cohorts?|pools?|classes?|buckets?|categories|strata|arms)\b[^.]{0,50}\b(?:rose|risen|fell|dropped|improved|declined|climbed|increased|decreased|lowered|reduced|better|higher|lower)\b/i,
+  /\b(?:rose|risen|fell|dropped|improved|declined|climbed|increased|decreased|lowered|reduced)\s+in\s+both\b/i,
+  /\bin\s+both\s+(?:groups?|tiers?|stages?|cohorts?|pools?|classes?|buckets?|categories|strata|arms)\b/i,
+  /\bacross\s+both\s+(?:groups?|tiers?|stages?|cohorts?|pools?|classes?|buckets?|strata)\b/i,
+  /\beach\s+(?:group|tier|stage|cohort|pool|class|bucket|stratum)\s+(?:saw|showed|posted|reported)\b/i,
+];
+
+// 腿③ CLAIM 成效结论：把账面改善归因为标准/干预/改革真实有效。
+const CLAIM_ZH = [
+  /(?:说明|证明|可见|表明|足以证明|意味着|反映出|体现出|佐证了?|印证了?)[^。！？]{0,18}(?:改善|提高|有效|成功|疗效|预后|成绩|成果|进步|见效|立竿见影|水平|水准|科学|合理|准确|靠谱|显著|明显|大幅)/,
+  /(?:显著|明显|大幅|切实|真正)[^。！？]{0,6}(?:改善|提高|提升|好转)/,
+];
+// 腿③（英文）：proof … works / shows excellent / so the new … works
+// （推断标记分词形 showing/proving/indicating 与名词形 evidence/同收；
+// 成效结论收 succeeded / paid off / accurate——「证明新标准更准确」
+// 「说明改革成功了」都是把账面改善归因为标准自身改良）
+const CLAIM_EN = [
+  /\b(?:proof|proves|proved|proving|shows?|showed|showing|demonstrates?|demonstrated|demonstrating|indicates?|indicated|indicating|confirms?|confirmed|confirming|suggests?|suggested|suggesting|evidence|means?)\b[^.]{0,40}\b(?:works?|worked|effective|excellent|superb|outstanding|improved|improvement|success|successful|succeeded|better|progress|benefit|accurate|paid\s+off|pays\s+off)\b/i,
+  /\bso\s+the\s+new\b[^.]{0,30}\b(?:works?|worked|is\s+effective|succeeded|paid\s+off)\b/i,
+  /\b(?:works?|worked|effective|improved|improvement|success|successful)\b[^.]{0,30}\b(?:proof|proves|shows?|demonstrates?|confirms?)\b/i,
+];
+
+// 豁免 EXEMPT_WR（只作用于路径 g——被豁免的句子仍可由路径 (a)-(f)
+// 或 simpsons_paradox 等维度评判）：
+//  (a) 偏误点名（Will Rogers/分期迁移偏误/统计假象/没有一个…真的…变好/
+//      stage migration bias / reclassification artifact / without anyone
+//      improving）——那是在破除本谬误；
+//  (b) 谨慎解读否定（不能/并不/不代表/并不意味着…改善/有效/说明）——
+//      正确判别动作，正是本族要教的；
+//  (c) 总体终点无变化（总生存期没有变化/总体持平/overall unchanged）
+//      ——账面之外的总体终点已排除真实改善的可能。
+const EXEMPT_WR_ZH = [
+  /Will\s*Rogers|威尔·?罗杰斯|威耳·?罗杰斯/,
+  /(?:分期|重新分类|归类|迁移|重分类|转组|调组|编班|分层|分类)(?:偏误|偏倚|问题|效应|假象|陷阱|现象)/,
+  /统计假象|账面改善|账面提高|账面上升|账面下降|统计幻觉|虚假改善|账面数据/,
+  /(?:不能|并非|不代表|不等于|并不意味着|并不能|不足以|无法|很难|未必|不一定|不应|不可|并不会)[^。！？]{0,20}(?:改善|提高|有效|成功|水平|疗效|进步|变好|成效|结果|说明|科学)/,
+  /(?:没有|并没|未曾)[^。！？]{0,8}(?:一个|任何人|有人|病人|患者|学生|员工|成员)[^。！？]{0,12}(?:真的|真正)?[^。！？]{0,6}(?:变好|改善|进步|好转|提升|更健康|活得更久|受益|提高)/,
+  /(?:总生存期|总体|整体|合计|总共|总人数|总数)[^。！？]{0,10}(?:没有|并无|未见|保持不变|不变|持平|无变化|原地踏步|毫无变化)/,
+];
+const EXEMPT_WR_EN = [
+  /\bWill\s+Rogers\b/i,
+  /\b(?:stage\s+migration|reclassification|restaging|re-?bucketing|migration)\b[^.]{0,40}\b(?:bias|artifact|phenomenon|effect|illusion)\b/i,
+  /\bstatistical\s+(?:artifact|illusion)\b/i,
+  /\b(?:does\s+not|do\s+not|doesn'?t|don'?t|cannot|can'?t|is\s+not|not)\b[^.]{0,30}\b(?:improve|improved|improvement|mean|indicate|prove|show|effective|progress|better|works?)\b/i,
+  /\b(?:without|no)\s+(?:any|a single|one)?\s*(?:\w+\s+){0,2}(?:actually\s+)?(?:improving|getting\s+better|living\s+longer|being\s+better|doing\s+better)\b/i,
+  /\bno\s+(?:one|patient|student|employee|borrower|worker|person)\b[^.]{0,30}\b(?:actually\s+)?(?:got|became|is|was)\s+(?:better|improved|healthier|worse)\b/i,
+  /\boverall\s+(?:survival|outcome|performance|results?|numbers?)\s+(?:was|is|were|remained?)\s+(?:unchanged|the\s+same|flat|identical)\b/i,
+];
+
 // 取某正则清单在文本中最早匹配的起始下标（无匹配返回 -1）
 function earliestIdx(list, text) {
   let best = -1;
@@ -709,6 +852,34 @@ function checkImmortalTimeBias(text, inject) {
     }
   }
 
+  // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移（stage migration）────
+  // 重新分类动作 × 两组指标同向变动 × 成效结论，三腿共现 + 跨腿邻近窗。
+  // 与路径 (a)-(f) 相互独立：本路径**不要求筛查域在场**（错位来源是
+  // 成员在组间被搬移，不是起点/筛查/病例构成），同样在锚腿门槛之前
+  // 评判。豁免只作用于本路径——被豁免的句子仍可由路径 (a)-(f) 或
+  // 其他维度评判。
+  const XW_Z = R.EXEMPT_WR_ZH || EXEMPT_WR_ZH;
+  const XW_E = R.EXEMPT_WR_EN || EXEMPT_WR_EN;
+  if (!(anyHit(XW_Z, text) || anyHit(XW_E, text))) {
+    const pg1 = earliestEither(R.RECLASS_ZH || RECLASS_ZH, R.RECLASS_EN || RECLASS_EN, text);
+    if (pg1 >= 0 && !/[？?]\s*$/.test(text)) {
+      const winW = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
+      const pg2 = earliestEither(R.BOTH_UP_ZH || BOTH_UP_ZH, R.BOTH_UP_EN || BOTH_UP_EN, text);
+      const pg3 = earliestEither(R.CLAIM_ZH || CLAIM_ZH, R.CLAIM_EN || CLAIM_EN, text);
+      if (pg2 >= 0 && pg3 >= 0) {
+        const span = Math.max(pg1, pg2, pg3) - Math.min(pg1, pg2, pg3);
+        if (span <= winW) {
+          return {
+            hit: true, score: 0.6, count: 1,
+            detail: /[\u4e00-\u9fff]/.test(text)
+              ? 'Will Rogers现象×重新分类×两组指标同升×成效结论(zh)'
+              : 'will-rogers-phenomenon×reclassification×both-groups-improve×efficacy-claim(en)',
+          };
+        }
+      }
+    }
+  }
+
   // 腿① 起点时点锚（至少一处）
   const anchorCount = countMatches(A_Z, text) + countMatches(A_E, text);
   if (anchorCount < 1) return { hit: false, score: 0, detail: '', count: 0 };
@@ -787,5 +958,10 @@ module.exports = {
     OVERDIAG_ZH, OVERDIAG_EN,
     GAIN_CLAIM_ZH, GAIN_CLAIM_EN,
     EXEMPT_LEN_ZH, EXEMPT_LEN_EN,
+    // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
+    RECLASS_ZH, RECLASS_EN,
+    BOTH_UP_ZH, BOTH_UP_EN,
+    CLAIM_ZH, CLAIM_EN,
+    EXEMPT_WR_ZH, EXEMPT_WR_EN,
   }),
 };
