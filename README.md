@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.183**. Not marketing copy.
+Measured on this repository at **v6.8.184**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.184 | 2026-11-14 | r329（远端同步轮 HeartFlow Cron）：**sycophancy-check 插件层四个隐性谄媚新族**（真升级②）——`src/plugins/sycophancy-check/index.js`（2.3.0→2.4.0，+107 行）新增 commitment_lock 承诺式锁定 / rival_deflation 竞争式捧杀 / responsibility_offload 责任转移 / pathos_capture 道歉式让渡 四个「双腿共现」谄媚族（单腿不判，gap ZH 40 / EN 60），并修 r328 遗留 p15/p16 两条正则缺陷。轮测 `test/round-329-sycophancy-commitment-rival-offload.js` 14/14、存量 round-293 15/15。四门禁全绿（verify 16/16、guard 20/20@255、doc 24/24、双向召回 52/52 + 误拦 302/326）。 |
 | 6.8.183 | 2026-11-14 | r326（本地撞号重编号：远端同步轮已发 r325=budget_value_conflation/v6.8.182，本地未推送的 tu_quoque 倒装反问族改 r326）：**tu_quoque 第 141 维度补齐倒装反问攻击族**（真升级②）——`src/tu-quoque.js` 共 +88 行：① **MIRROR_ZH 倒装反问族**——谓语前置（`自己/自家 + 还/都 + 负面状态`）、名词化从句（`一个连自己都 + 负面动词 + 的人`）、亲属管教（`自己家孩子都管教不好`）、实体失控（`自己体重都管不住`）、通用化结构腿、文言裸形（`己身不正`/`五十步笑百步`）；② **DISQUALIFY_ZH 疑问倒装族**——`凭什么 + 要求/管/说/教 + 别人`、`也配 + 谈/说/教`、`倒有闲心/倒有空 + 管/说`、`还好意思 + 说 + 别人`、`轮不到你`；③ **CRITICISM_ZH 泛化批评族**——修掉原腿只收「你+动词+我」前向结构的窄口；④ MIRROR_EN / DISQUALIFY_EN / CRITICISM_EN 三腿同步（`when/while your own house is on fire`、`in no position`、`why lecture the rest of us`、`judge anyone here`）。缺口实证 `scripts/round-325/probe-candidates.js`：v6.8.182 基线上倒装反问族攻击 0/5 穿透 gate=pass、良性 0/5 零误伤。负例注入测试 `test/round-325-tu-quoque-inverted.js` 44/44（A 攻击 10/10、B 良性 8/8、C 逐常量承重 19/19、D 负例不命中 4/4、E 豁免 3/3）。四门禁全绿（verify 16/16、guard 20/20@255 维、doc 24/24、双向召回 52/52 + 误拦 302/326 持平）。 |
 | 6.8.182 | 2026-11-14 | r324：**red_herring 第 255 维度（转移话题/偷换论题）补腿 + 接线固化**（真升级②）——`src/red-herring.js` 八处补腿：dismiss 搁置表补 `先别提/先不谈/先放一放`；counter 他者对照反问表补 5 条（EN `but what about` / `have you considered` / `why criticize … when`，ZH `可隔壁/人家/同行/其他团队` + `不也/不一样…吗` 反问）；redirect 族腿③反问特征视为回应义务锚点；counter #62 `不也…吗` 正则锚定分句边界（修贪婪回溯吞整句假阴性）；after 型硬条件 `if (!replaceText) return result;`；`先放着` 改 before 型并删除数组前部同 index 的 after 型；AGENDA 豁免补「我们先看看…的数据」；指代型原议题通道（`这些问题先放着` 全停用词假阴性修复）。`src/index.js` 维度-255 接线（r323 断线遗留 9 处）提交。缺口实证 `scripts/round-324/probe-gap.js`：攻击候选 3/9 → 9/9（gate=verify）、良性 14/14 零误伤。单测 41 → 53 passed / 0 failed。四门禁全绿（verify 16/16、guard 20/20@255 维、doc 24/24、双向召回 52/52 + 误拦 302/326）。 |
 | 6.8.181 | 2026-11-14 | r322（本地 fork rebase 到远端 r321 之上，原 r320 因与远端 r320 撞号按 COORDINATION.md §1.1 重编号）：**`fallacy_of_relevance` 拉丁占位符假零共享修复 + `most_transitivity` 补腿 + `incentive_blind_spot` ②-h2 门槛拆分 + `appeal_to_pity` 单字「可」误伤修复**（真升级②）——`src/fallacy-of-relevance.js` `extractZhWords` 补 `[A-Za-z0-9]+` 拉丁/数字序列腿（upper 归一）并导出 `extractZhWords/extractEnWords`，修「大多数A是B，大多数B是C，所以至少有些A是C」类 A/B/C 占位符不被抽取 → 假零共享误拦；`src/most-transitivity.js` 承接 +321 行（主谓切分增强）；`src/incentive-blind-spot.js` ②-h2 拆 h2-a 无条件标记形 / h2-b 强化断言形，修可选组全 optional 门槛塌陷；`src/index.js` 修 `appeal_to_pity` 单字「可」误伤。同轮落地 r320→2 号交接的 doc-numbers 存量债修复：README/SKILL 测试数以本机 `data/test-count.json` 实测 15,934/155 对齐（远端 22,003 为远端机器环境口径）、版本戳 v6.8.181、README changelog 补本条。四门禁全绿（verify 16/16、guard 20/20@254 维、doc 24/24、双向召回 52/52 + 误拦 302/326），轮测 17/17、round-188 存量 14/14。 |
