@@ -246,7 +246,7 @@ const DAILY_IN_ZH = [
   /([一二两三四五六七八九十百千半\d]+)\s*(个?小时|分钟|个钟|杯|瓶|碗|勺|匙|盅|袋|包|盒|罐|桶|盆|碟|根|支|瓣|颗|粒|片|丸|滴|斤|两|克|公斤|毫升|升|口|顿)/,
 ];
 const DAILY_IN_EN = [
-  /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|fifty|hundred|thousand|dozen|half|a|an|\d+)\s+(cups?|glasses|bowls?|spoonfuls?|bottles?|bags?|boxes|pills?|capsules?|tablets?|doses?|servings?|hours?|minutes?|days?|weeks?|slices?|pieces?|scoops?|shots?|drinks?|beers?|cans?|plates?|portions?)\b/i,
+  /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|fifty|hundred|thousand|dozen|half|a|an|single|\d+)\s+(cups?|glass(?:es)?|bowls?|spoonfuls?|bottles?|bags?|box(?:es)?|pills?|capsules?|tablets?|doses?|servings?|hours?|minutes?|days?|weeks?|slices?|pieces?|scoops?|shots?|drinks?|beers?|cans?|plates?|portions?)\b/i,
 ];
 
 // ─── [r341] 日常物品剂量外推族：腿② TASK_AMP 能力标记 × 极端任务 ──────────
@@ -256,17 +256,17 @@ const DAILY_IN_EN = [
 // 判定双重承重。
 const TASK_AMP_ZH = [
   // 能力标记在前 × 极端任务（同句近距，任务名词前允许 ≤10 字插入）
-  /(?:就能|就可以|就足以|足以|都能|都可以|甚至能|还能|更能|准能|包能|肯定|保证|必然|势必|不成问题|不在话下|轻松|轻易|分分钟)[^。；，！？]{0,10}(?:通宵|整夜|彻夜|连夜|连轴|连日|不休|不困|不累|不睡|马拉松|丰收|扛[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|千克|吨)|挑[^。；，]{0,3}(?:斤|公斤|吨)|背[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|搬[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|跑完|走完|游完|看完|学完|深度休息|深度睡眠|满分|夺冠|铁人|超人|神仙|无穷|无尽|无限)/,
+  /(?:就能|就可以|就足以|足以|都能|都可以|甚至能|还能|更能|准能|包能|肯定|保证|必然|势必|不成问题|不在话下|轻松|轻易|分分钟)[^。；，！？]{0,10}(?:通宵|整夜|彻夜|连夜|连轴|连日|不休|不困|不累|不睡|马拉松|丰收|扛[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|千克|吨)|挑[^。；，]{0,3}(?:斤|公斤|吨)|背[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|搬[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|亩产[一二两三四五六七八九十百千万\d]+\s*(?:斤|吨|公斤)|跑完|走完|游完|看完|学完|深度休息|深度睡眠|满分|夺冠|铁人|超人|神仙|无穷|无尽|无限)/,
   // 极端任务在前 × 能力标记（「跑完马拉松都不成问题」）
-  /(?:通宵|整夜|彻夜|连夜|连轴|马拉松|大丰收|丰收|扛[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|跑完|走完|游完|看完|学完|深度休息|深度睡眠|满分|夺冠|铁人|无穷|无尽|无限)[^。；，！？]{0,6}(?:就能|都可以|都能|不成问题|不在话下|肯定|保证|更是|更是能)/,
+  /(?:通宵|整夜|彻夜|连夜|连轴|马拉松|大丰收|丰收|扛[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|亩产[一二两三四五六七八九十百千万\d]+\s*(?:斤|吨|公斤)|跑完|走完|游完|看完|学完|深度休息|深度睡眠|满分|夺冠|铁人|无穷|无尽|无限)[^。；，！？]{0,6}(?:就能|都可以|都能|不成问题|不在话下|肯定|保证|更是|更是能)/,
 ];
 const TASK_AMP_EN = [
   // will/can × extreme task（允许 ≤4 词插入：will power a whole marathon）
-  /\b(?:will|would|can|could|shall|going to|gonna)\s+(?:[a-z]+\s+){0,4}(?:keep you up|stay up|pull an all[- ]?nighter|all[- ]?nighter|all week|all night|nonstop|non-stop|without (?:sleep|rest|sleeping|stopping)|deepen|marathon|harvest|yield|finish line)\b/i,
+  /\b(?:will|would|can|could|shall|going to|gonna)\s+(?:[a-z]+\s+){0,4}(?:keep you up|stay up|pull an all[- ]?nighter|all[- ]?nighter|all week|all night|nonstop|non-stop|without (?:sleep|rest|sleeping|stopping)|deepen|marathon|harvest|yield|finish line|beast|monster|superhero|superhuman|champion|world[- ]class)\b/i,
   // guarantee/ensure × outcome noun
   /\b(?:guarantee|guarantees|guaranteed|ensure|ensures|ensuring|assure|assures)\s+(?:[a-z]+\s+){0,3}(?:harvest|yield|crop|record|victory|success|win)\b/i,
-  // carry-class verb × quantity object（carry a hundred jin）
-  /\b(?:carry|lift|haul|move|tote)\s+(?:[a-z]+\s+){0,3}(?:hundred|thousand|dozens?|scores|pounds?|lbs?|kilos?|kilograms?|jin|catties|miles?|kilometers?|kilometres?)\b/i,
+  // 搬运/运动类动词 × 数量宾语（carry a hundred jin / run a hundred miles）
+  /\b(?:carry|lift|haul|move|tote|run|walk|swim|cycle|jog|hike)\s+(?:[a-z]+\s+){0,3}(?:hundred|thousand|dozens?|scores|pounds?|lbs?|kilos?|kilograms?|jin|catties|miles?|kilometers?|kilometres?)\b/i,
 ];
 
 // ─── [r341] 剂量升级判定 ─────────────────────────────────────────────────
@@ -275,7 +275,7 @@ const TASK_AMP_EN = [
 // 进入深度休息」）因此不判。单位归一化：去「个」前缀（个小时→小时）、
 // 英文去复数后缀（cups→cup）。
 const ZH_NUM = { 零: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
-const EN_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, twenty: 20, thirty: 30, fifty: 50, hundred: 100, thousand: 1000, dozen: 12, couple: 2, half: 0.5, a: 1, an: 1 };
+const EN_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, twenty: 20, thirty: 30, fifty: 50, hundred: 100, thousand: 1000, dozen: 12, couple: 2, half: 0.5, a: 1, an: 1, single: 1 };
 
 function numVal(tok) {
   if (/^\d+(?:\.\d+)?$/.test(tok)) return parseFloat(tok);
@@ -288,16 +288,19 @@ function numVal(tok) {
   if (/^[一二两三四五六七八九]$/.test(tok)) return ZH_NUM[tok];
   const mb = /^([一二两三四五六七八九])百([一二两三四五六七八九]?十[一二两三四五六七八九]?)?$/.exec(tok);
   if (mb) return ZH_NUM[mb[1]] * 100 + (mb[2] ? numVal(mb[2]) : 0);
-  return null;
+  // 英文数词回退（one/ten/half/a…）：大小写已在调用方归一
+  const e = EN_NUM[tok];
+  return e !== undefined ? e : null;
 }
 
 function normUnit(u) {
   // 英文复数归一：sibilant(s/x/z/ch/sh)+es 剥 es（glasses→glass/boxes→box），
-  // 其余只剥尾部 s（bottles→bottle/cups→cup）——早前双剥离把 bottles 切成
-  // bottl 与 bottle 对不上，升级判定恒 false。
+  // 其余只剥尾部 s（bottles→bottle/cups→cup），但 ss 结尾（glass）不剥——
+  // 早前双剥离把 bottles 切成 bottl 与 bottle 对不上、glass 切成 glas，
+  // 升级判定恒 false。
   let s = String(u).toLowerCase().replace(/^个/, '');
   if (/(?:s|x|z|ch|sh)es$/.test(s)) s = s.replace(/es$/, '');
-  else if (/s$/.test(s)) s = s.replace(/s$/, '');
+  else if (/s$/.test(s) && !/ss$/.test(s)) s = s.replace(/s$/, '');
   return s;
 }
 
@@ -310,12 +313,7 @@ function hasDailyEscalation(text) {
       let m;
       while ((m = g.exec(text)) !== null) {
         const raw = String(m[1]).toLowerCase();
-        let qty;
-        if (/^[\d.]+$/.test(raw)) qty = parseFloat(raw);
-        else {
-          const nv = numVal(raw);
-          qty = (nv !== null && nv !== undefined) ? nv : EN_NUM[raw];
-        }
+        const qty = numVal(raw);
         if (typeof qty !== 'number' || !isFinite(qty) || qty <= 0) continue;
         const u = normUnit(m[2]);
         (byUnit[u] = byUnit[u] || []).push(qty);
