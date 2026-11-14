@@ -1,3 +1,15 @@
+## r333 — illusion_of_control 补腿 ×4 + 撞号重编号收尾（真升级②；远端同步轮已发 r332=winners_curse，本地 r332 固化工作按 r327 先例改 r333）
+
+- **背景（r332 未 commit 遗留）**：上一轮 r332 实质改动全部落盘并通过四门禁，但报告时处于未 commit 状态（工作树还有 4 条补腿 + 3 个探针未提交）。本轮开轮同步即遇 rebase 冲突（exit 4，coordination/claims.jsonl）：远端同步轮（HeartFlow Cron）已于 08:08-09:1x 发布 r332=winners_curse 数字竞价域新措辞家族（v6.8.184，src/winners-curse.js +108/-5、新轮测 240 行），与本地未推送的 c020aeb7（r332 illusion_of_control 接线固化，VERSION 6.8.185）轮次号撞。
+- **撞号处理（COORDINATION.md §1.1 + r327 先例）**：远端 r332 不动；本地未推送工作重编号为 r333，rebase 到远端 3dbd813a 之上。claims.jsonl 冲突手工合并：`:2:`（ours=远端 r332 winners_curse 两条）+ `:3:`（theirs=本地 r331 release + r332 claim 改号 r333），252 行全部 JSON 合法、零冲突标记残留。首次合并脚本有缺陷（ours 尾部缺换行致行粘连 + `>>>>>>>` 标记未删净，250/252 两行损坏），以 `git show :2:/:3:` 重做后 252/252 valid。
+- **补腿 ×4**（`src/illusion-of-control.js`，工作树未提交部分本轮固化）：① **A_ZH ①-b 补 `命运/手气`**——ZH 运气弱锚点原表有「运气」，补同族两形；② **A_EN ①-b 补 `luck` 裸词 + `chances` 复数 + `fortune`**——EN 侧原表只有 odds/probability/chance/likelihood，「does my luck really improve at the table」整句因腿①零命中穿透（EN/ZH 不对称，ZH 早有「运气」）；③ **B_EN 拉丁幸运物 EN 侧腿**——`(?:lucky )?(?:charm|coin|penny|socks?|red string|bracelet|four-leaf clover|horseshoe|rabbit's foot|crystal|amulet|jade|pendant)`，与 ②-b3 lucky 修饰形互补（b3 要求 lucky 紧接物件词，本腿收不带 lucky 前缀的器物裸名）；string 收紧为 red string（裸 string 是 "a string of" 高频词）；④ **C_ZH ③-a 补 `上升/升高`**——名词+提升动词反序匹配原表只有「上涨/走高」。
+- **探针固化**（r227 教训：本地独有产能不丢）：`scripts/round-332/probe-leg-diagnose.js`（腿级诊断，A_ZH 注入改用真实命中样本）、`probe-runtime-mcp.js`（经 MCP 网关 127.0.0.1:8588 运行态实测）、`probe-variant-matrix.js`（10 攻击 + 10 良性变体矩阵 + 负例注入逐常量承重）。
+- **四门禁复跑（rebase 合并后整树）**：verify **16/16** PASS；guard-abilities **20/20** PASS（判别维度 **256**）；doc-numbers **24/24** PASS（r332 报告遗留的 2 处口径版本戳 FAIL 在当前树上已不存在——README:207 与 SKILL:80 均已 v6.8.185）；双向召回 **52/52** PASS + 误拦 **302/326**（与基线持平，零新增误伤）。
+- **轮测/存量**：`test/round-331-illusion-of-control.js` 攻击 **20/20** 全中、良性 **16/16** 零误伤（findings guidance 2490 字）；存量 `round-323` **152/152**、`round-295` **63/63**、illusion-of-control.test.js 11/11 无回退。
+- **VERSION**：6.8.185（不变——r332 已 bump，本轮仅 rebase + 补腿 + 文档已同步）。
+- **死认领治理**：hf4-claim.sh scan 确认无活跃轮次；误认领 r334（脚本按 UPGRADE_LOG 下一号发放，不知本轮实为 r333）已 release 并在账本标注原因；r333 claim 登记 completed。
+- **已知边界/下轮可继续**：① r331 探针发现 dose_response_linearity 日常物品剂量外推族（「喝一杯咖啡提神，那喝十杯就能通宵不困」类）模块层 MISS——r330 同方向，轮换纪律禁，下轮可接（给 1 号）；② probe-negative-injection.js 的 inject 协议（对象键替换 `R.B_ZH || B_ZH`、anchor 匹配必须 `source.includes()`，`new RegExp(anchor)` 会把 `\\s` 二次转义）写同类探针必看；③ scripts/round-331/probe-scan-all.js（4370 存量样本穿透扫描）建议入 CI。
+
 ## r332 — illusion_of_control 第 256 维度接线 + 三条穿透腿补齐（真升级②，r331 未提交半成品收尾）
 
 - **背景（r331 交接）**：r331 选题自我推翻未提交，遗留工作树半成品——`src/illusion-of-control.js`（547 行，r239 五候选竞争分析选出控制幻觉族 C：13/13 穿透、良性零纠缠）与 index.js 九处接线，但 `test/round-331-illusion-of-control.js` 攻击 17/20（3 条穿透）。本轮开局先做死认领治理（释放 r331 的 illusion_of_control 死认领、认领 r332），再接续补齐。

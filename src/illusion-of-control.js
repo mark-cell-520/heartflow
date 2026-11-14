@@ -134,7 +134,11 @@ const A_ZH = [
   // ①-a 纯随机装置/事件名词
   /(?:彩票|彩票号|中奖|中大奖|中签|摇号|抽奖|抽签|掷骰子|抛骰子|掷色子|骰子|抛硬币|掷硬币|硬币|轮盘|赌大小|老虎机|吃角子老虎机|开箱|抽卡|暴击|掉落|开奖|盲盒|彩球|签池|抽奖箱|摇号池|机选|机器选号|随机数|随机事件|随机抽取|赌场|赌博|博彩|六合彩|押大押小|开大小)/,
   // ①-b 弱锚点（概率/运气类——须与②③共现才承重）
-  /(?:概率|几率|机率|运气)/,
+  // r332 补 luck：EN ①-b 缺运气弱锚点（ZH ①-b 有「运气」而 EN 只有
+  // odds/probability/chance/likelihood——「does my luck really improve
+  // at the table」整句因腿①零命中而穿透，EN/ZH 不对称；同族补裸 luck
+  // 与复数 chances，与既有裸名词教训同源）
+  /(?:概率|几率|机率|运气|命运|手气)/,
 ];
 
 // ─── 腿① 纯随机事件锚点（英文）────────────────────────────────
@@ -151,7 +155,10 @@ const A_EN = [
   /\b(?:quick[- ]?pick|machine[- ]?pick|computer[- ]generated)\b/i,
   /\b(?:casino|gambling|betting\s+slip)\b/i,
   // ①-b 弱锚点
-  /\b(?:odds|probability|chance|likelihood)\b/i,
+  // r332 补腿：luck 裸词 + chances 复数形（「does my luck really
+  // improve at the table」穿透：①-b 原表无 luck；「raises my chances」
+  // 穿透：无复数 chances。ZH ①-b 早有「运气」——EN/ZH 不对称补平）
+  /\b(?:odds|probability|chances?|likelihood|luck|fortune)\b/i,
 ];
 
 // ─── 腿② 主观控制行为（中文）──────────────────────────────────
@@ -210,7 +217,15 @@ const B_EN = [
   /\b(?:throw(?:ing)?\s+(?:the\s+)?(?:dice|die)\s+hard|hard\s+throw)\b/i,
   /\b(?:touch(?:ing)?\s+wood|knock(?:ing)?\s+on\s+wood|cross(?:ing)?\s+(?:your\s+)?fingers)\b/i,
   // ②-d 时长投入族
-  /\b(?:deliberat\w+|careful(?:ly)?\s+(?:pick|choos|select)|took\s+(?:his|her|their)\s+time|lingered|hovered|reached\s+(?:in|into)\s+the)\b/i,
+  /\b(?:deliberat\w+|careful(?:ly)?\s+(?:pick|choos|select)|took\s+(?:his|her|their)\s+time|lingered|hovered|reached\s+(?:in|into)\s+the)/i,
+  // ②-e2b r332 补腿：拉丁幸运物（B_ZH ②-e2 的中文链穿透修复补丁发现
+  // B_EN 侧同样缺——「Wearing my red bracelet genuinely raises my
+  // chances」「after I touch the horseshoe」EN 链腿②零命中，纯 EN 句
+  // 整族穿透。与 ②-b3 lucky 修饰形互补：b3 要求 lucky 紧接物件词，本腿
+  // 收不带 lucky 前缀的器物裸名（red string/bracelet、horseshoe 等）。
+  // string 收紧为 red string——裸 string 是 "a string of" 高频词，
+  // 靠 A×C 两腿虽能兜，但收紧后误伤面更小且 ZH 侧只收红绳对称））
+  /\b(?:lucky\s+)?(?:charm|coin|penny|socks?|red\s+string|bracelet|four[- ]leaf\s+clover|horseshoe|rabbit'?s\s+foot|crystal|amulet|jade|pendant)\b/i,
 ];
 
 // ─── 腿③ 影响断言（中文）──────────────────────────────────────
@@ -230,7 +245,7 @@ const C_ZH = [
   // 名词在前的同族形，③-a 的「名词+形容词」结构收不住；补裸名词+
   // 提升动词反序匹配，同族变体矩阵实测「戴着幸运袜去赌场，押大的胜率
   // 都会提升」原穿透 gate=pass）
-  /(?:中奖率|中奖概率|中签率|几率|机率|概率|可能性|胜率|命中率|赔率|赢面|手气|运势|机会)[^。，！？；\n]{0,8}(?:都会|也会|就能|就会|将|将会)?(?:提高|提升|增加|拉高|抬高|改善|增大|放大|变大|变强|变好|上涨|走高)/,
+  /(?:中奖率|中奖概率|中签率|几率|机率|概率|可能性|胜率|命中率|赔率|赢面|手气|运势|机会)[^。，！？；\n]{0,8}(?:都会|也会|就能|就会|将|将会)?(?:提高|提升|增加|拉高|抬高|改善|增大|放大|变大|变强|变好|上升|升高|上涨|走高)/,
   // ③-e 虔诚-灵验族
   /(?:心诚则灵|心诚(?:者)?灵|念佛(?:者)?灵|拜了(?:就)?灵)/,
   // ③-f 挑得准族（摸得久挑得准）
@@ -266,15 +281,17 @@ const C_EN = [
   // winning 的比较形——EN 侧原表只有 improves X odds 前动词形）。
   // my/our 也收（r331 实测「my luck improves whenever I rub the dice」
   // 原穿透——物主表缺 my）。
-  /\b(?:your|his|her|their|my|our|the)\s+(?:odds|chances?|luck|probability|likelihood)\s+(?:will\s+|would\s+|can\s+|may\s+)?(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better)\b/i,
+  /\b(?:your|his|her|their|my|our|the)\s+(?:odds|chances?|luck|probability|likelihood|fortunes?)\s+(?:will\s+|would\s+|can\s+|may\s+)?(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better)\b/i,
   // ③-g2 r332 补腿：really/somehow/definitely 等副词插入形（「does my luck
   // really improve in the weekly draw」原穿透：③-g 要求名词后紧跟助动词+
   // 动词，副词插入即漏；同族变体矩阵教训）
-  /\b(?:your|his|her|their|my|our|the)\s+(?:odds|chances?|luck|probability|likelihood)\s+(?:really|actually|somehow|definitely|certainly|genuinely|truly|simply|just)\s+(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better|changes?)\b/i,
+  /\b(?:your|his|her|their|my|our|the)\s+(?:odds|chances?|luck|probability|likelihood|fortunes?)\s+(?:really|actually|somehow|definitely|certainly|genuinely|truly|simply|just)\s+(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better|changes?)\b/i,
   // ③-g3 r332 补腿：the odds of <名词/动名词> 的 of 插入形（「the odds of
   // hitting it will go up」原穿透：③-g 的 odds 后不接 of 短语；同族变体
-  // 矩阵教训。收 odds/chance of X + 提升动词，X 取短名词短语）
-  /\b(?:the|your|his|her|their|my|our)\s+(?:odds|chances?|probability|likelihood)\s+of\s+(?:\w+\s+){0,3}?(?:will\s+|would\s+|can\s+|may\s+)?(?:go(?:es)?\s+up|improves?|improved|rises?|increases?|gets?\s+better|climbs?)\b/i,
+  // 矩阵教训。收 odds/chance of X + 提升动词，X 取短名词短语。
+  // r332b 补 fortunes：长句「his fortune would improve at the roulette
+  // wheel」穿透——③-g/③-g2 已补 fortunes 而本腿漏，C 侧不对称）
+  /\b(?:the|your|his|her|their|my|our)\s+(?:odds|chances?|probability|likelihood|fortunes?)\s+of\s+(?:\w+\s+){0,3}?(?:will\s+|would\s+|can\s+|may\s+)?(?:go(?:es)?\s+up|improves?|improved|rises?|increases?|gets?\s+better|climbs?)\b/i,
   /\b(?:better|higher|greater|improved)\s+chance\s+of\s+(?:winning|getting|rolling|drawing|hitting)\b/i,
   /\b(?:improves?|improved|boosts?|boosted|raises?|raised|increases?|increased)\s+(?:your|his|her|their)\s+(?:luck|fortunes?|winning)\b/i,
 ];
