@@ -38,6 +38,8 @@ const FAMILIES = [
   { key: 'winners_curse',                  mod: '../../winners-curse.js',                  fn: 'detectWinnersCurse',                group: 'econ',  zh: '赢家诅咒',                 en: "winner's curse",                 round: 'r237' },
   // r336 新增：机会成本忽视（econ 族第 19 子族，r260 backlog 重启）
   { key: 'opportunity_cost_neglect',       mod: '../../opportunity-cost-neglect.js',       fn: 'detectOpportunityCostNeglect',     group: 'econ',  zh: '机会成本忽视',             en: 'opportunity cost neglect',       round: 'r336' },
+  // r339 新增：适应证混杂（因果/统计推理方向，econ 族第 20 子族）
+  { key: 'confounding_by_indication',      mod: '../../confounding-by-indication.js',      fn: 'detectConfoundingByIndication',    group: 'econ',  zh: '适应证混杂',               en: 'confounding by indication',     round: 'r339' },
   { key: 'tragedy_of_commons',             mod: '../../tragedy-of-commons.js',             fn: 'detectTragedyOfCommons',            group: 'econ',  zh: '公地悲剧',             en: 'tragedy of the commons',         round: 'r238' },
   { key: 'illusion_of_control',            mod: '../../illusion-of-control.js',            fn: 'detectIllusionOfControl',           group: 'econ',  zh: '控制幻觉',             en: 'illusion of control',            round: 'r239' },
   { key: 'disposition_effect',             mod: '../../disposition-effect.js',             fn: 'detectDispositionEffect',           group: 'econ',  zh: '处置效应',             en: 'disposition effect',             round: 'r240' },

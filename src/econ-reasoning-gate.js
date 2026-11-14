@@ -43,6 +43,10 @@ const FAMILIES = [
   // 零成本零损失，被放弃的替代用途未计入；双腿 + RULE/CONCEPT/CORRECT
   // 三组豁免解掉 r260 记录的 use-it-or-lose-it/免费品/闲置纠正误伤陷阱）。
   { key: 'opportunity_cost_neglect',        mod: './opportunity-cost-neglect.js',       fn: 'detectOpportunityCostNeglect',     zh: '机会成本忽视',             en: 'opportunity cost neglect',       round: 'r336' },
+  // r339 新增：适应证混杂（confounding by indication——治疗分配由基线
+  // 预后驱动时，组间粗结局率差异反映的是基线风险而非治疗效应；双腿 +
+  // CONCEPT/CORRECT 两组豁免 + 腿②对冲守卫解掉正确限定形）。
+  { key: 'confounding_by_indication',       mod: './confounding-by-indication.js',      fn: 'detectConfoundingByIndication',   zh: '适应证混杂',               en: 'confounding by indication',     round: 'r339' },
   { key: 'tragedy_of_commons',              mod: './tragedy-of-commons.js',            fn: 'detectTragedyOfCommons',            zh: '公地悲剧',                 en: 'tragedy of the commons',         round: 'r238' },
   { key: 'illusion_of_control',             mod: './illusion-of-control.js',            fn: 'detectIllusionOfControl',           zh: '控制幻觉',                 en: 'illusion of control',            round: 'r239' },
   { key: 'disposition_effect',              mod: './disposition-effect.js',             fn: 'detectDispositionEffect',           zh: '处置效应',                 en: 'disposition effect',             round: 'r240' },
