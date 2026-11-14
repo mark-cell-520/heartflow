@@ -70,15 +70,17 @@ for (const [text, tag] of benign) {
 
 // ─── C 组：负例注入（逐族清空，证明承重腿） ─────────────────────────
 const I = __internals();
-// 清空证据腿 → 全部 miss
+// 清空证据腿 → 全部 miss（r338：腿①扩为 EVID/SUBGROUP/CROSS_TRIAL 五族，
+// 注入表随模块家族表补全——清空口径保持「腿①全空 → 全部 miss」不变量）
 {
-  const R = { EVID_ZH: [], EVID_EN: [] };
+  const R = { EVID_ZH: [], EVID_EN: [], SUBGROUP_ZH: [], SUBGROUP_EN: [], CROSS_TRIAL_ZH: [], CROSS_TRIAL_EN: [] };
   const n = attacks.filter(([t]) => checkEvidenceClaimMismatch(t, R).hit).length;
   ok(n === 0, `EVID emptied → 0/${attacks.length} hits`, `got ${n}`);
 }
-// 清空越界腿 → 全部 miss
+// 清空越界腿 → 全部 miss（r338：腿②新增 OVERREACH_NEW_ZH/EN 两组，
+// 注入表随模块家族表补全——「越界腿全空 → 全部 miss」不变量保持完整）
 {
-  const R = { OVERREACH_ZH: [], OVERREACH_EN: [] };
+  const R = { OVERREACH_ZH: [], OVERREACH_EN: [], OVERREACH_NEW_ZH: [], OVERREACH_NEW_EN: [] };
   const n = attacks.filter(([t]) => checkEvidenceClaimMismatch(t, R).hit).length;
   ok(n === 0, `OVERREACH emptied → 0/${attacks.length} hits`, `got ${n}`);
 }

@@ -275,13 +275,19 @@ const OVERREACH_ZH = [
   /(?:可以|能|能够)[^。；，]{0,8}(?:延长寿命|延年益寿|永葆|重返年轻|长生)/,
   // r307 补：直接断言全国/整体覆盖（无连接词形）
   /(?:证明|证实|说明)了?[^。；，]{0,14}(?:全国|全球|整体|全面|全民|所有行业|每个人)/,
-  // r338 补：家族 A 子组→普适越界形（子组证据在场，断言跨子组/全人群）
+];
+
+// ─── r338 腿②新增越界形（中文）────────────────────────────────────────
+// 家族 A 子组→普适越界形 + 家族 B 跨试验间接比较越界形。独立成组便于
+// 负例注入逐组删除验证承重。
+const OVERREACH_NEW_ZH = [
+  // 家族 A · 子组→普适
   /(?:所以|因此|因而|可见|足见|据此|这说明|这意味着|于是|那么)[^。；，]{0,18}(?:同样|也)[^。；，]{0,6}(?:适用|有效|成立|获益)/,
   /(?:所以|因此|说明|可见|据此|足以证明)[^。；，]{0,18}(?:也|同样|一定|必然)[^。；，]{0,6}(?:有效|适用|成立|获益)/,
   /宣称[^。；，]{0,14}(?:两性|男女|所有|任何|人人|全民|各类|各种|所有人)/,
   /对(?:两性|男女|所有|任何|各类)[^。；，]{0,6}(?:都)?(?:有效|适用|成立)/,
   /推广到[^。；，]{0,6}(?:全国|全球|全世界|全民|所有|各地|全人类)/,
-  // r338 补：家族 B 跨试验间接比较越界形（分立试验各自 vs 对照 ⇒ A 优于 B）
+  // 家族 B · 跨试验间接比较
   /(?:所以|因此|因而|可见|足见|据此|于是|那么)[^。；，]{0,16}(?:优于|胜过|强于|好于|更有效|效果更好|更胜)/,
   /(?:所以|因此|可见|据此)[^。；，]{0,8}[A-Za-z甲乙丙]\s*比\s*[A-Za-z甲乙丙]\s*(?:强|好|优)/,
   /说明[^。；，]{0,8}(?:更有效|效果更好|更优|优于)/,
@@ -298,10 +304,14 @@ const OVERREACH_EN = [
   /\b(?:so|therefore|thus|this\s+(?:proves|shows|means)|which\s+(?:proves|shows|means))\b[^.!?]{0,40}\b(?:everyone|everybody|all\s+(?:people|humans?|patients?|cases)|universally|without\s+exception)\b/i,
   // O3 局部 → 整体
   /\b(?:so|therefore|thus|this\s+(?:proves|shows|means))\b[^.!?]{0,40}\b(?:nationwide|globally|worldwide|across\s+the\s+(?:country|world|nation)|everywhere)\b/i,
-  // r338 补：家族 A 子组→普适越界形（EN）
+];
+
+// ─── r338 腿②新增越界形（英文）────────────────────────────────────────
+const OVERREACH_NEW_EN = [
+  // 家族 A · 子组→普适
   /\b(?:which\s+means|so|therefore|thus|meaning)\b[^.!?]{0,40}\b(?:younger|older|other|both\s+sexes|women|men|males|females|everyone)\b[^.!?]{0,30}\b(?:benefit|works?|effective|applies|respond|helped)\b/i,
   /\bgeneraliz\w+\s+(?:worldwide|globally|everywhere|across\b)/i,
-  // r338 补：家族 B 跨试验间接比较越界形（EN）
+  // 家族 B · 跨试验间接比较
   /\b(?:so|therefore|thus)\b[^.!?]{0,40}\b(?:superior|better|more\s+effective|outperforms?)\b/i,
 ];
 
@@ -416,7 +426,10 @@ function checkEvidenceClaimMismatch(text, inject) {
     .concat(positions(R.SUBGROUP_EN || SUBGROUP_EN, text))
     .concat(positions(R.CROSS_TRIAL_ZH || CROSS_TRIAL_ZH, text))
     .concat(positions(R.CROSS_TRIAL_EN || CROSS_TRIAL_EN, text));
-  const over = positions(R.OVERREACH_ZH || OVERREACH_ZH, text).concat(positions(R.OVERREACH_EN || OVERREACH_EN, text));
+  const over = positions(R.OVERREACH_ZH || OVERREACH_ZH, text)
+    .concat(positions(R.OVERREACH_EN || OVERREACH_EN, text))
+    .concat(positions(R.OVERREACH_NEW_ZH || OVERREACH_NEW_ZH, text))
+    .concat(positions(R.OVERREACH_NEW_EN || OVERREACH_NEW_EN, text));
   if (evid.length === 0 || over.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
 
   const win = isZh ? 80 : 200;
@@ -442,6 +455,7 @@ module.exports = {
   checkEvidenceClaimMismatch,
   __internals: () => ({
     EVID_ZH, EVID_EN, OVERREACH_ZH, OVERREACH_EN,
+    OVERREACH_NEW_ZH, OVERREACH_NEW_EN,
     SUBGROUP_ZH, SUBGROUP_EN, CROSS_TRIAL_ZH, CROSS_TRIAL_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_SUFF_ZH, EXEMPT_SUFF_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
