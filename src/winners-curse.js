@@ -109,6 +109,36 @@
  *   否定前缀修饰（不等于估值正确/不能说明值这个价/not that the
  *   price was right）不计。
  *
+ * [r332 数字竞价域新措辞家族] 零命中探针 scripts/round-332/
+ * r332-probe-direction.js（v6.8.184 基线实测）：存量四链（含 r316
+ * 抢地/牌照/打新/评标族）对「竞拍到搜索关键词×说明市场认可流量
+ * 价值 / 天价签下主播×证明平台认可商业价值 / 抢到黄金广告位×
+ * 判断没错、这个位置就值这个钱 / won the keyword auction×confirms
+ * this traffic is worth / signing the star streamer×proves the
+ * platform accepts her market value」6/6 完全穿透（gate.action=
+ * pass、econ_reasoning_gate 归因 0），良性 6/6 零误伤。数字营销/
+ * 直播电商/MCN 话语域无任何存量腿：关键词/广告位/流量/坑位/主播
+ * 不在 WIN_ZH3 标的表，「流量价值/商业价值/变现价值/花得值」不在
+ * VALUE_ZH3 推断表。新增 WIN_ZH4/EN4×VALUE_ZH4/EN4 平行常量独立链
+ * （findSignatures 第六、七链）：腿①竞得动词（竞拍到/投得/抢到/
+ * 斩获）×数字标的（关键词/广告位/流量/坑位/主播/明星/域名/NFT）、
+ * 被动归属形、竞价语境×数字标的、签约竞价族（天价/重金/斥资×
+ * 签下/挖到）；EN won the keyword/ad/slot/influencer auction、
+ * outbid … for the keyword/slot/streamer、(signed|landed|secured)
+ * the streamer/influencer/creator、数字标的×(went to|awarded to)
+ * us/the highest bidder。腿②推断动词×(市场|平台|广告主)?认可×
+ * (流量|商业|变现)?价值、数字标的×值这个价/花得值/没白花、推断
+ * 动词×价值名词；EN (confirms|proves|shows)×(market|platform|
+ * advertisers)(recognized|accepted|validated)×(traffic|
+ * commercial|monetization) value、(keyword|slot|traffic|
+ * streamer) is worth it、(signing|slot|ad) (fee|budget|spend)
+ * was worth it/money well spent/paid off、(confirms|proves)×
+ * (commercial|monetization|traffic|market) value。同轮补否定守卫
+ * 「并不/并没有」（原 NEG_BEFORE/NEG_INSIDE 缺该词，「并不说明
+ * 市场认可这个价值」式否定句会假阳性，present-bias 模块先例已收）。
+ * 存量四链与豁免层零改动。海外扫描 arXiv parse-fail（OR 稀释）/
+ * GitHub 0 / S2 429——空返，按既有形态自建。
+ *
  * 为什么取 VERIFY 级：单句可能是在转述一次已完成的交易结果而未
  * 及展开估值复核（这类由缺腿/豁免覆盖），也可能是报价部门的
  * 真诚信念陈述。verify 的语义是「这段话把竞价胜利当成了标的物
@@ -131,8 +161,8 @@
 
 // ─── 腿① 竞价/招标/拍卖胜利（中文）────────────────────────────
 const WIN_ZH = [
-  // ①-a 中标/竞得/拍得/拍下/夺标/标王（自带竞价语境的单词性锚点）
-  /(?:中标|竞得|拍得|拍下|夺标|标王)/,
+  // ①-a 中标/竞得/拍得/拍下/拍到/拍走/夺标/标王（自带竞价语境的单词性锚点）
+  /(?:中标|竞得|拍得|拍下|拍到|拍走|夺标|标王)/,
   // ①-b (竞标|投标|招标|竞拍|拍卖)×(赢|胜|成功|拿下|夺魁|拔得头筹)
   /(?:竞标|投标|招标|竞拍|拍卖)[^。，！？；\n]{0,10}(?:赢|胜|成功|拿下|夺得|夺魁|拔得头筹)/,
   // ①-c (赢|胜|拿下|夺得|夺魁|拔得头筹)×(竞标|投标|招标|竞拍|拍卖|标的)
@@ -164,7 +194,7 @@ const WIN_EN = [
 // ─── 腿② 价值/判断力推断（中文）────────────────────────────────
 const VALUE_ZH = [
   // ②-a (说明|证明|意味着|表明|可见|足以证明|反映出)×(值这个价|被低估|…)
-  /(?:说明|证明|意味着|表明|可见|足以证明|反映出)[^。，！？；\n]{0,14}(?:值这个价|被低估|低估|估值合理|价格合理|报价合理|性价比|确实好|真的好|物有所值|物超所值|划算|抄底|捡漏|捡了漏|好东西|好货|最佳选择|最优选择|识货)/,
+  /(?:说明|证明|意味着|表明|可见|足以证明|反映出)[^。，！？；\n]{0,14}(?:值这个价|值这个钱|被低估|低估|估值合理|价格合理|报价合理|性价比|确实好|真的好|物有所值|物超所值|划算|抄底|捡漏|捡了漏|好东西|好货|最佳选择|最优选择|识货)/,
   // ②-b (判断|眼光|决策|估值|方案|选择|出价)×(得到验证|没错|正确|精准|高明|英明)
   /(?:判断|眼光|决策|估值|方案|选择|出价)[^。，！？；\n]{0,8}(?:得到验证|被验证|得到印证|没错|是对的|正确|精准|高明|英明)/,
   // ②-c (市场|业主|客户|买家|对方|评标委员会)×(认可|接受|认了)×(价格|价|报价|成本|估值)
@@ -246,6 +276,68 @@ const VALUE_EN3 = [
   /\b(?:market|client|customer|seller|buyer|owner|panel|board)\b[^.]{0,30}\b(?:values?|valued|recognizes?|recognized|accepts?|accepted|agrees?)\b[^.]{0,30}\b(?:price|value|valuation|offer|cost|worth)\b/i,
 ];
 
+// ─── [r332] 数字竞价域新措辞家族（关键词竞价/广告位/直播坑位/主播签约）──
+// 零命中探针 scripts/round-332/r332-probe-direction.js（v6.8.184 基线实测）：
+// 存量腿（含 r316 抢地/牌照/打新/评标族）对「竞拍到搜索关键词×说明市场认可
+// 流量价值 / 天价签下主播×证明平台认可商业价值 / 抢到黄金广告位×判断没错、
+// 这个位置就值这个钱 / won the keyword auction×confirms this traffic is
+// worth / signing the star streamer×proves the platform accepts her
+// market value」6/6 完全穿透（gate.action=pass、econ_reasoning_gate 归因
+// 0），良性 6/6 零误伤。数字营销/直播电商/MCN 话语域没有任何存量腿覆盖：
+// 关键词/广告位/流量/坑位/主播 不在 WIN_ZH3 的标的表，「流量价值/商业价值/
+// 变现价值/花得值」不在 VALUE_ZH3 的推断表。平行常量 + findSignatures 独立
+// 链，存量四链与豁免层零改动。
+const WIN_ZH4 = [
+  // ①-m 数字竞价标的 × 竞得动词（竞拍到关键词/抢到广告位/投得流量坑位）
+  /(?:竞拍到|竞拍下|竞拍得|投得|投中|抢到|抢下|拿下|斩获|夺得|摘得|收入囊中)[^。，！？；\n]{0,8}(?:关键词|广告位|流量|坑位|主播|明星|网红|达人|域名|藏品|数字藏品)/,
+  // ①-n 被动形（关键词被对手拍走/广告位归了别家/主播被别家签走）
+  /(?:关键词|广告位|流量|坑位|主播|明星|网红|达人|域名|藏品)[^。，！？；\n]{0,10}(?:被|归|由)[^。，！？；\n]{0,8}(?:拍得|拍走|拿下|竞得|投得|收入囊中|夺走|抢走|签走)/,
+  // ①-o 竞价语境 × 数字标的（关键词竞价/广告位拍卖/流量拍卖/坑位竞价）
+  /(?:竞价|竞拍|拍卖|投标|招标)[^。，！？；\n]{0,6}(?:关键词|广告位|流量|坑位|主播|明星|网红|达人|域名|藏品)/,
+  // ①-p 签约竞价族（天价/重金/高价/斥资 × 签下/签到/挖到/拿下——竞价抬价
+  // 语义由修饰词承载，人才竞价胜利本身携带「最乐观估值者胜出」结构）
+  /(?:天价|重金|高价|斥资|花大价钱|砸钱)[^。，！？；\n]{0,6}(?:签下|签到|签入|挖到|挖来|挖走|拿下|揽下|招致)/,
+  // ①-q 数字标的 × 竞价语境逆序形（广告位拍卖/关键词竞价/流量坑位竞拍）
+  /(?:关键词|广告位|流量|坑位|主播|明星|网红|达人|域名|藏品)[^。，！？；\n]{0,6}(?:拍卖|竞价|竞拍|招标|投标)/,
+];
+
+const WIN_EN4 = [
+  // ①-m3 won the keyword/ad/traffic/slot/influencer auction（数字标的拍卖，
+  // 允许拍卖名带 1-2 个修饰词：ad slot auction / premium keyword auction；
+  // 0 修饰词的 won the auction 由存量 ①-a 覆盖）
+  /\bw(?:on|inning)\s+(?:the\s+)?(?:[a-z][\w-]*\s+){1,2}?(?:auction|bidding)\b/i,
+  // ①-m4 outbid everyone for the keyword/slot/streamer（为数字标的竞价胜出）
+  /\boutbid\w*\b[^.]{0,40}\b(?:for|on)\s+(?:the\s+)?(?:keyword|ad|ads|slot|placement|traffic|streamer|influencer|creator)\b/i,
+  // ①-m5 (signed|signing|landed|landing|secured|securing|snapped up|snapping up|won) the streamer/influencer/creator
+  /\b(?:signed|signing|landed|landing|secured|securing|snapped\s+up|snapping\s+up|won|winning)\s+(?:the\s+)?(?:star\s+|top\s+|influential\s+)?(?:streamer|influencer|creator|talent|anchor)\b/i,
+  // ①-m6 数字标的 × (went to|awarded to) us/the highest bidder（被动归属形）
+  /\b(?:keyword|ad\s+slot|slot|placement|traffic|streamer|influencer|sponsorship)\b[^.]{0,40}\b(?:went\s+to|awarded\s+to|given\s+to)\s+(?:us|our|the\s+highest\s+bidder)\b/i,
+];
+
+// ─── [r332] 数字域价值/判断力推断新形（中文）──────────────────
+const VALUE_ZH4 = [
+  // ②-i 推断动词 × (市场|平台|客户|用户|资本|行业)?认可 × (流量|商业|变现)?价值
+  /(?:说明|证明|意味着|表明|可见|足以证明|反映出|说明得了|印证了)[^。，！？；\n]{0,12}(?:市场|平台|客户|用户|资本|行业|圈内|广告主|甲方)?(?:认可|认同|接受|认|买账)[^。，！？；\n]{0,8}(?:流量|商业|变现|市场|潜在|含金量)?(?:价值|价格|价|报价|估值)/,
+  // ②-j 数字标的 × 值这个价/花得值（广告位就值这个价/签约费花得值/没白花）
+  /(?:关键词|广告位|坑位|流量|主播|明星|网红|达人|域名|藏品|位置|签约费|转会费|坑位费|片酬)[^。，！？；\n]{0,8}(?:就)?(?:值这个价|值这个钱|物有所值|物超所值|花得值|花的值|没白花|签得值|投得值|买得值|确实值|真的值)/,
+  // ②-k 推断动词 × 价值名词（说明…商业价值/变现价值/流量价值/号召力）
+  /(?:说明|证明|意味着|表明|可见|反映出|足以证明|印证)[^。，！？；\n]{0,14}(?:商业价值|变现价值|流量价值|市场价值|潜在价值|含金量|购买力|号召力)/,
+];
+
+// ─── [r332] 数字域价值/判断力推断新形（英文）──────────────────
+const VALUE_EN4 = [
+  // ②-i3 (confirms|proves|shows|means|...) × (market|platform|advertisers) (recognized|accepted|validated|values) × (traffic|commercial|monetization) value
+  /\b(?:confirms?|proves?|shows?|means?|demonstrates?|suggests?|indicates?)\b[^.]{0,50}\b(?:market|platform|advertisers?|users?|capital|industry|clients?)\b[^.]{0,30}\b(?:recogniz\w+|accept\w+|validat\w+|valu\w+|embrac\w+)\b[^.]{0,40}\b(?:traffic|commercial|monetization|market|potential)?\s*(?:value|worth|price)\b/i,
+  // ②-i4 (keyword|slot|traffic|streamer|influencer) is worth it / worth every dollar
+  /\b(?:keyword|ad|slot|placement|traffic|streamer|influencer|creator|domain|nft)\b[^.]{0,40}\b(?:worth\s+(?:it|every|the\s+price)|is\s+worth|was\s+worth)\b/i,
+  // ②-i5 (signing|transfer|slot|placement|ad) (fee|budget|spend|bid) was worth it / money well spent / paid off
+  /\b(?:signing|transfer|slot|placement|advertising|ad|keyword|auction)\s+(?:fee|budget|spend|bid|price)\b[^.]{0,30}\b(?:worth\s+it|money\s+well\s+spent|paid\s+off|justified|validated)\b/i,
+  // ②-i6 (confirms|proves|shows|means) ... (commercial|monetization|traffic|market) value
+  /\b(?:confirms?|proves?|shows?|means?|demonstrates?|suggests?)\b[^.]{0,50}\b(?:commercial|monetization|monetisation|traffic|market|potential)\s+value\b/i,
+  // ②-i7 (market|platform|advertisers|clients) (validated|confirmed|accepted|recognized) ... (bid|offer|price)
+  /\b(?:market|platform|advertisers?|clients?|users?|industry)\b[^.]{0,30}\b(?:validat\w+|confirm\w+|accept\w+|recogniz\w+)\b[^.]{0,30}\b(?:bid|offer|price|pricing)\b/i,
+];
+
 // 双腿距离窗
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -269,9 +361,9 @@ function allMatches(re, text) {
 
 // 腿②匹配的否定前缀检查（「不等于估值正确/不能说明值这个价」不计）。
 // 窗口取匹配前 8 字符，允许否定词与被否定短语间插入少量字。
-const NEG_BEFORE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能)[^。，！？；\n]{0,5}$/;
+const NEG_BEFORE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|并没有|并不|没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能)[^。，！？；\n]{0,5}$/;
 // 匹配 span 内部的否定词（「效率并未提升」式副词内嵌否定）
-const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能)/;
+const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|无法|并不能|并未|并没有|并不|没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|还不能)/;
 
 // 英文否定（EN 无负例注入语言侧区分，统一启用）：span 内否定 +
 // 匹配前 45 字符窗口内的否定（does not prove / cannot show …）。
@@ -340,6 +432,16 @@ function findSignatures(text, R) {
       w: R.WIN_EN3 || WIN_EN3, v: R.VALUE_EN3 || VALUE_EN3,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r332] 数字竞价域（关键词/广告位/流量坑位/主播签约 × 市场认可流量价值/
+    // 商业价值/签约费花得值，独立链；存量四链零改动）
+    {
+      w: R.WIN_ZH4 || WIN_ZH4, v: R.VALUE_ZH4 || VALUE_ZH4,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      w: R.WIN_EN4 || WIN_EN4, v: R.VALUE_EN4 || VALUE_EN4,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { w, v, win, lang } of langs) {
     const { wm, vm } = collectLegs(text, w, v, true);
@@ -397,6 +499,7 @@ module.exports = {
   __internals: () => ({
     WIN_ZH, WIN_EN, VALUE_ZH, VALUE_EN,
     WIN_ZH3, WIN_EN3, VALUE_ZH3, VALUE_EN3,
+    WIN_ZH4, WIN_EN4, VALUE_ZH4, VALUE_EN4,
     CURSE_ZH, CURSE_EN,
     PAIR_ZH, PAIR_EN,
   }),
