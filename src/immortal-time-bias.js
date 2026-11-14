@@ -98,6 +98,71 @@
  * 概括。verify 的含义是「这个生存期/寿命比较可能存在领先时间核算问
  * 题，需要改用死亡率终点或对齐诊断时点再比」。
  *
+ * [r331 扩展] 筛查偏误三兄弟的剩余两族——病程长度偏误（length-time
+ * bias）与过度诊断（overdiagnosis）——同样自 r270 起就在边界注释里
+ * 与 lead_time_bias 并列记为「src/ 下无独立维度」，本轮把这两个缺口
+ * 闭环为同一检测器的**路径 (e)** 与**路径 (f)**（维度计数 255 不变、
+ * src/index.js 零改动，与 r320-r330 各轮同形态）。立项探针实证
+ * （scripts/round-331/r331-probe-lengthtime.js，集成树 v6.8.184）：
+ * 14 条攻击样本 10 条完全穿引擎（gate.action=pass、findings 无归因），
+ * 其余 4 条被既有维度代拦（rewrite 1 / verify 3）；手工良性 10 条中
+ * 4 条被既有维度 verify（教学纠正形，属既有基线，非本轮引入）。
+ *
+ * 路径 (e) 病程长度偏误（length-time bias / 长度时间偏误）——筛查
+ * **优先检出进展缓慢的惰性病灶**（长得快的在两次筛查间期就发作了，
+ * 根本等不到被筛出来），于是筛查组的病例组合（case-mix）天然偏向
+ * 温和病程，生存指标账面更好，却被当作「筛查有效」：
+ *   筛查发现的肿瘤大多是生长缓慢的类型，所以筛出来的人预后天然更好，
+ *   这说明筛查确实有效。
+ *   Cancers found by screening are mostly slow-growing indolent tumors,
+ *   so screened patients naturally survive longer — screening works.
+ *
+ * 路径 (f) 过度诊断（overdiagnosis）——筛查查出一批**本来一辈子都不会
+ * 发病、也不需要治疗**的病灶，把这些检出计入「救治成果/筛查收益」，
+ * 是用检出动作冒充健康收益：
+ *   早筛查出了大量本来一辈子都不会发病的病变，这些病例证明筛查挽救了
+ * 无数生命。
+ *   Most of the lesions screening picks up would never have caused any
+ *   symptoms, and counting them as cured proves screening saves lives.
+ *
+ * 与既有维度的边界（r331 归因）：
+ *   · 路径 (d) 领先时间偏误判**确诊时点被筛查前移**（诊断日期提前、
+ *     生存从确诊日起算 → 账面变长）；路径 (e) 两组诊断时点可以完全
+ *     一致，错在**被检出的病例本身偏向慢病程**；路径 (f) 判**被检出
+ *     的病灶本不会成为临床事件**。三条路径错位来源不同，可并存。
+ *   · survivorship_bias(132) 管「只统计存活者」；本两族两组样本都可
+ *     完整在场，错在病例构成与检出计数。
+ *   · selection_bias(168) 管「受限样本 → 总体推广」；本两族是比较
+ *     内部的病例组合问题，与推广范围无关。
+ *   · statistical_misleading(58) 管小基数百分比；本两族不涉及基数。
+ *
+ * 判据（路径 e/f，三腿共现 + 跨腿邻近窗 + 豁免，缺一不判）：
+ *   腿① LEAD_SCREEN 筛查域（复用路径 d 腿①：早筛/筛查/检出/基因检测/
+ *     EN screening / early detection）
+ *   腿② 路径 (e) LEN_COMP 病例构成（生长缓慢/进展慢/惰性/懒癌/温和型/
+ *     低度恶性；EN slow-growing / slow-progressing / indolent /
+ *     low-grade / less aggressive）
+ *        路径 (f) OVERDIAG 过度诊断（本来一辈子都不会发病/终生不会恶变/
+ *     本来不需要治疗；EN would never have caused / never would have /
+ *     overdiagnosed）
+ *   腿③ 路径 (e) SCREEN_BENEFIT 筛查获益结论（窄口：筛查词与结局获益
+ *     词近邻，或「可见/说明/证明…筛查…有效」推断形，或「筛查组…
+ *     生存率/预后…更高」）
+ *        路径 (f) GAIN_CLAIM 收益计入断言（计入/算进…收益/救治成果，
+ *     「收益可观」，EN counted as / saves lives / proves screening
+ *     saves）
+ *   豁免 EXEMPT_LEN（只作用于路径 e/f，与 EXEMPT_LEAD 分离——r328 轮测
+ *     断言 EXEMPT_LEAD 恰三元素，不动其结构）：偏误点名（病程长度偏误/
+ *     长度时间偏误/过度诊断+纠正语境/length-time bias/case-mix）/
+ *     谨慎解读否定 / 收益高估夸大 / 死亡率终点设计。
+ *   疑问形守卫同路径 (d)：整句问号收尾不判。
+ *
+ * 为什么取 VERIFY 级：单句可能是筛查方法学课堂反例（「筛查优先检出
+ * 慢病程病灶，所以筛查组预后好不等于筛查有效」正是本族要教的判别
+ * 动作）、对筛查营销话术的批评转述、新闻概括。verify 的含义是「这个
+ * 筛查获益结论可能存在病例组合或过度诊断问题，需要改用死亡率终点或
+ * 对齐病例构成再比」。
+ *
  * 判据（起点锚腿 × 起点错位腿 × 疗效结论腿，三腿共现，缺一不判）：
  *   腿① START_ANCHOR 起点时点锚（中英，裸名词必收）
  *   腿② START_GAP   起点错位——三条等价路径：
@@ -394,6 +459,109 @@ const EXEMPT_LEAD_EN = [
 const WIN_LEAD_ZH = 160;
 const WIN_LEAD_EN = 400;
 
+// ─── [r331] 路径 (e) 病程长度偏误（length-time bias）子家族常量 ─────────
+// 腿② LEN_COMP 病例构成：筛查优先检出的是**进展缓慢/惰性**的病灶——长得快
+// 的病灶在两次筛查的间期里就发作，根本等不到被筛出来，所以筛查组的病例
+// 组合（case-mix）天然偏向温和病程。161 轮教训：收裸名词形态（「惰性」
+// 「懒癌」「温和型」不带后缀也命中）。
+const LEN_COMP_ZH = [
+  /生长缓慢|生长慢|长得慢|进展缓慢|进展慢|发展缓慢|发展慢|病程较长|长病程/,
+  /惰性|懒癌|懒瘤|温和型|低度恶性|低恶性|恶性度低|恶性程度低|活跃度低|不怎么进展|不太进展|不怎么发展|不太发展|生长不快|进展不快|不怎么长/,
+];
+// 腿②（英文）：slow-growing / slow-progressing / indolent / low-grade
+const LEN_COMP_EN = [
+  /\bslow[- ]?(?:growing|progressing|developing|evolving)\b/i,
+  /\bindolent\b/i,
+  /\blow[- ]grade\b/i,
+  /\bless\s+aggressive\b/i,
+  /\b(?:rarely|seldom|almost\s+never)\s+(?:progress|progresses|progressed)\b/i,
+  /\b(?:lazy|smouldering|smoldering)\s+(?:cancers?|tumou?rs?)\b/i,
+];
+
+// 腿③ SCREEN_BENEFIT 筛查获益结论（窄口，只收**结局获益**断言：
+// 不收裸「有效/受欢迎」，只收改善/提高/延长/救命/获益/更好/值得 +
+// 推断标记形 + 「筛查组…生存率/预后…更高」形）。
+// 窄口理由：「体检筛查出生长缓慢的肿瘤也值得记录」类正常工程/医疗陈述
+// 若收裸「有效/值得」会误伤；结局获益词与筛查词近邻才构成「筛查改善
+// 结局」结论。
+const SCREEN_BENEFIT_ZH = [
+  /(?:筛查|早筛|筛出|检出|普筛|筛检|体检|检测)[^。！？]{0,12}(?:改善|提高|延长|救命|延寿|活得更久|活得长|获益|受益|更好|值得|有价值)/,
+  /(?:改善|提高|延长|救命|延寿|活得更久|活得长|获益|受益|更好|值得|有价值)[^。！？]{0,12}(?:筛查|早筛|筛出|检出|普筛|筛检|体检|检测)/,
+  /(?:可见|说明|证明|表明|因此|所以|显然|足以证明)[^。！？]{0,16}(?:筛查|早筛|筛出|检出|检测)[^。！？]{0,8}(?:有效|有用|管用|见效|值得|救命|挽救|拯救|改善|提高|延长|更好|获益|受益|有价值)/,
+  /(?:筛查|早筛|筛检|检测)[^。！？]{0,6}(?:组|人群|者)?[^。！？]{0,4}(?:生存率|生存期|预后|结局)[^。！？]{0,8}(?:更高|更长|更好|更高一截|明显高于|显著高于|大幅改善)/,
+];
+// 腿③（英文）
+const SCREEN_BENEFIT_EN = [
+  /\bscreen(?:ing|ed|s)?\b[^.]{0,40}\b(?:improves?|improved|extends?|extended|prolongs?|prolonged|saves?|saved|works?|worked|worth|beneficial|helps?\s+(?:\w+\s+){0,2}live\s+longer|live\s+longer)\b/i,
+  /\b(?:improves?|improved|extends?|extended|prolongs?|prolonged|saves?|saved|works?|proves?|proven|shows?)\b[^.]{0,40}\bscreen(?:ing|ed|s)?\b/i,
+  /\b(?:screened|screening)\s+(?:groups?|patients?|cohorts?|population)\b[^.]{0,40}\b(?:better|higher|longer|improved|superior)\b/i,
+  /\b(?:better|higher|longer|improved|superior)\s+(?:survival|outcomes?|prognosis)\b[^.]{0,40}\bscreen/i,
+  /\b(?:improvement|gain)\b[^.]{0,40}\bscreen(?:ing|ed)?\b/i,
+  /\bscreen(?:ing|ed)?\b[^.]{0,40}\b(?:improvement|gain)\b/i,
+];
+
+// ─── [r331] 路径 (f) 过度诊断（overdiagnosis）子家族常量 ────────────────
+// 腿② OVERDIAG 过度诊断：被检出的病灶**本来不会成为临床事件**（一辈子
+// 不会发病/不会恶变/不需要治疗）——把它们计入「早期发现/救治成果」，
+// 是用检出动作冒充健康收益。
+const OVERDIAG_ZH = [
+  /本来一辈子都不会发病|一辈子都不会发病|终生不会发病|永远不发病|本来不会发病|一生都不会发病|压根不会发病/,
+  /本来不会(?:恶变|癌变|进展|发展|变成|出问题|有问题)|终生不会[^。！？]{0,2}(?:恶变|癌变|进展|出症状|引起症状|有症状)|一辈子不会(?:恶变|癌变|出症状)|永远不会?(?:恶变|癌变|进展|发病)/,
+  /本来不需要治疗|不需要治疗|无需治疗|不用治疗|治不治都一样|不治也没事|不治也不会|观察等待即可/,
+  /过度诊断|过度诊疗|被过诊/,
+];
+// 腿②（英文）：would never have caused / never would have / overdiagnosed
+const OVERDIAG_EN = [
+  /\bwould\s+never\s+(?:have\s+)?(?:caused|progressed|become|developed|mattered|surfaced|shown|led)\b/i,
+  /\bnever\s+would\s+have\b/i,
+  /\boverdiagnos(?:is|ed|e|es|ing)\b/i,
+  /\b(?:harmless|innocent|inert|indolent)\s+(?:lesions?|tumou?rs?|cancers?|growths?|findings?)\b/i,
+  /\b(?:lesions?|tumou?rs?|cancers?|findings?)\s+that\s+(?:would|will)\s+never\b/i,
+  /\bno\s+treatment\s+(?:was|is)\s+(?:needed|necessary|required)\b/i,
+];
+
+// 腿③ GAIN_CLAIM 收益计入断言（过度诊断病例被算成筛查成果/救命证据）
+const GAIN_CLAIM_ZH = [
+  /(?:计入|算入|算进|纳入|归入|统计进|算成|算作|算作是)[^。！？]{0,10}(?:收益|成果|救治|治愈|战绩|成绩|绩效|业绩|数据|案例|病例|名单)/,
+  /(?:收益|成果|价值|效果|好处|战绩|成绩)[^。！？]{0,4}(?:可观|显著|巨大|极大|丰厚|很高|极高|不小)/,
+  /证明[^。！？]{0,12}(?:筛查|检测|早筛|体检)[^。！？]{0,6}(?:挽救|拯救|救命|有效|价值|值得|改善)/,
+  /(?:证明|说明|可见|表明|足以证明)[^。！？]{0,12}(?:筛查|检测|早筛|体检)[^。！？]{0,6}(?:拯救|挽救|救命|救治|改善|提高|延长|有效|价值)/,
+];
+// 腿③（英文）：counted as / saves lives / proves screening saves
+const GAIN_CLAIM_EN = [
+  /\b(?:counted|credited|tallied|recorded|logged|booked|chalked)\b[^.]{0,30}\b(?:as|toward|into)\b/i,
+  /\b(?:saves?|saved|rescues?|rescued|cured?|healed)\s+(?:lives|life|patients)\b/i,
+  /\bproves?\s+(?:that\s+)?(?:screening|early\s+detection)\s+(?:works|saves|is\s+worth|delivers)\b/i,
+  /\b(?:shows?|demonstrates?|proves?)\b[^.]{0,30}\b(?:screening|early\s+detection)\b[^.]{0,30}\b(?:saves?|works|benefit)\b/i,
+  /\b(?:improvement|gain|benefit)\s+in\s+screened\b[^.]{0,40}\b(?:proves?|shows?|demonstrates?|confirms?)\b/i,
+];
+
+// 豁免 EXEMPT_LEN（r331，只作用于路径 e/f——与 EXEMPT_LEAD 分离：
+// r328 轮测断言 EXEMPT_LEAD 恰三元素，不动其既有结构）。四条通路：
+//  (a) 偏误点名（病程长度偏误/长度时间偏误裸名；过度诊断须带纠正语境，
+//      否则「把过度诊断病例算进收益」型攻击会被自己的机制词豁免）；
+//      EN length-time bias / case-mix 裸名，overdiagnos* 须带纠正词）；
+//  (b) 谨慎解读否定（不能/并不/不代表…不等于寿命延长/筛查有效）；
+//  (c) 收益高估夸大（高估/夸大/虚增…收益；EN inflates/overestimates…
+//      benefit）；
+//  (d) 死亡率终点设计（以总死亡率为终点——设计已消除筛查偏误）。
+const EXEMPT_LEN_ZH = [
+  /病程长度偏误|病程长度偏倚|长度时间偏误|长度时间偏倚|长度偏误|病例组合(?:偏误|偏倚|问题|效应)/,
+  /过度诊断[^。！？]{0,20}(?:偏误|偏倚|问题|效应|高估|夸大|虚增|并不意味着|并不能|不代表)|(?:偏误|偏倚|问题|效应)[^。！？]{0,6}过度诊断/,
+  /(?:不能|并非|不代表|不等于|不足以|无法|很难|未必|不一定|不应|不可|并不会)[^。！？]{0,18}(?:寿命|生命|延寿|延年|活得更久|多活|延长|救命|收益|获益|有效|价值|改善|提高|救治|治愈)/,
+  /(?:高估|夸大|虚增|注水|放大)[^。！？]{0,8}(?:收益|获益|效果|价值|成果|作用|好处)/,
+  /(?:收益|获益|效果|价值|成果|作用|好处)[^。！？]{0,8}(?:被)?(?:高估|夸大|虚增|注水|放大|失真)/,
+  /(?:以|用|按|采用)[^。！？]{0,12}(?:总死亡率|全因死亡率|死亡率|死亡)[^。！？]{0,10}(?:为|作|作为)[^。！？]{0,8}(?:终点|指标|主要终点|观察终点|主要指标)/,
+];
+const EXEMPT_LEN_EN = [
+  /\blength[- ]?time\s+bias\b/i,
+  /\bcase[- ]mix\b/i,
+  /\boverdiagnos(?:is|ed|e|es|ing)\b[^.]{0,60}\b(?:inflates?|overestimat\w+|bias|problem|means|does\s+not|is\s+not)\b/i,
+  /\b(?:does\s+not|do\s+not|doesn'?t|don'?t|cannot|can'?t|not)\b[^.]{0,28}\b(?:live\s+longer|longer\s+life|life\s+extension|extends?\s+life|prolongs?\s+life|saves?\s+lives|works?|effective|benefit|improves?|proves?)\b/i,
+  /\b(?:inflates?|inflated|overestimat\w+|exaggerat\w+|overstat\w+)\b[^.]{0,30}\b(?:benefit|survival|value|effect|apparent)\b/i,
+  /\b(?:overall|all[- ]?cause|total|disease[- ]specific)\s+mortality\b[^.]{0,36}\b(?:endpoint|primary\s+outcome|unchanged|no\s+difference)\b/i,
+];
+
 // 取某正则清单在文本中最早匹配的起始下标（无匹配返回 -1）
 function earliestIdx(list, text) {
   let best = -1;
@@ -497,6 +665,50 @@ function checkImmortalTimeBias(text, inject) {
     }
   }
 
+  // ─── [r331] 路径 (e)(f) 筛查偏误兄弟族 ────────────────────────────
+  // 病程长度偏误（length-time bias）与过度诊断（overdiagnosis）——与
+  // 领先时间偏误（路径 d）同属筛查偏误三兄弟，src/ 下均无独立维度。
+  // 两条路径共享腿①筛查域与豁免 EXEMPT_LEN，只换腿②（病例构成 /
+  // 本不会发病病灶）与腿③（筛查获益结论 / 收益计入断言），同样在锚腿
+  // 门槛之前评判（不要求起点锚在场）。豁免只作用于本两条路径——被豁免
+  // 的句子仍可被路径 (d) 或 (a)(b)(c) 评判。
+  const XL2_Z = R.EXEMPT_LEN_ZH || EXEMPT_LEN_ZH;
+  const XL2_E = R.EXEMPT_LEN_EN || EXEMPT_LEN_EN;
+  if (!(anyHit(XL2_Z, text) || anyHit(XL2_E, text))) {
+    const ps1 = earliestEither(R.LEAD_SCREEN_ZH || LEAD_SCREEN_ZH, R.LEAD_SCREEN_EN || LEAD_SCREEN_EN, text);
+    if (ps1 >= 0 && !/[？?]\s*$/.test(text)) {
+      const winL = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
+      // 路径 (e) 病程长度偏误：筛查域 × 惰性病程病例构成 × 筛查获益结论
+      const pe2 = earliestEither(R.LEN_COMP_ZH || LEN_COMP_ZH, R.LEN_COMP_EN || LEN_COMP_EN, text);
+      const pe3 = earliestEither(R.SCREEN_BENEFIT_ZH || SCREEN_BENEFIT_ZH, R.SCREEN_BENEFIT_EN || SCREEN_BENEFIT_EN, text);
+      if (pe2 >= 0 && pe3 >= 0) {
+        const span = Math.max(ps1, pe2, pe3) - Math.min(ps1, pe2, pe3);
+        if (span <= winL) {
+          return {
+            hit: true, score: 0.6, count: 1,
+            detail: /[\u4e00-\u9fff]/.test(text)
+              ? '病程长度偏误×筛查优先检出惰性病程×筛查获益结论(zh)'
+              : 'length-time-bias×screening-enriched-for-slow-progression×screening-benefit-claim(en)',
+          };
+        }
+      }
+      // 路径 (f) 过度诊断：筛查域 × 本不会发病病灶 × 收益计入断言
+      const pf2 = earliestEither(R.OVERDIAG_ZH || OVERDIAG_ZH, R.OVERDIAG_EN || OVERDIAG_EN, text);
+      const pf3 = earliestEither(R.GAIN_CLAIM_ZH || GAIN_CLAIM_ZH, R.GAIN_CLAIM_EN || GAIN_CLAIM_EN, text);
+      if (pf2 >= 0 && pf3 >= 0) {
+        const span = Math.max(ps1, pf2, pf3) - Math.min(ps1, pf2, pf3);
+        if (span <= winL) {
+          return {
+            hit: true, score: 0.6, count: 1,
+            detail: /[\u4e00-\u9fff]/.test(text)
+              ? '过度诊断×本不会发病病灶计入收益×筛查获益结论(zh)'
+              : 'overdiagnosis×would-never-progress-lesions×screening-benefit-claim(en)',
+          };
+        }
+      }
+    }
+  }
+
   // 腿① 起点时点锚（至少一处）
   const anchorCount = countMatches(A_Z, text) + countMatches(A_E, text);
   if (anchorCount < 1) return { hit: false, score: 0, detail: '', count: 0 };
@@ -569,5 +781,11 @@ module.exports = {
     LIFE_CLAIM_ZH, LIFE_CLAIM_EN,
     EXEMPT_LEAD_ZH, EXEMPT_LEAD_EN,
     WIN_LEAD_ZH, WIN_LEAD_EN,
+    // [r331] 路径 (e) 病程长度偏误 + 路径 (f) 过度诊断（负例注入口）
+    LEN_COMP_ZH, LEN_COMP_EN,
+    SCREEN_BENEFIT_ZH, SCREEN_BENEFIT_EN,
+    OVERDIAG_ZH, OVERDIAG_EN,
+    GAIN_CLAIM_ZH, GAIN_CLAIM_EN,
+    EXEMPT_LEN_ZH, EXEMPT_LEN_EN,
   }),
 };

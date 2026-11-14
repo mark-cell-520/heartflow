@@ -1,0 +1,365 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/vIln3sILSMmYy+P0dIQf94I1bSw</id>
+  <title>arXiv Query: search_query=all:length-time OR all:bias OR all:overdiagnosis OR all:cancer OR all:screening OR all:survival&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-14T05:35:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:length-time+OR+(all:bias+OR+(all:overdiagnosis+OR+(all:cancer+OR+(all:screening+OR+all:survival))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>136827</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17327v1</id>
+    <title>Decoupling Dynamics: A Tale of Two Limits</title>
+    <updated>2026-11-12T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17327v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17327v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The symmetries of a $d$-dimensional QFT are known to be captured by a topological theory in one dimension higher, the Symmetry Topological Field Theory (SymTFT), which is invariant under gauging finite symmetries of the QFT, but not under dynamical gauging of continuous symmetries. We show that the distinct SymTFTs of a $d$-dimensional QFT before and after dynamical gauging of a continuous Abelian symmetry arise as different topological limits of the same dynamical holographic gauge theory in $(d+1)$-dimensions. Gauging changes the boundary condition of this dynamical theory and thereby selects a different topological limit, explaining why the associated SymTFT changes. We give a fully quantum definition of these SymTFTs at the level of Hilbert spaces and operators by combining suitable limits of the bulk holographic theory with photon truncation. This construction clarifies how topological symmetry defects, charges, and anomalies survive while the dynamical information carried by currents is discarded. We study non-anomalous and anomalous examples, providing a complete quantum analysis for $(2+1)$-dimensional bulks. For a four-dimensional boundary theory with a mixed axial-vector anomaly, we recover the SymTFT of the non-invertible chiral symmetry that remains after gauging the vector symmetry.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:31Z</published>
+    <arxiv:comment>30 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Andrea Antinucci</name>
+    </author>
+    <author>
+      <name>Oscar Lewis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17311v1</id>
+    <title>Integer Programming with Polyhedral Constraints on the Image</title>
+    <updated>2026-11-12T18:56:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.17311v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17311v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We generalize integer programming to the setting in which the image $A \mathbf{x}$ is restricted to an explicitly given rational polyhedron $P$. That is, we solve $\min\{\mathbf{c}^{\mathsf T}\mathbf{x}:A\mathbf{x}\in P, \mathbf{x}\in\mathbb{Z}_{\geq 0}^n\}$, where $A\in\mathbb{Z}^{d\times n}$ and $P$ is an explicitly given rational polyhedron. We present a randomized algorithm running in time $(dΔ)^{O(d)}\operatorname{poly}(L)$ in this regime, where $Δ:= \|A\|_\infty$ and $L$ is the binary input length. This running time matches that of the best-known parameterized algorithms for integer programming, due to Eisenbrand and Weismantel and to Jansen and Rohwedder, and improves on the $O(d^2)$ exponent achieved by Dadush, Léonard, Rohwedder, and Verschae in a more general setting.
+  This result enables several applications, including exact algorithms for integer programming and unbounded knapsack in which the consumed resources $A\mathbf{x}$ must satisfy arbitrary additional linear constraints. We also obtain a randomized fixed-parameter algorithm for Unbounded Subset Sum parameterized by the doubling constant, resolving an open problem of Randolph and Węgrzycki. For integer programs with $m$ constraints and bounded row doubling, we obtain an $f(C,m)n^{O(m)}\operatorname{poly}(L)$-time algorithm and show that the dependence on $m$ in the exponent of $n$ is necessary under $\mathsf{W[1]}\ne\mathsf{FPT}$.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:58Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Anubhav Dhar</name>
+    </author>
+    <author>
+      <name>Tim Randolph</name>
+    </author>
+    <author>
+      <name>Karol Węgrzycki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17302v1</id>
+    <title>FLEX-LBP: Learning Local Binary Patterns with Exact Binary Inference for Texture Classification</title>
+    <updated>2026-11-12T18:55:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17302v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17302v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Local Binary Patterns (LBP) remain among the most widely used texture descriptors, from industrial inspection to medical imaging. Yet their radius, sampling angles, color transform and thresholds are fixed by hand for each dataset. We present FLEX-LBP, which learns these parameters by backpropagation while every forward pass computes exact binary codes and hard histogram counts. A straight-through estimator acts only in the backward pass, so the deployed descriptor is an interpretable hard-binary LBP with 90 learnable parameters and unchanged inference cost. In a controlled ablation on six color texture benchmarks, the component worth learning is dataset-dependent. One configuration, applied unchanged everywhere, learns the geometry and thresholds with the color transform frozen. It improves the nearest-neighbor accuracy of the identical fixed descriptor by 3.55 points on average over five seeds, significantly on five of six benchmarks and never significantly worse. With a linear discriminant readout, it gains 0.9 points; the fully learned descriptor gains 2.7 and has the highest mean. FLEX-LBP is more accurate than five classical LBP-family descriptors, PCANet and a neural LBP on five of six benchmarks. Its mean nearest-neighbor accuracy exceeds that of frozen ImageNet ResNet-50 features (23.5 million parameters). On the Kather colorectal cancer histology benchmark, the fully learned descriptor reaches 93.8%, significantly above the best classical descriptor (Completed LBP, 92.8%). The learned radii adapt in directions that recur across seeds. Noise drowns single-pixel comparisons and illuminant change flips inter-channel ones; median sampling or gray-world normalization restores 96-97%. The code is available as a drop-in PyTorch layer at https://github.com/medalimoussa/FLEX-LBP.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:56Z</published>
+    <arxiv:comment>21 pages, 5 figures, 8 tables. Code: https://github.com/medalimoussa/FLEX-LBP</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mohamed Alimoussa</name>
+    </author>
+    <author>
+      <name>Amal El Kaid</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17299v1</id>
+    <title>Simulation-Based Priors and BAO Shifts from the Lyman-$α$ Forest at the Field Level</title>
+    <updated>2026-11-12T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17299v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17299v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an analytic forward model for the Lyman-alpha (Ly-alpha) forest flux field based on cubic-order large-scale structure perturbation theory (effective field theory) calculations. We validate our cubic model on two sets of hydrodynamic simulations spanning $2 \leq z \leq 4$: the small-volume CAMELS suite, which spans a wide range of cosmological and astrophysical parameters, and the large-volume, high-resolution Sherwood simulations. We find qualitatively similar results for both at the power-spectrum level. The perturbative model reproduces the three-dimensional flux power spectrum of the simulations to $\sim 5\%$ down to $k \simeq 1$-$1.5\,h\,{\rm Mpc}^{-1}$, depending on the redshift. This improves compared to previous quadratic perturbative forward models by up to 40%. Exploiting cosmic-variance cancellation in the field-level approach, we carry out precision measurements of the Lyman-alpha forest bias parameters from the CAMELS simulation suite. We use these measurements to analytically predict the shifts in the Baryon Acoustic Oscillations (BAO) scaling parameters induced by nonlinearities in the three-dimensional Lyman-alpha forest clustering as a function of cosmological parameters. We find sub-percent shifts in both the radial and transverse directions with a noticeable dependence on cosmology and redshift. Finally, from the field-level fits we construct simulation-based priors that can be used for cosmological analyses of the Lyman-alpha forest with the currently observing Dark Energy Spectroscopic Instrument (DESI). In addition, our cubic model captures the connected four-point function (trispectrum) of the forest, which opens up novel opportunities for accurate covariance matrix estimation for DESI and its successor, DESI-II.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:10Z</published>
+    <arxiv:comment>16+15 pages, 8+3 figures, 0+2 tables (main text + appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Divij Sharma</name>
+    </author>
+    <author>
+      <name>Roger de Belsunce</name>
+    </author>
+    <author>
+      <name>Mikhail M. Ivanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17298v1</id>
+    <title>Consistent Video-to-Video Translation via Explicit Correspondences</title>
+    <updated>2026-11-12T18:55:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.17298v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17298v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interactive video-to-video applications require real-time generation while maintaining long-range temporal consistency. However, recent methods achieve speed by restricting attention to a fixed-length causal window. This limits long-range consistency whenever relevant history falls outside the context window. To address this limitation, we introduce vid2vid-long, a correspondence-based approach grounded in a simple observation. Video-to-video translation provides an explicit cross-frame reference: the regions that match in the input video should match in the output video too. Concretely, we compute patch-level correspondences in the input, guiding retrieval of previously generated outputs in the corresponding regions, and condition the model on these patches through correspondence cross-attention. Our experiments demonstrate that vid2vid-long consistently improves long-range temporal consistency across recent video models while preserving generation quality and real-time performance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:09Z</published>
+    <arxiv:comment>ECCV 2026. Project Website: https://www.cs.cmu.edu/~vid2vid-long/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Gaurav Parmar</name>
+    </author>
+    <author>
+      <name>Zhengqi Li</name>
+    </author>
+    <author>
+      <name>Richard Zhang</name>
+    </author>
+    <author>
+      <name>Jun-Yan Zhu</name>
+    </author>
+    <author>
+      <name>Srinivasa Narasimhan</name>
+    </author>
+    <author>
+      <name>Eli Shechtman</name>
+    </author>
+    <author>
+      <name>Yotam Nitzan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17295v1</id>
+    <title>Traces of Vacuum Squeezing: A Superconducting Transmission-Line Analogue of Cosmological Particle Creation</title>
+    <updated>2026-11-12T18:54:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.17295v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17295v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Particle creation in time-dependent quantum fields is a central phenomenon in early-universe cosmology, yet it remains experimentally inaccessible in its original context. We show theoretically that superconducting circuits based on a waveguide-like transmission line loaded with dc-SQUIDs can provide a direct analogue of a scalar field in a radiation-dominated Friedmann--Robertson--Walker universe in conformal time. The mode equation of the circuit reduces to the Weber equation, the same equation governing cosmological particle creation in a radiation-dominated background, admitting an exact solution in terms of parabolic cylinder functions and an exponentially suppressed particle spectrum. We analyse the conditions under which the analogy holds, which require a compromise between the duration of the pulse, the uniformity of the modulation and the symmetry of the SQUIDs, and show that dissipation does not erase the cosmological signal. We use the anomalous moment of each mode as a witness of the Bogoliubov mixing: it vanishes for any thermal state and survives dissipation, and, together with the photon number, it certifies squeezing, and with the purity of the state, it identifies whether the pairs created from the vacuum dominate.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:44Z</published>
+    <arxiv:comment>17 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Entropy 2026, 28, 1248 (2026)</arxiv:journal_ref>
+    <author>
+      <name>Paula I. Villar</name>
+    </author>
+    <author>
+      <name>Federico Guglielmucci Nazar</name>
+    </author>
+    <author>
+      <name>Elián Urtubey</name>
+    </author>
+    <author>
+      <name>Fernando C. Lombardo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17290v1</id>
+    <title>Radiation, Thermochemistry, and Stellar Feedback in DISPATCH</title>
+    <updated>2026-11-12T18:53:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.17290v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17290v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growth of massive stars depends on whether their accretion flows survive radiation and outflow feedback from the forming stellar population. We present an extension of DISPATCH that couples directional stellar radiation, diffuse infrared transport, and thermochemistry to self-gravitating magnetohydrodynamics, individual stellar accretion, and protostellar jets. This AMR-based method uses DISPATCH's local timestepping, allowing stellar environments and their larger scale cluster environments to step on separate timescales, and providing the framework needed to scale to long-duration simulations of GMCs. Direct radiation is transported in multiple bands, including both ionizing and nonionizing radiation, and uses short characteristics to maintain source directions and shadowing. Diffuse radiation is implemented for IR reprocessed light, with M1 and stationary ray options for transport. The thermochemical model includes atomic and molecular hydrogen and helium chemistry, and metal cooling and dust. It also includes a composition-dependent equation of state. Stellar masses grow through accretion of gas rather than a prescribed IMF, allowing stellar masses to respond to the evolving gas supply and feedback. In tests, multiple-source illumination retains geometric shadows while diffuse reprocessing heats shielded material, and tests of jets, ionization fronts, and radiation pressure demonstrate expected behavior and convergence. Ionization fronts also cross asynchronous refinement boundaries with late-time propagation speeds within a few percent of analytic predictions. Together, these developments provide a framework for determining how radiative and mechanical feedback modify the duration and efficiency of accretion from turbulent clouds, connecting the gas supply to individual stars with the high-mass stellar initial mass function.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:53:03Z</published>
+    <arxiv:comment>19 pages, 11 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>William Lake</name>
+    </author>
+    <author>
+      <name>Paolo Padoan</name>
+    </author>
+    <author>
+      <name>Åke Nordlund</name>
+    </author>
+    <author>
+      <name>Troels Haugbølle</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17284v1</id>
+    <title>Augmented Hybrid TV Services. Habits, Preferences, Opinions and Expectations of Spanish Consumers</title>
+    <updated>2026-11-12T18:52:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.17284v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17284v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The convergence of hybrid broadcast and broadband delivery, companion devices, and immersive technologies enables new forms of interactive, personalized, and accessible TV services. This paper introduces the concept of Augmented Hybrid TV services and presents an exploratory user requirements and preliminary acceptance assessment for 5 representative use cases. They were selected through an exploratory stakeholder consultation and 3 co-design workshops with audiovisual professionals and participants from organizations supporting people with visual or hearing impairments. They combine conventional TV with complementary content delivered to connected devices, including AR/VR HMD. They were subsequently evaluated through a cross-sectional CAWI survey of 626 Internet and connected TV users in Spain. Each participant viewed standardized video demonstrations of 2 randomly assigned cases and assessed their perceived usefulness, anticipated benefits/limitations, and interest in them. The results show substantial interest across all five use cases, ranging from 64.7% to 76.9%. Adaptive and personalized augmented subtitles received the highest level of interest and were particularly valued for their accessibility, language-learning, and personalization benefits. Immersive services involving complementary AR content, virtual screens, 3D objects, and 360 video were also evaluated positively, although participants identified device cost, ergonomics, connectivity, usability, and synchronization as anticipated limitations. The findings provide user-centered evidence that can inform the prioritization, design, and subsequent prototype-based evaluation of standards-compliant Augmented Hybrid TV services. Because the study assessed video-based scenarios rather than functional systems, the results represent perceived usefulness and stated interest rather than observed adoption or technically validated QoE.</summary>
+    <category term="cs.MM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:52:02Z</published>
+    <arxiv:comment>26 pages, 12 figures and 16 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.MM"/>
+    <author>
+      <name>Fernando Boronat</name>
+    </author>
+    <author>
+      <name>Bernat Roig</name>
+    </author>
+    <author>
+      <name>Enric Sigalat</name>
+    </author>
+    <author>
+      <name>Santiago J. Flores</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17271v1</id>
+    <title>Niche construction as an emerging phenomenon from fast ecological and slow evolutionary-environmental timescales in individual-based models</title>
+    <updated>2026-11-12T18:46:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17271v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17271v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider an individual-based model of niche construction built upon birth-death processes of d interacting biological entities (e.g., species, subpopulations or mutant strains in the same species) immersed in a slowly-varying environment which is influenced by the population state. In this setting, extinction and/or emergence of entities with negligible size or rarity, on long time scales can be observed. We prove that the joint dynamics of the environment and the species sizes on a logarithmic scale undergo a piecewise deterministic Markov process in a large time regime, which can be approximated by an explicit dynamical system in the limit of large populations. This convergence result holds true under the assumption that no "bad event" occurs during the population dynamics, corresponding to situations where several species become dominant or go extinct simultaneously. We also prove that no such bad event occurs for Baire-almost all initial conditions of the population sizes and the environmental resources. We apply this framework to study the long term coexistence of two specialist species consuming two resources, with a "joint" niche construction where each species constructs the niche of the other while depleting its resources. We also study an example of immune escape in cancer, where the environmental variable is associated with the state of the immune system and the species are associated with three types of tumor cells.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:46:56Z</published>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Nicolas Champagnat</name>
+    </author>
+    <author>
+      <name>Coralie Fritsch</name>
+    </author>
+    <author>
+      <name>Pablo A. Marquet</name>
+    </author>
+    <author>
+      <name>Cristobal Quiñinao</name>
+    </author>
+    <author>
+      <name>Leonardo Videla</name>
+    </author>
+    <author>
+      <name>Nicolás Zalduendo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17257v1</id>
+    <title>Interactions from memory footprints: Cage-hopping, mnemotaxis &amp; nonreciprocity</title>
+    <updated>2026-11-12T18:41:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.17257v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17257v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cellular motility is integral to biological processes ranging from foraging to immune responses and cancer metastasis. While cells often navigate by sensing pre-existing environmental cues, many actively steer their future trajectories by remodeling their surroundings via shared, long-lived physicochemical trails called memory footprints. These stigmergic responses to shared footprints also influence large-scale self-organization, such as the early stages of microcolony formation. Despite recent progress, a unified framework connecting single-cell dynamics and collective organization through effective pairwise interactions remains elusive. To bridge this gap, we perform extensive agent-based simulations of an interacting random walk model that explicitly accounts for footprint deposition and decay. Our approach reveals distinct cage-hopping dynamics in solitary cells, as well as complex mnemotactic responses to externally imposed memory gradients. Furthermore, we demonstrate that shared spatial memory fields generate nontrivial effective pairwise interactions, both reciprocal and nonreciprocal, that shape the collective organization of cell populations. Beyond multiscale cellular dynamics, our findings have broader implications for the collective behavior of synthetic active matter, such as swarm robots.</summary>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:41:46Z</published>
+    <arxiv:comment>12 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.soft"/>
+    <author>
+      <name>Jyoti Prasad Banerjee</name>
+    </author>
+    <author>
+      <name>Sambodh Sinha</name>
+    </author>
+    <author>
+      <name>Shashi Thutupalli</name>
+    </author>
+    <author>
+      <name>Rituparno Mandal</name>
+    </author>
+    <author>
+      <name>Deb Sankar Banerjee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17234v1</id>
+    <title>Mean-field Fluctuations for First-Passage Percolation with Symmetric Kernels</title>
+    <updated>2026-11-12T18:23:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.17234v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17234v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study first-passage percolation on finite weighted graphs whose normalized Weibull edge hazards form a symmetric Markov kernel on $N$ vertices. We prove that a uniform absolute spectral gap and an $O(N^{-1})$ bound on a fixed even-step return probability imply the stochastic mean-field passage-time limit and an independent Gaussian hopcount limit. Jointly with these quantities, the entire geodesic from an arbitrary source to an independent uniform target is approximated in total variation by an independent Markov chain stopped at the hopcount. This comparison yields laws of large numbers for fixed-length path segments and joint central limit theorems for bounded additive observables. The results extend to edge laws with a uniform relative hazard error $o(1/\log N)$, including common noise distributions with a power-law hazard and a positive-power error near zero. Applications include integrable singular torus kernels, macroscopic spread-out graphs, non-transitive regular graphs, finite groups, and discretizations of symmetric continuum kernels.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:23:33Z</published>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Partha S. Dey</name>
+    </author>
+    <author>
+      <name>Daecheol Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17229v1</id>
+    <title>Peak Performance in Matched Filtering: Fused Correlation and Statistically Controlled Screening on CPUs and GPUs</title>
+    <updated>2026-11-12T18:21:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.17229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Batched matched filtering and cross-correlation over large template banks are a primary computational cost in gravitational-wave astronomy, seismology, and radio transient searches. Standard pipelines pair a general-purpose inverse Fast Fourier Transform (FFT) with separate multiplication and peak-finding kernels, writing intermediate spectra and full correlation series to memory for every template. We fuse the conjugate product into the first inverse-transform butterflies and the peak reduction into the last so only candidate peaks leave processor registers, and tile batches in 2D so $K^2$ correlations reuse $2K$ cached spectra. This shifts filtering from a DRAM-bandwidth-bound to an on-chip cache-bandwidth-bound regime. In some situations, the signal-to-noise ratio (SNR) is concentrated toward lower frequencies while higher frequencies dominate the transform length. We develop a hierarchical screening method that exploits this via a sequence of short low-frequency transforms before evaluating the full band, deriving stage thresholds from the spectral power profile and matched-filter noise autocovariance to target a specified false-dismissal probability. We demonstrate these methods in the open-source matchedfilter library across eight CPU architectures and two integrated GPUs (AMD Radeon 8060S via Vulkan and Apple M2 via Metal). On an AMD Ryzen AI Max+ 395 at $N=4096$, fused peak-only filtering is $1.4\times$ faster than a standalone AOCL-FFTW inverse transform on one CPU core and $6.2\times$ faster than rocFFT on its Radeon 8060S GPU ($3.1\times$ over MLX FFT on the M2 GPU). For a fiducial gravitational-wave search ($ρ_\mathrm{th}=5.5$, $10^{-2}$ false-dismissal target), hierarchical screening yields a $26\times$ speedup over AOCL-FFTW on CPU, $21\times$ over rocFFT on the 8060S GPU, and $19\times$ over MLX FFT on the M2 GPU.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:21:14Z</published>
+    <arxiv:comment>10 pages, 4 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Alexander H. Nitz</name>
+    </author>
+    <author>
+      <name>Keisi Kacanja</name>
+    </author>
+    <author>
+      <name>Collin D. Capano</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17228v1</id>
+    <title>Linear Regression with Self-Selection Bias in Polynomial Time</title>
+    <updated>2026-11-12T18:21:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.17228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We revisit the problem of estimating $k$ linear regressors with self-selection bias in $n$ dimensions up to error $\varepsilon$ with the maximum self-selection criterion, as introduced by Cherapanamjeri, Daskalakis, Ilyas, and Zampetakis [CDIZ23, STOC]. Our main result is a $\mathrm{poly}(n,k,1/\varepsilon)$ time algorithm for the unknown-index variant of this problem, thereby improving upon the running times of the best known algorithms due to Gaitonde and Mossel [GM24] and Kalavasis, Mehrotra, and Zhou [KMZ26, COLT] with exponential dependence on $k$. Our algorithm succeeds in the presence of correlated noise between regressors, which captures the related setting of max-affine regression. Consequently, we also give the first polynomial-time algorithm for this problem, improving on the prior works of Ghosh, Pananjady, Guntuboyina, and Ramchandran [GPGR22, IEEE Transactions on Information Theory] and Gaitonde and Mossel [GM24] with exponential dependence on $k$.
+  Prior works exhaustively search over a $k$-dimensional subspace spanned by the regressors, using conditional moments of the response to test candidates. In contrast, our algorithm is driven by an improved understanding of the moments of the covariates. We show that, restricting to observations with large response values, the degree-$(\log n)$ Hermite moment of the covariates approximately decomposes as a sum of tensor powers of the regressors. The first step of our algorithm can be viewed as a tensor decomposition algorithm for these implicitly represented high-order tensors, which outputs unit vectors parallel to the regressors. A secondary step based on a simple variant of ordinary least squares extracts estimates for the regressors given these unit vectors. We believe our analytic insight and algorithmic components may have applications to designing efficient algorithms for other latent-variable problems.</summary>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:21:11Z</published>
+    <arxiv:primary_category term="math.ST"/>
+    <author>
+      <name>Felix Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17201v1</id>
+    <title>A Little Length Slack Goes a Long Way in Planar Length-Constrained Network Design</title>
+    <updated>2026-11-12T18:04:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.17201v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17201v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Problems in length-constrained network design ask for min-cost subgraphs connecting $k$ input vertex pairs by paths of length at most $h$. Algorithms that instead connect these pairs by paths of length at most $βh$ are said to have length slack $β$. Recent work has shown that poly-time polylogarithmic approximations with polylogarithmic length slack are possible for a broad class of both directed and multicommodity length-constrained network design problems on planar graphs.
+  We give the first poly-time polylogarithmic approximations with $O(1)$ length slack for these problems on planar graphs. In particular, for the length-constrained setting, we give LP-competitive algorithms for planar graphs with length slack $1+ε$ and approximation ratios of $O(\log^2 k/ε)$ for directed Steiner tree and $O(\log^5 k/ε^2)$ for (undirected) Steiner forest. Similarly, for length-constrained directed Steiner forest, we give an $O(\log^6 k/ε)$ approximation on planar graphs with length slack $6+ε$. Our approach is based on a novel charging argument that charges the cost of our solution to the length of the LP and the length of our solution to the cost of the LP. We complement these algorithms with hardness results that separate planar and general graphs for both forest problems: under standard complexity assumptions, we rule out polylogarithmic approximations on general graphs with length slack below $3$.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:04:29Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>D Ellis Hershkowitz</name>
+    </author>
+    <author>
+      <name>Richard Z Huang</name>
+    </author>
+    <author>
+      <name>Rhea Jain</name>
+    </author>
+    <author>
+      <name>Manas Korimilli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17196v1</id>
+    <title>Physically Interpretable Basin Selection in Discrete-Variable Origami Design</title>
+    <updated>2026-11-12T17:59:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.17196v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17196v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Automatic differentiation has enabled rapid progress on continuous-variable mechanical design problems, but gradient-based optimization still struggles with discrete variables. The standard approach is to optimize using a continuous relaxation of the choices, then commit to the nearest discrete design at the end. Why this procedure selects unfavorable basins is poorly understood. Here, we introduce a practical, interpretable design problem inspired by origami, in which automatic differentiation is used to design shapes with a target functional behavior. Each origami sheet has a fixed geometry, and a bilevel optimization framework tunes which one of four discrete hinge types to place at each fold. Baseline gradient-based design settles into basins with a large discretization gap: relaxed optimization solves 97% of runs, but the final, discrete solutions succeed only half the time. We find that the gap can be relieved with a surprisingly simple modification. An initialization prior uniformly biased toward the stiff, flat hinge option boosts the final solve fraction from 49% to 69%. Applying the prior adds no additional compute and leaves the optimization process unchanged. Compared to the baseline, sheets produced with the prior have greater geometric compatibility and mechanical stiffness. Directly penalizing frustration and floppiness in the outer loss function produces an even greater improvement than the prior does, raising the solve fraction to 78% and indicating that these properties help distinguish the unfavorable basins. Our results demonstrate that loss landscapes for mechanical design can have physically meaningful basins that are not robust to discretization and cause solves to fail. Targeting these basins' physical signatures, even with just an initialization bias, helps avoid them.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:59:43Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Lucy Liu</name>
+    </author>
+    <author>
+      <name>Leon M. Kamp</name>
+    </author>
+    <author>
+      <name>Katia Bertoldi</name>
+    </author>
+    <author>
+      <name>L. Mahadevan</name>
+    </author>
+  </entry>
+</feed>
