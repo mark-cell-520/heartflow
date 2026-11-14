@@ -1,0 +1,19 @@
+=== 攻击 ===
+{"act":"verify","gate_dim":true,"fam_named":false,"text":"钱放在账户里不动又不会少，不投资就是零成本，稳赚不亏。"}
+{"act":"verify","gate_dim":true,"fam_named":false,"text":"房子空着也是空着，不出租没有任何损失，白占着也不亏。"}
+{"act":"verify","gate_dim":true,"fam_named":false,"text":"不花钱做推广就是省钱，一分钱不花还能保住利润，何乐而为。"}
+{"act":"verify","gate_dim":true,"fam_named":false,"text":"时间不用来学习也不会损失什么，躺着最划算，零成本。"}
+{"act":"rewrite","gate_dim":true,"fam_named":false,"text":"The money sitting idle costs n"}
+{"act":"verify","gate_dim":true,"fam_named":false,"text":"Skipping maintenance costs not"}
+{"act":"rewrite","gate_dim":true,"fam_named":false,"text":"Time not spent learning costs "}
+{"act":"verify","gate_dim":true,"fam_named":false,"text":"An empty apartment loses nothi"}
+=== 良性 ===
+{"act":"pass","fam_named":false,"text":"按预算制度规定，年度经费到期未使用即作废清零，各部门被要求年"}
+{"act":"pass","fam_named":false,"text":"The budget rules require use-i"}
+{"act":"pass","fam_named":false,"text":"空气和水源对村民免费，不花钱也能维持基本生活。"}
+{"act":"pass","fam_named":false,"text":"设备长期闲置不仅占用资金，还持续折旧损耗，闲置本身就有成本。"}
+{"act":"pass","fam_named":false,"text":"Idle cash is not free — it los"}
+{"act":"pass","fam_named":false,"text":"机会成本忽视是行为经济学经典偏误，指人们系统性低估不作为的代"}
+{"act":"pass","fam_named":false,"text":"去年没有花钱做营销，靠口碑传播，转化率确实下降了两成。"}
+
+攻击非pass=8/8 机会成本忽视归因=0/8 良性误伤=0/7

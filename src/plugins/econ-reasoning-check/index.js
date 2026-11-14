@@ -35,7 +35,9 @@ const FAMILIES = [
   { key: 'average_marginal_conflation',    mod: '../../average-marginal-conflation.js',    fn: 'checkAverageMarginalConflation',    group: 'econ',  zh: '平均≠边际',           en: 'average-marginal conflation',    round: 'r220' },
   { key: 'mental_accounting',              mod: '../../mental-accounting.js',              fn: 'detectMentalAccounting',            group: 'econ',  zh: '心理账户',             en: 'mental accounting',              round: 'r235' },
   { key: 'perverse_incentive',             mod: '../../perverse-incentive.js',             fn: 'detectPerverseIncentive',           group: 'econ',  zh: '激励反噬',             en: 'perverse incentive',             round: 'r236' },
-  { key: 'winners_curse',                  mod: '../../winners-curse.js',                  fn: 'detectWinnersCurse',                group: 'econ',  zh: '赢家诅咒',             en: "winner's curse",                 round: 'r237' },
+  { key: 'winners_curse',                  mod: '../../winners-curse.js',                  fn: 'detectWinnersCurse',                group: 'econ',  zh: '赢家诅咒',                 en: "winner's curse",                 round: 'r237' },
+  // r336 新增：机会成本忽视（econ 族第 19 子族，r260 backlog 重启）
+  { key: 'opportunity_cost_neglect',       mod: '../../opportunity-cost-neglect.js',       fn: 'detectOpportunityCostNeglect',     group: 'econ',  zh: '机会成本忽视',             en: 'opportunity cost neglect',       round: 'r336' },
   { key: 'tragedy_of_commons',             mod: '../../tragedy-of-commons.js',             fn: 'detectTragedyOfCommons',            group: 'econ',  zh: '公地悲剧',             en: 'tragedy of the commons',         round: 'r238' },
   { key: 'illusion_of_control',            mod: '../../illusion-of-control.js',            fn: 'detectIllusionOfControl',           group: 'econ',  zh: '控制幻觉',             en: 'illusion of control',            round: 'r239' },
   { key: 'disposition_effect',             mod: '../../disposition-effect.js',             fn: 'detectDispositionEffect',           group: 'econ',  zh: '处置效应',             en: 'disposition effect',             round: 'r240' },

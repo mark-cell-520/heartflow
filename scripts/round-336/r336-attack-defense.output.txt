@@ -1,0 +1,65 @@
+=== 攻击（应判 hit=true）===
+ok   A1 资金闲置 count=2
+ok   A2 资产闲置 count=2
+ok   A3 房屋空置 count=3
+ok   A4 库存堆压 count=2
+ok   A5 推广 count=1
+ok   A6 研发 count=2
+ok   A7 培训 count=2
+ok   A8 安全加固 count=2
+ok   A9 时间闲置 count=2
+ok   B1 idle cash count=2
+ok   B2 unused equipment count=1
+ok   B3 marketing count=1
+ok   B4 maintenance count=1
+ok   B5 vacant count=2
+ok   B6 time not spent count=1
+ok   C1 双签名 count=3
+=== 良性（应判 hit=false）===
+ok   B1 预算制度 -
+ok   B2 预算制度EN -
+ok   B3 免费品 -
+ok   B4 开源 -
+ok   B5 闲置纠正 -
+ok   B6 idle cash 纠正EN -
+ok   B7 概念教学 -
+ok   B8 概念教学EN -
+ok   B9 营销后果 -
+ok   B10 培训后果 -
+ok   B11 财政预算 -
+ok   B12 并非不花钱 -
+ok   B13 not zero cost -
+=== 近邻维度领地（应判 hit=false）===
+ok   D1 零价格效应形 -
+ok   D2 沉没成本形 -
+=== DROP_PATTERN 注入（清零新模式后攻击样本必须失效）===
+ok   drop INACTION_NEG_VERB_ZH → 攻击失效
+ok   drop INACTION_IDLE_ZH → 攻击失效
+ok   drop INACTION_DELAY_ZH → 攻击失效
+ok   drop INACTION_TIME_ZH → 攻击失效
+ok   drop INACTION_NOT_EN → 攻击失效
+ok   drop INACTION_IDLE_EN → 攻击失效
+ok   drop INACTION_SKIP_EN → 攻击失效
+ok   drop INACTION_NOTIN_EN → 攻击失效
+ok   drop ZEROCOST_NOLOSS_ZH → 攻击失效
+ok   drop ZEROCOST_ZERO_ZH → 攻击失效
+ok   drop ZEROCOST_FREEWIN_ZH → 攻击失效
+ok   drop ZEROCOST_SAVE_ZH → 攻击失效
+ok   drop ZEROCOST_BEST_ZH → 攻击失效
+ok   drop ZEROCOST_NOCOST_EN → 攻击失效
+ok   drop ZEROCOST_FREE_EN → 攻击失效
+ok   drop ZEROCOST_LOSE_EN → 攻击失效
+ok   drop ZEROCOST_SAVE_EN → 攻击失效
+ok   drop ZEROCOST_SAFE_EN → 攻击失效
+ok   drop PAIR_ZH=0 → 攻击失效
+ok   drop PAIR_EN=0 → 攻击失效
+=== DROP_EXEMPT 注入（删豁免后带攻击结构的良性样本必须变红）===
+ok   exempt RULE_ZH → 良性变红
+ok   exempt RULE_EN → 良性变红
+ok   exempt CONCEPT_ZH → 良性变红
+ok   exempt CONCEPT_EN → 良性变红
+ok   exempt CORRECT_ZH → 良性变红
+ok   exempt CORRECT_EN → 良性变红
+=== __internals keys: 38 ===
+
+ALL PASS
