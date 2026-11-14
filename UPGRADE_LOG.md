@@ -1,3 +1,13 @@
+## r326 — tu_quoque 第 141 维度补齐倒装反问攻击族（真升级②；本地撞号重编号：远端同步轮已发 r325=budget_value_conflation，本段原编号 r325 改 r326）
+
+- **背景**：r324 遗留已知边界「counter 族只做前向（他者主语在前、反问在后），倒装形保守不收」。本轮立项探针 `scripts/round-325/probe-candidates.js` 在 v6.8.182 pristine 基线上实测：倒装反问族攻击 0/5 穿透 gate=pass、良性 0/5 零误伤 → 完整承重缺口，满足真升级②（已有维度的全新句式族，非给旧族加样本）。开轮同步发现远端已发 r325（budget_value_conflation/v6.8.182），本地未推送产能按 COORDINATION.md §1.1 撞号规则重编号为 r326。
+- **外部搜索**：HN Algolia / Semantic Scholar / GitHub API 三轮均无可用结果（限流或唯一命中仓库 Real_time_fallacy_detection 120★ 为 LLM+ChatGPT 方案，违反零 LLM 依赖铁律）→ 按既定路径走内部缺口实证（报告如实记录）。
+- **心虫裁决**：`heartflow_philosophy_decision` → **accelerate**（confidence 0.7；cognitiveLoad/uncertainty 为 "unknown"——引擎未实测，如实记录不当实质背书）。
+- **补腿**（`src/tu-quoque.js`，共 +88 行）：① **MIRROR_ZH 倒装反问族**——谓语前置（`自己/自家 + 还/都 + 负面状态`）、名词化从句（`一个/一个连自己都 + 负面动词 + 的人`）、亲属管教（`自己家孩子都管教不好`）、实体失控（`自己体重都管不住`）、通用化结构腿（`自己 + ≤10字状态 + 负面语气词`、`自己 + 天天/经常 + 负面行为`）、文言裸形（`己身不正`/`五十步笑百步`）；② **DISQUALIFY_ZH 疑问倒装族**——`凭什么 + 要求/管/说/教 + 别人/人家/大家`、`也配 + 谈/说/教`、`倒有闲心/倒有空 + 管/说`、`还好意思 + 说 + 别人`、`轮不到你`/`哪有你什么资格`；③ **CRITICISM_ZH 泛化批评族**——主语从句化（`对别人指手画脚`、`没资格谈规则`、`盯着别人打卡`），修掉原腿只收「你+动词+我」前向结构的窄口；④ **MIRROR_EN / DISQUALIFY_EN / CRITICISM_EN 三腿同步**——`when/while your own house is on fire`、`in no position`、`who cannot keep his own`、`why lecture the rest of us`、`hardly one to talk about discipline`、`judge anyone here`。
+- **验证数据**：五门禁全绿——verify 16/16、guard-abilities 20/20、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326（与基线 302/326 持平，零新增误伤）、负例注入测试 `test/round-325-tu-quoque-inverted.js` 44/44（A 攻击 10/10、B 良性 8/8、C 逐常量承重 19/19、D 负例不命中 4/4、E 豁免 3/3）。同族变体矩阵 `scripts/round-325/matrix.js` 攻击 10/10 命中（含裸名词、带修饰长句、倒装、文言、中英双语），良性 FP 1/8 且 git stash 实证为既有基线（fallacy_of_relevance，非本轮引入）。
+- **回归清零实证**：`test/round-710-tu-quoque.js` 8 通过/2 失败，`git stash` 后基线同样 8/2 → 2 条失败为长期噪声非本轮回归。
+- **已知边界/下轮可继续**：① 倒装反问族的「隐性谄媚」亚型（如「您这么厉害，我们哪敢说话」）未收，属 sycophancy 族而非资格剥夺；② MIRROR_ZH 通用化腿的 `[^。，！？]{0,10}` 状态窗口仍可能漏极长插入语；③ 「你自己都做不到，凭什么要求我」类存量前向形 r710 已收，本轮倒装形补齐后两族合并测试可作下轮巩固。
+
 ## r324 — red_herring 第 255 维度补腿（他者对照反问族 + 搁置复合形，真升级②）
 
 - **背景**：r323 立项的 red_herring 第 255 维度（`src/red-herring.js`）接线遗留本地未提交（r323 断线产能），单测 38/41——3 条攻击样本（dismiss 搁置 + 反问复合形态）漏判。方向「形式谬误·话题操纵族」满足轮换纪律（r318→r323 连续 6 轮 econ-reasoning-gate 后换向）。

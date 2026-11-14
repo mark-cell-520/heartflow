@@ -95,6 +95,17 @@ const CRITICISM_ZH = new RegExp([
   '(?:你|您)(?:说|讲|批评|指责|要求|叫|让|管|数落|埋怨|怪)(?:我)?[^。，！？]{0,12}(?:不好|不对|有问题|错|别|不要|不行|差|太|不该|不应该|过分|差劲|糟糕|乱花|乱来|乱搞|浪费|挥霍|瞎搞|胡来|不上进|懒|自私|小气|抠门|笨|蠢|傻|脏|馋|拖拉|误事)',
   // 你说这/那/这套 + 名词 + 不对/有问题/错了（你说这套方法有问题）
   '(?:你|您)(?:说|讲)(?:这|那|这套|这个|那个)[^。，！？]{0,8}(?:不对|有问题|错|不行|不好)',
+  // ── 泛化批评族（r325 矩阵补漏）：对他人的管教/要求/指点，主语为句子主题 ──
+  // 对/跟/向 + 别人/人家/大家/他人 + 指手画脚/说三道四/说长道短/品头论足/挑三拣四
+  '(?:对|跟|向|朝)(?:着)?(?:别人|人家|大家|他人|旁人|其他人|别人家)(?:指手画脚|说三道四|说长道短|品头论足|挑三拣四|指指点点|说嘴|嚼舌|说闲话)',
+  // 要求/管/教/训/说 + 别人/人家/大家/任何人（凭什么要求别人守时）
+  '(?:要求|管教|教育|教训|数落|指点|说教)(?:别人|人家|大家|任何人|旁人|其他人|别人家)',
+  // 就(有)资格 + 动词（就有资格在这里对别人指手画脚了？）
+  '(?:还)?(?:有|配|够)(?:资格|脸|底气|立场|身份)(?:来|在这里|去|对)',
+  // 没资格 + 谈/说 + 规则/规矩（没资格谈规则的人——须带「没资格」前缀，防「我承认…想帮你避开」误伤）
+  '(?:没|没有|不)(?:资格|配)(?:谈|说|讲|提|论)(?:规则|规矩|原则|纪律|对错|是非)',
+  // 盯着别人 + 负面行为（盯着别人打卡）
+  '(?:盯着|盯着看|只盯着|光盯着|就盯着|专门盯着)(?:别人|人家|大家|他人|旁人)',
 ].join('|'));
 
 // 英文：You criticize/tell/ask/blame me ... + 对比连词（but/yet/while/when）。
@@ -103,6 +114,13 @@ const CRITICISM_EN = new RegExp([
   "\\b(?:you|u)\\s+(?:criticize|criticise|tell|told|accuse|blame|lecture|nag|judge|shame|preach)\\b[^.]{0,40}\\b(?:but|yet|while|when)\\b",
   // 弱动词支：say/said/claim 须负面评价词共现（You say I am lazy, but...）
   "\\b(?:you|u)\\s+(?:say|said|claim)\\b[^.]{0,30}\\b(?:lazy|wrong|bad|at\\s+fault|mistaken|incorrect|selfish|careless|sloppy|irresponsible|immature|thoughtless|rude|mean|unfair|never|always)\\b[^.]{0,25}\\b(?:but|yet|while|when)\\b",
+  // ── 泛化批评族（r325 矩阵补漏）：对他人管教/指点，主语非 you ──
+  // talk about / preach about + 抽象纪律（is hardly one to talk about discipline）
+  "\\b(?:talk|preach|lecture)\\s+(?:about|on|to\\s+us\\s+about)\\s+(?:discipline|rules?|compliance|morals?|ethics|conduct|hard\\s+work|integrity|loyalty)\\b",
+  // judge/criticize + 他人（judge anyone here）
+  "\\b(?:judge|criticize|criticise|blame|nag|lecture)\\s+(?:anyone|anybody|everyone|others|the\\s+rest\\s+of\\s+us|people|us|them)\\b",
+  // tell/preach + us/others + 应该（tell us how to live）
+  "\\b(?:tell|preach|lecture)\\s+(?:us|others|everyone|people)\\s+(?:how|what|to)\\b[^.]{0,30}\\b(?:live|behave|act|work|comply|follow)\\b",
 ].join('|'), 'i');
 
 // ─── 腿②-1 MIRROR 同样过错反噬（中文：你-based 主语 × 同样过错指示）──
@@ -117,6 +135,28 @@ const MIRROR_ZH = new RegExp([
   '(?:你|您)又(?:不|没|不是)',
   // 你/您 + 不是一样/不是一回/不是一码事（你不是一样迟到）
   '(?:你|您)不是(?:一样|一回|一码事)',
+  // ── 倒装反问族（r325）：MIRROR 主体降格为从句/名词化前置 ──
+  // 谓语前置：自己/自家 + 还/都 + 负面状态（自己家里还着火呢/自己都泥菩萨过江）
+  '(?:自己|自家)(?:家里|屋里|一身|屁股|屁事|破事)?(?:还|都)(?:着|在)?[^。，！？]{0,6}(?:着火|烂|糟|乱|一团|自身难保|没过明白|没活明白|不干净|没擦干净)',
+  // 一个/一个连 + 自己都/连自己都 + 负面动词 + 的人（一个自己都迟到的人）
+  '(?:一个|一位|一名|自家)?(?:连)?自己(?:都|也)(?:做不到|做不好|迟到|没|不|管不好|管教不好|守不住|控制不住|改不掉|抛不下|舍不得|管不住|禁不住|忍不住|戒不掉)[^。，！？]{0,4}(?:人|家伙|角色|的)?',
+  // 自己 + 实体名词 + 都/也/还 + 管/控制不住（自己体重都管不住/自己情绪都控制不住）
+  '(?:自己|自家)[^。，！？]{0,10}(?:都|也|还)(?:管不住|控制不住|禁不住|忍不住|戒不掉|治不了|hold不住|Hold不住)',
+  // 自己 + 家 + 亲属 + 都/也 + 管教/管/带 + 不好（自己家孩子都管教不好）
+  '(?:自己|自家)(?:家|的)?(?:孩子|儿子|女儿|老婆|老公|家人|下属|团队|员工|学生|宠物)[^。，！？]{0,6}(?:都|也|还)[^。，！？]{0,6}(?:管教不好|管不好|带不好|教不好|管不了|带不了|治不了|搞不定|Hold不住|hold不住)',
+  // ── 通用化结构腿（r325 矩阵补漏）：自己 + ≤10字状态 + 负面语气词 ──
+  // 自身状态一团糟/自身难保 泛指（自己那摊子事还一团乱麻/自己都泥菩萨过江）
+  '(?:自己|自家)(?:那|这)?(?:摊子|档子|事情|事儿|事情|事情|业务|项目|本职工作|一亩三分地|后院|屁股|脑袋|肚子|体重|孩子|家人|下属|团队|部门)[^。，！？]{0,8}(?:还|都|也)[^。，！？]{0,6}(?:一团|没理|没弄|没搞|管不好|管教|守不住|控制|收拾|处理|打理)[^。，！？]{0,4}',
+  // 自己 + 动词短语 + 呢（状态未收敛标记：…还没理清楚呢/…还没弄明白呢）
+  '(?:自己|自家)[^。，！？]{0,12}(?:还|都)(?:没|不)[^。，！？]{0,8}(?:清楚|明白|理清|弄好|搞定|收拾|改|做到|达标|合格)',
+  // 自己 + 天天/经常/时常 + 负面行为（自己上班天天摸鱼）
+  '(?:自己|自家)[^。，！？]{0,6}(?:天天|整天|经常|时常|每每|动不动)(?:摸鱼|划水|迟到|早退|旷工|偷懒|翘班|躺平|摆烂|放鸽子|爽约|拖沓|拖拉|敷衍|糊弄|混日子|不守时|不来开会)',
+  // 己身不正 / 自身不正（文言裸形）
+  '(?:己身|自身|本身)(?:不|未)?正',
+  // 五十步笑百步裸形
+  '五十步(?:笑|焉知)百步',
+  // 裸主体 + 负面状态 + 前置（屁股都没擦干净还好意思…）
+  '屁股(?:都|还)?没(?:擦干净|洗干净|抹干净)',
 ].join('|'));
 
 // 英文：but/yet/while/when + you(+'re/are) + 动词短语（but you drink every day）。
@@ -128,6 +168,19 @@ const MIRROR_EN = new RegExp([
   // you + 动词 + too 裸形（You lied too.）
   "\\byou\\s+[a-z]+(?:ed|s)?\\s+too\\b",
   "\\byou\\s+of\\s+all\\s+people\\b",
+  // ── 倒装反问族（r325）：主体降格为状语/名词从句前置 ──
+  // when/while + your own + 负面状态（When your own house is on fire...）
+  "\\b(?:when|while)\\s+(?:your|u'?r?)\\s+own\\s+(?:house|home|life|yard|back\\s+yard|business|affairs)\\b[^.]{0,40}\\b(?:on\\s+fire|is\\s+a\\s+mess|are\\s+broken|in\\s+disarray|is\\s+falling\\s+apart)\\b",
+  // your own + 负面状态（Your own backyard is a mess）
+  "\\b(?:your|u'?r?)\\s+own\\s+(?:house|home|yard|back\\s+yard|garden|life|record|history|closet)\\b[^.]{0,30}\\b(?:mess|broken|dirty|worse|filth|skeleton|falling)\\b",
+  // 资格裸形
+  "\\bsomeone\\s+(?:in|of)\\s+your\\s+position\\b",
+  "\\b(?:you'?re|you\\s+are)\\s+in\\s+no\\s+position\\b",
+  "\\b(?:you'?re|you\\s+are)\\s+hardly\\s+(?:one|in\\s+a\\s+position)\\b",
+  // 主语从句 + 自身失败（A person who cannot keep his own...）
+  "\\b(?:a|any|one|the)\\s+(?:person|man|woman|someone|guy|leader|boss)\\s+who\\s+(?:cannot|can'?t|couldn'?t|does\\s+not|doesn'?t|has\\s+not|hasn'?t)\\b[^.]{0,40}\\b(?:own|his|her|their)\\b",
+  // 简化腿：who cannot/can't + keep/follow + own（who cannot keep his own）
+  "\\bwho\\s+(?:cannot|can'?t|couldn'?t)\\s+(?:keep|follow|live\\s+by|practice)\\s+(?:his|her|their|its)\\s+own\\b",
 ].join('|'), 'i');
 
 // ─── 腿②-2 DISQUALIFY 剥夺资格词（中文）──────────────────────────
@@ -144,6 +197,18 @@ const DISQUALIFY_ZH = new RegExp([
   '(?:来)?(?:说|管|教育|训|数落|指点|批评|骂|怪)(?:我|咱们)?你',
   // 要求我/管我/教育我（凭什么要求我的后半段裸形）
   '(?:要求|管|教育|训|数落|指点|批评)(?:我)?$',
+  // ── 疑问倒装族（r325）：宾语从「我」换成他人/泛化，资格剥夺指向听者 ──
+  // 凭什么 + 要求/管/说/教/谈 + 别人/人家/大家/我们/任何人（凭什么要求别人守时）
+  '凭什么(?:要求|管|说|教|谈|讲|数落|指点|批评|骂|怪|规定|限制)(?:别人|人家|大家|我们|任何人|旁人|其他人)',
+  // 也配 + 谈/说/讲/提/要求（也配谈规则？）
+  '也配(?:谈|说|讲|提|要求|管|教|称|叫)',
+  // 倒有闲心/倒有空/倒是闲着 + 管/说/关心（倒有闲心管别人家的瓦霜）
+  '(?:倒有|倒还|倒是)(?:闲心|空闲|空|脸|胆子|底气|立场)(?:来)?(?:管|说|讲|谈|关心|指责|批评|教训|数落)',
+  // 还好意思/好意思 + 说/讲 + 别人/人家（还好意思说别人脏）
+  '(?:还好意思|好意思)(?:说|讲|谈|提|数落|指责|批评|骂)(?:别人|人家|大家|旁人)',
+  // 轮不到你 / 哪轮到你 / 有你什么事（倒装剥夺：对象从句化）
+  '(?:轮不到|哪轮得到|还轮不到)(?:你|您)(?:来)?',
+  '(?:有|哪有)(?:你|您)什么(?:事|资格|资格说|资格管)',
 ].join('|'));
 
 // 英文：who are you to / no right to / not one to talk / can't talk /
@@ -156,6 +221,14 @@ const DISQUALIFY_EN = new RegExp([
   "\\bhave\\s+no\\s+business\\b",
   "\\bglass\\s+houses\\b",
   "\\bpot\\s+calling\\s+the\\s+kettle\\b",
+  // ── 疑问倒装族（r325）：why + 评说动词 + 对象（why lecture us on...）──
+  "\\bwhy\\s+(?:lecture|preach|judge|criticize|criticise|nag|blame|tell|lecturing)\\s+(?:us|me|everyone|others|anybody|people)\\b",
+  "\\b(?:what|where)\\s+right\\s+(?:do|does)\\s+(?:you|u|they|anyone)\\s+have\\s+to\\b",
+  "\\b(?:hardly|barely)\\s+(?:in\\s+a\\s+position|qualified|one)\\s+to\\s+(?:talk|judge|criticize|criticise|say)\\b",
+  "\\b(?:not|aren'?t|are\\s+not)\\s+(?:exactly|exactly\\s+ones?|ones?)\\s+to\\s+talk\\b",
+  // ── 通用化腿（r325 矩阵补漏）：the rest of us / everyone else 宾语；主语从句形 ──
+  "\\bwhy\\s+(?:lecture|preach|judge|criticize|criticise|nag|blame|tell)\\s+(?:the\\s+rest\\s+of\\s+us|everyone\\s+else|the\\s+rest\\s+of\\s+them|others|anybody|people)\\b",
+  "\\b(?:nobody|no\\s+one)\\s+who\\s+[^.]{0,30}\\b(?:has\\s+the\\s+right|is\\s+qualified)\\s+to\\s+(?:talk|judge|criticize)\\b",
 ].join('|'), 'i');
 
 // ─── 豁免：真诚自省/互相改进/正当边界/保留语/概念分析 ──────────────
