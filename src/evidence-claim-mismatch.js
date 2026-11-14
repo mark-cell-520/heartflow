@@ -81,11 +81,43 @@
  *   · completion_evidence 管空完成声明（说做完但无产物），本维度
  *     与研究/数据陈述相关，与工作完成无关。
  *
+ * [r338 立项] 立项探针 coordination/agent4/probes/r338-probe-candidates.js
+ * （集成树 v6.8.185 全量 findings 口径）：因果与科学推理方向五候选族
+ * 定拨——A 子组效应外推普适 4/8 穿透且疑难良性 4/4 零误伤（最高穿透
+ * + 零误伤胜出）；B 跨试验间接比较 ZH 侧 3/3 穿透（EN 侧已被既有维度
+ * 代拦）；C 统计推断误读 1/6、D 安慰剂万能解释 1/5 已被存量维度基本
+ * 覆盖且伴良性误伤，放弃；E 动物外推 2/5 部分覆盖。海外扫描 arXiv 15
+ * 条全为物理/多模态无关条目、GitHub 0 条、S2 429——空返，按既有形态
+ * 自建。A+B 落地为两个新措辞家族（真升级②），src/index.js 零改动、
+ * 维度计数 256 不变（同 r306/r320-r337 先例）。
+ *
+ * [r338 新措辞家族 A · 子组效应外推普适（subgroup-scope evidence →
+ * universal claim）] 证据本身是子组限定形的疗效/获益陈述（只在男性
+ * 亚组中显著/仅覆盖北美人群/对65岁以上患者有效），断言却跨子组或
+ * 全人群（适用于所有人群/年轻人同样适用/对两性都有效/推广到全球/
+ * works for everyone/younger patients benefit too/generalizes
+ * worldwide）。旧实现腿①只认「研究/数据」这类可回溯来源标记，子组
+ * 限定形整族漏判（探针 4/8 穿透）。子组限定形本身就是证据覆盖范围
+ * 的声明——「只在X中成立」的覆盖范围小于「对所有Y成立」的断言范围，
+ * 同属覆盖失配，补为腿①第二族（SUBGROUP_ZH/EN）。
+ *
+ * [r338 新措辞家族 B · 跨试验间接比较（indirect/cross-trial
+ * comparison）] 证据是两个分立试验各自与对照/安慰剂的比较结果
+ * （A 比安慰剂多降 20%、B 比安慰剂只降 5%），断言却是两干预之间
+ * 的高下（A 优于 B）——无头对头共同对照时效应量不可跨试验相比。
+ * 补为腿①第三族（CROSS_TRIAL_ZH/EN）+ 腿②对应越界形。ZH 侧探针
+ * 3/3 穿透；EN 侧既有维度已代拦，本轮补齐模块层归因。
+ *
  * 判据（两腿共现 + 邻近窗，缺一不判）：
- *   腿① EVID 证据/研究/数据标记：句中先出现研究/数据/统计/实验/调查/
- *     临床试验/论文/《X》年份 等可回溯证据源标记（ZH+EN 各一套），
- *     含裸名词形态（研究/数据/统计/实验 单独出现即命中——r161 教训
- *     自查：去后缀仍命中）；
+ *   腿① EVID 证据/研究/数据标记（r338 扩为三族）：EVID——句中先出现
+ *     研究/数据/统计/实验/调查/临床试验/论文/《X》年份 等可回溯证据源
+ *     标记（ZH+EN 各一套），含裸名词形态（研究/数据/统计/实验 单独
+ *     出现即命中——r161 教训自查：去后缀仍命中）；SUBGROUP——子组
+ *     限定形证据（只在X亚组中显著/仅覆盖X人群/对65岁以上患者有效/
+ *     only in the male subgroup/only enrolled North Americans），
+ *     家族 A 专用；CROSS_TRIAL——分立试验各自 vs 对照/安慰剂形
+ *     （A比安慰剂多降20%/另一项试验/beat placebo/trial 2），家族
+ *     B 专用。三族同属「证据覆盖范围声明」语义；
  *   腿② OVERREACH 超覆盖断言（四类越界形）：
  *     O1 相关→因果：证据腿近邻出现「导致/造成/引发/会引起/能够治疗/
  *       治愈/根治/预防」且证据腿陈述本身是共变/观察形（更少/更高/
@@ -164,6 +196,52 @@ const EVID_EN = [
   /\b\d+\s+(?:participants|subjects|patients|respondents|volunteers|students)\b/i,
 ];
 
+// ─── r338 腿①家族 A：子组限定证据标记（中文）──────────────────────────
+// 新措辞家族 A（子组效应外推普适）：证据本身是**子组限定形**的疗效/获益
+// 陈述（只在X亚组中显著/仅覆盖X人群/对65岁以上患者有效），不带「研究/
+// 数据」这类可回溯来源标记，旧 EVID 词表整族漏判。子组限定形本身就是
+// 证据覆盖范围的声明——覆盖范围小于断言范围即失配。
+const SUBGROUP_ZH = [
+  // 「只在/仅在/只有在 + 子组范围 + 显著/观察到/有效/获益」
+  /只在[^。；，]{0,10}(?:亚组|人群|患者|受试者|群体|年龄段|样本|层)/,
+  /仅有?在[^。；，]{0,10}(?:受试者|患者|人群|亚组|群体|对象)/,
+  /仅在[^。；，]{0,10}(?:中|内|身上)(?:显著|观察到|有效|获益|改善)/,
+  // 年龄/性别/症候子组限定 + 人群名词
+  /对?\s*\d+\s*岁以[上下][^。；，]{0,6}(?:患者|人群|受试者|群体|老人|成人|儿童)/,
+  /在[^。；，]{0,8}(?:重症|轻症|中度|重度|老年|中年|青年|男性|女性|儿童|成人|高危|低危)[^。；，]{0,6}(?:患者|人群|受试者|群体|对象)/,
+  // 覆盖范围限定形
+  /(?:只|仅)覆盖[^。；，]{0,10}(?:人群|地区|国家|样本|群体)/,
+];
+
+// ─── r338 腿①家族 A：子组限定证据标记（英文）──────────────────────────
+const SUBGROUP_EN = [
+  /\b(?:appeared|seen|observed|found|effective|works?|benefit\w*|improvement)\s+only\s+(?:in|among|for)\b/i,
+  /\bonly\s+(?:in|among|for)\s+(?:the\s+)?[a-z\s-]{0,30}(?:subgroup|patients?|participants?|subjects?|cohort|men|women|males?|females?)\b/i,
+  /\bin\s+patients?\s+(?:over|under|above|below|aged)\s+\d+/i,
+  /\b(?:male|female)\s+subgroup\b/i,
+  /\bonly\s+(?:enrolled|studied|tested|measured|recruited|included)\b/i,
+];
+
+// ─── r338 腿①家族 B：跨试验间接比较标记（中文）────────────────────────
+// 新措辞家族 B（跨试验间接比较）：证据是**各自与对照/安慰剂比较**的分立
+// 试验结果，断言却是两干预之间的高下（A 优于 B）——不同试验间无共同
+// 对照，效应量不可直接相比。同属「断言超出证据覆盖」：比较结论超出所
+// 摆证据（各自 vs 对照）可支撑的范围。
+const CROSS_TRIAL_ZH = [
+  /比安慰剂|与安慰剂相比|相对于安慰剂/,
+  /(?:各自|分别)与(?:对照|对照组|安慰剂)/,
+  /与对照(剂)?组?的?比较/,
+  /头对头|跨试验|另一项试验|两项试验/,
+];
+
+// ─── r338 腿①家族 B：跨试验间接比较标记（英文）───────────────────────
+const CROSS_TRIAL_EN = [
+  /\b(?:beat|beats|outperform\w*)\s+(?:the\s+)?(?:placebo|control)\b/i,
+  /\btrial\s+\d\b/i,
+  /\bin\s+(?:its|their)\s+own\s+(?:trial|study)\b/i,
+  /\bcross[- ]trial\b/i,
+];
+
 // ─── 腿② OVERREACH 超覆盖断言（中文）──────────────────────────────────
 // 四类越界形：O1 相关→因果，O2 部分→全体，O3 局部→整体，O4 疗效越界
 const OVERREACH_ZH = [
@@ -197,6 +275,16 @@ const OVERREACH_ZH = [
   /(?:可以|能|能够)[^。；，]{0,8}(?:延长寿命|延年益寿|永葆|重返年轻|长生)/,
   // r307 补：直接断言全国/整体覆盖（无连接词形）
   /(?:证明|证实|说明)了?[^。；，]{0,14}(?:全国|全球|整体|全面|全民|所有行业|每个人)/,
+  // r338 补：家族 A 子组→普适越界形（子组证据在场，断言跨子组/全人群）
+  /(?:所以|因此|因而|可见|足见|据此|这说明|这意味着|于是|那么)[^。；，]{0,18}(?:同样|也)[^。；，]{0,6}(?:适用|有效|成立|获益)/,
+  /(?:所以|因此|说明|可见|据此|足以证明)[^。；，]{0,18}(?:也|同样|一定|必然)[^。；，]{0,6}(?:有效|适用|成立|获益)/,
+  /宣称[^。；，]{0,14}(?:两性|男女|所有|任何|人人|全民|各类|各种|所有人)/,
+  /对(?:两性|男女|所有|任何|各类)[^。；，]{0,6}(?:都)?(?:有效|适用|成立)/,
+  /推广到[^。；，]{0,6}(?:全国|全球|全世界|全民|所有|各地|全人类)/,
+  // r338 补：家族 B 跨试验间接比较越界形（分立试验各自 vs 对照 ⇒ A 优于 B）
+  /(?:所以|因此|因而|可见|足见|据此|于是|那么)[^。；，]{0,16}(?:优于|胜过|强于|好于|更有效|效果更好|更胜)/,
+  /(?:所以|因此|可见|据此)[^。；，]{0,8}[A-Za-z甲乙丙]\s*比\s*[A-Za-z甲乙丙]\s*(?:强|好|优)/,
+  /说明[^。；，]{0,8}(?:更有效|效果更好|更优|优于)/,
 ];
 
 // ─── 腿② OVERREACH（英文）─────────────────────────────────────────────
@@ -210,6 +298,11 @@ const OVERREACH_EN = [
   /\b(?:so|therefore|thus|this\s+(?:proves|shows|means)|which\s+(?:proves|shows|means))\b[^.!?]{0,40}\b(?:everyone|everybody|all\s+(?:people|humans?|patients?|cases)|universally|without\s+exception)\b/i,
   // O3 局部 → 整体
   /\b(?:so|therefore|thus|this\s+(?:proves|shows|means))\b[^.!?]{0,40}\b(?:nationwide|globally|worldwide|across\s+the\s+(?:country|world|nation)|everywhere)\b/i,
+  // r338 补：家族 A 子组→普适越界形（EN）
+  /\b(?:which\s+means|so|therefore|thus|meaning)\b[^.!?]{0,40}\b(?:younger|older|other|both\s+sexes|women|men|males|females|everyone)\b[^.!?]{0,30}\b(?:benefit|works?|effective|applies|respond|helped)\b/i,
+  /\bgeneraliz\w+\s+(?:worldwide|globally|everywhere|across\b)/i,
+  // r338 补：家族 B 跨试验间接比较越界形（EN）
+  /\b(?:so|therefore|thus)\b[^.!?]{0,40}\b(?:superior|better|more\s+effective|outperforms?)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ─────────────────────────────────────────────
@@ -314,7 +407,15 @@ function checkEvidenceClaimMismatch(text, inject) {
   if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
-  const evid = positions(R.EVID_ZH || EVID_ZH, text).concat(positions(R.EVID_EN || EVID_EN, text));
+  // r338：腿①扩为五族——EVID（研究/数据标记）+ SUBGROUP（子组限定证据形，
+  // 家族 A）+ CROSS_TRIAL（分立试验各自 vs 对照，家族 B）。子组限定形与
+  // 跨试验分证形本身就是「证据覆盖范围」的声明，与 EVID 同属腿①语义。
+  const evid = positions(R.EVID_ZH || EVID_ZH, text)
+    .concat(positions(R.EVID_EN || EVID_EN, text))
+    .concat(positions(R.SUBGROUP_ZH || SUBGROUP_ZH, text))
+    .concat(positions(R.SUBGROUP_EN || SUBGROUP_EN, text))
+    .concat(positions(R.CROSS_TRIAL_ZH || CROSS_TRIAL_ZH, text))
+    .concat(positions(R.CROSS_TRIAL_EN || CROSS_TRIAL_EN, text));
   const over = positions(R.OVERREACH_ZH || OVERREACH_ZH, text).concat(positions(R.OVERREACH_EN || OVERREACH_EN, text));
   if (evid.length === 0 || over.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
 
@@ -341,6 +442,7 @@ module.exports = {
   checkEvidenceClaimMismatch,
   __internals: () => ({
     EVID_ZH, EVID_EN, OVERREACH_ZH, OVERREACH_EN,
+    SUBGROUP_ZH, SUBGROUP_EN, CROSS_TRIAL_ZH, CROSS_TRIAL_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_SUFF_ZH, EXEMPT_SUFF_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
   }),

@@ -1,0 +1,408 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/rmCJ1TjpAwNMFS51s32H/aCSFpE</id>
+  <title>arXiv Query: search_query=all:winner's OR all:curse OR all:online OR all:ad OR all:auction OR all:keyword OR all:bidding OR all:influencer OR all:signing OR all:overpayment OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-14T08:09:19Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:winner's+OR+(all:curse+OR+(all:online+OR+(all:ad+OR+(all:auction+OR+(all:keyword+OR+(all:bidding+OR+(all:influencer+OR+(all:signing+OR+(all:overpayment+OR+all:detection)))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>525882</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17334v1</id>
+    <title>Unbundling Multimodal Vision Encoding</title>
+    <updated>2026-11-12T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17334v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17334v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How multimodal language models should encode visual input remains up for debate. Most models use a pretrained vision encoder, while some recent recipes train the encoder from scratch with the language model or remove it entirely. Vision encoders bundle together three design choices: a visual prior from upstream pretraining, dedicated vision capacity, and pre-fusion placement of that capacity (i.e., before the multimodal backbone). Because published models also differ in data, architecture, and compute, comparing them cannot isolate the effect of each choice. We disentangle these choices via a controlled framework where we pretrain all models from scratch on common data and compare them on visual question answering and language benchmarks at matched lifetime compute. We find that the visual prior is not necessary; an encoder trained jointly from scratch is on par with a pretrained one, without a separate training stage. What matters instead is dedicated vision capacity: an encoder-free model trails on visual understanding even when its backbone is enlarged by the encoder's parameter count. Yet that capacity need not precede multimodal fusion, as vision-only modules added in-fusion to early backbone layers perform comparably to a pre-fusion encoder and can lower time to first token. These results also hold across backbone sizes, when encoder pretraining is treated as free, and when starting from a pretrained language model. Overall, our findings favor dedicated vision capacity trained jointly with the backbone and placed early within it.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:54Z</published>
+    <arxiv:comment>Project page: https://unbundling.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ellis Brown</name>
+    </author>
+    <author>
+      <name>Chris Hoang</name>
+    </author>
+    <author>
+      <name>Shengyi Qian</name>
+    </author>
+    <author>
+      <name>Shang-Wen Li</name>
+    </author>
+    <author>
+      <name>Mike Lewis</name>
+    </author>
+    <author>
+      <name>Marjan Ghazvininejad</name>
+    </author>
+    <author>
+      <name>Luke Zettlemoyer</name>
+    </author>
+    <author>
+      <name>Lucas Beyer</name>
+    </author>
+    <author>
+      <name>Mengye Ren</name>
+    </author>
+    <author>
+      <name>Jakob Verbeek</name>
+    </author>
+    <author>
+      <name>Saining Xie</name>
+    </author>
+    <author>
+      <name>Hu Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17333v1</id>
+    <title>Discrete Time Crystals from Anti-Unitary Floquet Driving and Dynamical Freezing</title>
+    <updated>2026-11-12T18:59:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17333v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17333v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show anti-unitary periodic drive paves a direct path for stabilizing a Discrete Time-Crystal by Dynamical Freezing (DF). The magnetization appears as an emergent conserved operator, and an exact pairing of two-cycle quasi-energies pins the subharmonic response. DF keeps the effective Hamiltonian $\textit{quasi-local}$; infinite-chain simulations show no detectable decay for a generic state with any finite magnetization. We outline an experimental realization of the anti-unitary drive.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:53Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Anirban Das</name>
+    </author>
+    <author>
+      <name>Asmi Haldar</name>
+    </author>
+    <author>
+      <name>Arnab Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17328v1</id>
+    <title>A Dark-Sector Mass Flip-Flop Mechanism for the ANITA-IV Events</title>
+    <updated>2026-11-12T18:59:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.17328v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17328v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>ANITA-IV has observed four upward-going air-shower candidates just below the horizon, consistent with ultra-high-energy $ν_τ$, yet IceCube, despite its much larger exposure, has detected no neutrino events at such energies. We propose a dark-sector mass flip-flop mechanism that reconciles these observations. We consider an all-sky, monoenergetic flux of ultra-high-energy $N_1$, that is lighter than its partner $N_2$ and stable in vacuum. In our scenario, an ultralight scalar mediating interactions with Earth matter inverts the mass ordering of $N_1$ and $N_2$, allowing an incident $N_1$ to decay into $N_2$ deep underground. The resulting $N_2$ propagates unimpeded through matter and exits the Earth, where the decay $N_2 \to N_1 Z'$ becomes kinematically allowed in the atmosphere, initiating an extensive air shower. At IceCube depths, neither $N_1\to N_2 Z'$ nor $N_2\to N_1 Z'$ is kinematically allowed, which explains the absence of analogous events at IceCube. Normalizing the $N_1$ flux to the four ANITA-IV events, we also predict three events during PUEO's first flight.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:33Z</published>
+    <arxiv:comment>6+2 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Dibya S. Chattopadhyay</name>
+    </author>
+    <author>
+      <name>Carlos A. Argüelles</name>
+    </author>
+    <author>
+      <name>Vedran Brdar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17323v1</id>
+    <title>AgentSSL: Can MLE Agents Leverage Unlabeled Data?</title>
+    <updated>2026-11-12T18:59:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.17323v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17323v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applying machine learning systems to new domains introduces bottlenecks in both labeled data acquisition and manual pipeline engineering. While recent MLE agents show promise in automating pipeline design, they have been studied almost exclusively in fully supervised settings, leaving them untested in realistic regimes where labeled data is scarce but unlabeled data is abundant. In this work, we introduce Agentic Semi-Supervised Learning (AgentSSL), framing SSL as a program search problem and studying how agents navigate this space under limited supervision. We find that even under weak feedback and matched compute, agents can synthesize code that combines and adapts established SSL techniques, exceeding the strongest human-engineered baselines in 8 of 12 settings by up to +21.8%. However, our results identify program selection as a critical bottleneck in AgentSSL, where performance drops by as much as 47% when selecting based on the agent's feedback metric. To systematically study this bottleneck, we introduce ProgramSelectBench, a large-scale benchmark with a combined total of 16,977 agent-generated and human-engineered SSL programs, and evaluate both unsupervised and active program selection methods. We further evaluate AgentSSL on real-world ecology detection tasks, highlighting the opportunities and challenges of transferring agent-discovered strategies beyond controlled benchmarks.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:06Z</published>
+    <arxiv:comment>NeurIPS 2026. Project Website: https://codiscovery.ai/AgentSSL</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ethan Lin</name>
+    </author>
+    <author>
+      <name>Akanksha Sarkar</name>
+    </author>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>Kristin Branson</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17314v1</id>
+    <title>Linking Rapid Learning to Compositional Structure in Neural Networks: Evidence from Additive Analogies in Meta-Learned Parameter Spaces</title>
+    <updated>2026-11-12T18:57:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.17314v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17314v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Humans can learn rapidly from limited experience, while neural networks typically require extensive training. In this work, we investigate what properties of a neural network can enable it to learn rapidly. We study neural networks that have been optimized via meta-learning, a technique that exposes a network to many related functions to facilitate its subsequent learning of similar functions. Prior work has shown that these meta-learned networks can learn new functions rapidly, but how they do so remains unclear. To investigate their internal structure, we take inspiration from classic work demonstrating additive relationships among the learned vectors that neural networks use to represent words (e.g., "king" minus "man" plus "woman" approximates "queen"). Analogously, we look for additive relationships among a meta-learned network's "representations" of different functions; when a meta-learned network rapidly learns to implement a specific function, all of its adapted parameter values can be concatenated into a single vector that we treat as representing the function. We find that such parameter vectors can be added and subtracted according to symbolic relationships among the functions they represent, yielding new parameter vectors that successfully represent the functions predicted by the corresponding symbolic manipulations: the networks specified by these artificially recombined vectors actually implement the intended functions without any direct training on them. Our results suggest that meta-learning can tune a network's starting point to organize subsequent learning along systematic, functionally meaningful trajectories through the space of possible parameter vectors, providing a geometric basis for realizing inductive biases in neural networks.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:49Z</published>
+    <arxiv:comment>24 pages plus references and appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Abigail L. Tenenbaum</name>
+    </author>
+    <author>
+      <name>R. Thomas McCoy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17312v1</id>
+    <title>The Tournament Equilibrium Set Is PSPACE-Complete, Even under Hereditary Uniqueness</title>
+    <updated>2026-11-12T18:57:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.17312v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17312v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The tournament equilibrium set (TEQ), proposed by Schwartz in 1990, is a classical voting rule based on pairwise majority comparisons. Its definition is recursive: an alternative is judged by the alternatives that beat it, called its dominators, and by which of those dominators TEQ itself selects. Deciding whether a given alternative belongs to TEQ was known to be NP-hard and to lie in PSPACE. We close this gap by proving that the problem is PSPACE-complete. To our knowledge, this is the first PSPACE-completeness result for membership in a tournament solution.
+  The hardness persists even when every nonempty subtournament has a unique minimal retentive set, the property conjectured by Schwartz to hold for all tournaments. Moreover, every such subtournament in our hard instances contains an alternative with at most three dominators. We prove that a single alternative with at most four dominators suffices both to guarantee uniqueness and to find a TEQ winner in $O(N^2)$ time. Thus, on our hard instances, finding one winner is efficient even though recognizing a specified winner is PSPACE-complete.
+  We also study how the complexity changes with the dominator bound. If every nonempty subtournament has an alternative with at most one dominator, the entire TEQ can be computed in quadratic time; allowing two dominators makes membership NP-hard. Under the same condition with four dominators, all $t$ winners can be computed in $O(2^t N^2)$ time, where $N$ is the number of alternatives.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:05Z</published>
+    <arxiv:comment>51 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Ethan Dickey</name>
+    </author>
+    <author>
+      <name>Athina Terzoglou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17303v1</id>
+    <title>Towards a Theory of Learnability via Debate</title>
+    <updated>2026-11-12T18:55:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.17303v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17303v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Debate has been recently proposed as a training protocol that is hoped to produce more aligned models even as model capabilities scale. The idea is that the human, instead of providing supervision in the form of labels, judges a debate between two models that compete to prove the correctness of opposite labels. It can be shown that functions of a much higher computational complexity can be correctly judged in this way, compared to the complexity of functions that can be directly evaluated using a computationally weak evaluator. This suggests that perhaps debate can be used to teach very complicated functions to models. However, previous work has largely ignored the fact that this is a training protocol, and simply analyzes the game being played between the two debaters for a known judge. We take the first steps towards understanding the learning problem implicit within the protocol, by formulating it as an online learning problem. We show that once we formulate the learning problem precisely, there are cases where the best way to learn given access to a judge is different from running an adversarial debate. This motivates us to define a cooperative version of the protocol, whose learnability we characterize using a combinatorial dimension. We also consider the possibility of the human judge being fallible and occasionally judging the debate incorrectly. We show that a small number of errors in judgement can lead to a large error in learning.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:58Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Tosca Lechner</name>
+    </author>
+    <author>
+      <name>Vinayak Pathak</name>
+    </author>
+    <author>
+      <name>Sivan Sabato</name>
+    </author>
+    <author>
+      <name>Ruth Urner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17291v1</id>
+    <title>A counterexample to fixed-profile soliton resolution for the three-dimensional quintic wave equation</title>
+    <updated>2026-11-12T18:53:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.17291v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17291v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the three-dimensional focusing energy-critical wave equation. We construct a bounded forward-global solution which starts arbitrarily close to a sign-changing stationary state and is asymptotic to a varying stationary profile plus one free wave. The core has two limits in distinct similarity orbits. A single energy-space norm identity identifies the radiation and reduces every competing fixed list to one profile; the two limits then give a contradiction. The construction uses summable radiation packets whose quadratic impulses produce fixed shape displacements on increasing time scales. We control the nonlinear error uniformly over these intervals and select the endpoints by a compact fixed-point map. A computer-assisted certificate validates the stationary state and its complete odd energy kernel.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:53:35Z</published>
+    <arxiv:comment>57 pages</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Xuwen Chen</name>
+    </author>
+    <author>
+      <name>Justin Holmer</name>
+    </author>
+    <author>
+      <name>Shunlin Shen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17274v1</id>
+    <title>A precision bound for gravitational transseries</title>
+    <updated>2026-11-12T18:50:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.17274v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17274v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose that the large $N$ transseries of a holographic observable above the black hole threshold admits a precision bound, a limit on how precisely the transseries can determine the observable at finite $N$, set by the data of its D-brane instanton sectors. In doing so, we develop methods in large $N$ resurgence, based on the work of Écalle, that capture the $e^{-N^2}$ asymptotics of gravitational saddles beyond the $e^{-N}$ instantons. Under an assumption on the growth of the D-brane instanton sums that we expect in the black hole phase, we find an analytic obstruction to the resummation of the large $N$ transseries. This obstruction sets the precision bound. As our main example and consistency check, we study the $\frac{1}{16}$-BPS index of $\mathcal{N}=4$ super Yang-Mills and its black hole. We derive relations between the D-brane instanton data on thermal AdS and on the black hole, in the form of a duality that exchanges the numbers of D-brane instantons on the two backgrounds. In the index, these relations reproduce the actions of D3-branes wrapped on the black hole. We conclude with our expectations for generic situations and their relation to the double-cone wormhole.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:50:14Z</published>
+    <arxiv:comment>52 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Ji Hoon Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17271v1</id>
+    <title>Niche construction as an emerging phenomenon from fast ecological and slow evolutionary-environmental timescales in individual-based models</title>
+    <updated>2026-11-12T18:46:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17271v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17271v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider an individual-based model of niche construction built upon birth-death processes of d interacting biological entities (e.g., species, subpopulations or mutant strains in the same species) immersed in a slowly-varying environment which is influenced by the population state. In this setting, extinction and/or emergence of entities with negligible size or rarity, on long time scales can be observed. We prove that the joint dynamics of the environment and the species sizes on a logarithmic scale undergo a piecewise deterministic Markov process in a large time regime, which can be approximated by an explicit dynamical system in the limit of large populations. This convergence result holds true under the assumption that no "bad event" occurs during the population dynamics, corresponding to situations where several species become dominant or go extinct simultaneously. We also prove that no such bad event occurs for Baire-almost all initial conditions of the population sizes and the environmental resources. We apply this framework to study the long term coexistence of two specialist species consuming two resources, with a "joint" niche construction where each species constructs the niche of the other while depleting its resources. We also study an example of immune escape in cancer, where the environmental variable is associated with the state of the immune system and the species are associated with three types of tumor cells.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:46:56Z</published>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Nicolas Champagnat</name>
+    </author>
+    <author>
+      <name>Coralie Fritsch</name>
+    </author>
+    <author>
+      <name>Pablo A. Marquet</name>
+    </author>
+    <author>
+      <name>Cristobal Quiñinao</name>
+    </author>
+    <author>
+      <name>Leonardo Videla</name>
+    </author>
+    <author>
+      <name>Nicolás Zalduendo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17268v1</id>
+    <title>Observation of Genuine Multi-Time Quantum Memory</title>
+    <updated>2026-11-12T18:46:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.17268v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17268v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Memory effects in open quantum systems do not by themselves imply quantum memory, since non-Markovian dynamics can often be reproduced by classical-memory models. Known criteria certify the presence of quantum memory in the environment by comparing the evolution of the system at two different times. We show that quantum memory can remain hidden from all such pairwise tests and become detectable only when three or more times are considered jointly. We derive an analytical three-time witness and use it to certify quantum memory in a minimal qubit example in which every pair of times has a classical-memory explanation, thus establishing a strict hierarchy of quantum memory effects. Genuine multi-time quantum memory does not rely on fine-tuned time-dependent Hamiltonians or gate-based evolution. We experimentally demonstrate the hierarchy of quantum memory in a time-continuous realization on a superconducting-qubit platform with time-independent couplings.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:46:04Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Konstantin Beyer</name>
+    </author>
+    <author>
+      <name>Valentin Link</name>
+    </author>
+    <author>
+      <name>Surihan Sean Borjigin</name>
+    </author>
+    <author>
+      <name>Qian Cao</name>
+    </author>
+    <author>
+      <name>Orion Lee</name>
+    </author>
+    <author>
+      <name>Kater Murch</name>
+    </author>
+    <author>
+      <name>Igor Pikovski</name>
+    </author>
+    <author>
+      <name>Philip Taranto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17266v1</id>
+    <title>Global Fit Inference for LISA with samsara++</title>
+    <updated>2026-11-12T18:45:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.17266v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17266v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Laser Interferometer Space Antenna (LISA) will observe a superposition of gravitational-wave signals, requiring joint inference of an unknown number of sources, parameters, and instrumental noise. To disentangle these contributions, that overlap in both time and frequency, a Global Fit (GF) analysis is needed. We present samsara++, a C++/CUDA sampler designed to address this trans-dimensional GF problem. Building on the continuous-time MCMC framework of samsara, the algorithm combines birth-death processes for adding and removing sources, with mutation moves for parameter estimation. Birth and death are selected through posterior-dependent rates. Shared-memory parallelism, incremental likelihood updates, and indexed storage reduce the computational and memory costs, while parallel tempering improves the exploration of multimodal posteriors. We assess the performance using simulated one-year LISA datasets containing Galactic double white dwarf binaries and stationary Gaussian instrumental noise. Analyses of populations containing 143 and 866 binaries start from empty source models, without preliminary searches or proposals tailored to the injected population. These tests demonstrate source reconstruction and catalog generation, highlighting, at the same time, the importance of source-count, overlapping signals, and incomplete mixing on joint source and noise inference. Then we perform a separate stress test, initialized at the injected parameters, exploring a population of 16,435 binaries, corresponding to 131,480 source parameters. This run completes 15 million iterations in approximately 16 hours using about 3 GB of RAM. All together, these benchmarks show the computational feasibility of birth-death sampling for large Galactic-binary populations, and provide a foundation for extending samsara++ toward a comprehensive LISA global fit.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:45:15Z</published>
+    <arxiv:comment>23 pages, 9 figures, 2 tables, 3 appendices</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Lorenzo Valbusa Dall'Armi</name>
+    </author>
+    <author>
+      <name>Gabriele Astorino</name>
+    </author>
+    <author>
+      <name>Riccardo Buscicchio</name>
+    </author>
+    <author>
+      <name>Angelo Ricciardone</name>
+    </author>
+    <author>
+      <name>Walter Del Pozzo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17265v1</id>
+    <title>A deployed four-city entanglement-based QKD network with real-time key delivery, benchmarked against finite-key security bounds</title>
+    <updated>2026-11-12T18:45:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.17265v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17265v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum key distribution (QKD) generates shared secret keys whose security rests on the laws of physics rather than on computational assumptions. We report the entanglement-based segment of the Slovak national quantum communication infrastructure, connecting four cities in western Slovakia over deployed telecommunication fiber. Polarization-entangled photons generated at a central node are passively routed by wavelength to form a trusted-node-free, fully meshed sub-network of three cities, with the fourth connected through the central node and all links operated simultaneously. We also introduce a matrix formalism for passive wavelength routing that enables the algorithmic construction of uniquely and fully connected topologies. Unlike most previous demonstrations, which estimate key rates from raw coincidences, all rates reported here are obtained after the complete post-processing chain, with keys delivered in real time via ETSI GS QKD 014. With partial non-local chromatic dispersion compensation, we obtain 13.5 bit/s over 109 km, and 4.3 bit/s over 32.1 dB of accumulated loss between two cities without a direct fiber link. Benchmarking against finite-key security bounds shows that the implemented heuristic privacy amplification can exceed the finite-key bound, and that replacing detect-and-discard with error correction would increase the finite-key rate by a factor of 4.1-6.6, and yield a positive finite-key rate on the 142.9 km link where the implemented scheme yields none.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:45:08Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Gilberto Borges</name>
+    </author>
+    <author>
+      <name>Saeid Salari</name>
+    </author>
+    <author>
+      <name>Ekta Panwar</name>
+    </author>
+    <author>
+      <name>Samgeeth Puliyil</name>
+    </author>
+    <author>
+      <name>Kartik Kakade</name>
+    </author>
+    <author>
+      <name>Peter Rapčan</name>
+    </author>
+    <author>
+      <name>Mario Ziman</name>
+    </author>
+    <author>
+      <name>Djeylan Aktas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17257v1</id>
+    <title>Interactions from memory footprints: Cage-hopping, mnemotaxis &amp; nonreciprocity</title>
+    <updated>2026-11-12T18:41:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.17257v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17257v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cellular motility is integral to biological processes ranging from foraging to immune responses and cancer metastasis. While cells often navigate by sensing pre-existing environmental cues, many actively steer their future trajectories by remodeling their surroundings via shared, long-lived physicochemical trails called memory footprints. These stigmergic responses to shared footprints also influence large-scale self-organization, such as the early stages of microcolony formation. Despite recent progress, a unified framework connecting single-cell dynamics and collective organization through effective pairwise interactions remains elusive. To bridge this gap, we perform extensive agent-based simulations of an interacting random walk model that explicitly accounts for footprint deposition and decay. Our approach reveals distinct cage-hopping dynamics in solitary cells, as well as complex mnemotactic responses to externally imposed memory gradients. Furthermore, we demonstrate that shared spatial memory fields generate nontrivial effective pairwise interactions, both reciprocal and nonreciprocal, that shape the collective organization of cell populations. Beyond multiscale cellular dynamics, our findings have broader implications for the collective behavior of synthetic active matter, such as swarm robots.</summary>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.bio-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:41:46Z</published>
+    <arxiv:comment>12 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.soft"/>
+    <author>
+      <name>Jyoti Prasad Banerjee</name>
+    </author>
+    <author>
+      <name>Sambodh Sinha</name>
+    </author>
+    <author>
+      <name>Shashi Thutupalli</name>
+    </author>
+    <author>
+      <name>Rituparno Mandal</name>
+    </author>
+    <author>
+      <name>Deb Sankar Banerjee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17252v1</id>
+    <title>Sowing the Seeds of Intractability: Kalah is PSPACE-complete</title>
+    <updated>2026-11-12T18:38:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.17252v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17252v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Kalah is a classic two-player game in the mancala family of sowing games. Computers have solved several standard-size starting positions, but the complexity of the game on boards of growing size has remained open. We study the natural generalization in which the number of pits per side is part of the input and an arbitrary position is given, with the stone counts given in unary. We show that deciding whether a designated player can force a win from such a position is PSPACE-complete. The hard positions have Alice to move first and both stores initially empty. The same positions are hard under either common convention for capture opposite an empty pit, and with or without the bonus rule, which gives a player another turn when the last stone is sown into their own store.
+  We introduce Line Kalah as an intermediate problem, a game on a line in which stones that leave the line effectively disappear and Alice must save each of her target pits before Bob captures it, and we reduce quantified Boolean formulas to it. The reduction uses a set of sequential timer piles whose last stones approach a group of targets, forcing Alice to choose between two captures in order to set the truth value of a variable, and a final capture gadget to test a clause chosen by Bob (only one is needed adversarially).
+  Since either player may move any pile at any time, the stages are placed so that premature timer firings protect earlier potential targets. For a true formula, Alice's strategy against arbitrary opposing play either gains enough time to save the remaining targets (after Bob deviates from the intended play) or reaches the final test with a correctly encoded, protected input. Finally, the line positions are embedded in Kalah with both stores empty. A separate Bob pit holds the score adjustment, so the winner takes a strict majority of the stones.</summary>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:38:34Z</published>
+    <arxiv:comment>55 pages, 6 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CC"/>
+    <author>
+      <name>Ethan Dickey</name>
+    </author>
+    <author>
+      <name>Ethan Mader</name>
+    </author>
+  </entry>
+</feed>
