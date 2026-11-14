@@ -134,7 +134,7 @@ const CAUSAL_MARK_ZH_A = /(?:所以|因此|因而|故|可见|故而|这说明|�
 // A2 证实词×治疗×裁决族（证明新药有害 / 研究表明该药不安全）。
 const CAUSAL_PROVE_ZH_B = /(?:证明|说明|表明|意味着|反映出|足以证实|证实了|证明了|研究表明|研究发现|数据表明)[^。，！？；\n]{0,26}(?:新药|新疗法|该药|该疗法|这种治疗|这种疗法|本方案|该治疗|该方案|疗法|药物|干预|手段|措施|它)[^。，！？；\n]{0,16}(?:有害|无效|有效|安全|危险|有问题|可靠|不可取|更好|更差|加重|致死|不安全|导致死亡|造成死亡)/;
 // A3 治疗×裁决无标记族（新药反而有害 / 该药无效 / 新疗法导致更高的死亡率）。
-const CAUSAL_TREAT_ZH_C = /(?:新药|新疗法|该药|该疗法|这种治疗|这种疗法|本方案|该治疗|该方案|疗法|药物|干预|手段|措施)[^。，！？；\n]{0,10}(?:反而|更|较)?[^。，！？；\n]{0,10}(?:有害|无效|有效|安全|危险|有问题|不可取|更危险|更好|更差|导致(?:更高的)?(?:死亡率|死亡|风险)|造成(?:更高的)?(?:死亡率|死亡|风险)|加重)/;
+const CAUSAL_TREAT_ZH_C = /(?:新药|新疗法|该药|该疗法|这种治疗|这种疗法|本方案|该治疗|该方案|疗法|药物|干预|手段|措施)[^。，！？；\n]{0,10}(?:反而|更|较)?[^。，！？；\n]{0,10}(?<![不无未])(?:有害|无效|有效|安全|危险|有问题|不可取|更危险|更好|更差|导致(?:更高的)?(?:死亡率|死亡|风险)|造成(?:更高的)?(?:死亡率|死亡|风险)|加重)/;
 // A4 结局差异族（痊愈率明显更低 / 死亡率更高）。
 const CAUSAL_OUTCOME_ZH_D = /(?:死亡率|病死率|死亡人数|复发率|恶化率|并发症|生存率|痊愈率|治愈率|缓解率|有效率|失败率|不良反应|疗效|预后|死亡|痊愈|治愈|缓解|恶化|复发)[^。，！？；\n]{0,14}(?:更高|更低|更多|更少|更好|更差|上升|下降|升高|降低|最长|最短|更长|更短|明显更高|明显更低|明显更多|明显更少)/;
 
@@ -151,7 +151,7 @@ const CAUSAL_SO_EN_A = /\b(?:so|therefore|thus|hence|consequently|as\s+a\s+resul
 // B2 proves/shows … the drug … unsafe 族
 const CAUSAL_PROVE_EN_B = /\b(?:proves?|shows?|means?|demonstrates?|indicates?)\b[^.]{0,40}\b(?:the\s+)?(?:drug|therapy|treatment|intervention|regimen|medication|procedure)\b[^.]{0,40}\b(?:harmful|dangerous|unsafe|ineffective|effective|works?|fails?|causes?|is\s+no\s+good|does\s+not\s+work)\b/i;
 // B3 the drug is ineffective 族（无标记，治疗名词紧邻裁决）
-const CAUSAL_TREAT_EN_C = /\b(?:the\s+|this\s+|new\s+)?(?:drug|therapy|treatment|intervention|regimen|medication)\s+(?:is\s+|was\s+|are\s+|were\s+)?(?:harmful|dangerous|unsafe|ineffective|effective|works?|fails?|causes?)\b/i;
+const CAUSAL_TREAT_EN_C = /\b(?:the\s+|this\s+|new\s+)?(?:drug|therapy|treatment|intervention|regimen|medication)\s+(?:is\s+|was\s+|are\s+|were\s+)?(?:harmful|dangerous|ineffective|effective|works?|fails?|causes?)\b/i;
 // B4 mortality rates were higher 族
 const CAUSAL_RATE_EN_D = /\b(?:death|mortality|survival|response|recurrence|complication|cure|remission|failure)\s+(?:rates?|risks?|numbers?)?\s*(?:were|was|are|is)?\s*(?:significantly\s+|much\s+|far\s+)?(?:higher|lower|increased|reduced|elevated|worse|better)\b|\b(?:higher|lower|increased|reduced|elevated|worse|better)\s+(?:death|mortality|survival|response|recurrence|complication|cure|remission|failure)\s+(?:rates?|risks?|numbers?)?\b/i;
 
@@ -321,7 +321,7 @@ function detectConfoundingByIndication(text, inject) {
       ? '选择性分配「' + x.selection + '」× 治疗归因「' + x.causal + '」'
       : 'selection "' + x.selection + '" x causal claim "' + x.causal + '"')),
     details: s.lang === 'zh'
-      ? '适应证混杂(' + sigs.length + '处: 「' + s.selection + '」说明治疗分配由基线风险驱动，却把「' + s.causal + '」的组间结局差异直接归因于治疗——两组基线不可比，粗率差异不能作为疗效/危害证据)(zh)'
+      ? 'confounding-by-indication 适应证混杂(' + sigs.length + '处: 「' + s.selection + '」说明治疗分配由基线风险驱动，却把「' + s.causal + '」的组间结局差异直接归因于治疗——两组基线不可比，粗率差异不能作为疗效/危害证据)(zh)'
       : 'confounding-by-indication(' + sigs.length + 'x: "' + s.selection + '" shows treatment assignment was driven by baseline risk, yet "' + s.causal + '" attributes the crude outcome gap to the treatment — groups are not comparable at baseline)(en)',
     guidance: '适应证混杂（confounding by indication / 指征混杂）指治疗分配由基线预后驱动时（重症患者才用新药、病情重的医生才敢开），组间粗结局率差异反映的是基线风险而非治疗效应，直接据此断言治疗有害或有效是把不可比的两组当成可比。它的危害不在「重症确实更多地用了新药」这个事实陈述（那可以用处方记录核实），而在紧随其后的第二动作：把由此产生的死亡率/痊愈率/并发症率差异当成药物的效果——这一步跳过了「两组本来就可比」的前提。正当做法是先核对两组的基线风险分布并做分层/多变量调整/倾向评分，或直接指出只能做随机对照试验比较；需要按基线分层或随机化后才能比较、把差异归因于基线预后本身的纠正句、或明确指出这是适应证混杂，都是正当做法。',
     tags: ['causal-inference', 'epidemiology', 'confounding', 'statistics', 'evidence-based-medicine', 'treatment-comparison'],
