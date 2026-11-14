@@ -297,12 +297,62 @@ const CRISIS_EN = [
   /\b(?:fires?|wildfires?|cardiac\s+arrests?|heart\s+attacks?|crashes?|accidents?|overdoses?|drownings?|storms?|floods?|earthquakes?|disasters?|emergencies|collapses?|explosions?|blazes?)\b/i,
 ];
 
+// ─── [r340 新增族] protopathic bias 用药先于确诊倒置框（主判据 D）────────
+// 收录口径：疾病**早期症状**促使患者就医用药（治疗分配由前驱症状驱动），
+// 用药因此先于确诊；把「确诊前在用药」的时间差当成「用药导致该病」的
+// 证据——与判据 A 同属因果倒置，但表面形态是「时序差 × 归因于药」，
+// 且疾病名词（发病/疾病）不在 RESULT 表、时序标记（确诊前/before
+// diagnosis）不在任何存量腿，故独立成框，既有路径零改动。
+// 典型形：
+//   得病的人病发前普遍服用过这个药，足以证明服药是发病的原因。
+//   患者在确诊前一年内大量使用该药物，因此该药物是致病因素。
+//   Patients who developed the disease had been taking this drug
+//   before diagnosis, so the drug causes it.
+// 良性形（不判）：早期症状促使用药的方向陈述/概念讨论/前瞻研究语境。
+// 四条件共现，缺一不判：①PRE_USE 时序标记 ②MED 药物/治疗名词
+// ③ATTRIB 归因断言 ④疾病名词落在归因动词近距窗内。
+const PRE_USE_ZH = [
+  /确诊前|确诊之前|确诊以前|发病前|发病之前|发病以前|病发前|得病前|得病之前|生病前|患病前|罹病前|起病前|就诊前|诊断前|查出前|确诊以?前|发病以?前/,
+];
+const PRE_USE_EN = [
+  /\b(?:before|prior\s+to|preceding|preceded|ahead\s+of)\s+(?:the\s+)?(?:diagnosis|diagnosed|diagnosing|onset)\b/i,
+  /\bbefore\s+(?:being\s+)?(?:diagnosed|the\s+diagnosis|the\s+disease\s+was\s+(?:diagnosed|detected))\b/i,
+  // beforehand/previously 只在与药物名词共现时才算时序标记（防日常词泛化）
+  /\b(?:beforehand|earlier)\b(?=[^.]{0,80}\b(?:drug|medication|medicine|treatment|therapy|prescribed)\b)/i,
+];
+const MED_ZH = [
+  /吃药|服药|服用|用药|吃了?[^。，]{0,6}药|服[了过]?[^。，]{0,6}药|药物|药片|胶囊|颗粒|输液|打针|挂水|抗生素|激素|止痛|止疼|安眠|抗抑郁|降压|降糖|他汀|阿司匹林|布洛芬|中药|西药|处方|治疗|疗法|用了?[^。，]{0,6}药|喂[了过]?药/,
+];
+const MED_EN = [
+  /\b(?:drug|drugs|medication|medications?|medicine|medicines|pill|pills|tablet|capsule|treatment|therapy|therapies|prescribed|prescription|taking|took|administered|dose|dosing|aspirin|ibuprofen|statins?|steroids?|antibiotics?)\b/i,
+];
+const ATTRIB_ZH = [
+  // 归因断言：宽形「是…（的）原因/因素/诱因/元凶/祸根/根源」+ 强势因果动词
+  /是[^。，]{0,12}(?:的)?(?:原因|因素|诱因|元凶|祸根|根源)/,
+  /导致|造成|引发|引起|诱发|催生|酿造?成|致使|归因于|归罪于|怪罪于/,
+];
+const ATTRIB_EN = [
+  /\b(?:causes?|caused|causing|led\s+to|leads?\s+to|resulted?\s+in|results?\s+in|is\s+responsible\s+for|triggers?|triggered|induces?|induced)\b/i,
+  // "must be the cause / is the culprit" 类名词性归因
+  /\b(?:is|are|was|were|must\s+be|may\s+be|be)\s+the\s+(?:cause|culprit)\b/i,
+];
+const PROT_DISEASE_ZH = [
+  // 只收疾病发生类名词；刻意不收裸「病」与「确诊/诊断」（防「是该病的
+  // 元凶」类句子误伤，也防与判据 A 的确诊行为词串扰）
+  /发病|得病|患病|罹患|疾病|病症|病情|生病|致病|染病|中招|患上/,
+];
+const PROT_DISEASE_EN = [
+  /\b(?:disease|disorder|illness|syndrome|condition|diagnosis|diagnosed|cancer|tumor|infection)\b/i,
+];
+
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────
 const EXEMPT_META_ZH = [
   /因果倒置|反向因果|逆向因果|因果混淆|混淆变量|混杂因素|相关不等于因果|相关性不等于因果|辛普森悖论|辛普森悖误|内生性|选择效应|生态谬误|区群谬误|统计学|统计课|数学课|教材|课本|课堂|教案|论文里|文章里|科普|逻辑课|谬误|谬论|研究方法|课堂教学/,
 ];
 const EXEMPT_META_EN = [
   /\b(?:reverse\s+causa\w+|causality\s+reversal|confounding|confounder|endogeneity|selection\s+effect|simpson'?s\s+paradox|correlation\s+(?:does\s+not|isn'?t)\s+(?:equal|imply)\s+causation|spurious\s+correlation|statistics|textbook|lecture|methodology|epidemiolog\w+|fallacy)\b/i,
+  // [r340] protopathic bias 概念讨论豁免（「Protopathic bias occurs when…」）
+  /\bprotopathic\b/i,
 ];
 
 // ─── 豁免二：实验/证据语境（方向已被检验）────────────────────────────
@@ -592,6 +642,27 @@ function responderDispatch(text, isZh, R) {
   return false;
 }
 
+/** [r340 新增] 主判据 D：protopathic bias 用药先于确诊倒置框。
+ *  四条件共现，缺一不判：
+ *   ① PRE_USE 时序标记（确诊前/发病前；EN before diagnosis/preceded）；
+ *   ② MED 药物/治疗名词在场；
+ *   ③ ATTRIB 归因断言（是…原因/因素/诱因；EN causes/led to/must be the cause）；
+ *   ④ 疾病名词落在归因动词近距窗内（ZH 18 字 / EN 45 字符，双向——
+ *      EN 语序两种都有：「the drug causes the disease」与「patients who
+ *      developed the disease … the drug causes it」）。
+ *  全局豁免（概念/证据/否定/对冲/疑问）在 checkReverseCausation 入口已执行。 */
+function protopathicBias(text, isZh, R) {
+  const PRE = isZh ? (R.PRE_USE_ZH || PRE_USE_ZH) : (R.PRE_USE_EN || PRE_USE_EN);
+  const MED = isZh ? (R.MED_ZH || MED_ZH) : (R.MED_EN || MED_EN);
+  const ATTRIB = isZh ? (R.ATTRIB_ZH || ATTRIB_ZH) : (R.ATTRIB_EN || ATTRIB_EN);
+  const DIS = isZh ? (R.PROT_DISEASE_ZH || PROT_DISEASE_ZH) : (R.PROT_DISEASE_EN || PROT_DISEASE_EN);
+  if (!anyHit(PRE, text)) return false;
+  if (!anyHit(MED, text)) return false;
+  if (!anyHit(ATTRIB, text)) return false;
+  const win = isZh ? 18 : 45;
+  return nearFrom(ATTRIB, DIS, text, win) || nearBefore(ATTRIB, DIS, text, win);
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -712,6 +783,16 @@ function checkReverseCausation(text, inject) {
     }
   }
 
+  // 主判据 D（r340 新增）：protopathic bias 用药先于确诊倒置框
+  if (protopathicBias(text, isZh, R)) {
+    return {
+      hit: true, score: 0.6, count: 1,
+      detail: isZh
+        ? '因果倒置×用药先于确诊的protopathic框(zh)'
+        : 'reverse causation×protopathic pre-diagnosis-use(en)',
+    };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
@@ -724,5 +805,7 @@ module.exports = {
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_EVID_ZH, EXEMPT_EVID_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
     EXEMPT_DETECT_ZH, EXEMPT_DETECT_EN, // [r316]
+    PRE_USE_ZH, PRE_USE_EN, MED_ZH, MED_EN, // [r340]
+    ATTRIB_ZH, ATTRIB_EN, PROT_DISEASE_ZH, PROT_DISEASE_EN, // [r340]
   }),
 };

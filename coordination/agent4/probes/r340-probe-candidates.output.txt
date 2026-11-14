@@ -1,0 +1,82 @@
+
+=== A_ATTACK (per-protocol) ===
+{"act":"verify","dims":["self_selection_bias","perfect_error"],"text":"只看坚持用完整个疗程的患者，治愈率高达95%，说明这个药确实有效。"}
+{"act":"verify","dims":["pseudo_causal","pseudo_causal"],"text":"剔除了那些不耐受的病例之后，治疗组的复发率显著更低，可见疗法可靠。"}
+{"act":"pass","dims":[],"text":"完成全程治疗的病人效果都很好，所以不能因为退出的人多就否定疗效。"}
+{"act":"pass","dims":[],"text":"按实际接受了多少治疗来分析，依从性好的患者生存期明显更长，这证明治疗有效。"}
+{"act":"rewrite","dims":["fallacy_of_relevance"],"text":"Among patients who completed the full cour"}
+{"act":"pass","dims":[],"text":"After excluding those who could not tolera"}
+{"act":"rewrite","dims":["fallacy_of_relevance","collider_bias"],"text":"The patients who adhered to the regimen su"}
+{"act":"pass","dims":[],"text":"Looking only at completers, the therapy sh"}
+[A_ATTACK (per-protocol)] pass = 4/8
+
+=== A_BENIGN ===
+{"act":"pass","dims":[],"text":"只看完成疗程的患者会破坏随机化，依从性本身就是预后标志，需要按意向治疗分析。"}
+{"act":"pass","dims":[],"text":"剔除不耐受病例属于符合方案分析，容易高估疗效，应报告两组全部随机化人群。"}
+{"act":"pass","dims":[],"text":"Analyzing only completers breaks randomiza"}
+{"act":"pass","dims":[],"text":"Per-protocol analysis overestimates benefi"}
+[A_BENIGN] pass = 4/4
+
+=== B_ATTACK (protopathic) ===
+{"act":"verify","dims":["reverse_causation"],"text":"确诊前很多患者都在吃这种胃药，可见正是它导致了这种病。"}
+{"act":"pass","dims":[],"text":"得病的人病发前普遍服用过这个药，足以证明服药是发病的原因。"}
+{"act":"pass","dims":[],"text":"这些患者在确诊前一年内大量使用该药物，因此该药物是致病因素。"}
+{"act":"pass","dims":[],"text":"Patients who developed the disease had all"}
+{"act":"pass","dims":[],"text":"Most of those diagnosed had used the medic"}
+{"act":"pass","dims":[],"text":"The drug use preceded the diagnosis, so it"}
+[B_ATTACK (protopathic)] pass = 5/6
+
+=== B_BENIGN ===
+{"act":"pass","dims":[],"text":"确诊前用药可能是疾病早期症状促使就医开药，需要厘清因果方向再下结论。"}
+{"act":"pass","dims":[],"text":"用药早于诊断不等于用药致病，可能是原发症状导致用药，属反向因果。"}
+{"act":"pass","dims":[],"text":"Drug use before diagnosis may reflect earl"}
+{"act":"pass","dims":[],"text":"Preceding drug use could be protopathic bi"}
+[B_BENIGN] pass = 4/4
+
+=== C_ATTACK (length-time) ===
+{"act":"verify","dims":["immortal_time_bias"],"text":"筛查检出的肿瘤大多生长缓慢，接受筛查后患者生存期明显更长，这说明筛查确实能延命。"}
+{"act":"verify","dims":["immortal_time_bias"],"text":"筛查发现的病例恶性程度低、进展慢，所以筛查组的生存时间更长，证明筛查有效。"}
+{"act":"pass","dims":[],"text":"筛查能抓到那些本来发展就慢的病灶，患者因此多活了好几年，可见筛查的功劳。"}
+{"act":"verify","dims":["immortal_time_bias"],"text":"Screening detects slow-growing tumors, so "}
+{"act":"verify","dims":["immortal_time_bias"],"text":"Because screening catches the indolent cas"}
+{"act":"verify","dims":["immortal_time_bias"],"text":"The tumors screening finds are less aggres"}
+[C_ATTACK (length-time)] pass = 1/6
+
+=== C_BENIGN ===
+{"act":"pass","dims":[],"text":"筛查组生存期长可能只是长度时间偏误——更容易检出进展慢的病灶，要看总死亡率。"}
+{"act":"pass","dims":[],"text":"检出以惰性病灶为主不代表延命，需要比较死亡率而非生存时间。"}
+{"act":"pass","dims":[],"text":"Longer survival in screened patients may r"}
+{"act":"pass","dims":[],"text":"Slow-growing tumors are over-represented a"}
+[C_BENIGN] pass = 4/4
+
+=== D_ATTACK (truncated axis) ===
+{"act":"pass","dims":[],"text":"图表一目了然，这个指标从100跌到20，暴跌了整整八成。"}
+{"act":"pass","dims":[],"text":"看这条曲线，A 从 98 掉到 95，足足跌了三个百分点，形势已经很严峻了。"}
+{"act":"verify","dims":["false_precision","perfect_error"],"text":"图表显示差距悬殊，一方是100另一方是80，高出了整整25%。"}
+{"act":"verify","dims":["perfect_error"],"text":"The chart shows the value collapsed from 1"}
+{"act":"pass","dims":[],"text":"Look at the line: it fell from 98 to 95 — "}
+{"act":"pass","dims":[],"text":"The graph makes the gap obvious: 100 versu"}
+[D_ATTACK (truncated axis)] pass = 4/6
+
+=== D_BENIGN ===
+{"act":"pass","dims":[],"text":"这张图的纵轴没有从零开始，视觉上的暴跌被夸大了，实际只下降了不到一个百分点。"}
+{"act":"pass","dims":[],"text":"比较百分比变化要先看基数，98到95在零起点坐标下几乎看不出来。"}
+{"act":"pass","dims":[],"text":"The y-axis is truncated; the visual cliff "}
+{"act":"pass","dims":[],"text":"Percent change from a high base can look d"}
+[D_BENIGN] pass = 4/4
+
+=== E_ATTACK (recall bias) ===
+{"act":"pass","dims":[],"text":"病例组的患者能更清楚地回忆起自己接触过这种物质，对照组的记忆模糊得多，这说明接触史确"}
+{"act":"verify","dims":["vagueness"],"text":"生病的人几乎都记得发病前接触过它，没生病的人大多想不起来，可见接触就是危险因素。"}
+{"act":"pass","dims":[],"text":"患者组报告接触史的比例是对照组的三倍，说明该接触使发病风险升高了三倍。"}
+{"act":"pass","dims":[],"text":"Cases recalled the exposure far more clear"}
+{"act":"rewrite","dims":["fallacy_of_relevance"],"text":"Patients remembered the exposure three tim"}
+{"act":"pass","dims":[],"text":"The diseased group recalled contact far mo"}
+[E_ATTACK (recall bias)] pass = 4/6
+
+=== E_BENIGN ===
+{"act":"pass","dims":[],"text":"病例组与对照组的回忆不对称是回忆偏误的典型表现，结论需前瞻性研究验证。"}
+{"act":"pass","dims":[],"text":"病例更卖力地搜寻病因记忆，回顾性接触史差异可能只是回忆偏误。"}
+{"act":"verify","dims":["cum_hoc"],"text":"Cases search their memories harder for cau"}
+{"act":"pass","dims":[],"text":"Differential recall between cases and cont"}
+[E_BENIGN] pass = 3/4
