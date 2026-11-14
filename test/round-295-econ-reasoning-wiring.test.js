@@ -1,12 +1,13 @@
 /**
- * r295 经济与资源推理 + 统计素养插件层+MCP 接线轮测（r296 扩族至 21 族后随族表更新）
+ * r295 经济与资源推理 + 统计素养插件层+MCP 接线轮测（r296 扩族至 21 族、
+ * r336 机会成本忽视扩族至 22 族后随族表更新）
  *
  * 覆盖：
- *   A 插件元数据与族表（21 族 = 16 econ + 5 stats，族键/模块路径/组归属）
- *   B 每族攻击命中（21 族全中，模块级两腿共现判据经插件聚合后仍可达）
+ *   A 插件元数据与族表（22 族 = 17 econ + 5 stats，族键/模块路径/组归属）
+ *   B 每族攻击命中（22 族全中，模块级两腿共现判据经插件聚合后仍可达）
  *   C 良性零误伤（12 条官方良性形状语料）
  *   D action=<family key> 单族过滤（MCP action 入参）
- *   E 负例注入-删条（21 个：blind inject 各模块 __internals 探针键后，
+ *   E 负例注入-删条（22 个：blind inject 各模块 __internals 探针键后，
  *     该族必须从命中中消失——证明每个族的 dispatch 都是承重的，删了会红）
  *   F 引擎 think 路径真 dispatch（真 HeartFlow 实例 + 真 runThinkPipeline：
  *     插件经 PluginLoader 加载 → postprocess.think hook 写
@@ -58,6 +59,9 @@ const ATTACK = {
   adverse_selection: '保险池自然会同时吸引低风险和高风险的人，这对保费没有影响。',
   moral_hazard: '全额兜底不会让机构去承担更多风险。',
   free_rider: '公共事务总会有人站出来管，我个人不用参与。',
+  // r336 机会成本忽视（src/opportunity-cost-neglect.js，单腿①单腿②样本——
+  // E 段盲注承重需要该句只依赖一对腿组）
+  opportunity_cost_neglect: '设备闲置着也不会产生额外成本，没有任何损失。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -101,6 +105,8 @@ const INJECT_KEY = {
   adverse_selection: ['POOL_ZH', 'POOL_EN', 'NODISTORT_ZH', 'NODISTORT_EN'],
   moral_hazard: ['SHIELD_ZH', 'SHIELD_EN', 'NOCHANGE_ZH', 'NOCHANGE_EN'],
   free_rider: ['COLLECTIVE_ZH', 'COLLECTIVE_EN', 'ABSTAIN_ZH', 'ABSTAIN_EN'],
+  // r336 机会成本忽视（腿①闲置族 + 腿②无损失族，对 ATTACK 样本单腿承重）
+  opportunity_cost_neglect: ['INACTION_IDLE_ZH', 'ZEROCOST_NOLOSS_ZH'],
 };
 
 console.log('=== A 插件元数据与族表 ===');
@@ -111,14 +117,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 21 族：16 econ + 5 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 21); // r295 18 + r296 信息与激励盲区 3
+T('A2 族表 22 族：17 econ + 5 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 22); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 16);
+  assert.strictEqual(econ.length, 17);
   assert.strictEqual(stats.length, 5);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 21);
+  assert.strictEqual(new Set(keys).size, 22);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
