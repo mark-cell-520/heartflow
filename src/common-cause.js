@@ -54,6 +54,12 @@
  *     - C-a 相关名词形（必含双变量，免并列结构要求）：相关/相关性/
  *       高度相关/正相关/负相关/显著相关/密切相关/强相关；
  *       EN correlated / correlation / covary / covariation；
+ *       [r326] 比较级共变·双变量内含形（并入 C-a 免并列通道）：越X，Y和Z越W
+ *       （两个越子句被逗号/较长间隔分开，双变量由句中 和/与/跟 承载）；
+ *       EN the+比较级…，the+比较级… and …（双变量由第二子句内部 and
+ *       承载）。与 C-b 首正则「越[^。，]{1,4}越」的差异：允许逗号分隔、
+ *       间隔放宽至 10 字；「参与」的「与」以环视排除，第二越子句禁模态/
+ *       能愿词（越(?![要应得该须能想])）。
  *     - C-b 共变动词形（必须同句近处有并列双变量结构）：同步上升/同步
  *       增长/同步下降/一同/一齐/一起+上升类/齐涨/齐升/齐跌/同涨同跌/
  *       同升同降/相伴上升/如影随形/齐头并进/亦步亦趋/水涨船高/随之
@@ -129,6 +135,17 @@ const COVARY_REL_ZH = [
   // 越子句由「的」连接（单主语的「越练越强」无「的」不中）；第二越子句禁模态/
   // 能愿词（越(?![要应得该须能想])），挡「越忙的时候越要多喝水」类良性处方形。
   /越[^。，；！？]{1,6}的[^。，；！？]{1,10}越(?![要应得该须能想])[^。，；！？]{0,8}(?:大|多|高|少|低)/,
+  // [r326] 比较级共变·双变量内含形（真升级②）：「气温越高，冰淇淋销量和溺水
+  // 人数就越高，所以吃冰淇淋会导致溺水」——两个越子句被逗号/较长间隔分开，
+  // 双变量由句中 和/与/跟 承载（连词在匹配内部，PAIR-before 结构不成立，
+  // 故走 COVARY_REL 免并列通道，同 r283 with-more 先例）。与首正则
+  // 「越[^。，]{1,4}越」的差异：允许逗号分隔、间隔放宽至 10 字（越子句常带
+  // 主语）。三点安全设计：① 「参与」的「与」是构词语素非连词，环视排除；
+  // ② 第二越子句禁模态/能愿词（越(?![要应得该须能想])），挡「越忙的时候越
+  // 要多喝水」类良性处方形；③ 仍受全局豁免（EXEMPT_EVID/NEG/HEDGE/
+  // NO_CONFOUND）+ 腿②真因果动词双朝向 60 字窗约束。良性预检：官方四基准
+  // 语料 369 条零新增命中。
+  /越[^。；！？]{1,10}(?<![参])[和与跟][^。；！？]{1,10}越(?![要应得该须能想])[^。；！？]{0,6}(?:多|高|少|低|差|好|明显|严重|频繁|罕见)/,
 ];
 
 // ─── 腿① C-b 共变动词形（中文，裸名词形态）────────────────────────────
@@ -170,6 +187,15 @@ const COVARY_REL_EN = [
   // 共变无相关名词、无 and 并列，双变量由 with 短语与主句谓语承载（走 COVARY_REL
   // 免并列通道）。
   /\b(?:with|where|when|as)\s+(?:more|less|fewer|higher|lower|greater)\s+[\w\s]{1,40}\s+(?:more|less|fewer|higher|lower|greater)\b/i,
+  // [r326] the-比较级双形共变·and 内含形（真升级②）：「The hotter the summer,
+  // the more ice cream sales and drowning cases rise, so ice cream causes
+  // drowning.」——两个 the+比较级子句被逗号/较长间隔分开，双变量由第二子句
+  // 内部的 and 承载（and 在匹配内部，PAIR-before 结构不成立，故走 COVARY_REL
+  // 免并列通道）。与 COVARY_MOVE_EN 既有「the…the…」44 字窗的差异：窗放宽至
+  // 60/40 字，且 and 可出现在第二比较级之后（sales and drowning cases 在
+  // the more 之后）。仍受全局豁免 + 腿②真因果动词双朝向 120 字符窗约束。
+  // 良性预检：官方四基准语料 369 条零新增命中。
+  /\bthe\s+(?:\w+er|more|less|better|worse|fewer|higher|lower|faster|slower)\b[^.]{1,60}\bthe\s+(?:\w+er|more|less|better|worse|fewer|higher|lower|faster|slower)\b[^.]{1,40}\b(?:and|&)\b/i,
 ];
 const COVARY_MOVE_EN = [
   /\b(?:rise\s+together|rises\s+together|rose\s+together|rising\s+together|move\s+together|moves\s+together|moved\s+together|moving\s+together|fall\s+together|falls\s+together|fell\s+together|go\s+up\s+together|went\s+up\s+together|lockstep|hand\s+in\s+hand|tandem|in\s+sync|track\s+each\s+other|tracks\s+each\s+other|rise\s+and\s+fall\s+together|moves?\s+in\s+tandem)\b/i,

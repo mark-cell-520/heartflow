@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/bWYu0UkwlWI2Js2sKWWMufslVv0</id>
+  <title>arXiv Query: search_query=all:collider OR all:bias OR all:endogenous OR all:selection OR all:causal OR all:inference OR all:fallacy OR all:conditioning&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-13T23:48:00Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:collider+OR+(all:bias+OR+(all:endogenous+OR+(all:selection+OR+(all:causal+OR+(all:inference+OR+(all:fallacy+OR+all:conditioning))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>730677</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17336v1</id>
+    <title>Back to Pixels: Lifting Latent Video Diffusion into Pixel Space</title>
+    <updated>2026-11-12T18:59:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.17336v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17336v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier video generation models work in a VAE latent space that compresses video in both space and time. This compression made training tractable, but now limits high-resolution, controllable, and interactive generation -- doubling resolution quadruples token count, conditions apply to groups of frames rather than individual ones, and each response must wait for the rest of its multi-frame block. We present PixVid, a simple yet effective method that lifts a pretrained latent video model to directly generate every frame in pixel space. PixVid keeps the diffusion transformer and replaces the VAE decoder with a convolutional head that renders its outputs into pixels. We find that predicting clean video rather than velocity, together with a larger noise shift, is key to quality. Finetuned from Wan2.1-14B, PixVid is competitive with the latent baseline within $\sim 1.3$M training clips. Working framewise in pixels, it generates at $2\times$ higher resolution with the same per-frame token count, keeps depth-conditioned video editing aligned under fast motion, and responds to each action at the next frame. Project page: https://chenshuo20.github.io/PixVid/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:55Z</published>
+    <arxiv:comment>Project Page: https://chenshuo20.github.io/PixVid/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yanke Song</name>
+    </author>
+    <author>
+      <name>Shuo Chen</name>
+    </author>
+    <author>
+      <name>Chris Rockwell</name>
+    </author>
+    <author>
+      <name>Guande He</name>
+    </author>
+    <author>
+      <name>Nan Liu</name>
+    </author>
+    <author>
+      <name>Desai Xie</name>
+    </author>
+    <author>
+      <name>Tianpei Gu</name>
+    </author>
+    <author>
+      <name>Yong-Hyun Park</name>
+    </author>
+    <author>
+      <name>Aryan V S</name>
+    </author>
+    <author>
+      <name>Dennis Yuren Menn</name>
+    </author>
+    <author>
+      <name>Ming-Hsuan Yang</name>
+    </author>
+    <author>
+      <name>Xun Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17332v1</id>
+    <title>ArchSpace: Recording, Reviewing, and Referencing LLM Architecture Research</title>
+    <updated>2026-11-12T18:59:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.17332v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17332v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Model architecture shapes the scaling behavior, training efficiency, and inference cost of LLMs, making it a central focus of both industry and academia. In industry, teams such as those behind DeepSeek, Qwen, and Kimi routinely introduce architectural innovations, yet public reports rarely document which ideas succeeded, which were abandoned, and why. In academia, limited compute and inconsistent baselines often restrict evaluations to small-scale, single-point comparisons, making it difficult to establish whether improvements hold at larger scales or translate into broader impact. ArchSpace addresses both gaps as a public platform for Recording, Reviewing, and Referencing Architecture Researc}: each proposal is recorded with its experiments and reasoning, reviewed by the community, and referenced by later work. To evaluate ideas before costly large-scale training, ArchSpace leverages scaling laws to predict model loss at larger scales from smaller experiments, a practice widely adopted in industry. We provide initial references that make the platform usable: Qwen3.5 and OLMo3 baselines, fitted scaling laws, and a reusable training recipe. Ideas validated through this review can in turn become new baselines, and ArchSpace thereby aims to broaden the range of ideas that shape the next generation of models.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:52Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jie Wang</name>
+    </author>
+    <author>
+      <name>Tong Zhu</name>
+    </author>
+    <author>
+      <name>JiaHao Kuang</name>
+    </author>
+    <author>
+      <name>Zhe Xu</name>
+    </author>
+    <author>
+      <name>Yunkai Chai</name>
+    </author>
+    <author>
+      <name>Dehong Zheng</name>
+    </author>
+    <author>
+      <name>Yu Cheng</name>
+    </author>
+    <author>
+      <name>Tao Ji</name>
+    </author>
+    <author>
+      <name>ZhouHan Lin</name>
+    </author>
+    <author>
+      <name>Qi Zhang</name>
+    </author>
+    <author>
+      <name>Bowen Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17329v1</id>
+    <title>Internalizing Investment Mandates: A Neurosymbolic RL Approach to Portfolio Allocation</title>
+    <updated>2026-11-12T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.17329v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17329v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Institutional portfolios operate under investment policy statements that specify asset allocation constraints, often conditioned on market regime information. Deep reinforcement learning has been shown to optimize financial performance but typically does not enforce rule compliance, making it unsuitable for real-world deployment. Existing neurosymbolic methods such as Probabilistic Logic Policy Gradient (PLPG) offer constraint-satisfying reinforcement learning (RL) via differentiable symbolic supervision but assume a finite, discrete action space. We present a PLPG-inspired continuous allocation method that estimates the probability that the policy's own executed action satisfies the investment mandate, using reparameterized Monte Carlo sampling, and adds it to the training objective. No post-hoc enforcement mechanism intercepts actions at inference time and compliance is learned by the agent. Audited directly on deterministic mean actions with no correction, the policy reduces violations of a six-rule regime-conditional mandate from 96-98% for unconstrained RL and 33.4% for a reward-penalty baseline to 4.8%, showing that a continuous-action neurosymbolic policy can substantially internalize a symbolic mandate.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:37Z</published>
+    <arxiv:comment>Accepted at ICAIF '26</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zeynep Yıldız</name>
+    </author>
+    <author>
+      <name>Satchit Chatterji</name>
+    </author>
+    <author>
+      <name>Ercan Atam</name>
+    </author>
+    <author>
+      <name>Erman Acar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17327v1</id>
+    <title>Decoupling Dynamics: A Tale of Two Limits</title>
+    <updated>2026-11-12T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17327v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17327v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The symmetries of a $d$-dimensional QFT are known to be captured by a topological theory in one dimension higher, the Symmetry Topological Field Theory (SymTFT), which is invariant under gauging finite symmetries of the QFT, but not under dynamical gauging of continuous symmetries. We show that the distinct SymTFTs of a $d$-dimensional QFT before and after dynamical gauging of a continuous Abelian symmetry arise as different topological limits of the same dynamical holographic gauge theory in $(d+1)$-dimensions. Gauging changes the boundary condition of this dynamical theory and thereby selects a different topological limit, explaining why the associated SymTFT changes. We give a fully quantum definition of these SymTFTs at the level of Hilbert spaces and operators by combining suitable limits of the bulk holographic theory with photon truncation. This construction clarifies how topological symmetry defects, charges, and anomalies survive while the dynamical information carried by currents is discarded. We study non-anomalous and anomalous examples, providing a complete quantum analysis for $(2+1)$-dimensional bulks. For a four-dimensional boundary theory with a mixed axial-vector anomaly, we recover the SymTFT of the non-invertible chiral symmetry that remains after gauging the vector symmetry.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:31Z</published>
+    <arxiv:comment>30 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Andrea Antinucci</name>
+    </author>
+    <author>
+      <name>Oscar Lewis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17324v1</id>
+    <title>K2V: Generative Keyframing For Physically Plausible Video Generation</title>
+    <updated>2026-11-12T18:59:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.17324v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17324v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Video diffusion models are able to generate samples with high-quality appearance and textural qualities. However, content produced by these methods is known to exhibit significant physical errors. This is because, in a classical video generation setting, all physical reasoning must take place simultaneously and exclusively within the diffusion process.We propose to resolve these issues by redistributing the task of physical reasoning onto a language model-backed keyframe generation module, which allows for explicit reasoning in language, and fine-grained control over the appearance of the video at important moments in the video. We then condition a video generation model with these keyframes, reducing the role of the diffusion model to the simpler task of interpolating between physically-correct intermediate states, rather than inferring an entire sequence with diffusion. Results demonstrate that our approach significantly outperforms existing approaches, achieving state-of-the-art performance on the Physics-IQ Verified benchmark and PhyGenBench.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:09Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Felix O'Mahony</name>
+    </author>
+    <author>
+      <name>Daniel Olmeda Reino</name>
+    </author>
+    <author>
+      <name>Roberto Cipolla</name>
+    </author>
+    <author>
+      <name>Ayush Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17323v1</id>
+    <title>AgentSSL: Can MLE Agents Leverage Unlabeled Data?</title>
+    <updated>2026-11-12T18:59:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.17323v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17323v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applying machine learning systems to new domains introduces bottlenecks in both labeled data acquisition and manual pipeline engineering. While recent MLE agents show promise in automating pipeline design, they have been studied almost exclusively in fully supervised settings, leaving them untested in realistic regimes where labeled data is scarce but unlabeled data is abundant. In this work, we introduce Agentic Semi-Supervised Learning (AgentSSL), framing SSL as a program search problem and studying how agents navigate this space under limited supervision. We find that even under weak feedback and matched compute, agents can synthesize code that combines and adapts established SSL techniques, exceeding the strongest human-engineered baselines in 8 of 12 settings by up to +21.8%. However, our results identify program selection as a critical bottleneck in AgentSSL, where performance drops by as much as 47% when selecting based on the agent's feedback metric. To systematically study this bottleneck, we introduce ProgramSelectBench, a large-scale benchmark with a combined total of 16,977 agent-generated and human-engineered SSL programs, and evaluate both unsupervised and active program selection methods. We further evaluate AgentSSL on real-world ecology detection tasks, highlighting the opportunities and challenges of transferring agent-discovered strategies beyond controlled benchmarks.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:06Z</published>
+    <arxiv:comment>NeurIPS 2026. Project Website: https://codiscovery.ai/AgentSSL</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ethan Lin</name>
+    </author>
+    <author>
+      <name>Akanksha Sarkar</name>
+    </author>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>Kristin Branson</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17322v1</id>
+    <title>Ensemble phase transitions in measurement-unitary hybrid quantum circuits</title>
+    <updated>2026-11-12T18:59:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.17322v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17322v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The universal properties of state ensembles generated by quantum dynamics provide a refined lens into Hilbert-space ergodicity and deep thermalisation, or lack thereof. We investigate deep-ergodicity breaking transitions of an ancillary qubit entangled with a system undergoing dynamics via hybrid quantum circuits, where unitary evolution is interspersed with projective measurements. Specifically, we analyse the statistical properties of two distinct state ensembles: the trajectory ensemble (TE) conditioned on the measurement outcomes of the hybrid circuit, and the projected ensemble (PE) generated by further projective measurements of the system at the final temporal boundary. We find that both ensembles undergo non-analytic changes -- ensemble phase transitions -- at the critical point of the measurement-induced purification transition, despite their first moments remaining completely maximally mixed and blind to the transition. For Haar-random circuits, the TE transitions from a trivial identity ensemble to the uniform Haar ensemble, while the PE transitions from the Haar ensemble to a trivial singleton pure state. In Clifford circuits, absence of non-stabiliserness limits the PE to a $1$-design, while the TE forms a $k$-design for $k \leq 3$. We demonstrate that these genuine ensemble transitions offer a clear physical mechanism for the measurement-induced entanglement or purification transitions, illustrating how the capacity to ergodically steer a quantum subsystem shifts from the temporal boundary measurements in the mixed phase to the bulk trajectory measurements in the pure phase.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:03Z</published>
+    <arxiv:comment>14 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Saptarshi Mandal</name>
+    </author>
+    <author>
+      <name>Sthitadhi Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17321v1</id>
+    <title>BrickFlow: Connectivity-Guided Brick Reconstruction</title>
+    <updated>2026-11-12T18:58:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17321v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17321v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Given a set of LEGO parts and an image of an assembled object, our task is to infer the pose of each part to assemble the object. In contrast with traditional 3D reconstruction, doing so requires satisfying discrete physical constraints, which provide structure but render the problem combinatorial and highly sensitive to small pose errors. To learn a prior over how parts fit together, we train a set-conditioned SE(3) flow model on procedurally generated assemblies. We then finetune this model to inject image conditioning, using 1% as much data. However, while the learned flow captures global structure, it does not enforce connectivity. To address this, we introduce an analytic connectivity-field guidance to pull predictions toward connected assemblies at test time. Through this, we demonstrate improved build quality with model size, pretraining, and guidance. We make our models and data available for research purposes at https://kulits.github.io/BrickFlow/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:51Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Peter Kulits</name>
+    </author>
+    <author>
+      <name>Cordelia Schmid</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17319v1</id>
+    <title>The Cauchy problem for skew-torsion-parallel spinors with applications to supergravity</title>
+    <updated>2026-11-12T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.17319v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17319v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We solve the Cauchy problem for an irreducible real spinor parallel with respect to a metric connection with skew-symmetric torsion on a globally hyperbolic Lorentzian four-manifold, proving that it is well-posed modulo an obstruction that we identify explicitly, and obtaining an initial-data characterization of such spinors. Our proof relies on the theory of spinorial forms, which we use to explicitly integrate the coupled flow for the spinor and underlying metric via a rotated pull-back action of the flow generated by a vector field on the Cauchy hypersurface $Σ$. We characterize the corresponding constraint equations as an explicit exterior differential system and describe all its solutions in terms of contact structures and flat foliations, obtaining a complete classification in the compact case. In particular, we conclude that every oriented compact three-manifold arises as the Cauchy hypersurface of a globally hyperbolic Lorentzian four-manifold equipped with a skew-torsion parallel spinor. Building on these results, we study the interaction between the four-dimensional Neveu-Schwarz supergravity evolution flow on an abelian bundle gerbe and the spinorial evolution flow determined by its supersymmetric conditions, which we prove to be well-posed and compatible. This establishes the well-posedness of the supersymmetric Neveu-Schwarz system in four dimensions and provides an initial-data characterization of supersymmetry. Furthermore, we obtain a strong rigidity result stating that every globally hyperbolic supersymmetric Neveu-Schwarz solution with a compact Cauchy hypersurface is flat and has vanishing bundle-gerbe curvature.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:38Z</published>
+    <arxiv:comment>65 pages. Comments welcome!</arxiv:comment>
+    <arxiv:primary_category term="math.DG"/>
+    <author>
+      <name>C. S. Shahbazi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17318v1</id>
+    <title>Spatial Foundry: A Multimodal Dataset for Spatial Intelligence</title>
+    <updated>2026-11-12T18:58:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.17318v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17318v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spatial intelligence requires connecting visual observations to the geometry, objects, and persistent state of an environment. Images alone leave these relationships implicit, while disconnected annotations make it difficult to study appearance, camera motion, and scene changes under a common reference. We introduce Spatial Foundry, a collection of 5,280 furnished residential 3D scene configurations with editable assets and aligned visual, geometric, and temporal data. Its modalities include floor plans, perspective and panoramic RGB, metric depth, point clouds, meshes, instance-level 3D bounding boxes, and camera trajectories paired with video. Shared scene coordinates link observations across views and time; editable source scenes enable additional camera paths and controlled object changes. We describe the data representation and construction workflow, and discuss applications in floor-plan-conditioned 3D generation, geometric reconstruction, instance-level perception, camera-conditioned video generation, shared world modeling, and scene editing. Controlled camera and scene variations support spatial perception and world-model research. The public project page provides videos and an interactive colored point-cloud preview.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:36Z</published>
+    <arxiv:comment>Project Page: https://ranolabs.com/Blog/spatial-foundry</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ethan Lin</name>
+    </author>
+    <author>
+      <name>Yang Song</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17316v1</id>
+    <title>CoReMem: Cost-Internalizing Memory for Successive Coding Tasks with Prospective Valuation</title>
+    <updated>2026-11-12T18:58:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17316v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17316v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents tackle successive tasks on an evolving repository, carrying forward edits and writing memory before the next task is known. Selecting memory for unknown next tasks requires balancing future usefulness against the costs of writing and reading it. The actor must also decide when acting on available memory saves effort as the task unfolds. We introduce Coding-Repository Memory (CoReMem), a cost-internalizing framework that guides memory design and actor adaptation through measured memory value on the next task. Prospective segment valuation compares runs of the next task with and without individual trajectory segments from the same inherited repository state, guiding a compact memory built around anchors: repository locations and executable checks. Actor adaptation estimates on-policy memory value within rollout groups with and without memory, using a reward that prioritizes resolution and penalizes step count in successful runs. Provenance-gated value credit assigns the additional value term to steps identified as using memory-supplied anchors, while every step retains outcome credit. On ChainSWE, CoReMem raises the 27B actor's resolve rate from 21.0% to 25.7%, with 17% fewer steps and 11% fewer total cache-aware tokens, including memory-module calls, relative to the untrained actor model without memory.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:22Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peiwen Li</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Harshit Verma</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Sophia Zhou</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Haiwen Wang</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Ngoc Bui</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Heng Chang</name>
+      <arxiv:affiliation>Tsinghua University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Fei Fei</name>
+      <arxiv:affiliation>Goodvision AI</arxiv:affiliation>
+    </author>
+    <author>
+      <name>David van Dijk</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Rex Ying</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17313v1</id>
+    <title>Sketching Language Models for Context Attribution</title>
+    <updated>2026-11-12T18:57:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.17313v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17313v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Context attribution asks how removing parts of a prompt changes a language model's output. We study leave-one-out (LOO) attribution for a prompt of $n$ tokens and a fixed measurement function. Computing all LOO values directly requires $n$ model evaluations. Under a stability assumption, our algorithm estimates all LOO values to error proportional to $\varepsilon$ with constant probability using $O(\sqrt{\log(1/\varepsilon)}/\varepsilon)$ evaluation calls. To complement our upper bound, we prove a matching $Ω(\sqrt{\log(1/\varepsilon)}/\varepsilon)$ lower bound on the number of evaluation calls in an oracle model. Empirically, we verify coefficient decay consistent with stability and evaluate the performance of our sketching algorithm on a small language-model retrieval task.
+  Technically, our result is based on a sketching algorithm for arithmetic circuits whose Taylor coefficients satisfy the stability condition recently introduced by Gunn [Gun26]. A direct adaptation of their forward differentiation sketches would require $\widetilde{O}(\log(n)/\varepsilon^2)$ evaluation calls. Our key observation is that we can apply forward differentiation to the backpropagation circuit, with only constant overhead over a forward sketch of the same Taylor degree. This reduces the variance of the sketches and is key to our improved evaluation bound. Our lower bound builds on the techniques of Amsel, Chen, Duman Keles, Halikias, Musco, and Musco [ACDH+26, SIAM Journal on Matrix Analysis and Applications] for lower bounding the number of matrix-vector queries to estimate the diagonal elements of random matrices.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:48Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Christopher Liaw</name>
+    </author>
+    <author>
+      <name>Aranyak Mehta</name>
+    </author>
+    <author>
+      <name>Grigoris Velegkas</name>
+    </author>
+    <author>
+      <name>Felix Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17312v1</id>
+    <title>The Tournament Equilibrium Set Is PSPACE-Complete, Even under Hereditary Uniqueness</title>
+    <updated>2026-11-12T18:57:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.17312v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17312v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The tournament equilibrium set (TEQ), proposed by Schwartz in 1990, is a classical voting rule based on pairwise majority comparisons. Its definition is recursive: an alternative is judged by the alternatives that beat it, called its dominators, and by which of those dominators TEQ itself selects. Deciding whether a given alternative belongs to TEQ was known to be NP-hard and to lie in PSPACE. We close this gap by proving that the problem is PSPACE-complete. To our knowledge, this is the first PSPACE-completeness result for membership in a tournament solution.
+  The hardness persists even when every nonempty subtournament has a unique minimal retentive set, the property conjectured by Schwartz to hold for all tournaments. Moreover, every such subtournament in our hard instances contains an alternative with at most three dominators. We prove that a single alternative with at most four dominators suffices both to guarantee uniqueness and to find a TEQ winner in $O(N^2)$ time. Thus, on our hard instances, finding one winner is efficient even though recognizing a specified winner is PSPACE-complete.
+  We also study how the complexity changes with the dominator bound. If every nonempty subtournament has an alternative with at most one dominator, the entire TEQ can be computed in quadratic time; allowing two dominators makes membership NP-hard. Under the same condition with four dominators, all $t$ winners can be computed in $O(2^t N^2)$ time, where $N$ is the number of alternatives.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:05Z</published>
+    <arxiv:comment>51 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Ethan Dickey</name>
+    </author>
+    <author>
+      <name>Athina Terzoglou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17310v1</id>
+    <title>Quantum Metrology and Quantum Battery in a Hyperfine-Coupled Spin System</title>
+    <updated>2026-11-12T18:56:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.17310v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17310v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate multiparameter quantum metrology and the energetic properties of an effective electron--proton spin system inspired by the hyperfine structure of the hydrogen atom. Considering the external magnetic field $\mathcal B$ and the hyperfine coupling strength $Λ$ as unknown parameters, we derive the quantum Fisher information matrix and establish the corresponding quantum Cramér--Rao bounds for their simultaneous estimation. We analyze the estimation precision and the correlations between the two parameters, showing that the weak-commutativity condition is satisfied despite the noncommutativity of the associated symmetric logarithmic derivatives. Independently, we explore the energetic properties of the system under a unitary charging protocol, characterizing its ergotropy, anti-ergotropy, storage capacity, and energy-basis coherence. We investigate the dependence of these quantities on the magnetic field, hyperfine coupling, temperature, and charging time. Our results provide a comprehensive characterization of the metrological properties and energetic performance of a hyperfine spin-based quantum system, highlighting its potential as a platform for quantum sensing and energy storage.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:57Z</published>
+    <arxiv:comment>14 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Omar Bachain</name>
+    </author>
+    <author>
+      <name>Mohamed Amazioug</name>
+    </author>
+    <author>
+      <name>Rachid Ahl Laamara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17309v1</id>
+    <title>Classical Energies Learn to Reason 1,000x Faster than Looped Models</title>
+    <updated>2026-11-12T18:56:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17309v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17309v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Looped models have emerged as a prominent paradigm for reasoning, with successes on simple reasoning puzzles such as Sudoku-Extreme and Maze-Unique. However, these models can be unstable, slow to train, and use many parameters and FLOPs to solve simple puzzles. Descent on an energy not only mitigates these issues but also offers advantages: built-in early stopping, compute that adapts to problem difficulty, fast training without differentiating through a solver, and interpretable weights that learn the constraints of the puzzle. Here we demonstrate this with a learned version of Hopfield &amp; Tank's energy from the 80s, which we term CRAM, solves 99.996% of Sudoku-Extreme and 100% of Maze-Unique test puzzles after 42 ms and 132 ms of training on one GPU, at least 1,000x faster than looped models on these tasks. CRAM also matches baseline looped models at their highest accuracy on Sudoku-Extreme using at least 282x fewer inference FLOPs. Our work suggests two things. First, that energies are an extremely promising direction for training reasoning from data. Second, a caution against using trivially solvable benchmarks like Sudoku and Maze to test the scalability of looped reasoning techniques.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:56Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Benjamin Hoover</name>
+    </author>
+    <author>
+      <name>Hugh Blayney</name>
+    </author>
+    <author>
+      <name>James C. R. Whittington</name>
+    </author>
+  </entry>
+</feed>
