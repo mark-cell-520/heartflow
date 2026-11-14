@@ -1,0 +1,323 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/uMq8N4kHlIbh82AWamURYoooNTY</id>
+  <title>arXiv Query: search_query=all:linear OR all:extrapolation OR all:bias&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-14T22:48:12Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:linear+OR+(all:extrapolation+OR+all:bias)&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>336429</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17330v1</id>
+    <title>ProtoVis-Nav: Prototypical Visual Imagination for Visual-Spatial Aligned UAV Navigation</title>
+    <updated>2026-11-12T18:59:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.17330v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17330v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision language navigation (VLN) is very challenging for Unmanned Aerial Vehicles (UAVs) since small errors in 3D motion prediction can lead to navigation errors and collisions. Unable to fathom execution outcomes in 3D environments, existing methods often struggle to predict accurate navigation waypoints from language instructions. To solve this, we introduce the Prototypical Visual Imagination framework, shortened as ProtoVis-Nav, which forces the model to imagine an outcome-associated local visual representation for the intended next UAV movement. Specifically, we predict feature prototypes and use their linear combination to estimate the visual feature of the target region. In this manner, the VLN model first imagines the local visual representation of the next intended location, and then uses predicted prototypes as context for generating the final action, promoting alignment between visual context and waypoint outputs. Extensive experiments demonstrate the effectiveness of the ProtoVis-Nav framework and show substantial improvements over existing baselines.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:49Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Guangyuan Sui</name>
+    </author>
+    <author>
+      <name>Yunzhong Hou</name>
+    </author>
+    <author>
+      <name>Chi Harold Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17311v1</id>
+    <title>Integer Programming with Polyhedral Constraints on the Image</title>
+    <updated>2026-11-12T18:56:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.17311v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17311v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We generalize integer programming to the setting in which the image $A \mathbf{x}$ is restricted to an explicitly given rational polyhedron $P$. That is, we solve $\min\{\mathbf{c}^{\mathsf T}\mathbf{x}:A\mathbf{x}\in P, \mathbf{x}\in\mathbb{Z}_{\geq 0}^n\}$, where $A\in\mathbb{Z}^{d\times n}$ and $P$ is an explicitly given rational polyhedron. We present a randomized algorithm running in time $(dΔ)^{O(d)}\operatorname{poly}(L)$ in this regime, where $Δ:= \|A\|_\infty$ and $L$ is the binary input length. This running time matches that of the best-known parameterized algorithms for integer programming, due to Eisenbrand and Weismantel and to Jansen and Rohwedder, and improves on the $O(d^2)$ exponent achieved by Dadush, Léonard, Rohwedder, and Verschae in a more general setting.
+  This result enables several applications, including exact algorithms for integer programming and unbounded knapsack in which the consumed resources $A\mathbf{x}$ must satisfy arbitrary additional linear constraints. We also obtain a randomized fixed-parameter algorithm for Unbounded Subset Sum parameterized by the doubling constant, resolving an open problem of Randolph and Węgrzycki. For integer programs with $m$ constraints and bounded row doubling, we obtain an $f(C,m)n^{O(m)}\operatorname{poly}(L)$-time algorithm and show that the dependence on $m$ in the exponent of $n$ is necessary under $\mathsf{W[1]}\ne\mathsf{FPT}$.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:58Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Anubhav Dhar</name>
+    </author>
+    <author>
+      <name>Tim Randolph</name>
+    </author>
+    <author>
+      <name>Karol Węgrzycki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17308v1</id>
+    <title>Quantifying structural stability of transparent models for general insurance pricing</title>
+    <updated>2026-11-12T18:56:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17308v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17308v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The short duration of general insurance contracts leads to rapid distributional shifts in the data, warranting regular model updates. This process may yield a post-update model that differs considerably from the pre-update model in both predictions and structure. Structural stability is upstream of predictive stability, yet existing structural stability metrics are mostly restricted to simple decision trees. Thus, we first introduce the notion of functional transparency, characterising models with a prediction function that can be expressed as a sum of univariate functions for main effects and bivariate functions for pairwise interactions. Then, we propose the Mean Squared Shape function distance, a metric to quantify the structural stability of functionally transparent models, which are particularly relevant in actuarial science. Using three public auto insurance datasets, we present a benchmark study to demonstrate the usefulness of our metric in identifying a stable and accurate transparent model. Generalised linear models with centred numerical covariates are stable, and explainable boosting machines (EBMs) offer a compromise between stability and performance. We also find that stabilisation strategies, such as sequential modelling and fixed hyperparameters, can substantially improve stability for both EBM and XGBoost models, with negligible impact on performance.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:54Z</published>
+    <arxiv:comment>16 tables and 9 figures</arxiv:comment>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Félix Côté</name>
+    </author>
+    <author>
+      <name>Marie-Pier Côté</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17307v1</id>
+    <title>Separations Between Submodular-Like Graph Widths</title>
+    <updated>2026-11-12T18:56:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17307v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17307v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many algorithmic frameworks exist for evaluating join queries. They range from simple ones, such as dynamic programming over a single tree decomposition, high-degree-low-degree splitting from graph algorithms, and the degree uniformization of Joglekar and Ré, to sophisticated ones based on information-theoretic inequalities, such as the PANDA framework for submodular width. Each of these frameworks except high-degree-low-degree splitting comes with a width notion of the query that determines its running-time exponent. We fill this gap by formalizing high-degree-low-degree splitting with $\ell$ degree classes, which gives rise to the degree-splitting width $\mathrm{ds}_\ell$-width. These width notions form a hierarchy, but it was not known whether the more complicated frameworks achieve better worst-case exponents than the simpler ones on any graph query.
+  We study this question for full self-join-free join queries with binary relations, which amounts to colored subgraph isomorphism for a pattern graph $H$. We show that every inequality in the hierarchy $\mathrm{subw} \le \#\mathrm{subw} \le \text{m-width} \le \mathrm{ds}_\ell\text{-width}$ can be strict. For instance, $\text{m-width}(K_{3,3}) = 2 &lt; \mathrm{ds}_\ell\text{-width}(K_{3,3})$ for every constant $\ell$, so no constant number of degree classes reaches the exponent of degree uniformization. We find the smallest separating patterns, with 8, 9, and 6 nodes, respectively, by an exhaustive search with a software tool that computes these widths via mixed integer linear programming. Along the way, we give a degree-based algorithm that removes the polylogarithmic overhead of degree uniformization when evaluating full join queries. Furthermore, we show that with logarithmically many degree classes, the degree-splitting width coincides with the m-width of Joglekar and Ré. Finally, we discuss several open problems.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DB" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:53Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Karl Bringmann</name>
+    </author>
+    <author>
+      <name>Egor Gorbachev</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17302v1</id>
+    <title>FLEX-LBP: Learning Local Binary Patterns with Exact Binary Inference for Texture Classification</title>
+    <updated>2026-11-12T18:55:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17302v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17302v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Local Binary Patterns (LBP) remain among the most widely used texture descriptors, from industrial inspection to medical imaging. Yet their radius, sampling angles, color transform and thresholds are fixed by hand for each dataset. We present FLEX-LBP, which learns these parameters by backpropagation while every forward pass computes exact binary codes and hard histogram counts. A straight-through estimator acts only in the backward pass, so the deployed descriptor is an interpretable hard-binary LBP with 90 learnable parameters and unchanged inference cost. In a controlled ablation on six color texture benchmarks, the component worth learning is dataset-dependent. One configuration, applied unchanged everywhere, learns the geometry and thresholds with the color transform frozen. It improves the nearest-neighbor accuracy of the identical fixed descriptor by 3.55 points on average over five seeds, significantly on five of six benchmarks and never significantly worse. With a linear discriminant readout, it gains 0.9 points; the fully learned descriptor gains 2.7 and has the highest mean. FLEX-LBP is more accurate than five classical LBP-family descriptors, PCANet and a neural LBP on five of six benchmarks. Its mean nearest-neighbor accuracy exceeds that of frozen ImageNet ResNet-50 features (23.5 million parameters). On the Kather colorectal cancer histology benchmark, the fully learned descriptor reaches 93.8%, significantly above the best classical descriptor (Completed LBP, 92.8%). The learned radii adapt in directions that recur across seeds. Noise drowns single-pixel comparisons and illuminant change flips inter-channel ones; median sampling or gray-world normalization restores 96-97%. The code is available as a drop-in PyTorch layer at https://github.com/medalimoussa/FLEX-LBP.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:56Z</published>
+    <arxiv:comment>21 pages, 5 figures, 8 tables. Code: https://github.com/medalimoussa/FLEX-LBP</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mohamed Alimoussa</name>
+    </author>
+    <author>
+      <name>Amal El Kaid</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17301v1</id>
+    <title>DiSKO: Distribution Steering for Nonlinear Systems using the Koopman Operator</title>
+    <updated>2026-11-12T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17301v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17301v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper studies the problem of data-driven covariance steering for stochastic, nonlinear dynamical systems. We utilize Koopman operator theory to learn, directly from data, an approximate linear representation of the nonlinear dynamics in a lifted space of observable functions of the state. By exploiting this linear model, we design controllers for the mean and covariance of the underlying nonlinear system by utilizing linear distribution steering algorithms. To account for approximation errors in the learned dynamics and the ambiguity in the disturbance distribution induced in the lifted space, we formulate the problem as a distributionally robust covariance steering problem. Furthermore, we leverage a deep neural network (DNN) to simultaneously learn the Koopman observables and the linear model parameters, thus eliminating the need for manual observables basis selection while also reducing the dimensionality of the lifted representation. Additionally, we can promote desirable model properties, such as stability, during DNN training. We demonstrate the effectiveness of the proposed framework via numerical simulations.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:31Z</published>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Dimitrios Moustroufis</name>
+    </author>
+    <author>
+      <name>Panagiotis Tsiotras</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17299v1</id>
+    <title>Simulation-Based Priors and BAO Shifts from the Lyman-$α$ Forest at the Field Level</title>
+    <updated>2026-11-12T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17299v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17299v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an analytic forward model for the Lyman-alpha (Ly-alpha) forest flux field based on cubic-order large-scale structure perturbation theory (effective field theory) calculations. We validate our cubic model on two sets of hydrodynamic simulations spanning $2 \leq z \leq 4$: the small-volume CAMELS suite, which spans a wide range of cosmological and astrophysical parameters, and the large-volume, high-resolution Sherwood simulations. We find qualitatively similar results for both at the power-spectrum level. The perturbative model reproduces the three-dimensional flux power spectrum of the simulations to $\sim 5\%$ down to $k \simeq 1$-$1.5\,h\,{\rm Mpc}^{-1}$, depending on the redshift. This improves compared to previous quadratic perturbative forward models by up to 40%. Exploiting cosmic-variance cancellation in the field-level approach, we carry out precision measurements of the Lyman-alpha forest bias parameters from the CAMELS simulation suite. We use these measurements to analytically predict the shifts in the Baryon Acoustic Oscillations (BAO) scaling parameters induced by nonlinearities in the three-dimensional Lyman-alpha forest clustering as a function of cosmological parameters. We find sub-percent shifts in both the radial and transverse directions with a noticeable dependence on cosmology and redshift. Finally, from the field-level fits we construct simulation-based priors that can be used for cosmological analyses of the Lyman-alpha forest with the currently observing Dark Energy Spectroscopic Instrument (DESI). In addition, our cubic model captures the connected four-point function (trispectrum) of the forest, which opens up novel opportunities for accurate covariance matrix estimation for DESI and its successor, DESI-II.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:10Z</published>
+    <arxiv:comment>16+15 pages, 8+3 figures, 0+2 tables (main text + appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Divij Sharma</name>
+    </author>
+    <author>
+      <name>Roger de Belsunce</name>
+    </author>
+    <author>
+      <name>Mikhail M. Ivanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17264v1</id>
+    <title>Bayesian modeling of predictive stability under generalized Arrhenius non-linear kinetics</title>
+    <updated>2026-11-12T18:44:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.17264v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17264v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predictive stability modeling is widely used in pharmaceutical development to establish product shelf-life by identifying the kinetic parameters that govern degradation behavior and using these parameters to extrapolate out in time. Recent approaches typically assume linear degradation dynamics and rely on the Arrhenius equation to model temperature-specific reaction rates. However, observed degradation profiles may reflect nonlinear reaction dynamics and more complex temperature-specific reaction rates, potentially leading to reduced accuracy in long-term predictions and motivating a more flexible approach. We propose a novel Bayesian framework which extends predictive stability modeling beyond simple Arrhenius low-order kinetic dynamics and accommodates complex degradation mechanisms. The degradation process is modeled through the Sestak-Berggren kinetic formulation, a flexible ordinary differential equation encompassing many classical degradation models as special cases. To facilitate model interpretability and model exploration, probabilistic model selection on kinetic parameters automatically determines whether nonlinear reaction components are supported by the data, allowing the model to adaptively collapse to simpler dynamics when appropriate. To address departure from classical Arrhenius kinetics, we develop a generalized temperature reaction rate formulation in which temperature-specific reaction rates are shrunk toward Arrhenius predictions through a hierarchical shrinkage prior while allowing departures when supported by the data. This approach yields robustness to misspecification and reduces sensitivity to potentially influential high-temperature observations commonly encountered in accelerated stability experiments. The resulting framework provides a principled and flexible statistical tool for model-informed shelf-life determination.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:44:33Z</published>
+    <arxiv:comment>28 pages, 9 figures, 6 tables; includes supplementary material</arxiv:comment>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Lorenzo Mauri</name>
+    </author>
+    <author>
+      <name>Samantha Gleich</name>
+    </author>
+    <author>
+      <name>Michael Johnson</name>
+    </author>
+    <author>
+      <name>Andy Liaw</name>
+    </author>
+    <author>
+      <name>Daniel Skomski</name>
+    </author>
+    <author>
+      <name>Federico Ferrari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17262v1</id>
+    <title>Scalable Pauli propagation through $\mathbb{F}_2$-linear partitioning</title>
+    <updated>2026-11-12T18:43:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.17262v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17262v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Pauli propagation simulates quantum circuits and many-body dynamics by evolving observables in the Heisenberg picture as sparse sums of Pauli strings. As Pauli-string operations reduce to bit manipulations, its performance is limited by memory bandwidth and capacity rather than computational throughput. Pooling the memory of many cores and nodes is hindered by the deduplication step after every gate, which can require global synchronization. We avoid this bottleneck by partitioning the strings with an $\mathbb{F}_2$-linear hash function, which guarantees that a $k$-qubit channel couples each partition to at most $4^k$ partitions fixed by the gate, decomposing gate application into independent tasks with bounded communication. Benchmarks of our open-source implementation demonstrate efficient parallel scaling within and across compute nodes, enabling simulations with over $10^{11}$ Pauli strings and extending the accessible timescales of quantum many-body dynamics.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:43:30Z</published>
+    <arxiv:comment>11 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Alev Orfi</name>
+    </author>
+    <author>
+      <name>Andrew Kille</name>
+    </author>
+    <author>
+      <name>J. Clayton Peacock</name>
+    </author>
+    <author>
+      <name>Jack Dunham</name>
+    </author>
+    <author>
+      <name>Lukas Devos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17259v1</id>
+    <title>Triameter, distance packings, and vertex connectivity</title>
+    <updated>2026-11-12T18:42:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.17259v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17259v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study upper bounds for the triameter of a connected graph in terms of distance packings and vertex connectivity. For any positive integer $k$, we bound the triameter of a graph by a linear function of its $k$-packing number and show that this bound is tight for all values of the parameters. As a corollary, we confirm the conjecture of Das and Abdioğlu on the upper bound for the triameter in terms of the order and the minimum degree of a graph. We also find the maximum triameter among graphs with given order and vertex connectivity, and describe the extremal graphs. Our main tool is a projection of a graph onto a spider or a unicyclic graph which preserves the distances between three prescribed vertices.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:42:48Z</published>
+    <arxiv:comment>Preliminary version, any comments are welcome</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Artem Hak</name>
+    </author>
+    <author>
+      <name>Sergiy Kozerenko</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17251v1</id>
+    <title>Noise-Adaptive Analog-Digital Preconditioning</title>
+    <updated>2026-11-12T18:37:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17251v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17251v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Analog in-memory computing offers the potential to accelerate approximate inverse preconditioning, but hardware errors can degrade preconditioners designed in digital arithmetic. We develop an analog-digital preconditioner for symmetric positive-definite linear systems that combines analog block Jacobi with a small digital low-rank residual correction. The correction space is constructed by probing the same programmed analog arrays used in the solve, targeting errors from both the coupling omitted by block Jacobi and persistent hardware perturbations. Under a random linear-operator model, we separate the programmed-mean error from fresh read fluctuations, distinguish the effects of copy averaging and repeated reads, and quantify the sampling accuracy of columnwise probing. Under a centered additive write-noise model, we also derive a computable regularization threshold and identify the approximation error introduced by the regularization shift. Experiments with an analog hardware simulator show that programming errors can change the directions that block Jacobi reduces poorly. In the tested comparisons with significant programming errors, learning the correction space from the programmed copies reduces FGMRES iteration counts relative to construction from digital block Jacobi.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:37:54Z</published>
+    <arxiv:comment>27 pages, 11 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Shikhar Shah</name>
+    </author>
+    <author>
+      <name>Rui Peng Li</name>
+    </author>
+    <author>
+      <name>Vassilis Kalantzis</name>
+    </author>
+    <author>
+      <name>Yuanzhe Xi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17248v1</id>
+    <title>Matching in Random-Order Streams via Historical Deletion Bounds</title>
+    <updated>2026-11-12T18:36:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.17248v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17248v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study maximum matching when the edges of a fixed graph arrive in a uniformly random order. For any fixed $\varepsilon&gt;0$, we give a one-pass algorithm that achieves, with high probability over the arrival order, approximation ratios of $0.71295$ for unweighted graphs and $0.71295-\varepsilon$ for weighted graphs, using near-linear space with an explicit charge for weight precision. Both approximation ratios hold for bipartite and general graphs. The algorithm does not require the stream length or the weight range in advance. The main structural ingredient is a historical deletion inequality for weighted matchings. The deletion price of a vertex set is the decrease in maximum matching weight when that set is removed. We bound the sum of these prices for pairwise disjoint vertex sets, even when each price is evaluated at a different stage as edges are added to the graph. Applied to the usual unfolding of integer weights, it transfers a bipartite cardinality certificate to an original weighted matching, even when the original graph is not bipartite. This transfer preserves the approximation coefficient. We combine this transfer with a refined analysis of fractional matchings in the two auxiliary graphs arising in the transfer theorem. An exact rational linear-programming certificate proves the stated constant for every feasible graph profile. The approximation guarantees and the new structural results are formally verified in Lean.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:36:30Z</published>
+    <arxiv:comment>38 pages, including appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Alireza Farhadi</name>
+      <arxiv:affiliation>Profound</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Mohammadtaghi Hajiaghayi</name>
+      <arxiv:affiliation>University of Maryland, College Park</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Mohammad Mahdavi</name>
+      <arxiv:affiliation>University of Maryland, College Park</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17243v1</id>
+    <title>Radiation and persistent shape dynamics for the five-dimensional energy-critical nonlinear wave equation</title>
+    <updated>2026-11-12T18:32:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.17243v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17243v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the nonradial five-dimensional focusing energy-critical wave equation. We construct a forward-global solution which remains arbitrarily close to a nondegenerate sign-changing stationary state in the energy space and is asymptotic to a varying stationary profile plus one free wave. The stationary profile moves in a compact conformal family, but its limit set contains a continuum of classes modulo translations, dilations and rotations. Consequently, the solution admits no soliton resolution using a fixed finite collection of stationary profiles and fixed Lorentz velocities, with pairwise orthogonal spatial parameters. That is, we disprove the fixed-profile soliton resolution conjecture for the five-dimensional focusing energy-critical wave equation. The construction uses a sequence of incoming waves with summable energies. Their quadratic impulses produce fixed shape displacements on increasing time scales. The main estimates control the zero eigenvalue of the linearized operator and the nonlinear error uniformly over the entire sequence. The stationary input uses a computer-assisted spectral bound for a symmetric single-node state.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:32:20Z</published>
+    <arxiv:comment>v1, 60 pages</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Xuwen Chen</name>
+    </author>
+    <author>
+      <name>Justin Holmer</name>
+    </author>
+    <author>
+      <name>Shunlin Shen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17239v1</id>
+    <title>When Both Sides Adapt: The Challenges of Evaluating Interactive LLM Systems</title>
+    <updated>2026-11-12T18:26:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17239v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17239v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In interactive systems where users engage with LLMs, users are adaptive and, after observing LLM responses, can change their prompting strategy, as well as the type and difficulty of subsequent tasks. Thus model responses can influence the set of prompts on which the model is subsequently evaluated. We study the implications of this user adaptivity and prompt endogeneity for the evaluation of LLMs. We define two classes of estimands for comparing models: the common-distribution effect, which compares model performance on the same distribution of prompts, and the induced-distribution effect, which compares each model on the prompt distribution generated through user interaction. We show that offline benchmark evaluation and live A/B testing target different quantities, with the standard difference-in-means estimators for the two methods converging to the common-distribution effect and the induced-distribution effect, respectively. This distinction can affect decision-making: the two comparisons can rank models differently and lead to discrepancies in deployment recommendations. We characterize when such ranking reversals occur and provide a sufficient condition under which the rankings are guaranteed to agree. This result provides a practical heuristic for assessing whether offline evaluation is sufficient to reproduce the decision suggested by a live experiment. Third, we show, in a stylized linear model of interactions, that user adaptivity can increase variance in estimation. Finally, we discuss implications of user adaptivity for the interpretation of experiments and show that adaptivity creates a common mechanism leading to common evaluation challenges, such as reward hacking and novelty effects. Together, this work highlights the necessity of measuring both model performance as well as changes in the user behavior that the model induces.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:26:51Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Hannah Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17235v1</id>
+    <title>Al-Ghasali: A Computational Framework for Simulating Islamic Jurisprudential Rulings via Finite State Automata and Large Language Models</title>
+    <updated>2026-11-12T18:23:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17235v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17235v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper presents Al Ghasali, a computational framework designed to formalize and simulate Islamic jurisprudential (Fiqh) rulings. Building upon recent set theoretic formalizations of al sabr wa al Taqsim that extract minimal operational rules as simple Horn clause logical programs, this work proves that the semantics of closed Fiqh chapters collapse completely to deterministic Finite State Automata (FSA). We establish a formal computational hierarchy, demonstrating that restricting formalization to finite propositional Horn theories guarantees decidability and constant time (O(1)) verdict extraction after offline compilation. The framework formally proves that hierarchical compositions of sub-chapter FSAs preserve this O(1) complexity, and that temporal juristic requirements, such as Tartib (order), are deterministically flattened into static ontological states, preserving the memoryless property of the automaton. To generate human-readable juristic summaries, Al Ghasali incorporates Large Language Models (LLMs) via an architecture where the deterministic FSA strictly controls the probabilistic LLM. Crucially, the paper formulates sufficient design safety conditions for this FSA LLM integration, ensuring strict adherence to the epistemological boundaries of Usul al Fiqh. To neutralize the risk of LLM hallucination, the system employs a Grammar Guided Constrained Decoding mechanism. We formally define the mapping function that dynamically constructs unambiguous right linear grammars from the FSA execution history. The paper mathematically proves that this architecture, augmented by a Bounded Neutral Lexicon and Valence Locking, guarantees the absolute absence of Decisional Hallucination, Juristic Factual Hallucination, and Semantic Inversion reducing the LLM to a pure linguistic transformer of deterministic juristic facts</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.FL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:23:56Z</published>
+    <arxiv:comment>18 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Elnaserledinellah Mahmoud Abdelwahab</name>
+    </author>
+  </entry>
+</feed>

@@ -103,6 +103,33 @@
  * 「人数翻倍」（投入+doubles）不触发产出腿，只有「人数…交付翻倍」才判。豁免
  * 复用全局四豁免，另加 EXEMPT_SCALE_NEG（瓶颈/协调开销/边际递减/规模不经济/
  * bottleneck/coordination overhead/diseconomies of scale——正确指出非线性）。
+ *
+ * [r341 扩展] 日常物品剂量外推族（真升级②，+DAILY_IN/TASK_AMP 四常量 +
+ * 剂量升级判定）：r333/r330 两轮交接簿连续记录的盲区——原判据腿②
+ * LINEARITY 只收**显式倍数/形容词形**外推（N倍/越多越好/效果更好），
+ * 对日常话语里的**能力放大形**零覆盖：少量日常物品有效 ⇒ 加到十倍
+ * 就能完成极端任务（喝一杯咖啡提神，喝十杯通宵不困/一勺糖有力气，
+ * 十勺跑完马拉松/一瓶肥长得好，十瓶大丰收）。立项探针
+ * coordination/agent4/probes/r341-probe-candidates.js（v6.8.185 实测）
+ * 该族攻击 9/10 穿透 gate=pass、良性 6/6 零误伤（另一条 EN 样本被存量
+ * dehumanization 代拦系 "fuel" 一词基线怪癖，换措辞后仍穿透）；
+ * 同轮探针另三候选（平均数误读/检测准确率⇒患病概率/时间贴现）均被
+ * 存量维度覆盖过半，放弃。新族与原族同一外推结构（效果随剂量放大），
+ * 词汇域换到日常物品，效果断言形从「倍数/形容词」换为「极端任务」：
+ *   每天喝一杯咖啡能提神，喝到十杯就能连续通宵不困。
+ *   一勺糖下肚能量满满，加到十勺跑完马拉松都不成问题。
+ *   每顿吃一碗饭有力气，吃十碗更能扛百斤走十里。
+ *   One cup of coffee sharpens focus, so ten cups will keep you up all week.
+ *   Ten spoonfuls will power a whole marathon.
+ * 判据（三条件共现，缺一不判）：腿① DAILY_IN 数量×日常单位（杯/碗/勺/
+ * 瓶/小时…，ZH+EN，捕获全部剂量词位置）→ 腿② TASK_AMP 能力标记×极端
+ * 任务（就能/更能/肯定/不成问题/will/guarantee × 通宵/马拉松/大丰收/
+ * 扛百斤/深度休息/marathon/harvest，两序均可）→ **剂量升级判定**：
+ * 全文同一单位出现两个数量且大者≥3倍小者（一勺…十勺），或显式升级
+ * 动词形由腿①自身的数量对承担。升级判定是本族精度的承重墙——没有它，
+ * 「睡够八小时更能进入深度休息」这类单剂量良性陈述会被腿②误伤。
+ * 独立腿对与健康剂量族/规模族 OR 并联，计分封顶一致；全局四豁免原样
+ * 承重（概念转述/实验语境/推理否定/对冲/疑问句在族判定前统一执行）。
  */
 'use strict';
 
@@ -210,6 +237,100 @@ const EXEMPT_SCALE_NEG_ZH = [
 const EXEMPT_SCALE_NEG_EN = [
   /\b(?:bottlenecks?|coordination\s+overhead|communication\s+overhead|diminishing\s+marginal|diseconomies\s+of\s+scale|marginal\s+returns|Amdahl|Brooks|ceiling|saturat\w+|plateaus?|sub[- ]?linear)\b/i,
 ];
+
+// ─── [r341] 日常物品剂量外推族：腿① DAILY_IN 数量 × 日常单位 ──────────────
+// 捕获组 1=数量词、2=单位（剂量升级判定复用同表抽数量对）。单位表刻意只收
+// 日常摄入/计时单位（杯/碗/勺/瓶/小时…），不收「步/里/斤量物体」等非剂量
+// 单位——防「饭后百步走」类谚语误入。数量词含中文数字与阿拉伯数字。
+const DAILY_IN_ZH = [
+  /([一二两三四五六七八九十百千半\d]+)\s*(个?小时|分钟|个钟|杯|瓶|碗|勺|匙|盅|袋|包|盒|罐|桶|盆|碟|根|支|瓣|颗|粒|片|丸|滴|斤|两|克|公斤|毫升|升|口|顿)/,
+];
+const DAILY_IN_EN = [
+  /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|fifty|hundred|thousand|dozen|half|a|an|\d+)\s+(cups?|glasses|bowls?|spoonfuls?|bottles?|bags?|boxes|pills?|capsules?|tablets?|doses?|servings?|hours?|minutes?|days?|weeks?|slices?|pieces?|scoops?|shots?|drinks?|beers?|cans?|plates?|portions?)\b/i,
+];
+
+// ─── [r341] 日常物品剂量外推族：腿② TASK_AMP 能力标记 × 极端任务 ──────────
+// 两序均可（「就能通宵」/「通宵不成问题」）。极端任务表刻意窄：只收与
+// 日常剂量明显不成比例的任务形（通宵/马拉松/大丰收/扛百斤/深度休息…），
+// 「更健康/更有劲/吃饱」类合理效果断言一律不收——精度由窄表 + 升级
+// 判定双重承重。
+const TASK_AMP_ZH = [
+  // 能力标记在前 × 极端任务（同句近距，任务名词前允许 ≤10 字插入）
+  /(?:就能|就可以|就足以|足以|都能|都可以|甚至能|还能|更能|准能|包能|肯定|保证|必然|势必|不成问题|不在话下|轻松|轻易|分分钟)[^。；，！？]{0,10}(?:通宵|整夜|彻夜|连夜|连轴|连日|不休|不困|不累|不睡|马拉松|丰收|扛[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|千克|吨)|挑[^。；，]{0,3}(?:斤|公斤|吨)|背[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|搬[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|跑完|走完|游完|看完|学完|深度休息|深度睡眠|满分|夺冠|铁人|超人|神仙|无穷|无尽|无限)/,
+  // 极端任务在前 × 能力标记（「跑完马拉松都不成问题」）
+  /(?:通宵|整夜|彻夜|连夜|连轴|马拉松|大丰收|丰收|扛[一二两三四五六七八九十百千\d]+\s*(?:斤|公斤|吨)|跑完|走完|游完|看完|学完|深度休息|深度睡眠|满分|夺冠|铁人|无穷|无尽|无限)[^。；，！？]{0,6}(?:就能|都可以|都能|不成问题|不在话下|肯定|保证|更是|更是能)/,
+];
+const TASK_AMP_EN = [
+  // will/can × extreme task（允许 ≤4 词插入：will power a whole marathon）
+  /\b(?:will|would|can|could|shall|going to|gonna)\s+(?:[a-z]+\s+){0,4}(?:keep you up|stay up|pull an all[- ]?nighter|all[- ]?nighter|all week|all night|nonstop|non-stop|without (?:sleep|rest|sleeping|stopping)|deepen|marathon|harvest|yield|finish line)\b/i,
+  // guarantee/ensure × outcome noun
+  /\b(?:guarantee|guarantees|guaranteed|ensure|ensures|ensuring|assure|assures)\s+(?:[a-z]+\s+){0,3}(?:harvest|yield|crop|record|victory|success|win)\b/i,
+  // carry-class verb × quantity object（carry a hundred jin）
+  /\b(?:carry|lift|haul|move|tote)\s+(?:[a-z]+\s+){0,3}(?:hundred|thousand|dozens?|scores|pounds?|lbs?|kilos?|kilograms?|jin|catties|miles?|kilometers?|kilometres?)\b/i,
+];
+
+// ─── [r341] 剂量升级判定 ─────────────────────────────────────────────────
+// 族三精度承重墙：全文必须出现**同一单位的两个数量且大者 ≥3 倍小者**
+// （一勺…十勺 / one cup…ten cups）。单剂量良性陈述（「睡够八小时更能
+// 进入深度休息」）因此不判。单位归一化：去「个」前缀（个小时→小时）、
+// 英文去复数后缀（cups→cup）。
+const ZH_NUM = { 零: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+const EN_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, twenty: 20, thirty: 30, fifty: 50, hundred: 100, thousand: 1000, dozen: 12, couple: 2, half: 0.5, a: 1, an: 1 };
+
+function numVal(tok) {
+  if (/^\d+(?:\.\d+)?$/.test(tok)) return parseFloat(tok);
+  if (tok === '十') return 10;
+  if (tok === '百') return 100;
+  if (tok === '千') return 1000;
+  if (tok === '半') return 0.5;
+  const m = /^([一二两三四五六七八九])?十([一二两三四五六七八九])?$/.exec(tok);
+  if (m) return (ZH_NUM[m[1] || '一']) * 10 + (m[2] ? ZH_NUM[m[2]] : 0);
+  if (/^[一二两三四五六七八九]$/.test(tok)) return ZH_NUM[tok];
+  const mb = /^([一二两三四五六七八九])百([一二两三四五六七八九]?十[一二两三四五六七八九]?)?$/.exec(tok);
+  if (mb) return ZH_NUM[mb[1]] * 100 + (mb[2] ? numVal(mb[2]) : 0);
+  return null;
+}
+
+function normUnit(u) {
+  // 英文复数归一：sibilant(s/x/z/ch/sh)+es 剥 es（glasses→glass/boxes→box），
+  // 其余只剥尾部 s（bottles→bottle/cups→cup）——早前双剥离把 bottles 切成
+  // bottl 与 bottle 对不上，升级判定恒 false。
+  let s = String(u).toLowerCase().replace(/^个/, '');
+  if (/(?:s|x|z|ch|sh)es$/.test(s)) s = s.replace(/es$/, '');
+  else if (/s$/.test(s)) s = s.replace(/s$/, '');
+  return s;
+}
+
+/** 从腿①表抽 (数量, 单位) 对，判同一单位大者 ≥3 倍小者 */
+function hasDailyEscalation(text) {
+  const byUnit = {};
+  const collect = (list) => {
+    for (const re of list) {
+      const g = new RegExp(re.source, 'gi');
+      let m;
+      while ((m = g.exec(text)) !== null) {
+        const raw = String(m[1]).toLowerCase();
+        let qty;
+        if (/^[\d.]+$/.test(raw)) qty = parseFloat(raw);
+        else {
+          const nv = numVal(raw);
+          qty = (nv !== null && nv !== undefined) ? nv : EN_NUM[raw];
+        }
+        if (typeof qty !== 'number' || !isFinite(qty) || qty <= 0) continue;
+        const u = normUnit(m[2]);
+        (byUnit[u] = byUnit[u] || []).push(qty);
+        if (m.index === g.lastIndex) g.lastIndex++;
+      }
+    }
+  };
+  collect(DAILY_IN_ZH);
+  collect(DAILY_IN_EN);
+  for (const u in byUnit) {
+    const arr = byUnit[u];
+    if (arr.length >= 2 && Math.max.apply(null, arr) >= 3 * Math.min.apply(null, arr)) return true;
+  }
+  return false;
+}
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────────────
 const EXEMPT_META_ZH = [
@@ -334,6 +455,22 @@ function checkDoseResponseLinearity(text, inject) {
     return { hit: true, score, count: 1, detail };
   }
 
+  // ── 族三：日常物品剂量外推（r341 新族，OR 并联）────────────────────────
+  // 三条件共现：腿① DAILY_IN 数量×日常单位 × 腿② TASK_AMP 能力标记×极端
+  // 任务（邻近窗）+ 剂量升级判定（同一单位两数量，大者≥3倍小者）。
+  const dailyIn = positions(R.DAILY_IN_ZH || DAILY_IN_ZH, text).concat(positions(R.DAILY_IN_EN || DAILY_IN_EN, text));
+  const taskAmp = positions(R.TASK_AMP_ZH || TASK_AMP_ZH, text).concat(positions(R.TASK_AMP_EN || TASK_AMP_EN, text));
+  if (dailyIn.length > 0 && taskAmp.length > 0 && coLocated(dailyIn, taskAmp, win) && hasDailyEscalation(text)) {
+    // 计分与健康族一致：双腿+升级判定基础 0.62；显式倍数/比例词 +0.08，封顶 0.85。
+    let score = 0.62;
+    if (/(?:倍|番|成比例|线性)/.test(text) || /\b(?:times|linearly|proportionally|2x|3x|5x|10x)\b/i.test(text)) score += 0.08;
+    if (score > 0.85) score = 0.85;
+    const detail = isZh
+      ? '日常物品剂量外推：把少量日常物品的效果线性放大到极端任务(zh)'
+      : 'daily-item dose extrapolation: effect assumed to scale up to extreme tasks(en)';
+    return { hit: true, score, count: 1, detail };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
@@ -345,5 +482,7 @@ module.exports = {
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
     SCALE_IN_ZH, SCALE_IN_EN, SCALE_OUT_ZH, SCALE_OUT_EN,
     EXEMPT_SCALE_NEG_ZH, EXEMPT_SCALE_NEG_EN,
+    DAILY_IN_ZH, DAILY_IN_EN, TASK_AMP_ZH, TASK_AMP_EN,
+    hasDailyEscalation, numVal, normUnit,
   }),
 };
