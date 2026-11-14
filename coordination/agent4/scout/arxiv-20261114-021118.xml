@@ -1,0 +1,362 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/v2hPOijDgk3jHIAUkaUTPD2D+a0</id>
+  <title>arXiv Query: search_query=all:lead-time OR all:bias OR all:screening OR all:survival&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-14T02:11:19Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:lead-time+OR+(all:bias+OR+(all:screening+OR+all:survival))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>170152</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17327v1</id>
+    <title>Decoupling Dynamics: A Tale of Two Limits</title>
+    <updated>2026-11-12T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17327v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17327v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The symmetries of a $d$-dimensional QFT are known to be captured by a topological theory in one dimension higher, the Symmetry Topological Field Theory (SymTFT), which is invariant under gauging finite symmetries of the QFT, but not under dynamical gauging of continuous symmetries. We show that the distinct SymTFTs of a $d$-dimensional QFT before and after dynamical gauging of a continuous Abelian symmetry arise as different topological limits of the same dynamical holographic gauge theory in $(d+1)$-dimensions. Gauging changes the boundary condition of this dynamical theory and thereby selects a different topological limit, explaining why the associated SymTFT changes. We give a fully quantum definition of these SymTFTs at the level of Hilbert spaces and operators by combining suitable limits of the bulk holographic theory with photon truncation. This construction clarifies how topological symmetry defects, charges, and anomalies survive while the dynamical information carried by currents is discarded. We study non-anomalous and anomalous examples, providing a complete quantum analysis for $(2+1)$-dimensional bulks. For a four-dimensional boundary theory with a mixed axial-vector anomaly, we recover the SymTFT of the non-invertible chiral symmetry that remains after gauging the vector symmetry.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:31Z</published>
+    <arxiv:comment>30 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Andrea Antinucci</name>
+    </author>
+    <author>
+      <name>Oscar Lewis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17299v1</id>
+    <title>Simulation-Based Priors and BAO Shifts from the Lyman-$α$ Forest at the Field Level</title>
+    <updated>2026-11-12T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17299v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17299v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an analytic forward model for the Lyman-alpha (Ly-alpha) forest flux field based on cubic-order large-scale structure perturbation theory (effective field theory) calculations. We validate our cubic model on two sets of hydrodynamic simulations spanning $2 \leq z \leq 4$: the small-volume CAMELS suite, which spans a wide range of cosmological and astrophysical parameters, and the large-volume, high-resolution Sherwood simulations. We find qualitatively similar results for both at the power-spectrum level. The perturbative model reproduces the three-dimensional flux power spectrum of the simulations to $\sim 5\%$ down to $k \simeq 1$-$1.5\,h\,{\rm Mpc}^{-1}$, depending on the redshift. This improves compared to previous quadratic perturbative forward models by up to 40%. Exploiting cosmic-variance cancellation in the field-level approach, we carry out precision measurements of the Lyman-alpha forest bias parameters from the CAMELS simulation suite. We use these measurements to analytically predict the shifts in the Baryon Acoustic Oscillations (BAO) scaling parameters induced by nonlinearities in the three-dimensional Lyman-alpha forest clustering as a function of cosmological parameters. We find sub-percent shifts in both the radial and transverse directions with a noticeable dependence on cosmology and redshift. Finally, from the field-level fits we construct simulation-based priors that can be used for cosmological analyses of the Lyman-alpha forest with the currently observing Dark Energy Spectroscopic Instrument (DESI). In addition, our cubic model captures the connected four-point function (trispectrum) of the forest, which opens up novel opportunities for accurate covariance matrix estimation for DESI and its successor, DESI-II.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:10Z</published>
+    <arxiv:comment>16+15 pages, 8+3 figures, 0+2 tables (main text + appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Divij Sharma</name>
+    </author>
+    <author>
+      <name>Roger de Belsunce</name>
+    </author>
+    <author>
+      <name>Mikhail M. Ivanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17295v1</id>
+    <title>Traces of Vacuum Squeezing: A Superconducting Transmission-Line Analogue of Cosmological Particle Creation</title>
+    <updated>2026-11-12T18:54:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.17295v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17295v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Particle creation in time-dependent quantum fields is a central phenomenon in early-universe cosmology, yet it remains experimentally inaccessible in its original context. We show theoretically that superconducting circuits based on a waveguide-like transmission line loaded with dc-SQUIDs can provide a direct analogue of a scalar field in a radiation-dominated Friedmann--Robertson--Walker universe in conformal time. The mode equation of the circuit reduces to the Weber equation, the same equation governing cosmological particle creation in a radiation-dominated background, admitting an exact solution in terms of parabolic cylinder functions and an exponentially suppressed particle spectrum. We analyse the conditions under which the analogy holds, which require a compromise between the duration of the pulse, the uniformity of the modulation and the symmetry of the SQUIDs, and show that dissipation does not erase the cosmological signal. We use the anomalous moment of each mode as a witness of the Bogoliubov mixing: it vanishes for any thermal state and survives dissipation, and, together with the photon number, it certifies squeezing, and with the purity of the state, it identifies whether the pairs created from the vacuum dominate.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:44Z</published>
+    <arxiv:comment>17 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Entropy 2026, 28, 1248 (2026)</arxiv:journal_ref>
+    <author>
+      <name>Paula I. Villar</name>
+    </author>
+    <author>
+      <name>Federico Guglielmucci Nazar</name>
+    </author>
+    <author>
+      <name>Elián Urtubey</name>
+    </author>
+    <author>
+      <name>Fernando C. Lombardo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17290v1</id>
+    <title>Radiation, Thermochemistry, and Stellar Feedback in DISPATCH</title>
+    <updated>2026-11-12T18:53:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.17290v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17290v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growth of massive stars depends on whether their accretion flows survive radiation and outflow feedback from the forming stellar population. We present an extension of DISPATCH that couples directional stellar radiation, diffuse infrared transport, and thermochemistry to self-gravitating magnetohydrodynamics, individual stellar accretion, and protostellar jets. This AMR-based method uses DISPATCH's local timestepping, allowing stellar environments and their larger scale cluster environments to step on separate timescales, and providing the framework needed to scale to long-duration simulations of GMCs. Direct radiation is transported in multiple bands, including both ionizing and nonionizing radiation, and uses short characteristics to maintain source directions and shadowing. Diffuse radiation is implemented for IR reprocessed light, with M1 and stationary ray options for transport. The thermochemical model includes atomic and molecular hydrogen and helium chemistry, and metal cooling and dust. It also includes a composition-dependent equation of state. Stellar masses grow through accretion of gas rather than a prescribed IMF, allowing stellar masses to respond to the evolving gas supply and feedback. In tests, multiple-source illumination retains geometric shadows while diffuse reprocessing heats shielded material, and tests of jets, ionization fronts, and radiation pressure demonstrate expected behavior and convergence. Ionization fronts also cross asynchronous refinement boundaries with late-time propagation speeds within a few percent of analytic predictions. Together, these developments provide a framework for determining how radiative and mechanical feedback modify the duration and efficiency of accretion from turbulent clouds, connecting the gas supply to individual stars with the high-mass stellar initial mass function.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:53:03Z</published>
+    <arxiv:comment>19 pages, 11 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>William Lake</name>
+    </author>
+    <author>
+      <name>Paolo Padoan</name>
+    </author>
+    <author>
+      <name>Åke Nordlund</name>
+    </author>
+    <author>
+      <name>Troels Haugbølle</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17284v1</id>
+    <title>Augmented Hybrid TV Services. Habits, Preferences, Opinions and Expectations of Spanish Consumers</title>
+    <updated>2026-11-12T18:52:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.17284v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17284v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The convergence of hybrid broadcast and broadband delivery, companion devices, and immersive technologies enables new forms of interactive, personalized, and accessible TV services. This paper introduces the concept of Augmented Hybrid TV services and presents an exploratory user requirements and preliminary acceptance assessment for 5 representative use cases. They were selected through an exploratory stakeholder consultation and 3 co-design workshops with audiovisual professionals and participants from organizations supporting people with visual or hearing impairments. They combine conventional TV with complementary content delivered to connected devices, including AR/VR HMD. They were subsequently evaluated through a cross-sectional CAWI survey of 626 Internet and connected TV users in Spain. Each participant viewed standardized video demonstrations of 2 randomly assigned cases and assessed their perceived usefulness, anticipated benefits/limitations, and interest in them. The results show substantial interest across all five use cases, ranging from 64.7% to 76.9%. Adaptive and personalized augmented subtitles received the highest level of interest and were particularly valued for their accessibility, language-learning, and personalization benefits. Immersive services involving complementary AR content, virtual screens, 3D objects, and 360 video were also evaluated positively, although participants identified device cost, ergonomics, connectivity, usability, and synchronization as anticipated limitations. The findings provide user-centered evidence that can inform the prioritization, design, and subsequent prototype-based evaluation of standards-compliant Augmented Hybrid TV services. Because the study assessed video-based scenarios rather than functional systems, the results represent perceived usefulness and stated interest rather than observed adoption or technically validated QoE.</summary>
+    <category term="cs.MM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:52:02Z</published>
+    <arxiv:comment>26 pages, 12 figures and 16 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.MM"/>
+    <author>
+      <name>Fernando Boronat</name>
+    </author>
+    <author>
+      <name>Bernat Roig</name>
+    </author>
+    <author>
+      <name>Enric Sigalat</name>
+    </author>
+    <author>
+      <name>Santiago J. Flores</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17264v1</id>
+    <title>Bayesian modeling of predictive stability under generalized Arrhenius non-linear kinetics</title>
+    <updated>2026-11-12T18:44:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.17264v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17264v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predictive stability modeling is widely used in pharmaceutical development to establish product shelf-life by identifying the kinetic parameters that govern degradation behavior and using these parameters to extrapolate out in time. Recent approaches typically assume linear degradation dynamics and rely on the Arrhenius equation to model temperature-specific reaction rates. However, observed degradation profiles may reflect nonlinear reaction dynamics and more complex temperature-specific reaction rates, potentially leading to reduced accuracy in long-term predictions and motivating a more flexible approach. We propose a novel Bayesian framework which extends predictive stability modeling beyond simple Arrhenius low-order kinetic dynamics and accommodates complex degradation mechanisms. The degradation process is modeled through the Sestak-Berggren kinetic formulation, a flexible ordinary differential equation encompassing many classical degradation models as special cases. To facilitate model interpretability and model exploration, probabilistic model selection on kinetic parameters automatically determines whether nonlinear reaction components are supported by the data, allowing the model to adaptively collapse to simpler dynamics when appropriate. To address departure from classical Arrhenius kinetics, we develop a generalized temperature reaction rate formulation in which temperature-specific reaction rates are shrunk toward Arrhenius predictions through a hierarchical shrinkage prior while allowing departures when supported by the data. This approach yields robustness to misspecification and reduces sensitivity to potentially influential high-temperature observations commonly encountered in accelerated stability experiments. The resulting framework provides a principled and flexible statistical tool for model-informed shelf-life determination.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:44:33Z</published>
+    <arxiv:comment>28 pages, 9 figures, 6 tables; includes supplementary material</arxiv:comment>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Lorenzo Mauri</name>
+    </author>
+    <author>
+      <name>Samantha Gleich</name>
+    </author>
+    <author>
+      <name>Michael Johnson</name>
+    </author>
+    <author>
+      <name>Andy Liaw</name>
+    </author>
+    <author>
+      <name>Daniel Skomski</name>
+    </author>
+    <author>
+      <name>Federico Ferrari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17260v1</id>
+    <title>Non-interferometric tests of gravitational decoherence models with mechanical oscillators</title>
+    <updated>2026-11-12T18:43:12Z</updated>
+    <link href="https://arxiv.org/abs/2611.17260v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17260v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Phenomenological models of quantum-gravity-induced decoherence can leave observable effects even in experiments that do not rely on interferometric measurements. We study three such models, based respectively on deformed relativistic symmetries, stochastic metric fluctuations, and a stochastic generalized uncertainty principle, all of which induce decoherence in the momentum basis. For a free particle, the models preserve momentum distribution and mean energy but produce position diffusion and momentum-space decoherence with model-specific momentum dependences. For a harmonic oscillator, the noncommutativity of the collapse operators with the oscillator Hamiltonian results in anomalous heating, with the three models leading to qualitatively different energy dynamics. The first gives heating at a constant rate, the second at a rate proportional to the kinetic energy, which can lead to exponential growth, and the third at a rate growing cubically with excitation. We further derive the stationary position power spectral density and show that all three models produce the same leading-order excess lineshape in the weak-noise regime, distinct from that of force noise. Comparing with existing mechanical platforms, we find that displacement-noise measurements can already constrain the fluctuation time of the first model below the Planck time, while occupation measurements could improve the bounds on the second model by up to fourteen orders of magnitude over those from ground-state heating of levitated particles. Summing the heating over all phonon modes of a solid, the residual heat release of low-temperature experiments constrains the first model far below the Planck time and the second at the Planck time. Our results establish heating and continuous measurements as complementary non-interferometric probes of gravity-related decoherence.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:43:12Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Sandro Donadi</name>
+    </author>
+    <author>
+      <name>Iarley P. Lobo</name>
+    </author>
+    <author>
+      <name>Matteo Fadel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17229v1</id>
+    <title>Peak Performance in Matched Filtering: Fused Correlation and Statistically Controlled Screening on CPUs and GPUs</title>
+    <updated>2026-11-12T18:21:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.17229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Batched matched filtering and cross-correlation over large template banks are a primary computational cost in gravitational-wave astronomy, seismology, and radio transient searches. Standard pipelines pair a general-purpose inverse Fast Fourier Transform (FFT) with separate multiplication and peak-finding kernels, writing intermediate spectra and full correlation series to memory for every template. We fuse the conjugate product into the first inverse-transform butterflies and the peak reduction into the last so only candidate peaks leave processor registers, and tile batches in 2D so $K^2$ correlations reuse $2K$ cached spectra. This shifts filtering from a DRAM-bandwidth-bound to an on-chip cache-bandwidth-bound regime. In some situations, the signal-to-noise ratio (SNR) is concentrated toward lower frequencies while higher frequencies dominate the transform length. We develop a hierarchical screening method that exploits this via a sequence of short low-frequency transforms before evaluating the full band, deriving stage thresholds from the spectral power profile and matched-filter noise autocovariance to target a specified false-dismissal probability. We demonstrate these methods in the open-source matchedfilter library across eight CPU architectures and two integrated GPUs (AMD Radeon 8060S via Vulkan and Apple M2 via Metal). On an AMD Ryzen AI Max+ 395 at $N=4096$, fused peak-only filtering is $1.4\times$ faster than a standalone AOCL-FFTW inverse transform on one CPU core and $6.2\times$ faster than rocFFT on its Radeon 8060S GPU ($3.1\times$ over MLX FFT on the M2 GPU). For a fiducial gravitational-wave search ($ρ_\mathrm{th}=5.5$, $10^{-2}$ false-dismissal target), hierarchical screening yields a $26\times$ speedup over AOCL-FFTW on CPU, $21\times$ over rocFFT on the 8060S GPU, and $19\times$ over MLX FFT on the M2 GPU.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:21:14Z</published>
+    <arxiv:comment>10 pages, 4 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Alexander H. Nitz</name>
+    </author>
+    <author>
+      <name>Keisi Kacanja</name>
+    </author>
+    <author>
+      <name>Collin D. Capano</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17228v1</id>
+    <title>Linear Regression with Self-Selection Bias in Polynomial Time</title>
+    <updated>2026-11-12T18:21:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.17228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We revisit the problem of estimating $k$ linear regressors with self-selection bias in $n$ dimensions up to error $\varepsilon$ with the maximum self-selection criterion, as introduced by Cherapanamjeri, Daskalakis, Ilyas, and Zampetakis [CDIZ23, STOC]. Our main result is a $\mathrm{poly}(n,k,1/\varepsilon)$ time algorithm for the unknown-index variant of this problem, thereby improving upon the running times of the best known algorithms due to Gaitonde and Mossel [GM24] and Kalavasis, Mehrotra, and Zhou [KMZ26, COLT] with exponential dependence on $k$. Our algorithm succeeds in the presence of correlated noise between regressors, which captures the related setting of max-affine regression. Consequently, we also give the first polynomial-time algorithm for this problem, improving on the prior works of Ghosh, Pananjady, Guntuboyina, and Ramchandran [GPGR22, IEEE Transactions on Information Theory] and Gaitonde and Mossel [GM24] with exponential dependence on $k$.
+  Prior works exhaustively search over a $k$-dimensional subspace spanned by the regressors, using conditional moments of the response to test candidates. In contrast, our algorithm is driven by an improved understanding of the moments of the covariates. We show that, restricting to observations with large response values, the degree-$(\log n)$ Hermite moment of the covariates approximately decomposes as a sum of tensor powers of the regressors. The first step of our algorithm can be viewed as a tensor decomposition algorithm for these implicitly represented high-order tensors, which outputs unit vectors parallel to the regressors. A secondary step based on a simple variant of ordinary least squares extracts estimates for the regressors given these unit vectors. We believe our analytic insight and algorithmic components may have applications to designing efficient algorithms for other latent-variable problems.</summary>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:21:11Z</published>
+    <arxiv:primary_category term="math.ST"/>
+    <author>
+      <name>Felix Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17196v1</id>
+    <title>Physically Interpretable Basin Selection in Discrete-Variable Origami Design</title>
+    <updated>2026-11-12T17:59:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.17196v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17196v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Automatic differentiation has enabled rapid progress on continuous-variable mechanical design problems, but gradient-based optimization still struggles with discrete variables. The standard approach is to optimize using a continuous relaxation of the choices, then commit to the nearest discrete design at the end. Why this procedure selects unfavorable basins is poorly understood. Here, we introduce a practical, interpretable design problem inspired by origami, in which automatic differentiation is used to design shapes with a target functional behavior. Each origami sheet has a fixed geometry, and a bilevel optimization framework tunes which one of four discrete hinge types to place at each fold. Baseline gradient-based design settles into basins with a large discretization gap: relaxed optimization solves 97% of runs, but the final, discrete solutions succeed only half the time. We find that the gap can be relieved with a surprisingly simple modification. An initialization prior uniformly biased toward the stiff, flat hinge option boosts the final solve fraction from 49% to 69%. Applying the prior adds no additional compute and leaves the optimization process unchanged. Compared to the baseline, sheets produced with the prior have greater geometric compatibility and mechanical stiffness. Directly penalizing frustration and floppiness in the outer loss function produces an even greater improvement than the prior does, raising the solve fraction to 78% and indicating that these properties help distinguish the unfavorable basins. Our results demonstrate that loss landscapes for mechanical design can have physically meaningful basins that are not robust to discretization and cause solves to fail. Targeting these basins' physical signatures, even with just an initialization bias, helps avoid them.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:59:43Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Lucy Liu</name>
+    </author>
+    <author>
+      <name>Leon M. Kamp</name>
+    </author>
+    <author>
+      <name>Katia Bertoldi</name>
+    </author>
+    <author>
+      <name>L. Mahadevan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17192v1</id>
+    <title>Cubic, Non-Fermi Liquid Exchange Couplings for Doublet Impurities</title>
+    <updated>2026-11-12T17:56:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.17192v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17192v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We construct non-Fermi liquid (NFL) quantum impurity models for doublet impurities in a cubic metal, involving conduction electrons with half-integer total angular momentum, $J$. We highlight the only two crystal-symmetry-protected NFL quantum impurity models: the spin-half impurity, $J=3/2$ conduction electron Kondo model, and the two-channel Kondo model originally derived in the context of the quadrupolar Kondo model. We show explicitly that the quadrupolar Kondo model preserves time-reversal symmetry. We also construct two cubic quantum impurity models in which NFL behavior is not symmetry-protected. Each has $Γ_8$ and either $Γ_{6}$ or $Γ_{7}$ conduction electrons screening the impurity simultaneously, one model for a non-Kramers doublet and the other for a Kramers doublet impurity ground state. To our knowledge, the latter model has not been considered before; we expect it to realize a new NFL fixed point, but its solution is left for future work. Finally, we derive the relevant cubic perturbation that drives the non-symmetry-protected systems away from their NFL scaling regimes.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:56:25Z</published>
+    <arxiv:comment>6 pages, submitted to JPS Conference Proceedings, Proceedings of the International Conference on Strongly Correlated Electron Systems (SCES2026)</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>Anna I. Tóth</name>
+    </author>
+    <author>
+      <name>Davide Marenduzzo</name>
+    </author>
+    <author>
+      <name>Andrew D. Huxley</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17190v1</id>
+    <title>Consensus Capture in Reference-Based UAV Video Stabilization: A Benchmark on Dynamic Urban Scenes</title>
+    <updated>2026-11-12T17:55:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.17190v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17190v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reference-frame stabilization registers every frame of a hovering-drone video onto one reference frame, keeping object positions comparable. The registration pipelines it relies on are selected on feature-matching benchmarks in which only the camera moves. Over a busy intersection, vehicles moving together supply mutually consistent correspondences that can draw the robust homography estimate toward their motion: consensus capture, which inlier statistics cannot flag. A two-part benchmark measures it and the object masking meant to prevent it. A static protocol scores ten pipelines under exactly known homographies on 4K aerial frames, tuned on a site-disjoint split at a matched resolution and feature budget. A dynamic protocol scores them at an offline and a real-time budget on hovers selected from the video alone to span the amount and coherence of moving foreground, plus a stationary control. It measures background alignment, object position error and the share of a moving group's displacement an estimate follows, against a pseudo-ground-truth reference audited with manually annotated ground control points, which also score every candidate. On static scenes, tuned AKAZE, RootSIFT, SIFT and BRISK lead, retuning the matcher thresholds raises the mean average accuracy (mAA) by at most 0.0062, and masking costs less than 0.005. Unmasked ORB is captured on 28 of 304 real-time dynamic pairs and on 6 offline; its real-time captured estimates have a median corner error of 18.8 px yet typical inlier counts and ratios. Masking removes capture for every pipeline and leaves the leading pipelines unchanged. Code, data and results are released.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:55:06Z</published>
+    <arxiv:comment>50 pages, 17 figures, 24 tables. Code at https://github.com/rfonod/stabilo-benchmark and data at https://doi.org/10.5281/zenodo.23623540 and https://doi.org/10.5281/zenodo.15050577</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Robert Fonod</name>
+    </author>
+    <author>
+      <name>Nikolas Geroliminis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17185v1</id>
+    <title>Neural Render Proxies for Interactive and Differentiable Lighting</title>
+    <updated>2026-11-12T17:52:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.17185v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17185v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Within the CG animation production pipeline, the challenges artists tackle in Lighting can be immense. Even minor adjustments require re-rendering massive scenes with slow offline renderers; global illumination has to be sampled and complex shaders have to be evaluated, leading to iteration times of minutes to hours per frame. To accelerate this process, we introduce a novel neural render proxy (NRP) that enables differentiable relighting of static scenes with fixed camera and materials at interactive rates. Our main insight is the decoupling of traditional rendering into path sampling and emission computation. From a single, light-agnostic render pass, we collect light transport data in the form of path samples. This enables rapidly sampling lighting conditions on the fly, and training a scene-specific lightweight neural network that learns how light is transported from any scene location to any image pixel. This approach is compatible with non-differentiable production renderers, induces minimal memory requirements during inference, and scales only with resolution and the number of light sources and parameters, but independently of scene and appearance complexity. Our evaluation demonstrates interactive frame rates for relighting (~30-60 Hz) while closely approximating the visual fidelity of ground-truth path tracing. In addition, the differentiable NRP enables fast, gradient-based inverse workflows, allowing artists to efficiently solve for lighting parameters from intuitive image-space edits or generative targets.</summary>
+    <category term="cs.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:52:44Z</published>
+    <arxiv:comment>Accepted at Computer Graphics Forum (Proc. EGSR 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.GR"/>
+    <author>
+      <name>Sergio Sancho</name>
+    </author>
+    <author>
+      <name>Alexander Rath</name>
+    </author>
+    <author>
+      <name>Marco Manzi</name>
+    </author>
+    <author>
+      <name>Pascal Chang</name>
+    </author>
+    <author>
+      <name>Amit H. Bermano</name>
+    </author>
+    <author>
+      <name>Derek Nowrouzezahrai</name>
+    </author>
+    <author>
+      <name>Markus Gross</name>
+    </author>
+    <author>
+      <name>Marios Papas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17177v1</id>
+    <title>The 21 cm-Lyman-$α$ forest cross-power spectrum with a minimal effective field theory</title>
+    <updated>2026-11-12T17:47:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.17177v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17177v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Intensity maps of the 21 cm line and the Lyman-$α$ (Ly$α$) forest trace the same cosmic volume at $2\lesssim z\lesssim 4$. Their cross-power spectrum is insensitive to foregrounds that do not correlate between the two probes and, together with the Ly$α$ auto-spectrum, separates the mean 21 cm brightness temperature from the neutral hydrogen (HI) bias. Effective field theory models of each tracer exist, but at one loop they carry tens of nuisance parameters. We test whether a minimal effective field theory (mEFT), consisting of the tree-level Kaiser model with leading-order counterterms and stochastic terms, previously validated for the Ly$α$ auto-spectrum, describes the 21 cm auto-, Ly$α$ auto- and cross-power spectra jointly. We use the Sherwood 80 $h^{-1}$Mpc hydrodynamical simulation with HI painted onto halos at $z=2.4$-$4.2$, and reduce sample variance with Zel'dovich control variates. Each spectrum is validated separately and then in a joint fit with shared parameters. With scale cuts $k_{\rm max}=0.5$, $1.2$ and $2.0\,h\,{\rm Mpc}^{-1}$ for the 21 cm auto-, cross- and Ly$α$ auto-spectra, the mEFT fits all three spectra at all five redshifts. In the joint fit the mEFT determines the HI bias to 2.0-2.5% and the Ly$α$ density bias to 2.1-2.3%. The scale cuts follow the HI velocity dispersion and the Ly$α$ pressure-smoothing scale. When the brightness temperature is left free, the fits that include the cross-spectrum prefer values 20-30% above the true one, at 1-2$σ$, while the two auto-spectra together do not constrain it. A prior on the HI bias recovers the true value of the brightness temperature.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:47:36Z</published>
+    <arxiv:comment>31 pages, 11 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>G. Autieri</name>
+    </author>
+    <author>
+      <name>V. Iršič</name>
+    </author>
+    <author>
+      <name>M. Viel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17139v1</id>
+    <title>Three-body dynamics of the Roper resonance</title>
+    <updated>2026-11-12T17:29:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.17139v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17139v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The enigmatic Roper resonance is notoriously difficult to determine in lattice QCD. Its quantum numbers, $J^P=1/2^+$, allow for two pions and a nucleon in relative $S$-waves. This absence of a centrifugal barrier leads to strong three-body $ππN$ effects on top of the two-body $πN$ channel -maybe the reason why the Roper is obscured in lattice QCD close to physical masses. Guided by unitarity, an amplitude is constructed in which three-body states are populated through channels in $f_0(500)N(939)1/2^+$, $πΔ(1232)3/2^+$, and $πN(1440)1/2^+$ configurations. The latter channel is required by unitarity in the presence of nucleon exchange, and it contains the nucleon as a bound state, generating the $πN$ channel automatically. With the sub-channels matching the corresponding two-body amplitudes from experiment and nucleon properties, the $P_{11}$ amplitude from SAID is fitted, allowing for an accurate determination of the Roper poles close to the complex $πΔ$ threshold. The Roper poles and residues are, for the first time, determined by explicitly including this and other non-analyticities in combination with strict two- and three-body unitarity. Contour deformation allows for a direct pole search. Systematic uncertainties from the parametrization dependence are quantified. The result for the Roper $S$-matrix pole is $\sqrt{s_R}/{\rm MeV} =1346\pm 2^{+6}_{-3} - i(81\pm 2^{+7}_{-8})$. The amplitude developed here will serve as the central input for a quantization condition that allows for future determinations of the Roper resonance from lattice QCD.</summary>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T17:29:13Z</published>
+    <arxiv:comment>64 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="nucl-th"/>
+    <author>
+      <name>Jinzi Wu</name>
+    </author>
+    <author>
+      <name>Michael Döring</name>
+    </author>
+    <author>
+      <name>Maxim Mai</name>
+    </author>
+  </entry>
+</feed>

@@ -42,6 +42,62 @@
  *   · denominator_swap(224) 管「不同分母的绝对计数比较」；本族比的是
  *     **时间长度**，且错位发生在**起算点**而非分母基数。
  *
+ * [r328 扩展] 领先时间偏误（lead-time bias）子家族——本文件自 r270 立项
+ * 起就在边界注释里写明「lead_time_bias（领先时间偏误，src/ 下无独立维
+ * 度）判『筛查使确诊提前但死亡时刻不变 → 生存期账面变长』」，本轮把该
+ * 缺口闭环为**同一检测器的路径 (d)**（维度计数 255 不变、src/index.js
+ * 零改动，与 r320-r327 各轮同形态）。立项探针实证（scripts/round-328/
+ * r328-probe-leadtime.js，集成树 v6.8.183）：7 条精化攻击样本 3 条完全
+ * 穿引擎（gate.action=pass、findings 无归因），其余被 post_hoc /
+ * reverse_causation / econ_reasoning_gate / survivor_time_bias 代拦；
+ * 官方四基准良性语料 369 条模块级直调零命中。
+ *
+ * 辨别的族（子家族）：领先时间偏误（lead-time bias / 领先时间偏倚）——
+ * 筛查/早发现把**确诊时点提前**，而生存率/生存期一律**从确诊之日起
+ * 算**，于是生存指标账面改善（「五年生存率从40%提高到80%」）并不伴随
+ * 死亡时刻的任何改变，却被当作「筛查延长了生命」的证据：
+ *   肿瘤早筛让确诊时间平均提前了两年，患者的五年生存率因此大幅上升，
+ *   可见筛查显著延长了寿命。
+ *   Cancer screening advances the diagnosis by about two years on
+ *   average, so the five-year survival rate rises significantly —
+ *   screening genuinely prolongs life.
+ *
+ * 与既有维度的边界（r328 归因）：
+ *   · 本模块路径 (a)(b)(c)（永生时间偏误本体）判**起点错位**（起算口径
+ *     不一致/存活门槛），不依赖筛查；路径 (d) 判**确诊提前**（筛查前移
+ *     诊断时点），两条路径的错位来源不同，可并存于同一检测器。
+ *   · survivor_time_bias(226) 判「两组病程长度结构不同 → 生存期长短不
+ *     可比」；本子家族两组病程长度完全一致，错在**诊断时点被筛查前移**。
+ *   · statistical_misleading(58) 管小基数百分比；本子家族不涉及基数。
+ *   · post_hoc / pseudo_causal 代拦「筛查普及后生存率提高」型时序因
+ *     果，但给不出 lead-time 归因（探针代拦句 findings 均无本维度），
+ *     且对无时序词的形态（「早筛组确诊时间比临床发病早两年」）失效。
+ *   · regression_to_the_mean / clustering_illusion 管极值回归与聚类
+ *     错觉，与本族的时间核算结构无关。
+ *
+ * 判据（路径 d，三腿共现 + 跨腿邻近窗 + 豁免，缺一不判）：
+ *   腿① LEAD_SCREEN 筛查域在场（早筛/筛查/普筛/体检筛查/癌症筛查/
+ *      基因检测/肿瘤标志物/早发现/筛出/检出；EN screening / screened /
+ *      early detection / detected earlier）
+ *   腿② SURV_ACCOUNT 生存核算口径在场（五年生存率/生存率/生存期/
+ *      存活率/中位生存/平均生存/生存时间/活得更久/多活/寿命；EN
+ *      five-year survival / survival rate / median survival / lived
+ *      longer）
+ *   腿③ LIFE_CLAIM 寿命延长结论在场（延长寿命/延寿/延年/救命/活得更
+ *      久；EN extends lives / prolongs life / saves lives / live
+ *      longer），三腿首匹配跨度 ≤ WIN_LEAD（中 160 字 / 英 400 字符）
+ *   豁免四 EXEMPT_LEAD：领先时间偏误被点名（方法学纠正）/ 谨慎解读
+ *      （「不能等同于寿命延长」形否定）/ 死亡率终点设计（以总死亡率
+ *      为终点/overall mortality endpoint）
+ *   疑问形守卫：整句以问号收尾（「…说明筛查延长了寿命吗？」）是探询
+ *      不是断言，不判（同 common-cause 等族疑问豁免口径）。
+ *
+ * 为什么取 VERIFY 级：单句可能是流行病学教学反例（「五年生存率是从
+ * 确诊之日起算的，筛查会让确诊提前，所以生存率提高不能直接等同于寿命
+ * 延长」正是本族要教的判别动作）、对他人错误论证的转述、新闻报道的
+ * 概括。verify 的含义是「这个生存期/寿命比较可能存在领先时间核算问
+ * 题，需要改用死亡率终点或对齐诊断时点再比」。
+ *
  * 判据（起点锚腿 × 起点错位腿 × 疗效结论腿，三腿共现，缺一不判）：
  *   腿① START_ANCHOR 起点时点锚（中英，裸名词必收）
  *   腿② START_GAP   起点错位——三条等价路径：
@@ -266,6 +322,101 @@ const EXEMPT_DESIGN_EN = [
   /\bdouble[-\s]?blind\b|\bplacebo[-\s]?controlled\b/i,
 ];
 
+// ─── [r328] 路径 (d) 领先时间偏误（lead-time bias）子家族常量 ─────────
+// 腿① LEAD_SCREEN 筛查域（中文）：核心词取裸名词形态（「早筛」「筛查」
+// 不带后缀也命中），并覆盖现代体检营销高频复合词。161 轮教训：只收带
+// 后缀的「癌症早筛项目」会漏裸「早筛组」整句。
+const LEAD_SCREEN_ZH = [
+  /早筛|早查|普筛|筛查|筛检|筛出|检出|体检筛查|癌症筛查|肿瘤筛查|防癌筛查/,
+  /基因检测|肿瘤标志物|液体活检|早发现/,
+];
+// 腿①（英文）：screening / screened / early detection / detected earlier
+const LEAD_SCREEN_EN = [
+  /\bscreen(?:ing|ed|s)?\b/i,
+  /\bearly\s+detection\b/i,
+  /\bdetect(?:ing|ed|s)?\b[^.]{0,24}\bearlier\b/i,
+  /\bdiagnos(?:is|ed)\s+(?:about\s+)?(?:\w+\s+){0,2}earlier\b/i,
+  /\bmoves?\s+(?:the\s+)?diagnosis\s+(?:forward|earlier)\b/i,
+];
+
+// 腿② SURV_ACCOUNT 生存核算口径（中文）：生存率/生存期一律从确诊日起
+// 算，这正是 lead-time 账面改善的承载指标；不含「死亡率」（那是正确
+// 终点，列入豁免而非判据），也不含「活得更久/寿命」（那是结论侧，
+// 放腿③——否则「早发现才能活得更久」类良性建议会双腿互证成假阳性）。
+const SURV_ACCOUNT_ZH = [
+  /(?:五年|5年|十年|10年)?生存(?:率|期)|生存时间|存活(?:率|期)/,
+  /中位生存|平均生存|术后生存|确诊后生存|无进展生存/,
+];
+// 腿②（英文）
+const SURV_ACCOUNT_EN = [
+  /\b(?:five|10|ten)[-\s]?year\s+survival\b/i,
+  /\bsurvival\s+(?:rates?|times?|statistics?|from\s+diagnosis)\b/i,
+  /\bmedian\s+survival\b|\baverage\s+survival\b/i,
+];
+
+// 腿③ LIFE_CLAIM 寿命延长结论（中文）：落点必须是「生命/寿命/生存被
+// 延长」，不收「降低死亡」——总死亡率下降是正确证据形态（列入豁免）。
+const LIFE_CLAIM_ZH = [
+  /(?:延长|拉长)[^。！？]{0,4}(?:生命|寿命|性命)/,
+  /(?:延长|拉长)[^。！？]{0,4}(?:生存期|生存时间|存活期)/,
+  /延寿|延年|延年益寿|益寿|救命|起死回生/,
+  /活得更久|活得长|多活/,
+];
+// 腿③（英文）
+const LIFE_CLAIM_EN = [
+  /\bextends?\s+(?:patients'?\s+)?(?:lives|life|lifetime)\b/i,
+  /\bprolongs?\s+(?:life|survival)\b/i,
+  /\bsaves?\s+lives\b/i,
+  /\bhelps?\s+(?:people\s+)?live\s+longer\b/i,
+  /\blive\s+longer\b/i,
+];
+
+// 豁免四 EXEMPT_LEAD（r328）：三条通路各自承重，负例注入逐条验证。
+//  (a) 领先时间偏误被点名（方法学纠正/教学反例）——那是在破除本谬误；
+//  (b) 谨慎解读形：「不能等同于寿命延长」「并不代表活得更久」——正确
+//      判别动作，正是本族要教的；
+//  (c) 死亡率终点设计在场：以总死亡率为终点/overall mortality endpoint
+//      ——设计已消除 lead-time 核算问题。
+const EXEMPT_LEAD_ZH = [
+  /领先时间偏误|领先时间偏倚|领先时间效应|提前确诊效应/,
+  /(?:不能|并非|不代表|不等于|不足以|无法|很难|未必|不一定|不应|不可)[^。！？]{0,18}(?:寿命|生命|延寿|延年|活得更久|多活|延长|救命)/,
+  /(?:以|用|按|采用)[^。！？]{0,12}(?:总死亡率|全因死亡率|死亡率|死亡)[^。！？]{0,10}(?:为|作|作为)[^。！？]{0,8}(?:终点|指标|主要终点|观察终点|主要指标)/,
+];
+const EXEMPT_LEAD_EN = [
+  /\blead[-\s]?time\s+bias\b/i,
+  /\b(?:does\s+not|do\s+not|doesn'?t|don'?t|cannot|can'?t|not|no)\b[^.]{0,28}\b(?:live\s+longer|longer\s+life|life\s+extension|extends?\s+life|prolongs?\s+life|saves?\s+lives)\b/i,
+  /\b(?:overall|all[-\s]?cause|total|disease[-\s]?specific)\s+mortality\b[^.]{0,36}\b(?:endpoint|primary\s+outcome|unchanged|no\s+difference)\b/i,
+];
+
+// 路径 (d) 跨腿邻近窗：三腿首匹配跨度上限（中 160 字 / 英 400 字符），
+// 同路径 (a)(b) 的 WIN_LAYERS 口径——防止同一段落里三个无关句子拼成
+// 虚假共现。
+const WIN_LEAD_ZH = 160;
+const WIN_LEAD_EN = 400;
+
+// 取某正则清单在文本中最早匹配的起始下标（无匹配返回 -1）
+function earliestIdx(list, text) {
+  let best = -1;
+  for (const re of list) {
+    const flags = re.flags.includes('g') ? re.flags : re.flags + 'g';
+    const m = text.match(new RegExp(re.source, flags));
+    if (m && m.length > 0) {
+      const i = text.indexOf(m[0]);
+      if (i >= 0 && (best < 0 || i < best)) best = i;
+    }
+  }
+  return best;
+}
+
+// 中英两清单的最早匹配下标（-1 视为缺席，取非负最小值）
+function earliestEither(zhList, enList, text) {
+  const a = earliestIdx(zhList, text);
+  const b = earliestIdx(enList, text);
+  if (a < 0) return b;
+  if (b < 0) return a;
+  return Math.min(a, b);
+}
+
 function anyHit(list, text) {
   for (const re of list) { if (re.test(text)) return true; }
   return false;
@@ -315,6 +466,36 @@ function checkImmortalTimeBias(text, inject) {
   if (anyHit(M_Z, text) || anyHit(M_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(L_Z, text) || anyHit(L_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(D_Z, text) || anyHit(D_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
+
+  // ─── [r328] 路径 (d) 领先时间偏误（lead-time bias）子家族 ───────────
+  // 筛查域 × 生存核算口径 × 寿命延长结论，三腿共现 + 跨腿邻近窗。
+  // 与路径 (a)(b)(c)（起点错位）相互独立：本路径**不要求起点锚在场**
+  // （领先时间的错位来源是筛查前移诊断时点，不是起算口径不一致），
+  // 因此必须在锚腿门槛之前评判。豁免四只作用于本路径——被豁免的句子
+  // 仍可被路径 (a)(b)(c) 以永生时间偏误本体评判。
+  const XL_Z = R.EXEMPT_LEAD_ZH || EXEMPT_LEAD_ZH;
+  const XL_E = R.EXEMPT_LEAD_EN || EXEMPT_LEAD_EN;
+  if (!(anyHit(XL_Z, text) || anyHit(XL_E, text))) {
+    const p1 = earliestEither(R.LEAD_SCREEN_ZH || LEAD_SCREEN_ZH, R.LEAD_SCREEN_EN || LEAD_SCREEN_EN, text);
+    const p2 = earliestEither(R.SURV_ACCOUNT_ZH || SURV_ACCOUNT_ZH, R.SURV_ACCOUNT_EN || SURV_ACCOUNT_EN, text);
+    const p3 = earliestEither(R.LIFE_CLAIM_ZH || LIFE_CLAIM_ZH, R.LIFE_CLAIM_EN || LIFE_CLAIM_EN, text);
+    if (p1 >= 0 && p2 >= 0 && p3 >= 0) {
+      // 疑问形守卫：整句以问号收尾（「…说明筛查延长了寿命吗？」/「…saves
+      // lives?」）是探询不是断言，与 common-cause 等族的疑问豁免同口径。
+      if (!/[？?]\s*$/.test(text)) {
+        const win = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
+        const span = Math.max(p1, p2, p3) - Math.min(p1, p2, p3);
+        if (span <= win) {
+          return {
+            hit: true, score: 0.6, count: 1,
+            detail: /[\u4e00-\u9fff]/.test(text)
+              ? '领先时间偏误×筛查提前确诊×生存账面改善×寿命延长结论(zh)'
+              : 'lead-time-bias×screening-advances-diagnosis×survival-accounting×life-extension-claim(en)',
+          };
+        }
+      }
+    }
+  }
 
   // 腿① 起点时点锚（至少一处）
   const anchorCount = countMatches(A_Z, text) + countMatches(A_E, text);
@@ -382,5 +563,11 @@ module.exports = {
     EXEMPT_METHOD_ZH, EXEMPT_METHOD_EN,
     EXEMPT_ALIGNED_ZH, EXEMPT_ALIGNED_EN,
     EXEMPT_DESIGN_ZH, EXEMPT_DESIGN_EN,
+    // [r328] 路径 (d) 领先时间偏误子家族（负例注入口）
+    LEAD_SCREEN_ZH, LEAD_SCREEN_EN,
+    SURV_ACCOUNT_ZH, SURV_ACCOUNT_EN,
+    LIFE_CLAIM_ZH, LIFE_CLAIM_EN,
+    EXEMPT_LEAD_ZH, EXEMPT_LEAD_EN,
+    WIN_LEAD_ZH, WIN_LEAD_EN,
   }),
 };
