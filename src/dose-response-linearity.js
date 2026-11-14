@@ -83,6 +83,26 @@
  *     EN maybe / perhaps / might / possibly / probably / seems /
  *     appears）——概率化结论不作谬误判定；
  *   · 疑问句（含 ?/？）：提问不是断言。
+ *
+ * [r330 扩展] 现代规模 scaling 域新措辞家族（真升级②，+SCALE 六常量）：
+ * 原判据的腿① DOSE 只收**可摄入/可计时**的投入量（片/杯/小时×摄入动词），
+ * 对现代工程与经营话语的**可规模化资源**（服务器/集群节点/团队人数/研发投入/
+ * 营销预算/工厂产能/加班工时）零覆盖。池化探针（coordination/agent4/probes/
+ * r330-probe-scaling.js，v6.8.184 实测）该族 15/15 攻击整族穿透 gate=pass、
+ * 良性 6/7（1 条被既有本维度 verify，非新增误伤）。新族与原族共用「投入量 ×
+ * 效果按比例放大」的同一外推结构，只是词汇域从健康剂量换到规模 scaling：
+ *   服务器扩容一倍，系统吞吐量就能翻倍。
+ *   团队人数翻倍，交付速度必然也翻倍。
+ *   研发投入加倍，创新产出就会加倍。
+ *   Double the servers and throughput doubles.
+ *   If we double the R&D spend, output doubles.
+ * 判别的是「假设投入-产出沿直线缩放」——忽略瓶颈、协调开销、边际递减、规模
+ * 不经济（Amdahl 定律/ Brooks 定律/收益递减）。**独立腿对** SCALE_IN（可规模
+ * 化投入 × 增减动作）× SCALE_OUT（产出/绩效名词 × 比例/倍数断言）+ 邻近窗，
+ * 与健康剂量族 OR 并联，互不影响；投入名词表与产出名词表**刻意不交叉**，故
+ * 「人数翻倍」（投入+doubles）不触发产出腿，只有「人数…交付翻倍」才判。豁免
+ * 复用全局四豁免，另加 EXEMPT_SCALE_NEG（瓶颈/协调开销/边际递减/规模不经济/
+ * bottleneck/coordination overhead/diseconomies of scale——正确指出非线性）。
  */
 'use strict';
 
@@ -147,6 +167,48 @@ const LINEARITY_EN = [
   /\b(?:if\s+)?(?:one|two|a\s+couple)\s+(?:pill|pills|cup|cups|glass|glasses|dose|doses|serving|servings|hours?)\s+(?:helps?|works?)\s*,?\s*(?:then\s+)?(?:more|ten|eight|double)\b/i,
   /\b(?:helps?|works?|improves?|boosts?|benefits?)\s+[^.!?]{0,60}\b(?:so\s+)?(?:five|ten|eight|more)\s+[^.!?]{0,30}\b(?:times?\s+as\s+(?:much|effective|good|strong|fast|beneficial)|times)\b/i,
   /\b(?:five|ten|eight|double)\s+(?:times\s+as\s+(?:much|effective|good|strong|fast|beneficial))\b/i,
+];
+
+// ─── [r330] 现代规模 scaling 域：腿① SCALE_IN 可规模化投入 × 增减动作 ──────
+// 与健康剂量族 OR 并联的独立腿对。投入名词表（基础设施/人力/预算/产能/工时）
+// 与产出名词表（吞吐/交付/利润/获客）刻意不交叉。
+const SCALE_IN_ZH = [
+  // 投入名词 × 增减动作（同句近距）：服务器扩容 / 节点翻倍 / 预算加倍 / 研发投入加大
+  /(?:服务器|集群|节点|实例|副本|带宽|内存|产线|产能|门店|席位|工位|团队|人数|人手|员工|工程师|劳动力|研发|预算|经费|资金|资本|广告费|营销费用|加班|工时|投放|服务器数量|节点数)[^。；，！？!?]{0,6}(?:扩容|增设|增加|增至|加到|提升到|扩大到|扩张|翻倍|加倍|翻番|扩大|扩招|招聘|招人|投入|上线|部署|加码|加量|堆)/,
+  // 增减动作 × 投入名词（前置形）：翻倍服务器 / 扩招人员 / 加倍预算 / 增加人手
+  /(?:翻倍|加倍|翻番|扩大|增加|增设|扩招|招聘|投入|部署|上线|加码)[^。；，！？!?]{0,6}(?:服务器|集群|节点|实例|副本|带宽|内存|产线|产能|门店|席位|工位|团队|人数|人手|员工|工程师|劳动力|研发|预算|经费|资金|资本|广告费|营销费用|加班|工时|投放)/,
+  // 招聘/扩编 × 人力（前置动词形）：再招一倍的人 / 扩招工程师 / 增聘人手
+  /(?:扩招|招聘|招募|增聘|招|聘|雇|引进)[^。；，！？!?]{0,4}(?:人|人员|人手|员工|工程师|开发者|劳动力|团队|编制)/,
+];
+const SCALE_IN_EN = [
+  // scaling verb × resource noun（允许 1-2 个修饰词：double the factory capacity）
+  /\b(?:double|doubling|doubled|triple|tripling|tripled|twice|scale|scaling|scaled|ramp|ramping|add|adding|increase|increasing)\s+(?:up\s+)?(?:the\s+)?(?:[a-z]+\s+){0,2}(?:servers?|nodes?|instances?|replicas?|machines?|clusters?|bandwidth|memory|cores?|capacity|headcount|team|staff|engineers?|developers?|workers?|workforce|budget|spend|spending|funding|investment|R&D|overtime|hours?)\b/i,
+  // resource noun × scaling verb（servers scale up / headcount doubles）
+  /\b(?:servers?|nodes?|instances?|replicas?|headcount|team\s+size|staff|engineers?|developers?|budget|spend|capacity|R&D|overtime|bandwidth|workers?)\b[^.!?]{0,30}\b(?:double|doubles|doubled|triple|triples|scales?\s+linearly|scale\s+up|increase|increases)\b/i,
+];
+
+// ─── [r330] 现代规模 scaling 域：腿② SCALE_OUT 产出/绩效名词 × 比例断言 ────
+const SCALE_OUT_ZH = [
+  // 产出名词 × 比例/倍数断言：吞吐量翻倍 / 交付提速一倍 / 利润成比例
+  /(?:吞吐量|处理能力|处理量|并发|承载量|产能|产量|产出|输出|交付|交付速度|交付效率|进度|获客|客户数|用户数|线索|订单|销量|销售额|营收|收入|利润|收益|转化率|留存|性能|效率|成果|产值)[^。；，！？!?]{0,8}(?:翻倍|加倍|翻番|提速[一二两三四五六七八九十半\d]?倍|提升[一二两三四五六七八九十半\d]?倍|增加[一二两三四五六七八九十半\d]?倍|扩大[一二两三四五六七八九十半\d]?倍|线性|成比例|等比|随之翻倍)/,
+  // 产出名词 × 达到/就是 × N倍
+  /(?:吞吐量|产出|交付|利润|获客|销量|销售额|营收|产能|性能|效率)[^。；，！？!?]{0,6}(?:就是|也是|达到|将是|将为)[一二两三四五六七八九十半\d]+\s*(?:倍|番)/,
+];
+const SCALE_OUT_EN = [
+  // output noun × scaling assertion
+  /\b(?:throughput|output|delivery|profit|revenue|sales|customers?|conversions?|retention|performance|productivity|capacity|yield|results?|turnaround)\b[^.!?]{0,25}\b(?:doubles?|triples?|scales?\s+linearly|scales?\s+proportionally|linearly|proportionally|twofold|twice|double)\b/i,
+  // multiplier × the × output noun：double the throughput / twice the sales
+  /\b(?:double|doubles|twice|2x|twofold|triple)\s+the\s+(?:throughput|output|delivery|profit|revenue|sales|customers?|performance|productivity|capacity|yield)\b/i,
+];
+
+// ─── [r330] scaling 域专属推理否定（正确指出非线性/瓶颈/边际递减）──────────
+// 全局 EXEMPT_NEG 已覆盖 not linear / diminishing returns / 未必 / 不会等；此处
+// 只补工程/经营域专有词汇，且仅在 scaling 分支判定，绝不影响健康剂量族行为。
+const EXEMPT_SCALE_NEG_ZH = [
+  /瓶颈|协调开销|沟通成本|边际递减|收益递减|规模不经济|边际效用递减|负载均衡|阿姆达尔|木桶|短板|封顶|饱和/,
+];
+const EXEMPT_SCALE_NEG_EN = [
+  /\b(?:bottlenecks?|coordination\s+overhead|communication\s+overhead|diminishing\s+marginal|diseconomies\s+of\s+scale|marginal\s+returns|Amdahl|Brooks|ceiling|saturat\w+|plateaus?|sub[- ]?linear)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────────────
@@ -237,25 +299,42 @@ function checkDoseResponseLinearity(text, inject) {
   if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
+  const win = isZh ? 60 : 160;
+
+  // ── 族一：健康剂量-反应线性外推（r306 原族，计分/细节零改动）──────────
   const dose = positions(R.DOSE_ZH || DOSE_ZH, text).concat(positions(R.DOSE_EN || DOSE_EN, text));
   const lin = positions(R.LINEARITY_ZH || LINEARITY_ZH, text).concat(positions(R.LINEARITY_EN || LINEARITY_EN, text));
-  if (dose.length === 0 || lin.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
+  if (dose.length > 0 && lin.length > 0 && coLocated(dose, lin, win)) {
+    // 计分：双腿共现基础 0.62；显式倍数/比例词（倍/番/成比例/times/linearly）
+    // +0.08；极端剂量断言（越多越好/多多益善/more is better）+0.05，封顶 0.85。
+    let score = 0.62;
+    if (/(?:倍|番|成比例|线性)/.test(text) || /\b(?:times|linearly|proportionally|2x|3x|5x|10x)\b/i.test(text)) score += 0.08;
+    if (/越多越好|多多益善/.test(text) || /\b(?:more\s+is\s+better|the\s+more\s+the\s+better)\b/i.test(text)) score += 0.05;
+    if (score > 0.85) score = 0.85;
+    const detail = isZh
+      ? '剂量-反应线性外推：把有效剂量的效果按比例放大到更大剂量(zh)'
+      : 'linear dose-response extrapolation: effect assumed to scale with dose(en)';
+    return { hit: true, score, count: 1, detail };
+  }
 
-  const win = isZh ? 60 : 160;
-  if (!coLocated(dose, lin, win)) return { hit: false, score: 0, detail: '', count: 0 };
+  // ── 族二：现代规模 scaling 域线性缩放假设（r330 新族，OR 并联）────────
+  // 专属推理否定（瓶颈/边际递减/规模不经济…）仅在本族判定，不污染健康族。
+  if (anyHit(R.EXEMPT_SCALE_NEG_ZH || EXEMPT_SCALE_NEG_ZH, text) || anyHit(R.EXEMPT_SCALE_NEG_EN || EXEMPT_SCALE_NEG_EN, text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  const sIn = positions(R.SCALE_IN_ZH || SCALE_IN_ZH, text).concat(positions(R.SCALE_IN_EN || SCALE_IN_EN, text));
+  const sOut = positions(R.SCALE_OUT_ZH || SCALE_OUT_ZH, text).concat(positions(R.SCALE_OUT_EN || SCALE_OUT_EN, text));
+  if (sIn.length > 0 && sOut.length > 0 && coLocated(sIn, sOut, win)) {
+    let score = 0.62;
+    if (/(?:倍|番|成比例|线性)/.test(text) || /\b(?:times|linearly|proportionally|2x|3x|5x|10x|twice|double)\b/i.test(text)) score += 0.08;
+    if (score > 0.85) score = 0.85;
+    const detail = isZh
+      ? '规模线性缩放假设：把投入增减线性外推到产出按比例放大(zh)'
+      : 'linear scaling assumption: output assumed to scale proportionally with input(en)';
+    return { hit: true, score, count: 1, detail };
+  }
 
-  // 计分：双腿共现基础 0.62；显式倍数/比例词（倍/番/成比例/times/linearly）
-  // +0.08；极端剂量断言（越多越好/多多益善/more is better）+0.05，封顶 0.85。
-  let score = 0.62;
-  if (/(?:倍|番|成比例|线性)/.test(text) || /\b(?:times|linearly|proportionally|2x|3x|5x|10x)\b/i.test(text)) score += 0.08;
-  if (/越多越好|多多益善/.test(text) || /\b(?:more\s+is\s+better|the\s+more\s+the\s+better)\b/i.test(text)) score += 0.05;
-  if (score > 0.85) score = 0.85;
-
-  const detail = isZh
-    ? '剂量-反应线性外推：把有效剂量的效果按比例放大到更大剂量(zh)'
-    : 'linear dose-response extrapolation: effect assumed to scale with dose(en)';
-
-  return { hit: true, score, count: 1, detail };
+  return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
@@ -264,5 +343,7 @@ module.exports = {
     DOSE_ZH, DOSE_EN, LINEARITY_ZH, LINEARITY_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_EVID_ZH, EXEMPT_EVID_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
+    SCALE_IN_ZH, SCALE_IN_EN, SCALE_OUT_ZH, SCALE_OUT_EN,
+    EXEMPT_SCALE_NEG_ZH, EXEMPT_SCALE_NEG_EN,
   }),
 };
