@@ -161,8 +161,14 @@ for (const [name, fn] of ENTRY) {
 
 // ─── G 登记纪律 ────────────────────────────────────────────────────
 for (const k of ['A_ZH4', 'A_EN4', 'B_ZH4', 'B_EN4', 'C_ZH4', 'C_EN4']) ok(k in internals, `G 登记：__internals 暴露 ${k}`);
+// [r332 修] 原断言写死 r323 锚点 6.8.181，r324→r330 已 bump 三次
+// （实测 6.8.184）。改为「格式合法 + ≥6.8.181 单调不回退」下限断言，
+// 与 round-295 H1 同型修法。
 const VERSION = require('../src/core/version.js').VERSION;
-ok(VERSION === '6.8.181', `G 登记：VERSION 本轮不变 6.8.181（实测 ${VERSION}）`);
+ok(/^\d+\.\d+\.\d+$/.test(VERSION), `G 登记：VERSION 格式合法（实测 ${VERSION}）`);
+const _v = VERSION.split('.').map(Number);
+ok(_v[0] > 6 || (_v[0] === 6 && (_v[1] > 8 || (_v[1] === 8 && _v[2] >= 181))),
+  `G 登记：VERSION ≥ r323 锚点 6.8.181（实测 ${VERSION}）`);
 const claims = require('fs').readFileSync(require('path').join(__dirname, '..', 'coordination', 'claims.jsonl'), 'utf8');
 ok(claims.includes('"round":"r323"'), 'G 登记：claims.jsonl 含 r323 认领');
 

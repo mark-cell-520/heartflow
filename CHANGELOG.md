@@ -1,5 +1,21 @@
 ---
 
+# 6.8.185 变更日志条目
+
+## [6.8.185] - 2026-11-14
+
+### illusion_of_control 第 256 维度接线 + 三条穿透腿补齐（r332，真升级②，r331 未提交半成品收尾）
+
+- **`src/illusion-of-control.js`**（+63 行净增，三条穿透腿均经负例注入逐常量验证承重）：① ②-e2 拉丁幸运物腿（B_ZH）——`lucky charm / luck charm / lucky coin / lucky penny / lucky socks / red string / red bracelet / four-leaf clover / horseshoe / rabbit's foot`，修复中英混排句「去 lottery 抽奖前他总要先 lucky charm 摸一遍，这样中奖 rate 会更高」的跨语言链断桥（EN 链腿命中但腿③中文导致链配对失败）；② ③-g2 副词插入腿（C_EN）——`odds/chances/luck/probability/likelihood + really/actually/somehow/definitely/certainly/genuinely/truly/simply/just + improves/goes up/rises/changes`，修复「does my luck really improve」的副词插入漏判；③ ③-g3 of 插入腿（C_EN）——`odds/chances/probability/likelihood of <≤3词名词短语> + (will) go up/improves/rises/climbs`，修复「the odds of hitting it will go up」的 of 短语整族漏判。
+- **`src/index.js`**（+41 行）：dimMap 注册 illusion_of_control 为第 256 维度，VERIFY_DIMS 接线（223→…），DIM_GUIDANCE 登记 findings guidance（2490 字）。
+- **`test/round-331-illusion-of-control.js`**（新增）：20/20——攻击 20/20 全中、良性 16/16 零误伤（含边缘良性「多因共同造成的战争」类正确归因）、模块返回结构完整、guidance 从 gate findings 层可观测（原断言查 index.js 未导出的局部 const 恒 undefined，本轮改为 findings 层验证——测试缺陷非接线缺陷）。
+- **存量回归**：round-315 201/201、round-295 63/63（排除 illusion_of_control 交接项后其余族零接线）、round-323 152/152、illusion-of-control.test.js 11/11。
+- **验证**：verify 16/16、guard-abilities 20/20（判别维度 **256**）、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326（与基线持平，零新增误伤）；负例注入探针 `scripts/round-332/probe-negative-injection.js` 3/3 翻转（剔除任一条新腿后对应攻击样本从命中消失，三条腿全部承重）。
+- **文档数字同步**：README 5 处、SKILL 5 处、AGENTS 4 处（255→256、verify 222→223、Verify 层列举补 illusion_of_control、版本戳 6.8.184→6.8.185）。
+- **已知边界**：B_ZH 拉丁幸运物腿只收整词族（连写无连字符形未收）；③-g2 副词表 9 词（hopefully/conceivably 类弱副词未收）；③-g3 的 of 短语限 ≤3 词（长插入形仍可能漏）；dose_response_linearity 日常物品剂量外推族模块层 MISS 仍未补。
+
+---
+
 # 6.8.184 变更日志条目
 
 ## [6.8.184] - 2026-11-14

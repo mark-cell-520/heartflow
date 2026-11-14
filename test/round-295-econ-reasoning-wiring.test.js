@@ -324,7 +324,13 @@ console.log('=== F 引擎 think 路径真 dispatch ===');
     // （第203维，UPGRADE_LOG r297），属后续轮次的有意接线而非本断言要防的
     // 「意外接入」。其余 17 族仍须保持零接线。
     const econKeys = Object.keys(d.dimensions || {}).filter(k => /anchoring|endowment|disposition|mental_accounting|perverse|winners_curse|tragedy|illusion_of_control|present_bias|peak_end|effort_justification|budget_value|average_marginal|p_hacking|inverse_gamblers|significance_effect|selection_on_dependent/.test(k));
-    assert.strictEqual(econKeys.length, 0, `gate 维度表出现本轮族键: ${econKeys.join(',')}`);
+    // [r332 排除] illusion_of_control：r332 已正式把它接入 gate 维度表
+    // （第 256 维，UPGRADE_LOG r332——「交接项给 1 号」由 4 号海外产能单元
+    // 执行完毕：require/dispatch/scores/dimMap×2/DIM_GUIDANCE/VERIFY_DIMS/
+    // summary/module.exports 九处接线 + r332 三条补腿）。同 r297 排除
+    // ad_hominem 先例，属后续轮次的有意接线而非「意外接入」。其余族仍须零接线。
+    const unexpected = econKeys.filter(k => k !== 'illusion_of_control');
+    assert.strictEqual(unexpected.length, 0, `gate 维度表出现本轮族键: ${unexpected.join(',')}`);
   });
   T('H2 analyze 对同一输入确定性（无随机/无状态泄漏）', () => {
     const a = analyze(ATTACK.mental_accounting);

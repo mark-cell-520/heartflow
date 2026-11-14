@@ -145,6 +145,9 @@ const A_EN = [
   /\b(?:coin\s+flip|flip(?:ping)?\s+a\s+coin|heads\s+or\s+tails)\b/i,
   /\b(?:roulette|slot\s+machines?|one[- ]armed\s+bandit|wheel\s+of\s+fortune|spinning\s+the\s+wheel|spin\s+the\s+wheel)\b/i,
   /\b(?:bingo|keno|gacha|loot\s+box(?:es)?|card\s+packs?|random\s+draw|randomly\s+generated|game\s+of\s+chance|pure\s+chance|blind\s+draw)\b/i,
+  // r331 补腿：weekly/monthly/final draw（「in the weekly draw」原穿透：
+  // A_EN 只有 random/blind draw 组合形，周期性抽奖常用 bare draw 不收）
+  /\b(?:weekly|monthly|daily|annual|next|last|final|big)\s+draw\b/i,
   /\b(?:quick[- ]?pick|machine[- ]?pick|computer[- ]generated)\b/i,
   /\b(?:casino|gambling|betting\s+slip)\b/i,
   // ①-b 弱锚点
@@ -155,15 +158,24 @@ const A_EN = [
 const B_ZH = [
   // ②-a 自选/挑选控制
   /(?:自己|自行|亲自|本人)(?:来)?(?:选|挑|选号|挑选|编号|摇|抽|抓)/,
+  // ②-a2 r331 补腿：主观挑选形（挑一个有眼缘的/挑个顺眼的——「抽奖时我
+  // 总要挑一个看起来有眼缘的球」原穿透：②-a 要求自己/亲自+动词，②-c 只
+  // 收固定时长形，客观挑选动作这一族整族缺失）
+  /挑(?:了)?(?:一个|一张|一只|一条|一颗|个|张|只|条|颗)?[^。，！？；\n]{0,8}?(?:眼缘|顺眼|合眼缘|舒服|喜欢|中意|看中|有缘)/,
   /(?:自选|手选|自挑|自己选的号|自己挑的)/,
   // ②-b 意念/仪式族（含「上了香/拜了拜」式完成态）
   /(?:默念|默祷|心里(?:默|想|念)|念叨|许愿|祈福|祝福自己|拜拜|拜一拜|拜佛|拜神|上香|烧香|求签|祈祷|祷告|作法|念咒)/,
-  /(?:上|烧)(?:了|过)?(?:香|高香|柱香)/,
-  /拜(?:了|过)?(?:拜|佛|神|菩萨)/,
+  /(?:上|烧)(?:了|过|完)(?:香|高香|柱香)/,
+  /拜(?:了|过|完)(?:拜|佛|神|菩萨)/,
   // ②-c 时长/手感投入
   /(?:摸了|摸了好久|摸了半天|摸了很久|摸得久|挑了好久|挑了又挑|反复挑|精挑细选|仔细挑|凭手感|靠手感|手感挑|斟酌|拿捏半天)/,
   // ②-d 物理动作族
   /(?:用力(?:掷|甩|抛|扔|丢)|顺势(?:一)?甩|哈气|吹一口(?:气)?|擦(?:了)?干净|擦干净|双手捧|捧着(?:抽|摇|拿|摸)|沐浴更衣|斋戒|拜了又拜)/,
+  // ②-e2 r332 补腿：中英混排文本的拉丁幸运物形（「去 lottery 抽奖前他总要
+  // 先 lucky charm 摸一遍」原穿透：混排句中腿②只有中文幸运族可匹配，
+  // lucky charm / red string 等拉丁形整族缺席——EN 链的 B_EN 收得到，
+  // 但该句腿③「rate 会更高」是中文，EN 链配对失败；同族变体矩阵教训）
+  /(?:lucky\s+charm|luck\s+charm|good[- ]?luck\s+charm|lucky\s+coin|lucky\s+penny|lucky\s+socks?|red\s+string|red\s+bracelet|four[- ]leaf\s+clover|horseshoe|rabbit'?s\s+foot)/i,
   // ②-e 幸运物/吉数族
   /(?:幸运袜|幸运色|幸运物|幸运币|幸运数字|幸运号|吉利数字|吉利号|招财|辟邪|护身符|红绳|玉佩|风水|吉日|良辰吉日|黄道吉日|开过光)/,
   // ②-f 意念/虔诚族
@@ -176,7 +188,18 @@ const B_ZH = [
 const B_EN = [
   // ②-a 自选族
   /\b(?:pick(?:s|ed|ing)?|chose|choose|choosing|select(?:s|ed|ing)?)\s+(?:your|his|her|their|my|our)\s+own\b/i,
+  // ②-a2 r331 补腿：choose/pick the numbers / my own combination（自选号
+  // 的裸宾形——「Only after I choose the numbers myself」原穿透：②-a 要求
+  // choose 后紧跟 own，"choose the numbers" 不匹配）
+  /\b(?:pick(?:s|ed|ing)?|chose|choose|choosing|select(?:s|ed|ing)?)\s+(?:the\s+|a\s+)?(?:my\s+)?(?:numbers?|tickets?|combinations?|cards?)\b/i,
   /\b(?:own|chosen|hand[- ]?picked|lucky)\s+(?:numbers?|tickets?|combinations?)\b/i,
+  // ②-b2 r331 补腿：chant/recite/whisper the number（默念族——「If I
+  // chant the winning number three times」原穿透：意念族只有
+  // visualiz/imagin/focus，缺 chant 这一同族动作）
+  /\b(?:chant(?:s|ed|ing)?|recit\w+|whisper(?:s|ed|ing)?|murmur\w*|mut(?:ter|ters|tered|tering))\s+(?:the\s+|a\s+|my\s+|some\s+)?(?:winning\s+|lucky\s+)?(?:numbers?|numbers?|combinations?|words?)\b/i,
+  // ②-b3 r331 补腿：lucky + 颜色/材质修饰（lucky red shirt——原表要求
+  // lucky 紧接物件，中间有颜色/材质修饰即漏；同族变体）
+  /\blucky\s+(?:\w+\s+){0,2}?(?:socks?|coin|penny|charm|hat|shirt|underwear|numbers?|days?|pants?|jacket|gloves?|scarf|bracelet|ring|stone)\b/i,
   // ②-b 意念/仪式族
   /\b(?:visualiz\w+|imagin\w+|mental(?:ly)?\s+(?:focus|concentrat\w+)|concentrat\w+|focus(?:ing)?\s+(?:your\s+)?mind|intention|intent\w*|mind\s+over\s+matter|willpower|sheer\s+will)\b/i,
   /\b(?:pray\w*|prayer|prayers|bless\w*|ritual\w*|ceremon\w+|good[- ]?luck\s+charm)\b/i,
@@ -193,7 +216,9 @@ const B_EN = [
 // ─── 腿③ 影响断言（中文）──────────────────────────────────────
 const C_ZH = [
   // ③-a 概率/机会类名词 × 提升向形容词（概率会高一些/机会就更大/运气更好）
-  /(?:中奖率|中奖概率|几率|机率|概率|可能性|机会|希望|运气)[^。，！？；\n]{0,6}(?:会|就|也|更|往往|通常|自然)?(?:高|大|强|好)(?:一些|一点|不少|得多|很多)?/,
+  // r331：补胜率/命中率/赔率/赢面/手气 同族裸名词（原表只有中奖率/概率系——
+  // 「押大的胜率都会提升」整句因腿③名词表缺「胜率」而漏判，161 轮裸名词教训）。
+  /(?:中奖率|中奖概率|中签率|几率|机率|概率|可能性|机会|希望|运气|胜率|命中率|赔率|赢面|手气|运势|rate)[^。，！？；\n]{0,6}(?:会|就|也|更|往往|通常|自然|都)?(?:高|大|强|好)(?:一些|一点|不少|得多|很多)?/,
   // ③-b 比较形（比机选高/比随手一抓机会大）
   /(?:比|比起|相较于)[^。，！？；\n]{0,12}(?:更)?(?:高|大|强|好|多)/,
   // ③-c 中的希望形（更容易中/中的希望大/中签的希望大了不少）
@@ -201,6 +226,11 @@ const C_ZH = [
   /(?:中|中奖|中签|中大奖|抽中)的(?:希望|概率|几率|机会)了?(?:更)?(?:大|高|多)/,
   // ③-d 提升动词族（提高中奖率/增加中奖机会）
   /(?:提高|提升|增加|拉高|抬高|改善|增大|放大)(?:了)?(?:中奖率|中奖概率|几率|机率|概率|胜率|可能性|机会|运气)/,
+  // ③-d2 反序提升族（r331：胜率都会提升/赢面会变大/手气会更旺——动词在后、
+  // 名词在前的同族形，③-a 的「名词+形容词」结构收不住；补裸名词+
+  // 提升动词反序匹配，同族变体矩阵实测「戴着幸运袜去赌场，押大的胜率
+  // 都会提升」原穿透 gate=pass）
+  /(?:中奖率|中奖概率|中签率|几率|机率|概率|可能性|胜率|命中率|赔率|赢面|手气|运势|机会)[^。，！？；\n]{0,8}(?:都会|也会|就能|就会|将|将会)?(?:提高|提升|增加|拉高|抬高|改善|增大|放大|变大|变强|变好|上涨|走高)/,
   // ③-e 虔诚-灵验族
   /(?:心诚则灵|心诚(?:者)?灵|念佛(?:者)?灵|拜了(?:就)?灵)/,
   // ③-f 挑得准族（摸得久挑得准）
@@ -214,18 +244,39 @@ const C_ZH = [
 // ─── 腿③ 影响断言（英文）──────────────────────────────────────
 const C_EN = [
   // ③-a improves/raises/increases × odds/chances
-  /\b(?:improves?|improved|improving|raises?|raised|raising|increases?|increased|boosts?|boosted|enhances?|enhanced)\s+(?:your|his|her|their|the|our)?\s*(?:odds|chances?|probability|likelihood|luck)\b/i,
+  // r331 补腿：物主加 my（「raises my chances of a high number」原穿透）
+  /\b(?:improves?|improved|improving|raises?|raised|raising|increases?|increased|boosts?|boosted|enhances?|enhanced)\s+(?:your|his|her|their|my|our|the)?\s*(?:odds|chances?|probability|likelihood|luck)\b/i,
   // ③-b better/higher/greater odds（含 gives better odds）
   /\b(?:better|higher|greater|improved|winning)\s+odds\b/i,
   // ③-c more likely to win/roll/draw/land
-  /\bmore\s+likely\s+to\s+(?:win|roll|draw|get|land|hit|come\s+up)\b/i,
+  // r331 补腿：line up / pay out / hit the jackpot 同族结果动词
+  // （「the reels are more likely to line up for me」原穿透）
+  /\bmore\s+likely\s+to\s+(?:win|roll|draw|get|land|hit|come\s+up|line\s+up|pay\s+out|jackpot|match|appear|trigger)\b/i,
   // ③-d wins more often（chosen ticket wins more often）
   /\b(?:wins?|won|winning)\s+more\s+(?:often|frequently|easily)\b/i,
   // ③-e helps you win / works / matters（intention matters）
   /\b(?:helps?|helped)\s+(?:you\s+)?(?:win|luck\s+out)\b/i,
   /\b(?:matters|counts|works)\b/i,
   // ③-f increases your chance of（a high number）
-  /\b(?:increase|improve|raise|boost)s?\s+(?:your|his|her|their)\s+chance\s+of\b/i,
+  // r331 补腿：my/our + chances 复数形（「raises my chances of a high
+  // number」原穿透：物主表缺 my 且只有单数 chance）
+  /\b(?:increase|improve|raise|boost)s?\s+(?:your|his|her|their|my|our)\s+chances?\s+of\b/i,
+  // ③-g r331 同族补腿：your luck improves / the odds go up / better chance
+  // of winning（反序形：名词/物主在前、提升动词在后；以及 chance of
+  // winning 的比较形——EN 侧原表只有 improves X odds 前动词形）。
+  // my/our 也收（r331 实测「my luck improves whenever I rub the dice」
+  // 原穿透——物主表缺 my）。
+  /\b(?:your|his|her|their|my|our|the)\s+(?:odds|chances?|luck|probability|likelihood)\s+(?:will\s+|would\s+|can\s+|may\s+)?(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better)\b/i,
+  // ③-g2 r332 补腿：really/somehow/definitely 等副词插入形（「does my luck
+  // really improve in the weekly draw」原穿透：③-g 要求名词后紧跟助动词+
+  // 动词，副词插入即漏；同族变体矩阵教训）
+  /\b(?:your|his|her|their|my|our|the)\s+(?:odds|chances?|luck|probability|likelihood)\s+(?:really|actually|somehow|definitely|certainly|genuinely|truly|simply|just)\s+(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better|changes?)\b/i,
+  // ③-g3 r332 补腿：the odds of <名词/动名词> 的 of 插入形（「the odds of
+  // hitting it will go up」原穿透：③-g 的 odds 后不接 of 短语；同族变体
+  // 矩阵教训。收 odds/chance of X + 提升动词，X 取短名词短语）
+  /\b(?:the|your|his|her|their|my|our)\s+(?:odds|chances?|probability|likelihood)\s+of\s+(?:\w+\s+){0,3}?(?:will\s+|would\s+|can\s+|may\s+)?(?:go(?:es)?\s+up|improves?|improved|rises?|increases?|gets?\s+better|climbs?)\b/i,
+  /\b(?:better|higher|greater|improved)\s+chance\s+of\s+(?:winning|getting|rolling|drawing|hitting)\b/i,
+  /\b(?:improves?|improved|boosts?|boosted|raises?|raised|increases?|increased)\s+(?:your|his|her|their)\s+(?:luck|fortunes?|winning)\b/i,
 ];
 
 // ─── [r315] 体育赛事幸运仪式族（竞技/观赛迷信新措辞家族）────────────

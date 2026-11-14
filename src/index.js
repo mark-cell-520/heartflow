@@ -743,6 +743,16 @@ const { checkVividCaseAvailability } = require('./vivid-case-availability.js');
 // 能力；r311 补腿后攻击命中 4/4、良性 4/4 零误伤。变量名 png——probability
 // neglect 缩写，grep 0 命中。
 const { checkProbabilityNeglect } = require('./probability-neglect.js');
+// [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）require。模块
+// r239 起草即登记进 src/econ-reasoning-gate.js 的 FAMILIES 聚合表（第 249
+// 维度子族），但 src/index.js 的 dimMap 从未以独立维度名 dispatch（grep
+// 「illusion_of_control」index.js 0 命中——findings 里只会出现聚合名
+// econ_reasoning_gate，子族名只在其 details 内文中），且探针实测聚合路径
+// 下「戴着幸运袜去赌场，押大的胜率都会提升」穿透 gate=pass。r331 补齐腿②
+// 完成态（拜完佛/上完香）、腿③同族裸名词（胜率/赢面/手气）与反序提升形
+// （胜率都会提升）后独立接线。变量名 ioc——illusion of control 缩写，
+// grep 0 命中无冲突。
+const { detectIllusionOfControl } = require('./illusion-of-control.js');
 // [r313] 第 254 维度 zero_price_effect（零价格效应：零价格信号 × 需求/
 // 价值判断失真两腿共现 + 邻近窗 + 三组豁免；VERIFY 级）。变量名 zpe——
 // zero price effect 缩写，grep 0 命中。
@@ -2360,6 +2370,11 @@ function discriminate(text, evidence = [], contentMode) {
   // [r313] 第 254 维度 zero_price_effect（零价格效应）计算点。同 r311
   // 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 zpe。
   const zpe = _applyPedagogyRelaxation(detectZeroPriceEffect(_normText), "zero_price_effect", pedagogyRelaxation);
+  // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）独立 dispatch。
+  // r239 起草时只登记进 econ-reasoning-gate 的 FAMILIES 聚合表，src/index.js
+  // 从未以独立维度名 dispatch（findings 只会出现聚合名 econ_reasoning_gate）；
+  // 本行让控制幻觉以独立维度名进入 findings/scores/dimMap。
+  const ioc = _applyPedagogyRelaxation(detectIllusionOfControl(_normText), "illusion_of_control", pedagogyRelaxation);
   // [r207] 第 204 维度 might_makes_right（强权即公理）计算点。同
   // r206 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 mmr。
   const mmr = _applyPedagogyRelaxation(checkMightMakesRight(_normText), "might_makes_right", pedagogyRelaxation);
@@ -3086,6 +3101,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r313] 第 254 维度 zero_price_effect 参与判定（零价格效应）。同 r311
     // 先例：dimMap 与 allDims 两处都接。
     {score: zpe.score, name:'zero_price_effect'},
+    // [r331 接线] 第 256 维度 illusion_of_control 参与判定（控制幻觉）。
+    // r239 起草只登记 econ-reasoning-gate FAMILIES 聚合表，src/index.js
+    // 从未以独立维度名进 scores/findings。
+    {score: ioc.score, name:'illusion_of_control'},
     // [r207] 第 204 维度 might_makes_right 参与判定（强权即公理）。
     // 同 r206 先例：dimMap 与 allDims 两处都接。
     {score: mmr.score, name:'might_makes_right'},
@@ -3717,6 +3736,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r313] 第 254 维度 zero_price_effect（零价格效应×
     // 零价格信号腿×需求价值失真腿）。
     zero_price_effect: zpe,
+    // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉×
+    // 随机事件腿×控制行为腿×影响断言腿）。
+    illusion_of_control: ioc,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性偏差×
     // 生动个案腿×偏斜断言腿）。
     vivid_case_availability: vca,
@@ -4213,6 +4235,8 @@ function discriminate(text, evidence = [], contentMode) {
     'probability_neglect': "不得**把不同量级的概率抹平、或把残余风险说成不计成本即可消灭**——概率忽视（probability neglect / zero-risk bias / probability weighting distortion，前景理论中人类对小概率系统性超权、对中高概率系统性降权，导致「0.1% 与 1% 差不多」「只要不是零就必须按一定会发生来防」）是指文本同时给出**概率/风险量级表达**与**显式的权重扭曲断言**：把 0.1% 和 1% 说成差不多、把几乎不可能说成绝对不可能、为消灭最后一点残余风险不惜任何代价、把风险从 1% 降到 0.1% 说成「这个钱必须花，安全没有上限」、In order to eliminate the last remaining risk, no cost is too high、0.1% and 1% are basically the same odds、since the risk is not zero we must plan for it as certain（样本形状与负例见 test/round-311-probability-neglect.js）。为什么这本身就是问题：**概率权重函数不是线性的**——前景理论（Kahneman & Tversky 1979）实证人类用小概率的超权重替代真实概率，导致为极小概率支付不成比例成本（零风险溢价，Viscusi 等实证保险与监管中的系统性过度支付），或反向地把小概率当不可能而完全不防；两种方向都是**拿扭曲的权重替代真实概率**，让期望成本计算失效。判据**两腿共现 + 邻近窗，缺一不判**：腿① PROB 概率/风险量级表达（概率/几率/风险/可能性/胜率/事故率/失败率等裸名词、显式数值形 1%/百分之一/千分之一、量级形容词形 小概率/大概率/微乎其微、EN probability/chance/odds/risk、\d+%、a in N、not zero）；腿② NEGLECT 权重扭曲断言（三个子形：(a) 抹平形——概率差不多/一样/没什么区别/一回事；EN basically the same odds；(b) 零风险/不计成本形——花多少钱都值得/不计代价/不惜一切/安全没有上限/彻底消除风险/no cost is too high/at any cost；(c) 二值化形——非零即可能/不是零概率就等于很可能/按一定会发生来防；EN not zero so plan for it as certain），两腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「概率权重扭曲」断言。边界：availability_bias 管**回忆可得性偏斜**（拿生动个案替代发生率），本维度管**概率量级权重被抹平**（概率在场但权重失真）；base_rate_neglect 管**忽略基础频率**（缺的是率），本维度管**率在场但权重被扭曲**（0.1% 与 1% 都被说出，却说它们差不多）；false_precision 管**数字精度超出证据支撑**（假的精确），本维度管**真实概率数字被系统性地错误加权**（数字是真的、权重是假的）；false_equivalence 管**两事物被说成等同**（一般性等同），本维度特化于**概率量级被抹平**这一子形。明确不判：概念/教学转述（概率忽视/零风险/概率权重/前景理论/行为经济学/统计学/教材/论文；EN probability neglect / prospect theory / behavioral economics / textbook——讨论这个概念本身是正确判别）、证据/计算语境（期望值/期望成本/置信区间/贝叶斯/蒙特卡洛/统计显示/计算得；EN expected value / confidence interval / Bayesian / calculated——**显式量化计算是正确判别**）、推理否定（不代表/不意味着/推不出/不能说明/不等于/未必/不一定/取决于；EN does not mean / not necessarily / cannot conclude——指出权重扭曲是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定/多半；EN maybe/perhaps/might/probably/seems）、疑问句（含 ?/？）。",
     'red_herring': "不得**用另一议题顶替原议题以回避回应**——转移话题（red herring，红鲱鱼，中文又称「转移论点」「偷换论题」「混淆议题」）是指面对原议题（指控/提问/讨论事项）不回应其本身，而是用置换标记把注意力引向另一个议题，让讨论脱离原轨道：你指责我贪污，可是你知道我这些年给灾区捐了多少钱吗？/ 别再说我迟到了，公司去年不是也搞过一次团建吗？/ 关于这份提案的漏洞我们先放一边，难道你不觉得竞争对手的问题更大吗？/ You say I took bribes, but have you seen how much I donated? / Never mind the budget overrun, the real issue is our competitors（样本形状与负例见 test/round-323-red-herring.js）。为什么这本身就是问题：**原议题没有被回答**——被引来的替代议题本身可能是个真问题（教育公平确实重要、国产确实值得支持），但议题 A 的证据不能替代议题 B 的证据，讨论被引开后原议题的举证责任就被悬空了。判据**三段结构 + 资格门 + 五组豁免，缺一不判**：腿① SHIFT 置换标记（三类：(a) dismiss 搁置族——别再说/先不说/暂且不提/放一边/有什么好X的/别纠缠/never mind/forget about/stop asking about；(b) redirect 替换族——更重要的是/更值得关注/真正值得讨论的是/我们先谈谈/the real issue is/what we really should be discussing；(c) counter 反问族——可是你知道/但你看看/可他为什么不/but have you seen/but what about/why criticize X when）；腿② ORIGIN 原议题段（标记前的指控/提问/讨论锚点，或 capture 型标记捕获组，或标记在句首时其后第一个分句）；腿③ REPLACE 替换议题段（标记后的实质内容），且腿②与腿③**零共享实词**（共享即同一议题的内部延续）。redirect 族（纯替换标记、无搁置义）另需**回应义务锚点**资格门（？/你(说|问|指责|认为|批评|质疑)/关于(这|此|该)/(这个|那个|此|该)(问题|事情|议题|话题|事项)/被(质疑|批评|指控|举报|追问)/在讨论；EN you (say|said|ask|claim|accuse)、about (this|that|the) (issue|question|matter|topic)、?）——「这个方案成本高，更重要的是安全」这类同主体的补充陈述无回应义务锚点，不判。边界：whataboutism 管**反问形态的对称化回避**（「你倒是也……」「你怎么不先说说……」——把指控反弹回提问者本人），本维度管**陈述/祈使/反问形态的议题置换**（「别再说 X，先说 Y」「X 放一边，Y 才重要」），不要求反问句、不要求矛头转向对话者本人；soft_deflection 管**不给结论的滑脱**（「这事以后再说」「让我们拭目以待」），本维度**明确给出替代议题**；fallacy_of_relevance 管**前提与结论主题域不相干却用推断词连成因果/蕴含结论**（「他工作努力，所以产品一定优秀」——两段都是论据，缺陷在结论与前提的语义关联），本维度**不构造推论**，两段是「原议题」与「替换议题」的并列，缺陷在原议题被搁置；motivated_reasoning 管**以动机推定替代对论点实质内容的回应**，本维度不推定动机，是直接引入另一个议题；goal_drift 管**执行轨迹上目标被整体置换**（腿①是原始目标锚点），本维度腿①是**被讨论/被质疑的事项**（不限于目标）。明确不判：概念/教学转述（转移话题/偷换论题/混淆议题/转移论题/转移视线/红鲱鱼/red herring/ignoratio elenchi/谬误/逻辑错误/诡辩——讨论这个概念本身不是运用它）、正当议程管理（「我们先讨论A，再讨论B」「分两个议题讨论」「按议程依次」「one at a time」「address them separately」「two separate issues」——会议主持的正确做法）、对冲弱化（可能/也许/或许/maybe/perhaps）、显式回应当前问题（我来回答/回答你的问题/let me answer/to answer your question）、同议题延续（腿②腿③共享实词——「这份报告造假的事先放一边，报告的其他部分还是准确的」仍属同一议题内部）。",
     'zero_price_effect': "不得**拿零价格信号替代价值判断**——零价格效应（zero price effect）是指文本同时给出**零价格/免费信号**与**需求或价值判断失真**：因为免费就蜂拥抢购、因为不要钱就拿多少都不心疼、因为 0 元就完全失去判断力、因为免单就抢购一空、Because it was free, everyone grabbed more than they needed even though it is worthless、the zero price made demand jump even though the item has no value、they took it just because it was for free and never checked the quality（样本形状与负例见 test/round-313-zero-price-effect.js）。为什么这本身就是问题：**免费不是零成本，零价格也不是零价值**——Shampanier/Mazar/Ariely 2007 实证：同一商品定价为 0 时需求量出现非线性跃升，且被试**不再评估商品的实际效用**，把「免费」本身当成价值来源；把免费当价值来源会让「值不值」的评估失效，导致过量领取、囤积、不看质量、不顾需要。这是**用价格信号替代效用判断**——价格维度对价值维度的非法越权。判据**两腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① FREE 零价格信号（免费/不要钱/不收费/白送/0元/零元/倒贴/免单/送；EN free / for free / no cost / zero price / at no charge / cost nothing，含裸名词形：单独出现「免费」「0元」即命中腿①）；腿② DISTORTION 需求/价值失真（多拿/多领/囤/囤积/囤货/扫货/搬空/全都拿走/能拿多少拿多少/拿得越多越好/领了一大堆/用不完还拿/用不上也拿/堆在家里吃灰/拿多少都不心疼/不嫌多/有多少拿多少/生怕错过吃亏/不拿白不拿/蜂拥而至/抢购一空/抢空/抢光/疯抢/一抢而空/连夜排队；EN grabbed / hoarded / stockpiled / swarmed / flocked / rushed to get / cleared out / sold out in minutes / queued for hours / no reason not to take / took more than needed / demand jumped / despite no value / never checked the quality / lost all judgment；含裸形：「多拿」「囤」单独出现即命中腿②），两腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「零价格→价值失真」断言。边界：probability_neglect 管**零风险溢价**（为消灭残余风险不计成本），本维度管**零价格溢价**（因免费而过度获取、不评估效用）；sunk_cost_coercion 管**沉没成本胁迫**（「已经投入了所以别退出」），本维度管**零价格驱动获取**（「因为免费所以多拿」）——前者指向过去投入，后者指向零价格诱惑；anchoring_effect 管**数字锚定**（先出现的数字扭曲后续判断），本维度特指**价格锚定为零**这一子形——0 元锚把价值判断吸向「值得」；false_equivalence 管两类事物的错误等同，本族不引入等同关系，是价格信号对效用评估的**替代**。明确不判：概念/教学转述（零价格效应/零价格/免费心理/行为经济学/丹·艾瑞里；EN zero price effect / behavioral economics / Dan Ariely——讨论这个概念本身是正确判别）、证据/计算语境（效用/边际效用/边际成本/需求曲线/价格弹性/成本收益；EN utility / marginal cost / demand curve / price elasticity / cost-benefit——**显式经济学分析是正确判别**）、正当免费发放（疫苗/赈灾/救灾/公共/公益/扶贫/义务教育/公共资源；EN vaccine / relief / public health / charity / public good——福利性免费是正当分配）、否定与对冲（不免费/付费/收费；EN not free / paid / costs money；可能/也许/大概；EN maybe/perhaps/probably）、疑问句（含 ?/？）。",
+    // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）guidance。
+    'illusion_of_control': "不得**把主观行为、仪式或投入当作能改变纯随机结果的因素**——控制幻觉（illusion of control，Ellen Langer 1975：抽奖研究中自选号码的被试坚信自己选的中奖率更高，为放弃已选号码索要高 4 倍以上补偿）是指文本同时给出**随机事件锚点**与**主观控制行为**与**影响断言**三腿共现：买彩票要自己选号自己选的中奖率比机选高、掷骰子时心里默念大点数手上顺势用力甩出大的机会就更大、抽奖箱里摸了半天凭手感挑一个摸得久挑得准、拜完佛再去抽奖中签的机会就更大了、戴着幸运袜去赌场押大的胜率都会提升、picking your own lottery numbers gives better odds than a quick pick、praying before spinning the wheel raises the odds that the ball lands on your color、my luck improves whenever I rub the dice、carrying a good luck charm gives you a better chance of winning the raffle（样本形状与负例见 test/round-331-illusion-of-control.js）。为什么这本身就是问题：**独立同分布事件的每次结果互不影响，生成机制里没有你的控制接口**——彩票每期开奖相互独立，选号方式、挑选时长、仪式虔诚度、幸运物佩戴与否都不进入概率结构；把控制线索误用到纯随机事件上，等于在随机数发生器里寻找「手感」，会让期望值计算失效并持续为无效行为支付成本。判据**三腿共现 + 邻近窗 + 两组豁免，缺一不判**：腿① CHANCE 随机事件锚点（彩票/摇号/抽奖/掷骰子/开箱/开卡/抽卡/抽签/轮盘/博彩/赌场/押注；EN lottery / raffle / draw / dice / roulette / slot / gacha / bet / gamble，含裸名词形：单独出现「彩票」「摇号」即命中腿①）；腿② RITUAL 主观控制行为（自选/手选/自己挑的/机选不如/默念/许愿/祈福/拜拜/拜一拜/拜佛/拜神/上香/烧香/求签/祈祷/作法/念咒/摸了好久/摸了半天/摸得久/精挑细选/凭手感/用力掷/顺势甩/哈气/斋戒/反复挑/挑了又挑/幸运物/护身符/ lucky charm；EN pick my own numbers / quick pick / blow on the dice / rub the dice / lucky charm / good luck sock / pray / chant / meditate on the number / feels lucky，含完成态形：上了香/拜了拜/拜完佛/上完香）；腿③ INFLUENCE 影响断言（概率/几率/胜率/赢面/中奖率/运气/手气 × 更高/更大/会提升/都会提高/比机选高/比随手一抓机会大；EN the odds go up / your luck improves / better chance of winning / improves your chances / increases your chance of，含反序形：胜率都会提升、赢面会变大、the odds will go up、your luck will improve），三腿落在 60 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「控制线索误用」断言。边界：hasty_generalization 管**小样本外推**（几次成功当成规律），本维度管**把控制线索用在不接受控制的随机事件上**（小样本是对过去的归纳，控制幻觉是对机制的误解）；appeal_to_future 管**未发生的未来承诺**，本维度管**当下断言里的控制-随机混淆**；gamblers_fallacy 管**独立事件的序列依赖**（连着出大下次该出小），本维度管**主观行为对独立事件的影响**（我的动作能改变下一次结果）；hot_hand 管**热手谬误**（连续成功会延续），本维度管**仪式/投入对结果的因果主张**（我做了某个动作所以结果变好）——两者都属控制感家族但方向相反：热手是对自己的能力的过度归因，控制幻觉是对随机机制的过度赋权。明确不判：概念/教学转述（控制幻觉/控制错觉/illusion of control/行为经济学/心理学实验/心理学研究；EN illusion of control / behavioral economics / psychology——讨论这个概念本身是正确判别）、技能与练习（练习/训练/天天练/肌肉记忆/手感是练出来的/命中率靠的是/实力/技术提升；EN practice / training / skill / muscle memory——**真实能力提升是正确判别**）、风险管理（保险/对冲/风险转移/保费/保障/风险管理；EN insurance / hedge / risk transfer——**制度性风险处置是正确判别**）、概率教学（独立同分布/相互独立/iid/概率结构/生成机制/每次开奖/期望值/大数定律；EN independent and identically distributed / iid / probability structure / generating mechanism——**显式概率分析是正确判别**）、否定与对冲（不代表/不意味着/推不出/不能说明/不等于/未必/不一定/取决于；EN does not mean / not necessarily / cannot conclude；可能/也许/大概/似乎；EN maybe/perhaps/probably）、疑问句（含 ?/？）。",
     'vivid_case_availability': "不得**拿单个生动个案的存在性替代总体发生率**——生动个案可得性偏差（vivid-case availability / availability heuristic）是指文本先呈现一个**高度曝光/容易回忆的单个案例**（亲历目击/媒体报道个案/病毒视频/熟人转述的成功或灾难叙事），继而给出一个**越过基础频率的偏斜断言**：看到一次坠机就断言飞行太危险、听说有人中奖就说买彩票靠谱、新闻里有个孩子不学习也成功就说学习不重要、a friend of a friend won the lottery, so the odds must be overblown、I witnessed a mugging on the subway, so the subway is full of crime（样本形状与负例见 test/round-308-vivid-case-availability.js）。为什么这本身就是问题：**可得性不等于发生率**——媒体曝光量、情绪强度、人际传播频率与一件事的真实概率是三个独立的量；人类（和模仿人类推理的模型）系统性地把「想起来的容易程度」误当「发生的频繁程度」。这是统计推理中最古老的已知偏差之一（Tversky & Kahneman 1973），却是 AI 输出里最常出现的形态：用一句「我听说/我看到/新闻里有个」就把一个需要十万样本才能回答的问题判了。判据**两腿共现 + 邻近窗，缺一不判**：腿① VIVID 生动个案在场（亲历目击/新闻媒体报道个案/病毒式传播视频/熟人转述的成功或灾难叙事；EN I saw / I witnessed / there was a case / viral video / a friend of a friend won；含裸名词形态：邻居/同事中奖、亲眼看到单独出现即命中腿①）；腿② SKEW 偏斜断言（该现象比想象的危险/常见/少见/靠谱/无害/稳赚；EN far more common / overblown / way more dangerous / full of crime），两腿落在 120 字（EN 240 字符）邻近窗内且个案腿在前即视为同一次「可得性→发生率」推断。边界：anecdote_as_proof 管**个案作为证据证明论点**（腿①是「有个人…所以」的论证宣告），本维度腿①是**案例的生动性属性**（亲历/媒体/病毒传播/熟人转述）、不要求它被当作论据；availability_bias 是**单腿模式匹配**清单（不要求个案腿×偏斜腿共现、无邻近窗、无豁免体系），本族是两腿共现+邻近窗+四组豁免的成对结构；selection_bias 管**抽样框偏斜**，本维度管**回忆可得性偏斜**——前者是数据怎么来的，后者是数据怎么被想起的；base_rate_neglect 管**忽略基础频率**，本族管**用个案替代基础频率**——前者缺的是率，后者是拿故事换率。明确不判：证据/数据在场（统计/官方/数据/研究表明/基础频率/据…统计；EN statistics show / according to official data / the base rate is——**主动给出基础频率是正确判别**）、主动求证（但我查了/核对/核实/求证/验证后再判断；EN I checked / verified / cross-referenced）、概念/教学转述（可得性/启发式/认知偏差/可得性偏差/卡尼曼；EN availability heuristic / cognitive bias / Tversky Kahneman——讨论这个概念本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定/有待；EN maybe/perhaps/might/probably/seems）、疑问句（含 ?/？）。",
     'argument_to_moderation': "不得把**折中立场本身当成真理的依据**——诉诸中庸（argument to moderation / 中间立场谬误）是指把两个立场并置后，断言**「真相/正确答案在中间」「各打五十大板」「折中才是对的」「一个巴掌拍不响」**，用「取中」这个动作替代对双方证据的检验：「甲方乙方各有过错，真相在中间，各打五十大板才是最公道的处理」「这两种观点都太极端了，正确的答案在它们中间」「公说公有理婆说婆有理，其实折中才是对的」「关于这项政策该不该继续，支持和反对的人都走了极端，中间立场才是理性的」「Both extremes are wrong, so the truth lies somewhere in the middle.」「Let's just split the difference — the middle ground is the correct answer.」「When two sides clash, the fairest position is usually the one in between.」（样本形状与负例见 test/round-196-argument-to-moderation.js）。为什么这本身就是问题：中间立场偶尔确实更接近真相，但那要凭证据成立，不能凭「它在中间」成立——以位置取信跳过的是举证责任，两端各自的证据强度、折中结论为何比任一端更成立，都需要单独检验。正当做法是**列出两端各自的证据**并说明折中结论为何更成立，或明确「目前证据不足以在两端间定论」，而不是把「取中」当成结论本身。判据**两腿共现 + 叙事窗，缺一不判**：腿① MIDDLE 中间/折中立场表述（中间立场/中间道路/真相·答案·结论在(两者|双方)之间/折中/中庸/各打五十大板/一个巴掌拍不响/双方都有错/都太极端/走了极端/各让一步/各退一步；EN middle ground / in between / split the difference / meet in the middle / both extremes / compromise position）；腿② TRUTH 中间=正确断言（才是(对|正确|真理|正解|理性|客观|公道|合理|最优)的/(中间|折中)才是X/(都|全)不(完全)(对|错)|都不全对/把(中间|折中)当成(真理|真相|正确)/(最|才)(公平|合理)的(处理|解决|做法|方案|方式)/(正确|真正|对)的(答案|结论|真相|立场)(就)在；EN is the (correct|right|true|rational|fair|fairest|reasonable|best) answer/position/conclusion / truth lies in the middle / both sides are wrong / neither side is entirely right / middle ground is the (correct|fairest|rational) / the (fairest|correct|best) position is (the one) in between），两腿命中相距 ≤50 字（EN ≤200 字符）。边界：false_balance 管**等权并置**（「两种说法/各有道理」把未证实指控并列到已证事实旁），本族不停留在并置、而是进一步断言**中间立场才是正确的**——false_balance 说「一样重」，本族说「中间对」；false_dilemma 管**排除第三选项的二元压迫**（「要么A要么B，没有中间路线」），本族恰好相反——承认两端存在，但把**中间**封为真理，不逼人选边；false_equivalence 管两类事物的错误类比，本族不引入类比对象；sole_narrative 管口径垄断（只许一种说法），本族的主张是「只有中间那种说法对」；monocause 管多因压成单因，本族不断言原因数量，反对的是**以位置取信**而非以证据取信。明确不判：概念/教学转述（诉诸中庸/argument to moderation/中庸之道/儒家/亚里士多德/逻辑谬误/教材/论文——讨论这个概念本身是正确判别）、谈判/交易/和解语境（谈判/协商/和解/调解/协议/签约/签署/成交/报价/让步/调解员/合同；EN negotiated / deal / signed / contract / settlement / mediation / agreement——博弈中「各让一步」是关于成交的程序动作，不是真理断言）、算术/统计取中（平均值/均值/中位数/中间值/取平均；EN average / median / midpoint——取中位数是正当计算）、推理否定/反向承认（并不总是/并不等于/不等于/并不意味着/未必/不一定/推不出/不见得/不是都对也都错/是谬误；EN does not mean / not automatically / not necessarily / is not correct——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
     'completion_evidence': "不得**在没有可验证证据的情况下声明工作已完成**——空完成声明（empty completion claim / unfalsifiable completion）是把「已完成/已修复/已解决/已搞定/已交付/已推送/已提交/全部通过/确认正常/验证通过/没问题/可以了」当作事实陈述，却不附任何**可定位、可复现的完成证据**：git commit 哈希、测试通过的具体数字（16/0）、文件路径、退出码、PR 链接、被调用的具体命令。声明与证据之间的**缺口本身就是判别信号**——真正完成的工作必然留下痕迹（哈希/计数/路径/输出），「说完成了但没有任何痕迹」与「完成了」在证据上不可区分，因此空声明不可信。这是 AI agent 输出中最常见的自欺形态：汇报时把「执行了动作」等同于「达成了效果」，把「我跑了测试」等同于「测试通过了」，把「代码写完了」等同于「问题解决了」。「我已经修复了这个问题。」「全部测试都通过了。」「改动已经推送到远端。」「确认正常，可以上线了。」「Everything is done and working.」判据**声明腿 × 证据缺席腿，缺一不判**：腿① CLAIM 完成/验证声明（已完成/已修复/已解决/已搞定/已交付/已推送/已提交 + done/fixed/resolved/pushed/committed；全部通过/all tests passed/确认正常/验证通过/检查无误/checked ok/verification passed/all good；模糊收尾 可以了/好了/没问题/works fine/no problem/all set）；腿② EVIDENCE 证据在场检查——声明点 ±200 字窗口内出现 git 哈希（[0-9a-f]{7,40}）、测试计数（\\d+ passed/通过/tests）、commit 引用、PR 编号、URL、具体计数（N 个/N 条/N 处/N 项）、exit code 0、`验证:` 冒号引内容、C2/C3 的检查方法词（curl/node/python/pytest/test/git log/cat/运行/执行/查看了）。**豁免**：① 带证据的声明不判（「已修复，commit 3f2a91b，verify 16/0」有哈希有计数）；② C2/C3 附近出现具体检查方法词时是正当技术陈述（「运行 node test/run-all.js，确认正常」——方法在场）；③ C4 附近有数字时是真实汇报（「全部通过：16 passed, 0 failed」）。明确不判：转述他人的完成声明并附出处、历史陈述（「2024 年已完成迁移」是事实陈述非工作声明）、教学示例（演示本维度概念的句子）、带哈希/计数/路径/URL 任一证据的正常汇报。与 reward_hacking（BLOCK：自认式指标作弊）、bullshit（伪深度空话）边界错开：本族管的是**声明与证据的结构性缺口**，是证据纪律判别，不是文风判别。来源（真实，未编造）：内部路径——`src/completion-evidence.js` 自第 N 轮起即 require（src/index.js:194）并 module.exports 导出（src/index.js:17157），但从未进入 gate/dispatch 主路径（r274 接线前 grep 实证：模块 5 类检测 C1-C5 全部零调用），属「已加载未 dispatch」能力；判据为心虫自有纯规则实现（零 LLM 依赖）。探针 /tmp/hf-probe-r274.js。",
@@ -5840,6 +5864,16 @@ function discriminate(text, evidence = [], contentMode) {
     // 边界：本维度只管「零价格→价值判断失真」这一族，不管商品本身定价
     // 的合理性、也不管免费策略的商业成败。
     'zero_price_effect',
+    // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）登记。verify
+    // 级——控制幻觉是把主观行为/仪式/投入当作能改变纯随机结果的因素（彩票
+    // 自选号比机选强/拜完佛中奖率会高/戴着幸运物胜率提升），多数是认知偏差
+    // 陈述而非恶意欺骗，且技能域（练习提升命中率）、风险管理（保险转移
+    // 风险）与概率教学（独立同分布讲解）都在同一词场，rewrite/block 会
+    // 误伤。verify 的含义是「这段文本把控制线索误用到纯随机事件上，需要
+    // 按 findings 的 guidance 补上概率独立性论证再采信」。射程边界：本
+    // 维度只管「随机事件×主观控制行为×影响断言」三腿共现这一族，不管
+    // 主观能动性本身的价值、也不管技能练习带来的真实能力提升。
+    'illusion_of_control',
   ]);
   // pass：无问题通过
 
@@ -6298,6 +6332,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r307] 第 251 维度 evidence_claim_mismatch（证据-断言覆盖失配）。
       // 同上：八处一次接齐。
       evidence_claim_mismatch: ecm,
+      // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）。ioc。
+      // r239 起草只登记 econ-reasoning-gate FAMILIES，从未独立 dispatch。
+      illusion_of_control: ioc,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6454,6 +6491,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r313] 第 254 维度 zero_price_effect 补登记（零价格效应）。
     // zpe——zero price effect 缩写。同上：九处一次接齐。
     zero_price_effect: zpe,
+    // [r331 接线] 第 256 维度 illusion_of_control 补登记（控制幻觉：把
+    // 主观行为/仪式/投入当作能改变纯随机结果的因素）。ioc——illusion of
+    // control 缩写。同上：九处一次接齐。
+    illusion_of_control: ioc,
     // [r323] 第 255 维度 red_herring 补登记（转移话题/偷换论题：用
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。
