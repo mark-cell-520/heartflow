@@ -270,6 +270,12 @@
  *     EN screening / early detection）+ [r347] DETECT_UP_EN 检出能力
  *     变动形（EN 专项：detection rates have risen / improved surveillance /
  *     more sensitive imaging / more cases detected——中文侧探针实证无缺口）
+ *     + [r348] DETECT_UP_ZH 检出普及形（ZH 专项：检查/检测的普及/铺开/
+ *     推广、检测手段的进步）+ [r350] DETECT_UP_EN4/ZH4 检出名词化形
+ *     （EN：widespread adoption of CT scans / growing use of MRI /
+ *     ubiquitous testing / mass testing campaigns / expansion of testing
+ *     capacity；ZH：排查监测+力度加大、全面排查、全员检测——技术普及与
+ *     排查强度使检出计数上升，同样是检出动作的结果而非发生率变化）
  *   腿② CASE_SURGE 检出病例数激增（确诊/新发/病例人数+激增/翻倍/攀升；
  *     EN number of diagnosed cases surged / cases tripled / case count
  *     surge / screening detected far more tumors；[r347] 补裸助动词省略
@@ -897,6 +903,66 @@ const CASE_SURGE_ZH3 = [
   /(?:病例|患者|病灶|肿瘤|癌症|感染者|病人)[^。！？]{0,8}(?:被|得以|得到)(?:带进|带入|纳入)(?:视野|公众视野|人们视野|视线|统计)/,
 ];
 
+// ─── [r350] 路径 (h) 第四措辞家族·腿①检出名词化/普及动作形（族独立常量）──
+// r350 立项探针（coordination/agent4/probes/r350-probe-candidates.js，集成
+// 树 v6.8.185 gate() 全量 findings 口径）候选定拨：
+//   A 腿①检出名词化族：攻击 17 条穿透 10 条（其中 7 EN + 3 ZH 为腿①纯形
+//     缺口——findings 无任何维度归因；其余被 fallacy_of_relevance /
+//     dose_response_linearity / pseudo_causal / reverse_causation 代拦，
+//     不截胡纪律）、良性 10 条中 2 条非 pass 均为既有基线误伤
+//     （post_hoc / activity_outcome_confusion，非本路径新增）→ 落地；
+//   B Berkson 住院选择形（collider_bias COND_EN 名词表缺 hospitalized/
+//     inpatient）4/7 穿透、良性 1/4 为既有基线误伤 → 穿透率低于 A 且需改
+//     共享常量 COND_EN，本轮不立项（留交接）；
+//   C 诉诸传统 EN 新形 0/3 已被 fallacy_of_relevance 全覆盖、mean
+//     reversion 金融形 1/4 → 不立项。
+// r349 交接项①落地：DETECT_UP_EN p3 须 sensitive/advanced 形容词前缀
+// （"ubiquitous testing"/"widespread testing" 名词化形穿透）、LEAD_SCREEN_EN
+// 只收 screen* 词根（"adoption of CT scans"/"use of MRI" 穿透）、
+// DETECT_UP_ZH 只收普及/进步形（"排查力度加大"/"监测力度的加强"/"全面排查"
+// 穿透——排查/监测不在任何腿①表）。仿 r348/r349 先例建独立族常量（*4
+// 后缀）而非追加既有家族表：r346–r349 四轮测以精确 equality/注入钉死既有
+// 常量元素数与承重（DETECT_UP_EN 恰 5、DETECT_UP_ZH 恰 2、LEAD_SCREEN_EN
+// 恰 5），追加会打破存量断言——独立族零触碰存量测试，注入按族隔离。
+// 族隔离纪律（r348/r349 教训：存量轮测以注入旧常量钉死承重，新族与旧族
+// 交集不得让"删旧族后应翻转"的句子被新族 rescue）：
+//   ① r347 轮测注入 DETECT_UP_EN=[] 要求 5 条检出能力变动句翻转——本族
+//      不收 improved/enhanced/higher + detection/surveillance 形容词形
+//      （"improved surveillance"/"detection rates have risen" 均不匹配）；
+//   ② r346 轮测注入 LEAD_SCREEN_ZH=[] 要求 8 条 ZH 攻击翻转——本族不收
+//      裸 筛查/筛出/早筛 词（"全员癌症早筛"的"全员"后是"癌症"不匹配 p3）；
+//   ③ r348 轮测注入 DETECT_UP_ZH=[] 要求"检查的普及"承重句翻转——本族
+//      p1 须 力度/强度/频次/范围 后缀（"检查的普及"无此后缀）。
+// 腿① DETECT_UP_EN4（EN 专项，只服务路径 h——同 r347/r348 口径不并入
+// 共享 LEAD_SCREEN，避免波及路径 d/e/f 判别面与 302/326 良性基线）。
+const DETECT_UP_EN4 = [
+  // 普及/采用名词形：widespread adoption / growing use / rollout of
+  // CT/MRI/imaging/scanning/testing（技术普及使检出计数上升的能力源）
+  /\b(?:widespread|broad|growing|expanded|expanding|increasing|mass|routine|universal|ubiquitous|large[- ]scale|population[- ]wide)\s+(?:adoption|use|usage|uptake|application|deployment|rollout|expansion|introduction)\s+of\s+(?:CT|MRI|PET|ultrasound|imaging|scanning|screening|testing|tests?|diagnostics?|genetic\s+testing)\b/i,
+  // 技术 + became/becoming + 普及形容词：As CT scanning became universal
+  /\b(?:CT|MRI|PET|ultrasound|imaging|scanning|screening|testing)\s+(?:became|becomes|becoming|is\s+now|now\s+is|has\s+become)\s+(?:universal|widespread|standard|routine|commonplace|ubiquitous|the\s+norm|normal\s+practice)\b/i,
+  // 技术 + now + 普及形容词：With CT now standard practice
+  /\b(?:CT|MRI|PET|ultrasound|imaging|scanning|screening|testing)\s+now\s+(?:standard|routine|universal|widespread|commonplace|ubiquitous)\b/i,
+  // 普及形容词 + testing/surveillance 名词化形（DETECT_UP_EN p3 须
+  // sensitive/advanced 形容词，"ubiquitous testing"类穿透）
+  /\b(?:ubiquitous|widespread|universal|mass|routine|population[- ]wide|large[- ]scale|pervasive)\s+(?:testing|surveillance)\b/i,
+  // 普及动作 + campaigns/programs/drives：mass testing campaigns
+  /\b(?:mass|large[- ]scale|population[- ]wide|widespread|national|community)\s+(?:testing|screening|surveillance)\s+(?:campaigns?|programs?|drives?|efforts?|initiatives?|rollouts?)\b/i,
+  // 产能/覆盖扩张名词形：expansion of testing capacity / scale-up of screening
+  /\b(?:expansion|growth|scale[- ]up|increase|ramp[- ]up)\s+of\s+(?:testing|screening|detection|diagnostic|surveillance)\s+(?:capacity|capabilities?|coverage|efforts?|programs?|services?)\b/i,
+];
+// 腿① DETECT_UP_ZH4（ZH 专项，只服务路径 h——排查/监测/检测+力度形：
+// 排查/监测不在 LEAD_SCREEN_ZH 与 DETECT_UP_ZH 任何表，"检测力度加大"
+// 的力度后缀也不在 DETECT_UP_ZH 普及/进步形内）。
+const DETECT_UP_ZH4 = [
+  // 排查/监测/检测 + 力度/强度/频次/范围 + 加大/加强/增强/提升/扩大
+  /(?:排查|监测|监控|检测|检查|筛检|检验)(?:力度|强度|频次|范围|规模|覆盖面|广度|深度)(?:的)?(?:不断|持续|进一步)?(?:加大|加强|增强|提升|扩大|扩面|加密|提高)/,
+  // 全面/大规模/大范围/拉网式 + 排查/监测/检测（裸名词带范围前缀）
+  /(?:全面|大规模|大范围|拉网式|网格化|挨家挨户|入户)(?:的)?(?:排查|监测|检测|筛检)/,
+  // 大/全民/全域/全员 + 排查/监测/检测（大排查/全员检测形）
+  /(?:大|全民|全域|全员)(?:排查|监测|检测)/,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1151,8 +1217,12 @@ function checkImmortalTimeBias(text, inject) {
     // [r348] 腿①第三族：检出普及形（ZH 专项——检查/检测的普及/铺开/推广，
     // 同 r347 口径只服务路径 h）
     const ph1c = earliestIdx(R.DETECT_UP_ZH || DETECT_UP_ZH, text);
-    const ph1 = [ph1a, ph1b, ph1c].filter(x => x >= 0).length
-      ? Math.min(...[ph1a, ph1b, ph1c].filter(x => x >= 0)) : -1;
+    // [r350] 腿①第四族：检出名词化/普及动作形（EN adoption/use of CT/MRI/
+    // ubiquitous testing/mass testing campaigns；ZH 排查/监测+力度、全面排查）
+    const ph1d = earliestIdx(R.DETECT_UP_EN4 || DETECT_UP_EN4, text);
+    const ph1e = earliestIdx(R.DETECT_UP_ZH4 || DETECT_UP_ZH4, text);
+    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e].filter(x => x >= 0).length
+      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e].filter(x => x >= 0)) : -1;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
@@ -1305,6 +1375,8 @@ module.exports = {
     EXEMPT_INC_ZH2, EXEMPT_INC_EN2,
     // [r349] 路径 (h) 第三措辞家族（负例注入口，族独立常量）
     CASE_SURGE_ZH3, CASE_SURGE_EN3,
+    // [r350] 路径 (h) 第四措辞家族·腿①检出名词化形（负例注入口，族独立常量）
+    DETECT_UP_EN4, DETECT_UP_ZH4,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
