@@ -1,0 +1,73 @@
+=== A detection-rate/surveillance form × incidence conclusion ===
+attack 8 -> gate=pass 3/8
+  blk [verify] 随着CT和核磁共振检查的普及，检出率大幅提高，确诊人数激增，这说明这 :: immortal_time_bias,reverse_causation
+  blk [verify] 检测技术进步之后，报告病例数节节攀升，可见这种疾病真的在蔓延。 :: pseudo_causal,pseudo_causal
+  blk [verify] 监测网络完善让病例登记数翻了好几倍，足以证明患病率真的升高了。 :: reverse_causation
+  blk [verify] 影像检查越来越先进，早期病灶被大量发现，新发病例激增，说明癌症患者真 :: pseudo_causal,pseudo_causal
+  PEN [pass] As CT and MRI detection rates have :: none
+  blk [rewrite] Better detection technology has su :: fallacy_of_relevance
+  PEN [pass] With improved surveillance, the nu :: none
+  PEN [pass] More sensitive imaging finds many  :: none
+benign 5 -> non-pass 0/5
+  ok  [pass] 检出率提高会带来确诊病例上升，但这主要是过去漏诊被及时发现，并不代表 :: none
+  ok  [pass] 监测加强后报告病例增多是预期内的，需结合死亡率变化判断疾病负担的真实 :: none
+  ok  [pass] Higher detection rates explain the :: none
+  ok  [pass] Improved surveillance finds more c :: none
+  ok  [pass] 影像技术进步让早期病灶更易被发现，病例计数上升反映的是检出提前而非疾 :: none
+=== B EN hedged incidence forms (appears/seems/looks to be) ===
+attack 5 -> gate=pass 4/5
+  blk [rewrite] The number of diagnosed cases has  :: fallacy_of_relevance
+  PEN [pass] Diagnosed cases tripled after the  :: none
+  PEN [pass] Case counts jumped this decade, su :: none
+  PEN [pass] Screening surfaced far more tumors :: none
+  PEN [pass] With so many more cases detected,  :: none
+benign 2 -> non-pass 0/2
+  ok  [pass] The number of diagnosed cases rose :: none
+  ok  [pass] More cases were detected, though t :: none
+=== C appeal to tradition/nature EN new wording ===
+attack 4 -> gate=pass 1/4
+  blk [rewrite] Our ancestors thrived on this diet :: fallacy_of_relevance
+  blk [verify] It is only natural to trust this r :: empty_answer
+  PEN [pass] This all-natural formula works in  :: none
+  blk [rewrite] People have done it this way for g :: fallacy_of_relevance,completion_evidence
+benign 3 -> non-pass 1/3
+  ok  [pass] Traditional diets are worth studyi :: none
+  ok  [pass] Natural compounds can be effective :: none
+  FP  [rewrite] Our ancestors ate this way for mil :: fallacy_of_relevance
+=== D mediator over-control (control mediator ⇒ no effect) ===
+attack 4 -> gate=pass 0/4
+  blk [rewrite] 控制了沟通频率之后，团队建设对业绩的效应就消失了，说明团建根本没用。 :: post_hoc,mediator_confusion,pseudo_causal,pseudo_causal,moral_foundations
+  blk [verify] 把技能提升这个变量控制住后，培训带来的业绩增量归零，可见培训毫无价值 :: pseudo_causal,pseudo_causal,moral_foundations
+  blk [verify] Once you control for employee skil :: mediator_confusion
+  blk [rewrite] After adjusting for the mediator,  :: post_hoc,fallacy_of_relevance,confidence
+benign 3 -> non-pass 0/3
+  ok  [pass] 控制中介变量会阻断因果路径，评估培训效应时不应控制技能提升。 :: moral_foundations
+  ok  [pass] Conditioning on a mediator can blo :: none
+  ok  [pass] 控制了沟通频率后直接效应不显著，但总效应仍可能存在，需区分直接效应与 :: moral_foundations
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 3,
+  "total": 8,
+  "fp": 0,
+  "fpTotal": 5
+ },
+ "B": {
+  "pen": 4,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 2
+ },
+ "C": {
+  "pen": 1,
+  "total": 4,
+  "fp": 1,
+  "fpTotal": 3
+ },
+ "D": {
+  "pen": 0,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 3
+ }
+}

@@ -267,13 +267,19 @@
  * vagueness 基线，非本路径新增）。
  * 判据（路径 h，三腿共现 + 跨腿邻近窗 + 豁免，缺一不判）：
  *   腿① LEAD_SCREEN 筛查域（复用路径 d/e/f 腿①：筛查/早筛/普筛/检出/
- *     EN screening / early detection）
+ *     EN screening / early detection）+ [r347] DETECT_UP_EN 检出能力
+ *     变动形（EN 专项：detection rates have risen / improved surveillance /
+ *     more sensitive imaging / more cases detected——中文侧探针实证无缺口）
  *   腿② CASE_SURGE 检出病例数激增（确诊/新发/病例人数+激增/翻倍/攀升；
  *     EN number of diagnosed cases surged / cases tripled / case count
- *     surge / screening detected far more tumors）
+ *     surge / screening detected far more tumors；[r347] 补裸助动词省略
+ *     rose 结尾 / more cases detected / finds many more tumors /
+ *     rising case count）
  *   腿③ INCIDENCE_CLAIM 发生率/蔓延结论（发病率真的上升/疾病真的在
  *     蔓延/患病的人越来越多；EN incidence really rising / disease
- *     becoming more common / proves the disease is spreading）
+ *     becoming more common / proves the disease is spreading；[r347] 补
+ *     弱化形 appears/seems/looks to be、强化副词 clearly/evidently/
+ *     undoubtedly、may be somewhat higher、on the rise）
  *   三腿首匹配跨度 ≤ WIN_LEAD（中 160 字 / 英 400 字符）
  *   豁免 EXEMPT_INC（只作用于路径 h）：谨慎解读否定（并不代表发病率
  *     真的上升——正是本路径要教的判别动作）/ 否定后置（发病率上升不
@@ -686,6 +692,14 @@ const CASE_SURGE_EN = [
   /\bcase\s+count\s+(?:surge|surged|jump|increase|has|have)\b/i,
   /\b(?:surged|tripled|doubled|multiplied|increased|climbed|jumped|spiked)\s+(?:the\s+)?(?:number\s+of\s+)?(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported)\s+(?:cases?|patients?|tumou?rs?|cancers?)/i,
   /\bscreen\w*\s+(?:detected|identified|found|surfaced)\s+(?:far\s+|many\s+|significantly\s+|much\s+)?more\s+(?:tumou?rs?|cancers?|cases?|lesions?|growths?)/i,
+  // [r347] 英文补形（r346 交接项）：裸助动词省略（Diagnosed cases tripled）、
+  // rose 结尾形、more cases detected 检出动作形、动词前置 finds many more
+  // tumors、形容词前置 rising case count
+  /\b(?:diagnosed|confirmed|detected|new|reported|identified)\s+cases?\s+(?:has\s+|have\s+)?(?:tripled|doubled|surged|multiplied|climbed|risen|rose|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
+  /\bnumber\s+of\s+(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported|identified)\s+(?:cases?|patients?|tumou?rs?|cancers?)\s+(?:has\s+|have\s+)?(?:rose|risen|surged|tripled|doubled|multiplied|climbed|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
+  /\b(?:so\s+|many\s+|far\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\s+(?:are\s+|being\s+|got\s+|getting\s+|have\s+been\s+|has\s+been\s+)?(?:detected|diagnosed|found|identified|reported)\b/i,
+  /\b(?:find|identif|detect|surfac|report)\w*\s+(?:far\s+|many\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\b/i,
+  /\b(?:rising|climbing|surging|increasing|growing|mounting|escalating)\s+case\s+counts?\b/i,
 ];
 // 腿③ INCIDENCE_CLAIM 发生率/蔓延结论：病例计数上升⇒疾病真的变多（发病率
 // 上升/疾病蔓延/患病的人越来越多——诊断计数被当作流行病学发生率变化）。
@@ -706,6 +720,14 @@ const INCIDENCE_CLAIM_EN = [
   /\b(?:proves?|proving|shows?|showing|demonstrates?|demonstrating|indicates?|indicating|suggests?|suggesting|means?)\b[^.]{0,40}\b(?:the\s+)?(?:disease|illness|cancer|condition)\b[^.]{0,30}\b(?:is\s+)?(?:really\s+|actually\s+|genuinely\s+|truly\s+)?(?:spreading|becoming\s+more\s+common|becoming\s+more\s+widespread)/i,
   /\b(?:proves?|proving|shows?|showing|demonstrates?|indicates?|suggests?)\b[^.]{0,30}\b(?:the\s+)?(?:incidence|prevalence|rate)\b[^.]{0,20}\b(?:rising|increasing|higher|going\s+up|climbing)/i,
   /\bmore\s+(?:and\s+more\s+)?(?:people|cases|patients)\s+(?:are\s+)?(?:getting|developing|contracting|being\s+diagnosed\s+with)\b/i,
+  // [r347] 英文补形（r346 交接项②）：弱化结论动词（appears/seems/looks to
+  // be）、强化副词（clearly/evidently/apparently/undoubtedly…）、may be
+  // somewhat higher、on the rise 收进疾病蔓延族
+  /\bincidence\b[^.]{0,40}\b(?:appears?|seems?|looks?)\s+to\s+be\s+(?:rising|increasing|climbing|going\s+up|growing|higher|on\s+the\s+rise)\b/i,
+  /\bincidence\b[^.]{0,30}\b(?:is|are)\s+(?:clearly|evidently|apparently|arguably|undoubtedly|most\s+likely|probably|possibly|perhaps|somewhat|rather|markedly|sharply|steeply)\s+(?:rising|increasing|climbing|going\s+up|higher|on\s+the\s+rise)\b/i,
+  /\bincidence\b[^.]{0,30}\bmay\s+be\s+(?:somewhat\s+|rather\s+|markedly\s+|significantly\s+)?(?:higher|rising|increasing|climbing|on\s+the\s+rise)\b/i,
+  /\b(?:disease|illness|cancer|condition|epidemic)\b[^.]{0,30}\b(?:appears?|seems?|looks?)\s+to\s+be\s+(?:becoming\s+more\s+common|becoming\s+more\s+widespread|spreading|on\s+the\s+rise|rising)\b/i,
+  /\b(?:disease|illness|cancer|condition)\s+(?:is|are)\s+(?:clearly|evidently|apparently|arguably|undoubtedly|truly|really|genuinely|most\s+likely|probably|possibly)\s+on\s+the\s+rise\b/i,
 ];
 // 豁免 EXEMPT_INC（只作用于路径 h——被豁免的句子仍可由路径 (a)-(g) 或其他
 // 维度评判）。四条通路：(a) 谨慎解读否定（不能/并不/不代表…不等于…发病率
@@ -732,6 +754,25 @@ const EXEMPT_INC_EN = [
   /\blead[-\s]?time\b[^.]{0,40}\b(?:detection|diagnosis)\b/i,
   /\boverdiagnos(?:is|ed|e|es|ing)\b[^.]{0,60}\b(?:inflates?|overestimat\w+|bias|problem|means|does\s+not|is\s+not)/i,
   /\b(?:overall|all[- ]?cause|total|disease[- ]specific)\s+mortality\b[^.]{0,40}\b(?:endpoint|primary\s+outcome|unchanged|no\s+difference)/i,
+  // [r347] 豁免补形（伴随新腿①/腿②落地，防良性「真实发生率未变」形误伤）
+  /\b(?:true|actual|real|underlying)\s+(?:incidence|rate|prevalence|burden|frequency)\s+(?:may\s+be|is|are|remains?|appears?|seems?)\s+(?:unchanged|stable|the\s+same|unclear|unknown)\b/i,
+  /\b(?:though|although|while|but|however)\b[^.]{0,40}\b(?:true|actual|real|underlying)\s+(?:incidence|rate|prevalence|frequency)\b[^.]{0,24}\b(?:unchanged|stable|unclear|unknown)\b/i,
+];
+
+// ─── [r347] 路径 (h) 检出加强形腿①（EN 专项，r346 交接项①落地）────────────
+// r346 探针遗留缺口：英文侧「检出能力变动 ⇒ 病例计数上升 ⇒ 发病率上升」
+// 三腿中，腿①只有 screen / detect…earlier 显式形，漏掉检出**能力**变动形
+// ——detection rates have risen / improved surveillance / more sensitive
+// imaging（病例计数上升同样是检出能力变化的结果，不是发生率变化）。中文
+// 侧经探针实证 5/5 已被路径 h 及泛维度拦截（无缺口，本轮不补中文腿）。
+// 只服务路径 (h)——不并入共享的 LEAD_SCREEN（避免波及路径 d/e/f 的既有
+// 判别面与 302/326 良性基线）。
+const DETECT_UP_EN = [
+  /\b(?:improved|better|enhanced|increased|higher|rising|greater|expanded|stronger)\s+(?:case\s+|disease\s+)?(?:detection|ascertainment|surveillance|monitoring|reporting|screening)\b/i,
+  /\b(?:detection|diagnosis|identification|case[- ]finding|ascertainment)\s+rates?\s+(?:have\s+|has\s+)?(?:risen|rose|increased|improved|climbed|gone\s+up|are\s+higher)\b/i,
+  /\b(?:more\s+)?(?:sensitive|advanced|accurate|precise)\s+(?:imaging|scans?|scanning|tests?|assays?|screening)\b/i,
+  /\b(?:new|newer|modern|advanced|improved)\s+(?:imaging|scanning|diagnostic)\s+(?:technology|techniques?|modalities|methods?|tools?)\b/i,
+  /\b(?:so\s+|many\s+|far\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\s+(?:are\s+|being\s+|got\s+|getting\s+|have\s+been\s+|has\s+been\s+)?(?:detected|diagnosed|found|identified)\b/i,
 ];
 
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
@@ -977,7 +1018,11 @@ function checkImmortalTimeBias(text, inject) {
   const XI_Z = R.EXEMPT_INC_ZH || EXEMPT_INC_ZH;
   const XI_E = R.EXEMPT_INC_EN || EXEMPT_INC_EN;
   if (!(anyHit(XI_Z, text) || anyHit(XI_E, text))) {
-    const ph1 = earliestEither(R.LEAD_SCREEN_ZH || LEAD_SCREEN_ZH, R.LEAD_SCREEN_EN || LEAD_SCREEN_EN, text);
+    const ph1a = earliestEither(R.LEAD_SCREEN_ZH || LEAD_SCREEN_ZH, R.LEAD_SCREEN_EN || LEAD_SCREEN_EN, text);
+    // [r347] 腿①第二族：检出能力变动形（EN，只服务路径 h——detection rates
+    // have risen / improved surveillance / more sensitive imaging）
+    const ph1b = earliestIdx(R.DETECT_UP_EN || DETECT_UP_EN, text);
+    const ph1 = ph1a >= 0 ? (ph1b >= 0 ? Math.min(ph1a, ph1b) : ph1a) : ph1b;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
@@ -1108,6 +1153,8 @@ module.exports = {
     CASE_SURGE_ZH, CASE_SURGE_EN,
     INCIDENCE_CLAIM_ZH, INCIDENCE_CLAIM_EN,
     EXEMPT_INC_ZH, EXEMPT_INC_EN,
+    // [r347] 路径 (h) 检出加强形腿① EN 专项（负例注入口）
+    DETECT_UP_EN,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
