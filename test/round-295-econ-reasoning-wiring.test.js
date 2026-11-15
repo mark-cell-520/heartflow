@@ -55,10 +55,15 @@ const ATTACK = {
   significance_effect_size: 'p 小于 0.05，所以这个药有效，可以全面推广',
   selection_on_dependent_variable: '能活下来的公司都融过资，所以融资能救命',
   ad_hominem: '他是个骗子，所以他说的关于气候的数据全是假的。',
+  // r339 适应证混杂（src/confounding-by-indication.js——探针胜出句原样）
+  confounding_by_indication: '用新药的都是重症患者，所以新药组死亡率更高，这证明新药反而有害。',
   // r296 信息与激励盲区三子族（src/incentive-blind-spot.js）
   adverse_selection: '保险池自然会同时吸引低风险和高风险的人，这对保费没有影响。',
   moral_hazard: '全额兜底不会让机构去承担更多风险。',
   free_rider: '公共事务总会有人站出来管，我个人不用参与。',
+  // r343 incentive_conflation 子族（src/incentive-blind-spot.js 镜像腿——
+  // 腿①关键在于参保后 + 腿②没有任何关系，单样本双腿承重）
+  incentive_conflation: '赔付增加关键在于参保后的过度就医，跟投保前的风险构成没有任何关系。',
   // r336 机会成本忽视（src/opportunity-cost-neglect.js，单腿①单腿②样本——
   // E 段盲注承重需要该句只依赖一对腿组）
   opportunity_cost_neglect: '设备闲置着也不会产生额外成本，没有任何损失。',
@@ -107,6 +112,11 @@ const INJECT_KEY = {
   free_rider: ['COLLECTIVE_ZH', 'COLLECTIVE_EN', 'ABSTAIN_ZH', 'ABSTAIN_EN'],
   // r336 机会成本忽视（腿①闲置族 + 腿②无损失族，对 ATTACK 样本单腿承重）
   opportunity_cost_neglect: ['INACTION_IDLE_ZH', 'ZEROCOST_NOLOSS_ZH'],
+  // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
+  confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
+  // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
+  // ATTACK 样本承重；EN 两组同列保持与 r345 轮测一致的注入键全集）
+  incentive_conflation: ['MIRROR_ATTR_ZH_E', 'MIRROR_ATTR_ZH_F', 'MIRROR_ATTR_EN_D', 'MIRROR_DENIAL_ZH_A', 'MIRROR_DENIAL_ZH_D', 'MIRROR_DENIAL_EN_F'],
 };
 
 console.log('=== A 插件元数据与族表 ===');
@@ -117,14 +127,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 22 族：17 econ + 5 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 22); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1
+T('A2 族表 24 族：19 econ + 5 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 24); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 17);
+  assert.strictEqual(econ.length, 19);
   assert.strictEqual(stats.length, 5);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 22);
+  assert.strictEqual(new Set(keys).size, 24);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
@@ -134,7 +144,7 @@ T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
     assert.ok(/^r\d+$/.test(f.round), `${f.key} 起草轮次异常: ${f.round}`);
   }
 });
-T('A4 21 个模块文件全部存在且导出函数是函数', () => {
+T('A4 24 个模块文件全部存在且导出函数是函数', () => {
   for (const f of FAMILIES) {
     const p = path.join(ROOT, 'src/plugins/econ-reasoning-check', f.mod);
     assert.ok(fs.existsSync(p), `模块缺失: ${f.mod}`);

@@ -328,9 +328,11 @@ check('G 登记：__internals 暴露镜像常量组、GROUPS 与窗', () => {
   // [r345] 族表随新家族补全后登记计数同步更新（r336/r344 先例：登记断言随族表
   //   补全翻转，非弱化）——ZH 腿① 4→5（E 连接词族）、EN 腿① 3→4（D 连接词族）、
   //   ZH 腿② 3→4（D dismiss 新尾族）、EN 腿② 5→6（F can-be-dismissed 族）。
-  assert.strictEqual(I.MIRROR_ATTR_ZH_GROUPS.length, 5);
+  // [r346] 再次随新家族补全翻转（同先例）——ZH 腿① 5→6（F 连接词变体族）、
+  //   ZH 腿② 4→5（E dismiss 尾口语变体族）；EN 两侧 r346 不补腿。
+  assert.strictEqual(I.MIRROR_ATTR_ZH_GROUPS.length, 6);
   assert.strictEqual(I.MIRROR_ATTR_EN_GROUPS.length, 4);
-  assert.strictEqual(I.MIRROR_DENIAL_ZH_GROUPS.length, 4);
+  assert.strictEqual(I.MIRROR_DENIAL_ZH_GROUPS.length, 5);
   assert.strictEqual(I.MIRROR_DENIAL_EN_GROUPS.length, 6);
   assert.strictEqual(I.ADV_ATTR_ZH_GROUPS.length, 3);   // r343 存量不回归
   assert.strictEqual(I.MORAL_DENIAL_EN_GROUPS.length, 6);
