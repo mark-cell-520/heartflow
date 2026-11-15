@@ -1,0 +1,61 @@
+=== A path-h leg② passive deeper forms (were brought to light / got picked up / 被重新发现) ===
+attack 10 -> gate=pass 6/10
+  PEN [pass] With wider screening, many more case :: none
+  PEN [pass] The rollout of population screening  :: none
+  PEN [pass] Thanks to better surveillance, far m :: none
+  PEN [pass] More sensitive testing means additio :: none
+  PEN [pass] Enhanced detection got many more cas :: none
+  blk [rewrite] As screening expanded, numerous hidd :: fallacy_of_relevance
+  blk [verify] 筛查推广后，大量此前隐藏的病例被带进视野，可见这种病真的在变多。 :: reverse_causation,pseudo_causal,pseudo_causal
+  blk [verify] 检测普及后，更多潜在患者被查了出来，说明患病率真的在上升。 :: pseudo_causal,pseudo_causal
+  PEN [pass] 普筛铺开让许多既往漏掉的病例被重新发现，足以证明疾病真的在蔓延。 :: none
+  blk [rewrite] 监测加强后，更多感染者被识别出来，可见这种病确实在扩散。 :: fallacy_of_relevance,pseudo_causal,pseudo_causal
+benign 6 -> non-pass 0/6
+  ok  [pass] With wider screening, many more case :: none
+  ok  [pass] Better monitoring picked up many mor :: none
+  ok  [pass] More sensitive testing means additio :: none
+  ok  [pass] 筛查推广后大量隐藏病例被带进视野，但这主要是过去漏诊被及时发现，并不代表 :: none
+  ok  [pass] 检测普及后更多潜在患者被查了出来，然而真实患病率似乎并没有变化。 :: none
+  ok  [pass] 普筛铺开让许多既往漏掉的病例被重新发现，但这反映的是检出提前，不代表发病 :: none
+=== B Berkson hospitalized-patient forms (collider_bias) ===
+attack 7 -> gate=pass 1/7
+  blk [verify] Among hospitalized patients, the exp :: cum_hoc
+  PEN [pass] Within the hospitalized group, smoke :: none
+  blk [block] Because both the exposure and the di :: dehumanization
+  blk [verify] Among admitted patients, coffee drin :: cum_hoc
+  blk [verify] Looking only at patients admitted to :: cum_hoc
+  blk [verify] 住院病人里经常同时看到吸烟和肺癌，可见吸烟引发肺癌。 :: reasoning_coherence
+  blk [rewrite] 在住院病人中，这个因素和这种病高度相关，所以该因素会导致这种病。 :: cum_hoc,reverse_causation,common_cause
+benign 3 -> non-pass 2/3
+  FP  [verify] Among hospitalized patients, the ass :: cum_hoc
+  ok  [pass] 住院病人里看到的关联可能只是因为两者都导致住院，这是对撞偏误的典型例子。 :: none
+  FP  [verify] 在医院数据中观察到的相关性需要回到全样本验证，不能直接推断因果。 :: liberty_restriction
+=== C bonus (DNA prosecutor / base-rate medical / hot hand) ===
+attack 3 -> gate=pass 0/3
+  blk [rewrite] The DNA profile matches with a proba :: fallacy_of_relevance,vagueness
+  blk [verify] 这种疾病的患病率只有万分之一，但检测的准确率高达99%，你测出阳性，几乎 :: false_precision
+  blk [rewrite] 这支球队连胜三场，球员手感正热，下一场投篮命中率一定会更高。 :: hot_hand,law_of_small_numbers,absolute_claim,perfect_error
+benign 2 -> non-pass 1/2
+  ok  [pass] A one-in-a-million random match prob :: none
+  FP  [verify] 即便检测准确率99%，在患病率极低的人群中阳性也多半是假阳性，这是基数率 :: false_precision
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 6,
+  "total": 10,
+  "fp": 0,
+  "fpTotal": 6
+ },
+ "B": {
+  "pen": 1,
+  "total": 7,
+  "fp": 2,
+  "fpTotal": 3
+ },
+ "C": {
+  "pen": 0,
+  "total": 3,
+  "fp": 1,
+  "fpTotal": 2
+ }
+}

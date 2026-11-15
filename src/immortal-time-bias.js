@@ -847,6 +847,56 @@ const INCIDENCE_CLAIM_EN2 = [
   /\b(?:incidence|disease|illness|cancer|condition|epidemic)\b[^.]{0,40}\b(?:is|are)\s+on\s+an\s+upward\s+trend\b/i,
 ];
 
+// ─── [r349] 路径 (h) 第三措辞家族（r348 交接项③落地，族独立常量）─────────
+// r349 立项探针（coordination/agent4/probes/r349-probe-candidates.js 与
+// r349-probe-a2.js，集成树 v6.8.185 gate() 全量 findings 口径）候选定拨：
+//   A 腿②被动深形：攻击 15 条穿透 11 条、良性 14/14 零误伤 → 落地；
+//   B Berkson 住院选择形（collider_bias）1/7 穿透（cum_hoc /
+//     reasoning_coherence 代拦为主）且良性 2/3 为既有基线误伤 → 不立项；
+//   C DNA 匹配 prosecutor / 医学基数率 / 手感 0/3 全覆盖
+//     （fallacy_of_relevance / false_precision / hot_hand 代拦）→ 不立项。
+// r348 CASE_SURGE_*2 只收 has/have brought + came to light + were caught +
+// are now found；本轮穿透形（探针 PEN）：裸 were/was brought to light、
+// get 使役被动（got … picked up）、has surfaced + 形容词量化、were
+// identified/detected + 形容词量化、ZH 被重新发现/被识别出来/被带进视野。
+// 族隔离纪律（r348 教训：存量轮测以注入旧常量钉死承重，新族与旧族必须
+// 严格不相交，否则旧常量注空后旧句被新族承重不翻转）：
+//   ① brought 形加 (?<!\bhas\s)(?<!\bhave\s) 负向断言——r348 EN2 p2 专属
+//      has/have brought，防「has brought more cases to light」被新族承重；
+//   ② were/was 被动动词表剔除 caught（r348 EN2 p4 were caught 专属）与
+//      现在时 are/being（r346 p6 / r347 p9 专属）；
+//   ③ get 使役形（got/gets/getting + 量化 + 病例名词 + picked up 类）与
+//      名词前置形（量化 + 病例名词 + got + picked up 类）既有表无对应形；
+//   ④ has/have surfaced/identified 形要求形容词量化尾（r346 p7 要 screen
+//      词前缀、r347 p8 finds 形无助动词，均不相交）；
+//   ⑤ 名词前置 brought 形（病例名词 + were/was + brought to light）与
+//      r348 EN2 的 brought 前置语序（has/have brought + 名词 + to light）
+//      语序相反，负向断言双保险。
+const CASE_SURGE_EN3 = [
+  // 裸 brought … to light（were/was/无助动词——r348 只收 has/have brought）
+  /(?<!\bhas\s)(?<!\bhave\s)\bbrought\s+(?:(?:far|many|significantly|much|substantially|more|numerous|additional|hidden|silent|previously\s+(?:undiagnosed|hidden|unnoticed|unrecognized|unseen)|newly\s+(?:found|identified))\s+)*(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+to\s+light\b/i,
+  // 名词前置形：量化 + 病例名词 + were/was + brought to light（r348 只收
+  // has/have brought + 名词的 brought 前置语序，本形名词在前）
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:were|was)\s+brought\s+to\s+light\b/i,
+  // 形容词量化 + 病例名词 + were/was + 被动检出动词（剔除 caught/now being）
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:(?:numerous|additional|hidden|silent|previously\s+(?:undiagnosed|hidden|unnoticed|unrecognized|unseen)|newly\s+(?:found|identified))\s+)+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:were|was)\s+(?:picked\s+up|surfaced|identified|detected|found|uncovered|diagnosed)\b/i,
+  // 名词前置形：量化 + 病例名词 + got/gets/getting + 被动检出动词
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?)\s+(?:got|gets|getting)\s+(?:picked\s+up|caught|detected|found|identified|surfaced)\b/i,
+  // get 使役形：got/gets/getting + 量化 + 病例名词 + 被动检出动词
+  /\b(?:got|gets|getting)\s+(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?)\s+(?:picked\s+up|caught|detected|found|identified|surfaced)\b/i,
+  // has/have + surfaced/identified 类 + 形容词量化（可多重）+ 病例名词
+  /\b(?:has|have)\s+(?:surfaced|identified|found|detected|uncovered|reported)\s+(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:(?:numerous|additional|hidden|silent|previously\s+(?:undiagnosed|hidden|unnoticed|unrecognized|unseen)|newly\s+(?:found|identified))\s+)+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\b/i,
+];
+// 腿②（中文第三族）：被重新发现/被识别出来/被查了出来/被重新检出 +
+// 被带进视野/纳入统计——病例名词 + ≤8 字 + 被动检出/收纳动词。
+// 族隔离：r348 ZH2 专属 浮出水面/带入视野/暴露出来（无"被"字被动前缀），
+// 本族专属"被/得以/得到 + （重新）?"被动形；"被及时发现"类形由
+// EXEMPT_INC_ZH (c) 谨慎标记前置豁免兜底（无标记同行即按攻击判）。
+const CASE_SURGE_ZH3 = [
+  /(?:病例|患者|病灶|肿瘤|癌症|感染者|病人|确诊者)[^。！？]{0,8}(?:被|得以|得到)(?:重新)?(?:发现|识别|查出|检出|确诊)/,
+  /(?:病例|患者|病灶|肿瘤|癌症|感染者|病人)[^。！？]{0,8}(?:被|得以|得到)(?:带进|带入|纳入)(?:视野|公众视野|人们视野|视线|统计)/,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1110,8 +1160,11 @@ function checkImmortalTimeBias(text, inject) {
       // [r348] 腿②第二族：被动浮现形（浮出水面/带入视野/brought to light/
       // were caught/are now found——检出计数上升但不带激增类方向动词）
       const ph2b = earliestEither(R.CASE_SURGE_ZH2 || CASE_SURGE_ZH2, R.CASE_SURGE_EN2 || CASE_SURGE_EN2, text);
-      const ph2 = [ph2a, ph2b].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b].filter(x => x >= 0)) : -1;
+      // [r349] 腿②第三族：被动深形（were/was brought to light / got picked
+      // up / were identified + 形容词量化；ZH 被重新发现/被带进视野）
+      const ph2c = earliestEither(R.CASE_SURGE_ZH3 || CASE_SURGE_ZH3, R.CASE_SURGE_EN3 || CASE_SURGE_EN3, text);
+      const ph2 = [ph2a, ph2b, ph2c].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
@@ -1250,6 +1303,8 @@ module.exports = {
     CASE_SURGE_ZH2, CASE_SURGE_EN2,
     INCIDENCE_CLAIM_ZH2, INCIDENCE_CLAIM_EN2,
     EXEMPT_INC_ZH2, EXEMPT_INC_EN2,
+    // [r349] 路径 (h) 第三措辞家族（负例注入口，族独立常量）
+    CASE_SURGE_ZH3, CASE_SURGE_EN3,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,

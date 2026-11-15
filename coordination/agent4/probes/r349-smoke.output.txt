@@ -1,0 +1,19 @@
+=== attack module-level hit ===
+hit 13/13; misses: []
+=== attack gate-level ===
+non-pass+attributed 13/13; fails: []
+=== benign module-level ===
+clean 10/10; FPs: []
+=== stock with new constants emptied ===
+still hit 38/38; broken: []
+=== attack with new constants emptied (must flip) ===
+flipped 13/13; not flipped: []
+=== corpus (4 official benchmarks, path-h module level) ===
+
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+
+
+corpus n=378 path-h FP=0; hits: []
+=== __internals registration ===
+CASE_SURGE_EN3.len = 6  CASE_SURGE_ZH3.len = 2
+CASE_SURGE_EN2.len = 5  CASE_SURGE_ZH2.len = 1  CASE_SURGE_EN.len = 12  CASE_SURGE_ZH.len = 1

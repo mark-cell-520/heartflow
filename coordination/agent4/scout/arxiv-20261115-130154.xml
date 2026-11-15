@@ -1,0 +1,446 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/OIZjEhnYDuVCsaYqJVFiH7vHYO4</id>
+  <title>arXiv Query: search_query=all:stage OR all:migration OR all:Will OR all:Rogers OR all:phenomenon OR all:survival OR all:rate OR all:reclassification OR all:statistical OR all:bias&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-15T13:01:55Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:stage+OR+(all:migration+OR+(all:Will+OR+(all:Rogers+OR+(all:phenomenon+OR+(all:survival+OR+(all:rate+OR+(all:reclassification+OR+(all:statistical+OR+all:bias))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>658696</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17334v1</id>
+    <title>Unbundling Multimodal Vision Encoding</title>
+    <updated>2026-11-12T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17334v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17334v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How multimodal language models should encode visual input remains up for debate. Most models use a pretrained vision encoder, while some recent recipes train the encoder from scratch with the language model or remove it entirely. Vision encoders bundle together three design choices: a visual prior from upstream pretraining, dedicated vision capacity, and pre-fusion placement of that capacity (i.e., before the multimodal backbone). Because published models also differ in data, architecture, and compute, comparing them cannot isolate the effect of each choice. We disentangle these choices via a controlled framework where we pretrain all models from scratch on common data and compare them on visual question answering and language benchmarks at matched lifetime compute. We find that the visual prior is not necessary; an encoder trained jointly from scratch is on par with a pretrained one, without a separate training stage. What matters instead is dedicated vision capacity: an encoder-free model trails on visual understanding even when its backbone is enlarged by the encoder's parameter count. Yet that capacity need not precede multimodal fusion, as vision-only modules added in-fusion to early backbone layers perform comparably to a pre-fusion encoder and can lower time to first token. These results also hold across backbone sizes, when encoder pretraining is treated as free, and when starting from a pretrained language model. Overall, our findings favor dedicated vision capacity trained jointly with the backbone and placed early within it.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:54Z</published>
+    <arxiv:comment>Project page: https://unbundling.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Ellis Brown</name>
+    </author>
+    <author>
+      <name>Chris Hoang</name>
+    </author>
+    <author>
+      <name>Shengyi Qian</name>
+    </author>
+    <author>
+      <name>Shang-Wen Li</name>
+    </author>
+    <author>
+      <name>Mike Lewis</name>
+    </author>
+    <author>
+      <name>Marjan Ghazvininejad</name>
+    </author>
+    <author>
+      <name>Luke Zettlemoyer</name>
+    </author>
+    <author>
+      <name>Lucas Beyer</name>
+    </author>
+    <author>
+      <name>Mengye Ren</name>
+    </author>
+    <author>
+      <name>Jakob Verbeek</name>
+    </author>
+    <author>
+      <name>Saining Xie</name>
+    </author>
+    <author>
+      <name>Hu Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17333v1</id>
+    <title>Discrete Time Crystals from Anti-Unitary Floquet Driving and Dynamical Freezing</title>
+    <updated>2026-11-12T18:59:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17333v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17333v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show anti-unitary periodic drive paves a direct path for stabilizing a Discrete Time-Crystal by Dynamical Freezing (DF). The magnetization appears as an emergent conserved operator, and an exact pairing of two-cycle quasi-energies pins the subharmonic response. DF keeps the effective Hamiltonian $\textit{quasi-local}$; infinite-chain simulations show no detectable decay for a generic state with any finite magnetization. We outline an experimental realization of the anti-unitary drive.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:53Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Anirban Das</name>
+    </author>
+    <author>
+      <name>Asmi Haldar</name>
+    </author>
+    <author>
+      <name>Arnab Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17327v1</id>
+    <title>Decoupling Dynamics: A Tale of Two Limits</title>
+    <updated>2026-11-12T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17327v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17327v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The symmetries of a $d$-dimensional QFT are known to be captured by a topological theory in one dimension higher, the Symmetry Topological Field Theory (SymTFT), which is invariant under gauging finite symmetries of the QFT, but not under dynamical gauging of continuous symmetries. We show that the distinct SymTFTs of a $d$-dimensional QFT before and after dynamical gauging of a continuous Abelian symmetry arise as different topological limits of the same dynamical holographic gauge theory in $(d+1)$-dimensions. Gauging changes the boundary condition of this dynamical theory and thereby selects a different topological limit, explaining why the associated SymTFT changes. We give a fully quantum definition of these SymTFTs at the level of Hilbert spaces and operators by combining suitable limits of the bulk holographic theory with photon truncation. This construction clarifies how topological symmetry defects, charges, and anomalies survive while the dynamical information carried by currents is discarded. We study non-anomalous and anomalous examples, providing a complete quantum analysis for $(2+1)$-dimensional bulks. For a four-dimensional boundary theory with a mixed axial-vector anomaly, we recover the SymTFT of the non-invertible chiral symmetry that remains after gauging the vector symmetry.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:31Z</published>
+    <arxiv:comment>30 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Andrea Antinucci</name>
+    </author>
+    <author>
+      <name>Oscar Lewis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17322v1</id>
+    <title>Ensemble phase transitions in measurement-unitary hybrid quantum circuits</title>
+    <updated>2026-11-12T18:59:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.17322v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17322v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The universal properties of state ensembles generated by quantum dynamics provide a refined lens into Hilbert-space ergodicity and deep thermalisation, or lack thereof. We investigate deep-ergodicity breaking transitions of an ancillary qubit entangled with a system undergoing dynamics via hybrid quantum circuits, where unitary evolution is interspersed with projective measurements. Specifically, we analyse the statistical properties of two distinct state ensembles: the trajectory ensemble (TE) conditioned on the measurement outcomes of the hybrid circuit, and the projected ensemble (PE) generated by further projective measurements of the system at the final temporal boundary. We find that both ensembles undergo non-analytic changes -- ensemble phase transitions -- at the critical point of the measurement-induced purification transition, despite their first moments remaining completely maximally mixed and blind to the transition. For Haar-random circuits, the TE transitions from a trivial identity ensemble to the uniform Haar ensemble, while the PE transitions from the Haar ensemble to a trivial singleton pure state. In Clifford circuits, absence of non-stabiliserness limits the PE to a $1$-design, while the TE forms a $k$-design for $k \leq 3$. We demonstrate that these genuine ensemble transitions offer a clear physical mechanism for the measurement-induced entanglement or purification transitions, illustrating how the capacity to ergodically steer a quantum subsystem shifts from the temporal boundary measurements in the mixed phase to the bulk trajectory measurements in the pure phase.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:03Z</published>
+    <arxiv:comment>14 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Saptarshi Mandal</name>
+    </author>
+    <author>
+      <name>Sthitadhi Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17316v1</id>
+    <title>CoReMem: Cost-Internalizing Memory for Successive Coding Tasks with Prospective Valuation</title>
+    <updated>2026-11-12T18:58:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17316v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17316v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents tackle successive tasks on an evolving repository, carrying forward edits and writing memory before the next task is known. Selecting memory for unknown next tasks requires balancing future usefulness against the costs of writing and reading it. The actor must also decide when acting on available memory saves effort as the task unfolds. We introduce Coding-Repository Memory (CoReMem), a cost-internalizing framework that guides memory design and actor adaptation through measured memory value on the next task. Prospective segment valuation compares runs of the next task with and without individual trajectory segments from the same inherited repository state, guiding a compact memory built around anchors: repository locations and executable checks. Actor adaptation estimates on-policy memory value within rollout groups with and without memory, using a reward that prioritizes resolution and penalizes step count in successful runs. Provenance-gated value credit assigns the additional value term to steps identified as using memory-supplied anchors, while every step retains outcome credit. On ChainSWE, CoReMem raises the 27B actor's resolve rate from 21.0% to 25.7%, with 17% fewer steps and 11% fewer total cache-aware tokens, including memory-module calls, relative to the untrained actor model without memory.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:22Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peiwen Li</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Harshit Verma</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Sophia Zhou</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Haiwen Wang</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Ngoc Bui</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Heng Chang</name>
+      <arxiv:affiliation>Tsinghua University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Fei Fei</name>
+      <arxiv:affiliation>Goodvision AI</arxiv:affiliation>
+    </author>
+    <author>
+      <name>David van Dijk</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Rex Ying</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17306v1</id>
+    <title>Statistics of Fock-space correlation lengths in the many-body localised phase</title>
+    <updated>2026-11-12T18:56:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.17306v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17306v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The presence of long-ranged, many-body resonances in the many-body localised phase of disordered quantum systems is manifest in strong inhomogeneities of eigenstate amplitudes on the Fock space. We develop a quantitative, microscopic theory for this, centred on two-point Fock-space correlation functions. Exact diagonalisation of the disordered tilted-field Ising chain uncovers a stark contrast: typical correlations decay perfectly exponentially, whereas average correlations exhibit subexponential decay with systematic system-size dependence driven by rare resonant nodes. We show that this behaviour stems from an underlying distribution of Fock-space correlation lengths with a variance that scales inversely with system size. Crucially, the interplay of this distribution with the high-dimensional geometry of the hypercubic Fock-space graph, leads to the qualitative difference between the typical and average behaviours. The theory also allows us to derive the singularity spectrum of the many-body localised eigenstates, and to establish theoretically the anomalous symmetry violation of quantum multifractality as an inherent consequence of the Fock-space geometry.</summary>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:50Z</published>
+    <arxiv:comment>7 pages, 5 figures, and supplementary material</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.dis-nn"/>
+    <author>
+      <name>Bibek Saha</name>
+    </author>
+    <author>
+      <name>David E. Logan</name>
+    </author>
+    <author>
+      <name>Sthitadhi Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17299v1</id>
+    <title>Simulation-Based Priors and BAO Shifts from the Lyman-$α$ Forest at the Field Level</title>
+    <updated>2026-11-12T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17299v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17299v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an analytic forward model for the Lyman-alpha (Ly-alpha) forest flux field based on cubic-order large-scale structure perturbation theory (effective field theory) calculations. We validate our cubic model on two sets of hydrodynamic simulations spanning $2 \leq z \leq 4$: the small-volume CAMELS suite, which spans a wide range of cosmological and astrophysical parameters, and the large-volume, high-resolution Sherwood simulations. We find qualitatively similar results for both at the power-spectrum level. The perturbative model reproduces the three-dimensional flux power spectrum of the simulations to $\sim 5\%$ down to $k \simeq 1$-$1.5\,h\,{\rm Mpc}^{-1}$, depending on the redshift. This improves compared to previous quadratic perturbative forward models by up to 40%. Exploiting cosmic-variance cancellation in the field-level approach, we carry out precision measurements of the Lyman-alpha forest bias parameters from the CAMELS simulation suite. We use these measurements to analytically predict the shifts in the Baryon Acoustic Oscillations (BAO) scaling parameters induced by nonlinearities in the three-dimensional Lyman-alpha forest clustering as a function of cosmological parameters. We find sub-percent shifts in both the radial and transverse directions with a noticeable dependence on cosmology and redshift. Finally, from the field-level fits we construct simulation-based priors that can be used for cosmological analyses of the Lyman-alpha forest with the currently observing Dark Energy Spectroscopic Instrument (DESI). In addition, our cubic model captures the connected four-point function (trispectrum) of the forest, which opens up novel opportunities for accurate covariance matrix estimation for DESI and its successor, DESI-II.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:10Z</published>
+    <arxiv:comment>16+15 pages, 8+3 figures, 0+2 tables (main text + appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Divij Sharma</name>
+    </author>
+    <author>
+      <name>Roger de Belsunce</name>
+    </author>
+    <author>
+      <name>Mikhail M. Ivanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17295v1</id>
+    <title>Traces of Vacuum Squeezing: A Superconducting Transmission-Line Analogue of Cosmological Particle Creation</title>
+    <updated>2026-11-12T18:54:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.17295v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17295v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Particle creation in time-dependent quantum fields is a central phenomenon in early-universe cosmology, yet it remains experimentally inaccessible in its original context. We show theoretically that superconducting circuits based on a waveguide-like transmission line loaded with dc-SQUIDs can provide a direct analogue of a scalar field in a radiation-dominated Friedmann--Robertson--Walker universe in conformal time. The mode equation of the circuit reduces to the Weber equation, the same equation governing cosmological particle creation in a radiation-dominated background, admitting an exact solution in terms of parabolic cylinder functions and an exponentially suppressed particle spectrum. We analyse the conditions under which the analogy holds, which require a compromise between the duration of the pulse, the uniformity of the modulation and the symmetry of the SQUIDs, and show that dissipation does not erase the cosmological signal. We use the anomalous moment of each mode as a witness of the Bogoliubov mixing: it vanishes for any thermal state and survives dissipation, and, together with the photon number, it certifies squeezing, and with the purity of the state, it identifies whether the pairs created from the vacuum dominate.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:44Z</published>
+    <arxiv:comment>17 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Entropy 2026, 28, 1248 (2026)</arxiv:journal_ref>
+    <author>
+      <name>Paula I. Villar</name>
+    </author>
+    <author>
+      <name>Federico Guglielmucci Nazar</name>
+    </author>
+    <author>
+      <name>Elián Urtubey</name>
+    </author>
+    <author>
+      <name>Fernando C. Lombardo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17294v1</id>
+    <title>Metal Sandbox: Isolated Execution and Command Scheduling for GPU Coding Agents on Apple Silicon</title>
+    <updated>2026-11-12T18:54:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.17294v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17294v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-device inference requires kernels that make effective use of local accelerators. Efficient training and evaluation of models that generate Apple Metal kernels benefit from native macOS tools and concurrent agent sessions. These sessions alternate between model requests, development commands, and GPU execution, leaving GPU capacity idle for much of a rollout. We present Metal Sandbox, infrastructure that combines restricted per-instance file access, native command execution, and command-level scheduling across interconnected Macs. Each agent retains its workspace and private development environment. Parallel commands can run concurrently, while serial commands share one execution slot per node; eligible waiting commands can migrate to available Macs and return results to the original agent. Integration with Harbor supports task execution, automatic verification, and rollout collection through a common workflow. Controlled experiments on four Mac mini M4 nodes achieve $1.68\times$--$2.05\times$ gains in command throughput under concentrated demand. Sixteen static agent traces give an estimated $2.14\times$ sustained-throughput gain for four sessions per node versus one, assuming continuously replenished sessions and unchanged mean durations. Replaying these measured traces under dynamic scheduling reduces mean tool waiting by 18.8% and batch elapsed time by 22.3%, assuming unchanged phase durations. Metal Sandbox and its Harbor integration are open-source on GitHub.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:42Z</published>
+    <arxiv:comment>16 pages, 7 figures, 5 tables. Code available at https://github.com/WangHaoZhe/metal-sandbox and https://github.com/WangHaoZhe/harbor</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Haozhe Wang</name>
+    </author>
+    <author>
+      <name>Lina Chen</name>
+    </author>
+    <author>
+      <name>Fanqi Wan</name>
+    </author>
+    <author>
+      <name>Qi Han</name>
+    </author>
+    <author>
+      <name>Yinmin Zhang</name>
+    </author>
+    <author>
+      <name>Zheng Ge</name>
+    </author>
+    <author>
+      <name>Daxin Jiang</name>
+    </author>
+    <author>
+      <name>Junchi Yan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17290v1</id>
+    <title>Radiation, Thermochemistry, and Stellar Feedback in DISPATCH</title>
+    <updated>2026-11-12T18:53:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.17290v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17290v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growth of massive stars depends on whether their accretion flows survive radiation and outflow feedback from the forming stellar population. We present an extension of DISPATCH that couples directional stellar radiation, diffuse infrared transport, and thermochemistry to self-gravitating magnetohydrodynamics, individual stellar accretion, and protostellar jets. This AMR-based method uses DISPATCH's local timestepping, allowing stellar environments and their larger scale cluster environments to step on separate timescales, and providing the framework needed to scale to long-duration simulations of GMCs. Direct radiation is transported in multiple bands, including both ionizing and nonionizing radiation, and uses short characteristics to maintain source directions and shadowing. Diffuse radiation is implemented for IR reprocessed light, with M1 and stationary ray options for transport. The thermochemical model includes atomic and molecular hydrogen and helium chemistry, and metal cooling and dust. It also includes a composition-dependent equation of state. Stellar masses grow through accretion of gas rather than a prescribed IMF, allowing stellar masses to respond to the evolving gas supply and feedback. In tests, multiple-source illumination retains geometric shadows while diffuse reprocessing heats shielded material, and tests of jets, ionization fronts, and radiation pressure demonstrate expected behavior and convergence. Ionization fronts also cross asynchronous refinement boundaries with late-time propagation speeds within a few percent of analytic predictions. Together, these developments provide a framework for determining how radiative and mechanical feedback modify the duration and efficiency of accretion from turbulent clouds, connecting the gas supply to individual stars with the high-mass stellar initial mass function.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:53:03Z</published>
+    <arxiv:comment>19 pages, 11 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>William Lake</name>
+    </author>
+    <author>
+      <name>Paolo Padoan</name>
+    </author>
+    <author>
+      <name>Åke Nordlund</name>
+    </author>
+    <author>
+      <name>Troels Haugbølle</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17279v1</id>
+    <title>On stimulated scattering including harmonic generation in an unmagnetized pair plasma for arbitrary pump strengths</title>
+    <updated>2026-11-12T18:50:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17279v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17279v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A fully nonlinear analysis for the growth rate of the stimulated backscatter instability of an intense electromagnetic (EM) wave with arbitrary polarization in an unmagnetized pair plasma is presented. The connection of this instability to the FEL process is discussed and utilized. An intense EM wave causes an initially stationary pair plasma to drift forward with a speed near the speed of light. The resulting distribution function for both cold and warm pair plasmas is presented. It is shown that the frequency of the reflected light is thus Doppler downshifted from that of the incident wave. For a linearly polarized EM wave there is also an additional contribution to the forward drift at its second harmonic which leads to backscattered light at all odd harmonics of the Doppler downshifted frequency for sufficiently cold pair plasmas. Fully nonlinear particle-in-cell simulations confirm the theoretical growth rates and show how the instability depends on the pair plasma temperature. The effect of the intensity profile of the incoming EM wave as well as implications for astrophysical pair plasmas is discussed.</summary>
+    <category term="physics.plasm-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:50:51Z</published>
+    <arxiv:primary_category term="physics.plasm-ph"/>
+    <author>
+      <name>Vijay Patel</name>
+    </author>
+    <author>
+      <name>Thomas Grismayer</name>
+    </author>
+    <author>
+      <name>Samuel Sebastian</name>
+    </author>
+    <author>
+      <name>Xinlu Xu</name>
+    </author>
+    <author>
+      <name>John Palastro</name>
+    </author>
+    <author>
+      <name>Paulo Alves</name>
+    </author>
+    <author>
+      <name>Warren B. Mori</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17272v1</id>
+    <title>Stiffness in Confined Quantum Walks</title>
+    <updated>2026-11-12T18:47:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.17272v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17272v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate boundary-induced stiffness in discrete-time quantum walks confined to a finite lattice by unitary reflecting boundaries implemented through coin-flip operations. We define a dimensionless spreading stiffness from the instantaneous variation of the spatial width relative to the asymptotic spreading rate of the corresponding unconfined Hadamard walk and compare localized, Gaussian, and truncated-uniform initial states. The long-time response retains a strong dependence on the initial spatial profile: the localized and truncated-uniform states show an overall increase in stiffness with increasing confinement size, whereas the Gaussian state exhibits a nonmonotonic dependence with a broad maximum at intermediate sizes. The first and second stiffness moments satisfy the expected asymptotic consistency relation in the high-stiffness regime. The normalized Kullback--Leibler divergence reveals a slower spatial reorganization and qualitatively different finite-size trends, showing that dynamical stiffness and spatial homogenization are distinct properties. These results indicate that unitary confinement produces an intrinsically nonstationary regime whose long-time properties emerge from the interplay between boundary reflections, system size, and the spatial structure of the initial state.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:47:36Z</published>
+    <arxiv:comment>Two columns, 14 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Pablo G. M. Dantas</name>
+    </author>
+    <author>
+      <name>Rafael Vieira</name>
+    </author>
+    <author>
+      <name>Edgard P. M. Amorim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17271v1</id>
+    <title>Niche construction as an emerging phenomenon from fast ecological and slow evolutionary-environmental timescales in individual-based models</title>
+    <updated>2026-11-12T18:46:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17271v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17271v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider an individual-based model of niche construction built upon birth-death processes of d interacting biological entities (e.g., species, subpopulations or mutant strains in the same species) immersed in a slowly-varying environment which is influenced by the population state. In this setting, extinction and/or emergence of entities with negligible size or rarity, on long time scales can be observed. We prove that the joint dynamics of the environment and the species sizes on a logarithmic scale undergo a piecewise deterministic Markov process in a large time regime, which can be approximated by an explicit dynamical system in the limit of large populations. This convergence result holds true under the assumption that no "bad event" occurs during the population dynamics, corresponding to situations where several species become dominant or go extinct simultaneously. We also prove that no such bad event occurs for Baire-almost all initial conditions of the population sizes and the environmental resources. We apply this framework to study the long term coexistence of two specialist species consuming two resources, with a "joint" niche construction where each species constructs the niche of the other while depleting its resources. We also study an example of immune escape in cancer, where the environmental variable is associated with the state of the immune system and the species are associated with three types of tumor cells.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:46:56Z</published>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Nicolas Champagnat</name>
+    </author>
+    <author>
+      <name>Coralie Fritsch</name>
+    </author>
+    <author>
+      <name>Pablo A. Marquet</name>
+    </author>
+    <author>
+      <name>Cristobal Quiñinao</name>
+    </author>
+    <author>
+      <name>Leonardo Videla</name>
+    </author>
+    <author>
+      <name>Nicolás Zalduendo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17266v1</id>
+    <title>Global Fit Inference for LISA with samsara++</title>
+    <updated>2026-11-12T18:45:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.17266v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17266v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Laser Interferometer Space Antenna (LISA) will observe a superposition of gravitational-wave signals, requiring joint inference of an unknown number of sources, parameters, and instrumental noise. To disentangle these contributions, that overlap in both time and frequency, a Global Fit (GF) analysis is needed. We present samsara++, a C++/CUDA sampler designed to address this trans-dimensional GF problem. Building on the continuous-time MCMC framework of samsara, the algorithm combines birth-death processes for adding and removing sources, with mutation moves for parameter estimation. Birth and death are selected through posterior-dependent rates. Shared-memory parallelism, incremental likelihood updates, and indexed storage reduce the computational and memory costs, while parallel tempering improves the exploration of multimodal posteriors. We assess the performance using simulated one-year LISA datasets containing Galactic double white dwarf binaries and stationary Gaussian instrumental noise. Analyses of populations containing 143 and 866 binaries start from empty source models, without preliminary searches or proposals tailored to the injected population. These tests demonstrate source reconstruction and catalog generation, highlighting, at the same time, the importance of source-count, overlapping signals, and incomplete mixing on joint source and noise inference. Then we perform a separate stress test, initialized at the injected parameters, exploring a population of 16,435 binaries, corresponding to 131,480 source parameters. This run completes 15 million iterations in approximately 16 hours using about 3 GB of RAM. All together, these benchmarks show the computational feasibility of birth-death sampling for large Galactic-binary populations, and provide a foundation for extending samsara++ toward a comprehensive LISA global fit.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:45:15Z</published>
+    <arxiv:comment>23 pages, 9 figures, 2 tables, 3 appendices</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Lorenzo Valbusa Dall'Armi</name>
+    </author>
+    <author>
+      <name>Gabriele Astorino</name>
+    </author>
+    <author>
+      <name>Riccardo Buscicchio</name>
+    </author>
+    <author>
+      <name>Angelo Ricciardone</name>
+    </author>
+    <author>
+      <name>Walter Del Pozzo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17265v1</id>
+    <title>A deployed four-city entanglement-based QKD network with real-time key delivery, benchmarked against finite-key security bounds</title>
+    <updated>2026-11-12T18:45:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.17265v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17265v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum key distribution (QKD) generates shared secret keys whose security rests on the laws of physics rather than on computational assumptions. We report the entanglement-based segment of the Slovak national quantum communication infrastructure, connecting four cities in western Slovakia over deployed telecommunication fiber. Polarization-entangled photons generated at a central node are passively routed by wavelength to form a trusted-node-free, fully meshed sub-network of three cities, with the fourth connected through the central node and all links operated simultaneously. We also introduce a matrix formalism for passive wavelength routing that enables the algorithmic construction of uniquely and fully connected topologies. Unlike most previous demonstrations, which estimate key rates from raw coincidences, all rates reported here are obtained after the complete post-processing chain, with keys delivered in real time via ETSI GS QKD 014. With partial non-local chromatic dispersion compensation, we obtain 13.5 bit/s over 109 km, and 4.3 bit/s over 32.1 dB of accumulated loss between two cities without a direct fiber link. Benchmarking against finite-key security bounds shows that the implemented heuristic privacy amplification can exceed the finite-key bound, and that replacing detect-and-discard with error correction would increase the finite-key rate by a factor of 4.1-6.6, and yield a positive finite-key rate on the 142.9 km link where the implemented scheme yields none.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:45:08Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Gilberto Borges</name>
+    </author>
+    <author>
+      <name>Saeid Salari</name>
+    </author>
+    <author>
+      <name>Ekta Panwar</name>
+    </author>
+    <author>
+      <name>Samgeeth Puliyil</name>
+    </author>
+    <author>
+      <name>Kartik Kakade</name>
+    </author>
+    <author>
+      <name>Peter Rapčan</name>
+    </author>
+    <author>
+      <name>Mario Ziman</name>
+    </author>
+    <author>
+      <name>Djeylan Aktas</name>
+    </author>
+  </entry>
+</feed>
