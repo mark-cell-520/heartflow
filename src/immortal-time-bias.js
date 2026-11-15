@@ -244,6 +244,44 @@
  * 动作）、对医院排名营销话术的批评转述、新闻概括。verify 的含义是
  * 「这个成效结论可能来自重新分类造成的账面改善，需要核对总体终点
  * （总生存期/总违约数）或对齐分类口径再采信」。
+ *
+ * [r346 扩展] 过度诊断发生率误读（overdiagnosis incidence misread）——
+ * r342/r343/r345 三度延期候选（候选 A）落地。筛查普及使更多（含惰性/
+ * 本不会发病）病灶被检出，**病例计数上升是检出动作的结果，不是发生率
+ * 变化**，把「确诊人数翻倍」当作「发病率真的在上升/疾病真的在蔓延」，
+ * 是用检出计数冒充流行病学发生率：
+ *   癌症筛查让每年新确诊的病例数成倍增长，这表明这种病的发病率确实
+ *   在升高。
+ *   Widespread screening has multiplied the number of newly diagnosed
+ *   cases, which shows the incidence of this cancer is genuinely rising.
+ * 与既有维度的边界（r346 归因）：lead_time(路径 d) 判确诊时点前移、
+ * length_time(路径 e) 判病例构成偏慢病程、overdiagnosis(路径 f) 判本
+ * 不会发病病灶被计入收益——三条均不触及「检出计数⇒发生率结论」这一
+ * 推论腿；reverse_causation/pseudo_causal 等泛维度在 gate 层可代拦
+ * 部分变体（r346 探针实测 11/13），本路径补**纯形缺口**（2/13）并保持
+ * 族内自足（维度计数 256 不变、src/index.js 零改动，与 r328/r331/
+ * r335 各轮同形态）。立项探针实证（coordination/agent4/probes/
+ * r346-probe-candidates.js，集成树 v6.8.185 gate() 全量 findings 口径）：
+ * A 候选族攻击 13 条中纯形 2 条完全穿引擎、其余 11 条被既有维度代拦
+ * （不截胡纪律：代拦者存在，本路径只补纯形）；良性 8 条 FP 1（既有
+ * vagueness 基线，非本路径新增）。
+ * 判据（路径 h，三腿共现 + 跨腿邻近窗 + 豁免，缺一不判）：
+ *   腿① LEAD_SCREEN 筛查域（复用路径 d/e/f 腿①：筛查/早筛/普筛/检出/
+ *     EN screening / early detection）
+ *   腿② CASE_SURGE 检出病例数激增（确诊/新发/病例人数+激增/翻倍/攀升；
+ *     EN number of diagnosed cases surged / cases tripled / case count
+ *     surge / screening detected far more tumors）
+ *   腿③ INCIDENCE_CLAIM 发生率/蔓延结论（发病率真的上升/疾病真的在
+ *     蔓延/患病的人越来越多；EN incidence really rising / disease
+ *     becoming more common / proves the disease is spreading）
+ *   三腿首匹配跨度 ≤ WIN_LEAD（中 160 字 / 英 400 字符）
+ *   豁免 EXEMPT_INC（只作用于路径 h）：谨慎解读否定（并不代表发病率
+ *     真的上升——正是本路径要教的判别动作）/ 否定后置（发病率上升不
+ *     等于…）/ 检出解释（谨慎标记前置：主要是/本质上/反映的是…+漏诊被
+ *     及时发现/检出提前/统计错觉/筛查普及度——病例计数上升的良性归因；
+ *     标记前置是防呆，攻击句自身描述机制时无谨慎标记同行即按攻击判）/
+ *     过度诊断点名带纠正语境 / 死亡率终点设计
+ *   疑问形守卫同路径 (d)(e)(f)(g)：整句以问号收尾不判。
  */
 'use strict';
 
@@ -449,7 +487,7 @@ const EXEMPT_DESIGN_EN = [
 // 不带后缀也命中），并覆盖现代体检营销高频复合词。161 轮教训：只收带
 // 后缀的「癌症早筛项目」会漏裸「早筛组」整句。
 const LEAD_SCREEN_ZH = [
-  /早筛|早查|普筛|筛查|筛检|筛出|检出|体检筛查|癌症筛查|肿瘤筛查|防癌筛查/,
+  /早筛|早查|普筛|筛查|筛检|筛出|检出|体检筛查|体检普及|癌症筛查|肿瘤筛查|防癌筛查/,
   /基因检测|肿瘤标志物|液体活检|早发现/,
 ];
 // 腿①（英文）：screening / screened / early detection / detected earlier
@@ -617,6 +655,83 @@ const EXEMPT_LEN_EN = [
   /\b(?:does\s+not|do\s+not|doesn'?t|don'?t|cannot|can'?t|not)\b[^.]{0,28}\b(?:live\s+longer|longer\s+life|life\s+extension|extends?\s+life|prolongs?\s+life|saves?\s+lives|works?|effective|benefit|improves?|proves?)\b/i,
   /\b(?:inflates?|inflated|overestimat\w+|exaggerat\w+|overstat\w+)\b[^.]{0,30}\b(?:benefit|survival|value|effect|apparent)\b/i,
   /\b(?:overall|all[- ]?cause|total|disease[- ]specific)\s+mortality\b[^.]{0,36}\b(?:endpoint|primary\s+outcome|unchanged|no\s+difference)\b/i,
+];
+
+// ─── [r346] 路径 (h) 过度诊断发生率误读子家族常量 ────────────────────────
+// r342/r343/r345 三度延期候选（候选 A）落地：lead_time/length_time/
+// overdiagnosis 三条既有路径均未收「检出病例激增⇒发病率真的上升」这一腿——
+// 筛查普及使更多（含惰性/本不会发病）病灶被检出，**病例计数上升是检出动作
+// 的结果，不是发生率变化**（overdiagnosis incidence misread）。r346 立项
+// 探针实证：纯形攻击穿透 2/13、良性 FP 1/4（既有 vagueness 基线，非本路径
+// 新增）；其余攻击变体在 gate 层已被 reverse_causation/pseudo_causal 代拦
+// （不截胡纪律——代拦者不抢功，本路径补纯形缺口）。
+// 三腿共现 + 跨腿邻近窗，腿①复用筛查域 LEAD_SCREEN（与路径 d/e/f 同域），
+// 疑问形守卫同路径 (d)(e)(f)(g)。豁免 EXEMPT_INC 只作用于本路径——被豁免
+// 的句子仍可由路径 (a)-(g) 或其他维度评判。
+// 腿② CASE_SURGE 检出病例数激增（时态变动形：激增/翻倍/攀升/tripled/
+// surged——病例计数名词紧跟方向变动动词；名词后缀可缺省，「新增病例
+// 大幅增加」「病例比以前多了好几倍」同族；后缀缺省时下一字不得为「率」
+// ——防「发病率上升」自身充当腿②，腿②必须是检出计数而非发生率本身）。
+const CASE_SURGE_ZH = [
+  /(?:确诊|新发|新增|患病|发病|病例|检出|筛出|发现|报告|登记)(?:(?:人数|数量|病例数|例数|数目|数)|(?!率))[^。！？]{0,8}(?:激增|飙升|猛增|大涨|成倍增长|翻倍|翻番|倍增|翻(?:了)?(?:几|好几)?倍|节节攀升|大幅上升|大幅增加|显著增加|明显增多|上升|增长|增加|提高|攀升|上涨|变多|增多|多了)/,
+];
+// 腿②（英文）：number of diagnosed cases surged / cases tripled /
+// multiplied the number of … / case count surge / screening detected far
+// more tumors（检出动作使病例计数上升的显式形）
+const CASE_SURGE_EN = [
+  /\bnumber\s+of\s+(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported|identified)\s+(?:cases?|patients?|tumou?rs?|cancers?)\s+(?:has|have)?\s*(?:surged|tripled|doubled|multiplied|climbed|risen|increased|jumped|spiked|soared|grown|skyrocketed)/i,
+  /\b(?:diagnosed|confirmed|detected|new|reported)\s+cases?\s+(?:has|have)\s+(?:surged|tripled|doubled|multiplied|climbed|risen|increased|jumped|spiked|soared|grown|skyrocketed)/i,
+  /\b(?:has|have)\s+(?:multiplied|doubled|tripled|increased|surged|climbed)\s+the\s+number\s+of\s+(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported)\s+(?:cases?|patients?|tumou?rs?|cancers?)/i,
+  /\b(?:surge|jump|spike|increase|rise|climb)\s+in\s+(?:the\s+)?(?:number\s+of\s+)?(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported)\s+(?:cases?|patients?|tumou?rs?|cancers?)/i,
+  /\bcase\s+count\s+(?:surge|surged|jump|increase|has|have)\b/i,
+  /\b(?:surged|tripled|doubled|multiplied|increased|climbed|jumped|spiked)\s+(?:the\s+)?(?:number\s+of\s+)?(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported)\s+(?:cases?|patients?|tumou?rs?|cancers?)/i,
+  /\bscreen\w*\s+(?:detected|identified|found|surfaced)\s+(?:far\s+|many\s+|significantly\s+|much\s+)?more\s+(?:tumou?rs?|cancers?|cases?|lesions?|growths?)/i,
+];
+// 腿③ INCIDENCE_CLAIM 发生率/蔓延结论：病例计数上升⇒疾病真的变多（发病率
+// 上升/疾病蔓延/患病的人越来越多——诊断计数被当作流行病学发生率变化）。
+const INCIDENCE_CLAIM_ZH = [
+  /(?:发病率|发生率|患病率|罹患率|罹病率)[^。！？]{0,10}(?:真的|确实|真正|实实在在)?[^。！？]{0,4}(?:在|正在)?(?:上升|升高|提高|上涨|增长|走高|变高)/,
+  /(?:真的|确实|真正)[^。！？]{0,6}(?:发病率|发生率|患病率|罹患率)[^。！？]{0,6}(?:上升|升高|提高|上涨|增长|变高)/,
+  /(?:表明|说明|证明|可见|意味着|足以证明|这说明)[^。！？]{0,16}(?:发病率|发生率|患病率|罹患率)[^。！？]{0,8}(?:上升|升高|提高|上涨|增长|增加|更高)/,
+  /(?:疾病|病症|这种病|此病|癌症|肿瘤|病情)[^。！？]{0,10}(?:真的|确实|真正)?[^。！？]{0,4}(?:在|正在)?(?:变多|增多|蔓延|流行|扩散|传播|高发|频发|爆发|越来越多)/,
+  /(?:表明|说明|证明|可见|这意味着|足以证明)[^。！？]{0,14}(?:疾病|病症|这种病|此病|癌症|肿瘤)[^。！？]{0,6}(?:真的|确实|真正)?[^。！？]{0,4}(?:变多|增多|蔓延|流行|扩散|高发)/,
+  /(?:患病|得病|生病|罹患|感染|确诊|患)[^。！？]{0,3}(?:这种|此|该)?[^。！？]{0,3}(?:癌|病|症|疾病|肿瘤)?(?:的人|者|人群)[^。！？]{0,6}(?:越来越多|与日俱增|明显增多|大幅增多)/,
+  /(?:越来越多|与日俱增)[^。！？]{0,6}(?:人|患者|病人|病例)[^。！？]{0,4}(?:患病|得病|生病|确诊|感染)/,
+];
+// 腿③（英文）：incidence really rising / disease becoming more common /
+// proves the disease is spreading / more people getting the disease
+const INCIDENCE_CLAIM_EN = [
+  /\bincidence\s+(?:rate\s+)?(?:of\s+)?(?:this\s+|the\s+)?(?:disease|cancer|illness|condition)?\s*(?:is|are|has\s+been|have\s+been)?\s*(?:really|actually|genuinely|truly)?\s*(?:is|are)?\s*(?:rising|increasing|going\s+up|climbing|growing|higher|on\s+the\s+rise)/i,
+  /\b(?:disease|illness|cancer|condition|epidemic)\s+(?:is\s+|are\s+)?(?:really|actually|genuinely|truly)?\s*(?:becoming\s+)?(?:more\s+common|more\s+widespread|more\s+prevalent|spreading|on\s+the\s+rise)/i,
+  /\b(?:proves?|proving|shows?|showing|demonstrates?|demonstrating|indicates?|indicating|suggests?|suggesting|means?)\b[^.]{0,40}\b(?:the\s+)?(?:disease|illness|cancer|condition)\b[^.]{0,30}\b(?:is\s+)?(?:really\s+|actually\s+|genuinely\s+|truly\s+)?(?:spreading|becoming\s+more\s+common|becoming\s+more\s+widespread)/i,
+  /\b(?:proves?|proving|shows?|showing|demonstrates?|indicates?|suggests?)\b[^.]{0,30}\b(?:the\s+)?(?:incidence|prevalence|rate)\b[^.]{0,20}\b(?:rising|increasing|higher|going\s+up|climbing)/i,
+  /\bmore\s+(?:and\s+more\s+)?(?:people|cases|patients)\s+(?:are\s+)?(?:getting|developing|contracting|being\s+diagnosed\s+with)\b/i,
+];
+// 豁免 EXEMPT_INC（只作用于路径 h——被豁免的句子仍可由路径 (a)-(g) 或其他
+// 维度评判）。四条通路：(a) 谨慎解读否定（不能/并不/不代表…不等于…发病率
+// 上升/疾病变多——「并不代表发病率真的上升」正是本路径要教的判别动作）；
+// (b) 否定后置（发病率上升不等于/并不能说明…）；(c) 检出解释（谨慎解读
+// 标记前置：主要是/本质上/其实/反映的是…+漏诊被及时发现/检出提前/统计
+// 错觉/筛查普及度——病例计数上升的良性归因；标记前置是防呆，攻击句自身
+// 描述机制时（「筛查普及后确诊人数上升」）无谨慎标记同行即按攻击判）；
+// (d) 过度诊断点名须带纠正语境（同 EXEMPT_LEN (a) 口径，防攻击句被自己的
+// 机制词豁免）；(e) 死亡率终点设计（同 EXEMPT_LEN (d) 口径）。
+const EXEMPT_INC_ZH = [
+  /(?:不能|并非|不代表|不等于|并不意味着|并不能|不足以|无法|很难|未必|不一定|不应|不可|并不会|谈不上)[^。！？]{0,20}(?:发病率|发生率|患病率|罹患率|患病|流行|蔓延|变多|增多)/,
+  /(?:发病率|发生率|患病率|罹患率|患病|流行|蔓延)[^。！？]{0,12}(?:不能|并非|不代表|不等于|并不意味着|并不能|不足以|无法|很难|未必|不一定|并不会|谈不上)/,
+  /(?:不能|并非|并不是|不代表|不等于|并不意味着|并不能|主要是|本质上|其实|更多是|很大程度上|反映的是|说明的是|恰恰是|关键在于)[^。！？]{0,24}(?:漏诊|漏检|检出提前|发现提前|提前发现|被及时发现|统计错觉|统计假象|检出率提高|确诊率提高|筛查普及度|普筛普及|检查普及|体检普及|检测普及)/,
+  /过度诊断[^。！？]{0,20}(?:偏误|偏倚|问题|效应|高估|夸大|虚增|并不意味着|并不能|不代表)|(?:偏误|偏倚|问题|效应)[^。！？]{0,6}过度诊断/,
+  /(?:以|用|按|采用)[^。！？]{0,12}(?:总死亡率|全因死亡率|死亡率|死亡)[^。！？]{0,10}(?:为|作|作为)[^。！？]{0,8}(?:终点|指标|主要终点|观察终点|主要指标)/,
+];
+const EXEMPT_INC_EN = [
+  /\b(?:does|do)\s+not\s+(?:mean|indicate|show|prove|imply|suggest)\b[^.]{0,50}\b(?:incidence|prevalence|rate|more\s+common|more\s+widespread|spreading|rising|increasing)/i,
+  /\b(?:is|are)\s+not\b[^.]{0,30}\b(?:rising|increasing|becoming\s+more\s+common|spreading)/i,
+  /\b(?:isn'?t|aren'?t|cannot|can'?t)\b[^.]{0,20}\b(?:becoming\s+more\s+common|on\s+the\s+rise|spreading|rising|increasing)/i,
+  /\b(?:better|increased|improved|earlier|enhanced)\s+(?:case\s+)?detection\b[^.]{0,60}\b(?:does\s+not|not|rather\s+than|instead\s+of)\b/i,
+  /\b(?:detection|screening)\b[^.]{0,40}\b(?:rather\s+than|instead\s+of)\b[^.]{0,20}\b(?:real|true|actual)\b/i,
+  /\blead[-\s]?time\b[^.]{0,40}\b(?:detection|diagnosis)\b/i,
+  /\boverdiagnos(?:is|ed|e|es|ing)\b[^.]{0,60}\b(?:inflates?|overestimat\w+|bias|problem|means|does\s+not|is\s+not)/i,
+  /\b(?:overall|all[- ]?cause|total|disease[- ]specific)\s+mortality\b[^.]{0,40}\b(?:endpoint|primary\s+outcome|unchanged|no\s+difference)/i,
 ];
 
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
@@ -852,6 +967,37 @@ function checkImmortalTimeBias(text, inject) {
     }
   }
 
+  // ─── [r346] 路径 (h) 过度诊断发生率误读（overdiagnosis incidence misread）─
+  // 筛查域 × 检出病例数激增 × 发病率上升结论，三腿共现 + 跨腿邻近窗。
+  // r342/r343/r345 三度延期候选（候选 A）落地：既有 lead_time / length_time /
+  // overdiagnosis 路径均未收「病例计数上升⇒疾病真的变多」这一腿——筛查普及
+  // 使更多（含惰性/本不会发病）病灶被检出，病例计数上升是检出动作的结果，
+  // 不是发生率变化。与路径 (d)(e)(f) 共享腿①筛查域与疑问形守卫；豁免
+  // EXEMPT_INC 只作用于本路径——被豁免的句子仍可由路径 (a)-(g) 评判。
+  const XI_Z = R.EXEMPT_INC_ZH || EXEMPT_INC_ZH;
+  const XI_E = R.EXEMPT_INC_EN || EXEMPT_INC_EN;
+  if (!(anyHit(XI_Z, text) || anyHit(XI_E, text))) {
+    const ph1 = earliestEither(R.LEAD_SCREEN_ZH || LEAD_SCREEN_ZH, R.LEAD_SCREEN_EN || LEAD_SCREEN_EN, text);
+    if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
+      const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
+      // 腿② 检出病例数激增（时态变动形）
+      const ph2 = earliestEither(R.CASE_SURGE_ZH || CASE_SURGE_ZH, R.CASE_SURGE_EN || CASE_SURGE_EN, text);
+      // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
+      const ph3 = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
+      if (ph2 >= 0 && ph3 >= 0) {
+        const span = Math.max(ph1, ph2, ph3) - Math.min(ph1, ph2, ph3);
+        if (span <= winI) {
+          return {
+            hit: true, score: 0.6, count: 1,
+            detail: /[\u4e00-\u9fff]/.test(text)
+              ? '过度诊断发生率误读×检出病例激增×发病率上升结论(zh)'
+              : 'overdiagnosis-incidence-misread×case-count-surge×incidence-rise-claim(en)',
+          };
+        }
+      }
+    }
+  }
+
   // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移（stage migration）────
   // 重新分类动作 × 两组指标同向变动 × 成效结论，三腿共现 + 跨腿邻近窗。
   // 与路径 (a)-(f) 相互独立：本路径**不要求筛查域在场**（错位来源是
@@ -958,6 +1104,10 @@ module.exports = {
     OVERDIAG_ZH, OVERDIAG_EN,
     GAIN_CLAIM_ZH, GAIN_CLAIM_EN,
     EXEMPT_LEN_ZH, EXEMPT_LEN_EN,
+    // [r346] 路径 (h) 过度诊断发生率误读（负例注入口）
+    CASE_SURGE_ZH, CASE_SURGE_EN,
+    INCIDENCE_CLAIM_ZH, INCIDENCE_CLAIM_EN,
+    EXEMPT_INC_ZH, EXEMPT_INC_EN,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
