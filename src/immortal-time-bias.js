@@ -998,6 +998,90 @@ const DETECT_UP_ZH4 = [
   /(?:大|全民|全域|全员)(?:排查|监测|检测)/,
 ];
 
+// ─── [r352] 路径 (h) 腿③过去时推断词/was 系动词形（EN 专项，族独立常量）──
+// r351 交接项①落地（r351 轮测实现教训①同形）：legacy INCIDENCE_CLAIM_EN
+// 推断词表只有现在时（proves?/shows?/showing/demonstrates?/suggests?/
+// means?…），无 showed/demonstrated/proved/suggested/indicated/revealed
+// 等过去时——p3 匹配失败，整族穿透（r352 立项探针 8/8）；p2 系动词组
+// 只收 is/are 无 was/were——"the disease was truly on the rise" 裸系词
+// 形同样穿透。腿①/腿②均由 r346–r351 既有族覆盖，本族只补腿③。中文无
+// 时态，INCIDENCE_CLAIM_ZH p3/p5 的 表明/说明/证明 族已覆盖同形
+// （探针实证 ZH 代拦无缺口），本族 EN 专项。
+// 族隔离纪律（r346–r351 六轮测以精确 equality/注入钉死既有常量：
+// INCIDENCE_CLAIM_EN 恰 10、INCIDENCE_CLAIM_EN2 恰 5，追加会打破存量
+// 断言——r346 轮测注入 INCIDENCE_CLAIM_EN=[] 要求 7 条 EN 攻击翻转、
+// r348 轮测注入 INCIDENCE_CLAIM_EN2=[] 要求 4 条 trending 攻击翻转）：
+//   ① 推断词只收过去时形，现在时词形（shows/proving/suggests…）不
+//      匹配——r346 翻转集 7 句全现在时推断词，不被本族 rescue；
+//   ② 系词只收 was/were 不收 is/are——p2（is/are）与 p3（(?:is\s+)?
+//      可选）承重的现在时系词句与本族无交集（动词层过去时即不相交，
+//      系词层再双保险）；
+//   ③ 裸系词形（无推断词）限 was/were——"the disease is truly
+//      spreading" 现在时形仍由 p2 承重不变。
+const INCIDENCE_CLAIM_EN3 = [
+  // p1: 过去时推断词 + (the) disease/illness/cancer/condition + was/were
+  // + (really/actually/genuinely/truly)? + spreading / becoming more
+  // common / becoming more widespread / on the rise
+  /\b(?:showed|demonstrated|proved|suggested|indicated|revealed|meant|confirmed)\b[^.]{0,40}\b(?:the\s+)?(?:disease|illness|cancer|condition)\b[^.]{0,30}\b(?:was|were)\s+(?:really\s+|actually\s+|genuinely\s+|truly\s+)?(?:spreading|becoming\s+more\s+common|becoming\s+more\s+widespread|on\s+the\s+rise)\b/i,
+  // p2: 过去时推断词 + (the) incidence/prevalence/rate + was/were +
+  // (adv)? + rising / increasing / higher / going up / climbing /
+  // on the rise（p4 推断词表同缺过去时形）
+  /\b(?:showed|demonstrated|proved|suggested|indicated|revealed|meant|confirmed)\b[^.]{0,40}\b(?:the\s+)?(?:incidence|prevalence|rate)\b[^.]{0,30}\b(?:was|were)\s+(?:really\s+|actually\s+|genuinely\s+|truly\s+)?(?:rising|increasing|higher|going\s+up|climbing|on\s+the\s+rise)\b/i,
+  // p3: 裸系词形（无推断词）——disease/illness/cancer/condition/
+  // epidemic + was/were + (adv)? + (becoming)? more common/widespread/
+  // prevalent / spreading / on the rise
+  /\b(?:disease|illness|cancer|condition|epidemic)\s+(?:was|were)\s+(?:really\s+|actually\s+|genuinely\s+|truly\s+)?(?:becoming\s+)?(?:more\s+common|more\s+widespread|more\s+prevalent|spreading|on\s+the\s+rise)\b/i,
+];
+
+// ─── [r352] 路径 (h) 腿②单助动词形 × infections/illnesses 名词族 ──────
+// （EN 专项，族独立常量；r350 交接项②/r351 候选 C 续打落地）
+// legacy CASE_SURGE_EN p1/p2/p8/p9/p10 与 DETECT_UP_EN p5 的名词表均只有
+// cases/patients/tumors/cancers/lesions——"many more infections have
+// been identified" / "reported illnesses have tripled" / "Screening
+// identified many more infections" 等单助动词与名词前置形穿透（r352
+// 立项探针 4/5，良性 0/4 零误伤；r351 CASE_SURGE_EN4 已覆盖双助动词
+// ×infections 交集——"are being caught"形由该族承重，本族单助动词形
+// 与其严格不相交）。
+// 族隔离纪律（r346–r351 六轮测以注入钉死既有常量承重）：
+//   ① r351 轮测注入 CASE_SURGE_EN4=[] 要求 7 条双助动词攻击翻转——
+//      本族助动词组为单助动词集合（are/being/got/getting/have been/
+//      has been 择一），"are being caught"/"were being identified"
+//      双助动词共现形不匹配（aux 择一后下一词必须是检出动词，"being"
+//      不在检出动词表）；
+//   ② r349 轮测注入 CASE_SURGE_EN3=[] 要求 "far more infections got
+//      picked up" 翻转——本族 infections 形（p1b）剔除 got/getting
+//      （EN3 p4/p5 专属），illnesses 形（p1a）保留全助动词组（EN3
+//      名词表只收 infections 不收 illnesses，"illnesses got picked
+//      up" 仍是缺口）；
+//   ③ r346 轮测注入 CASE_SURGE_EN=[] 要求 7 条 EN 攻击翻转、r347 轮测
+//      注入 CASE_SURGE_EN=[旧 7 形] 要求 5 条新模式翻转——本族名词表
+//      只有 infections/illnesses，既有翻转集全为 cases/tumors 名词，
+//      不被 rescue；
+//   ④ r348 轮测注入 CASE_SURGE_EN2=[] 的 are-now-found/brought to
+//      light 形名词均为 cases/tumors，与本族无交集。
+const CASE_SURGE_EN5 = [
+  // p1a: 量化 + more + illnesses + 单助动词（全组含 got/getting）+
+  // 检出动词（legacy p9 名词表缺 illnesses；动词表取 legacy p9 与
+  // EN3 p4 的并集——"illnesses got picked up" 的 picked up 不在
+  // legacy p9 动词表，EN3 p4/p5 名词表又只收 infections 不收
+  // illnesses，探针实证该形穿透后补入）
+  /\b(?:(?:so|many|far|significantly|much|substantially)\s+)?more\s+illnesses?\s+(?:are\s+|being\s+|got\s+|getting\s+|have\s+been\s+|has\s+been\s+)?(?:detected|diagnosed|found|identified|reported|picked\s+up|caught|surfaced)\b/i,
+  // p1b: 量化 + more + infections + 单助动词（剔除 got/getting——EN3
+  // p4/p5 已收 infections + got/getting + picked up 类，r349 注入翻转
+  // 集含该形，本族不得 rescue）+ 检出动词（同上取并集——"many more
+  // infections are caught" 单助动词形 legacy p9 名词表缺 infections）
+  /\b(?:(?:so|many|far|significantly|much|substantially)\s+)?more\s+infections?\s+(?:are\s+|being\s+|have\s+been\s+|has\s+been\s+)?(?:detected|diagnosed|found|identified|reported|picked\s+up|caught|surfaced)\b/i,
+  // p2: number of + (newly)? + 检出形容词 + infections/illnesses +
+  // (has|have)? + 激增动词（legacy p1 名词表缺）
+  /\bnumber\s+of\s+(?:newly\s+)?(?:diagnosed|confirmed|detected|new|reported|identified)\s+(?:infections?|illnesses?)\s+(?:has|have)?\s*(?:surged|tripled|doubled|multiplied|climbed|risen|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
+  // p3: 检出形容词 + infections/illnesses + has/have + 激增动词
+  // （legacy p2 名词表缺——"reported illnesses have tripled"）
+  /\b(?:diagnosed|confirmed|detected|new|reported|identified)\s+(?:infections?|illnesses?)\s+(?:has|have)\s+(?:surged|tripled|doubled|multiplied|climbed|risen|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
+  // p4: 检出动词前置 + (far|many|…)?more + infections/illnesses
+  // （legacy p10 名词表缺——"Screening identified many more infections"）
+  /\b(?:find|identif|detect|surfac|report)\w*\s+(?:(?:far|many|significantly|much|substantially)\s+)?more\s+(?:infections?|illnesses?)\b/i,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1271,15 +1355,21 @@ function checkImmortalTimeBias(text, inject) {
       // [r351] 腿②第四族：双助动词被动形（EN 专项——are/were/is being +
       // 检出动词；legacy p9 单助动词可选组不收双助动词组合）
       const ph2d = earliestIdx(R.CASE_SURGE_EN4 || CASE_SURGE_EN4, text);
-      const ph2 = [ph2a, ph2b, ph2c, ph2d].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b, ph2c, ph2d].filter(x => x >= 0)) : -1;
+      // [r352] 腿②第五族：单助动词形 × infections/illnesses 名词（EN 专项
+      // ——legacy p1/p2/p8/p9/p10 与 DETECT_UP_EN p5 名词表均缺）
+      const ph2e = earliestIdx(R.CASE_SURGE_EN5 || CASE_SURGE_EN5, text);
+      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
       // looks to be trending higher / on an upward trend）
       const ph3b = earliestEither(R.INCIDENCE_CLAIM_ZH2 || INCIDENCE_CLAIM_ZH2, R.INCIDENCE_CLAIM_EN2 || INCIDENCE_CLAIM_EN2, text);
-      const ph3 = [ph3a, ph3b].filter(x => x >= 0).length
-        ? Math.min(...[ph3a, ph3b].filter(x => x >= 0)) : -1;
+      // [r352] 腿③第三族：过去时推断词/was 系动词形（EN 专项——legacy
+      // 推断词表只有现在时、p2 系动词组只收 is/are）
+      const ph3c = earliestIdx(R.INCIDENCE_CLAIM_EN3 || INCIDENCE_CLAIM_EN3, text);
+      const ph3 = [ph3a, ph3b, ph3c].filter(x => x >= 0).length
+        ? Math.min(...[ph3a, ph3b, ph3c].filter(x => x >= 0)) : -1;
       if (ph2 >= 0 && ph3 >= 0) {
         const span = Math.max(ph1, ph2, ph3) - Math.min(ph1, ph2, ph3);
         if (span <= winI) {
@@ -1417,6 +1507,9 @@ module.exports = {
     DETECT_UP_EN4, DETECT_UP_ZH4,
     // [r351] 路径 (h) 腿②双助动词被动形（负例注入口，族独立常量 EN 专项）
     CASE_SURGE_EN4,
+    // [r352] 路径 (h) 腿②单助动词×infections/illnesses 名词族 + 腿③
+    // 过去时推断词/was 系动词族（负例注入口，族独立常量 EN 专项）
+    CASE_SURGE_EN5, INCIDENCE_CLAIM_EN3,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
