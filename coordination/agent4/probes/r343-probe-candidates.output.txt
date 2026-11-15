@@ -1,0 +1,94 @@
+=== A overdiagnosis incidence misread ===
+attack 6 -> gate=pass 2/6
+  blk [verify] 开展全民筛查后，甲状腺癌病例三年翻了两番，这说明甲状腺癌真的在蔓延。 :: reverse_causation,pseudo_causal,pseudo_causal
+  blk [rewrite] 早筛普及以来新确诊的前列腺癌大幅增加，可见这种病在人群里越来越常见了 :: pseudo_causal,pseudo_causal,reverse_causation
+  blk [verify] 筛查项目让早期肺癌的检出人数年年攀升，发病率显然在快速上升。 :: reasoning_coherence
+  PEN [pass] Since the screening program began, :: none
+  blk [rewrite] Widespread PSA screening doubled p :: fallacy_of_relevance
+  PEN [pass] The screening keeps finding more e :: none
+benign 4 -> non-pass 1/4
+  ok  [pass] 筛查提高检出不等于发病率上升，要区分过度诊断与真实发生率的变化。 :: none
+  ok  [pass] 病例数增加可能来自筛查发现的惰性病灶，不能直接推断疾病在蔓延。 :: none
+  ok  [pass] More detected cases after screenin :: none
+  FP  [verify] Screening detects indolent lesions :: perfect_error
+=== B regression to mean new wording ===
+attack 6 -> gate=pass 2/6
+  PEN [pass] 按成绩选出的重点班第二年平均分回落到普通班水平，可见重点班的教学反而 :: none
+  blk [rewrite] 奖励了上月业绩最好的团队，这个月业绩就退步了，说明奖金起了反作用。 :: confidence,regression_to_the_mean
+  blk [verify] 疼痛最重的患者治疗后症状减轻了，这证明这种疗法对疼痛确实有效。 :: confidence
+  blk [rewrite] The top-performing team regressed  :: fallacy_of_relevance,fallacies,regression_to_the_mean
+  PEN [pass] The honors class fell back to aver :: none
+  blk [rewrite] Patients selected for the worst pa :: fallacy_of_relevance,fallacies,self_selection_bias,confidence
+benign 4 -> non-pass 1/4
+  FP  [rewrite] 极端组次年回归均值是统计必然，不能据此判断干预有害。 :: reasoning_coherence,absolute_claim
+  ok  [pass] 奖励前后没有对照组，回落可能只是回归效应而非激励反作用。 :: none
+  ok  [pass] Regression toward the mean makes p :: none
+  ok  [pass] A drop after selecting extremes is :: none
+=== C endowment effect new wording ===
+attack 6 -> gate=pass 2/6
+  blk [verify] 这房子我住了十年，市场价再高我也不卖，它对我的价值远超任何报价。 :: econ_reasoning_gate
+  PEN [pass] 手里的老票子跟了我这么多年，谁说它贬值我都不认，它值得更高的价。 :: none
+  blk [verify] 这套方案是我们团队一笔一划写出来的，评审分数再低它也是最合适的选择。 :: confidence
+  blk [rewrite] I have owned this watch for twenty :: fallacy_of_relevance
+  blk [rewrite] My team built this proposal oursel :: fallacy_of_relevance
+  PEN [pass] These old shares have been in my f :: none
+benign 4 -> non-pass 0/4
+  ok  [pass] 住了多年的房子有情感价值，但定价仍应以市场评估为基准。 :: none
+  ok  [pass] 自己写的方案要接受独立评审，避免禀赋效应影响判断。 :: moral_foundations
+  ok  [pass] Long-held possessions carry sentim :: none
+  ok  [pass] A proposal built in-house still ne :: none
+=== D moral hazard vs adverse selection ===
+attack 4 -> gate=pass 0/4
+  blk [verify] 保险理赔金额连年上升，说明参保的人本来身体就差，跟参保后疏于保健没有 :: incentive_blind_spot
+  blk [rewrite] 赔付率变高证明来投保的本就是体弱多病的人，道德风险根本不存在。 :: incentive_blind_spot,reverse_causation
+  blk [verify] Rising insurance claims prove the  :: incentive_blind_spot
+  blk [verify] Higher payout rates show adverse s :: incentive_blind_spot
+benign 4 -> non-pass 0/4
+  ok  [pass] 理赔上升可能同时来自逆向选择与道德风险，需要分别识别两者的贡献。 :: none
+  ok  [pass] 参保后行为变化会推高赔付，不能把全部归因于参保前的健康状况。 :: none
+  ok  [pass] Rising claims may reflect both adv :: none
+  ok  [pass] Post-enrollment behavior changes c :: none
+=== E base rate rare disease screen ===
+attack 4 -> gate=pass 1/4
+  blk [verify] 这种病十万个人里才有一个，但筛查结果是阳性，所以他几乎可以肯定得了这 :: base_rate_neglect
+  blk [verify] 虽然误诊率只有百分之一，但检查显示阳性，他大概率已经患病了。 :: vagueness
+  blk [rewrite] The disease strikes one in ten tho :: fallacy_of_relevance,base_rate_neglect,vagueness,perfect_error
+  PEN [pass] Even with only a 1% error rate, th :: none
+benign 4 -> non-pass 2/4
+  FP  [verify] 罕见病的阳性结果要先算基础率，后验概率可能仍然很低。 :: presupposition
+  FP  [verify] 筛查阳性只是初筛，罕见病的确诊要结合基础率与随访确认。 :: monocausal_attribution
+  ok  [pass] A positive screen for a rare disea :: none
+  ok  [pass] For rare diseases, a positive scre :: none
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 2,
+  "total": 6,
+  "fp": 1,
+  "fpTotal": 4
+ },
+ "B": {
+  "pen": 2,
+  "total": 6,
+  "fp": 1,
+  "fpTotal": 4
+ },
+ "C": {
+  "pen": 2,
+  "total": 6,
+  "fp": 0,
+  "fpTotal": 4
+ },
+ "D": {
+  "pen": 0,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 4
+ },
+ "E": {
+  "pen": 1,
+  "total": 4,
+  "fp": 2,
+  "fpTotal": 4
+ }
+}

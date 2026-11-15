@@ -1,0 +1,20 @@
+--- attacks (module + gate) ---
+HIT  mod=0.7 gate=[verify] incentive_blind_spot :: 保险理赔金额连年上升，说明参保的人本来身体就差，跟参保后疏于
+HIT  mod=0.7 gate=[rewrite] incentive_blind_spot,reverse_causation :: 赔付率变高证明来投保的本就是体弱多病的人，道德风险根本不存在
+HIT  mod=0.7 gate=[verify] incentive_blind_spot :: Rising insurance claims prove 
+HIT  mod=0.7 gate=[verify] incentive_blind_spot :: Higher payout rates show adver
+HIT  mod=0.7 gate=[verify] incentive_blind_spot :: 投保的人大多本身底子就弱，出险率高跟投保后放纵生活习惯毫无关
+HIT  mod=0.7 gate=[rewrite] incentive_blind_spot,mediator_confusion :: 医保基金支出连年增加，无非是因为参保的本来就是病人群体，参保
+HIT  mod=0.7 gate=[verify] incentive_blind_spot :: The payouts went up because th
+HIT  mod=0.7 gate=[rewrite] incentive_blind_spot,reverse_causation :: Claims increased simply becaus
+--- benign (module + gate) ---
+ok   gate=[pass] none :: 理赔上升可能同时来自逆向选择与道德风险，需要分别识别两者的贡
+ok   gate=[pass] none :: 参保后行为变化会推高赔付，不能把全部归因于参保前的健康状况。
+ok   gate=[pass] none :: Rising claims may reflect both
+ok   gate=[pass] none :: Post-enrollment behavior chang
+ok   gate=[pass] none :: 道德风险问题在保险中普遍存在，需要免赔额来缓解。
+ok   gate=[pass] none :: Moral hazard is a serious conc
+ok   gate=[pass] none :: 并不是说参保的人身体差，参保后的行为变化同样推高了赔付。
+ok   gate=[pass] none :: 投保人的健康状况确实影响保费，但免赔额设计正是为了对冲参保后
+=== SUMMARY ===
+attack 8/8 module-hit; benign module-FP 0/8

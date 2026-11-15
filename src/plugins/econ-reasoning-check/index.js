@@ -57,7 +57,9 @@ const FAMILIES = [
   // ── econ：信息与激励盲区（r296，src/incentive-blind-spot.js 三子族）──
   { key: 'adverse_selection',              mod: '../../incentive-blind-spot.js',           fn: 'detectAdverseSelection',            group: 'econ',  zh: '逆选择忽视',           en: 'adverse selection blind spot',   round: 'r296' },
   { key: 'moral_hazard',                   mod: '../../incentive-blind-spot.js',           fn: 'detectMoralHazard',                 group: 'econ',  zh: '道德风险忽视',         en: 'moral hazard blind spot',        round: 'r296' },
-  { key: 'free_rider',                     mod: '../../incentive-blind-spot.js',           fn: 'detectFreeRider',                   group: 'econ',  zh: '搭便车盲区',           en: 'free-rider blind spot',          round: 'r296' },
+  { key: 'free_rider',                     mod: '../../incentive-blind-spot.js',           fn: 'detectFreeRider',                   group: 'econ',  zh: '搭便车盲区',           en: 'free-rider blind spot',   round: 'r296' },
+  // r343 新增：归因混淆（incentive-blind-spot 第 4 子族，r297 已接 gate 路径，族内加腿零改 index.js）
+  { key: 'incentive_conflation',           mod: '../../incentive-blind-spot.js',           fn: 'detectIncentiveConflation',        group: 'econ',  zh: '逆选择/道德风险归因混淆', en: 'incentive conflation',   round: 'r343' },
 ];
 
 const _cache = new Map();

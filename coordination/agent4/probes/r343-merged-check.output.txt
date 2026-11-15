@@ -1,0 +1,8 @@
+merged dim=incentive_conflation score=0.7 :: 保险理赔金额连年上升，说明参保的人本来身体就差，跟参
+merged dim=incentive_conflation score=0.7 :: 赔付率变高证明来投保的本就是体弱多病的人，道德风险根
+merged dim=incentive_conflation score=0.7 :: Rising insurance claims pr
+merged dim=incentive_conflation score=0.7 :: Higher payout rates show a
+merged dim=incentive_conflation score=0.7 :: 投保的人大多本身底子就弱，出险率高跟投保后放纵生活习
+merged dim=incentive_conflation score=0.7 :: 医保基金支出连年增加，无非是因为参保的本来就是病人群
+merged dim=incentive_conflation score=0.7 :: The payouts went up becaus
+merged dim=incentive_conflation score=0.7 :: Claims increased simply be

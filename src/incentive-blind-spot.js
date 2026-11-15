@@ -1,8 +1,9 @@
 /**
- * src/incentive-blind-spot.js — 「信息与激励盲区」检测器（r296 起草）
- * （ provisional 第 247 个判别维度，含三个子族：adverse_selection /
- * moral_hazard / free_rider；src/index.js gate 接线由 1 号主力补全，
- * 接线规格见 coordination/reports/r296-dimension-agent4.md §五。
+ * src/incentive-blind-spot.js — 「信息与激励盲区」检测器（r296 起草，
+ * r297 已接进 gate 路径——第 247 维度 incentive_blind_spot，九处接入点
+ * 由 1 号主力补齐；含四个子族：adverse_selection / moral_hazard /
+ * free_rider / incentive_conflation——第四子族归因混淆 r343 新增，
+ * 挂本模块内自动获得 gate 覆盖，src/index.js 零改动）
  * 编号 provisional 的原因同 r218-r295：本模块本轮经
  * src/plugins/econ-reasoning-check/ 插件层 dispatch（postprocess.think
  * → _discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读
@@ -27,8 +28,23 @@
  * 道德风险——隐藏行动使兜底改变行为；Olson 1965 集体行动逻辑——
  * 公共品供给中个体有搭便车激励）。
  *
+ * [r343 立项] 零命中探针（2026-11-15，v6.8.185 gate() 全量实测，
+ * coordination/agent4/probes/r343-probe-candidates.js）：五候选竞品——
+ *   A 筛查过度诊断（病例激增⇒疾病真的蔓延）2/6、B 均值回归新形 2/6
+ *     +良性 1/4、C 禀赋效应新措辞 2/6、E 罕见病筛查阳性⇒必然患病
+ *     1/4+良性 2/4，均放弃；D 道德风险与逆向选择混淆（理赔上升⇒
+ *     参保人本来体弱+否认参保后行为变化）攻击 3/4 穿透、良性 4/4
+ *     零误伤胜出。海外扫描（coordination/agent4/scout/*20261115-020140*）：
+ *     arXiv OR 拆散返回无关条目、GitHub repos 0 命中、Semantic Scholar
+ *     429——空返，按既有形态自建。判据为心虫自有纯规则实现（家族定义
+ *     取自信息经济学标准描述：Akerlof 1970 逆选择——池子按私有风险
+ *     自我筛选；道德风险——隐藏行动使兜底改变行为；本族是两者的
+ *     归因混淆：只认前者、抹掉后者）。
+ * 落地方式：本模块已由 r297 接进 gate 路径（detectIncentiveBlindSpot
+ * 是 src/index.js 第 247 维度计算点），族内加第四子族零改 index.js。
+ *
  * 辨别的族：信息与激励盲区（incentive blind spot）——**忽略隐藏
- * 信息、隐藏行动与集体行动对结果的系统性影响**，三个子族：
+ * 信息、隐藏行动与集体行动对结果的系统性影响**，四个子族：
  *
  * ① adverse_selection 逆选择忽视：**风险池/信贷池自我筛选语境**
  *    （保险/投保/保费/参保/保单/风险池/医保/社保/贷款/信贷/借款/
@@ -61,16 +77,36 @@
  *      Someone else will always contribute to the public good,
  *      so I don't need to do my part.
  *
- * 为什么这是判别者的核心缺口（对齐「判断是非」）：这三族是 LLM 在
+ * ④ incentive_conflation 归因混淆（r343 新增子族）：**参保前风险
+ *    归因在场**（参保/投保的人本来身体就差/来投保的本就是体弱
+ *    多病/投保的多是高风险人群；EN the insured were already sicker/
+ *    people who buy insurance are high-risk/adverse selection alone）×
+ *    **道德风险否认/排他**（道德风险根本不存在/跟参保后疏于保健
+ *    没有关系/参保后的行为没有任何变化；EN moral hazard plays no
+ *    role/behavior after enrolling is irrelevant）：
+ *      保险理赔金额连年上升，说明参保的人本来身体就差，跟参保后
+ *      疏于保健没有关系。
+ *      赔付率变高证明来投保的本就是体弱多病的人，道德风险根本不存在。
+ *      Rising insurance claims prove the insured were already sicker;
+ *      how they behave after enrolling is irrelevant.
+ *    前三族判「效应被否认」，本族判「效应被错误归因」：逆选择与
+ *    道德风险两种机制同时在场，说话者只承认参保前那条、抹掉参保
+ *    后那条——用一半机制解释全部变化的归因混淆。
+ *
+ * 为什么这是判别者的核心缺口（对齐「判断是非」）：这四族是 LLM 在
  * 经济与制度分析里最典型的系统性错误——写作者把「池子/合同/集体」
  * 当成静态背景，看不到参与者会按私有信息和隐藏行动重新排序自己
  * 的行为。信息不对称不是道德瑕疵而是结构约束：否认逆选择，后面
  * 的定价、风控、准入设计全部建在幻觉上；否认道德风险，兜底政策
- * 的副作用完全脱眶；否认搭便车，公共品供给方案落空。与正当表述
- * 有明确界线：纠正/防范表述（要防逆选择/通过免赔额缓解道德风险/
- * 为防止搭便车需设计选择性激励）、概念教学（正确定义天然不含
- * 「无扭曲」断言腿）、缺任一腿（只报保险事实无行为不变断言、
- * 只报公共事务无退出断言）——均豁免。
+ * 的副作用完全脱眶；否认搭便车，公共品供给方案落空；把赔付变化
+ * 单方面归因于参保前风险构成（本族④），风险治理会开错药方——
+ * 该上核保与风险分层的地方上了行为约束，该上免赔额与共付的地方
+ * 上了参保门槛。与正当表述有明确界线：纠正/防范表述（要防逆选择/
+ * 通过免赔额缓解道德风险/为防止搭便车需设计选择性激励）、概念
+ * 教学（正确定义天然不含「无扭曲」断言腿）、两种机制并重的正确
+ * 陈述（赔付上升可能同时来自逆选择与道德风险，需分别识别）、
+ * 缺任一腿（只报保险事实无行为不变断言、只报公共事务无退出断言）
+ * ——均豁免。
  *
  * 与既有维度的边界（r296 归因）：
  *   · perverse_incentive（插件 econ 族，r236）管**激励设计反噬**
@@ -89,13 +125,18 @@
  *     操控结构。
  *
  * 判据（每子族双腿共现，缺一不判）：
- *   ① 腿① 语境锚点（POOL/SHIELD/COLLECTIVE，中英分列）；
- *   ② 腿② 断言腿（NODISTORT/NOCHANGE/ABSTAIN，中英分列）；
- *   两腿落在近距离窗内（ZH 60 字 / EN 180 字符）。
+ *   ① 腿① 语境锚点（POOL/SHIELD/COLLECTIVE/ADV_ATTR，中英分列）；
+ *   ② 腿② 断言腿（NODISTORT/NOCHANGE/ABSTAIN/MORAL_DENIAL，中英
+ *      分列）；
+ * 两腿落在近距离窗内（ZH 60 字 / EN 180 字符）。
  *   腿②匹配若被翻转短语修饰（不等于/并非/不能说/未必/not that/
  *   far from）不计——说话者已在纠正该推理，正是本族解药。
  *   全篇出现防范/警惕/克服类针对性纠偏短句（要防逆选择/为克服
  *   搭便车/guard against moral hazard）→ 整条豁免。
+ *   子族④另设两者并重豁免（同时来自/都要考虑/不能把全部归因；
+ *   reflects both/separate the two/cannot attribute everything）
+ *   ——赔付上升同时归因于两种机制是正确陈述，正是本族要教的
+ *   判别动作本身。
  *
  * 为什么取 VERIFY 级：单句可能是在转述一个既成制度安排而未及展开
  * 效应分析（这类由缺腿/豁免覆盖），也可能是分析者的真诚信念陈述。
@@ -407,9 +448,94 @@ const ABSTAIN_EN = [
   /\b(?:someone\s+else|somebody\s+else|others?|everyone\s+else|other\s+(?:members|people|residents|contributors|tenants)|the\s+others|the\s+rest|the\s+group|the\s+team|the\s+community|the\s+government|the\s+state|the\s+authorities|the\s+system|the\s+institution)\s+(?:will|would|can|could|shall|should|always|surely|certainly|eventually|inevitably|no\s+doubt)\s+(?:\w+\s+){0,2}?(?:step\s+in|step\s+up|take\s+over|take\s+care|handle|do\s+the\s+work|do\s+it|do\s+the\s+job|fix\s+it|sort\s+it|sort\s+it\s+out|pick\s+up\s+the\s+slack|take\s+the\s+lead|lead|organize|manage|deal\s+with\s+it|take\s+charge|cover\s+for|cover\s+it|fill\s+the\s+gap|fill\s+in|step\s+forward|come\s+forward)\b/i,
 ];
 
+// ═══════════════════════════════════════════════════════════════
+// 子族④ incentive_conflation 归因混淆（r343 新增）
+// ——把理赔/赔付上升全部归因于参保前的风险构成（逆选择），
+//   同时否认参保后的行为变化（道德风险）。前三族判「效应被
+//   否认」，本族判「效应被错误归因」：两种机制同时在场，
+//   说话者只承认前者、抹掉后者。
+// ═══════════════════════════════════════════════════════════════
+
+// 腿① 参保前风险归因在场（中文）
+// ④-a (参保|投保|入保|买保险)的人(本来|大多|本身)身体就差/本来就是病人
+//    （副词/连接词组用 * 可重复：「大多本身」「就是」连续出现是高频形）
+const ADV_ATTR_ZH_A = /(?:参保|投保|入保|买保险)(?:的人|者|的)?(?:本来|原本|本就|天生|向来|一向|一律|都|多半|大多|本身)*(?:身体|健康|底子|体质|状况)?(?:就|更|较|多半|是)*(?:差|弱|不好|糟|多病|病弱|不健康|欠佳|病人|患者|病号|亚健康|高危|高风险)/;
+// ④-b 来投保的本就是体弱多病/高风险的人
+const ADV_ATTR_ZH_B = /来(?:投保|参保)的(?:都|多|往往|一般|通常|多数|大多|本就|本来|基本上|几乎)(?:是|为)?(?:体弱多病|病秧子|病人|病号|患者|高风险|高风险人群|高危|身体不好|不健康|亚健康|体质差|底子差)/;
+// ④-c 投保的(都|多|往往|多数|属于)是高风险/体弱群体
+const ADV_ATTR_ZH_C = /(?:投保|参保|买保险)的(?:人|者)?(?:都|多|往往|通常|多数|大多|一般|其中|里)?(?:是|为|属于)(?:高风险|高危|病人|患者|体弱|亚健康|不健康|病号)/;
+
+const ADV_ATTR_ZH_GROUPS = [
+  ['ADV_ATTR_ZH_A', [ADV_ATTR_ZH_A]],
+  ['ADV_ATTR_ZH_B', [ADV_ATTR_ZH_B]],
+  ['ADV_ATTR_ZH_C', [ADV_ATTR_ZH_C]],
+];
+const ADV_ATTR_ZH = [ADV_ATTR_ZH_A, ADV_ATTR_ZH_B, ADV_ATTR_ZH_C];
+
+// 腿① 参保前风险归因在场（英文）
+// ④-d the insured were already sicker / those who enroll are high-risk
+const ADV_ATTR_EN_D = /\b(?:the\s+)?(?:insured|enrollees?|policyholders?|those\s+who\s+(?:buy|purchase|enroll\w*|sign\w*\s+up\s+for))\b[^.]{0,40}\b(?:were|are|was|is)\s+(?:already\s+|inherently\s+|naturally\s+)?(?:sicker|sickest|high[- ]risk|in\s+worse\s+health|less\s+healthy|unhealthy|frailer)/i;
+// ④-e people who buy insurance are already sicker
+const ADV_ATTR_EN_E = /\b(?:people|those|individuals)\s+who\s+(?:buy|purchase|enroll\s+in|sign\s+up\s+for|take\s+out)\s+(?:insurance|policies|coverage)\s+(?:are|were)\s+(?:already\s+|inherently\s+|naturally\s+)?(?:sicker|high[- ]risk|less\s+healthy|in\s+worse\s+health|unhealthy)/i;
+// ④-f adverse selection alone explains / alone; moral hazard… / entirely due to pre-existing health
+const ADV_ATTR_EN_F = /\badverse\s+selection\s+alone\b[^.]{0,60}\b(?:explains?|accounts?|responsible|drives?|causes?|suffices?|enough|reason|moral\s+hazard)\b|\b(?:entirely|wholly|solely|only)\s+(?:due\s+to|attributable\s+to|explained\s+by|driven\s+by)\s+(?:pre-?existing|prior|pre-?enrollment)\s+(?:health|risk|conditions)/i;
+// ④-g claims/payouts rose because the people who signed up were already sicker
+const ADV_ATTR_EN_G = /\b(?:claims?|payouts?|losses|costs)\s+(?:went|gone|go|rose|risen|rising|increased|increases?|climbed|jumped|grew|growth)\b[^.]{0,60}\b(?:only\s+|simply\s+)?because\s+(?:the\s+)?(?:people|those|individuals)\s+who\s+(?:signed\s+up|enrolled|bought|purchased)\b[^.]{0,40}\b(?:were|are)\s+(?:already\s+)?(?:sicker|high[- ]risk|less\s+healthy)/i;
+
+const ADV_ATTR_EN_GROUPS = [
+  ['ADV_ATTR_EN_D', [ADV_ATTR_EN_D]],
+  ['ADV_ATTR_EN_E', [ADV_ATTR_EN_E]],
+  ['ADV_ATTR_EN_F', [ADV_ATTR_EN_F]],
+  ['ADV_ATTR_EN_G', [ADV_ATTR_EN_G]],
+];
+const ADV_ATTR_EN = [ADV_ATTR_EN_D, ADV_ATTR_EN_E, ADV_ATTR_EN_F, ADV_ATTR_EN_G];
+
+// 腿② 道德风险否认/排他（中文）
+// ④-h 道德风险(根本)不存在/没有/无关/不起作用
+const MORAL_DENIAL_ZH_H = /道德风险(?:问题)?(?:根本|完全|压根|丝毫|其实|本身|在此)?(?:不存在|并未存在|并不存在|没有|并无|谈不上|不起作用|不起任何作用|不构成问题|不是问题|无关|可以排除|可以忽略|无需考虑|不必考虑|不予考虑|不值一提)/;
+// ④-i (跟|与)(投保|参保)后(放纵|疏于)生活习惯(变化)(毫)无(任何)关系
+const MORAL_DENIAL_ZH_I = /(?:跟|与|和)(?:参保|投保|入保)后(?:的)?(?:放纵|疏于|忽视|忽略|不注意|放松)?(?:行为|行为方式|保健|生活方式|生活习惯|习惯|作为|自我约束|锻炼|饮食)[^。，！？；\n]{0,8}(?:没有|无|毫无)(?:任何)?(?:关系|关联|相干)/;
+// ④-j 参保后的(保健)行为(并)没有(任何)变化/影响
+const MORAL_DENIAL_ZH_J = /参保后(?:的)?(?:放纵|疏于|忽视|忽略|不注意|放松)?(?:行为|行为方式|保健|生活方式|生活习惯|习惯|自我约束)[^。，！？；\n]{0,8}(?:并?没有|毫无|并无)(?:任何)?(?:变化|改变|影响|不同|放松)/;
+
+const MORAL_DENIAL_ZH_GROUPS = [
+  ['MORAL_DENIAL_ZH_H', [MORAL_DENIAL_ZH_H]],
+  ['MORAL_DENIAL_ZH_I', [MORAL_DENIAL_ZH_I]],
+  ['MORAL_DENIAL_ZH_J', [MORAL_DENIAL_ZH_J]],
+];
+const MORAL_DENIAL_ZH = [MORAL_DENIAL_ZH_H, MORAL_DENIAL_ZH_I, MORAL_DENIAL_ZH_J];
+
+// 腿② 道德风险否认/排他（英文）
+// ④-k moral hazard plays/has no role
+const MORAL_DENIAL_EN_K = /\bmoral\s+hazard\s+(?:plays?|has)\s+no\s+(?:role|part|place)\b/i;
+// ④-l moral hazard is not a factor/concern/issue
+const MORAL_DENIAL_EN_L = /\bmoral\s+hazard\s+is\s+(?:not|no)\s+(?:a\s+|an\s+|the\s+)?(?:factor|concern|issue|problem|consideration)\b/i;
+// ④-m moral hazard does not exist / can be ruled out
+const MORAL_DENIAL_EN_M = /\bmoral\s+hazard\s+(?:does\s+not|doesn'?t)\s+exist\b|\bmoral\s+hazard\s+can\s+be\s+(?:ruled\s+out|excluded|ignored|dismissed)\b/i;
+// ④-n behavior after enrolling / post-enrollment behavior is irrelevant
+const MORAL_DENIAL_EN_N = /\b(?:behavio(?:u)?r|conduct|actions?|behave|act)\s+(?:of\s+(?:the\s+)?(?:insured|enrollees?|policyholders?)|(?:after|post-?)\s*(?:enrolling|enrollment|insur\w+|buying\s+insurance))\s+is\s+(?:irrelevant|beside\s+the\s+point)\b|\b(?:after|post-?)\s*(?:enrolling|enrollment|insur\w+|buying\s+insurance)\s+(?:behavio(?:u)?r|conduct|actions?)\s+is\s+(?:irrelevant|beside\s+the\s+point)\b/i;
+// ④-o nothing to do with how the insured behave
+const MORAL_DENIAL_EN_O = /\b(?:nothing|little)\s+to\s+do\s+with\s+(?:how|what|whether)\s+(?:the\s+)?(?:insured|enrollees?|policyholders?|they)\s+(?:behave|act|take\s+care)\b/i;
+// ④-p nothing to do with post-enrollment behavior
+const MORAL_DENIAL_EN_P = /\bhas\s+nothing\s+to\s+do\s+with\s+(?:post-?enrollment|post-?insurance)\s+(?:behavio(?:u)?r|conduct|actions?)\b/i;
+
+const MORAL_DENIAL_EN_GROUPS = [
+  ['MORAL_DENIAL_EN_K', [MORAL_DENIAL_EN_K]],
+  ['MORAL_DENIAL_EN_L', [MORAL_DENIAL_EN_L]],
+  ['MORAL_DENIAL_EN_M', [MORAL_DENIAL_EN_M]],
+  ['MORAL_DENIAL_EN_N', [MORAL_DENIAL_EN_N]],
+  ['MORAL_DENIAL_EN_O', [MORAL_DENIAL_EN_O]],
+  ['MORAL_DENIAL_EN_P', [MORAL_DENIAL_EN_P]],
+];
+const MORAL_DENIAL_EN = [MORAL_DENIAL_EN_K, MORAL_DENIAL_EN_L, MORAL_DENIAL_EN_M, MORAL_DENIAL_EN_N, MORAL_DENIAL_EN_O, MORAL_DENIAL_EN_P];
+
 // ─── 双腿距离窗 ───────────────────────────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
+
+// 归因混淆豁免：两者并重的正确陈述（解药句，整条豁免）
+const CONFLATION_CORRECT_ZH = /(?:同时来自|同时存在|两者都有|二者兼具|都要考虑|需要分别|分别识别|分别考虑|不能把全部|不能全部|不能只|并非全部|未必都|不只是|不仅仅|两方面)/;
+const CONFLATION_CORRECT_EN = /\bboth\s+(?:adverse\s+selection\s+and\s+moral\s+hazard|moral\s+hazard\s+and\s+adverse\s+selection)\b|\breflects?\s+both\b|\bseparate\s+the\s+two\b|\bcannot\s+attribute\s+everything\b|\bnot\s+(?:entirely|solely|only)\s+(?:due\s+to|attributable\s+to)\b/i;
 
 // ─── 纠偏豁免：针对性防范/克服短句（解药句，整条豁免）──────────
 const ANTIDOTE_ZH = /(?:防止|避免|克服|纠正|警惕|防范|应对|缓解|规避)[^。，！？；\n]{0,8}(?:逆选择|道德风险|搭便车|免费搭车|搭顺风车)/;
@@ -563,9 +689,60 @@ function detectFreeRider(text, inject) {
     ['economics', 'collective-action', 'free-rider', 'public-goods', 'cooperation']);
 }
 
-// ─── 合并入口（三子族并跑，取首个命中；供未来单键 gate 接线）──
+// ─── 子族④ incentive_conflation 归因混淆 ────────────────────
+// 注入解析：整表替换（R.ADV_ATTR_ZH=[]）优先，否则按命名组逐组替换
+// （R.ADV_ATTR_ZH_A=[] 只删该组）——负例注入-删条的最小粒度。
+function resolveConflationGroups(R, groups, wholeKey) {
+  if (Object.prototype.hasOwnProperty.call(R, wholeKey)) return R[wholeKey] || [];
+  const out = [];
+  for (const [name, defs] of groups) out.push(...(Object.prototype.hasOwnProperty.call(R, name) ? (R[name] || []) : defs));
+  return out;
+}
+
+function detectIncentiveConflation(text, inject) {
+  if (!text || typeof text !== 'string' || text.length < 6) return EMPTY;
+  const R = inject || {};
+  if ((R.ANTIDOTE_ZH || ANTIDOTE_ZH).test(text) || (R.ANTIDOTE_EN || ANTIDOTE_EN).test(text)) return EMPTY;
+  // 两者并重的正确陈述（同时来自/都要考虑/不能把全部归因）——解药句
+  if ((R.CONFLATION_CORRECT_ZH || CONFLATION_CORRECT_ZH).test(text) || (R.CONFLATION_CORRECT_EN || CONFLATION_CORRECT_EN).test(text)) return EMPTY;
+  // 注入副本：命名组解析成整表后交给共享 findSignatures
+  const inj = inject ? Object.assign({}, R) : null;
+  if (inj) {
+    inj.ADV_ATTR_ZH = resolveConflationGroups(R, ADV_ATTR_ZH_GROUPS, 'ADV_ATTR_ZH');
+    inj.ADV_ATTR_EN = resolveConflationGroups(R, ADV_ATTR_EN_GROUPS, 'ADV_ATTR_EN');
+    inj.MORAL_DENIAL_ZH = resolveConflationGroups(R, MORAL_DENIAL_ZH_GROUPS, 'MORAL_DENIAL_ZH');
+    inj.MORAL_DENIAL_EN = resolveConflationGroups(R, MORAL_DENIAL_EN_GROUPS, 'MORAL_DENIAL_EN');
+  }
+  const sigs = findSignatures(text, inj || R, {
+    aZH: 'ADV_ATTR_ZH', aEN: 'ADV_ATTR_EN', bZH: 'MORAL_DENIAL_ZH', bEN: 'MORAL_DENIAL_EN',
+    defA: ADV_ATTR_ZH, defA_EN: ADV_ATTR_EN, defB: MORAL_DENIAL_ZH, defB_EN: MORAL_DENIAL_EN,
+  });
+  if (sigs.length === 0) return EMPTY;
+  const s = sigs[0];
+  // 分数略高于前三族（0.62/0.72）：本族与 adverse_selection / moral_hazard
+  // 可能同句共现（攻击句常同时含池子/兜底语境词），detectIncentiveBlindSpot
+  // 取最高分命中，略高可保证归因不被前三族截胡。
+  const score = sigs.length >= 2 ? 0.78 : 0.70;
+  return {
+    hit: true,
+    dimension: 'incentive_conflation',
+    severity: Math.round(score * 100),
+    score,
+    count: sigs.length,
+    evidence: sigs.slice(0, 2).map(x => (x.lang === 'zh'
+      ? '「' + x.anchor + '」×「' + x.claim + '」'
+      : '"' + x.anchor + '" x "' + x.claim + '"')),
+    details: s.lang === 'zh'
+      ? 'incentive-conflation 归因混淆(' + sigs.length + '处: 「' + s.anchor + '」把结果归因于参保前风险构成，却以「' + s.claim + '」抹掉参保后的行为变化——逆选择与道德风险两种机制被混为一谈)(zh)'
+      : 'incentive-conflation(' + sigs.length + 'x: "' + s.anchor + '" attributes the outcome to pre-enrollment risk, while "' + s.claim + '" erases post-enrollment behavior change — adverse selection and moral hazard conflated)(en)',
+    guidance: '不要把理赔/赔付上升自动归因于「参保的人本来身体就差」：保险池同时受两种机制驱动——参保前的风险构成差异（逆选择）与参保后的行为变化（道德风险）。只承认前者、否认后者，是用一半机制解释全部变化的归因混淆（参保的人本来身体就差，跟参保后疏于保健没有关系 / the insured were already sicker, so how they behave after enrolling is irrelevant）。两种机制的识别方法不同：逆选择看参保前的风险分布与核保记录，道德风险看参保后的行为指标（就诊频次/用药量/出险行为）与免赔额、共付等行为约束设计。请先分别核对两条证据链，再决定归因权重；正确表述是「赔付上升可能同时来自逆选择与道德风险，需分别识别」。',
+    tags: ['economics', 'information-economics', 'moral-hazard', 'adverse-selection', 'insurance', 'attribution'],
+  };
+}
+
+// ─── 合并入口（四子族并跑，取最高分命中；供未来单键 gate 接线）──
 function detectIncentiveBlindSpot(text, inject) {
-  const subs = [detectAdverseSelection, detectMoralHazard, detectFreeRider];
+  const subs = [detectAdverseSelection, detectMoralHazard, detectFreeRider, detectIncentiveConflation];
   let best = null;
   for (const fn of subs) {
     const r = fn(text, inject);
@@ -578,12 +755,16 @@ module.exports = {
   detectAdverseSelection,
   detectMoralHazard,
   detectFreeRider,
+  detectIncentiveConflation,
   detectIncentiveBlindSpot,
   __internals: () => ({
     POOL_ZH, POOL_EN, NODISTORT_ZH, NODISTORT_EN,
     SHIELD_ZH, SHIELD_EN, NOCHANGE_ZH, NOCHANGE_EN,
     COLLECTIVE_ZH, COLLECTIVE_EN, ABSTAIN_ZH, ABSTAIN_EN,
+    ADV_ATTR_ZH, ADV_ATTR_EN, MORAL_DENIAL_ZH, MORAL_DENIAL_EN,
     ANTIDOTE_ZH, ANTIDOTE_EN,
+    CONFLATION_CORRECT_ZH, CONFLATION_CORRECT_EN,
+    ADV_ATTR_ZH_GROUPS, ADV_ATTR_EN_GROUPS, MORAL_DENIAL_ZH_GROUPS, MORAL_DENIAL_EN_GROUPS,
     PAIR_ZH, PAIR_EN,
   }),
 };

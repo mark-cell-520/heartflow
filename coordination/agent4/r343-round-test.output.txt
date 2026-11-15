@@ -1,0 +1,62 @@
+  ✓ A gate 层：攻击 8/8 → action≠pass 且 findings 含 incentive_blind_spot
+  ✓ B 模块直调：攻击 8/8 命中且 details 带 incentive-conflation 族名标
+  ✓ B 合并入口：攻击 8/8 归因 incentive_conflation（不被前三子族截胡）
+  ✓ C 良性零误伤：手工良性 8/8 模块级不命中
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+  ✓ C 良性零误伤：官方四基准语料全量模块级零命中
+  ✓ D 注册：插件层 FAMILIES 含 incentive_conflation 行
+  ✓ D 注册：模块导出 detectIncentiveConflation 且并入 detectIncentiveBlindSpot 子族表
+  ✓ E 注入 ADV_ATTR_ZH_A=[] → A 独担样本失效
+  ✓ E 注入 ADV_ATTR_ZH_B=[] → B 独担样本失效
+  ✓ E 注入 ADV_ATTR_ZH_C=[] → C 独担样本失效
+  ✓ E 注入 ADV_ATTR_EN_D=[] → D 独担样本失效
+  ✓ E 注入 ADV_ATTR_EN_E=[] → E 独担样本失效
+  ✓ E 注入 ADV_ATTR_EN_F=[] → F 独担样本失效
+  ✓ E 注入 ADV_ATTR_EN_G=[] → G 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_ZH_H=[] → H 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_ZH_I=[] → I 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_ZH_J=[] → J 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_EN_K=[] → K 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_EN_L=[] → L 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_EN_M=[] → M 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_EN_N=[] → N 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_EN_O=[] → O 独担样本失效
+  ✓ E 注入 MORAL_DENIAL_EN_P=[] → P 独担样本失效
+  ✓ E 注入 ADV_ATTR_ZH=[] → 中文攻击全失效
+  ✓ E 注入 MORAL_DENIAL_ZH=[] → 中文攻击全失效
+  ✓ E 注入 ADV_ATTR_EN=[] → 英文攻击全失效
+  ✓ E 注入 MORAL_DENIAL_EN=[] → 英文攻击全失效
+  ✓ E 注入 PAIR_ZH=-1 → 中文攻击全失效
+  ✓ E 注入 PAIR_EN=-1 → 英文攻击全失效
+  ✓ E 注入 CONFLATION_CORRECT_ZH 永假 → 两者并重良性变红
+  ✓ E 注入 CONFLATION_CORRECT_EN 永假 → 两者并重良性变红
+  ✓ E 注入 ANTIDOTE_ZH 永假 → 防范表述+攻击结构良性变红
+  ✓ E 注入 ANTIDOTE_EN 永假 → guard 表述+攻击结构良性变红
+  ✓ E 翻转守卫：腿②前置「不是说」→ 不判
+  ✓ E 翻转守卫：腿②前置「not that」→ 不判
+  ✓ E 族独立性：本族腿组全清 → 攻击 8/8 失效
+  ✓ F 边界：adverse_selection 攻击句不判（无道德风险否认腿）
+  ✓ F 边界：moral_hazard 攻击句不判（无参保前归因腿）
+  ✓ F 边界：free_rider 攻击句不判
+  ✓ F 边界：只腿①（参保归因在场、无道德风险否认）不判
+  ✓ F 边界：只腿②（道德风险否认、无参保归因）不判
+  ✓ F 边界：镜像归因混淆（全部归因道德风险、抹掉逆选择）暂不判
+  ✓ F 边界：概念教学句不判
+  ✓ G 登记：__internals 暴露本族常量组、GROUPS 与窗
+
+r343 轮测：44 通过 / 0 失败
