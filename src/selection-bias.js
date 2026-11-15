@@ -197,11 +197,11 @@ const PUB_EVERY_ZH = ['每一项', '每项', '各项', '每一项研究', '所�
 const PUB_CLAIM_ZH = /(?:有效|管用|有用|成立|充分|明确|确凿|可靠|安全|采信|定论|毋庸置疑|毫无疑问|站得住|靠得住|可以放心|可以推广|可以采纳|值得相信|值得采纳|足以采信|证据充分)/;
 
 // 腿① EN：量化词 × 文献名词 × 动词/系词 × 结果词（单正则，窗内共现）
-const PUB_EN_RE = /\b(?:every|all|each|no|none|not\s+a\s+single|with\s+no|the\s+literature|the\s+published\s+literature|unanimously|consistently|without\s+exception)\b[^.;]{0,50}?\b(?:(?:published|peer-reviewed)\s+)?(?:study|studies|trial|trials|paper|papers|report|reports|publication|article|research)s?\b[^.;]{0,40}?\b(?:show|shows|showed|showing|report|reports|reported|reporting|find|finds|found|finding|support|supports|confirm|confirms|demonstrate|demonstrates|suggest|suggests|were|was|are|is|came\s+back)\b[^.;]{0,30}?\b(?:positive|null|negative|effective|benefit|beneficial|harm|significant|works)\b/i;
+const PUB_EN_RE = /\b(?:every|all|each|no|none|not\s+a\s+single|with\s+no|the\s+literature|the\s+published\s+literature|unanimously|consistently|without\s+exception)\b[^.;]{0,50}?\b(?:(?:published|peer-reviewed)\s+)?(?:study|studies|trial|trials|paper|papers|report|reports|publication|article|research)s?\b[^.;]{0,40}?\b(?:show|shows|showed|showing|report|reports|reported|reporting|find|finds|found|finding|support|supports|confirm|confirms|demonstrate|demonstrates|suggest|suggests|were|was|are|is|came\s+back)\b[^.;]{0,30}?\b(?:positive|null|negative|effective|benefits?|harms?|significant|works?)\b/i;
 // 腿① EN 路由 b：literature 主语 × 一致性副词 × 动词 × 结果词
 // （"The literature unanimously reports positive results"——主语即文献域，
 //   无 study/trial 名词，路由 a 的名词位收不到）
-const PUB_EN_RE2 = /\b(?:the\s+)?(?:published\s+|peer-reviewed\s+)?literature\b[^.;]{0,30}?\b(?:unanimously|consistently|without\s+exception)?[^.;]{0,20}?\b(?:show|shows|showed|showing|report|reports|reported|reporting|find|finds|found|finding|support|supports|confirm|confirms|demonstrate|demonstrates|suggest|suggests)\b[^.;]{0,30}?\b(?:positive|null|negative|effective|benefit|beneficial|harm|significant|works)\b/i;
+const PUB_EN_RE2 = /\b(?:the\s+)?(?:published\s+|peer-reviewed\s+)?literature\b[^.;]{0,30}?\b(?:unanimously|consistently|without\s+exception)?[^.;]{0,20}?\b(?:show|shows|showed|showing|report|reports|reported|reporting|find|finds|found|finding|support|supports|confirm|confirms|demonstrate|demonstrates|suggest|suggests)\b[^.;]{0,30}?\b(?:positive|null|negative|effective|benefits?|harms?|significant|works?)\b/i;
 
 // 腿② EN：普效/定论断言
 const PUB_CLAIM_EN = /\b(?:proven|proves|effective|works|worked|established|conclusive|conclusively|settled|settles|definitive|solid|reliable|trustworthy|can\s+trust|adopt|safe|clear|valid|sound)\b/i;
@@ -377,9 +377,9 @@ function _findPublicationRestriction(clause, R) {
 }
 
 // ── [r342] 腿②：普效/定论断言（仅 PUB 型受限路由调用）──────────────
-function _pubClaim(body, isEN) {
+function _pubClaim(body, isEN, R) {
   if (!body) return false;
-  return isEN ? PUB_CLAIM_EN.test(body) : PUB_CLAIM_ZH.test(body);
+  return isEN ? (R.PUB_CLAIM_EN || PUB_CLAIM_EN).test(body) : (R.PUB_CLAIM_ZH || PUB_CLAIM_ZH).test(body);
 }
 
 // ── 腿②：总体推广检测 ─────────────────────────────────────────
@@ -493,8 +493,8 @@ function checkSelectionBias(text, inject) {
   // 全文级守卫（概念 / 教学 / 幸存者射程 / 充分取样 / 明示局限）
   for (const m of META_CONCEPT) { if (t.toLowerCase().includes(m)) return _exempt('META_CONCEPT', m); }
   // [r342] 发表偏倚概念教学/纠正语境全句豁免（与 META_CONCEPT 同构）
-  for (const m of PUB_META_ZH) { if (t.includes(m)) return _exempt('PUB_META', m); }
-  for (const m of PUB_META_EN) { if (t.toLowerCase().includes(m)) return _exempt('PUB_META', m); }
+  for (const m of (R.PUB_META_ZH || PUB_META_ZH)) { if (t.includes(m)) return _exempt('PUB_META', m); }
+  for (const m of (R.PUB_META_EN || PUB_META_EN)) { if (t.toLowerCase().includes(m)) return _exempt('PUB_META', m); }
   for (const m of TEACH) { if (t.includes(m)) return _exempt('TEACH', m); }
   for (const m of SURVIVOR_ZH) { if (t.includes(m)) return _exempt('SURVIVOR', m); }
   for (const m of SURVIVOR_EN) { if (t.toLowerCase().includes(m)) return _exempt('SURVIVOR', m); }
@@ -562,7 +562,7 @@ function checkSelectionBias(text, inject) {
       if (ACK_CLAUSE_EN.some(a => low.includes(a))) continue;
       if (HEDGE_ZH.some(h => body.includes(h))) continue;
       if (HEDGE_EN.some(h => new RegExp('\\b' + h + '\\b').test(low))) continue;
-      const route = _hasGeneralization(body, R) || (/^PUB/.test(restr.type) && _pubClaim(body, restr.type === 'PUB_EN') ? (restr.type === 'PUB_EN' ? 'EN_PUB' : 'ZH_PUB') : null);
+      const route = _hasGeneralization(body, R) || (/^PUB/.test(restr.type) && _pubClaim(body, restr.type === 'PUB_EN', R) ? (restr.type === 'PUB_EN' ? 'EN_PUB' : 'ZH_PUB') : null);
       if (!route) continue;
       hits.push({ sample: clause.trim(), conclusion: body, type: restr.type, route });
       break;
