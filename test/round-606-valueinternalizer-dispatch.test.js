@@ -65,11 +65,11 @@ t('A5 路由全集等于预期 12 个公开方法', () => {
   ].sort();
   assert.deepStrictEqual(r, expect);
 });
-t('A6 模块总数较接线前 +1（147）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length); // [v6.8.85] A6 模块数 147→161
+t('A6 模块总数较接线前 +1（148）', () => {
+  assert.strictEqual(Object.keys(hf._modules).length, 162, 'modules=' + Object.keys(hf._modules).length); // [v6.8.85] 147→161；[v6.8.121] eduEngine 接入 161→162
 });
-t('A7 路由总数较接线前 +12（1190）', () => {
-  assert.strictEqual(Array.from(HeartFlow_Allows(hf)).length, 1314, 'routes=' + Array.from(HeartFlow_Allows(hf)).length); // [v6.8.85] A7 路由基线 1190→1314
+t('A7 路由总数较接线前 +12（1191）', () => {
+  assert.strictEqual(Array.from(HeartFlow_Allows(hf)).length, 1316, 'routes=' + Array.from(HeartFlow_Allows(hf)).length); // [v6.8.85] 1190→1314；[v6.8.121] eduEngine 接入 1314→1316
 });
 
 function HeartFlow_Allows(h) {
@@ -233,5 +233,7 @@ t('D5b logBoundaryNegotiation 空实参抛可读入参校验错（契约行为�
 });
 
 console.log('\n=== 结果 ===');
-console.log('通过 ' + passed + ' / 失败 ' + failed);
+// [v6.8.158] 汇总行改标准格式「N 通过, M 失败」：原「通过 N / 失败 M」动词在前，
+// run-all 解析正则不认（round311 契约钉死该格式必须判静默），断言全过也计 1 败。
+console.log('测试结果: ' + passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
 if (failures.length) { console.log('失败项:\n  ' + failures.join('\n  ')); process.exit(1); }

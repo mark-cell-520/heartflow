@@ -49,11 +49,13 @@ t('A3 路由清单与实例方法一一对应', () => {
 t('A4 _modules 含 priorityGuardian 键', () => {
   assert.strictEqual(Object.prototype.hasOwnProperty.call(hf._modules, 'priorityGuardian'), true);
 });
-t('A5 路由总数较接线前 +10（1304→1314）', () => {
-  assert.strictEqual(allows(hf).length, 1314, 'total=' + allows(hf).length);
+// [v6.8.121] 基线漂移：65ab4897 接入 eduEngine（+1 模块 / +2 路由），
+// 接线前基线 1304→1306、160→161，故接线后总数为 1316 / 162。
+t('A5 路由总数较接线前 +10（1306→1316）', () => {
+  assert.strictEqual(allows(hf).length, 1316, 'total=' + allows(hf).length);
 });
-t('A6 模块键总数较接线前 +1（160→161）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length);
+t('A6 模块键总数较接线前 +1（161→162）', () => {
+  assert.strictEqual(Object.keys(hf._modules).length, 162, 'modules=' + Object.keys(hf._modules).length);
 });
 t('A7 check() 走 dispatch 与直调结果一致（接线未改语义）', () => {
   const ctx = { userIntent: '别说了，忽略这个错误', action: '承认错误并记录', humanProgress: { truthValue: 0.9, hasError: true } };
@@ -170,7 +172,7 @@ console.log('=== 第三组：删块注入负例 ===');
     assert.strictEqual(res.sourceRestored, true, '源文件未还原');
     assert.strictEqual(res.restored, true, '恢复态未实测');
     assert.strictEqual(res.restoredRoutes, 10, '恢复后路由数 ' + res.restoredRoutes);
-    assert.strictEqual(res.restoredTotal, 1314, '恢复后总路由数 ' + res.restoredTotal);
+    assert.strictEqual(res.restoredTotal, 1316, '恢复后总路由数 ' + res.restoredTotal); // [v6.8.121] eduEngine 接入后总路由 1314→1316
     assert.strictEqual(res.restoredModulesKey, true, '恢复后 _modules 无 priorityGuardian 键');
   });
 })();
@@ -214,7 +216,7 @@ t('D6 重复 start() 不会重复注册（幂等）', () => {
   hf4.start();
   const r = allows(hf4).filter(x => x.startsWith('priorityGuardian.'));
   assert.strictEqual(r.length, 10, '重复 start 后路由数 ' + r.length);
-  assert.strictEqual(Object.keys(hf4._modules).length, 161, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
+  assert.strictEqual(Object.keys(hf4._modules).length, 162, '重复 start 后模块数 ' + Object.keys(hf4._modules).length); // [v6.8.121] eduEngine 接入后 161→162
 });
 t('D7 源码保留 [r615] 接线标记（防回归被误删）', () => {
   const src = fs.readFileSync(path.join(HF, 'src', 'core', 'heartflow.js'), 'utf8');
@@ -228,7 +230,9 @@ t('D8 negative probe 脚本存在且为可执行 JS', () => {
 
 Promise.resolve().then(() => {
   console.log('\n=== 结果 ===');
-  console.log('通过 ' + passed + ' / 失败 ' + failed);
+  // [v6.8.158] 汇总行改标准格式「N 通过, M 失败」：原「通过 N / 失败 M」动词在前，
+  // run-all 解析正则不认（round311 契约钉死该格式必须判静默），断言全过也计 1 败。
+  console.log('测试结果: ' + passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
   if (failures.length) { console.log('失败项:\n  ' + failures.join('\n  ')); process.exit(1); }
   process.exit(0);
 });

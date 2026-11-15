@@ -50,11 +50,13 @@ t('A3 路由清单与实例公有方法对应', () => {
 t('A4 _modules 含 uncertaintyQuantifier 键', () => {
   assert.strictEqual(Object.prototype.hasOwnProperty.call(hf._modules, PREFIX), true);
 });
-t('A5 路由总数较接线前 +3（1311→1314）', () => {
-  assert.strictEqual(allows(hf).length, 1314, 'total=' + allows(hf).length);
+// [v6.8.121] 基线漂移：65ab4897 接入 eduEngine（+1 模块 / +2 路由），
+// 接线前基线 1311→1313、160→161，故接线后总数为 1316 / 162。
+t('A5 路由总数较接线前 +3（1313→1316）', () => {
+  assert.strictEqual(allows(hf).length, 1316, 'total=' + allows(hf).length);
 });
-t('A6 模块键总数较接线前 +1（160→161）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length);
+t('A6 模块键总数较接线前 +1（161→162）', () => {
+  assert.strictEqual(Object.keys(hf._modules).length, 162, 'modules=' + Object.keys(hf._modules).length);
 });
 t('A7 evaluate 走 dispatch 与直调结果一致（接线未改语义）', () => {
   // [v6.8.85 审计修复] 两处口径缺陷：
@@ -135,8 +137,12 @@ t('B9 recordOutcome 记录校准数据并可被 getStats 读出', () => {
   assert.strictEqual(typeof st.recentRecords[st.recentRecords.length - 1].hallucinationRisk, 'number');
 });
 t('B10 同一输入两次调用结果稳定（无随机漂移）', () => {
-  const a = JSON.stringify(hf.dispatch(PREFIX + '.evaluate', { text: '根据记录数据显示研究表明已有结论' }));
-  const b = JSON.stringify(hf.dispatch(PREFIX + '.evaluate', { text: '根据记录数据显示研究表明已有结论' }));
+  // [v6.8.158 修复] 原断言直接 stringify 两次 dispatch 结果，而 dispatch 包装带
+  // duration（执行耗时毫秒数，1ms vs 0ms 天然不等）——与 A7 同型的口径缺陷，
+  // 会恒红。判别内容本身确定（strip 后实测相等），比较前剔除 duration。
+  const strip = o => { const c = JSON.parse(JSON.stringify(o)); delete c.duration; return JSON.stringify(c); };
+  const a = strip(hf.dispatch(PREFIX + '.evaluate', { text: '根据记录数据显示研究表明已有结论' }));
+  const b = strip(hf.dispatch(PREFIX + '.evaluate', { text: '根据记录数据显示研究表明已有结论' }));
   assert.strictEqual(a, b);
 });
 
@@ -234,7 +240,7 @@ t('D8 重复 start() 不会重复注册（幂等）', () => {
   hf4.start();
   const r = allows(hf4).filter(x => x.startsWith(PREFIX + '.'));
   assert.strictEqual(r.length, 3, '重复 start 后路由数 ' + r.length);
-  assert.strictEqual(Object.keys(hf4._modules).length, 161, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
+  assert.strictEqual(Object.keys(hf4._modules).length, 162, '重复 start 后模块数 ' + Object.keys(hf4._modules).length); // [v6.8.121] eduEngine 接入后 161→162
 });
 t('D9 源码保留 [r617] 接线标记（防回归被误删）', () => {
   const src = fs.readFileSync(path.join(HF, 'src', 'core', 'heartflow.js'), 'utf8');
@@ -248,7 +254,9 @@ t('D10 negative probe 脚本存在且为可执行 JS', () => {
 
 Promise.resolve().then(() => {
   console.log('\n=== 结果 ===');
-  console.log('通过 ' + passed + ' / 失败 ' + failed);
+  // [v6.8.158] 汇总行改标准格式「N 通过, M 失败」：原「通过 N / 失败 M」动词在前，
+  // run-all 解析正则不认（round311 契约钉死该格式必须判静默），断言全过也计 1 败。
+  console.log('测试结果: ' + passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
   if (failures.length) { console.log('失败项:\n  ' + failures.join('\n  ')); process.exit(1); }
   process.exit(0);
 });
