@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/TDh2Iz8eqIdYZkLb1yrf/xUsmas</id>
+  <title>arXiv Query: search_query=all:collider OR all:bias OR all:Berkson OR all:hospitalization OR all:selection OR all:medical OR all:statistics&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-15T16:32:03Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:collider+OR+(all:bias+OR+(all:Berkson+OR+(all:hospitalization+OR+(all:selection+OR+(all:medical+OR+all:statistics)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>551409</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17327v1</id>
+    <title>Decoupling Dynamics: A Tale of Two Limits</title>
+    <updated>2026-11-12T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17327v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17327v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The symmetries of a $d$-dimensional QFT are known to be captured by a topological theory in one dimension higher, the Symmetry Topological Field Theory (SymTFT), which is invariant under gauging finite symmetries of the QFT, but not under dynamical gauging of continuous symmetries. We show that the distinct SymTFTs of a $d$-dimensional QFT before and after dynamical gauging of a continuous Abelian symmetry arise as different topological limits of the same dynamical holographic gauge theory in $(d+1)$-dimensions. Gauging changes the boundary condition of this dynamical theory and thereby selects a different topological limit, explaining why the associated SymTFT changes. We give a fully quantum definition of these SymTFTs at the level of Hilbert spaces and operators by combining suitable limits of the bulk holographic theory with photon truncation. This construction clarifies how topological symmetry defects, charges, and anomalies survive while the dynamical information carried by currents is discarded. We study non-anomalous and anomalous examples, providing a complete quantum analysis for $(2+1)$-dimensional bulks. For a four-dimensional boundary theory with a mixed axial-vector anomaly, we recover the SymTFT of the non-invertible chiral symmetry that remains after gauging the vector symmetry.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:31Z</published>
+    <arxiv:comment>30 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Andrea Antinucci</name>
+    </author>
+    <author>
+      <name>Oscar Lewis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17323v1</id>
+    <title>AgentSSL: Can MLE Agents Leverage Unlabeled Data?</title>
+    <updated>2026-11-12T18:59:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.17323v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17323v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applying machine learning systems to new domains introduces bottlenecks in both labeled data acquisition and manual pipeline engineering. While recent MLE agents show promise in automating pipeline design, they have been studied almost exclusively in fully supervised settings, leaving them untested in realistic regimes where labeled data is scarce but unlabeled data is abundant. In this work, we introduce Agentic Semi-Supervised Learning (AgentSSL), framing SSL as a program search problem and studying how agents navigate this space under limited supervision. We find that even under weak feedback and matched compute, agents can synthesize code that combines and adapts established SSL techniques, exceeding the strongest human-engineered baselines in 8 of 12 settings by up to +21.8%. However, our results identify program selection as a critical bottleneck in AgentSSL, where performance drops by as much as 47% when selecting based on the agent's feedback metric. To systematically study this bottleneck, we introduce ProgramSelectBench, a large-scale benchmark with a combined total of 16,977 agent-generated and human-engineered SSL programs, and evaluate both unsupervised and active program selection methods. We further evaluate AgentSSL on real-world ecology detection tasks, highlighting the opportunities and challenges of transferring agent-discovered strategies beyond controlled benchmarks.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:06Z</published>
+    <arxiv:comment>NeurIPS 2026. Project Website: https://codiscovery.ai/AgentSSL</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ethan Lin</name>
+    </author>
+    <author>
+      <name>Akanksha Sarkar</name>
+    </author>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>Kristin Branson</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17322v1</id>
+    <title>Ensemble phase transitions in measurement-unitary hybrid quantum circuits</title>
+    <updated>2026-11-12T18:59:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.17322v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17322v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The universal properties of state ensembles generated by quantum dynamics provide a refined lens into Hilbert-space ergodicity and deep thermalisation, or lack thereof. We investigate deep-ergodicity breaking transitions of an ancillary qubit entangled with a system undergoing dynamics via hybrid quantum circuits, where unitary evolution is interspersed with projective measurements. Specifically, we analyse the statistical properties of two distinct state ensembles: the trajectory ensemble (TE) conditioned on the measurement outcomes of the hybrid circuit, and the projected ensemble (PE) generated by further projective measurements of the system at the final temporal boundary. We find that both ensembles undergo non-analytic changes -- ensemble phase transitions -- at the critical point of the measurement-induced purification transition, despite their first moments remaining completely maximally mixed and blind to the transition. For Haar-random circuits, the TE transitions from a trivial identity ensemble to the uniform Haar ensemble, while the PE transitions from the Haar ensemble to a trivial singleton pure state. In Clifford circuits, absence of non-stabiliserness limits the PE to a $1$-design, while the TE forms a $k$-design for $k \leq 3$. We demonstrate that these genuine ensemble transitions offer a clear physical mechanism for the measurement-induced entanglement or purification transitions, illustrating how the capacity to ergodically steer a quantum subsystem shifts from the temporal boundary measurements in the mixed phase to the bulk trajectory measurements in the pure phase.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:03Z</published>
+    <arxiv:comment>14 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Saptarshi Mandal</name>
+    </author>
+    <author>
+      <name>Sthitadhi Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17316v1</id>
+    <title>CoReMem: Cost-Internalizing Memory for Successive Coding Tasks with Prospective Valuation</title>
+    <updated>2026-11-12T18:58:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17316v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17316v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents tackle successive tasks on an evolving repository, carrying forward edits and writing memory before the next task is known. Selecting memory for unknown next tasks requires balancing future usefulness against the costs of writing and reading it. The actor must also decide when acting on available memory saves effort as the task unfolds. We introduce Coding-Repository Memory (CoReMem), a cost-internalizing framework that guides memory design and actor adaptation through measured memory value on the next task. Prospective segment valuation compares runs of the next task with and without individual trajectory segments from the same inherited repository state, guiding a compact memory built around anchors: repository locations and executable checks. Actor adaptation estimates on-policy memory value within rollout groups with and without memory, using a reward that prioritizes resolution and penalizes step count in successful runs. Provenance-gated value credit assigns the additional value term to steps identified as using memory-supplied anchors, while every step retains outcome credit. On ChainSWE, CoReMem raises the 27B actor's resolve rate from 21.0% to 25.7%, with 17% fewer steps and 11% fewer total cache-aware tokens, including memory-module calls, relative to the untrained actor model without memory.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:58:22Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peiwen Li</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Harshit Verma</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Sophia Zhou</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Haiwen Wang</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Ngoc Bui</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Heng Chang</name>
+      <arxiv:affiliation>Tsinghua University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Fei Fei</name>
+      <arxiv:affiliation>Goodvision AI</arxiv:affiliation>
+    </author>
+    <author>
+      <name>David van Dijk</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Rex Ying</name>
+      <arxiv:affiliation>Yale University</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17313v1</id>
+    <title>Sketching Language Models for Context Attribution</title>
+    <updated>2026-11-12T18:57:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.17313v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17313v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Context attribution asks how removing parts of a prompt changes a language model's output. We study leave-one-out (LOO) attribution for a prompt of $n$ tokens and a fixed measurement function. Computing all LOO values directly requires $n$ model evaluations. Under a stability assumption, our algorithm estimates all LOO values to error proportional to $\varepsilon$ with constant probability using $O(\sqrt{\log(1/\varepsilon)}/\varepsilon)$ evaluation calls. To complement our upper bound, we prove a matching $Ω(\sqrt{\log(1/\varepsilon)}/\varepsilon)$ lower bound on the number of evaluation calls in an oracle model. Empirically, we verify coefficient decay consistent with stability and evaluate the performance of our sketching algorithm on a small language-model retrieval task.
+  Technically, our result is based on a sketching algorithm for arithmetic circuits whose Taylor coefficients satisfy the stability condition recently introduced by Gunn [Gun26]. A direct adaptation of their forward differentiation sketches would require $\widetilde{O}(\log(n)/\varepsilon^2)$ evaluation calls. Our key observation is that we can apply forward differentiation to the backpropagation circuit, with only constant overhead over a forward sketch of the same Taylor degree. This reduces the variance of the sketches and is key to our improved evaluation bound. Our lower bound builds on the techniques of Amsel, Chen, Duman Keles, Halikias, Musco, and Musco [ACDH+26, SIAM Journal on Matrix Analysis and Applications] for lower bounding the number of matrix-vector queries to estimate the diagonal elements of random matrices.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:48Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Christopher Liaw</name>
+    </author>
+    <author>
+      <name>Aranyak Mehta</name>
+    </author>
+    <author>
+      <name>Grigoris Velegkas</name>
+    </author>
+    <author>
+      <name>Felix Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17312v1</id>
+    <title>The Tournament Equilibrium Set Is PSPACE-Complete, Even under Hereditary Uniqueness</title>
+    <updated>2026-11-12T18:57:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.17312v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17312v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The tournament equilibrium set (TEQ), proposed by Schwartz in 1990, is a classical voting rule based on pairwise majority comparisons. Its definition is recursive: an alternative is judged by the alternatives that beat it, called its dominators, and by which of those dominators TEQ itself selects. Deciding whether a given alternative belongs to TEQ was known to be NP-hard and to lie in PSPACE. We close this gap by proving that the problem is PSPACE-complete. To our knowledge, this is the first PSPACE-completeness result for membership in a tournament solution.
+  The hardness persists even when every nonempty subtournament has a unique minimal retentive set, the property conjectured by Schwartz to hold for all tournaments. Moreover, every such subtournament in our hard instances contains an alternative with at most three dominators. We prove that a single alternative with at most four dominators suffices both to guarantee uniqueness and to find a TEQ winner in $O(N^2)$ time. Thus, on our hard instances, finding one winner is efficient even though recognizing a specified winner is PSPACE-complete.
+  We also study how the complexity changes with the dominator bound. If every nonempty subtournament has an alternative with at most one dominator, the entire TEQ can be computed in quadratic time; allowing two dominators makes membership NP-hard. Under the same condition with four dominators, all $t$ winners can be computed in $O(2^t N^2)$ time, where $N$ is the number of alternatives.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:57:05Z</published>
+    <arxiv:comment>51 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Ethan Dickey</name>
+    </author>
+    <author>
+      <name>Athina Terzoglou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17308v1</id>
+    <title>Quantifying structural stability of transparent models for general insurance pricing</title>
+    <updated>2026-11-12T18:56:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.17308v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17308v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The short duration of general insurance contracts leads to rapid distributional shifts in the data, warranting regular model updates. This process may yield a post-update model that differs considerably from the pre-update model in both predictions and structure. Structural stability is upstream of predictive stability, yet existing structural stability metrics are mostly restricted to simple decision trees. Thus, we first introduce the notion of functional transparency, characterising models with a prediction function that can be expressed as a sum of univariate functions for main effects and bivariate functions for pairwise interactions. Then, we propose the Mean Squared Shape function distance, a metric to quantify the structural stability of functionally transparent models, which are particularly relevant in actuarial science. Using three public auto insurance datasets, we present a benchmark study to demonstrate the usefulness of our metric in identifying a stable and accurate transparent model. Generalised linear models with centred numerical covariates are stable, and explainable boosting machines (EBMs) offer a compromise between stability and performance. We also find that stabilisation strategies, such as sequential modelling and fixed hyperparameters, can substantially improve stability for both EBM and XGBoost models, with negligible impact on performance.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:54Z</published>
+    <arxiv:comment>16 tables and 9 figures</arxiv:comment>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Félix Côté</name>
+    </author>
+    <author>
+      <name>Marie-Pier Côté</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17306v1</id>
+    <title>Statistics of Fock-space correlation lengths in the many-body localised phase</title>
+    <updated>2026-11-12T18:56:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.17306v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17306v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The presence of long-ranged, many-body resonances in the many-body localised phase of disordered quantum systems is manifest in strong inhomogeneities of eigenstate amplitudes on the Fock space. We develop a quantitative, microscopic theory for this, centred on two-point Fock-space correlation functions. Exact diagonalisation of the disordered tilted-field Ising chain uncovers a stark contrast: typical correlations decay perfectly exponentially, whereas average correlations exhibit subexponential decay with systematic system-size dependence driven by rare resonant nodes. We show that this behaviour stems from an underlying distribution of Fock-space correlation lengths with a variance that scales inversely with system size. Crucially, the interplay of this distribution with the high-dimensional geometry of the hypercubic Fock-space graph, leads to the qualitative difference between the typical and average behaviours. The theory also allows us to derive the singularity spectrum of the many-body localised eigenstates, and to establish theoretically the anomalous symmetry violation of quantum multifractality as an inherent consequence of the Fock-space geometry.</summary>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:50Z</published>
+    <arxiv:comment>7 pages, 5 figures, and supplementary material</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.dis-nn"/>
+    <author>
+      <name>Bibek Saha</name>
+    </author>
+    <author>
+      <name>David E. Logan</name>
+    </author>
+    <author>
+      <name>Sthitadhi Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17302v1</id>
+    <title>FLEX-LBP: Learning Local Binary Patterns with Exact Binary Inference for Texture Classification</title>
+    <updated>2026-11-12T18:55:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.17302v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17302v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Local Binary Patterns (LBP) remain among the most widely used texture descriptors, from industrial inspection to medical imaging. Yet their radius, sampling angles, color transform and thresholds are fixed by hand for each dataset. We present FLEX-LBP, which learns these parameters by backpropagation while every forward pass computes exact binary codes and hard histogram counts. A straight-through estimator acts only in the backward pass, so the deployed descriptor is an interpretable hard-binary LBP with 90 learnable parameters and unchanged inference cost. In a controlled ablation on six color texture benchmarks, the component worth learning is dataset-dependent. One configuration, applied unchanged everywhere, learns the geometry and thresholds with the color transform frozen. It improves the nearest-neighbor accuracy of the identical fixed descriptor by 3.55 points on average over five seeds, significantly on five of six benchmarks and never significantly worse. With a linear discriminant readout, it gains 0.9 points; the fully learned descriptor gains 2.7 and has the highest mean. FLEX-LBP is more accurate than five classical LBP-family descriptors, PCANet and a neural LBP on five of six benchmarks. Its mean nearest-neighbor accuracy exceeds that of frozen ImageNet ResNet-50 features (23.5 million parameters). On the Kather colorectal cancer histology benchmark, the fully learned descriptor reaches 93.8%, significantly above the best classical descriptor (Completed LBP, 92.8%). The learned radii adapt in directions that recur across seeds. Noise drowns single-pixel comparisons and illuminant change flips inter-channel ones; median sampling or gray-world normalization restores 96-97%. The code is available as a drop-in PyTorch layer at https://github.com/medalimoussa/FLEX-LBP.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:56Z</published>
+    <arxiv:comment>21 pages, 5 figures, 8 tables. Code: https://github.com/medalimoussa/FLEX-LBP</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mohamed Alimoussa</name>
+    </author>
+    <author>
+      <name>Amal El Kaid</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17301v1</id>
+    <title>DiSKO: Distribution Steering for Nonlinear Systems using the Koopman Operator</title>
+    <updated>2026-11-12T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.17301v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17301v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper studies the problem of data-driven covariance steering for stochastic, nonlinear dynamical systems. We utilize Koopman operator theory to learn, directly from data, an approximate linear representation of the nonlinear dynamics in a lifted space of observable functions of the state. By exploiting this linear model, we design controllers for the mean and covariance of the underlying nonlinear system by utilizing linear distribution steering algorithms. To account for approximation errors in the learned dynamics and the ambiguity in the disturbance distribution induced in the lifted space, we formulate the problem as a distributionally robust covariance steering problem. Furthermore, we leverage a deep neural network (DNN) to simultaneously learn the Koopman observables and the linear model parameters, thus eliminating the need for manual observables basis selection while also reducing the dimensionality of the lifted representation. Additionally, we can promote desirable model properties, such as stability, during DNN training. We demonstrate the effectiveness of the proposed framework via numerical simulations.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:31Z</published>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Dimitrios Moustroufis</name>
+    </author>
+    <author>
+      <name>Panagiotis Tsiotras</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17299v1</id>
+    <title>Simulation-Based Priors and BAO Shifts from the Lyman-$α$ Forest at the Field Level</title>
+    <updated>2026-11-12T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17299v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17299v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an analytic forward model for the Lyman-alpha (Ly-alpha) forest flux field based on cubic-order large-scale structure perturbation theory (effective field theory) calculations. We validate our cubic model on two sets of hydrodynamic simulations spanning $2 \leq z \leq 4$: the small-volume CAMELS suite, which spans a wide range of cosmological and astrophysical parameters, and the large-volume, high-resolution Sherwood simulations. We find qualitatively similar results for both at the power-spectrum level. The perturbative model reproduces the three-dimensional flux power spectrum of the simulations to $\sim 5\%$ down to $k \simeq 1$-$1.5\,h\,{\rm Mpc}^{-1}$, depending on the redshift. This improves compared to previous quadratic perturbative forward models by up to 40%. Exploiting cosmic-variance cancellation in the field-level approach, we carry out precision measurements of the Lyman-alpha forest bias parameters from the CAMELS simulation suite. We use these measurements to analytically predict the shifts in the Baryon Acoustic Oscillations (BAO) scaling parameters induced by nonlinearities in the three-dimensional Lyman-alpha forest clustering as a function of cosmological parameters. We find sub-percent shifts in both the radial and transverse directions with a noticeable dependence on cosmology and redshift. Finally, from the field-level fits we construct simulation-based priors that can be used for cosmological analyses of the Lyman-alpha forest with the currently observing Dark Energy Spectroscopic Instrument (DESI). In addition, our cubic model captures the connected four-point function (trispectrum) of the forest, which opens up novel opportunities for accurate covariance matrix estimation for DESI and its successor, DESI-II.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:10Z</published>
+    <arxiv:comment>16+15 pages, 8+3 figures, 0+2 tables (main text + appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Divij Sharma</name>
+    </author>
+    <author>
+      <name>Roger de Belsunce</name>
+    </author>
+    <author>
+      <name>Mikhail M. Ivanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17297v1</id>
+    <title>Goal Encoding in LLMs</title>
+    <updated>2026-11-12T18:55:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.17297v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17297v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate whether and how LLMs encode goals: internal neural representations that precede and guide action, and that are flexible enough to be realized through many different execution paths. We construct a coding setting with multiple sub-tasks that allows us to evaluate goal-seeking behavior and the selection of sub-goals. In this setting, we localize an encoding of the next sub-goal in the outputs of a sparse set of attention heads. The same heads can be used to decode the LM's future actions in natural language (e.g., "I'm checking if a word is a palindrome"). We verify that this encoding is causal for next action and is plastic: transplanting it into a different environment, e.g., another programming language, triggers the same operation realized with a different sequence of tokens. The LM also sustains the encoding throughout the action's execution, which is puzzling because a transformer LM without recurrence cannot carry a state forward for more tokens than it has layers left. We propose that it does not need to. Under a non-recurrent goal-seeking (NRGS) account, the LM frequently re-reads the goal from the task specification, compares it with the progress visible in the growing context, and pursues what remains. We test the predictions of this account with targeted causal interventions.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:55:06Z</published>
+    <arxiv:comment>Project page, code and data: https://goals.baulab.info/</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Arnab Sen Sharma</name>
+    </author>
+    <author>
+      <name>Eric Todd</name>
+    </author>
+    <author>
+      <name>Sheridan Feucht</name>
+    </author>
+    <author>
+      <name>Andy Arditi</name>
+    </author>
+    <author>
+      <name>Rohit Gandikota</name>
+    </author>
+    <author>
+      <name>Natalie Shapira</name>
+    </author>
+    <author>
+      <name>Gabriele Sarti</name>
+    </author>
+    <author>
+      <name>Constanza Fierro</name>
+    </author>
+    <author>
+      <name>Lisa Schut</name>
+    </author>
+    <author>
+      <name>David Bau</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17292v1</id>
+    <title>The Submodular Secretary Problem: Tight $1-1/e$ for Monotone Objectives, and Strictly Between $1/e$ and $1/2$ in General</title>
+    <updated>2026-11-12T18:53:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.17292v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17292v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In the submodular secretary problem with a cardinality constraint, $n$ elements arrive in uniformly random order, and an algorithm must irrevocably accept or reject each one on arrival so as to maximize a nonnegative submodular function over sets of at most $k$ elements. For monotone objectives we settle the problem: the optimal competitive ratio tends to
+  exactly $1-1/e$ as $k\to\infty$, and its worst case over all budgets $k$ is exactly $1/e$. The bound $1-1/e$ cannot be exceeded even with unlimited computation, and it is achieved by a single algorithm with at most $4n+1$ value queries; previously the best ratio without a shortlist was $1/e-o(1)$, with exponentially many queries. For general objectives,
+  where the best known ratio was about $0.107$, we show that the optimal limiting ratio lies strictly between $1/e$ and $1/2$: we achieve $1/e+3.5\cdot10^{-6}$ for large $k$, and no algorithm achieves more than $0.497053$. We also achieve $0.2677$ at every budget. The main new ingredient of our algorithm is eligibility attenuation: an element that passes the
+  price test at time $t$ is accepted with probability $e^{-τ}$, where $τ$ is the total earlier time during which it would have passed, which makes the probability that it has already been selected exactly $1-e^{-τ}$.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:53:44Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Hamed Abdi</name>
+    </author>
+    <author>
+      <name>Kiarash Banihashem</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+    <author>
+      <name>Danny Mittal</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17291v1</id>
+    <title>A counterexample to fixed-profile soliton resolution for the three-dimensional quintic wave equation</title>
+    <updated>2026-11-12T18:53:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.17291v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17291v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the three-dimensional focusing energy-critical wave equation. We construct a bounded forward-global solution which starts arbitrarily close to a sign-changing stationary state and is asymptotic to a varying stationary profile plus one free wave. The core has two limits in distinct similarity orbits. A single energy-space norm identity identifies the radiation and reduces every competing fixed list to one profile; the two limits then give a contradiction. The construction uses summable radiation packets whose quadratic impulses produce fixed shape displacements on increasing time scales. We control the nonlinear error uniformly over these intervals and select the endpoints by a compact fixed-point map. A computer-assisted certificate validates the stationary state and its complete odd energy kernel.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:53:35Z</published>
+    <arxiv:comment>57 pages</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Xuwen Chen</name>
+    </author>
+    <author>
+      <name>Justin Holmer</name>
+    </author>
+    <author>
+      <name>Shunlin Shen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17286v1</id>
+    <title>Fictitious Play When Agents Are Not Expected-Utility Maximizers: A Geometric Analysis in $2$-Action Games</title>
+    <updated>2026-11-12T18:52:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.17286v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17286v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fictitious play (FP) is one of the earliest and most fundamental learning procedures in games, where each agent independently chooses a best response to the empirical distribution of opponents' past actions by maximizing the expected payoff with respect to it. However, learning agents may not always be expected-utility maximizers: they may use nonlinear evaluation functionals to account for the uncertainty induced by the opponents, e.g., via risk measures. In this work, we study nonlinear fictitious play (NL-FP), in which each pure action is evaluated by a general, possibly nonlinear functional of the payoff distribution induced by the opponent's empirical belief. To analyze NL-FP, we first identify a single-crossing property (SCP) of evaluation functionals that preserves the classical geometry of FP in $2\times2$ games. Furthermore, we conduct a novel geometric analysis of the convergence behavior of NL-FP in $2\times2$ games, even when the SCP fails. Beyond $2\times2$ games, we show that the convergence of NL-FP in $2\times n$ ($n\ge3$) games may fail even for continuous-time NL-FP, when the two-action player uses conditional value-at-risk (CVaR) in a $2\times3$ game. In addition, we identify a finite-crossing condition that ensures convergence of the selected continuous-time dynamics and the discrete-time iterates in general $2\times n$ games, which also provides new insights into the global landscape of continuous-time classical FP in such games.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:52:14Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Hao Liang</name>
+    </author>
+    <author>
+      <name>Solaleh Mohammadi</name>
+    </author>
+    <author>
+      <name>Kaiqing Zhang</name>
+    </author>
+  </entry>
+</feed>

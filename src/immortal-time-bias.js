@@ -903,6 +903,41 @@ const CASE_SURGE_ZH3 = [
   /(?:病例|患者|病灶|肿瘤|癌症|感染者|病人)[^。！？]{0,8}(?:被|得以|得到)(?:带进|带入|纳入)(?:视野|公众视野|人们视野|视线|统计)/,
 ];
 
+// ─── [r351] 路径 (h) 腿②双助动词被动形（EN 专项，族独立常量）────────────
+// r350 交接项①落地：legacy CASE_SURGE_EN p9（r347 追加形）的助动词可选组
+// 为**单助动词集合**（are / being / got / getting / have been / has been），
+// 不收「are being + 检出动词」的双助动词组合——"are" 后接 "being" 而非
+// 检出动词，p9 匹配失败，整族穿透（r351 立项探针 7/7，良性 0/6 零误伤；
+// 中文侧同形 4/4 已被 immortal_time_bias 代拦，无缺口，本族 EN 专项）。
+// 名词表含 infections/illnesses（r350 交接项②的 legacy 名词缺口交集——
+// p9 名词表仅 cases/patients/tumors/cancers/lesions；"many more
+// infections are being caught" 双助动词形由本族覆盖，单助动词形
+// "many more infections have been identified" 留交接）。
+// 族隔离纪律（r346–r350 六轮测以精确 equality/注入钉死既有常量元素数与
+// 承重——CASE_SURGE_EN 恰 12、CASE_SURGE_EN2 恰 5、CASE_SURGE_EN3 恰 6、
+// DETECT_UP_EN 恰 5、LEAD_SCREEN_EN 恰 5，追加会打破存量断言）：
+//   ① r347 轮测注入 CASE_SURGE_EN=[旧 7 形] 要求 5 条腿②新模式翻转——
+//      本族 p1 须 are|were|is + being 双助动词共现，单助动词形（"are
+//      detected"/"being detected"/"have been identified"）均不匹配；
+//   ② r349 轮测注入 CASE_SURGE_EN3=[] 要求第三族 9 条翻转——本族不收
+//      brought to light / were picked up / 形容词量化前置形（p1 须
+//      more + 名词 + 双助动词，p2 须 growing number of 形）；
+//   ③ r350 轮测注入 DETECT_UP_EN4=[] 要求腿①名词化族翻转——本族只作
+//      腿②，不含任何腿①元素（adoption/use of/mass testing 不收）。
+const CASE_SURGE_EN4 = [
+  // p1a: 量化 + more + 病例名词（含 infections/illnesses）+ are/were/is +
+  // being + 检出动词（镜像 legacy p9 的 more 前置形）
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:are|were|is)\s+being\s+(?:detected|diagnosed|identified|found|caught|picked\s+up|reported|screened|uncovered|surfaced|confirmed)\b/i,
+  // p1b: 形容词量化（numerous additional / hidden / previously undiagnosed
+  // 等，可多重）+ 病例名词 + are/were/is + being + 检出动词——镜像
+  // CASE_SURGE_EN3 p3 的形容词量化族设计（该族形容词组必填、more 可
+  // 缺省；"numerous additional cases are being identified" 无 more 前缀
+  // 形 p1a 不收，r351 探针 #1 实证穿透）
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:(?:numerous|additional|hidden|silent|previously\s+(?:undiagnosed|hidden|unnoticed|unrecognized|unseen)|newly\s+(?:found|identified))\s+)+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:are|were|is)\s+being\s+(?:detected|diagnosed|identified|found|caught|picked\s+up|reported|screened|uncovered|surfaced|confirmed)\b/i,
+  // p2: a growing number of + 病例名词 + are/is + being + 检出动词
+  /\b(?:a\s+)?growing\s+number\s+of\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:are|is)\s+being\s+(?:detected|diagnosed|identified|found|caught|reported|uncovered|surfaced|confirmed)\b/i,
+];
+
 // ─── [r350] 路径 (h) 第四措辞家族·腿①检出名词化/普及动作形（族独立常量）──
 // r350 立项探针（coordination/agent4/probes/r350-probe-candidates.js，集成
 // 树 v6.8.185 gate() 全量 findings 口径）候选定拨：
@@ -1233,8 +1268,11 @@ function checkImmortalTimeBias(text, inject) {
       // [r349] 腿②第三族：被动深形（were/was brought to light / got picked
       // up / were identified + 形容词量化；ZH 被重新发现/被带进视野）
       const ph2c = earliestEither(R.CASE_SURGE_ZH3 || CASE_SURGE_ZH3, R.CASE_SURGE_EN3 || CASE_SURGE_EN3, text);
-      const ph2 = [ph2a, ph2b, ph2c].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b, ph2c].filter(x => x >= 0)) : -1;
+      // [r351] 腿②第四族：双助动词被动形（EN 专项——are/were/is being +
+      // 检出动词；legacy p9 单助动词可选组不收双助动词组合）
+      const ph2d = earliestIdx(R.CASE_SURGE_EN4 || CASE_SURGE_EN4, text);
+      const ph2 = [ph2a, ph2b, ph2c, ph2d].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c, ph2d].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
@@ -1377,6 +1415,8 @@ module.exports = {
     CASE_SURGE_ZH3, CASE_SURGE_EN3,
     // [r350] 路径 (h) 第四措辞家族·腿①检出名词化形（负例注入口，族独立常量）
     DETECT_UP_EN4, DETECT_UP_ZH4,
+    // [r351] 路径 (h) 腿②双助动词被动形（负例注入口，族独立常量 EN 专项）
+    CASE_SURGE_EN4,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
