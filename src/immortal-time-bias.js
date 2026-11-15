@@ -775,6 +775,78 @@ const DETECT_UP_EN = [
   /\b(?:so\s+|many\s+|far\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\s+(?:are\s+|being\s+|got\s+|getting\s+|have\s+been\s+|has\s+been\s+)?(?:detected|diagnosed|found|identified)\b/i,
 ];
 
+// ─── [r348] 路径 (h) 第二措辞家族（r347 交接项①②落地，族独立常量）─────────
+// r348 立项探针（coordination/agent4/probes/r348-probe-candidates.js，集成
+// 树 v6.8.185 gate() 全量 findings 口径）四候选竞品定拨：
+//   A 检出腿被动/名词化形：攻击 10 条 7 条穿透、良性 4/4 零误伤 → 落地
+//     （3 条被 fallacy_of_relevance/immortal_time_bias 代拦，不截胡纪律）；
+//   B 腿③ trending 形：攻击 5 条 4 条穿透（1 条无检出腿按设计保留腿①
+//     门槛，即 r347 交接项③纯计数句）、良性 1 条非 pass 为既有
+//     mediator_confusion 基线非本轮新增 → 落地；
+//   C1 均值回归新形 2/5、C2 禀赋效应 5/5 但攻击形与良性教科书描述不可
+//     区分、C3 诉诸传统 0/3 已被代拦 → 均不立项（详见轮报告）。
+// 中文侧探针实证两个纯形缺口（r347 当时「中文无缺口」结论仅覆盖检出
+// **能力**变动形，不含本轮被动/普及形）：①「检查的普及使更多病例被及时
+// 发现」——腿① LEAD_SCREEN_ZH 只收筛查域显式词，检查/检测的普及形穿透；
+// ②「大量潜伏病例浮出水面」——腿②只收激增类方向动词，被动浮现形穿透。
+// 仿 r338 先例建独立族常量（*2 后缀）而非追加进既有家族表：r347 轮测
+// G 段以精确 equality 钉死 CASE_SURGE_EN/INCIDENCE_CLAIM_EN/ZH 元素数
+// （12/10/1/7），追加会打破既有轮次断言——独立族零触碰存量测试，注入
+// 按族隔离（负例注入口随 __internals 登记）。
+// 腿① DETECT_UP_ZH（ZH 专项，只服务路径 h——同 r347 口径不并入共享
+// LEAD_SCREEN，避免波及路径 d/e/f 判别面与 302/326 良性基线）。
+const DETECT_UP_ZH = [
+  /(?:影像|CT|核磁|内镜|肿瘤标志物|基因|血液)?(?:检查|检测|检验)的?(?:普及|铺开|推广|广泛应用|广泛开展|大规模开展|大规模普及)/,
+  /(?:检查|检测|检验|诊断)(?:技术|手段|方法|能力|水平)(?:的)?(?:进步|提升|改进|发展|普及|推广)/,
+];
+// 腿② CASE_SURGE_*2 被动浮现形：病例浮出水面/带入视野（ZH）、brought
+// more cases to light / came to light / were caught / are now found（EN）
+// ——检出动作使病例计数上升但不带激增类方向动词的形。
+// 族隔离纪律：EN 形与 r346/r347 既有腿②表严格不相交（否则存量轮次注入
+// 测试注掉旧常量后仍被新族承重而变红）——① case counts 复数专属（r346
+// 腿⑤只收单数 case count + surge/surged/jump/increase/has/have）；
+// ② were 过去被动专属（r347 腿②只收 are/being/got/getting/have been/
+// has been + detected 类，无 were）。
+const CASE_SURGE_ZH2 = [
+  /(?:病例|患者|病灶|肿瘤|癌症)[^。！？]{0,6}(?:浮出水面|带入视野|暴露出来)/,
+];
+const CASE_SURGE_EN2 = [
+  /\bcase\s+counts\s+(?:surged|jumped|increased|rose|risen|climbed|tripled|doubled|multiplied|spiked|soared|skyrocketed)\b/i,
+  /\b(?:has|have)\s+brought\s+(?:far\s+|many\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\s+to\s+light\b/i,
+  /\b(?:far\s+|many\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\s+(?:came|come|has\s+come|have\s+come|could\s+come)\s+to\s+light\b/i,
+  /\b(?:far\s+|many\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:tumou?rs?|cancers?|cases?|lesions?)\s+were\s+(?:caught|found|detected|identified|picked\s+up)\b/i,
+  /\b(?:far\s+|many\s+|significantly\s+|much\s+|substantially\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?)\s+(?:are\s+|were\s+)?now\s+(?:being\s+)?(?:found|detected|identified|caught|reported|diagnosed)\b/i,
+];
+// 腿③ INCIDENCE_CLAIM_ZH2 趋势形（r348 探针校正）：旧腿③表动词只有
+// 上升/升高/提高/上涨/增长/走高/变高，且「发病率呈现上升趋势」已被旧
+// pattern 1 的 {0,10} gap 吸收（呈现落进 gap、上升命中）——真缺口是
+// 攀升/飙升类动词与疾病侧「呈现上升趋势」尾形（旧 p4 无上升/增长尾）。
+const INCIDENCE_CLAIM_ZH2 = [
+  /(?:发病率|发生率|患病率|罹患率|罹病率)[^。！？]{0,8}(?:不断|持续|一路|逐年|日益|稳中有升)?(?:攀升|飙升|猛涨|高涨|上行)/,
+  /(?:疾病|病症|癌症|肿瘤|病情|这种病|此病)[^。！？]{0,8}(?:呈|呈现|处于|步入|走入|进入)[^。！？]{0,6}(?:上升|增长)(?:的)?(?:趋势|态势)/,
+];
+// 豁免 EXEMPT_INC_ZH2（只作用于路径 h）：腿③ gap 形会吸收「发病率并没有
+// 攀升」类否定后置（旧 EXEMPT_INC_ZH 只收否定前置形）—— negated claim
+// 是正确判别动作，不是攻击。同族 EN 侧见 EXEMPT_INC_EN2。
+const EXEMPT_INC_ZH2 = [
+  /(?:发病率|发生率|患病率|罹患率|罹病率)[^。！？]{0,12}(?:并没有|并未|未见|谈不上|说不上|不见得)/,
+];
+// 豁免 EXEMPT_INC_EN2（只作用于路径 h）：does not appear/seem/look to be
+// rising/trending（r347/r348 腿③ hedge 形的否定后置——旧 EXEMPT_INC_EN
+// 只收 does not mean/indicate/show/prove/imply/suggest，漏 appear 类）。
+// 注意：has not risen/climbed 类不设豁免——腿③各形都要求 is/are/Appears
+// 显式动词（has not climbed 不匹配任何腿③形，无腿③即无命中，探针实证）。
+const EXEMPT_INC_EN2 = [
+  /\b(?:does|do)\s+not\s+(?:appear|seem|look)\s+to\s+be\s+(?:rising|increasing|climbing|going\s+up|growing|higher|trending\s+up(?:ward)?|on\s+the\s+rise|on\s+an\s+upward\s+trend)\b/i,
+];
+const INCIDENCE_CLAIM_EN2 = [
+  /\bincidence\b[^.]{0,40}\b(?:is|are)\s+trending\s+(?:upward|up|higher)\b/i,
+  /\bincidence\b[^.]{0,40}\b(?:appears?|seems?|looks?)\s+to\s+be\s+trending\s+(?:upward|up|higher)\b/i,
+  /\b(?:disease|illness|cancer|condition|epidemic)\b[^.]{0,40}\b(?:is|are)\s+(?:clearly|evidently|apparently|arguably|undoubtedly|truly|really|genuinely|most\s+likely|probably|possibly)\s+trending\s+(?:upward|up|higher|more\s+common)\b/i,
+  /\b(?:disease|illness|cancer|condition|epidemic)\b[^.]{0,40}\b(?:looks?|appears?|seems?)\s+to\s+be\s+trending\s+(?:higher|upward|up|more\s+common)\b/i,
+  /\b(?:incidence|disease|illness|cancer|condition|epidemic)\b[^.]{0,40}\b(?:is|are)\s+on\s+an\s+upward\s+trend\b/i,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1017,18 +1089,36 @@ function checkImmortalTimeBias(text, inject) {
   // EXEMPT_INC 只作用于本路径——被豁免的句子仍可由路径 (a)-(g) 评判。
   const XI_Z = R.EXEMPT_INC_ZH || EXEMPT_INC_ZH;
   const XI_E = R.EXEMPT_INC_EN || EXEMPT_INC_EN;
-  if (!(anyHit(XI_Z, text) || anyHit(XI_E, text))) {
+  // [r348] 第二豁免族：腿③ gap/hedge 形的否定后置（发病率并没有攀升 /
+  // does not appear to be trending）——与第一族并集判定
+  const XI_Z2 = R.EXEMPT_INC_ZH2 || EXEMPT_INC_ZH2;
+  const XI_E2 = R.EXEMPT_INC_EN2 || EXEMPT_INC_EN2;
+  if (!(anyHit(XI_Z, text) || anyHit(XI_E, text) || anyHit(XI_Z2, text) || anyHit(XI_E2, text))) {
     const ph1a = earliestEither(R.LEAD_SCREEN_ZH || LEAD_SCREEN_ZH, R.LEAD_SCREEN_EN || LEAD_SCREEN_EN, text);
     // [r347] 腿①第二族：检出能力变动形（EN，只服务路径 h——detection rates
     // have risen / improved surveillance / more sensitive imaging）
     const ph1b = earliestIdx(R.DETECT_UP_EN || DETECT_UP_EN, text);
-    const ph1 = ph1a >= 0 ? (ph1b >= 0 ? Math.min(ph1a, ph1b) : ph1a) : ph1b;
+    // [r348] 腿①第三族：检出普及形（ZH 专项——检查/检测的普及/铺开/推广，
+    // 同 r347 口径只服务路径 h）
+    const ph1c = earliestIdx(R.DETECT_UP_ZH || DETECT_UP_ZH, text);
+    const ph1 = [ph1a, ph1b, ph1c].filter(x => x >= 0).length
+      ? Math.min(...[ph1a, ph1b, ph1c].filter(x => x >= 0)) : -1;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
-      const ph2 = earliestEither(R.CASE_SURGE_ZH || CASE_SURGE_ZH, R.CASE_SURGE_EN || CASE_SURGE_EN, text);
+      const ph2a = earliestEither(R.CASE_SURGE_ZH || CASE_SURGE_ZH, R.CASE_SURGE_EN || CASE_SURGE_EN, text);
+      // [r348] 腿②第二族：被动浮现形（浮出水面/带入视野/brought to light/
+      // were caught/are now found——检出计数上升但不带激增类方向动词）
+      const ph2b = earliestEither(R.CASE_SURGE_ZH2 || CASE_SURGE_ZH2, R.CASE_SURGE_EN2 || CASE_SURGE_EN2, text);
+      const ph2 = [ph2a, ph2b].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
-      const ph3 = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
+      const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
+      // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
+      // looks to be trending higher / on an upward trend）
+      const ph3b = earliestEither(R.INCIDENCE_CLAIM_ZH2 || INCIDENCE_CLAIM_ZH2, R.INCIDENCE_CLAIM_EN2 || INCIDENCE_CLAIM_EN2, text);
+      const ph3 = [ph3a, ph3b].filter(x => x >= 0).length
+        ? Math.min(...[ph3a, ph3b].filter(x => x >= 0)) : -1;
       if (ph2 >= 0 && ph3 >= 0) {
         const span = Math.max(ph1, ph2, ph3) - Math.min(ph1, ph2, ph3);
         if (span <= winI) {
@@ -1155,6 +1245,11 @@ module.exports = {
     EXEMPT_INC_ZH, EXEMPT_INC_EN,
     // [r347] 路径 (h) 检出加强形腿① EN 专项（负例注入口）
     DETECT_UP_EN,
+    // [r348] 路径 (h) 第二措辞家族（负例注入口，族独立常量）
+    DETECT_UP_ZH,
+    CASE_SURGE_ZH2, CASE_SURGE_EN2,
+    INCIDENCE_CLAIM_ZH2, INCIDENCE_CLAIM_EN2,
+    EXEMPT_INC_ZH2, EXEMPT_INC_EN2,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,

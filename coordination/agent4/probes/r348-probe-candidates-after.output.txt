@@ -1,0 +1,90 @@
+=== A passive/nominalized detection leg (brought to light / surfaced) ===
+attack 10 -> gate=pass 0/10
+  blk [verify] The wider adoption of CT screening :: immortal_time_bias
+  blk [rewrite] With wider screening uptake, far m :: fallacy_of_relevance
+  blk [verify] As screening programs expanded, ma :: immortal_time_bias
+  blk [rewrite] The rollout of population screenin :: fallacy_of_relevance,immortal_time_bias
+  blk [verify] Broader screening coverage means m :: immortal_time_bias
+  blk [verify] Increased uptake of screening has  :: immortal_time_bias
+  blk [verify] As screening became more widesprea :: immortal_time_bias
+  blk [rewrite] 随着筛查覆盖面的扩大，越来越多的病例被带入视野，这说明这种病的发病率 :: immortal_time_bias,reverse_causation,pseudo_causal,pseudo_causal
+  blk [verify] 筛查项目的铺开让大量潜伏病例浮出水面，可见这种疾病真的在蔓延。 :: immortal_time_bias
+  blk [verify] 检查的普及使更多病例被及时发现，新发病例激增，足以证明患病率真的升高 :: immortal_time_bias
+benign 4 -> non-pass 0/4
+  ok  [pass] The wider adoption of screening ha :: none
+  ok  [pass] With broader coverage, more cases  :: none
+  ok  [pass] 筛查覆盖面扩大让更多病例被检出，但这主要是过去漏诊被及时发现，并不代 :: none
+  ok  [pass] More cases surfaced after the roll :: none
+=== B trending-upward conclusion forms ===
+attack 5 -> gate=pass 2/5
+  blk [rewrite] Diagnosed cases have surged since  :: fallacy_of_relevance,immortal_time_bias
+  PEN [pass] The number of detected tumors trip :: none
+  PEN [pass] Case counts jumped after the scree :: none
+  blk [verify] Screening surfaced far more cancer :: immortal_time_bias
+  blk [verify] With so many more cases detected,  :: immortal_time_bias
+benign 2 -> non-pass 1/2
+  FP  [verify] Case counts rose, but the incidenc :: mediator_confusion
+  ok  [pass] Reported cases surged, though the  :: none
+=== C1 mean reversion new forms ===
+attack 5 -> gate=pass 2/5
+  blk [verify] 这批学生期中考试垫底，补了一对一辅导后期末成绩大幅回升，可见辅导效果 :: activity_outcome_confusion,proxy_metric_goal
+  PEN [pass] 新赛季初段球员三分命中率奇低，教练换了投篮姿势后第二个月命中率回归正 :: none
+  blk [verify] The worst-performing stores last q :: confidence
+  blk [rewrite] Patients with the highest pain sco :: post_hoc
+  PEN [pass] 极端组选拔后表现回落，这说明当初的选拔标准把不行的也放进来了。 :: none
+benign 3 -> non-pass 0/3
+  ok  [pass] 选拔后表现回落部分源于均值回归，评估干预效果需要对照组。 :: none
+  ok  [pass] Extreme groups tend to regress tow :: none
+  ok  [pass] 期末成绩回升与均值回归混在一起，要分离干预效应得看随机对照结果。 :: none
+=== C2 endowment effect EN new wording ===
+attack 5 -> gate=pass 5/5
+  PEN [pass] Once employees were given the lapt :: none
+  PEN [pass] People demanded much more money to :: none
+  PEN [pass] Participants required a much highe :: none
+  PEN [pass] 一旦拥有了这项权益，员工们对它的估值立刻远超自己当初愿意支付的价格。 :: none
+  PEN [pass] 拿到赠品之后，大家对这件东西的看重程度明显高于它到手之前。 :: none
+benign 3 -> non-pass 0/3
+  ok  [pass] The gap between buying and selling :: none
+  ok  [pass] Willingness to accept exceeded wil :: none
+  ok  [pass] 禀赋效应解释了为什么拥有者对物品估值更高，这是行为经济学的经典发现。 :: none
+=== C3 appeal to tradition EN re-probe ===
+attack 3 -> gate=pass 0/3
+  blk [rewrite] Civilizations have followed this p :: fallacy_of_relevance
+  blk [rewrite] This remedy has been trusted since :: post_hoc,fallacy_of_relevance
+  blk [rewrite] Every generation before us raised  :: fallacy_of_relevance
+benign 2 -> non-pass 0/2
+  ok  [pass] This practice has been followed fo :: none
+  ok  [pass] Traditional methods may hold value :: none
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 0,
+  "total": 10,
+  "fp": 0,
+  "fpTotal": 4
+ },
+ "B": {
+  "pen": 2,
+  "total": 5,
+  "fp": 1,
+  "fpTotal": 2
+ },
+ "C1": {
+  "pen": 2,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 3
+ },
+ "C2": {
+  "pen": 5,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 3
+ },
+ "C3": {
+  "pen": 0,
+  "total": 3,
+  "fp": 0,
+  "fpTotal": 2
+ }
+}
