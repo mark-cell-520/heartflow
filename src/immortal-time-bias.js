@@ -1082,6 +1082,55 @@ const CASE_SURGE_EN5 = [
   /\b(?:find|identif|detect|surfac|report)\w*\s+(?:(?:far|many|significantly|much|substantially)\s+)?more\s+(?:infections?|illnesses?)\b/i,
 ];
 
+// ─── [r353] 路径 (h) 腿①形容词 + testing 名词形（EN 专项，族独立常量）──────
+// r351 交接项②/r352 候选 B 续打落地：DETECT_UP_EN p3 名词表 imaging/
+// scans?/scanning/tests?/assays?/screening 缺 testing 动名词形——"sensitive
+// testing" 的 "testing" 不被 tests? 的 \b 尾界匹配（test 后接 ing，\b 失败），
+// p4 须 imaging/scanning/diagnostic + technology/methods 前缀，"advanced
+// testing"/"improved testing" 类同样穿透。r353 立项探针
+// （coordination/agent4/probes/r353-probe-candidates.js，集成树 v6.8.185
+// gate() 全量 findings 口径）：候选 A 攻击 12 条 10 条穿透（2 条被
+// fallacy_of_relevance 代拦，不截胡纪律），其中 5 条纯腿①缺口（腿②由
+// CASE_SURGE_EN3/EN4/legacy、腿③由 legacy INCIDENCE_CLAIM_EN 承重，模块级
+// leg 实测 leg1=-）→ 落地；良性 10 条中 2 条非 pass 均为无路径 h 腿句子
+// 被既有维度（vagueness/pseudo_causal）代拦的基线误伤，模块级路径 h FP 0。
+// 族隔离纪律（r346–r352 七轮测以精确 equality/注入钉死既有常量：DETECT_UP_EN
+// 恰 5、DETECT_UP_EN4 恰 6，追加会打破存量断言——独立族零触碰存量测试）：
+//   ① r347 轮测注入 DETECT_UP_EN=[] 要求 5 条检出能力变动句翻转——本族
+//      形容词表无 ubiquitous/widespread/routine/mass（EN4 p4 专属），
+//      "ubiquitous testing"/"mass testing campaigns" 不匹配；
+//   ② r350 轮测注入 DETECT_UP_EN4=[] 要求腿①名词化族翻转——本族不收
+//      adoption/use of/rollout/expansion of 名词化形与 became universal
+//      系动词形（"As CT scanning became universal" 的 became 后接
+//      universal 不是 testing，不匹配）；
+//   ③ r346 轮测注入 LEAD_SCREEN_ZH/EN=[] 的筛查域句均为 screen* 词根，
+//      与本族 testing 形容词形无交集。
+const DETECT_UP_EN5 = [
+  /\b(?:more\s+)?(?:sensitive|accurate|precise|advanced|improved|better|enhanced|newer)\s+testing\b/i,
+];
+
+// ─── [r353] 路径 (h) 腿② case numbers 复数名词形（EN 专项，族独立常量）────
+// r353 立项探针候选 C 自建缺口：legacy CASE_SURGE_EN p1/p2/p6 只收
+// "number of + diagnosed cases + 激增动词" 与 "diagnosed cases + has/have
+// + 激增动词" 单数名词形，复数名词 "case numbers" 无形——"diagnosed case
+// numbers climbed steadily" / "case numbers have risen sharply" /
+// "reported case numbers tripled" 穿透（探针 3/3；腿①由 LEAD_SCREEN_EN/
+// DETECT_UP_EN4 p4 承重、腿③由 legacy INCIDENCE_CLAIM_EN 承重，模块级
+// leg 实测 leg2=-）。良性 5/5 零误伤（两条谨慎解读形由 EXEMPT_INC_EN/
+// EXEMPT_INC_EN2 兜底，三条无腿②/腿③）。
+// 族隔离纪律（r346–r352 七轮测以注入钉死既有常量承重）：
+//   ① r346 轮测注入 CASE_SURGE_EN=[] 的翻转集全为 "number of + cases"
+//      或 "cases + has/have + 动词" 形，"case numbers" 复数名词串不出现
+//      在任何翻转集句子中，不被 rescue；
+//   ② r348 轮测注入 CASE_SURGE_EN2=[] 的 case counts 专属（p1 只收
+//      "case counts + 激增动词"），"case numbers" 与 "case counts" 串不
+//      相交；
+//   ③ 名词串 numbers? 单复数同收——"case number" 单数亦为检出计数名词。
+const CASE_SURGE_EN6 = [
+  /\b(?:diagnosed|confirmed|detected|new|reported|identified)\s+case\s+numbers?\s+(?:has|have)\s+(?:surged|tripled|doubled|multiplied|climbed|risen|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
+  /\bcase\s+numbers?\s+(?:has\s+|have\s+)?(?:surged|tripled|doubled|multiplied|climbed|risen|rose|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1340,8 +1389,12 @@ function checkImmortalTimeBias(text, inject) {
     // ubiquitous testing/mass testing campaigns；ZH 排查/监测+力度、全面排查）
     const ph1d = earliestIdx(R.DETECT_UP_EN4 || DETECT_UP_EN4, text);
     const ph1e = earliestIdx(R.DETECT_UP_ZH4 || DETECT_UP_ZH4, text);
-    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e].filter(x => x >= 0).length
-      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e].filter(x => x >= 0)) : -1;
+    // [r353] 腿①第六族：形容词 + testing 名词形（EN 专项——sensitive/
+    // advanced/improved/better/newer + testing，DETECT_UP_EN p3 的 tests?
+    // 尾界不匹配 testing 动名词形）
+    const ph1f = earliestIdx(R.DETECT_UP_EN5 || DETECT_UP_EN5, text);
+    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f].filter(x => x >= 0).length
+      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f].filter(x => x >= 0)) : -1;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
@@ -1358,8 +1411,11 @@ function checkImmortalTimeBias(text, inject) {
       // [r352] 腿②第五族：单助动词形 × infections/illnesses 名词（EN 专项
       // ——legacy p1/p2/p8/p9/p10 与 DETECT_UP_EN p5 名词表均缺）
       const ph2e = earliestIdx(R.CASE_SURGE_EN5 || CASE_SURGE_EN5, text);
-      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e].filter(x => x >= 0)) : -1;
+      // [r353] 腿②第六族：case numbers 复数名词形（EN 专项——legacy p1/p2/p6
+      // 只收 number of + cases 与 cases + has/have + 动词，复数名词无形）
+      const ph2f = earliestIdx(R.CASE_SURGE_EN6 || CASE_SURGE_EN6, text);
+      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
@@ -1510,6 +1566,9 @@ module.exports = {
     // [r352] 路径 (h) 腿②单助动词×infections/illnesses 名词族 + 腿③
     // 过去时推断词/was 系动词族（负例注入口，族独立常量 EN 专项）
     CASE_SURGE_EN5, INCIDENCE_CLAIM_EN3,
+    // [r353] 路径 (h) 腿①形容词+testing 名词族 + 腿② case numbers 复数
+    // 名词族（负例注入口，族独立常量 EN 专项）
+    DETECT_UP_EN5, CASE_SURGE_EN6,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
