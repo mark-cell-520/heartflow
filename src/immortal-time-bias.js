@@ -1219,6 +1219,81 @@ const DETECT_UP_EN6 = [
   /\b(?:testing|surveillance|monitoring|scanning)\s+(?:coverage|intensity|reach|scope|breadth|volume|frequency)\s+(?:has\s+|have\s+|had\s+|was\s+|were\s+|is\s+|are\s+)?(?:expanded|increased|grown|grew|risen|rose|climbed|broadened|scaled\s+up|ramped\s+up|extended)\b/i,
 ];
 
+// ─── [r355] 路径 (h) 腿①形容词前置检出手段形（ZH 专项，族独立常量）──────────
+// r354 交接项（ZH 双缺口腿①侧）落地：DETECT_UP_ZH p1 须 的+普及/铺开/推广
+// 类后缀、p2 须 进步/提升/改进 后缀（"检测手段的进步"形），形容词前置形
+// "更先进的检测手段"/"新型的检验技术"/"更精确的检验手段"穿透（r355 立项探针
+// coordination/agent4/probes/r355-probe-candidates.js，集成树 v6.8.185 gate()
+// 全量 findings 口径：候选 C 攻击 4 条穿透 3 条——1 条"工具投入使用后"被
+// pseudo_causal 代拦，不截胡纪律；良性 3 条中 1 条非 pass 为既有 pseudo_causal
+// 基线（"新型检验技术上线后，实验室周转时间明显缩短"——无腿②/腿③，路径 h
+// 不判，非本族新增）；控制 2/2（检测手段的进步 DETECT_UP_ZH p2 + 检查的普及
+// p1 均已被承重）证新形确为缺口。
+// 族隔离纪律（r346–r354 九轮测以精确 equality/注入钉死既有常量承重）：
+//   ① DETECT_UP_ZH p1/p2 均须 进步/普及/推广 后缀——本族后缀为 技术/手段/
+//      方法/工具/设备/应用/方式，无进步普及义，不相交；
+//   ② LEAD_SCREEN_ZH 只收 筛查/检出/早筛 等筛查域显式词——"检测手段"整词
+//      不在其表（"基因检测"专属串不相交）；
+//   ③ DETECT_UP_ZH4 收 排查/监测+力度、全面+排查——本族为 形容词+检查/检测/
+//      检验/诊断+技术类后缀，无力度无范围前缀，不相交。
+const DETECT_UP_ZH5 = [
+  // 形容词 + [影像/CT 类] + 检查/检测/检验/诊断 + 技术/手段/方法/工具/设备/
+  // 应用/方式（"更先进的检测手段"/"新型的检验技术上线后"/"更精确的检验手段
+  // 应用"——形容词前置形，DETECT_UP_ZH 须进步/普及后缀）
+  /(?:更|更加|越来越|更为)?(?:先进|灵敏|精准|精确|改良|新型|新式|高端)(?:的)?(?:影像|CT|核磁|内镜)?(?:检查|检测|检验|诊断)(?:技术|手段|方法|工具|设备|应用|方式)/,
+];
+
+// ─── [r355] 路径 (h) 腿②名词+裸过去时无助动词形（EN 专项，族独立常量）──────
+// r354 交接项（腿②动词前置裸过去时边缘变体）落地：两个子缺口——
+// (a) "picked up far more early-stage tumors"（pick + [副词] more + 形容词 +
+// 名词——EN8(a) 须 more+名词紧跟、legacy p10 词干表 find/identif/detect/
+// surfac/report 缺 pick）；
+// (b) "numerous additional cases surfaced"（量化 + 名词 + 裸过去时 surfaced/
+// uncovered/emerged，无助动词——EN8(b) 动词前置、EN3 p3/EN7 须 were/was、
+// EN3 p6 须 has/have、legacy p10 动词前置）。
+// r355 立项探针：候选 A 攻击 4 穿透 3（1 条被 fallacy_of_relevance 代拦，不
+// 截胡纪律）、良性 0/3 零误伤、控制 1/1（pick+more+名词紧跟已被 EN8(a) 承
+// 重）；候选 B 攻击 4/4 穿透、良性 0/3、控制 2/2（形容词+were+surfaced /
+// more+were+surfaced 已被 EN3 p3/EN7 承重）证新形确为缺口。
+// 族隔离纪律：
+//   ① (a) 形 more 后须形容词再名词（[a-z-]+ 组必填）——EN8(a) more+名词
+//      紧跟形不相交；
+//   ② (b) 形动词表只收 surfaced/uncovered/emerged——legacy p9 无助动词可选
+//      组的动词表 detected/diagnosed/found/identified/reported 全剔除，防
+//      "far more cases found" 类被 legacy 承重的形 rescue；
+//   ③ (b) 形名词后直接裸动词无 were/was/has/have/got——EN7 须 were/was、
+//      EN3 p3/p6 须 were/was/has-have、EN6 名词为 case numbers 专属且动词
+//      为激增类，均不相交；
+//   ④ (b) 形名词前置与 EN8(b)/legacy p10 动词前置语序相反，不相交。
+const CASE_SURGE_EN9 = [
+  // (a) pick(ed/s) up + [副词] more + 形容词 + 病例名词（more 与名词间形容词
+  // 修饰必填——EN8(a) more+名词紧跟形不相交、legacy p10 词干表缺 pick）
+  /\bpick(?:ed|s)?\s+up\s+(?:(?:far|many|significantly|much|substantially)\s+)?more\s+[a-z-]+\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\b/i,
+  // (b) [副词 more] + [形容词量化] + 病例名词 + 裸过去时 surfaced/uncovered/
+  // emerged（无助动词——动词表剔除 legacy p9 的 detected/diagnosed/found/
+  // identified/reported，族隔离双保险）
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?(?:more\s+)?(?:(?:numerous|additional|hidden|silent|previously\s+(?:undiagnosed|hidden|unnoticed|unrecognized|unseen)|newly\s+(?:found|identified))\s+)*(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:surfaced|uncovered|emerged)\b/i,
+];
+
+// ─── [r355] 路径 (h) 腿②浮出/暴露动词前置形（ZH 专项，族独立常量）──────────
+// r354 交接项（ZH 双缺口腿②侧）落地：CASE_SURGE_ZH2 须名词后置+浮出水面整
+// 词、CASE_SURGE_ZH3 须 被/得以/得到+发现，动词前置形 "浮出大量潜伏病例"/
+// "浮现出许多无症状感染者"/"暴露出越来越多隐匿病灶" 穿透（r355 立项探针：
+// 候选 D 攻击 4 穿透 2——2 条被 reverse_causation/pseudo_causal 代拦，不截
+// 胡纪律；良性 0/3 零误伤；控制 2/2（浮出水面 ZH2 + 被重新发现 ZH3 均已被
+// 承重）证新形确为缺口）。
+// 族隔离纪律：
+//   ① ZH2 为 名词+浮出水面/带入视野/暴露出来 后置形——本族动词前置且无
+//      "水面/出来"整词尾，语序相反不相交；
+//   ② ZH3 须 被/得以/得到+（重新）?发现/识别/查出——本族裸动词前置无"被"，
+//      不相交；
+//   ③ legacy CASE_SURGE_ZH 为 名词+激增动词 后置形——本族动词前置，不相交。
+const CASE_SURGE_ZH4 = [
+  // 浮出/浮现出/暴露/显露/曝出 + [出] + [量词] + [形容词] + [的] + 病例名词
+  // （动词前置裸形——ZH2 须浮出水面后置、ZH3 须被+发现）
+  /(?:浮出|浮现出?|暴露出?|显露出?|曝露出?)(?:大量|许多|众多|更多|越来越多|大批|不少)?(?:潜伏|隐性|隐匿|无症状|以往漏诊|既往漏诊)?(?:的)?(?:病例|患者|病灶|肿瘤|癌症|感染者|病人)/,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1485,8 +1560,12 @@ function checkImmortalTimeBias(text, inject) {
     // + coverage/intensity/reach + expanded/increased/was extended；LEAD_SCREEN
     // 只收 screen* 词根、EN4 p6 须 expansion of + capacity 名词形）
     const ph1g = earliestIdx(R.DETECT_UP_EN6 || DETECT_UP_EN6, text);
-    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g].filter(x => x >= 0).length
-      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g].filter(x => x >= 0)) : -1;
+    // [r355] 腿①第八族：形容词前置检出手段形（ZH 专项——更先进的检测手段/
+    // 新型的检验技术；DETECT_UP_ZH 须 进步/普及 后缀、LEAD_SCREEN_ZH 只收
+    // 筛查域显式词）
+    const ph1h = earliestIdx(R.DETECT_UP_ZH5 || DETECT_UP_ZH5, text);
+    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g, ph1h].filter(x => x >= 0).length
+      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g, ph1h].filter(x => x >= 0)) : -1;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
@@ -1512,8 +1591,14 @@ function checkImmortalTimeBias(text, inject) {
       // [r354] 腿②第八族：动词前置裸过去时（EN 专项——pick stem legacy p10 缺、
       // 动词+形容词量化无 more/has/were）
       const ph2h = earliestIdx(R.CASE_SURGE_EN8 || CASE_SURGE_EN8, text);
-      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h].filter(x => x >= 0)) : -1;
+      // [r355] 腿②第九族：名词+裸过去时无助动词形（EN 专项——pick+more+形容词+
+      // 名词 / 量化+名词+surfaced/uncovered/emerged 无助动词）
+      const ph2i = earliestIdx(R.CASE_SURGE_EN9 || CASE_SURGE_EN9, text);
+      // [r355] 腿②第十族：浮出/暴露动词前置形（ZH 专项——浮出大量潜伏病例；
+      // ZH2 须浮出水面后置、ZH3 须被+发现）
+      const ph2j = earliestIdx(R.CASE_SURGE_ZH4 || CASE_SURGE_ZH4, text);
+      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h, ph2i, ph2j].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h, ph2i, ph2j].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
@@ -1670,6 +1755,10 @@ module.exports = {
     // [r354] 路径 (h) 腿①筛查覆盖/强度扩张动词族 + 腿② were/was+surfaced/
     // uncovered 被动深形族 + 腿②动词前置裸过去时族（负例注入口，族独立常量 EN 专项）
     DETECT_UP_EN6, CASE_SURGE_EN7, CASE_SURGE_EN8,
+    // [r355] 路径 (h) 腿①形容词前置检出手段族（ZH 专项）+ 腿②名词+裸过去时
+    // 无助动词族（EN 专项）+ 腿②浮出/暴露动词前置族（ZH 专项）（负例注入口，
+    // 族独立常量）
+    DETECT_UP_ZH5, CASE_SURGE_EN9, CASE_SURGE_ZH4,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
