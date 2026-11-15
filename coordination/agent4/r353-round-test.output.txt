@@ -1,0 +1,52 @@
+  ✓ A gate 层归因：腿① testing 名词族攻击 8/8 action≠pass 且 immortal_time_bias 承重
+  ✓ A gate 层归因：腿② case numbers 族攻击 5/5 action≠pass 且 immortal_time_bias 承重
+  ✓ B 模块直调：腿①族 EN 8/8 命中且 detail 带 overdiagnosis-incidence 标
+  ✓ B 模块直调：腿②族 EN 5/5 命中且 detail 带 overdiagnosis-incidence 标
+  ✓ C 良性零误伤：两新族手工良性 16/16 gate 层 pass 且模块级不判
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+  ✓ C 良性零误伤：官方四基准语料全量模块级路径 h 零命中
+  ✓ C 既有基线隔离：3 条句子 gate 层非 pass 均由既有维度承重、模块级路径 h 不判
+  ✓ D 存量回归：r346–r352 路径 h 攻击仍命中（注入两新族置空不受影响）
+  ✓ D 存量回归：路径 (a)(d)(e)(f)(g) 攻击仍命中
+  ✓ D 存量回归：既有路径 h 常量元素数与窗值不变（族独立常量零触碰）
+  ✓ E 注入 DETECT_UP_EN5=[] → 腿① testing 名词族攻击 8/8 翻转不判
+  ✓ E 注入 CASE_SURGE_EN6=[] → 腿② case numbers 族攻击 5/5 翻转不判
+  ✓ E 注入 WIN_LEAD_EN=0 → 两新族攻击 13/13 全部翻转不判（窗承重）
+  ✓ E 族隔离硬探针（反向）：DETECT_UP_EN=[] → r347 检出能力变动独担句 5/5 仍翻转不判（testing 族不得 rescue）
+  ✓ E 族隔离硬探针（反向）：DETECT_UP_EN4=[] → r350 腿①名词化独担句 5/5 仍翻转不判（testing 族不得 rescue）
+  ✓ E 族隔离硬探针（反向）：CASE_SURGE_EN=[] → r346 腿② legacy 独担句 7/7 仍翻转不判
+  ✓ E 族隔离硬探针（反向）：CASE_SURGE_EN2=[] → r348 case counts/被动浮现独担句 3/3 仍翻转不判（case numbers 族不得 rescue）
+  ✓ E 族隔离硬探针（反向）：CASE_SURGE_EN5=[] → r352 infections/illnesses 独担句 4/4 仍翻转不判（case numbers 族不得 rescue）
+  ✓ E 族隔离硬探针（反向）：LEAD_SCREEN_EN=[] → r346 路径 h EN 独担句 5/5 仍翻转不判
+  ✓ F 边界锁：疑问形不判
+  ✓ F 边界锁：缺检出腿不判（腿②+腿③齐全，无普及/检出域词）
+  ✓ F 边界锁：缺病例激增腿不判（腿①+腿③齐全）
+  ✓ F 边界锁：缺发生率结论腿不判（腿①+腿②齐全）
+  ✓ F 边界锁：case numbers 族非 EN5 族（EN5 置空不影响腿① testing 形承重）
+  ✓ F 边界锁：testing 族非 EN6 族（EN6 置空不影响腿② case numbers 形承重）
+  ✓ F 边界锁：case counts 复数形非 case numbers 族（EN6 置空不影响 EN2 p1 承重）
+  ✓ F 边界锁：number-of 单数形非 case numbers 族（EN6 置空不影响 legacy p1 承重）
+  ✓ F 边界锁：tests 单数名词形非 testing 族（EN5 置空不影响 DETECT_UP_EN p3 承重）
+  ✓ F 边界锁：跨腿邻近窗（三腿相隔 >400 字符不判）
+  ✓ F 边界锁：良性工程产能句不判（无病例激增与发生率结论腿）
+  ✓ G VERSION / package.json 一致
+  ✓ G index.js 既有接线在位（require + 计算点 + dimMap 键）
+  ✓ G __internals 暴露两新族常量且元素数符合登记（EN5 恰 1 形 / EN6 恰 2 形）
+
+负例注入汇总: 55/55 个翻转断言全部翻转
+round-353 轮测结果: 33 通过, 0 失败, 共 33 个
