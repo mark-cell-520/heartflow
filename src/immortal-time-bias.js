@@ -1131,6 +1131,94 @@ const CASE_SURGE_EN6 = [
   /\bcase\s+numbers?\s+(?:has\s+|have\s+)?(?:surged|tripled|doubled|multiplied|climbed|risen|rose|increased|jumped|spiked|soared|grown|skyrocketed)\b/i,
 ];
 
+// ─── [r354] 路径 (h) 腿② were/was + surfaced/uncovered 无形容词量化形（EN 专项）──
+// r353 交接项①落地：legacy CASE_SURGE_EN2 p4 只收 were + caught/found/detected/
+// identified/picked up（动词表缺 surfaced/uncovered）、CASE_SURGE_EN3 p3 须
+// numerous/additional 等形容词量化组（"far more cases were surfaced" 的 more
+// 前置无形）——被动浮现深形穿透。r354 立项探针（coordination/agent4/probes/
+// r354-probe-candidates.js，集成树 v6.8.185 gate() 全量 findings 口径）：候选①
+// 攻击 6 条穿透 5 条（1 条被 fallacy_of_relevance 代拦，不截胡纪律），良性 4
+// 条中 1 条非 pass 为既有 post_hoc 基线误伤（谨慎解读形 "though the true
+// incidence appears stable"——无腿③，路径 h 不判，post_hoc 独立代拦，非本族
+// 新增），控制 2/2（were+found / 形容词+were+surfaced 均已被 EN2 p4/EN3 p3
+// 承重）证新形确为缺口。
+// 族隔离纪律（r346–r353 八轮测以精确 equality/注入钉死既有常量承重）：
+//   ① r348 轮测注入 CASE_SURGE_EN2=[] 的 were 翻转集动词为 caught/found/
+//      detected/identified/picked up——本族动词 surfaced/uncovered 不在其表，
+//      "far more tumors were caught" 不被本族 rescue；
+//   ② r349 轮测注入 CASE_SURGE_EN3=[] 的 p3 翻转集须形容词量化组——本族为
+//      more 前置无形（"far more cases were surfaced"），"numerous additional
+//      cases were surfaced" 的形容词前置形不被本族 rescue（more 非形容词）；
+//   ③ r351 轮测注入 CASE_SURGE_EN4=[] 的双助动词形（are/were/is + being +
+//      动词）——本族单助动词 were/was + surfaced/uncovered，无 being；
+//   ④ r352 轮测注入 CASE_SURGE_EN5=[] 的 infections/illnesses 翻转集助动词
+//      为 are/being/getting/have been/has been（无 were）——本族 were/was 专属，
+//      单助动词现在时形不被 rescue。
+const CASE_SURGE_EN7 = [
+  // [副词] more + 病例名词 + were/was + surfaced/uncovered（被动浮现深形，无
+  // 形容词量化组——EN3 p3 须形容词、EN2 p4 动词表缺 surfaced/uncovered）
+  /\b(?:(?:far|many|significantly|much|substantially)\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\s+(?:were|was)\s+(?:surfaced|uncovered)\b/i,
+];
+
+// ─── [r354] 路径 (h) 腿②动词前置裸过去时（EN 专项，族独立常量）──────────────
+// r353 交接项②落地：腿②检出动词前置形两个子缺口——(a) legacy CASE_SURGE_EN p10
+// 动词词干表 find/identif/detect/surfac/report 缺 pick（"picked up far more
+// tumors" 穿透）；(b) 动词前置 + 形容词量化无 more/has/were（"surfaced numerous
+// hidden cases"——EN3 p6 须 has/have 前缀、legacy p10 须 more，"the audit
+// surfaced" 裸过去时无形）。r354 立项探针：候选②a 攻击 4 穿透 3、良性 0/3 零误
+// 伤；候选②b 攻击 4 穿透 3（1 条 fallacy_of_relevance 代拦）、良性 1/3 为既有
+// post_hoc 基线（同候选①，无腿③，非本族新增），控制 2/2（has surfaced + 形容
+// 词 / surfaced + adverb + more 均已被 EN3 p6/legacy p10 承重）。
+// 族隔离纪律：
+//   ① r346/r347 轮测注入 CASE_SURGE_EN=[旧 7 形]/[] 的翻转集全为 number of
+//      + cases / cases + has-have + 动词 / finds more tumors 形——本族 (a) 须
+//      pick 词干（p10 无）、(b) 须形容词量化无 more，均不被 rescue；
+//   ② r349 轮测注入 CASE_SURGE_EN3=[] 的 p6 翻转集须 has/have 前缀——本族 (b)
+//      加 (?<!\bhas\s)(?<!\bhave\s) 负向断言剔除 has/have 前缀形，"has
+//      surfaced numerous hidden cases" 不被 rescue；(a) 动词 pick 不在 EN3
+//      p6 动词表（surfaced/identified/found/detected/uncovered/reported）；
+//   ③ r349 轮测注入 CASE_SURGE_EN3=[] 的 p4/p5 翻转集须 got/gets/getting——
+//      本族 (a) 无 got（"picked up far more tumors" 裸过去时）；
+//   ④ r352 轮测注入 CASE_SURGE_EN5=[] 的 p4 翻转集为 (find|identif|detect|
+//      surfac|report) + more + infections/illnesses——本族 (b) 须形容词无
+//      more、(a) 须 pick 词干，均不相交。
+const CASE_SURGE_EN8 = [
+  // (a) pick(ed/s) up + [副词] more + 病例名词（legacy p10 词干表缺 pick；
+  // EN3 p4/p5 须 got/gets/getting，本形裸过去时不相交）
+  /\bpick(?:ed|s)?\s+up\s+(?:(?:far|many|significantly|much|substantially)\s+)?more\s+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\b/i,
+  // (b) 裸过去时检出动词 + 形容词量化组 + 病例名词（无 more/无 has-have/无
+  // were-was——has/have 前缀形由 EN3 p6 专属，负向断言双保险；形容词组不含
+  // far/more，与 legacy p10 的 [副词] more 形不相交）
+  /(?<!\bhas\s)(?<!\bhave\s)\b(?:surfaced|identified|uncovered|detected|found|reported)\s+(?:(?:numerous|additional|hidden|silent|previously\s+(?:undiagnosed|hidden|unnoticed|unrecognized|unseen)|newly\s+(?:found|identified))\s+)+(?:cases?|patients?|tumou?rs?|cancers?|lesions?|infections?|illnesses?)\b/i,
+];
+
+// ─── [r354] 路径 (h) 腿①筛查覆盖/强度扩张动词形（EN 专项，族独立常量）──────
+// r353 交接项③落地：腿① "testing" 不在任何筛查域表（LEAD_SCREEN_EN 只收
+// screen* 词根、DETECT_UP_EN/EN5 须形容词前缀、DETECT_UP_EN4 p6 须 expansion
+// OF + capacity 名词形）——"testing intensity increased" / "testing coverage
+// expanded" / "testing coverage was extended" 动词形穿透（r353 拆腿 C5/C6
+// leg1=-）。screening-based 覆盖扩张形已被 LEAD_SCREEN 承重（"screening"裸词
+// 命中），本族补 testing/surveillance/monitoring/scanning 等非 screen* 词根
+// 缺口。r354 立项探针：候选③攻击 4 穿透 3（1 条 screening-intensity 形已被
+// immortal_time_bias 代拦——screening 命中 LEAD_SCREEN，按设计非缺口），良性
+// 0/3 零误伤，控制 2/2（expansion of testing capacity / screening coverage
+// expanded 均已被 EN4 p6/LEAD_SCREEN 承重）。
+// 族隔离纪律：
+//   ① r346 轮测注入 LEAD_SCREEN_EN=[] 的翻转集全为 screen* 词根裸句
+//      （screening detected far more tumors 类）——本族须 coverage/intensity/
+//      reach + 扩张动词后缀，裸筛查句不相交；
+//   ② r350 轮测注入 DETECT_UP_EN4=[] 的翻转集须 adoption/use of/rollout/
+//      expansion of 名词化形或 became universal 系动词形——本族为 覆盖名词 +
+//      扩张动词形（testing coverage expanded），无 of 名词化、无 became；
+//   ③ r347 轮测注入 DETECT_UP_EN=[] 的翻转集为 形容词 + detection/surveillance
+//      能力变动形——本族为 coverage/intensity/reach + 动词，无形容词能力形。
+const DETECT_UP_EN6 = [
+  // testing/surveillance/monitoring/scanning + coverage/intensity/reach/
+  // scope/breadth/volume/frequency + 扩张动词（expanded/increased/grew/rose/
+  // climbed/broadened/scaled up/extended…，含 was/were/has/have 助动词形）
+  /\b(?:testing|surveillance|monitoring|scanning)\s+(?:coverage|intensity|reach|scope|breadth|volume|frequency)\s+(?:has\s+|have\s+|had\s+|was\s+|were\s+|is\s+|are\s+)?(?:expanded|increased|grown|grew|risen|rose|climbed|broadened|scaled\s+up|ramped\s+up|extended)\b/i,
+];
+
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
 // 腿① RECLASS 重新分类动作：成员在组别间被搬进/搬出/重划。收裸动词
 // 形态（「重新划入」「分出去」「上调到」不带宾语也命中），并覆盖分类
@@ -1393,8 +1481,12 @@ function checkImmortalTimeBias(text, inject) {
     // advanced/improved/better/newer + testing，DETECT_UP_EN p3 的 tests?
     // 尾界不匹配 testing 动名词形）
     const ph1f = earliestIdx(R.DETECT_UP_EN5 || DETECT_UP_EN5, text);
-    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f].filter(x => x >= 0).length
-      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f].filter(x => x >= 0)) : -1;
+    // [r354] 腿①第七族：筛查覆盖/强度扩张动词形（EN 专项——testing/surveillance
+    // + coverage/intensity/reach + expanded/increased/was extended；LEAD_SCREEN
+    // 只收 screen* 词根、EN4 p6 须 expansion of + capacity 名词形）
+    const ph1g = earliestIdx(R.DETECT_UP_EN6 || DETECT_UP_EN6, text);
+    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g].filter(x => x >= 0).length
+      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g].filter(x => x >= 0)) : -1;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
@@ -1414,8 +1506,14 @@ function checkImmortalTimeBias(text, inject) {
       // [r353] 腿②第六族：case numbers 复数名词形（EN 专项——legacy p1/p2/p6
       // 只收 number of + cases 与 cases + has/have + 动词，复数名词无形）
       const ph2f = earliestIdx(R.CASE_SURGE_EN6 || CASE_SURGE_EN6, text);
-      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f].filter(x => x >= 0)) : -1;
+      // [r354] 腿②第七族：were/was + surfaced/uncovered 无形容词量化形（EN 专项
+      // ——EN2 p4 动词表缺 surfaced/uncovered、EN3 p3 须形容词组，more 前置无形）
+      const ph2g = earliestIdx(R.CASE_SURGE_EN7 || CASE_SURGE_EN7, text);
+      // [r354] 腿②第八族：动词前置裸过去时（EN 专项——pick stem legacy p10 缺、
+      // 动词+形容词量化无 more/has/were）
+      const ph2h = earliestIdx(R.CASE_SURGE_EN8 || CASE_SURGE_EN8, text);
+      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
@@ -1569,6 +1667,9 @@ module.exports = {
     // [r353] 路径 (h) 腿①形容词+testing 名词族 + 腿② case numbers 复数
     // 名词族（负例注入口，族独立常量 EN 专项）
     DETECT_UP_EN5, CASE_SURGE_EN6,
+    // [r354] 路径 (h) 腿①筛查覆盖/强度扩张动词族 + 腿② were/was+surfaced/
+    // uncovered 被动深形族 + 腿②动词前置裸过去时族（负例注入口，族独立常量 EN 专项）
+    DETECT_UP_EN6, CASE_SURGE_EN7, CASE_SURGE_EN8,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
