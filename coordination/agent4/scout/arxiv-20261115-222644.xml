@@ -1,0 +1,439 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/rtvonUmu3aH8/t55HZ/JyKnvP1o</id>
+  <title>arXiv Query: search_query=all:overdiagnosis OR all:incidence OR all:screening OR all:detection OR all:artifact OR all:epidemiology&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-15T22:26:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:overdiagnosis+OR+(all:incidence+OR+(all:screening+OR+(all:detection+OR+(all:artifact+OR+all:epidemiology))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>335715</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17333v1</id>
+    <title>Discrete Time Crystals from Anti-Unitary Floquet Driving and Dynamical Freezing</title>
+    <updated>2026-11-12T18:59:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.17333v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17333v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show anti-unitary periodic drive paves a direct path for stabilizing a Discrete Time-Crystal by Dynamical Freezing (DF). The magnetization appears as an emergent conserved operator, and an exact pairing of two-cycle quasi-energies pins the subharmonic response. DF keeps the effective Hamiltonian $\textit{quasi-local}$; infinite-chain simulations show no detectable decay for a generic state with any finite magnetization. We outline an experimental realization of the anti-unitary drive.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:53Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Anirban Das</name>
+    </author>
+    <author>
+      <name>Asmi Haldar</name>
+    </author>
+    <author>
+      <name>Arnab Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17328v1</id>
+    <title>A Dark-Sector Mass Flip-Flop Mechanism for the ANITA-IV Events</title>
+    <updated>2026-11-12T18:59:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.17328v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17328v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>ANITA-IV has observed four upward-going air-shower candidates just below the horizon, consistent with ultra-high-energy $ν_τ$, yet IceCube, despite its much larger exposure, has detected no neutrino events at such energies. We propose a dark-sector mass flip-flop mechanism that reconciles these observations. We consider an all-sky, monoenergetic flux of ultra-high-energy $N_1$, that is lighter than its partner $N_2$ and stable in vacuum. In our scenario, an ultralight scalar mediating interactions with Earth matter inverts the mass ordering of $N_1$ and $N_2$, allowing an incident $N_1$ to decay into $N_2$ deep underground. The resulting $N_2$ propagates unimpeded through matter and exits the Earth, where the decay $N_2 \to N_1 Z'$ becomes kinematically allowed in the atmosphere, initiating an extensive air shower. At IceCube depths, neither $N_1\to N_2 Z'$ nor $N_2\to N_1 Z'$ is kinematically allowed, which explains the absence of analogous events at IceCube. Normalizing the $N_1$ flux to the four ANITA-IV events, we also predict three events during PUEO's first flight.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:33Z</published>
+    <arxiv:comment>6+2 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Dibya S. Chattopadhyay</name>
+    </author>
+    <author>
+      <name>Carlos A. Argüelles</name>
+    </author>
+    <author>
+      <name>Vedran Brdar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17323v1</id>
+    <title>AgentSSL: Can MLE Agents Leverage Unlabeled Data?</title>
+    <updated>2026-11-12T18:59:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.17323v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17323v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applying machine learning systems to new domains introduces bottlenecks in both labeled data acquisition and manual pipeline engineering. While recent MLE agents show promise in automating pipeline design, they have been studied almost exclusively in fully supervised settings, leaving them untested in realistic regimes where labeled data is scarce but unlabeled data is abundant. In this work, we introduce Agentic Semi-Supervised Learning (AgentSSL), framing SSL as a program search problem and studying how agents navigate this space under limited supervision. We find that even under weak feedback and matched compute, agents can synthesize code that combines and adapts established SSL techniques, exceeding the strongest human-engineered baselines in 8 of 12 settings by up to +21.8%. However, our results identify program selection as a critical bottleneck in AgentSSL, where performance drops by as much as 47% when selecting based on the agent's feedback metric. To systematically study this bottleneck, we introduce ProgramSelectBench, a large-scale benchmark with a combined total of 16,977 agent-generated and human-engineered SSL programs, and evaluate both unsupervised and active program selection methods. We further evaluate AgentSSL on real-world ecology detection tasks, highlighting the opportunities and challenges of transferring agent-discovered strategies beyond controlled benchmarks.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:59:06Z</published>
+    <arxiv:comment>NeurIPS 2026. Project Website: https://codiscovery.ai/AgentSSL</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ethan Lin</name>
+    </author>
+    <author>
+      <name>Akanksha Sarkar</name>
+    </author>
+    <author>
+      <name>Ziang Liu</name>
+    </author>
+    <author>
+      <name>Kristin Branson</name>
+    </author>
+    <author>
+      <name>Jennifer J. Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17304v1</id>
+    <title>Where LLM Agents Get Stuck Debugging Databases: Access More Than Reasoning</title>
+    <updated>2026-11-12T18:56:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17304v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17304v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) coding agents are increasingly asked not only to write code but to debug running systems from live runtime data. We report a field observation of one such agent (Claude Code) as it diagnosed eight database incidents in a production message-dispatch engine. In every incident whose root cause depended on runtime concurrency, the agent announced a cause, shipped a fix, and later walked it back, and each wrong guess cost a deploy-and-observe cycle. Mapping each incident to what the agent lacked, we find that access to production state was the most pervasive bottleneck. The missing access included live lock views, untruncated deadlock reports, read-only execution, and an explicit environment context. An access gap was present in all five concurrency-dependent incidents: alone in one, and in four combined with a reasoning error such as anchoring on an early cause, incomplete exploration of the configuration, or a misreading of the code's transaction semantics. The three incidents that did not depend on concurrency needed nothing beyond what the agent already had. Within the incidents, the agent's wrong hypotheses were consistent with the evidence it could see; they were not fabrications. We argue that the next step for production-debugging agents is a forensics layer that gives the agent the access it lacks inside existing security controls. Such a layer would combine a safe interrogation API, a lock-and-deadlock flight recorder, and a production replay harness.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:56:22Z</published>
+    <arxiv:comment>12 pages, 2 figures, 2 tables. Submitted to the Journal of Systems and Software</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Gustavo Pinto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17293v1</id>
+    <title>Three-ends Furstenberg estimates and approximate rectangles</title>
+    <updated>2026-11-12T18:54:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.17293v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17293v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove a three-ends incidence estimate whose multiplicity exponent is sharp for one-dimensional Katz-Tao point sets.} At the heart of the argument lies rectangular non-concentration and its incidence theory introduced earlier by the authors. As an application, we obtain a strong quantitative bound on the number of approximate rectangles with the vertices belonging to four separated camps, each retaining a non-concentration condition.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:13Z</published>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Ciprian Demeter</name>
+    </author>
+    <author>
+      <name>William O'Regan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17284v1</id>
+    <title>Augmented Hybrid TV Services. Habits, Preferences, Opinions and Expectations of Spanish Consumers</title>
+    <updated>2026-11-12T18:52:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.17284v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17284v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The convergence of hybrid broadcast and broadband delivery, companion devices, and immersive technologies enables new forms of interactive, personalized, and accessible TV services. This paper introduces the concept of Augmented Hybrid TV services and presents an exploratory user requirements and preliminary acceptance assessment for 5 representative use cases. They were selected through an exploratory stakeholder consultation and 3 co-design workshops with audiovisual professionals and participants from organizations supporting people with visual or hearing impairments. They combine conventional TV with complementary content delivered to connected devices, including AR/VR HMD. They were subsequently evaluated through a cross-sectional CAWI survey of 626 Internet and connected TV users in Spain. Each participant viewed standardized video demonstrations of 2 randomly assigned cases and assessed their perceived usefulness, anticipated benefits/limitations, and interest in them. The results show substantial interest across all five use cases, ranging from 64.7% to 76.9%. Adaptive and personalized augmented subtitles received the highest level of interest and were particularly valued for their accessibility, language-learning, and personalization benefits. Immersive services involving complementary AR content, virtual screens, 3D objects, and 360 video were also evaluated positively, although participants identified device cost, ergonomics, connectivity, usability, and synchronization as anticipated limitations. The findings provide user-centered evidence that can inform the prioritization, design, and subsequent prototype-based evaluation of standards-compliant Augmented Hybrid TV services. Because the study assessed video-based scenarios rather than functional systems, the results represent perceived usefulness and stated interest rather than observed adoption or technically validated QoE.</summary>
+    <category term="cs.MM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:52:02Z</published>
+    <arxiv:comment>26 pages, 12 figures and 16 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.MM"/>
+    <author>
+      <name>Fernando Boronat</name>
+    </author>
+    <author>
+      <name>Bernat Roig</name>
+    </author>
+    <author>
+      <name>Enric Sigalat</name>
+    </author>
+    <author>
+      <name>Santiago J. Flores</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17280v1</id>
+    <title>Synthesis Smuggling: Maliciously Hiding Inferred Personal Attributes in LLM Outputs</title>
+    <updated>2026-11-12T18:51:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.17280v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17280v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose Synthesis Smuggling, a novel threat model in which an adversarial LLM infers sensitive information about a user from routine assistance-seeking interactions and steganographically encodes that into innocuous-looking model-generated content. The user may then unknowingly transmit that information by sharing the generated artifact, say as an email, social-media post, or message, through ordinary communication channels. An adversary monitoring these channels can discover this information. We demonstrate this threat by training two open-weight models to infer gender and age-group labels from conversational cues and encode their predictions using invisible characters or word choices. These results show that user-shared model outputs can become a covert channel for personal inferences, even when the model itself has no direct means of contacting an adversary.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:51:05Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Gautam Galada</name>
+    </author>
+    <author>
+      <name>Supreeth Shastri</name>
+    </author>
+    <author>
+      <name>Sagnik Ray Choudhury</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17279v1</id>
+    <title>On stimulated scattering including harmonic generation in an unmagnetized pair plasma for arbitrary pump strengths</title>
+    <updated>2026-11-12T18:50:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.17279v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17279v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A fully nonlinear analysis for the growth rate of the stimulated backscatter instability of an intense electromagnetic (EM) wave with arbitrary polarization in an unmagnetized pair plasma is presented. The connection of this instability to the FEL process is discussed and utilized. An intense EM wave causes an initially stationary pair plasma to drift forward with a speed near the speed of light. The resulting distribution function for both cold and warm pair plasmas is presented. It is shown that the frequency of the reflected light is thus Doppler downshifted from that of the incident wave. For a linearly polarized EM wave there is also an additional contribution to the forward drift at its second harmonic which leads to backscattered light at all odd harmonics of the Doppler downshifted frequency for sufficiently cold pair plasmas. Fully nonlinear particle-in-cell simulations confirm the theoretical growth rates and show how the instability depends on the pair plasma temperature. The effect of the intensity profile of the incoming EM wave as well as implications for astrophysical pair plasmas is discussed.</summary>
+    <category term="physics.plasm-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:50:51Z</published>
+    <arxiv:primary_category term="physics.plasm-ph"/>
+    <author>
+      <name>Vijay Patel</name>
+    </author>
+    <author>
+      <name>Thomas Grismayer</name>
+    </author>
+    <author>
+      <name>Samuel Sebastian</name>
+    </author>
+    <author>
+      <name>Xinlu Xu</name>
+    </author>
+    <author>
+      <name>John Palastro</name>
+    </author>
+    <author>
+      <name>Paulo Alves</name>
+    </author>
+    <author>
+      <name>Warren B. Mori</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17268v1</id>
+    <title>Observation of Genuine Multi-Time Quantum Memory</title>
+    <updated>2026-11-12T18:46:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.17268v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17268v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Memory effects in open quantum systems do not by themselves imply quantum memory, since non-Markovian dynamics can often be reproduced by classical-memory models. Known criteria certify the presence of quantum memory in the environment by comparing the evolution of the system at two different times. We show that quantum memory can remain hidden from all such pairwise tests and become detectable only when three or more times are considered jointly. We derive an analytical three-time witness and use it to certify quantum memory in a minimal qubit example in which every pair of times has a classical-memory explanation, thus establishing a strict hierarchy of quantum memory effects. Genuine multi-time quantum memory does not rely on fine-tuned time-dependent Hamiltonians or gate-based evolution. We experimentally demonstrate the hierarchy of quantum memory in a time-continuous realization on a superconducting-qubit platform with time-independent couplings.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:46:04Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Konstantin Beyer</name>
+    </author>
+    <author>
+      <name>Valentin Link</name>
+    </author>
+    <author>
+      <name>Surihan Sean Borjigin</name>
+    </author>
+    <author>
+      <name>Qian Cao</name>
+    </author>
+    <author>
+      <name>Orion Lee</name>
+    </author>
+    <author>
+      <name>Kater Murch</name>
+    </author>
+    <author>
+      <name>Igor Pikovski</name>
+    </author>
+    <author>
+      <name>Philip Taranto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17265v1</id>
+    <title>A deployed four-city entanglement-based QKD network with real-time key delivery, benchmarked against finite-key security bounds</title>
+    <updated>2026-11-12T18:45:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.17265v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17265v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum key distribution (QKD) generates shared secret keys whose security rests on the laws of physics rather than on computational assumptions. We report the entanglement-based segment of the Slovak national quantum communication infrastructure, connecting four cities in western Slovakia over deployed telecommunication fiber. Polarization-entangled photons generated at a central node are passively routed by wavelength to form a trusted-node-free, fully meshed sub-network of three cities, with the fourth connected through the central node and all links operated simultaneously. We also introduce a matrix formalism for passive wavelength routing that enables the algorithmic construction of uniquely and fully connected topologies. Unlike most previous demonstrations, which estimate key rates from raw coincidences, all rates reported here are obtained after the complete post-processing chain, with keys delivered in real time via ETSI GS QKD 014. With partial non-local chromatic dispersion compensation, we obtain 13.5 bit/s over 109 km, and 4.3 bit/s over 32.1 dB of accumulated loss between two cities without a direct fiber link. Benchmarking against finite-key security bounds shows that the implemented heuristic privacy amplification can exceed the finite-key bound, and that replacing detect-and-discard with error correction would increase the finite-key rate by a factor of 4.1-6.6, and yield a positive finite-key rate on the 142.9 km link where the implemented scheme yields none.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:45:08Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Gilberto Borges</name>
+    </author>
+    <author>
+      <name>Saeid Salari</name>
+    </author>
+    <author>
+      <name>Ekta Panwar</name>
+    </author>
+    <author>
+      <name>Samgeeth Puliyil</name>
+    </author>
+    <author>
+      <name>Kartik Kakade</name>
+    </author>
+    <author>
+      <name>Peter Rapčan</name>
+    </author>
+    <author>
+      <name>Mario Ziman</name>
+    </author>
+    <author>
+      <name>Djeylan Aktas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17250v1</id>
+    <title>Implementation of a 1D Gaussian-modulated CV-QKD under finite-size parameter estimation</title>
+    <updated>2026-11-12T18:37:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.17250v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17250v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Continuous-variable quantum key distribution (CV-QKD) is a promising technology for quantum-secure communications, offering high secret-key rates and straightforward integration with coherent optical communication systems. Conventional Gaussian-modulated CV-QKD encodes information in both optical-field quadratures, increasing requirements for state preparation, modulation, and calibration, while potentially introducing additional preparation imperfections. Unidimensional (1D) Gaussian modulation offers a simpler alternative by encoding information in only one quadrature, while the conjugate quadrature constrains the protocol's security. However, an integrated experimental 1D implementation combining independent-laser coherent reception with practical reconciliation, finite-size parameter estimation, and privacy amplification remains challenging. Here, we experimentally demonstrate a 1D Gaussian-modulated CV-QKD system over 12~km of standard single-mode fiber using a local local oscillator (LLO) architecture with independent lasers and an integrated offline classical post-processing chain. The implementation includes coherent detection, digital signal processing, information reconciliation, parameter estimation, physicality-constrained security analysis, and privacy amplification. The 1D system achieves a privacy-amplified rate of $1.421$~Mbit/s under the asymptotic security treatment and $0.364$~Mbit/s under the finite-size scenario. These results establish an experimental baseline for the performance--complexity trade-off associated with unidimensional Gaussian modulation and provide an experimental basis for developing lower-complexity CV-QKD transmitters.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:37:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Christiano M. S. Nascimento</name>
+    </author>
+    <author>
+      <name>Maron F. Anka</name>
+    </author>
+    <author>
+      <name>Gabriel A. V. Menezes</name>
+    </author>
+    <author>
+      <name>Davi J. G. de Sousa</name>
+    </author>
+    <author>
+      <name>Nelson A. Neto</name>
+    </author>
+    <author>
+      <name>Artur A. Matoso</name>
+    </author>
+    <author>
+      <name>Gustavo C. Amaral</name>
+    </author>
+    <author>
+      <name>Valéria L. Silva</name>
+    </author>
+    <author>
+      <name>Guilherme P. Temporão</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17229v1</id>
+    <title>Peak Performance in Matched Filtering: Fused Correlation and Statistically Controlled Screening on CPUs and GPUs</title>
+    <updated>2026-11-12T18:21:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.17229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Batched matched filtering and cross-correlation over large template banks are a primary computational cost in gravitational-wave astronomy, seismology, and radio transient searches. Standard pipelines pair a general-purpose inverse Fast Fourier Transform (FFT) with separate multiplication and peak-finding kernels, writing intermediate spectra and full correlation series to memory for every template. We fuse the conjugate product into the first inverse-transform butterflies and the peak reduction into the last so only candidate peaks leave processor registers, and tile batches in 2D so $K^2$ correlations reuse $2K$ cached spectra. This shifts filtering from a DRAM-bandwidth-bound to an on-chip cache-bandwidth-bound regime. In some situations, the signal-to-noise ratio (SNR) is concentrated toward lower frequencies while higher frequencies dominate the transform length. We develop a hierarchical screening method that exploits this via a sequence of short low-frequency transforms before evaluating the full band, deriving stage thresholds from the spectral power profile and matched-filter noise autocovariance to target a specified false-dismissal probability. We demonstrate these methods in the open-source matchedfilter library across eight CPU architectures and two integrated GPUs (AMD Radeon 8060S via Vulkan and Apple M2 via Metal). On an AMD Ryzen AI Max+ 395 at $N=4096$, fused peak-only filtering is $1.4\times$ faster than a standalone AOCL-FFTW inverse transform on one CPU core and $6.2\times$ faster than rocFFT on its Radeon 8060S GPU ($3.1\times$ over MLX FFT on the M2 GPU). For a fiducial gravitational-wave search ($ρ_\mathrm{th}=5.5$, $10^{-2}$ false-dismissal target), hierarchical screening yields a $26\times$ speedup over AOCL-FFTW on CPU, $21\times$ over rocFFT on the 8060S GPU, and $19\times$ over MLX FFT on the M2 GPU.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:21:14Z</published>
+    <arxiv:comment>10 pages, 4 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Alexander H. Nitz</name>
+    </author>
+    <author>
+      <name>Keisi Kacanja</name>
+    </author>
+    <author>
+      <name>Collin D. Capano</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17211v1</id>
+    <title>A Feasibility Study of Whole-Cerebrum Task-Based fMRI at 0.55 T: Motor and Visual Tasks Using Single-Shot EPI</title>
+    <updated>2026-11-12T18:09:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.17211v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17211v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Purpose: To evaluate the feasibility of whole-cerebrum task-based fMRI on a modern 0.55T system, examining the effects of extended scan duration and within-session consistency on functional mapping outcomes and comparison to acquisition with matched tasks at 3.0T. Methods: Six healthy participants were scanned at 0.55T using a single-shot EPI sequence during bilateral finger-tapping and visual checkerboard tasks. Data were processed using an open-source pipeline. To investigate sensitivity improvements, two consecutive 5-minute runs were concatenated. Within-session consistency was also assessed. A representative 3T dataset provided additional reference context for temporal dynamics and statistical sensitivity. Results: Task-evoked activations were detected at 0.55T using Family-Wise Error (FWE) rate correction (p &lt; 0.05) in both motor and visual cortices. While single 5-minute runs provided baseline detectability, extending the acquisition to 10 minutes increased t-statistic magnitudes and cluster extents while substantially reducing background noise (47% reduction in voxelwise dispersion). Run-to-run comparisons showed consistent peak locations and statistical significance across participants. Comparison with the 3T reference demonstrated that statistical significance increases with acquisition time so that a 0.55T scan approximately matches 3T significance levels at twice the scan duration across the range compared. Conclusion: Whole-cerebrum task fMRI is feasible at 0.55T using standard EPI and modern high-performance gradients. These results indicate that modest extensions in scan duration can compensate for reduced intrinsic BOLD sensitivity at lower field strengths.</summary>
+    <category term="physics.med-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:09:22Z</published>
+    <arxiv:primary_category term="physics.med-ph"/>
+    <author>
+      <name>Parsa Razmara</name>
+    </author>
+    <author>
+      <name>Takfarinas Medani</name>
+    </author>
+    <author>
+      <name>Anand A. Joshi</name>
+    </author>
+    <author>
+      <name>Majid Abbasi Sisara</name>
+    </author>
+    <author>
+      <name>Ye Tian</name>
+    </author>
+    <author>
+      <name>Sophia X. Cui</name>
+    </author>
+    <author>
+      <name>Justin P. Haldar</name>
+    </author>
+    <author>
+      <name>Krishna S. Nayak</name>
+    </author>
+    <author>
+      <name>Richard M. Leahy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17209v1</id>
+    <title>Shedding light on modified recombination scenarios with Rayleigh scattering of the CMB</title>
+    <updated>2026-11-12T18:07:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.17209v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17209v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Rayleigh scattering (RS) of cosmic microwave background (CMB) photons by neutral hydrogen and helium, during and shortly after the last scattering surface, adds a frequency-dependent contribution to the CMB anisotropies that scales approximately as $ν^4$ at leading order. The RS signal is most relevant at $200\,{\rm GHz}\lesssimν\lesssim800\,{\rm GHz}$ and could be detected using future CMB experiments. Because RS acts in a frequency-dependent manner which is sensitive to the ionisation history of the cosmological recombination process, it provides an additional probe of the recombination history. This makes it a natural test of modified recombination scenarios, such as variable electron mass $m_{\rm e}$ or fine-structure constant $α$, which have been proposed to ease the Hubble tension. The correlation between the RS and primary CMB signal, both in temperature and polarisation, further enhances its usefulness for constraining cosmological parameters. Using a multi-frequency Fisher analysis with realistic noise and foregrounds, we forecast parameter constraints and biases for PICO and LiteBIRD + Planck. For PICO, adding RS improves the $Λ$CDM constraints on cosmological parameters by $\lesssim7\%$, but improves the constraints on some parameters ($H_0$, $m_{\rm e}$, $α$, $Ω_{\rm b}h^2$, $Ω_{\rm c}h^2$) by $\simeq31\%$ for some modified scenarios in the recombination history. However, the improvement for LiteBIRD + Planck is limited to less than $2\%$ for most of the parameters. Neglecting RS biases the cosmological parameters by up to $\simeq1σ$ for PICO and below $1σ$ for LiteBIRD + Planck. Therefore RS must be modelled in the analyses of future CMB data.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:07:10Z</published>
+    <arxiv:comment>28 pages, 12 Figures, 9 Tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Debabrata Adak</name>
+    </author>
+    <author>
+      <name>Elena Vanetti</name>
+    </author>
+    <author>
+      <name>R. T. Génova-Santos</name>
+    </author>
+    <author>
+      <name>Jens Chluba</name>
+    </author>
+    <author>
+      <name>Carlos Hernández-Monteagudo</name>
+    </author>
+    <author>
+      <name>J. A. Rubiño-Martín</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17202v1</id>
+    <title>Parallel alignment of radio AGN jets and large cosmic web structures in the direction of the Shapley supercluster</title>
+    <updated>2026-11-12T18:05:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.17202v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17202v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Aims. We investigated the potential large-scale alignment of radio active galactic nuclei (AGN) jets in the proximity of the Shapley Supercluster (SSC) area and its correlation with the identified cosmic web structures. Methods. We analyzed 28 radio AGNs divided into two populations with comparable sky coverage north and south of a diffuse X-ray filamentary structure connecting clusters in the SSC core. We measured the average jet position angles (PAs) and combined them with spectroscopic redshifts to assess the persistence of the alignment along the line of sight. Results. We detected a significant large-scale alignment of the radio AGN jets with the foreground X-ray filament (oriented at PA $\sim$ 115$^\circ$ $\pm$ 10$^\circ$). Both the northern (PA $\sim$ 117$^\circ$) and southern (PA $\sim$ 129$^\circ$) groups align with this axis, yielding an overall statistical significance of 4.5 $σ$ (upper and lower bounds: 6.1$σ$, 3.8 $σ$). Although the projected alignment is highly significant, sparse spectroscopic coverage (seven sources spanning 0.048 $\lesssim$ z $\lesssim$ 0.55) suggests that this spatial coherence may extend beyond the SSC (z $\sim$ 0.048), hinting at a line-of-sight correlation across significantly larger cosmic scales. Conclusions. The observed alignment cannot be explained by localized dynamical processes alone. These findings may indicate a persistent influence of the large-scale structure of the cosmic web, or preferred directions of matter collapse, on supermassive black hole spin axes, highlighting a connection between AGN jet morphology and the underlying dark matter distribution. Such alignments represent an important systematic that must be accounted for in precision cosmology with surveys such as Euclid.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:05:08Z</published>
+    <arxiv:comment>Accepted for publication in A&amp;A. 13 pages (+5 pages of appendix), 9 figures (+4 in appendix)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>I. Baronchelli</name>
+    </author>
+    <author>
+      <name>T. Venturi</name>
+    </author>
+    <author>
+      <name>V. Casasola</name>
+    </author>
+    <author>
+      <name>P. Merluzzi</name>
+    </author>
+    <author>
+      <name>C. Burigana</name>
+    </author>
+    <author>
+      <name>G. Busarello</name>
+    </author>
+    <author>
+      <name>M. Bonato</name>
+    </author>
+    <author>
+      <name>O. Smirnov</name>
+    </author>
+    <author>
+      <name>T. Ronconi</name>
+    </author>
+    <author>
+      <name>M. Massardi</name>
+    </author>
+    <author>
+      <name>E. Liuzzo</name>
+    </author>
+  </entry>
+</feed>
