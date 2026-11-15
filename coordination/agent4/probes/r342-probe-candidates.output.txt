@@ -1,0 +1,104 @@
+=== A publication bias ===
+attack 10 -> gate=pass 8/10
+  PEN [pass] 文献库里二十项研究全部显示该药有效，所以这药确实管用。 :: none
+  blk [rewrite] 已发表的论文一致报告阳性结果，足以证明疗法有效。 :: fallacy_of_relevance,prosecutors_fallacy
+  PEN [pass] 顶级期刊上的研究都支持这个结论，我们直接采信就行。 :: none
+  PEN [pass] 同行评议过的文献没有一篇报告无效，结论已经很明确了。 :: none
+  PEN [pass] 检索到的每一项临床试验都是阳性结果，证据非常充分。 :: none
+  PEN [pass] Every published study shows the su :: none
+  PEN [pass] The literature unanimously reports :: none
+  blk [rewrite] No peer-reviewed paper has ever fo :: fallacy_of_relevance
+  PEN [pass] All twenty trials in the database  :: none
+  PEN [pass] With no published study showing ha :: moral_foundations
+benign 6 -> non-pass 0/6
+  ok  [pass] 文献检索必须同时找未发表研究与注册平台的阴性结果，否则结论会偏。 :: none
+  ok  [pass] 只统计已发表研究会犯发表偏倚，应该看试验注册库的完整记录。 :: none
+  ok  [pass] 漏斗图和失安全数可以检验发表偏倚，元分析要报告这些诊断。 :: none
+  ok  [pass] Looking only at published studies  :: none
+  ok  [pass] Funnel plots and fail-safe N are t :: none
+  ok  [pass] A meta-analysis restricted to posi :: none
+=== B will rogers stage migration ===
+attack 6 -> gate=pass 2/6
+  blk [rewrite] 采用新分期标准后，早期和晚期患者的五年生存率都上升了，说明治疗水平明 :: pseudo_causal,pseudo_causal,immortal_time_bias
+  blk [rewrite] 新指南重新分期之后，每一期的生存率都比以前高，可见癌症治疗越来越有效 :: post_hoc,fallacy_of_relevance,pseudo_causal,pseudo_causal
+  blk [verify] 改版分期方案让早期与晚期的预后数据同时改善，这证明新方案很成功。 :: activity_outcome_confusion
+  PEN [pass] After the new staging criteria, su :: none
+  PEN [pass] The revised guideline improved sta :: none
+  blk [rewrite] Both early and late stage survival :: fallacy_of_relevance,collider_bias,moral_foundations
+benign 4 -> non-pass 0/4
+  ok  [pass] 分期标准变化可能只是把病例重新归类，各期生存率齐升未必是疗效改善。 :: none
+  ok  [pass] Will Rogers 现象提醒我们：分期迁移能让各期生存率同时上升 :: none
+  ok  [pass] A change in staging can inflate su :: none
+  ok  [pass] Stage migration can raise survival :: none
+=== C differential surveillance ===
+attack 6 -> gate=pass 5/6
+  PEN [pass] 参加早筛的那批人查出更多的癌，说明不筛查的人反而更安全。 :: none
+  PEN [pass] 用药组每三个月复查一次，发现的并发症比对照组多，可见这药会引发并发症 :: none
+  PEN [pass] 随访更密的队列报告了更多不良反应，所以密集监测本身让治疗更危险。 :: none
+  PEN [pass] The screened group had more cancer :: none
+  blk [rewrite] Patients monitored every three mon :: fallacy_of_relevance
+  PEN [pass] The closely followed cohort had mo :: none
+benign 4 -> non-pass 0/4
+  ok  [pass] 筛查组查出的多可能只是发现得多，要比较同监测强度下的真实发生率。 :: none
+  ok  [pass] 检出差异可能来自监测频率不同，不能直接推断风险差异。 :: none
+  ok  [pass] Detection differences may reflect  :: none
+  ok  [pass] More detected cases in a screened  :: none
+=== D disposition effect new wording ===
+attack 6 -> gate=pass 4/6
+  PEN [pass] 股票一涨我就卖掉，亏的坚决不割，这才是成熟的投资心态。 :: none
+  PEN [pass] 赚钱的币早点落袋，归零的币留给孩子当纪念，价值投资就是这样。 :: none
+  PEN [pass] 见红就跑、套牢就装死，我这不是投机，是稳健的资产处置纪律。 :: none
+  blk [verify] I sell winners the moment they ris :: perfect_error
+  blk [verify] Take profits early and hold losers :: econ_reasoning_gate
+  PEN [pass] Cashing in gains quickly while kee :: none
+benign 4 -> non-pass 0/4
+  ok  [pass] 卖出盈利头寸同时止损亏损头寸，是执行既定资产配置再平衡纪律。 :: none
+  ok  [pass] 止盈止损都按事先设定的目标执行，不因盈亏状态改变规则。 :: none
+  ok  [pass] Selling winners and cutting losers :: none
+  ok  [pass] Both take-profit and stop-loss rul :: none
+=== E regression to mean new wording ===
+attack 6 -> gate=pass 3/6
+  PEN [pass] 按成绩选出的重点班第二年平均分回落到普通班水平，可见重点班的教学反而 :: none
+  blk [rewrite] 奖励了上月业绩最好的团队，这个月业绩就退步了，说明奖金起了反作用。 :: confidence,regression_to_the_mean
+  blk [verify] 把最差的员工送进培训营，结业后他们的排名更靠后了，培训明显拖累了他们 :: confidence
+  blk [rewrite] The top-performing team regressed  :: fallacy_of_relevance,fallacies,regression_to_the_mean
+  PEN [pass] The honors class fell back to aver :: none
+  PEN [pass] Workers sent to training ranked ev :: moral_foundations
+benign 4 -> non-pass 1/4
+  FP  [rewrite] 极端组次年回归均值是统计必然，不能据此判断干预有害。 :: reasoning_coherence,absolute_claim
+  ok  [pass] 奖励前后没有对照组，回落可能只是回归效应而非激励反作用。 :: none
+  ok  [pass] Regression toward the mean makes p :: none
+  ok  [pass] A drop after selecting extremes is :: none
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 8,
+  "total": 10,
+  "fp": 0,
+  "fpTotal": 6
+ },
+ "B": {
+  "pen": 2,
+  "total": 6,
+  "fp": 0,
+  "fpTotal": 4
+ },
+ "C": {
+  "pen": 5,
+  "total": 6,
+  "fp": 0,
+  "fpTotal": 4
+ },
+ "D": {
+  "pen": 4,
+  "total": 6,
+  "fp": 0,
+  "fpTotal": 4
+ },
+ "E": {
+  "pen": 3,
+  "total": 6,
+  "fp": 1,
+  "fpTotal": 4
+ }
+}

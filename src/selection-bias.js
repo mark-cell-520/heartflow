@@ -34,6 +34,37 @@
  *   - 只描述样本自身（会员的满意度更高/所有样本都合格）→ 无总体范围词，不判
  *   - 概率化结论（可能/也许/maybe）→ 非全称推广，不判
  *
+ * [r342 扩展] 发表偏倚（publication bias / file drawer effect）新措辞家族
+ * （coordination/agent4/probes/r342-probe-candidates.js，集成树 v6.8.185
+ * gate() 全量 findings 实测）：五候选族竞品定拨——A 发表偏倚攻击 10 条
+ * **8 条穿透 gate=pass**（2 条被 fallacy_of_relevance 存量代拦）、良性
+ * 6/6 零误伤胜出；B Will Rogers 分期迁移 2/6（immortal_time_bias/
+ * pseudo_causal 存量覆盖过半）、C 监测强度差异 5/6（次优，留档）、D 处置
+ * 效应新措辞 4/6（econ_reasoning_gate 部分覆盖）、E 均值回归新形 3/6 且
+ * 良性 1/4 误伤（存量覆盖+红线），均放弃。A 的族形状与 src/ 全部存量
+ * 维度零重叠：researcher_degrees_of_freedom(212) 管**自己的分析流程**被
+ * 结果反向决定（HARKing/p-hacking），cherry_picking(180) 管**选择性
+ * 取证×确定性结论**，confirmatory_evidence(220) 管**反复做实验直到出现
+ * 想要的结果**——没有一维判「**把已发表文献这个阳性富集的取样框当作
+ * 全部研究**，据此断言干预普遍有效」。这正是 selection_bias 的取样框
+ * 语义在证据生产端的延伸：发表动作本身就是自选择过滤器（阴性结果进
+ * 抽屉），已发表集合是全体研究的受限样本。
+ *
+ * 落地形态（平行常量 + 专属路由，存量腿一字不动）：
+ *   · 腿① PUB_RESTRICT：文献域 × 一致性阳性过滤——量化词（全部/都/
+ *     一致/每一项/没有一篇…） × 阳性动词（显示/报告/发现/支持/证实） ×
+ *     阳性结果（有效/阳性/获益/显著/无效/阴性/危害…）；EN 侧双正则
+ *     （every/all/no… + published study/trial/paper + show/report/found/
+ *     were + positive/null/harm/works…，外加 literature 主语 × 一致性
+ *     副词 × 动词 × 结果词形）。
+ *   · 腿② PUB_CLAIM：普效/定论断言（有效/管用/成立/充分/明确/采信/
+ *     proven/effective/conclusive/settled/established…），只对 PUB 型
+ *     受限路由生效（既有推广路由不动，行为零变化）。
+ *   · after-restr 候选：PUB 型受限同句后续段（"which settles the
+ *     question"/"— the therapy clearly works"）此前无候选路径。
+ *   · 豁免 PUB_META：发表偏倚/抽屉/漏斗图/注册库/未发表研究 教学与
+ *     纠正语境全句豁免（与存量 META_CONCEPT 同构）。
+ *
  * [r267 扩展] 池化探针实测 6/6 穿透的新措辞家族（scripts/round-267/
  * r267-probe-pool.js，v6.8.157）：① 口语化取证动词（问卷只撒在…/反馈
  * 全部捡自…/数据爬取自…）与渠道受限来源（微信群/首页推送/好评区/粉丝
@@ -138,6 +169,43 @@ const ADEQUATE_EN = ['random sample', 'randomly selected', 'randomly sampled', '
 const HEDGE_EN = ['may', 'might', 'could', 'perhaps', 'probably', 'likely', 'possibly', 'seems', 'appears', 'tends', 'tend'];
 const SURVIVOR_EN = ['survivors', 'survivor', 'survived', 'those who survived'];
 
+// ═══════════════════════════════════════════════════════════════════
+// [r342] 发表偏倚（publication bias / file drawer effect）新措辞家族
+// 平行常量：存量 RESTRICT/SOURCE/GEN 腿一字不动，PUB 专属路由 + PUB
+// 型断言腿 + PUB_META 豁免。负例注入-删条逐常量置空用。
+// ═══════════════════════════════════════════════════════════════════
+
+// 豁免：概念教学/纠正语境（与存量 META_CONCEPT 同构，全句生效）
+const PUB_META_ZH = ['发表偏倚', '发表偏差', '发表性偏倚', '阳性偏倚', '抽屉效应', '文件抽屉', '漏斗图', '失安全数', '试验注册', '注册库', '预注册', '灰色文献', '未发表研究', '阴性结果', '不发表'];
+const PUB_META_EN = ['publication bias', 'file drawer', 'funnel plot', 'fail-safe', 'trial registry', 'preregistration', 'pre-registration', 'grey literature', 'gray literature', 'unpublished stud', 'negative results'];
+
+// 腿① ZH：量化词 × 阳性动词 × 阳性结果（近邻共现，语序不限）
+const PUB_QUANT_ZH = ['全部', '都', '一致', '均', '无一例外', '每一项', '每项', '各项', '所有', '统统', '一概', '无一', '二十项', '三十项', '几十项', '十几项'];
+const PUB_VERB_ZH = ['显示', '报告', '发现', '支持', '证实', '证明', '表明', '提示', '得出一致'];
+const PUB_RES_ZH = ['有效', '阳性', '正面', '积极', '获益', '显著', '成功', '有效应', '有效果', '治愈', '延长', '改善'];
+// 腿① ZH 路由 b：量化词 × 支持/背书 × 该结论（「都支持这个结论」）
+const PUB_BACK_ZH = ['支持', '站在', '背书', '印证', '佐证'];
+const PUB_TARGET_ZH = ['这个结论', '该结论', '此结论', '这一结论', '这个说法', '该说法', '这一观点', '这个疗法', '该疗法', '这种疗法', '该药', '此药', '这个药', '该干预', '这个方案', '该方案'];
+// 腿① ZH 否定型：没有一篇/无一项/从未 + 报告/显示 + 无效/阴性/危害
+const PUB_NEG_ZH = ['没有', '无', '从未', '未见', '不曾', '没出现'];
+const PUB_NEG_UNIT_ZH = ['一篇', '一项', '任何', '一例', '一次', '一篇也', '一项也'];
+const PUB_NEG_RES_ZH = ['无效', '阴性', '负面', '风险', '危害', '不良反应', '问题', '质疑'];
+// 腿① ZH 等同型：每一项…都是阳性结果
+const PUB_EVERY_ZH = ['每一项', '每项', '各项', '每一项研究', '所有研究', '每篇'];
+
+// 腿②：普效/定论断言（仅 PUB 型受限路由生效）
+const PUB_CLAIM_ZH = /(?:有效|管用|有用|成立|充分|明确|确凿|可靠|安全|采信|定论|毋庸置疑|毫无疑问|站得住|靠得住|可以放心|可以推广|可以采纳|值得相信|值得采纳|足以采信|证据充分)/;
+
+// 腿① EN：量化词 × 文献名词 × 动词/系词 × 结果词（单正则，窗内共现）
+const PUB_EN_RE = /\b(?:every|all|each|no|none|not\s+a\s+single|with\s+no|the\s+literature|the\s+published\s+literature|unanimously|consistently|without\s+exception)\b[^.;]{0,50}?\b(?:(?:published|peer-reviewed)\s+)?(?:study|studies|trial|trials|paper|papers|report|reports|publication|article|research)s?\b[^.;]{0,40}?\b(?:show|shows|showed|showing|report|reports|reported|reporting|find|finds|found|finding|support|supports|confirm|confirms|demonstrate|demonstrates|suggest|suggests|were|was|are|is|came\s+back)\b[^.;]{0,30}?\b(?:positive|null|negative|effective|benefit|beneficial|harm|significant|works)\b/i;
+// 腿① EN 路由 b：literature 主语 × 一致性副词 × 动词 × 结果词
+// （"The literature unanimously reports positive results"——主语即文献域，
+//   无 study/trial 名词，路由 a 的名词位收不到）
+const PUB_EN_RE2 = /\b(?:the\s+)?(?:published\s+|peer-reviewed\s+)?literature\b[^.;]{0,30}?\b(?:unanimously|consistently|without\s+exception)?[^.;]{0,20}?\b(?:show|shows|showed|showing|report|reports|reported|reporting|find|finds|found|finding|support|supports|confirm|confirms|demonstrate|demonstrates|suggest|suggests)\b[^.;]{0,30}?\b(?:positive|null|negative|effective|benefit|beneficial|harm|significant|works)\b/i;
+
+// 腿② EN：普效/定论断言
+const PUB_CLAIM_EN = /\b(?:proven|proves|effective|works|worked|established|conclusive|conclusively|settled|settles|definitive|solid|reliable|trustworthy|can\s+trust|adopt|safe|clear|valid|sound)\b/i;
+
 const EN_STOP = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'of', 'to', 'and', 'or', 'in', 'on', 'at', 'for', 'with', 'by', 'that', 'this', 'it', 'its', 'as', 'if', 'then', 'so', 'who', 'which']);
 
 function _clauses(t) {
@@ -196,7 +264,8 @@ function _findRestriction(clause, R) {
       const rmt = clause.match(revRe);
       if (rmt) return { type: 'EN_RESTRICT', word: rmt[0].slice(0, 40), idx: rmt.index };
     }
-    return null;
+    // [r342] EN 分支同样兜底发表偏倚路由（EN 单正则），否则提前 return 漏掉整族
+    return _findPublicationRestriction(clause, R);
   }
   // 路由 a：限定标记 × 取样动词（标记在前 12 字内——「问卷只发给了」「只统计了」）
   const RESTRICT_ZH_R = R.RESTRICT_ZH || RESTRICT_ZH;
@@ -237,7 +306,80 @@ function _findRestriction(clause, R) {
       if (win.includes(v)) return { type: 'RESTRICTED_SOURCE', word: rs + '+' + v, idx };
     }
   }
+  // [r342] 发表偏倚路由（文献域 × 一致性阳性过滤）——存量路由之后兜底
+  return _findPublicationRestriction(clause, R);
+}
+
+// ── [r342] 腿①：发表偏倚路由（文献域 × 一致性阳性过滤）────────────
+function _findPublicationRestriction(clause, R) {
+  R = R || {};
+  if (!_isEN(clause)) {
+    // 否定型：没有一篇/无一项/从未 + 报告/显示 + 无效/阴性/危害
+    const PUB_NEG_ZH_R = R.PUB_NEG_ZH || PUB_NEG_ZH;
+    const PUB_NEG_UNIT_ZH_R = R.PUB_NEG_UNIT_ZH || PUB_NEG_UNIT_ZH;
+    const PUB_NEG_RES_ZH_R = R.PUB_NEG_RES_ZH || PUB_NEG_RES_ZH;
+    for (const neg of PUB_NEG_ZH_R) {
+      let from = 0, idx;
+      while ((idx = clause.indexOf(neg, from)) >= 0) {
+        const win = clause.slice(idx, idx + neg.length + 16);
+        if (PUB_NEG_UNIT_ZH_R.some(u => win.includes(u)) && PUB_NEG_RES_ZH_R.some(r => win.includes(r))) {
+          return { type: 'PUB_ZH', word: neg, idx, end: idx + neg.length };
+        }
+        from = idx + 1;
+      }
+    }
+    // 等同型：每一项…都是阳性结果
+    const PUB_EVERY_ZH_R = R.PUB_EVERY_ZH || PUB_EVERY_ZH;
+    const PUB_RES_ZH_R = R.PUB_RES_ZH || PUB_RES_ZH;
+    for (const e of PUB_EVERY_ZH_R) {
+      const idx = clause.indexOf(e);
+      if (idx < 0) continue;
+      const win = clause.slice(idx, idx + e.length + 14);
+      if (win.includes('都') && PUB_RES_ZH_R.some(r => win.includes(r))) {
+        return { type: 'PUB_ZH', word: e, idx, end: idx + e.length };
+      }
+    }
+    // 量化词 × 阳性动词 × 阳性结果
+    const PUB_QUANT_ZH_R = R.PUB_QUANT_ZH || PUB_QUANT_ZH;
+    const PUB_VERB_ZH_R = R.PUB_VERB_ZH || PUB_VERB_ZH;
+    for (const q of PUB_QUANT_ZH_R) {
+      let from = 0, idx;
+      while ((idx = clause.indexOf(q, from)) >= 0) {
+        const win = clause.slice(idx, idx + q.length + 16);
+        if (PUB_VERB_ZH_R.some(v => win.includes(v)) && PUB_RES_ZH_R.some(r => win.includes(r))) {
+          return { type: 'PUB_ZH', word: q, idx, end: idx + q.length };
+        }
+        from = idx + 1;
+      }
+    }
+    // 路由 b：量化词 × 支持/背书 × 该结论/该疗法
+    const PUB_BACK_ZH_R = R.PUB_BACK_ZH || PUB_BACK_ZH;
+    const PUB_TARGET_ZH_R = R.PUB_TARGET_ZH || PUB_TARGET_ZH;
+    for (const q of PUB_QUANT_ZH_R) {
+      let from = 0, idx;
+      while ((idx = clause.indexOf(q, from)) >= 0) {
+        const win = clause.slice(idx, idx + q.length + 16);
+        if (PUB_BACK_ZH_R.some(b => win.includes(b)) && PUB_TARGET_ZH_R.some(t => win.includes(t))) {
+          return { type: 'PUB_ZH', word: q + '+back', idx, end: idx + q.length };
+        }
+        from = idx + 1;
+      }
+    }
+  }
+  // EN 侧双正则（quant×noun×verb×outcome + literature 主语形）
+  const PUB_EN_RE_R = R.PUB_EN_RE || PUB_EN_RE;
+  const mt = clause.match(PUB_EN_RE_R);
+  if (mt) return { type: 'PUB_EN', word: mt[0].slice(0, 40), idx: mt.index, end: mt.index + mt[0].length };
+  const PUB_EN_RE2_R = R.PUB_EN_RE2 || PUB_EN_RE2;
+  const mt2 = clause.match(PUB_EN_RE2_R);
+  if (mt2) return { type: 'PUB_EN', word: mt2[0].slice(0, 40), idx: mt2.index, end: mt2.index + mt2[0].length };
   return null;
+}
+
+// ── [r342] 腿②：普效/定论断言（仅 PUB 型受限路由调用）──────────────
+function _pubClaim(body, isEN) {
+  if (!body) return false;
+  return isEN ? PUB_CLAIM_EN.test(body) : PUB_CLAIM_ZH.test(body);
 }
 
 // ── 腿②：总体推广检测 ─────────────────────────────────────────
@@ -350,6 +492,9 @@ function checkSelectionBias(text, inject) {
 
   // 全文级守卫（概念 / 教学 / 幸存者射程 / 充分取样 / 明示局限）
   for (const m of META_CONCEPT) { if (t.toLowerCase().includes(m)) return _exempt('META_CONCEPT', m); }
+  // [r342] 发表偏倚概念教学/纠正语境全句豁免（与 META_CONCEPT 同构）
+  for (const m of PUB_META_ZH) { if (t.includes(m)) return _exempt('PUB_META', m); }
+  for (const m of PUB_META_EN) { if (t.toLowerCase().includes(m)) return _exempt('PUB_META', m); }
   for (const m of TEACH) { if (t.includes(m)) return _exempt('TEACH', m); }
   for (const m of SURVIVOR_ZH) { if (t.includes(m)) return _exempt('SURVIVOR', m); }
   for (const m of SURVIVOR_EN) { if (t.toLowerCase().includes(m)) return _exempt('SURVIVOR', m); }
@@ -393,6 +538,11 @@ function checkSelectionBias(text, inject) {
       for (let k = segIdx - 1; k >= Math.max(0, segIdx - 2); k--) cands.push({ text: subsegs[k], mode: 'back' });
       for (let j = Math.max(0, i - 2); j < i; j++) cands.push({ text: clauses[j], mode: 'back' });
     }
+    // [r342] after-restr 候选：PUB 型受限的后续段（"which settles the
+    // question" / "，我们直接采信就行"）——推断词/后续句路由均不覆盖
+    if (/^PUB/.test(restr.type) && restr.end > restr.idx && restr.end < clause.length) {
+      cands.push({ text: clause.slice(restr.end), mode: 'after-restr' });
+    }
 
     for (const cand of cands) {
       let body = cand.text;
@@ -412,7 +562,7 @@ function checkSelectionBias(text, inject) {
       if (ACK_CLAUSE_EN.some(a => low.includes(a))) continue;
       if (HEDGE_ZH.some(h => body.includes(h))) continue;
       if (HEDGE_EN.some(h => new RegExp('\\b' + h + '\\b').test(low))) continue;
-      const route = _hasGeneralization(body, R);
+      const route = _hasGeneralization(body, R) || (/^PUB/.test(restr.type) && _pubClaim(body, restr.type === 'PUB_EN') ? (restr.type === 'PUB_EN' ? 'EN_PUB' : 'ZH_PUB') : null);
       if (!route) continue;
       hits.push({ sample: clause.trim(), conclusion: body, type: restr.type, route });
       break;
@@ -421,14 +571,16 @@ function checkSelectionBias(text, inject) {
 
   if (!hits.length) return _pass();
 
-  const baseScore = { RESTRICT: 76, SOURCE: 74, EN_RESTRICT: 74, EN_SOURCE: 72 };
+  const baseScore = { RESTRICT: 76, SOURCE: 74, EN_RESTRICT: 74, EN_SOURCE: 72, PUB_ZH: 74, PUB_EN: 72 };
   let score = 0;
   for (const h of hits) score = Math.max(score, baseScore[h.type] || 70);
   score += Math.min(3 * (hits.length - 1), 9);
   score = Math.min(score, 90);
 
   const first = hits[0];
-  const detail = '取样偏差（只从受限样本取证却推广到全体）' + hits.length + '处：取样来源「' + first.sample.slice(0, 22) +
+  const detail = (String(first.type).startsWith('PUB')
+    ? '发表偏倚（只以已发表文献为取样框×普效断言）'
+    : '取样偏差（只从受限样本取证却推广到全体）') + hits.length + '处：取样来源「' + first.sample.slice(0, 22) +
     '」受限/自选择，却据此推出「' + first.conclusion.slice(0, 20) + '」——取样来源与结论总体不匹配，证据效力被夸大';
   return {
     score,
@@ -451,5 +603,10 @@ module.exports = {
     ACK_FULL_ZH, ACK_CLAUSE_ZH, ADEQUATE_ZH, HEDGE_ZH, SURVIVOR_ZH, META_CONCEPT, TEACH,
     RESTRICT_EN, SAMPLING_VERBS_EN, SOURCE_FROM_EN, RESTRICTED_SOURCE_EN,
     GEN_VERB_EN, GEN_SCOPE_EN, ACK_FULL_EN, ACK_CLAUSE_EN, ADEQUATE_EN, HEDGE_EN, SURVIVOR_EN,
+    // [r342] 发表偏倚新措辞家族（平行常量，负例注入-删条用）
+    PUB_META_ZH, PUB_META_EN,
+    PUB_QUANT_ZH, PUB_VERB_ZH, PUB_RES_ZH, PUB_BACK_ZH, PUB_TARGET_ZH,
+    PUB_NEG_ZH, PUB_NEG_UNIT_ZH, PUB_NEG_RES_ZH, PUB_EVERY_ZH,
+    PUB_CLAIM_ZH, PUB_EN_RE, PUB_EN_RE2, PUB_CLAIM_EN,
   },
 };
