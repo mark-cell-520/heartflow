@@ -1,0 +1,17 @@
+miss :: 理赔金额上升，归根到底在于参保后大家疏于保健，跟投保前的风险
+miss :: 赔付率走高的问题出在参保后的生活习惯，参保前的健康结构无关紧
+miss :: 医疗费用激增，根源在于参保后的放纵行为，投保时的健康池构成可
+miss :: The rise in claims ultimately 
+miss :: The payout increase traces bac
+--- leg-level checks (current regexes) ---
+ZH leg2 A on 风险构成没有任何关系: true
+ZH leg2 B on 健康结构无关紧要: true
+ZH leg2 B on 健康池构成可以忽略: true
+EN leg1 any on ultimately comes down to: false
+EN leg1 any on traces back to: false
+EN leg2 any on health pool disregarded: false
+EN leg2 any on risk composition irrelevant: true
+--- candidate new regexes ---
+new attr ZH-pattern 归根到底在于 on D[0..2]: true,true,true
+new attr ZH-pattern EN ultimately/traces/stems/boils on D[0..2]: false,false,false
+new attr EN-pattern on D[3..4]: true,true

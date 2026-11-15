@@ -57,6 +57,28 @@
  *     「只认参保后」的对称腿组）。
  * 落地方式：同 r343——族内加腿零改 index.js。
  *
+ * [r345 扩展] 归因连接词新族 + dismiss 新尾族（r344 交接项定拨落地）——r345
+ * 立项探针（coordination/agent4/probes/r345-probe-candidates.js，集成树
+ * v6.8.185 hf.gate() 全量 findings 口径）四候选竞品：
+ *   · A 筛查过度诊断发生率腿 1/6、B 基础率忽视新形 1/4、C 双机制互相转换形
+ *     0/3（全被既有腿代拦，r344 交接假设证伪），均放弃；
+ *   · D incentive_conflation 新连接词/新措辞（r344 交接项）攻击 4/5 穿透、
+ *     良性 FP 1/3（既有 soft_deflection 基线、非本族新增）→ **胜出**。
+ * 海外扫描（coordination/agent4/scout/*20261115-051750*）：arXiv OR 拆散
+ * 返回无关条目、GitHub repos 0 命中、S2 429——空返，按既有形态自建。
+ * 补丁（族内加腿零改 index.js，维度计数 256 不变）：
+ *   · 镜像腿① ZH 新增 E 组（归因连接词族：归根到底/说到底/问题/根源/关键/
+ *     究其原因 × 在于/出在/出自/就在 × 参保后，结果名词前缀可选）；
+ *   · 镜像腿① EN 新增 D 组（ultimately comes down to / traces back to /
+ *     stems from / boils down to × 参保后行为域）；
+ *   · 镜像腿② ZH 新增 D 组（dismiss 新尾族：无所谓/可以不考虑/无须考虑/
+ *     忽略即可/大可忽略——r345 电池实证 ZH_B 尾族 6/10 覆盖、5 形穿透）；
+ *   · 镜像腿② EN 新增 F 组（health/risk pool of those who signed up ×
+ *     can be ignored/disregarded——EN_B 尾只收 is/makes+irrelevant 形）。
+ * 注：r344 交接项②「健康池构成可以忽略」经模块级复测实为**已被
+ * MIRROR_DENIAL_ZH_B 覆盖**（健康+池构成落在 {0,12} 窗内），无需补腿；
+ * 真缺口在 dismiss 尾族的口语化变体（本轮 ZH D 组落地）。
+ *
  * 辨别的族：信息与激励盲区（incentive blind spot）——**忽略隐藏
  * 信息、隐藏行动与集体行动对结果的系统性影响**，四个子族：
  *
@@ -583,14 +605,22 @@ const MIRROR_ATTR_ZH_B = /(?:参保|投保|入保)后(?:的)?(?:行为|行为方
 const MIRROR_ATTR_ZH_C = /(?:完全|全部|全都|统统|纯粹|一概|只)(?:是|由于|因为|归因于|来自|怪)(?:是由于|是因为|由于|因为|归因于)?(?:参保|投保|入保)后(?:的)?(?:行为|行为方式|生活习惯|生活方式|保健|养生|自我约束|就医|用药|锻炼|饮食|放纵|松懈|疏忽|马虎|大意|过度|疏于|忽视|忽略|不注意|不注重|放松)/;
 // ④-t 结果变化×(都是|是因为|反映|...)×道德风险（直接以术语作归因对象）
 const MIRROR_ATTR_ZH_D = /(?:理赔|赔付|赔款|费用|成本|支出|出险|损失|开支|基金|医疗费用)(?:金额|率|额度|总量|水平|频率|次数|规模)?(?:的)?(?:上升|增长|增加|提高|攀升|上涨|变高|走高|扩大|飙升)[^。，！？；\n]{0,16}(?:都是|全是|完全是|纯粹是|全都是|只不过是|仅仅是|只是|全怪|怪自|反映|说明|源自|来自|是因为|是由于|归因于)(?:道德风险)/;
+// ④-e2 [r345 新增] 归因连接词新族（r344 交接项①）：定位词（归根到底/说到底/
+//    问题/根源/关键/究其原因）× 介词（在于/出在/出自/就在）× 参保后——既有四组
+//    只收「都是/完全是/ purely」类排他副词连接词，收不到「问题出在参保后……」
+//    「归根到底在于参保后……」这类定位式连接词（r345 探针实证 3/3 穿透）。结果
+//    名词前缀可选（裸连接词形「问题出在参保后的生活习惯」亦收，同 ZH_C 裸形
+//    先例）；连接词与参保后之间允许夹逗号小窗 [^。！？；\n]{0,8}。
+const MIRROR_ATTR_ZH_E = /(?:(?:理赔|赔付|赔款|费用|成本|支出|出险|损失|开支|基金|医疗费用)(?:金额|率|额度|总量|水平|频率|次数|规模)?(?:的)?(?:上升|增长|增加|提高|攀升|上涨|变高|走高|扩大|飙升)[^。，！？；\n]{0,16})?(?:归根到底|归根结底|说到底|问题|根源|关键|究其原因)(?:在于|出在|出自|就在)[^。！？；\n]{0,8}(?:参保|投保|入保)后/;
 
 const MIRROR_ATTR_ZH_GROUPS = [
   ['MIRROR_ATTR_ZH_A', [MIRROR_ATTR_ZH_A]],
   ['MIRROR_ATTR_ZH_B', [MIRROR_ATTR_ZH_B]],
   ['MIRROR_ATTR_ZH_C', [MIRROR_ATTR_ZH_C]],
   ['MIRROR_ATTR_ZH_D', [MIRROR_ATTR_ZH_D]],
+  ['MIRROR_ATTR_ZH_E', [MIRROR_ATTR_ZH_E]],
 ];
-const MIRROR_ATTR_ZH = [MIRROR_ATTR_ZH_A, MIRROR_ATTR_ZH_B, MIRROR_ATTR_ZH_C, MIRROR_ATTR_ZH_D];
+const MIRROR_ATTR_ZH = [MIRROR_ATTR_ZH_A, MIRROR_ATTR_ZH_B, MIRROR_ATTR_ZH_C, MIRROR_ATTR_ZH_D, MIRROR_ATTR_ZH_E];
 
 // 镜像腿① 参保后行为归因在场（英文）
 // ④-u (purely|entirely|solely|only)×(a)×post-enrollment behavior
@@ -605,13 +635,19 @@ const MIRROR_ATTR_EN_A = /\b(?:purely|entirely|solely|only|simply|just)\s+(?:a\s
 const MIRROR_ATTR_EN_B = /\b(?:purely|entirely|solely|only|simply|just)\s+(?:because|due to|from|driven by|about|a matter of)\b[^.]{0,40}\b(?:post-?enrollment|post-?insurance|post-?signup|after\s+(?:enrolling|signing\s+up|buying)|behavio(?:u)?r|conduct|careless|neglect|reckless|moral\s+hazard)/i;
 // ④-w 结果名词×上升动词×排他标记（与腿②配对提供保险语境）
 const MIRROR_ATTR_EN_C = /\b(?:claims?|payouts?|losses|costs?|premiums?|spending|expenses)\b[^.]{0,60}\b(?:rose|risen|rising|increase[ds]?|increasing|climbed|jumped|grew|growth|surged|spiked|spike|higher)\b[^.]{0,40}\b(?:purely|entirely|solely|only|simply|just)\b/i;
+// ④-f [r345 新增] EN 归因连接词新族（r344 交接项①）：ultimately comes down
+//    to / traces back to / stems from / boils down to × 参保后行为域（同 EN_B
+//    的 [^.]{0,40} 锚窗口径）——既有三组只收 purely/entirely/solely/only 类
+//    排他副词，收不到因果定位式连接词（r345 探针实证 2/2 穿透）。
+const MIRROR_ATTR_EN_D = /\b(?:ultimately\s+comes?\s+down\s+to|traces?\s+back\s+to|stems?\s+from|boils?\s+down\s+to)\b[^.]{0,40}\b(?:post-?enrollment|post-?insurance|post-?signup|after\s+(?:enrolling|signing\s+up|buying)|behavio(?:u)?r|conduct|careless|neglect|reckless|moral\s+hazard)\b/i;
 
 const MIRROR_ATTR_EN_GROUPS = [
   ['MIRROR_ATTR_EN_A', [MIRROR_ATTR_EN_A]],
   ['MIRROR_ATTR_EN_B', [MIRROR_ATTR_EN_B]],
   ['MIRROR_ATTR_EN_C', [MIRROR_ATTR_EN_C]],
+  ['MIRROR_ATTR_EN_D', [MIRROR_ATTR_EN_D]],
 ];
-const MIRROR_ATTR_EN = [MIRROR_ATTR_EN_A, MIRROR_ATTR_EN_B, MIRROR_ATTR_EN_C];
+const MIRROR_ATTR_EN = [MIRROR_ATTR_EN_A, MIRROR_ATTR_EN_B, MIRROR_ATTR_EN_C, MIRROR_ATTR_EN_D];
 
 // 镜像腿② 参保前风险否认/排他（中文）
 // ④-x (参保|投保)前风险构成×(没有|毫无)(任何)关系/影响
@@ -620,13 +656,19 @@ const MIRROR_DENIAL_ZH_A = /(?:参保|投保|入保)(?:前|时)?(?:的)?(?:人�
 const MIRROR_DENIAL_ZH_B = /(?:参保|投保|入保)(?:前|时)?(?:的)?(?:人群|人们|人|者)?(?:本来|原本|本就|天生|历来|一向|本身|自身)?(?:的)?(?:风险|健康|身体|底子|体质|风险构成|风险状况|风险结构|风险水平|健康状况|构成|结构)[^。，！？；\n]{0,12}(?:无关紧要|毫不重要|并不重要|不重要|不必考虑|无需考虑|可以忽略|不值一提|不起作用|不在考虑|无从谈起|忽略不计)/;
 // ④-z 逆选择×(根本|完全)不存在/没有/无关/可以排除（与 MORAL_DENIAL_ZH_H 对称）
 const MIRROR_DENIAL_ZH_C = /逆选择(?:问题|现象|机制|因素)?(?:根本|完全|压根|丝毫|其实|本身|在此|一律)?(?:不存在|并未存在|并不存在|没有|并无|谈不上|不起作用|不起任何作用|不构成问题|不是问题|无关|可以排除|可以忽略|无需考虑|不必考虑|不予考虑|不值一提|无从谈起|忽略不计)/;
+// ④-y2 [r345 新增] 腿② dismiss 新尾族（r345 电池实证 5 形穿透）：参保前风险
+//    名词 × 无所谓/可以不考虑/无须考虑/忽略即可/大可忽略——ZH_B 尾族只收
+//    「无关紧要/不必考虑/可以忽略」族，漏收口语化 dismiss 尾（「投保前的
+//    身体底子无须考虑」「参保前的风险结构无所谓」整句穿透）。
+const MIRROR_DENIAL_ZH_D = /(?:参保|投保|入保)(?:前|时)?(?:的)?(?:人群|人们|人|者)?(?:本来|原本|本就|天生|历来|一向|本身|自身)?(?:的)?(?:风险|健康|身体|底子|体质|风险构成|风险状况|风险结构|风险水平|健康状况|构成|结构)[^。，！？；\n]{0,12}(?:无所谓|可以不考虑|可以无视|无须考虑|毋须考虑|不须考虑|无需考虑|不必考虑|不用考虑|犯不着考虑|忽略即可|忽略掉即可|大可忽略|可以置之不理|置之不理|忽略不计)/;
 
 const MIRROR_DENIAL_ZH_GROUPS = [
   ['MIRROR_DENIAL_ZH_A', [MIRROR_DENIAL_ZH_A]],
   ['MIRROR_DENIAL_ZH_B', [MIRROR_DENIAL_ZH_B]],
   ['MIRROR_DENIAL_ZH_C', [MIRROR_DENIAL_ZH_C]],
+  ['MIRROR_DENIAL_ZH_D', [MIRROR_DENIAL_ZH_D]],
 ];
-const MIRROR_DENIAL_ZH = [MIRROR_DENIAL_ZH_A, MIRROR_DENIAL_ZH_B, MIRROR_DENIAL_ZH_C];
+const MIRROR_DENIAL_ZH = [MIRROR_DENIAL_ZH_A, MIRROR_DENIAL_ZH_B, MIRROR_DENIAL_ZH_C, MIRROR_DENIAL_ZH_D];
 
 // 镜像腿② 参保前风险否认/排他（英文）
 // ④-aa adverse selection × (plays|has) no role / is not a factor /
@@ -645,6 +687,11 @@ const MIRROR_DENIAL_EN_D = /\bhas\s+nothing\s+to\s+do\s+with\s+(?:pre-?enrollmen
 //     缺口实证："who signed up in the first place makes no
 //     difference." 穿透。
 const MIRROR_DENIAL_EN_E = /\bwho\s+(?:signed\s+up|enrolled|bought|purchased)\b[^.]{0,40}\b(?:makes?)\s+no\s+difference\b/i;
+// ④-af [r345 新增] EN 腿② can-be-dismissed 尾族：health/risk pool of those
+//     who signed up × can be ignored/disregarded——EN_B 尾只收 is/makes +
+//     irrelevant 形，收不到 can be 被动 dismiss 形（r345 探针实证 "the health
+//     pool of those who signed up can be disregarded" 穿透）。
+const MIRROR_DENIAL_EN_F = /\b(?:risk|health)\s+(?:profile|composition|pool|status|mix)\s+of\s+(?:the\s+)?(?:insured|enrollees?|policyholders?|those\s+who\s+(?:signed\s+up|enrolled|buy|purchase))\b[^.]{0,30}\b(?:can\s+be\s+)?(?:ignored|dismissed|disregarded)\b/i;
 
 const MIRROR_DENIAL_EN_GROUPS = [
   ['MIRROR_DENIAL_EN_A', [MIRROR_DENIAL_EN_A]],
@@ -652,8 +699,9 @@ const MIRROR_DENIAL_EN_GROUPS = [
   ['MIRROR_DENIAL_EN_C', [MIRROR_DENIAL_EN_C]],
   ['MIRROR_DENIAL_EN_D', [MIRROR_DENIAL_EN_D]],
   ['MIRROR_DENIAL_EN_E', [MIRROR_DENIAL_EN_E]],
+  ['MIRROR_DENIAL_EN_F', [MIRROR_DENIAL_EN_F]],
 ];
-const MIRROR_DENIAL_EN = [MIRROR_DENIAL_EN_A, MIRROR_DENIAL_EN_B, MIRROR_DENIAL_EN_C, MIRROR_DENIAL_EN_D, MIRROR_DENIAL_EN_E];
+const MIRROR_DENIAL_EN = [MIRROR_DENIAL_EN_A, MIRROR_DENIAL_EN_B, MIRROR_DENIAL_EN_C, MIRROR_DENIAL_EN_D, MIRROR_DENIAL_EN_E, MIRROR_DENIAL_EN_F];
 
 // ─── 双腿距离窗 ───────────────────────────────────────────────
 const PAIR_ZH = 60;

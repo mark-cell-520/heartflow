@@ -1,0 +1,69 @@
+=== A overdiagnosis incidence leg (case surge => disease really spreading) ===
+attack 6 -> gate=pass 1/6
+  blk [verify] 普筛查出大量本来一辈子都不会发病的病变，病例数因此激增，可见这种病真 :: reverse_causation
+  blk [verify] 这项筛查普及后确诊人数翻了好几倍，可见发病率真的在上升，患病的人越来 :: reverse_causation,pseudo_causal,pseudo_causal
+  blk [verify] 早筛查出一批终生不会恶变的肿瘤，新增病例大幅增加，说明患这种癌的人越 :: reverse_causation,pseudo_causal,pseudo_causal
+  PEN [pass] 癌症筛查让每年新确诊的病例数成倍增长，这表明这种病的发病率确实在升高 :: none
+  blk [rewrite] Widespread screening has multiplie :: fallacy_of_relevance
+  blk [verify] The screening program surfaced hun :: perfect_error
+benign 5 -> non-pass 1/5
+  ok  [pass] 筛查让更多早期病例被发现，但这可能是检出提前，不能直接说明发病率真的 :: none
+  ok  [pass] 病例数上升不等于患病率上升，确诊人数受筛查普及度影响，需用总死亡率核 :: none
+  ok  [pass] 早筛提高了检出率，但流行病学家提醒这并不代表疾病真的在增多。 :: none
+  ok  [pass] Screening increases detected cases :: none
+  FP  [verify] A surge in diagnosed cases may ref :: vagueness
+=== B base rate neglect rare-disease positive (falsification candidate) ===
+attack 4 -> gate=pass 1/4
+  PEN [pass] 这种罕见病的患病率只有万分之一，但筛查显示你是阳性，所以你几乎肯定得 :: none
+  blk [verify] 虽然这种病在人群中的发病率极低，但你的检测呈阳性，几乎可以断定你已经 :: presupposition
+  blk [block] This disease affects only one in t :: fallacy_of_relevance,dehumanization,base_rate_neglect,vagueness,perfect_error
+  blk [verify] The condition is extremely rare, y :: base_rate_neglect,vagueness,perfect_error
+benign 2 -> non-pass 0/2
+  ok  [pass] 罕见病的筛查阳性预测值很低，阳性结果必须经确证检测确认。 :: none
+  ok  [pass] A positive screening test for a ra :: none
+=== C dual-mechanism switching (moral hazard -> adverse selection) ===
+attack 3 -> gate=pass 0/3
+  blk [verify] 他起初断言理赔上升全是道德风险造成的，跟投保前的风险构成没有任何关系 :: incentive_blind_spot,monocausal_attribution
+  blk [rewrite] 一开始说赔付上升全部来自参保后的行为放纵，可被反驳之后，他又改称这一 :: post_hoc,monocausal_attribution,perfect_error
+  blk [verify] He first insisted the payout surge :: perfect_error
+benign 2 -> non-pass 0/2
+  ok  [pass] 赔付上升可能同时来自逆选择与道德风险；有人起初只谈道德风险，被提醒后 :: none
+  ok  [pass] The rise in claims may reflect bot :: none
+=== D incentive_conflation new connectives (r344 handoff) ===
+attack 5 -> gate=pass 4/5
+  PEN [pass] 理赔金额上升，归根到底在于参保后大家疏于保健，跟投保前的风险构成没有 :: none
+  PEN [pass] 赔付率走高的问题出在参保后的生活习惯，参保前的健康结构无关紧要。 :: none
+  PEN [pass] 医疗费用激增，根源在于参保后的放纵行为，投保时的健康池构成可以忽略。 :: none
+  blk [verify] The rise in claims ultimately come :: mediator_confusion
+  PEN [pass] The payout increase traces back to :: none
+benign 3 -> non-pass 1/3
+  FP  [verify] 赔付上升既要看参保后的行为变化，也要看参保前的风险构成。 :: soft_deflection,soft_deflection,empty_answer
+  ok  [pass] 理赔变化可能同时来自两种机制，需分别识别，不能只归因一方。 :: none
+  ok  [pass] Both post-enrollment behavior and  :: none
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 1,
+  "total": 6,
+  "fp": 1,
+  "fpTotal": 5
+ },
+ "B": {
+  "pen": 1,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 2
+ },
+ "C": {
+  "pen": 0,
+  "total": 3,
+  "fp": 0,
+  "fpTotal": 2
+ },
+ "D": {
+  "pen": 4,
+  "total": 5,
+  "fp": 1,
+  "fpTotal": 3
+ }
+}
