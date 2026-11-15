@@ -325,10 +325,13 @@ check('G 登记：__internals 暴露镜像常量组、GROUPS 与窗', () => {
     'ADV_ATTR_ZH_GROUPS', 'ADV_ATTR_EN_GROUPS', 'MORAL_DENIAL_ZH_GROUPS', 'MORAL_DENIAL_EN_GROUPS',
     'CONFLATION_CORRECT_ZH', 'CONFLATION_CORRECT_EN', 'ANTIDOTE_ZH', 'ANTIDOTE_EN', 'PAIR_ZH', 'PAIR_EN',
   ]) assert.ok(k in I, '__internals 缺键: ' + k);
-  assert.strictEqual(I.MIRROR_ATTR_ZH_GROUPS.length, 4);
-  assert.strictEqual(I.MIRROR_ATTR_EN_GROUPS.length, 3);
-  assert.strictEqual(I.MIRROR_DENIAL_ZH_GROUPS.length, 3);
-  assert.strictEqual(I.MIRROR_DENIAL_EN_GROUPS.length, 5);
+  // [r345] 族表随新家族补全后登记计数同步更新（r336/r344 先例：登记断言随族表
+  //   补全翻转，非弱化）——ZH 腿① 4→5（E 连接词族）、EN 腿① 3→4（D 连接词族）、
+  //   ZH 腿② 3→4（D dismiss 新尾族）、EN 腿② 5→6（F can-be-dismissed 族）。
+  assert.strictEqual(I.MIRROR_ATTR_ZH_GROUPS.length, 5);
+  assert.strictEqual(I.MIRROR_ATTR_EN_GROUPS.length, 4);
+  assert.strictEqual(I.MIRROR_DENIAL_ZH_GROUPS.length, 4);
+  assert.strictEqual(I.MIRROR_DENIAL_EN_GROUPS.length, 6);
   assert.strictEqual(I.ADV_ATTR_ZH_GROUPS.length, 3);   // r343 存量不回归
   assert.strictEqual(I.MORAL_DENIAL_EN_GROUPS.length, 6);
   assert.strictEqual(I.PAIR_ZH, 60);
