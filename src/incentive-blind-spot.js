@@ -43,6 +43,20 @@
  * 落地方式：本模块已由 r297 接进 gate 路径（detectIncentiveBlindSpot
  * 是 src/index.js 第 247 维度计算点），族内加第四子族零改 index.js。
  *
+ * [r344 立项] 零命中探针（2026-11-15，v6.8.185 gate() 全量实测，
+ * coordination/agent4/probes/r344-probe-candidates.js）：三候选竞品——
+ *   · A 镜像归因混淆（结果全部归因参保后行为变化/道德风险，同时
+ *     抹掉参保前风险构成/逆选择——r343 交接项「对称腿组」）攻击
+ *     4/8 穿透、良性 1/6（且该 1 条为既有 soft_deflection 基线误伤、
+ *     非本族新增）→ **胜出**；
+ *   · B 均值回归新形 1/4+良性 2/4、C 禀赋效应新措辞 1/4+良性 0/4，
+ *     均放弃。海外扫描（coordination/agent4/scout/*20261115-035751*）：
+ *     arXiv 空返、GitHub repos 0 命中、Semantic Scholar 429——空返，
+ *     按既有形态自建（家族定义取自信息经济学标准描述：逆选择与道德
+ *     风险的归因混淆有两个方向——r343 收「只认参保前」，本轮补
+ *     「只认参保后」的对称腿组）。
+ * 落地方式：同 r343——族内加腿零改 index.js。
+ *
  * 辨别的族：信息与激励盲区（incentive blind spot）——**忽略隐藏
  * 信息、隐藏行动与集体行动对结果的系统性影响**，四个子族：
  *
@@ -93,6 +107,22 @@
  *    道德风险两种机制同时在场，说话者只承认参保前那条、抹掉参保
  *    后那条——用一半机制解释全部变化的归因混淆。
  *
+ *    ④′ 镜像归因混淆（r344 新增对称腿组）：**参保后行为归因在场**
+ *    （理赔上升全是道德风险造成的/参保后行为放纵是唯一原因；EN
+ *    claims rose purely because people neglect their health after
+ *    enrolling/the payout spike is entirely a post-enrollment
+ *    behavior story）× **参保前风险否认/排他**（跟参保前风险构成
+ *    没有关系/投保前的健康状况无关紧要；EN the risk profile of
+ *    the insured before enrollment is irrelevant/adverse selection
+ *    plays no role）：
+ *      理赔上升全是道德风险造成的，跟投保前的风险构成没有任何关系。
+ *      Claims rose purely because people neglect their health after
+ *      enrolling; the risk profile of the insured before enrollment
+ *      is irrelevant.
+ *    与④同族反向：说话者只承认参保后那条、抹掉参保前那条——同一
+ *    归因混淆的镜像。共用窗/豁免/翻转守卫，detectIncentiveConflation
+ *    两个方向并跑，不交叉配对。
+ *
  * 为什么这是判别者的核心缺口（对齐「判断是非」）：这四族是 LLM 在
  * 经济与制度分析里最典型的系统性错误——写作者把「池子/合同/集体」
  * 当成静态背景，看不到参与者会按私有信息和隐藏行动重新排序自己
@@ -125,9 +155,12 @@
  *     操控结构。
  *
  * 判据（每子族双腿共现，缺一不判）：
- *   ① 腿① 语境锚点（POOL/SHIELD/COLLECTIVE/ADV_ATTR，中英分列）；
- *   ② 腿② 断言腿（NODISTORT/NOCHANGE/ABSTAIN/MORAL_DENIAL，中英
- *      分列）；
+ *   ① 腿① 语境锚点（POOL/SHIELD/COLLECTIVE/ADV_ATTR/MIRROR_ATTR，
+ *      中英分列）；
+ *   ② 腿② 断言腿（NODISTORT/NOCHANGE/ABSTAIN/MORAL_DENIAL/
+ *      MIRROR_DENIAL，中英分列）；
+ *   子族④两个归因方向各配各的腿、不交叉配对：参保前归因×道德
+ *      风险否认（r343）；参保后归因×参保前/逆选择否认（r344 镜像）。
  * 两腿落在近距离窗内（ZH 60 字 / EN 180 字符）。
  *   腿②匹配若被翻转短语修饰（不等于/并非/不能说/未必/not that/
  *   far from）不计——说话者已在纠正该推理，正是本族解药。
@@ -529,6 +562,99 @@ const MORAL_DENIAL_EN_GROUPS = [
 ];
 const MORAL_DENIAL_EN = [MORAL_DENIAL_EN_K, MORAL_DENIAL_EN_L, MORAL_DENIAL_EN_M, MORAL_DENIAL_EN_N, MORAL_DENIAL_EN_O, MORAL_DENIAL_EN_P];
 
+// ═══════════════════════════════════════════════════════════════
+// 子族④ 镜像腿组（r344 新增）：归因混淆的反方向——把理赔/赔付
+// 变化全部归因于参保后的行为变化（道德风险），同时抹掉参保前
+// 的风险构成（逆选择）。与 r343 腿组共用窗、豁免与翻转守卫，
+// detectIncentiveConflation 两个方向并跑、不交叉配对。
+// ═══════════════════════════════════════════════════════════════
+
+// 镜像腿① 参保后行为归因在场（中文）
+// ④-q 结果变化×(都是|完全是|反映|说明|来自|是因为)×参保后行为
+//    缺口实证：「理赔金额上升都是因为参保后大家不注意保健了」/
+//    「出险频率增加只反映参保后的生活习惯问题」穿透——r343 方向
+//    只收参保前归因在场，收不到把变化归给参保后行为的断言。
+const MIRROR_ATTR_ZH_A = /(?:理赔|赔付|赔款|费用|成本|支出|出险|损失|开支|基金|医疗费用)(?:金额|率|额度|总量|水平|频率|次数|规模)?(?:的)?(?:上升|增长|增加|提高|攀升|上涨|变高|走高|扩大|飙升)[^。，！？；\n]{0,16}(?:都是|全是|完全是|纯粹是|全都是|只不过是|仅仅是|只是|全怪|怪自|反映|说明|源自|来自|是因为|是由于|归因于)[^。，！？；\n]{0,16}(?:参保|投保|入保)后/;
+// ④-r 参保后行为×(是|才是|属于)×(唯一|全部)原因
+const MIRROR_ATTR_ZH_B = /(?:参保|投保|入保)后(?:的)?(?:行为|行为方式|生活习惯|生活方式|保健|养生|自我约束|就医|用药|锻炼|饮食|放纵|松懈|疏忽|马虎|大意|过度|疏于|忽视|忽略|不注意|不注重|放松)[^。，！？；\n]{0,12}(?:是|才是|算是|属于)(?:唯一|惟一|全部)(?:的)?(?:原因|因素|解释|缘故|缘由)/;
+// ④-s (完全|统统|只)(是|由于|因为|归因于|怪)[(是由于|因为)]×参保后行为（短距形）
+//    连接词双字形：「完全是由于参保后……」「全都是因为参保后……」——
+//    单连接词组只收「完全是参保后」，双连接词形整句穿透（实测补）。
+const MIRROR_ATTR_ZH_C = /(?:完全|全部|全都|统统|纯粹|一概|只)(?:是|由于|因为|归因于|来自|怪)(?:是由于|是因为|由于|因为|归因于)?(?:参保|投保|入保)后(?:的)?(?:行为|行为方式|生活习惯|生活方式|保健|养生|自我约束|就医|用药|锻炼|饮食|放纵|松懈|疏忽|马虎|大意|过度|疏于|忽视|忽略|不注意|不注重|放松)/;
+// ④-t 结果变化×(都是|是因为|反映|...)×道德风险（直接以术语作归因对象）
+const MIRROR_ATTR_ZH_D = /(?:理赔|赔付|赔款|费用|成本|支出|出险|损失|开支|基金|医疗费用)(?:金额|率|额度|总量|水平|频率|次数|规模)?(?:的)?(?:上升|增长|增加|提高|攀升|上涨|变高|走高|扩大|飙升)[^。，！？；\n]{0,16}(?:都是|全是|完全是|纯粹是|全都是|只不过是|仅仅是|只是|全怪|怪自|反映|说明|源自|来自|是因为|是由于|归因于)(?:道德风险)/;
+
+const MIRROR_ATTR_ZH_GROUPS = [
+  ['MIRROR_ATTR_ZH_A', [MIRROR_ATTR_ZH_A]],
+  ['MIRROR_ATTR_ZH_B', [MIRROR_ATTR_ZH_B]],
+  ['MIRROR_ATTR_ZH_C', [MIRROR_ATTR_ZH_C]],
+  ['MIRROR_ATTR_ZH_D', [MIRROR_ATTR_ZH_D]],
+];
+const MIRROR_ATTR_ZH = [MIRROR_ATTR_ZH_A, MIRROR_ATTR_ZH_B, MIRROR_ATTR_ZH_C, MIRROR_ATTR_ZH_D];
+
+// 镜像腿① 参保后行为归因在场（英文）
+// ④-u (purely|entirely|solely|only)×(a)×post-enrollment behavior
+//    缺口实证："The payout spike is entirely a post-enrollment
+//    behavior story." 穿透。
+const MIRROR_ATTR_EN_A = /\b(?:purely|entirely|solely|only|simply|just)\s+(?:a\s+)?(?:post-?enrollment|post-?insurance|post-?signup)\s+(?:behavio(?:u)?r|conduct|action)/i;
+// ④-v 排他标记×连接词×参保后行为/道德风险（because|due to|about 族）
+//    缺口实证："Claims rose purely because people neglect their
+//    health after enrolling." / "Higher claims are solely due to
+//    careless behavior after signing up" / "Cost growth is only
+//    about post-insurance conduct." 穿透。
+const MIRROR_ATTR_EN_B = /\b(?:purely|entirely|solely|only|simply|just)\s+(?:because|due to|from|driven by|about|a matter of)\b[^.]{0,40}\b(?:post-?enrollment|post-?insurance|post-?signup|after\s+(?:enrolling|signing\s+up|buying)|behavio(?:u)?r|conduct|careless|neglect|reckless|moral\s+hazard)/i;
+// ④-w 结果名词×上升动词×排他标记（与腿②配对提供保险语境）
+const MIRROR_ATTR_EN_C = /\b(?:claims?|payouts?|losses|costs?|premiums?|spending|expenses)\b[^.]{0,60}\b(?:rose|risen|rising|increase[ds]?|increasing|climbed|jumped|grew|growth|surged|spiked|spike|higher)\b[^.]{0,40}\b(?:purely|entirely|solely|only|simply|just)\b/i;
+
+const MIRROR_ATTR_EN_GROUPS = [
+  ['MIRROR_ATTR_EN_A', [MIRROR_ATTR_EN_A]],
+  ['MIRROR_ATTR_EN_B', [MIRROR_ATTR_EN_B]],
+  ['MIRROR_ATTR_EN_C', [MIRROR_ATTR_EN_C]],
+];
+const MIRROR_ATTR_EN = [MIRROR_ATTR_EN_A, MIRROR_ATTR_EN_B, MIRROR_ATTR_EN_C];
+
+// 镜像腿② 参保前风险否认/排他（中文）
+// ④-x (参保|投保)前风险构成×(没有|毫无)(任何)关系/影响
+const MIRROR_DENIAL_ZH_A = /(?:参保|投保|入保)(?:前|时)?(?:的)?(?:人群|人们|人|者)?(?:本来|原本|本就|天生|历来|一向|本身|自身)?(?:的)?(?:风险|健康|身体|底子|体质|风险构成|风险状况|风险结构|风险水平|健康状况|构成|结构)[^。，！？；\n]{0,12}(?:没有|毫无|并无|没)(?:任何|丝毫|一切)?(?:关系|关联|相干|影响|作用)/;
+// ④-y (参保|投保)前风险构成×无关紧要/不必考虑/可以忽略
+const MIRROR_DENIAL_ZH_B = /(?:参保|投保|入保)(?:前|时)?(?:的)?(?:人群|人们|人|者)?(?:本来|原本|本就|天生|历来|一向|本身|自身)?(?:的)?(?:风险|健康|身体|底子|体质|风险构成|风险状况|风险结构|风险水平|健康状况|构成|结构)[^。，！？；\n]{0,12}(?:无关紧要|毫不重要|并不重要|不重要|不必考虑|无需考虑|可以忽略|不值一提|不起作用|不在考虑|无从谈起|忽略不计)/;
+// ④-z 逆选择×(根本|完全)不存在/没有/无关/可以排除（与 MORAL_DENIAL_ZH_H 对称）
+const MIRROR_DENIAL_ZH_C = /逆选择(?:问题|现象|机制|因素)?(?:根本|完全|压根|丝毫|其实|本身|在此|一律)?(?:不存在|并未存在|并不存在|没有|并无|谈不上|不起作用|不起任何作用|不构成问题|不是问题|无关|可以排除|可以忽略|无需考虑|不必考虑|不予考虑|不值一提|无从谈起|忽略不计)/;
+
+const MIRROR_DENIAL_ZH_GROUPS = [
+  ['MIRROR_DENIAL_ZH_A', [MIRROR_DENIAL_ZH_A]],
+  ['MIRROR_DENIAL_ZH_B', [MIRROR_DENIAL_ZH_B]],
+  ['MIRROR_DENIAL_ZH_C', [MIRROR_DENIAL_ZH_C]],
+];
+const MIRROR_DENIAL_ZH = [MIRROR_DENIAL_ZH_A, MIRROR_DENIAL_ZH_B, MIRROR_DENIAL_ZH_C];
+
+// 镜像腿② 参保前风险否认/排他（英文）
+// ④-aa adverse selection × (plays|has) no role / is not a factor /
+//      doesn't exist / can be ruled out（与 MORAL_DENIAL_EN_K/L/M 对称）
+const MIRROR_DENIAL_EN_A = /\badverse\s+selection\s+(?:plays?|has)\s+no\s+(?:role|part|place)\b|\badverse\s+selection\s+is\s+(?:not|no)\s+(?:a\s+|an\s+|the\s+)?(?:factor|concern|issue|problem|consideration)\b|\badverse\s+selection\s+(?:does\s+not|doesn'?t)\s+exist\b|\badverse\s+selection\s+can\s+be\s+(?:ruled\s+out|excluded|ignored|dismissed)/i;
+// ④-ab (risk|health) (profile|composition|pool) of the insured × is irrelevant
+//     缺口实证："the risk profile of the insured before enrollment
+//     is irrelevant." 穿透。
+const MIRROR_DENIAL_EN_B = /\b(?:risk|health)\s+(?:profile|composition|pool|status|mix)\s+of\s+(?:the\s+)?(?:insured|enrollees?|policyholders?|those\s+who\s+(?:signed\s+up|enrolled|buy|purchase))\b[^.]{0,30}\b(?:is|makes?)\s+(?:irrelevant|no\s+difference|beside\s+the\s+point)/i;
+// ④-ac pre-enrollment (risk|health|pool) × (can be) ignored/dismissed
+//     缺口实证："the pre-enrollment health pool can be ignored." 穿透。
+const MIRROR_DENIAL_EN_C = /\b(?:pre-?enrollment|pre-?insurance|pre-?existing|before\s+(?:enrolling|enrollment|signing\s+up|insurance))\s+(?:risk|health|risk\s+profile|health\s+status|risk\s+composition|pool)\b[^.]{0,20}\b(?:can\s+be\s+)?(?:ignored|dismissed|disregarded|ruled\s+out|irrelevant|makes?\s+no\s+difference)/i;
+// ④-ad has nothing to do with pre-enrollment risk/health（与 MORAL_DENIAL_EN_P 对称）
+const MIRROR_DENIAL_EN_D = /\bhas\s+nothing\s+to\s+do\s+with\s+(?:pre-?enrollment|pre-?insurance|prior|pre-?existing)\s+(?:risk|health)/i;
+// ④-ae who signed up × makes no difference
+//     缺口实证："who signed up in the first place makes no
+//     difference." 穿透。
+const MIRROR_DENIAL_EN_E = /\bwho\s+(?:signed\s+up|enrolled|bought|purchased)\b[^.]{0,40}\b(?:makes?)\s+no\s+difference\b/i;
+
+const MIRROR_DENIAL_EN_GROUPS = [
+  ['MIRROR_DENIAL_EN_A', [MIRROR_DENIAL_EN_A]],
+  ['MIRROR_DENIAL_EN_B', [MIRROR_DENIAL_EN_B]],
+  ['MIRROR_DENIAL_EN_C', [MIRROR_DENIAL_EN_C]],
+  ['MIRROR_DENIAL_EN_D', [MIRROR_DENIAL_EN_D]],
+  ['MIRROR_DENIAL_EN_E', [MIRROR_DENIAL_EN_E]],
+];
+const MIRROR_DENIAL_EN = [MIRROR_DENIAL_EN_A, MIRROR_DENIAL_EN_B, MIRROR_DENIAL_EN_C, MIRROR_DENIAL_EN_D, MIRROR_DENIAL_EN_E];
+
 // ─── 双腿距离窗 ───────────────────────────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -705,20 +831,32 @@ function detectIncentiveConflation(text, inject) {
   if ((R.ANTIDOTE_ZH || ANTIDOTE_ZH).test(text) || (R.ANTIDOTE_EN || ANTIDOTE_EN).test(text)) return EMPTY;
   // 两者并重的正确陈述（同时来自/都要考虑/不能把全部归因）——解药句
   if ((R.CONFLATION_CORRECT_ZH || CONFLATION_CORRECT_ZH).test(text) || (R.CONFLATION_CORRECT_EN || CONFLATION_CORRECT_EN).test(text)) return EMPTY;
-  // 注入副本：命名组解析成整表后交给共享 findSignatures
+  // 注入副本：命名组解析成整表后交给共享 findSignatures（两个方向共八张表）
   const inj = inject ? Object.assign({}, R) : null;
   if (inj) {
     inj.ADV_ATTR_ZH = resolveConflationGroups(R, ADV_ATTR_ZH_GROUPS, 'ADV_ATTR_ZH');
     inj.ADV_ATTR_EN = resolveConflationGroups(R, ADV_ATTR_EN_GROUPS, 'ADV_ATTR_EN');
     inj.MORAL_DENIAL_ZH = resolveConflationGroups(R, MORAL_DENIAL_ZH_GROUPS, 'MORAL_DENIAL_ZH');
     inj.MORAL_DENIAL_EN = resolveConflationGroups(R, MORAL_DENIAL_EN_GROUPS, 'MORAL_DENIAL_EN');
+    inj.MIRROR_ATTR_ZH = resolveConflationGroups(R, MIRROR_ATTR_ZH_GROUPS, 'MIRROR_ATTR_ZH');
+    inj.MIRROR_ATTR_EN = resolveConflationGroups(R, MIRROR_ATTR_EN_GROUPS, 'MIRROR_ATTR_EN');
+    inj.MIRROR_DENIAL_ZH = resolveConflationGroups(R, MIRROR_DENIAL_ZH_GROUPS, 'MIRROR_DENIAL_ZH');
+    inj.MIRROR_DENIAL_EN = resolveConflationGroups(R, MIRROR_DENIAL_EN_GROUPS, 'MIRROR_DENIAL_EN');
   }
-  const sigs = findSignatures(text, inj || R, {
+  // 方向一（r343）：参保前归因在场 × 道德风险否认
+  const sigs1 = findSignatures(text, inj || R, {
     aZH: 'ADV_ATTR_ZH', aEN: 'ADV_ATTR_EN', bZH: 'MORAL_DENIAL_ZH', bEN: 'MORAL_DENIAL_EN',
     defA: ADV_ATTR_ZH, defA_EN: ADV_ATTR_EN, defB: MORAL_DENIAL_ZH, defB_EN: MORAL_DENIAL_EN,
   });
+  // 方向二（r344 镜像）：参保后归因在场 × 参保前/逆选择否认
+  const sigs2 = findSignatures(text, inj || R, {
+    aZH: 'MIRROR_ATTR_ZH', aEN: 'MIRROR_ATTR_EN', bZH: 'MIRROR_DENIAL_ZH', bEN: 'MIRROR_DENIAL_EN',
+    defA: MIRROR_ATTR_ZH, defA_EN: MIRROR_ATTR_EN, defB: MIRROR_DENIAL_ZH, defB_EN: MIRROR_DENIAL_EN,
+  });
+  const sigs = sigs1.concat(sigs2);
   if (sigs.length === 0) return EMPTY;
-  const s = sigs[0];
+  const s = sigs1.length > 0 ? sigs1[0] : sigs2[0];
+  const mirrored = sigs1.length === 0; // 命中全部来自镜像方向
   // 分数略高于前三族（0.62/0.72）：本族与 adverse_selection / moral_hazard
   // 可能同句共现（攻击句常同时含池子/兜底语境词），detectIncentiveBlindSpot
   // 取最高分命中，略高可保证归因不被前三族截胡。
@@ -733,9 +871,13 @@ function detectIncentiveConflation(text, inject) {
       ? '「' + x.anchor + '」×「' + x.claim + '」'
       : '"' + x.anchor + '" x "' + x.claim + '"')),
     details: s.lang === 'zh'
-      ? 'incentive-conflation 归因混淆(' + sigs.length + '处: 「' + s.anchor + '」把结果归因于参保前风险构成，却以「' + s.claim + '」抹掉参保后的行为变化——逆选择与道德风险两种机制被混为一谈)(zh)'
-      : 'incentive-conflation(' + sigs.length + 'x: "' + s.anchor + '" attributes the outcome to pre-enrollment risk, while "' + s.claim + '" erases post-enrollment behavior change — adverse selection and moral hazard conflated)(en)',
-    guidance: '不要把理赔/赔付上升自动归因于「参保的人本来身体就差」：保险池同时受两种机制驱动——参保前的风险构成差异（逆选择）与参保后的行为变化（道德风险）。只承认前者、否认后者，是用一半机制解释全部变化的归因混淆（参保的人本来身体就差，跟参保后疏于保健没有关系 / the insured were already sicker, so how they behave after enrolling is irrelevant）。两种机制的识别方法不同：逆选择看参保前的风险分布与核保记录，道德风险看参保后的行为指标（就诊频次/用药量/出险行为）与免赔额、共付等行为约束设计。请先分别核对两条证据链，再决定归因权重；正确表述是「赔付上升可能同时来自逆选择与道德风险，需分别识别」。',
+      ? (mirrored
+        ? 'incentive-conflation 归因混淆(' + sigs.length + '处: 「' + s.anchor + '」把结果归因于参保后行为变化，却以「' + s.claim + '」抹掉参保前的风险构成——道德风险与逆选择两种机制被混为一谈)(zh)'
+        : 'incentive-conflation 归因混淆(' + sigs.length + '处: 「' + s.anchor + '」把结果归因于参保前风险构成，却以「' + s.claim + '」抹掉参保后的行为变化——逆选择与道德风险两种机制被混为一谈)(zh)')
+      : (mirrored
+        ? 'incentive-conflation(' + sigs.length + 'x: "' + s.anchor + '" attributes the outcome to post-enrollment behavior, while "' + s.claim + '" erases the pre-enrollment risk composition — moral hazard and adverse selection conflated)(en)'
+        : 'incentive-conflation(' + sigs.length + 'x: "' + s.anchor + '" attributes the outcome to pre-enrollment risk, while "' + s.claim + '" erases post-enrollment behavior change — adverse selection and moral hazard conflated)(en)'),
+    guidance: '不要把理赔/赔付上升自动归因于「参保的人本来身体就差」（也不要把全部归因于「参保后行为放纵」）：保险池同时受两种机制驱动——参保前的风险构成差异（逆选择）与参保后的行为变化（道德风险）。只承认一个方向、否认另一个方向，是用一半机制解释全部变化的归因混淆（参保的人本来身体就差，跟参保后疏于保健没有关系 / the insured were already sicker, so how they behave after enrolling is irrelevant；镜像形：理赔上升全是道德风险造成的，跟投保前的风险构成没有任何关系 / claims rose purely because of post-enrollment conduct, and pre-enrollment risk composition is irrelevant）。两种机制的识别方法不同：逆选择看参保前的风险分布与核保记录，道德风险看参保后的行为指标（就诊频次/用药量/出险行为）与免赔额、共付等行为约束设计。请先分别核对两条证据链，再决定归因权重；正确表述是「赔付上升可能同时来自逆选择与道德风险，需分别识别」。',
     tags: ['economics', 'information-economics', 'moral-hazard', 'adverse-selection', 'insurance', 'attribution'],
   };
 }
@@ -765,6 +907,8 @@ module.exports = {
     ANTIDOTE_ZH, ANTIDOTE_EN,
     CONFLATION_CORRECT_ZH, CONFLATION_CORRECT_EN,
     ADV_ATTR_ZH_GROUPS, ADV_ATTR_EN_GROUPS, MORAL_DENIAL_ZH_GROUPS, MORAL_DENIAL_EN_GROUPS,
+    MIRROR_ATTR_ZH, MIRROR_ATTR_EN, MIRROR_DENIAL_ZH, MIRROR_DENIAL_EN,
+    MIRROR_ATTR_ZH_GROUPS, MIRROR_ATTR_EN_GROUPS, MIRROR_DENIAL_ZH_GROUPS, MIRROR_DENIAL_EN_GROUPS,
     PAIR_ZH, PAIR_EN,
   }),
 };

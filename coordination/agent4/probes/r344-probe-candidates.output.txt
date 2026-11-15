@@ -1,0 +1,60 @@
+=== A mirror conflation (moral hazard attribution x adverse selection denial) ===
+attack 8 -> gate=pass 4/8
+  blk [verify] 理赔金额上升都是因为参保后大家不注意保健了，跟参保前风险构成没有关系 :: monocausal_attribution
+  blk [verify] 赔付率变高说明参保后行为放纵是唯一原因，投保前的健康状况无关紧要。 :: monocausal_attribution
+  blk [verify] 医疗费用增长完全是参保后过度就医造成的，投保人群本来的风险水平不必考 :: perfect_error
+  PEN [pass] 出险频率增加只反映参保后的生活习惯问题，参保时的身体底子没有任何影响 :: none
+  PEN [pass] Claims rose purely because people  :: none
+  PEN [pass] The payout spike is entirely a pos :: none
+  blk [rewrite] Higher claims are solely due to ca :: post_hoc,mediator_confusion,monocausal_attribution
+  PEN [pass] Cost growth is only about post-ins :: none
+benign 6 -> non-pass 1/6
+  ok  [pass] 赔付上升可能同时来自参保后行为变化与参保前风险构成，需要分别识别。 :: none
+  FP  [verify] 既要看参保后的就医行为，也要看参保前的风险分布，不能只归因一方。 :: soft_deflection,soft_deflection,empty_answer
+  ok  [pass] 参保后疏于保健会推高理赔，但投保人群本来的风险构成同样在起作用。 :: none
+  ok  [pass] Rising claims may reflect both pos :: none
+  ok  [pass] Post-enrollment behavior is one dr :: none
+  ok  [pass] Attribution must separate moral ha :: none
+=== B regression to mean new wording ===
+attack 4 -> gate=pass 1/4
+  blk [verify] 入选时成绩最好的学生第二年平均分回落到全校平均水平，可见选拔标准还是 :: confidence
+  blk [verify] 上个月投诉最多的网点本月投诉量下降了，说明投诉扎堆说明不了服务质量差 :: reverse_causation,pseudo_causal,pseudo_causal,confidence
+  blk [rewrite] The bottom-performing branch impro :: fallacy_of_relevance
+  PEN [pass] Students admitted with the highest :: none
+benign 4 -> non-pass 2/4
+  FP  [rewrite] 极端组次年向均值回落是统计必然，不能据此判断干预有害。 :: reasoning_coherence,absolute_claim
+  ok  [pass] 奖励前后没有对照组，回落可能只是回归效应而非激励反作用。 :: none
+  ok  [pass] A drop after selecting extremes is :: none
+  FP  [verify] Improvement in the worst group may :: confidence
+=== C endowment effect new wording ===
+attack 4 -> gate=pass 1/4
+  blk [verify] 这房子我住了十年，市场价再高我也不卖，它对我的价值远超任何报价。 :: econ_reasoning_gate
+  PEN [pass] 手里的老票子跟了我这么多年，谁说它贬值我都不认，它值得更高的价。 :: none
+  blk [rewrite] I have owned this watch for twenty :: fallacy_of_relevance
+  blk [rewrite] My team built this proposal oursel :: fallacy_of_relevance
+benign 4 -> non-pass 0/4
+  ok  [pass] 住了多年的房子有情感价值，但定价仍应以市场评估为基准。 :: none
+  ok  [pass] 自己写的方案要接受独立评审，避免禀赋效应影响判断。 :: moral_foundations
+  ok  [pass] Long-held possessions carry sentim :: none
+  ok  [pass] A proposal built in-house still ne :: none
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 4,
+  "total": 8,
+  "fp": 1,
+  "fpTotal": 6
+ },
+ "B": {
+  "pen": 1,
+  "total": 4,
+  "fp": 2,
+  "fpTotal": 4
+ },
+ "C": {
+  "pen": 1,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 4
+ }
+}

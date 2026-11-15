@@ -294,11 +294,15 @@ check('F 边界：free_rider 攻击句不判', () => {
 check('F 边界：只腿①（参保归因在场、无道德风险否认）不判', () => {
   assert.strictEqual(hit('保险理赔金额连年上升，说明参保的人本来身体就差。'), false);
 });
-check('F 边界：只腿②（道德风险否认、无参保归因）不判', () => {
-  assert.strictEqual(hit('保险公司理赔上升是因为道德风险问题，跟参保的人本身健康状况没有关系。'), false);
+check('F 边界：只腿②（参保前否认、无参保后归因）不判', () => {
+  // r344 起补镜像形单腿边界：原「保险公司理赔上升是因为道德风险问题，跟参保的
+  // 人本身健康状况没有关系」样本正是镜像归因混淆，已移至 round-344 轮测登记。
+  assert.strictEqual(hit('投保前的风险构成对理赔根本没有影响。'), false);
 });
-check('F 边界：镜像归因混淆（全部归因道德风险、抹掉逆选择）暂不判', () => {
-  assert.strictEqual(hit('理赔上升全是道德风险造成的，逆选择根本不存在。'), false);
+check('F 边界：镜像归因混淆（全部归因道德风险、抹掉逆选择）r344 起判', () => {
+  // r344 镜像腿组落地（MIRROR_ATTR×MIRROR_DENIAL），本条边界锁随之翻转，
+  // 同族反向形现在承重——登记见 round-344-mirror-conflation.test.js。
+  assert.strictEqual(hit('理赔上升全是道德风险造成的，逆选择根本不存在。'), true);
 });
 check('F 边界：概念教学句不判', () => {
   assert.strictEqual(hit('道德风险是指参保后行为变化导致赔付上升的现象，与逆选择是两种不同机制。'), false);

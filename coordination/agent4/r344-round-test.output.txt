@@ -1,0 +1,63 @@
+  ✓ A gate 层：攻击 8/8 → action≠pass 且 findings 含 incentive_blind_spot
+  ✓ B 模块直调：攻击 8/8 命中且 details 带 incentive-conflation 族名标
+  ✓ B 合并入口：攻击 8/8 归因 incentive_conflation（不被前三子族截胡）
+  ✓ B 方向互不回归：r343 参保前归因攻击 4/4 仍判（双向并跑）
+  ✓ C 良性零误伤：手工良性 11/11 模块级不命中
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+  ✓ C 良性零误伤：官方四基准语料全量模块级零命中
+  ✓ D 注册：插件层 FAMILIES 行沿用 r343（同键同 fn，族内加腿无需新行）
+  ✓ D 注册：模块导出 detectIncentiveConflation 且并入 detectIncentiveBlindSpot 子族表
+  ✓ E 注入 MIRROR_ATTR_ZH_A=[] → A 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_ZH_B=[] → B 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_ZH_C=[] → C 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_ZH_D=[] → D 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_EN_A=[] → A 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_EN_B=[] → B 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_EN_C=[] → C 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_ZH_A=[] → A 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_ZH_B=[] → B 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_ZH_C=[] → C 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_EN_A=[] → A 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_EN_B=[] → B 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_EN_C=[] → C 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_EN_D=[] → D 独担样本失效
+  ✓ E 注入 MIRROR_DENIAL_EN_E=[] → E 独担样本失效
+  ✓ E 注入 MIRROR_ATTR_ZH=[] → 中文镜像攻击全失效
+  ✓ E 注入 MIRROR_DENIAL_ZH=[] → 中文镜像攻击全失效
+  ✓ E 注入 MIRROR_ATTR_EN=[] → 英文镜像攻击全失效
+  ✓ E 注入 MIRROR_DENIAL_EN=[] → 英文镜像攻击全失效
+  ✓ E 注入 PAIR_ZH=-1 → 中文镜像攻击全失效
+  ✓ E 注入 PAIR_EN=-1 → 英文镜像攻击全失效
+  ✓ E 注入 CONFLATION_CORRECT_ZH 永假 → 两者并重良性变红
+  ✓ E 注入 CONFLATION_CORRECT_EN 永假 → 两者并重良性变红
+  ✓ E 注入 ANTIDOTE_ZH 永假 → 防范表述+镜像攻击结构良性变红
+  ✓ E 注入 ANTIDOTE_EN 永假 → guard 表述+镜像攻击结构良性变红
+  ✓ E 翻转守卫：镜像腿②前置「不是说」→ 不判
+  ✓ E 翻转守卫：镜像腿②前置「not that」→ 不判
+  ✓ E 族独立性：八张腿组表全清 → 攻击 8/8 失效
+  ✓ F 边界：adverse_selection 攻击句不判（无参保后归因+参保前否认对）
+  ✓ F 边界：moral_hazard 攻击句不判（无归因混淆双腿）
+  ✓ F 边界：free_rider 攻击句不判
+  ✓ F 边界：r343 方向只腿①（参保归因在场、无道德风险否认）不判
+  ✓ F 边界：r343 原「只腿②」样本 r344 起正是镜像形（边界锁随家族补全翻转）
+  ✓ F 边界：镜像形只腿①（参保后归因、无参保前否认）不判
+  ✓ F 边界：镜像形只腿②（参保前否认、无参保后归因）不判
+  ✓ F 边界：概念教学句不判（两种机制并重陈述）
+  ✓ G 登记：__internals 暴露镜像常量组、GROUPS 与窗
+
+r344 轮测：45 通过 / 0 失败

@@ -271,3 +271,4 @@
 {"round":"r342","agent":"agent-4","kind":"dimension","status":"completed"}
 {"round":"r343","agent":"agent-4","kind":"dimension","direction":"统计与科学推理·候选族定拨：A 筛查过度诊断 overdiagnosis（筛查检出大量惰性病灶⇒病例激增/疾病真的变多，lead_time/length_time 未覆盖发生率腿）、B 均值回归新形（极端组选拔后表现回落⇒选拔标准变严/干预有害）、C 禀赋效应新措辞（econ-reasoning-gate 补腿：拥有即高估/惜售×价值断言）、D 道德风险与逆向选择混淆、E 罕见病筛查阳性⇒几乎必然患病（基础率忽视新形）——立项探针穿透最高且良性零误伤者落地；海外扫描 arXiv/GitHub/S2；src/index.js 零改动","claim_at":"2026-11-15T02:01:00Z","expires_hours":6,"status":"active"}
 {"round":"r343","agent":"agent-4","kind":"dimension","status":"completed"}
+{"round":"r344","agent":"agent-4","kind":"dimension","direction":"经济与资源推理·镜像归因混淆：incentive_conflation 对称腿组（结果全部归因参保后行为变化/道德风险，同时否认参保前风险构成/逆选择——r343 交接项）+ 候选定拨（均值回归新形/禀赋效应新措辞备选）；立项探针穿透最高且良性零误伤者落地；海外扫描 arXiv/GitHub/S2；src/index.js 零改动","claim_at":"2026-11-15T03:57:27Z","expires_hours":6,"status":"active"}
