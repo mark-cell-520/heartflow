@@ -1,0 +1,95 @@
+=== A 腿② 被+低频副词+检出动词 (CASE_SURGE_ZH6 副词扩展) (期望缺口腿 leg2) ===
+attack 5 -> gate=pass(穿透) 1/5
+  PEN [pass] legs=101 检查普及以来，众多隐匿病灶被猛然发现，说明患病率真的在上升。 :: none
+  blk [verify] legs=101 筛查推广后，大量无症状感染者被骤然确诊，表明发病率确实在提高。 :: reverse_causation
+  blk [verify] legs=101 普筛开展后，大批隐匿病例被成批检出，这说明这种病真的在变多。 :: pseudo_causal,pseudo_causal
+  blk [verify] legs=101 体检普及以来，越来越多潜伏病例被批量识别，表明患病率真的在升高。 :: reverse_causation
+  blk [verify] legs=101 检测升级后，众多隐匿病灶被成群查出，说明发病率真的在上升。 :: pseudo_causal,pseudo_causal
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] legs=101 检查普及以来，众多隐匿病灶被猛然发现，但这并不代表发病率真的上升。 :: none
+  ok  [pass] legs=100 筛查推广后，大量无症状感染者被骤然确诊，均已纳入随访名单。 :: none
+control 2 -> 已覆盖(非pass) 2/2
+  ctl-ok    [verify] legs=111 检查普及以来，众多隐匿病灶被陆续发现，说明患病率真的在上升。 :: immortal_time_bias
+  ctl-ok    [verify] legs=111 筛查推广后，大量无症状感染者被大量确诊，表明发病率确实在提高。 :: immortal_time_bias,reverse_causation
+=== B 腿① 新进步动词 (DETECT_UP_ZH6 动词扩展) (期望缺口腿 leg1) ===
+attack 4 -> gate=pass(穿透) 3/4
+  PEN [pass] legs=011 检测技术突飞猛进后，大量病例被重新发现，这说明这种病真的在变多。 :: none
+  blk [verify] legs=111 检出手段日臻成熟，越来越多隐匿病灶被识别出来，说明发病率真的在上升。 :: immortal_time_bias,pseudo_causal,pseudo_causal
+  PEN [pass] legs=011 诊断技术日趋精湛，大批潜伏病例被查出，表明患病率确实在提高。 :: none
+  PEN [pass] legs=011 检测能力今胜于昔，大量病例浮出水面，这说明这种病真的在蔓延。 :: none
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] legs=011 检测技术突飞猛进后，大量病例被重新发现，但这并不代表发病率真的上升。 :: none
+  ok  [pass] legs=010 诊断技术日趋精湛，早期确诊比例明显提高，是体检中心的常规推荐。 :: none
+control 2 -> 已覆盖(非pass) 2/2
+  ctl-ok    [verify] legs=111 检测手段更新换代后，大量病例被重新发现，这说明这种病真的在变多。 :: immortal_time_bias
+  ctl-ok    [verify] legs=111 检测升级后，大量病例被重新发现，这说明这种病真的在变多。 :: immortal_time_bias
+=== C 腿③ 新趋势动词 (INCIDENCE_CLAIM_ZH3 动词扩展) (期望缺口腿 leg3) ===
+attack 5 -> gate=pass(穿透) 0/5
+  blk [verify] legs=111 筛查普及让更多病例被检出，患病率呈抬头趋势，这种病真的在变多。 :: immortal_time_bias
+  blk [verify] legs=111 检测升级后大量无症状感染者被确诊，患病率止跌回升，说明疾病真的在蔓延。 :: immortal_time_bias
+  blk [verify] legs=111 检查普及以来隐匿病灶被不断识别，患病率再度翘尾，表明发病率真的在上升。 :: immortal_time_bias
+  blk [verify] legs=111 普筛开展后大批潜伏病例浮出水面，患病率持续看高，这说明这种病真的在高发。 :: immortal_time_bias
+  blk [verify] legs=111 筛查推广后大量病例被陆续确诊，患病率报复性反弹，表明这种病真的在蔓延。 :: immortal_time_bias,reverse_causation
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] legs=111 筛查普及让更多病例被检出，但患病率可能并没有真的上升。 :: none
+  ok  [pass] legs=110 检测升级后早期确诊比例提高，患病率统计口径并未变化。 :: none
+control 2 -> 已覆盖(非pass) 2/2
+  ctl-ok    [verify] legs=111 筛查普及让更多病例被检出，患病率一路走强，这种病真的在变多。 :: immortal_time_bias
+  ctl-ok    [verify] legs=111 检测升级后大量无症状感染者被确诊，患病率一路攀升，说明疾病真的在蔓延。 :: immortal_time_bias
+=== D 腿② 新激增名词形 (legacy CASE_SURGE_ZH 扩展) (期望缺口腿 leg2) ===
+attack 4 -> gate=pass(穿透) 1/4
+  blk [verify] legs=101 筛查普及以来，新增病例呈井喷态势，说明患病率真的在上升。 :: reverse_causation,pseudo_causal,pseudo_causal
+  blk [verify] legs=101 检测升级后，确诊病例一路狂飙，表明发病率确实在提高。 :: reverse_causation
+  blk [rewrite] legs=111 检查普及以来，确诊病例滚雪球般增加，这说明这种病真的在变多。 :: immortal_time_bias,reverse_causation,pseudo_causal,pseudo_causal
+  PEN [pass] legs=101 普筛开展后，病例数屡创新高，表明患病率真的在升高。 :: none
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] legs=101 筛查普及以来，新增病例呈井喷态势，但这并不代表发病率真的上升。 :: none
+  ok  [pass] legs=100 普筛开展后，病例数屡创新高，均已纳入随访名单。 :: none
+control 1 -> 已覆盖(非pass) 1/1
+  ctl-ok    [rewrite] legs=111 筛查普及以来，新增病例激增，说明患病率真的在上升。 :: immortal_time_bias,reverse_causation,pseudo_causal,pseudo_causal
+=== E 腿①名词中介良性隐患（穿透=误伤，全 pass 才对） ===
+  FP  [verify] leg1=0 检测平台更新换代后，线上报警数量明显下降。 :: pseudo_causal,pseudo_causal
+  FP  [verify] leg1=0 检测系统升级后，代码缺陷率下降了三成。 :: pseudo_causal,pseudo_causal
+  ok  [pass] leg1=0 公司产品迭代更新后，用户留存率提升了两成。 :: none
+  FP  [verify] leg1=0 检测模块迭代后，告警误报率明显下降。 :: pseudo_causal,pseudo_causal
+  ok  [pass] leg1=0 检查流程更新后，单据处理效率提升了一半。 :: none
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 1,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 2,
+  "ctlTotal": 2
+ },
+ "B": {
+  "pen": 3,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 2,
+  "ctlTotal": 2
+ },
+ "C": {
+  "pen": 0,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 2,
+  "ctlTotal": 2
+ },
+ "D": {
+  "pen": 1,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 1,
+  "ctlTotal": 1
+ },
+ "E": {
+  "fp": 3,
+  "total": 5,
+  "leg1FP": 0
+ }
+}

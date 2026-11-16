@@ -1,0 +1,5 @@
+登记检查: DETECT_UP_ZH7=true CASE_SURGE_ZH7=true INCIDENCE_CLAIM_ZH4=true CASE_SURGE_ZH6[0].source含猛然=true
+B 腿① [verify] :: 检查技术突飞猛进后，大量病例被重新发现，这说明这种病真的在变多。 :: immortal_time_bias
+D 腿② [verify] :: 普筛开展后，病例数屡创新高，表明患病率真的在升高。 :: immortal_time_bias
+C 腿③ [verify] :: 筛查普及让更多病例被检出，患病率呈抬头趋势。 :: immortal_time_bias
+A 副词 [verify] :: 检查普及以来，众多隐匿病灶被猛然发现，说明患病率真的在上升。 :: immortal_time_bias
