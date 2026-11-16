@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.185**. Not marketing copy.
+Measured on this repository at **v6.8.186**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.186 | 2026-11-16 | r359（4 号）：**第 257 维度 coercive_affection（以情感要挟索取代付）上线**（真升级①）+ dose-response 日常剂量族合并 + 死认领治理——`src/index.js` 补齐 r334 遗留的九处接线（require/discriminate 计算点/scores/dimMap/VERIFY_DIMS/guidance/返回体），`src/dose-response-linearity.js` 合并版 GAIN/QUANT/EXEMPT_DAILY 三主判定。缺口实证：模块层 8/8 命中、gate 层仅 2/8（已加载未 dispatch）。轮测 `test/round-334-coercive-affection.js` 26/26、round-336 15/15、round-337 4/4。四门禁全绿（verify 16/16、guard 20/20@257 维、doc 24/24、双向召回 52/52 + 误拦 302/326）。 |
 | 6.8.185 | 2026-11-14 | r332（4 号）：**illusion_of_control 第 256 维度接线**（真升级②）——收尾 r331 未提交半成品：`src/index.js` 九处接线（require/dispatch/score/dimMap×2/DIM_GUIDANCE/VERIFY_DIMS/guidance）+ `src/illusion-of-control.js` 三条穿透腿补齐（拉丁幸运物族 B_ZH / 副词插入 ③-g2 / of 插入 ③-g3，各 1 条正则），负例注入 3/3 承重，轮测 20/20 + 良性 16/16，四门禁全绿（verify 16/16、guard 20/20@256、doc 24/24、双向召回 52/52 + 误拦 302/326）。 |
 | 6.8.184 | 2026-11-14 | r329（远端同步轮 HeartFlow Cron）：**sycophancy-check 插件层四个隐性谄媚新族**（真升级②）——`src/plugins/sycophancy-check/index.js`（2.3.0→2.4.0，+107 行）新增 commitment_lock 承诺式锁定 / rival_deflation 竞争式捧杀 / responsibility_offload 责任转移 / pathos_capture 道歉式让渡 四个「双腿共现」谄媚族（单腿不判，gap ZH 40 / EN 60），并修 r328 遗留 p15/p16 两条正则缺陷。轮测 `test/round-329-sycophancy-commitment-rival-offload.js` 14/14、存量 round-293 15/15。四门禁全绿（verify 16/16、guard 20/20@255、doc 24/24、双向召回 52/52 + 误拦 302/326）。 |
 | 6.8.183 | 2026-11-14 | r326（本地撞号重编号：远端同步轮已发 r325=budget_value_conflation/v6.8.182，本地未推送的 tu_quoque 倒装反问族改 r326）：**tu_quoque 第 141 维度补齐倒装反问攻击族**（真升级②）——`src/tu-quoque.js` 共 +88 行：① **MIRROR_ZH 倒装反问族**——谓语前置（`自己/自家 + 还/都 + 负面状态`）、名词化从句（`一个连自己都 + 负面动词 + 的人`）、亲属管教（`自己家孩子都管教不好`）、实体失控（`自己体重都管不住`）、通用化结构腿、文言裸形（`己身不正`/`五十步笑百步`）；② **DISQUALIFY_ZH 疑问倒装族**——`凭什么 + 要求/管/说/教 + 别人`、`也配 + 谈/说/教`、`倒有闲心/倒有空 + 管/说`、`还好意思 + 说 + 别人`、`轮不到你`；③ **CRITICISM_ZH 泛化批评族**——修掉原腿只收「你+动词+我」前向结构的窄口；④ MIRROR_EN / DISQUALIFY_EN / CRITICISM_EN 三腿同步（`when/while your own house is on fire`、`in no position`、`why lecture the rest of us`、`judge anyone here`）。缺口实证 `scripts/round-325/probe-candidates.js`：v6.8.182 基线上倒装反问族攻击 0/5 穿透 gate=pass、良性 0/5 零误伤。负例注入测试 `test/round-325-tu-quoque-inverted.js` 44/44（A 攻击 10/10、B 良性 8/8、C 逐常量承重 19/19、D 负例不命中 4/4、E 豁免 3/3）。四门禁全绿（verify 16/16、guard 20/20@255 维、doc 24/24、双向召回 52/52 + 误拦 302/326 持平）。 |
