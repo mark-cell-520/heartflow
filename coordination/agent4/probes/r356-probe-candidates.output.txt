@@ -1,0 +1,88 @@
+=== A ZH leg② noun + 浮现/显露/涌现 bare verb (CASE_SURGE_ZH5) ===
+attack 4 -> gate=pass(穿透) 2/4
+  PEN [pass] 随着检测普及，大量潜伏病例浮现出来，这说明这种病真的在变多。 :: none
+  blk [verify] 筛查推广后，众多无症状感染者显露出来，表明患病率确实在升高。 :: reverse_causation
+  blk [verify] 体检普及以来，越来越多隐匿病灶涌现出来，说明癌症真的高发了。 :: pseudo_causal,pseudo_causal
+  PEN [pass] 普筛开展后，大批以往漏诊的病例浮现，表明发病率真的在上升。 :: none
+benign 3 -> non-pass(误伤) 0/3
+  ok  [pass] 随着检测普及，大量潜伏病例浮现出来，但这并不代表发病率真的上升。 :: none
+  ok  [pass] 筛查推广后，越来越多的隐匿病灶被发现，均已纳入随访名单。 :: none
+  ok  [pass] 普查中浮现出来的问题环节，质检部门正在逐项整改。 :: none
+control 4 -> 已覆盖(非pass) 4/4
+  ctl-ok    [verify] 随着检测普及，大量潜伏病例浮出水面，这说明这种病真的在变多。 :: immortal_time_bias
+  ctl-ok    [verify] 筛查推广后，众多无症状感染者暴露出来，表明患病率确实在升高。 :: reverse_causation
+  ctl-ok    [rewrite] 体检普及以来，浮出越来越多隐匿病灶，说明癌症真的高发了。 :: pseudo_causal,pseudo_causal,immortal_time_bias
+  ctl-ok    [verify] 普筛开展后，大批以往漏诊的病例被重新发现，表明发病率真的在上升。 :: immortal_time_bias
+=== B ZH leg① 更新换代 renewal (DETECT_UP_ZH6) ===
+attack 4 -> gate=pass(穿透) 3/4
+  PEN [pass] 检测手段更新换代后，大量病例被重新发现，这说明这种病真的在变多。 :: none
+  PEN [pass] 诊断技术升级换代以来，众多无症状感染者被确诊，表明患病率确实在提高。 :: none
+  blk [verify] 检验方法日新月异，越来越多隐匿病灶被识别出来，说明发病率真的在上升。 :: pseudo_causal,pseudo_causal
+  PEN [pass] 检测能力今非昔比，大批潜伏病例被查出，表明这种病真的在蔓延。 :: none
+benign 3 -> non-pass(误伤) 1/3
+  ok  [pass] 检测手段更新换代后，大量病例被重新发现，但这并不代表发病率真的上升。 :: none
+  FP  [verify] 诊断技术升级换代让早期确诊比例明显提高，是体检中心的常规推荐。 :: reverse_causation
+  ok  [pass] 公司产品迭代更新后，用户留存率提升了两成。 :: none
+control 3 -> 已覆盖(非pass) 3/3
+  ctl-ok    [verify] 检测手段的进步让更多病例被查出，这说明患病率真的在上升。 :: immortal_time_bias
+  ctl-ok    [verify] 更先进的检测手段让更多病例被查出，这说明患病率真的在上升。 :: immortal_time_bias
+  ctl-ok    [verify] 检测力度的加强让更多病例被查出，这说明患病率真的在上升。 :: dose_response_linearity,immortal_time_bias
+=== C ZH leg③ new trend verbs (INCIDENCE_CLAIM_ZH3) ===
+attack 4 -> gate=pass(穿透) 2/4
+  blk [verify] 筛查普及让更多病例被检出，患病率水涨船高，这种病真的在变多。 :: common_cause,immortal_time_bias
+  PEN [pass] 检测升级后大量无症状感染者被确诊，患病率一路走强，说明疾病真的在蔓延。 :: none
+  PEN [pass] 检查普及以来隐匿病灶被不断识别，患病率节节走高，表明发病率真的在上升。 :: none
+  blk [verify] 普筛开展后大批潜伏病例浮出水面，患病率步步攀升，这说明这种病真的在高发。 :: immortal_time_bias
+benign 3 -> non-pass(误伤) 0/3
+  ok  [pass] 筛查普及让更多病例被检出，但患病率可能并没有真的上升。 :: none
+  ok  [pass] 检测升级后早期确诊比例提高，患病率统计口径并未变化。 :: none
+  ok  [pass] 新方法让检出率提升，但真实患病率依然保持稳定。 :: none
+control 3 -> 已覆盖(非pass) 2/3
+  ctl-ok    [verify] 筛查普及让更多病例被检出，患病率一路攀升，这种病真的在变多。 :: immortal_time_bias
+  CTL-PEN! [pass] 检测升级后大量无症状感染者被确诊，患病率真的在上升，说明疾病真的在蔓延。 :: none
+  ctl-ok    [verify] 普筛开展后大批潜伏病例浮出水面，这种病真的高发，说明患病率步步高升。 :: immortal_time_bias
+=== D Berkson hospitalized re-probe #5 (collider_bias COND_EN) ===
+attack 4 -> gate=pass(穿透) 4/4
+  PEN [pass] Among hospitalized patients, the more a drug :: none
+  PEN [pass] In the hospital inpatient population, patien :: none
+  PEN [pass] Among hospital inpatients, exercise frequenc :: none
+  PEN [pass] Among hospital-admitted patients, those with :: none
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] Among hospitalized patients, the apparent li :: none
+  ok  [pass] The hospitalised-only analysis cannot establ :: none
+control 0 -> 已覆盖(非pass) 0/0
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 2,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 3,
+  "ctlPass": 4,
+  "ctlTotal": 4
+ },
+ "B": {
+  "pen": 3,
+  "total": 4,
+  "fp": 1,
+  "fpTotal": 3,
+  "ctlPass": 3,
+  "ctlTotal": 3
+ },
+ "C": {
+  "pen": 2,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 3,
+  "ctlPass": 2,
+  "ctlTotal": 3
+ },
+ "D": {
+  "pen": 4,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 0,
+  "ctlTotal": 0
+ }
+}

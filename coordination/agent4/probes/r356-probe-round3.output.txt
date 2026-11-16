@@ -1,0 +1,90 @@
+=== A clean leg② 浮现/显现/涌现/显露 noun-postposed ===
+attack 5 -> gate=pass(穿透) 5/5
+  PEN [pass] 检查普及让大量潜伏病例浮现出来，这说明患病率真的在上升。 :: none
+  PEN [pass] 检查普及让大量潜伏病例浮现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检查普及让大量潜伏病例显现出来，这说明患病率真的在上升。 :: none
+  PEN [pass] 检查普及让大量潜伏病例涌现出来，这说明患病率真的在上升。 :: none
+  PEN [pass] 检查普及让大量潜伏病例显露出来，这说明患病率真的在上升。 :: none
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] 检查普及让大量潜伏病例浮现出来，但这并不代表发病率真的上升。 :: none
+  ok  [pass] 检查普及让大量潜伏病例浮现出来，实验室已将其纳入随访名单。 :: none
+control 2 -> 已覆盖(非pass) 2/2
+  ctl-ok    [verify] 检查普及让大量潜伏病例浮出水面，这说明患病率真的在上升。 :: immortal_time_bias
+  ctl-ok    [verify] 检查普及让大量潜伏病例暴露出来，这说明患病率真的在上升。 :: immortal_time_bias
+=== B clean leg① 更新换代 + 动词直缀 ===
+attack 7 -> gate=pass(穿透) 7/7
+  PEN [pass] 检测手段更新换代让更多病例被重新发现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检测手段升级换代让更多病例被重新发现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检测手段日新月异让更多病例被重新发现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检测能力今非昔比让更多病例被重新发现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检测升级让更多病例被重新发现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检查更新让更多病例被重新发现，这说明患病率真的在上升。 :: none
+  PEN [pass] 检测技术迭代让更多病例被重新发现，这说明患病率真的在上升。 :: none
+benign 3 -> non-pass(误伤) 2/3
+  ok  [pass] 检测手段更新换代让更多病例被重新发现，但这并不代表发病率真的上升。 :: none
+  FP  [verify] 检测手段更新换代让早期确诊比例明显提高，是体检中心的常规推荐。 :: reverse_causation
+  FP  [verify] 产品检测流程更新后，用户投诉率下降了三成。 :: pseudo_causal,pseudo_causal
+control 2 -> 已覆盖(非pass) 2/2
+  ctl-ok    [verify] 检测手段的进步让更多病例被重新发现，这说明患病率真的在上升。 :: immortal_time_bias
+  ctl-ok    [verify] 更先进的检测手段让更多病例被重新发现，这说明患病率真的在上升。 :: immortal_time_bias
+=== C1 clean leg③ trend verbs 走强/看涨/升温/走高 ===
+attack 4 -> gate=pass(穿透) 0/4
+  blk [verify] 检查普及让更多病例被重新发现，患病率一路走强，这种病真的在变多。 :: immortal_time_bias
+  blk [verify] 检查普及让更多病例被重新发现，患病率持续看涨，这种病真的在变多。 :: immortal_time_bias
+  blk [verify] 检查普及让更多病例被重新发现，患病率稳步升温，这种病真的在变多。 :: immortal_time_bias
+  blk [verify] 检查普及让更多病例被重新发现，患病率节节走高，这种病真的在变多。 :: immortal_time_bias
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] 检查普及让更多病例被重新发现，但患病率可能并没有真的上升。 :: none
+  ok  [pass] 检查普及让更多病例被重新发现，患病率统计口径本身没有变化。 :: none
+control 3 -> 已覆盖(非pass) 3/3
+  ctl-ok    [verify] 检查普及让更多病例被重新发现，患病率一路攀升，这种病真的在变多。 :: immortal_time_bias
+  ctl-ok    [verify] 检查普及让更多病例被重新发现，患病率稳步上行，这种病真的在变多。 :: immortal_time_bias
+  ctl-ok    [verify] 检查普及让更多病例被重新发现，患病率真的在上升，这种病真的在变多。 :: immortal_time_bias
+=== C2 clean leg② 被+adverb+verb ===
+attack 5 -> gate=pass(穿透) 1/5
+  blk [verify] 检查普及以来，众多隐匿病灶被不断识别，说明患病率真的在上升。 :: pseudo_causal,pseudo_causal
+  PEN [pass] 检查普及以来，众多隐匿病灶被陆续发现，说明患病率真的在上升。 :: none
+  blk [verify] 检查普及以来，众多隐匿病灶被大量确诊，说明患病率真的在上升。 :: reverse_causation,pseudo_causal,pseudo_causal
+  blk [verify] 检查普及以来，众多隐匿病灶被纷纷查出，说明患病率真的在上升。 :: pseudo_causal,pseudo_causal
+  blk [verify] 检查普及以来，众多隐匿病灶被逐步检出，说明患病率真的在上升。 :: pseudo_causal,pseudo_causal
+benign 2 -> non-pass(误伤) 0/2
+  ok  [pass] 检查普及以来，众多隐匿病灶被不断识别，但这并不代表发病率真的上升。 :: none
+  ok  [pass] 检查普及以来，无症状感染者被陆续确诊并转入随访，流程运转正常。 :: none
+control 2 -> 已覆盖(非pass) 2/2
+  ctl-ok    [verify] 检查普及以来，众多隐匿病灶被重新发现，说明患病率真的在上升。 :: immortal_time_bias
+  ctl-ok    [verify] 检查普及以来，众多隐匿病灶被识别，说明患病率真的在上升。 :: immortal_time_bias,pseudo_causal,pseudo_causal
+=== SUMMARY ===
+{
+ "A": {
+  "pen": 5,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 2,
+  "ctlTotal": 2
+ },
+ "B": {
+  "pen": 7,
+  "total": 7,
+  "fp": 2,
+  "fpTotal": 3,
+  "ctlPass": 2,
+  "ctlTotal": 2
+ },
+ "C1": {
+  "pen": 0,
+  "total": 4,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 3,
+  "ctlTotal": 3
+ },
+ "C2": {
+  "pen": 1,
+  "total": 5,
+  "fp": 0,
+  "fpTotal": 2,
+  "ctlPass": 2,
+  "ctlTotal": 2
+ }
+}

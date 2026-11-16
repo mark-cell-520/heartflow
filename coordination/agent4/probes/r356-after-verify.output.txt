@@ -1,0 +1,23 @@
+ZH5=1 ZH6=1 DUZH6=2 ICZH3=1
+OK  [verify] mod=true 检查普及让大量潜伏病例浮现出来，这说明患病率真的在上升。
+OK  [verify] mod=true 检查普及让大量潜伏病例浮现，这说明患病率真的在上升。
+OK  [verify] mod=true 检查普及让大量潜伏病例显现出来，这说明患病率真的在上升。
+OK  [verify] mod=true 检查普及让大量潜伏病例涌现出来，这说明患病率真的在上升。
+OK  [verify] mod=true 检查普及让大量潜伏病例显露出来，这说明患病率真的在上升。
+OK  [verify] mod=true 检测手段更新换代让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检测手段升级换代让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检测手段日新月异让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检测能力今非昔比让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检测升级让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检查更新让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检测技术迭代让更多病例被重新发现，这说明患病率真的在上升。
+OK  [verify] mod=true 检查普及让更多病例被重新发现，患病率一路走强。
+OK  [verify] mod=true 检查普及让更多病例被重新发现，患病率持续看涨。
+OK  [verify] mod=true 检查普及让更多病例被重新发现，患病率稳步升温。
+OK  [verify] mod=true 检查普及让更多病例被重新发现，患病率一路走热。
+OK  [verify] mod=true 检查普及让更多病例被重新发现，表明患病率一路走强。
+OK  [verify] mod=true 检查普及以来，众多隐匿病灶被陆续发现，说明患病率真的在上升。
+OK  [verify] mod=true 检查普及以来，众多隐匿病灶被大量发现，说明患病率真的在上升。
+OK  [verify] mod=true 检查普及让更多病例被及时发现，这说明患病率真的在上升。
+gate-layer covered: 20/20
+module-level path-h FP on benign: 0/14
