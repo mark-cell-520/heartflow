@@ -1,0 +1,6 @@
+{"text":"重新分层变动后，两组的生存率双双上升","action":"verify","reason":"需验证","score":0.88,"trace":"pseudo_causal×1(\"后，两组的生存率双双上升\") + pseudo_causal×1(\"后，两组的生存率双双上升\")"}
+  pipeline keys=["verdict","overallScore","gate","findings","dimensions","summary","dimensionRaw","trace","traceSummary"]
+{"text":"重新分组后，两个班的成绩水涨船高，但这只","action":"verify","reason":"需验证","score":0.85,"trace":"无命中"}
+  pipeline keys=["verdict","overallScore","gate","findings","dimensions","summary","dimensionRaw","trace","traceSummary"]
+{"text":"重新分组之后，两组的指标水涨船高","action":"pass","reason":"通过","score":1,"trace":"无命中"}
+  pipeline keys=["verdict","overallScore","gate","findings","dimensions","summary","dimensionRaw","trace","traceSummary"]

@@ -81,6 +81,20 @@
  * 改善被误归因。verify 的语义是「这段话把两组同时改善归功于重新分组，
  * 先核对个体层面数据与分组前后口径，再决定是否采信这个成效判断」。
  *
+ * r361 补齐（真升级类型②续，src/index.js 零改动、维度 257 不变）：
+ *   · 腿① MIGRATE_MOVE_ZH 补「转班 / 并班 / 并组」动词形、MIGRATE_RECLASS_ZH
+ *     补「分层调整 / 分层变动 / 层次调整」名词形（后者 gate 层已被
+ *     pseudo_causal 代拦，模块层双保险，负例注入在模块层证承重）；
+ *   · 腿② BOTHUP_ALL_ZH 删「全不」（r360 遗留缺陷：否定形「两组全不
+ *     提高」被误判为改善断言，探针实证 module=HIT）、补「无一例外 /
+ *     毫无例外」强调形与「齐刷刷 / 一律 / 清一色」批量形；新增
+ *     BOTHUP_IDIOM_ZH 成语族（水涨船高 / 步步高升）；
+ *   · EN 腿② fared 动词形经探针实证**非缺口**——「both cohorts fared
+ *     better」已被 BOTHUP_BOTHGROUPS_EN 的 better 兜底代拦（module=HIT），
+ *     不新增动词（r360 交接项③的 fared 部分以此结案）；
+ *   · EN 腿① cut-offs 独属负例样本补入 test/round-361（删 cut-?offs?
+ *     后该样本模块层失效，证 r360 所补正则承重）。
+ *
  * 明确不判的（豁免/判据天然排除，均可负例注入证明承重）：
  *   · 两组方向相反（重新分组后早期组上升、晚期组下降——不是本族形态，
  *     且属 simpsons_paradox 领地）；
@@ -96,12 +110,18 @@
 // M1 从A移到B 迁移动词族（从晚期移到早期 / 由高风险组调入低风险组）。
 //    自身含「从/由」，前后窗内须出现组名词才算迁移（见 GROUP_ZH 收紧）。
 const MIGRATE_FROM_TO_ZH = /(?:从|由)[^。，！？；\n]{0,10}(?:移到|移至|挪到|挪至|划入|划归|调入|归入|改判|重新归类|调整到|改到|分流到|分到|调到|换到|转移到|迁移到|流动到)/;
-// M2 重新分类名词族（重新分期 / 调整分组标准 / 换了口径）。
-const MIGRATE_RECLASS_ZH = /(?:重新分期|重新分组|重新分类|重新划归|重新划定|重新归类|调整分组|调整分期|重新编制|换(?:了)?(?:标准|口径|分组方式|计分方式)|分期标准(?:的)?(?:调整|改变|更新|更换|修订)|分组(?:规则|标准|口径)(?:的)?(?:调整|改变|更新|更换|变化)|新的(?:分期|分组|分类|分班)(?:标准|规则|方案|办法)|标准一改|口径一变|标准变化|分组方式变)/;
+// M2 重新分类名词族（重新分期 / 调整分组标准 / 换了口径 / 分层调整）。
+//    r361 补「分层调整 / 分层变动 / 层次调整」名词形（r360 交接项①——
+//    探针实证该形模块层 miss，gate 层已被 pseudo_causal「之后…都提高」
+//    代拦，模块层补齐走双保险，见 test/round-361）。
+const MIGRATE_RECLASS_ZH = /(?:重新分期|重新分组|重新分类|重新划归|重新划定|重新归类|调整分组|调整分期|重新编制|分层调整|分层变动|层次调整|分层重新划分|换(?:了)?(?:标准|口径|分组方式|计分方式)|分期标准(?:的)?(?:调整|改变|更新|更换|修订)|分组(?:规则|标准|口径)(?:的)?(?:调整|改变|更新|更换|变化)|新的(?:分期|分组|分类|分班)(?:标准|规则|方案|办法)|标准一改|口径一变|标准变化|分组方式变)/;
 // M3 分班 / 调组动词族（分到慢班 / 调进重点班 / 编入实验组）。
 const MIGRATE_ASSIGN_ZH = /(?:分到|分入|分进|调到|调往|调入|调进|划入|划进|编入|编进|归入|转进|转入|分流到|安排到|安排进)[^。，！？；\n]{0,6}(?:组|班|层|类|档|梯队)/;
-// M4 迁移语义裸族（组间迁移 / 病人迁移 / 转组）。
-const MIGRATE_MOVE_ZH = /(?:组间迁移|病人迁移|患者迁移|学员迁移|学生迁移|转组|换组|换班|调班|迁移|再分类|重新划分)/;
+// M4 迁移语义裸族（组间迁移 / 病人迁移 / 转组 / 转班 / 并班）。
+//    r361 补「转班 / 并班 / 并组」动词形（r360 交接项①——探针实证
+//    「给一批学生转班」「并班之后」整句零维度承重穿透，见
+//    test/round-361；换班/调班 r360 已在表，转班/并班组内补全）。
+const MIGRATE_MOVE_ZH = /(?:组间迁移|病人迁移|患者迁移|学员迁移|学生迁移|转组|换组|换班|调班|转班|并班|并组|迁移|再分类|重新划分)/;
 
 // 组名词（用于 M1/M3 的近距收紧：迁移目标必须是组名词而非任意宾语）
 const GROUP_ZH = /(?:早期|晚期|中期|终末期|轻症|重症|危重症|早期组|晚期组|中期组|轻症组|重症组|快班|慢班|尖子班|普通班|重点班|实验组|对照组|观察组|高风险组|低风险组|高危组|低危组|一期|二期|三期|四期|I期|II期|III期|IV期|A组|B组|C组|甲组|乙组|上层|下层|高分组|低分组|第一组|第二组|第三组|分层|亚组|子群)/;
@@ -138,7 +158,19 @@ const MIGRATE_EN = [MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIG
 
 // ─── 腿② BOTH_UP 两组同时改善断言 ────────────────────────────────
 // B1 都 + 上升动词族（都提高了 / 皆上升 / 均提升 / 统统变好）。
-const BOTHUP_ALL_ZH = /(?:都|皆|均|统统|全都|全不|一并)[^。，！？；\n]{0,4}(?:提高|提升|上升|升高|增长|增加|改善|好转|变好|涨了|上涨|走高|翻倍|进步|跑赢|胜出)/;
+//    r361 两改：① 删「全不」——r360 遗留潜在缺陷，探针实证
+//    「两组全不提高」（否定形）被本族当成改善断言命中（module=HIT，
+//    归因 econ_reasoning_gate），是全称量词踩否定句的假阳性；
+//    ② 补「无一例外 / 毫无例外」强调形与「齐刷刷 / 一律 / 清一色」
+//    批量形（r360 交接项②——探针实证「两组成绩无一例外地提高了」
+//    「两个班的分数齐刷刷地涨了」「成绩一律提升了」零维度承重穿透）。
+const BOTHUP_ALL_ZH = /(?:都|皆|均|统统|全都|一并|无一例外|毫无例外|齐刷刷|一律|清一色)[^。，！？；\n]{0,4}(?:提高|提升|上升|升高|增长|增加|改善|好转|变好|涨了|上涨|走高|翻倍|进步|跑赢|胜出)/;
+// B5 成语形族（水涨船高 / 步步高升——无双都字形的整体上升断言）。
+//    r360 交接项②：探针实证「两组的指标水涨船高」整句零维度承重穿透。
+//    两腿共现结构保护：良性「行业水涨船高，利润都提高了，因为市场
+//    需求真实增长」无腿①不判；「水涨船高，但这只是统计假象」走
+//    豁免 B 正确响应形。
+const BOTHUP_IDIOM_ZH = /(?:水涨船高|步步高升)/;
 // B2 双双 / 一起族（双双上升 / 一起涨 / 同时提升）。
 const BOTHUP_DOUBLE_ZH = /(?:双双|一齐|一起|一并|同时)[^。，！？；\n]{0,5}(?:上升|提高|提升|增长|增加|改善|好转|变好|上涨|涨|走高|翻倍|跑赢)/;
 // B3 两组都 + 指标 + 上升族（两组都提高了 / 两个班都上升了）。
@@ -149,11 +181,12 @@ const BOTHUP_GROUPNOUN_ZH = /(?:早期|晚期|中期|轻症|重症|快班|慢班
 
 const BOTHUP_ZH_GROUPS = [
   ['BOTHUP_ALL_ZH', [BOTHUP_ALL_ZH]],
+  ['BOTHUP_IDIOM_ZH', [BOTHUP_IDIOM_ZH]],
   ['BOTHUP_DOUBLE_ZH', [BOTHUP_DOUBLE_ZH]],
   ['BOTHUP_TWOGROUP_ZH', [BOTHUP_TWOGROUP_ZH]],
   ['BOTHUP_GROUPNOUN_ZH', [BOTHUP_GROUPNOUN_ZH]],
 ];
-const BOTHUP_ZH = [BOTHUP_ALL_ZH, BOTHUP_DOUBLE_ZH, BOTHUP_TWOGROUP_ZH, BOTHUP_GROUPNOUN_ZH];
+const BOTHUP_ZH = [BOTHUP_ALL_ZH, BOTHUP_IDIOM_ZH, BOTHUP_DOUBLE_ZH, BOTHUP_TWOGROUP_ZH, BOTHUP_GROUPNOUN_ZH];
 
 // BE1 both groups ... improved 族（both groups' survival rates improved）
 const BOTHUP_BOTHGROUPS_EN = /\bboth\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|batches|teams?|brackets?|stages?)['\u2019]?\s*(?:\w+\s+){0,4}?(?:improv(?:e|ed|es|ing|ement)|rose|risen|rises|increas(?:e|ed|es|ing)|went\s+up|got\s+up|grew|climb(?:ed|ing)?|higher|better|best|up|good)\b/i;
@@ -377,7 +410,7 @@ module.exports = {
   __internals: () => ({
     MIGRATE_FROM_TO_ZH, MIGRATE_RECLASS_ZH, MIGRATE_ASSIGN_ZH, MIGRATE_MOVE_ZH, GROUP_ZH,
     MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIGRATE_TOGROUP_EN, MIGRATE_SPLIT_EN,
-    BOTHUP_ALL_ZH, BOTHUP_DOUBLE_ZH, BOTHUP_TWOGROUP_ZH, BOTHUP_GROUPNOUN_ZH,
+    BOTHUP_ALL_ZH, BOTHUP_DOUBLE_ZH, BOTHUP_TWOGROUP_ZH, BOTHUP_GROUPNOUN_ZH, BOTHUP_IDIOM_ZH,
     BOTHUP_BOTHGROUPS_EN, BOTHUP_RAISEDBOTH_EN, BOTHUP_MADEBOTH_EN, BOTHUP_BOTHUP_EN, BOTHUP_INBOTH_EN,
     MIGRATE_ZH, MIGRATE_EN, BOTHUP_ZH, BOTHUP_EN,
     MIGRATE_ZH_GROUPS, MIGRATE_EN_GROUPS, BOTHUP_ZH_GROUPS, BOTHUP_EN_GROUPS,

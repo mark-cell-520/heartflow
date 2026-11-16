@@ -1,0 +1,7 @@
+{"text":"重新分层调整之后，两组的治愈率一个升一个降","findings":[],"checked":[]}
+{"text":"重新分组后，两个班的成绩水涨船高，但这只是统","findings":[],"checked":[]}
+{"text":"转班之后，两个班的成绩都提高了，因为每个学生","findings":[],"checked":[]}
+{"text":"学校按新方案给一批学生转班，两个班的平均分都","findings":[],"checked":[]}
+{"text":"按新的分层标准重新分层调整之后，两组的治愈率","findings":[],"checked":[]}
+{"text":"重新分组之后，两组全不提高，改革毫无效果","findings":[],"checked":[]}
+{"text":"调整分组后，两组成绩全不上升，说明方法有问题","findings":[],"checked":[]}
