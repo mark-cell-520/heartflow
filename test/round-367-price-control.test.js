@@ -205,13 +205,13 @@ check('F3 存量 benign 语料零误命中（官方良性集形状）', () => {
 
 // ─── G 登记纪律 ───
 console.log('### G 登记');
-check('G1 gate 桥族表含 price_control(r367) 且计数 23', () => {
+check('G1 gate 桥族表含 price_control(r367) 且计数 24（r368 扩族义务：23→24，mercantilism 入表后同步）', () => {
   assert(GATE_FAMS.some(f => f.key === 'price_control' && f.round === 'r367'), 'gate 桥缺 price_control');
-  assert.strictEqual(GATE_FAMS.length, 23, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 24, 'gate 桥计数 ' + GATE_FAMS.length);
 });
-check('G2 插件族表含 price_control(r367) 且计数 28', () => {
+check('G2 插件族表含 price_control(r367) 且计数 29（r368 扩族义务：28→29，mercantilism 入表后同步）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'price_control' && f.round === 'r367'), '插件缺 price_control');
-  assert.strictEqual(plugin.FAMILIES.length, 28, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.length, 29, '插件计数 ' + plugin.FAMILIES.length);
 });
 check('G3 插件 analyze(only=price_control) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'price_control' });
