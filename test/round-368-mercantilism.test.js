@@ -227,13 +227,13 @@ check('F5 存量 benign 语料零误命中（官方良性集形状）', () => {
 
 // ─── G 登记纪律 ───
 console.log('### G 登记');
-check('G1 gate 桥族表含 mercantilism(r368) 且计数 24', () => {
+check('G1 gate 桥族表含 mercantilism(r368) 且计数 25（r369 扩族义务：24→25，paradox_of_thrift 入表后同步）', () => {
   assert(GATE_FAMS.some(f => f.key === 'mercantilism' && f.round === 'r368'), 'gate 桥缺 mercantilism');
-  assert.strictEqual(GATE_FAMS.length, 24, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 25, 'gate 桥计数 ' + GATE_FAMS.length);
 });
-check('G2 插件族表含 mercantilism(r368) 且计数 29', () => {
+check('G2 插件族表含 mercantilism(r368) 且计数 30（r369 扩族义务：29→30，paradox_of_thrift 入表后同步）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'mercantilism' && f.round === 'r368'), '插件缺 mercantilism');
-  assert.strictEqual(plugin.FAMILIES.length, 29, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.length, 30, '插件计数 ' + plugin.FAMILIES.length);
 });
 check('G3 插件 analyze(only=mercantilism) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'mercantilism' });
