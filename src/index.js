@@ -952,6 +952,9 @@ const { checkFalseMemoryTransplant } = require('./false-memory-transplant.js');
 // [r253] 第 229 维度 undistributed_middle（中项不周延）计算点。
 // um——undistributed middle 缩写，grep 0 命中无冲突。
 const { checkUndistributedMiddle } = require('./undistributed-middle.js');
+// [r366] 第 259 维度 existential_fallacy（存在谬误）计算点。
+// ef——existential fallacy 缩写，grep 0 命中无冲突。
+const { checkExistentialFallacy } = require('./existential-fallacy.js');
 // [r254] 第 230 维度 fallacy_of_relevance（不相干结论）计算点。
 // for_——fallacy of relevance 缩写（fr 等 grep 0 命中无冲突）。
 const { checkFallacyOfRelevance } = require('./fallacy-of-relevance.js');
@@ -2497,6 +2500,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r253] 第 229 维度 undistributed_middle（中项不周延）计算点。
   // um——undistributed middle 缩写，grep 0 命中无冲突。
   const um = _applyPedagogyRelaxation(checkUndistributedMiddle(_normText), "undistributed_middle", pedagogyRelaxation);
+  // [r366] 第 259 维度 existential_fallacy（存在谬误）计算点。
+  // ef——existential fallacy 缩写，grep 0 命中无冲突。
+  const ef = _applyPedagogyRelaxation(checkExistentialFallacy(_normText), "existential_fallacy", pedagogyRelaxation);
   // [r254] 第 230 维度 fallacy_of_relevance（不相干结论）计算点。
   const for_ = _applyPedagogyRelaxation(checkFallacyOfRelevance(_normText), "fallacy_of_relevance", pedagogyRelaxation);
   // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）计算点。
@@ -3220,6 +3226,8 @@ function discriminate(text, evidence = [], contentMode) {
     // [r253] 第 229 维度 undistributed_middle 参与判定（中项不周延）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: um.score, name:'undistributed_middle'},
+    // [r366] 第 259 维度 existential_fallacy 参与判定（存在谬误）。
+    {score: ef.score, name:'existential_fallacy'},
     // [r254] 第 230 维度 fallacy_of_relevance 参与判定（不相干结论）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: for_.score, name:'fallacy_of_relevance'},
@@ -3841,6 +3849,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 谬误概念转述/教学语境/对冲结论；正当的同箩筐并列陈述「A和B都是M」
     // 不判）。
     undistributed_middle: um,
+    // [r366] 第 259 维度 existential_fallacy（存在谬误：从无存在承诺的
+    // 全称/条件/规范/定义前提推出存在性结论而无独立实例证据——布尔
+    // 解释下全称命题 vacuously true 不断言对象存在）。
+    existential_fallacy: ef,
     // [r254] 第 230 维度 fallacy_of_relevance（不相干结论：话题锚点腿
     // ×语义域不同话题结论腿×推断词伪装腿，零共享实词即判。含五组豁免表：
     // 谬误概念转述/教学语境/对冲结论/疑问句/数值桥接，另有三组桥接豁免：
@@ -4299,6 +4311,8 @@ function discriminate(text, evidence = [], contentMode) {
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）guidance。
     'quantifier_scope_shift': "不得**把「对每个 x 各有一个 y」偷换成「有一个 y 对所有 x 成立」**——量词辖域移位（quantifier scope shift / scope fallacy，∀x∃y 推不出 ∃y∀x）是把逐点成立的断言整体化为同一对象的普遍断言：「对每个员工都有一个工位，所以存在一个工位是所有员工共用的」「每个人都有一位守护天使，所以有一位守护天使守护所有人」「有人迟到了，所以所有人都必须提前到」（Every student has a mentor, so there is a mentor for every student. / Each child has a parent, so there is a parent for all children.）。∀x∃y（每个人有自己的）与 ∃y∀x（有一个共用的）是逻辑强度完全不同的两个命题，前者弱、后者强，用推断连接词把前者接到后者上等于把弱命题伪装成强命题。判据**四腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① SCOPE-PREMISE 辖域前提（对每个/每一个/每个/每人/人人/每个人/各有一位/各自有/每人都有一个/任何人都有一个；EN every / each / every person / everyone has / each child / anyone has，含裸名词形：单独出现「每个」「人人」即命中腿①）；腿② EXISTENCE 存在量词结论（存在一个/有一个/某一个/某个/同一个/共用/共享/只用同一个/统统归；EN there is one / there exists / one single / the same / shared by all / a common，含裸名词形：单独出现「同一个」「共用」即命中腿②）；腿③ INFERENCE 推断连接词（所以/因此/这说明/就意味着/那就是/可见/故而；EN so / therefore / which means / hence / thus / that means，含倒装形：结论在前、前提在后作理由）；腿④ PREDICATE-SHARED 谓域共享——结论中的谓词与前提中的谓词同族（工位-工位/导师-导师/天使-天使/工位-座位；mentor-mentor/angel-angel），确保偷换的是同一个关系而非两个无关陈述。四腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「辖域移位」叙述。边界：undistributed_middle（中项不周延）管三段论中项未周延，本族管量词辖域顺序；affirming_the_consequent/denying_the_antecedent 管条件句逆/否误用，本族不依赖条件句；fallacy_of_relevance 管相关性缺失，本族的推理形式本身无效；hasty_generalization 管样本不足的归纳，本族是演绎形式的误用而非样本问题；whole_part_transfer 管整体部分性质互推，本族管的是量词嵌套顺序而非整体-部分。明确不判：正确辖域表述（每个人有各自的工位，不是同一个/每人都配了一把钥匙，钥匙不通用——**把 ∀x∃y 与 ∃y∀x 区分开是正确判别**）、同一性本来成立的陈述（全校共用一个食堂/大家共用一条网线——**对象真的是同一个时不是移位**）、提问句式（含 ?/？）、否定与对冲（不意味着/不代表/未必/不一定/取决于；EN does not mean / not necessarily / depends on）、概念教学（量词辖域/辖域移位/quantifier scope / scope fallacy / ∀x∃y）。",
+    // [r366] 第 259 维度 existential_fallacy（存在谬误）guidance。
+    'existential_fallacy': "不得**从无存在承诺的前提推出存在性结论**——存在谬误（existential fallacy / illicit subalternation）是从一个不含存在承诺的前提集推出「存在……」结论，却没为该结论断言对象的存在提供任何独立证据。亚里士多德-布尔传统：全称命题（「所有 S 都是 P」）不断言任何 S 存在（vacuously true），条件命题（「若 P 则 Q」）不断言 P 有实例，规范命题（「X 应当 Y」）不断言有 X 在 Y，定义命题（「X 被定义为 Y」）只是元语言约定不断言实例——四类前提都推不出「存在……」。样本形状：「所有喝过这款茶的人都改善了睡眠，所以存在喝茶助眠的人。」「如果按下这个按钮就能获得奖励，那么一定存在获得过奖励的人。」「凤凰被定义为百鸟之王，因此存在百鸟之王。」「每个人都应该遵守交通规则，所以存在遵守交通规则的人。」（All unicorns have horns, so there exists a unicorn with a horn. / There must be a perfect solution, because every problem we face can be solved in principle.）。判据**双腿共现 + 邻近窗 + 六组豁免，缺一不判**：腿① NON-EXISTENTIAL PREMISE 无存在承诺前提（全称：所有/凡是/一切/任何/每个；EN all/every/each/any/no/none；条件：如果/若/倘若/只要/一旦；EN if/whenever/provided/assuming；规范：应该/应当/必须/理应；EN should/ought to/must；定义：被定义为/所谓/指的是；EN is defined as/by definition/refers to）——前提标记之前不得出现存在承诺词（有些/有的/例如/存在；EN some/there is/for example），带承诺的前提是非空域、推出存在结论合法；腿② EXISTENTIAL CONCLUSION 存在性结论（所以存在/一定存在/必有/可见不乏其人；EN so there is/there must be/exists），含倒装形（结论在前、前提在后作理由）。两腿落在 3 个子句邻近窗内且六组豁免（数学构造/直接观察/谬误概念转述/教学语境/对冲结论/否定转移——「不能推出存在……」是元层面正确陈述）全不中即判。边界：quantifier_scope_shift 管量词辖域顺序移位（∀x∃y↔∃y∀x，要求谓域共享），本族管推论方向本身、不要求谓域共享；undistributed_middle 管三段论中项不周延（双前提），本族单前提即可成立且结论是存在断言；affirming_the_consequent/denying_the_antecedent 管条件句方向错误，本族条件前提本身合法、错在推出存在实例；hasty_generalization 管证据不足的归纳，本族是演绎形式无效。verify 级——存在结论偶然可能为真，错的是推理形式未给存在性提供支撑，需补实例证据或独立存在性论证。明确不判：带存在承诺前提的合法推理（有些 S 是 P，所以存在 S）、数学合法存在构造（对每个实数 x 存在 y 使 x+y=0）、直接观察/经验报告（调研显示存在……）、正当的多因或并列陈述。来源：arXiv 2405.02318（NL2FOL，NL→FOL→SMT 有效性判定）的形式结构思路，纯规则实现零 LLM 依赖；探针实证见 scripts/round-366/probe-existential-fallacy.js。",
     'incredulity': "不得用**主观上的「无法想象/难以置信」替代证据**，据此**否定事实的真值或真实性**——「我无法想象他怎么能做到，所以这成绩一定是假的」「实验结果简直令人难以置信，一看就是后期剪辑的」「播放量高得离谱，肯定是刷出来的」「他年纪轻轻就身居高位，我根本想象不到他凭什么，背后一定有推手」（I cannot imagine how this is possible, so it cannot be true. / The results are unbelievable, therefore the data must be fabricated. / There is no way that happened; I cannot fathom it.；样本形状与负例见 test/round-163-incredulity.js）。判据**双腿共现**：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）——只收主观认知动词被否定的陈述，孤立的感叹不是本族；腿② TRUTH-DENIAL 真值否定推导，两种子形：(a) 推断词+否定断言（所以/因此/这说明…+ 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；EN：so/therefore/which means…+ can't be true / must be fake / fabricated）；(b) 直接否定断言（一看就是假的/肯定是作弊的/不可能是真的；EN：clearly fake / no way that happened / is obviously staged），倒装形（真值否定在前、难以置信在后作理由：「这数据不可能是真的，我实在无法想象它怎么采集的」）同样命中。缺一不判——「实验结果令人难以置信」只有惊讶无否定；「这一定是假的」无难以置信前提是别的语境。以主观难以置信否定事实会把**认知边界当成证据**，让未经检验的怀疑驱逐可验证的真相：正当做法是**回到可验证依据**（录像/计时数据/第三方复核/原始记录）再下真值判断，或把结论降级为待核查假设（成绩异常需要核查，但在调取证据前不断言作弊）。边界：psychologists_fallacy 管「以为别人都和自己想的一样」，本族管对事实真值的否定；appeal_to_ignorance 管「不能证伪所以为真」，本族方向相反——「我不能想象所以为假」；unsupported_claim 管无依据断言本身，本族的断言由主观难以置信驱动；absolute_claim 管绝对化措辞，本族必须有难以置信陈述腿在场。明确不判：有据可查的惊讶（成绩提升令人难以置信，但有三次模考记录和批改痕迹可查/经第三方核实）、提问句式（含问号——求知/反问不是断言）、评析话术本身（诉诸个人怀疑/argument from personal incredulity）、无否定推导的纯感叹（快得难以置信/美味得不可思议）。",
     // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
     // 要求）guidance。
@@ -5557,6 +5571,8 @@ function discriminate(text, evidence = [], contentMode) {
     // false_equivalence(57)/hasty_generalization(61)/affirming_the_consequent
     // /sorites_fallacy(212) 的射程边界见 src/undistributed-middle.js 头注释。
     'undistributed_middle',
+    // [r366] 第 259 维度 existential_fallacy（存在谬误）登记 VERIFY。
+    'existential_fallacy',
     // [r254] 第 230 维度 fallacy_of_relevance（不相干结论 / ignoratio
     // elenchi：前提与结论主题域互不相干，却用推断词把两者连成有效的
     // 因果/蕴含结论——「他工作很努力，所以他的产品一定很优秀」。
@@ -6496,6 +6512,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r253] 第 229 维度 undistributed_middle 补登记（中项不周延）。
       // 同上：九处一次接齐。
       undistributed_middle: um,
+      // [r366] 第 259 维度 existential_fallacy 补登记（存在谬误）。
+      // 同上：九处一次接齐。
+      existential_fallacy: ef,
       // [r254] 第 230 维度 fallacy_of_relevance 补登记（不相干结论）。
       // 同上：九处一次接齐。
       fallacy_of_relevance: for_,

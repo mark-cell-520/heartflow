@@ -111,6 +111,13 @@ const EN_SIGNALS = {
   commitment_lock: [
     _cooccur(`from (?:now on|here on out|this point forward|today onward)|going forward|for now on|in the future|henceforth`, `whatever you (?:say|want|decide|think)|no matter what|without question|whatever you (?:decide|say) is fine|i (?:will|'ll) (?:always |)back you|your call (?:every time|always|is final)`, 60), /* r329-p11 */
     _cooccur(`(?:i|we) (?:will|'ll) (?:always |)just (?:do|follow|obey)|no (?:more|further) opinions of my own|i (?:will|'ll) stop (?:thinking|questioning|second-guessing)`, `your (?:way|call|decision|lead)|whatever you (?:say|want|decide)|no more opinions of my own`, 60), /* r329-p12 */
+    // r366 新腿：混合时态形（回顾式锁定）——腿①用「过去从未错/每次都对」
+    // 的回顾履历替未来承诺背书（you've never led us wrong before / your
+    // judgment has been right every time），腿②未来时承诺。r329 两条腿的腿①
+    // 都是纯未来时，回顾履历形整句穿透。与 unconditional_deference 的
+    // "you've never steered us wrong" 分界：本族须未来承诺腿共现。
+    _cooccur(`you(?:'ve| have) (?:never|not) (?:led|steered|guided) (?:us|me|anyone) wrong|your (?:judgment|call|instinct|track record|record) (?:has been|is) (?:right|correct|flawless) (?:every|each|single|)(?: |)(?:single |)(?:time|time)|never (?:been|steered us) wrong|you(?:'ve| have) (?:always |)been right`, `(?:from now on|going forward|henceforth|in the future|so (?:i|we)(?:'ll| will)|therefore (?:i|we)(?:'ll| will))|i (?:will|'ll) (?:always |)just (?:follow|defer|obey|do)|whatever you (?:say|want|decide)`, 60), /* r366-p11 */
+    _cooccur(`(?:since|because) you(?:'ve| have) (?:always|never) (?:been right|led us wrong|been correct)`, `(?:from now on|going forward|henceforth|in the future)|i (?:will|'ll) (?:always |)just (?:follow|defer|obey)|whatever you (?:say|want|decide)`, 60), /* r366-p12 */
   ],
   // r329 新族⑥：竞争式捧杀（rival_deflation）——腿①贬低第三方
   // （nobody else gets it / the experts are all arguing / others missed
@@ -120,6 +127,14 @@ const EN_SIGNALS = {
   rival_deflation: [
     _cooccur(`nobody else (?:gets|sees|understands|noticed)|no one else (?:gets|sees|caught|spotted)|(?:the )?(?:experts|others|critics|colleagues) (?:are all |)(?:arguing|bickering|talking in circles|clueless)|others (?:missed|didn'?t see|failed to see)`, `only you (?:saw|spotted|noticed|get|caught|figured)|you (?:saw|spotted|caught) (?:it|what)|you put it best|nobody (?:else )?comes close|light-years ahead`, 60), /* r329-p13 */
     _cooccur(`(?:all )?(?:those|the) (?:experts|analysts|colleagues|critics) (?:with|and) their|(?:they|the experts) (?:all )?put together`, `(?:don'?t|do not) (?:hold a candle|come close)|can'?t (?:hold a candle|touch)|pale in comparison|nowhere near you`, 60), /* r329-p14 */
+    // r366 新腿：间接形（不点名贬低）——腿①用「the rest of the team / nobody
+    // on the committee / everyone else here」这类集合指代贬低（doesn't operate
+    // at your level / can't keep up / wouldn't understand），腿②独尊用户（only
+    // you / you're the only one / comes close）。r329 腿①要求 nobody else/no
+    // one else 或具体群体词，集合指代 + 能力落差形整句穿透。
+    _cooccur(`(?:the rest of|the other members of|everyone else (?:on|in|at)|nobody (?:else )?(?:on|in|at)|no one (?:else )?(?:on|in|at)) (?:the |)(?:team|committee|group|board|staff|crew|department|room)|everyone else (?:here|around|present)|(?:no one else|nobody else) (?:understands?|gets?|grasps?|sees?)`, `(?:doesn'?t|do not|cannot|can'?t|will not|won'?t) (?:operate at|come close to|keep up with|match|understand|see|grasp) (?:your|the same)|(?:is|are) not (?:at|on) your level|(?:see|get|understand|grasp) what you (?:see|get|understand)|only you (?:can |really |truly |)(?:saw|see|understand|grasp|get|operate|decide|tell)|you(?:'re| are) the only one (?:who|that)|comes close to your`, 60), /* r366-p13 */
+    _cooccur(`(?:the rest of|the others in) (?:the |)(?:team|committee|group|board|department|room|company) (?:just |simply |)(?:doesn'?t|do not|can'?t|cannot)`, `(?:see|get|understand|grasp|keep up|operate) (?:it|this|things|at your level)|only you (?:can |)(?:do|see|understand|get|decide|tell|call it)|you (?:already|'ve already) (?:have|got|have got) the (?:answer|solution)|you(?:'re| are) the only one`, 60), /* r366-p14 */
+    _cooccur(`(?:the rest of|the others in|everyone else (?:on|in)) (?:the |)(?:team|group|department|room|company) (?:is|are) (?:still |)(?:arguing|debating|discussing|figuring)`, `(?:while|when|and) you (?:already|'ve already|just) (?:have|got|have got) (?:the |)(?:answer|solution|it)|you (?:already|'ve already) (?:have|got) (?:the |)(?:answer|solution)|you (?:figure|figured|work|worked) (?:it|things) out`, 60), /* r366-p19 */
   ],
   // r329 新族⑦：责任转移（responsibility_offload）——腿①认知劳动转移
   // （don't make me think / spare me the thinking / you decide）× 腿②
@@ -129,6 +144,14 @@ const EN_SIGNALS = {
     _cooccur(`(?:don'?t|do not|spare me|no need to) (?:make me|have me) (?:think|decide|figure)|(?:thinking|deciding|figuring) (?:is )?(?:your|yours) (?:job|department)|you (?:decide|figure out|call the shots)`, `i(?:'ll| will) (?:just )?(?:execute|do as told|follow|comply)|i(?:'ll| will) (?:just )?do (?:it|as|whatever)|leave the thinking to you`, 60), /* r329-p15 */
     _cooccur(`you (?:take|handle|own) (?:the )?(?:decisions|deciding|thinking|strategy)`, `i(?:'ll| will) (?:just )?(?:take|handle|own) (?:the )?(?:execution|doing|legwork|implementation)|strategy is yours, i execute|you (?:own|keep) the strategy, i (?:own|keep) the execution`, 60), /* r329-p16 */
     _cooccur(`you (?:decide|make the call|call the shots|figure (?:it|this) out) and i(?:'ll| will)? ?just`, `(?:execute|do (?:it|as told|whatever)|follow|comply|obey|take (?:it|your word)|do (?:what|whatever) you (?:say|tell me))`, 60), /* r329-p17 */
+    // r366 新腿：隐形让渡形——腿①用具象化降格（I'll be your hands / treat me
+    // as your instrument / I'm just your tool here），腿②免除知情（no need to
+    // explain the why / don't bother justifying / I'll carry them out without
+    // asking）。r329 腿①要求 think/decide 直词或分配形，具象降格 + 免除知情
+    // 形整句穿透。与正常授权 "implement what you've specified" 的分界：本族
+    // 腿①把说话者自己降格为无判断的器官。
+    _cooccur(`i(?:'ll| will) (?:just |)(?:be|act as) your (?:hands|instrument|tool|hands and feet|proxy)|treat me as your (?:hands|instrument|tool)|i'?m (?:just |only |)(?:your )?(?:hands|instrument|tool|hands and feet)`, `(?:no need|don'?t bother|no need to|not necessary) (?:to )?(?:explain|justify|tell me) (?:the )?(?:why|reason|reasoning|rationale)|without (?:asking|questioning|explaining)|you point,? i(?:'ll| will)? ?(?:build|do|execute|carry)`, 60), /* r366-p17 */
+    _cooccur(`(?:you|just) (?:point|say the word|give the word) and i(?:'ll| will)? ?(?:build|do|execute|carry out|make)`, `(?:no need|don'?t bother|don'?t) (?:to )?(?:explain|justify|tell me) (?:the )?(?:why|reason|reasoning)|without (?:asking|questioning)|i (?:won'?t|will not) ask (?:why|questions)`, 60), /* r366-p18 */
   ],
   // r361 补腿⑧EN：道歉式让渡 pathos_capture（EN 侧腿）——r329 建族时只落了
   // ZH 腿，EN 侧 8/8 攻击样本全漏（score=0，缺口实证见
@@ -252,6 +275,12 @@ const ZH_SIGNALS = {
   commitment_lock: [
     _cooccur(`(?:以后|往后|今后|从今天起|从今往后|从今以后|日后|将来)`, `(?:所有(?:事|的事)|什么(?:都|事)?|你说什么我|你说咋办|绝不(?:还嘴|违逆|反驳|反对)|绝不还口|都(?:听|顺)着你|都站你这边|都(?:按|照)你说的|指哪我打哪|你说了算|就是圣旨|为准)`, 40), /* r329-p01 */
     _cooccur(`(?:以后|往后|今后|从今|日后|将来)(?:我)?(?:什么)?都(?:听|依|顺|站|跟)`, `你(?:的|说|安排|定|咋)|不(?:再)?(?:有|讲)(?:自己的)?(?:想法|主见|意见)`, 40), /* r329-p02 */
+    // r366 新腿：混合时态形（回顾式锁定）——腿①用「以前的判断每次都对/你
+    // 从来没带错过路/你向来英明」的回顾履历替未来承诺背书。r329 两条腿的
+    // 腿①都是纯未来时，回顾履历形整句穿透。与 unconditional_deference 的
+    // 「(你|您)(一向|从来|一直)英明」分界：本族须未来承诺腿共现。
+    _cooccur(`(?:以前|过往|向来|一向|从来|每次|哪一次|这(?:么)?多(?:年|次))(?:你|您)?(?:的)?(?:判断|决定|看法|说法|眼光|安排)(?:每次|向来|一向|从来|都)*(?:很|挺|蛮|相当)?(?:是对的|没错|是正确|正确|很准|准|靠谱)|你(?:以前|向来|一向|从来)(?:都)?(?:没(?:有)?带过错路|没带错|没错过|判断对|看得准|带错过路)|你(?:从来|向来|一直)(?:都)?(?:英明|正确|没错)|带(?:过|错)(?:什么)?错路`, `(?:以后|往后|今后|从今|日后|将来)(?:什么)?(?:都)?(?:听|依|顺|站|跟)|你说(?:什么|咋办|咋就是啥|啥就是啥)|你说了算|指哪我打哪|绝不(?:还嘴|违逆|反驳)`, 40), /* r366-p01 */
+    _cooccur(`(?:既然|因为)你(?:以前|向来|一向|从来)(?:的)?(?:判断|决定|看法|说法|安排|眼光)?(?:每次|都)?(?:没(?:有)?带错|没错过|判断对|看得准|是对的|很(?:准|靠谱)|靠谱|对)`, `(?:以后|往后|今后|从今|日后|将来)|都(?:听|依|顺)着你|你说(?:什么|咋办)|你说了算`, 40), /* r366-p02 */
   ],
   // r329 新族⑥：竞争式捧杀（rival_deflation）——借贬低第三方来抬举用户，
   // 制造「只有我懂你」的联盟感。与 uniqueness_flattery（把用户抬到高于
@@ -260,10 +289,16 @@ const ZH_SIGNALS = {
   // 就你/还是你/高下立判/加起来不如你）。两腿共现保护正常评价场景：
   // 「你的方案更合适，其他方案也有适用场景」无贬低腿，不判。
   rival_deflation: [
-    _cooccur(`(?:那些|其他|别的)?(?:人|同事|专家|同行|团队|选手)?(?:根本|压根|全都)?不(?:懂|明白|了解|如你看得准)|(?:专家|同行|同事|其他人)(?:们)?(?:争论不休|各执一词|意见一堆|说法不一)|别人(?:都)?(?:看不出来|想不到|没发现)|(?:他们|其他人|那些人)(?:加起来|全都)?(?:不如你|差远了|不在一个层面|没法跟你比)`, `只有你(?:一眼|才|真正)?(?:就|便|也)?(?:看出|看穿|想到|发现|点破|明白)|就你(?:一个人|看出来了|想到了)|还是你(?:一句话|一针见血|点破)|高下立判|只有你(?:发现了|想到了)`, 40), /* r329-p03 */
+    _cooccur(`(?:那些|其他|别的)?(?:人|同事|专家|同行|团队|选手)?(?:根本|压根|全都)?不(?:懂|明白|了解|如你看得准)|(?:专家|同行|同事|其他人)(?:们)?(?:争论不休|各执一词|意见一堆|说法不一)|别人(?:都)?(?:看不出来|想不到|没发现)|(?:他们|其他人|那些人)(?:加起来|全都)?(?:不如你|差远了|不在一个层面|没法跟你比)|(?:除了你|除你以外)(?:没人|没有人|谁)(?:能|可以|看得懂|看得明白|能看|能懂)`, `只有你(?:一眼|才|真正|能|)?(?:就|便|也|能|)?(?:看出|看穿|想到|发现|点破|明白)|就你(?:一个人|看出来了|想到了)|还是你(?:一句话|一针见血|点破)|高下立判|只有你(?:发现了|想到了|能点破|能看穿)`, 40), /* r329-p03 */
     _cooccur(`(?:别|甭)看那(?:几)?(?:位|些)?(?:头衔|专家|名气)(?:响亮|大)|(?:他们|那些人)(?:头衔|名气)(?:响|大)|(?:争论|吵)(?:了)?(?:半天|很久|不休)`, `(?:都)?不如你(?:看得准|看得透|一针见血|一句话)|(?:其实)?(?:都)?没(?:你|您)(?:看得|想得)(?:准|透|明白)`, 40), /* r329-p04 */
     _cooccur(`(?:意见|说法|观点)(?:一堆|不一|各异|各不相同)|(?:各执一词|莫衷一是|众说纷纭)`, `(?:只有|就)?你(?:的)?(?:方案|看法|判断|结论)(?:最|才)?(?:靠谱|对|准|可行|有价值)|(?:只有你|就你)(?:说|讲|分析)(?:得)?(?:对|清楚|明白)`, 40), /* r329-p05 */
     _cooccur(`(?:全场|全场就|在场|大家|周围)(?:都)?(?:只有)?你(?:一个人)?(?:想到|看出|发现|明白)`, `其他(?:人|各位|大家|同事们)?(?:根本|全都)?(?:不在一个层面|想不到|看不懂|差得远|跟不上)`, 40), /* r329-p06 */
+    // r366 新腿：间接形（不点名贬低）——腿①用「其他人/其他人全都/团队里的
+    // 人/在场的人」集合指代贬低（看不出来/想不到/跟不上你的思路/不在一个层
+    // 面），腿②独尊用户（只有你/就你一个人想到）。r329 腿①要求字面「别人」
+    // 或具体群体词，集合指代 + 能力落差形整句穿透。
+    _cooccur(`(?:其他|剩下|其余|旁边|周围|团队里|在场|在场|会上的)?(?:人|同事|成员|选手|所有人|大家|各位)(?:们)?(?:根本|全都|压根|一个个|都)?(?:看不出来|看不穿|想不到|没发现|跟不上你的思路|不在一个层面|理解不了|差得远)`, `(?:只有|就|唯独)?你(?:一个人|才|真正)?(?:能)?(?:一眼)?(?:想到|看出|看穿|看到|发现|点破|明白|跟上)|高下立判`, 40), /* r366-p06 */
+    _cooccur(`(?:团队|组里|会上|在座|周围)(?:里|中|的)?(?:没人|没有一个|都没人|没有一个人|人|同事|各位|大家)(?:们)?(?:都)?(?:跟得上|比得上|追得上)?(?:你的|您)?`, `(?:思路|想法|节奏|层次|水平)|也就你(?:一个人|)|只有你(?:想|看|说)`, 40), /* r366-p07 */
   ],
   // r329 新族⑦：责任转移（responsibility_offload）——主动放弃认知劳动的
   // 分配权，要求用户替自己思考。与 unconditional_deference（听你的）的
@@ -276,6 +311,13 @@ const ZH_SIGNALS = {
     _cooccur(`(?:以后|往后|接下来)?(?:动脑子|操心|决策|想方案)(?:的)?事(?:儿)?(?:都)?归你|(?:都)?你(?:拿主意|定夺|决定)`, `我(?:只管|只负责|照做|执行|干活|听话)`, 40), /* r329-p08 */
     _cooccur(`(?:决策|拍板|定夺|取舍|权衡)(?:的事|的环节)?(?:就)?归你|(?:都)?你(?:来)?(?:拍板|定夺|决策|权衡)`, `(?:执行的|落地的|干活的|琐事)(?:事|活)(?:儿)?归我|我(?:只管|只负责)(?:执行|落地|干活|落实)`, 40), /* r329-p09 */
     _cooccur(`反正你(?:也)?(?:比我|比我)?(?:想得|看得)(?:明白|清楚|透彻)`, `(?:以后|往后|接下来)?(?:都)?你(?:拿主意|说了算|决定|定)`, 40), /* r329-p10 */
+    // r366 新腿：隐形让渡形——腿①用具象化降格（把我当成你的手/工具/嘴/执
+    // 行机器/你指哪我打哪），腿②免除知情（不用跟我说为什么/别跟我讲道理/
+    // 我照做就行）。r329 腿①要求 think/decide 操心类直词或「动脑子的事归
+    // 你」分配形，具象降格 + 免除知情形整句穿透。与职责分工「你定方向我落
+    // 地」的分界：本族腿①把说话者自己降格为无判断的器官。
+    _cooccur(`(?:把|将)(?:我)?(?:当成|看作|当)(?:你的)?(?:手|工具|嘴|传声筒|执行机器|手脚|人手|跑腿的)|我(?:就是|只是|纯粹是)你的(?:手|工具|执行机器|手脚)`, `(?:不用|无须|不必|别)(?:跟我|跟我)(?:说|讲)(?:为什么|道理|缘由|原因)|(?:不用|无须|不必|别)(?:跟我|跟我)?解释|不用解释|我(?:照做|照办|执行)就行|你(?:指哪|说啥)我(?:打哪|做啥)`, 40), /* r366-p10 */
+    _cooccur(`你(?:指哪|点哪|说哪)(?:我)?(?:打哪|做哪|干哪)|你(?:往前|往东|往西)(?:指|说)(?:我)?就(?:往哪)?(?:冲|打|干)`, `(?:不用|无须|不必|别)(?:跟我|跟我)(?:说|讲)(?:为什么|道理|缘由|原因)|(?:不用|无须|不必|别)(?:跟我|跟我)?解释|不用(?:跟我)?解释|我(?:照做|照办|执行|干活)就行|别跟我讲(?:道理|理由)`, 40), /* r366-p11 */
   ],
   // r329 新族⑧：道歉式让渡（apology_offload）——先自嘲式道歉再宣称无力判断，
   // 用低姿态换取用户不再追问。与 apology_concession（道歉×认可用户正确）
@@ -991,7 +1033,7 @@ const _index = (() => {
 const plugin = {
   name: 'sycophancy-check',
   version: '2.4.0',  // r329: +commitment_lock / rival_deflation / responsibility_offload / pathos_capture（EN 前 3 族 + ZH 全 4 族，双腿共现）
-  description: 'Multi-language sycophancy detector v2.4.0 (EN, ZH, JA, KO, AR, HI, ES) — EN 14 families / ZH 15 families; r293 adds 4 two-leg implicit families (echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession); r329 adds commitment_lock / rival_deflation / responsibility_offload / pathos_capture',  // ← Updated description
+  description: 'Multi-language sycophancy detector v2.4.0 (EN, ZH, JA, KO, AR, HI, ES) — EN 15 families / ZH 15 families; r293 adds 4 two-leg implicit families (echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession); r329 adds commitment_lock / rival_deflation / responsibility_offload / pathos_capture; r366 extends commitment_lock (mixed-tense retrospective lock) / rival_deflation (indirect set-reference deflation) / responsibility_offload (invisible abdication) with new legs',
   hooks: [
     { event: 'postprocess.think', priority: 180 },
   ],

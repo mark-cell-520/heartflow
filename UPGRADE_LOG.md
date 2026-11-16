@@ -1,3 +1,26 @@
+## r366 — 第 259 维度 existential_fallacy 接线闭环（真升级①；经典三段论形式谬误族）
+
+- **背景**：近 20 轮升级集中于 econ_reasoning_gate 行为经济学族（anchoring/mental_accounting/sunk_cost/winners_curse/zero_price）与量词逻辑族（quantifier_scope_shift/tu_quoque/red_herring），按轮换纪律本轮转向**逻辑谬误/论证谬误检测**。三层外部搜索：HN Algolia 命中 arXiv 2405.02318「Translating natural language to first-order logic for logical fallacy detection」（Lalwani et al.，HN 258 pts，https://arxiv.org/abs/2405.02318）——该论文 LLM-based，心虫为纯规则引擎**不引入 LLM 依赖**，只取其「NL→形式结构→有效性校验」思路实现于经典三段论谬误族；Semantic Scholar 返回空；GitHub 同题最高仅 1 star（ecanlar/EvaAdriana-ArgumentFallacy），无成熟方案可抄。侦察落盘：/tmp/hf-scout-366.txt、/tmp/hf-scout-r366.txt、/tmp/hf-scout-round366.txt（含 HN item id=43257719）。
+- **缺口实证（探针，未信简报）**：scripts/round-366/probe-existential-fallacy.js 10 条攻击样本中 2 条**真零命中**——A7 条件前提→存在结论「如果按下这个按钮就能获得奖励，那么一定存在获得过奖励的人」、A9 定义前提→存在结论「凤凰被定义为百鸟之王，因此存在百鸟之王」。覆盖 grep 确认：affirming_the_consequent(155)/denying_the_antecedent(165)/illicit_conversion(167)/undistributed_middle(229) 已存在，`existential_fallacy/存在谬误/existence_fallacy` 零命中；「全称→存在」形已被 quantifier_scope_shift 代拦，**「条件→存在」「定义→存在」两形状完全无覆盖**。
+- **心虫裁决**：heartflow_philosophy_decision 返回 `accelerate`（confidence 0.7 / priority 40 / goalReviewed=true；cognitiveLoad 与 uncertainty 为 "unknown"，按纪律不当实质背书，如实说明）。
+- **实现**：新建 `src/existential-fallacy.js`（330 行）——存在谬误（existential fallacy / illicit subalternation，亚里士多德-布尔传统经典三段论规则 7 违背）：从不含存在承诺的前提集（全称/条件/规范/定义，布尔解释下全称命题 vacuously true 不断言对象存在）推出存在性结论而无独立证据。判据**双腿共现 + 邻近窗（3 子句）+ 六组豁免，缺一不判**：腿① 无存在承诺前提（四族 × 中英，前提标记**之前**不得出现存在承诺词——带承诺的前提是非空域、推出存在结论合法）；腿② 存在性结论（含倒装形：结论在前、前提在后作理由）。豁免：数学合法构造（须量词域共现 for every/each/any … exists）/ 直接观察 / 谬误概念转述 / 教学语境 / 对冲结论 / 否定转移。
+- **接线（九处）**：`src/index.js` require + dispatch 计算点 + 判定参与 + 两处 dimMap 值（主结果 3849 + checkout 6508）+ VERIFY_DIMS 登记（5571）+ DIM_GUIDANCE 键；`src/existential-fallacy.js` 为本次新建模块，dimMap 新键 `existential_fallacy`，维度 258→259，verify 225→226。
+- **实现期三处真实修复（均写进源码注释）**：① MATH_CONSTRUCT 英文腿原收裸 `/\bexists?\s+(?:a|an|the)?\s*\w+\s+with\b/`，把 "there exists a unicorn with a horn"（本族标准攻击形）误判为数学构造全数误杀（EN 2/2 MISS）→ 改为要求量词域共现；② 同语豁免原为简单 `pi===ci` 排同段，英文三段论整句常无句号分隔被全挡 → 改为位置有序判据（前提标记与结论标记错开位置即非同语复述）；③ 存在承诺检查原为段级（整段任何位置出现 some/there is 即取消前提资格），英文 "so there exists…" 在结论侧却污染前提 → 改为只看前提标记**之前**的文本；④ `segs.length < 2` 硬门禁挡掉全部英文单段标准形 → 改为 `< 1` 空文本保护。
+- **验证（五门禁 + 变体矩阵 + 负例注入，全绿）**：
+  - 本族测试 test/round-366-existential-fallacy.js：攻击 **12/12 命中**（中英双语、裸名词形、修饰、倒装、长句；含全称→存在/条件→存在/规范→存在/定义→存在四形）、良性 **10/10 干净**（含边缘良性：正确多因陈述、带存在承诺的合法推理、数学合法构造、否定转移元陈述、概念转述）、12 常量族全覆盖（无空挂腿）、**负例注入 11/11 承重**（置空后原命中样本至少一条 MISS）、gate 层 **12/12 进 findings 且 action 非 pass**。
+  - bin/verify.js **16 passed / 0 failed**；guard-abilities **20/20**；doc-numbers-accuracy **24/24**（接手时 15/9 红——9 项全为本轮数字未同步，修复后全绿）；bidirectional-guard 召回 **52/52** 不降、误拦 **302/326**（92.6%）不升。
+  - 文档三处同步 258→259、verify 225→226（README.md 7 处、SKILL.md 5 处、AGENTS.md 3 处）。
+- **版本**：VERSION 6.8.188→6.8.189，sync-version.js 同步四端。
+- **提交**：显式路径 add（src/existential-fallacy.js、src/index.js、test/round-366-existential-fallacy.js、README.md、SKILL.md、AGENTS.md、VERSION、CHANGELOG.md、UPGRADE_LOG.md + sync-version 产物），本地 commit 不 push。
+
+### 已知边界 / 下次可继续
+
+1. 英文倒装形（结论在前、前提在后）目前只在单段共现时覆盖，多段英文倒装的窗距判据可加强。
+2. 「定义→存在」在英文侧仅覆盖 `is defined as / by definition` 两种标记，`means / refers to` 等弱定义形未收。
+3. 与 quantifier_scope_shift 的射程边界按 guidance 声明切分（本族不要求谓域共享、单前提即可成立），实测无共命中冲突，但未做大规模共现消歧压测。
+4. src/index.js 超 14,000 行阈值（既有决议：只报警不拆分）。
+5. 推送由 22:45 脚本兜底执行，本轮不 push。
+
 ## r365 — 每日审计修复轮（r364 断线产能固化 + AGENTS.md 维度口径清偿；P2 文档债）
 
 - **背景**：22:30 每日审计任务复核过去 24h 升级产出（r350→r364，共 52 条 commit）。HEAD 为 r364（cf44f0fa，第 258 维度 quantifier_scope_shift 接线闭环），待推 1 条，22:45 推送脚本尚未启动，属正常窗口。
