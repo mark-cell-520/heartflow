@@ -91,6 +91,19 @@
  * 问题（教育公平确实重要、国产确实值得支持），verify 的含义是「当前文本
  * 没有回应原议题，需回到原议题作答后再转向其他」。与 r206-r269 同口径
  * 只登记 VERIFY。
+ *
+ * [r358 扩展] 时机搁置族（defer，第四类标记，真升级类型②）：用「时间不
+ * 成熟」把原议题推开（「疫苗安全的问题现在不是讨论的时候」「财报的事
+ * 现在谈不合时宜」「现在讨论预算赤字为时尚早」），同时在替换段给出
+ * **竞争性优先事项**（当务之急/更应该/聚焦/the real priority）。立项探针
+ * coordination/agent4/probes/r358-probe-round1.js（v6.8.185 实测）：该族
+ * 6/6 攻击整族穿透 gate=pass、良性 4/4 零误伤、已覆盖形 2/2 命中。精度
+ * 双墙承重：① 替换段必须含优先重定向标记（REPLACE_PRIORITY_ZH/EN）——
+ * 「等数据出来再说」「先把项目交付做完」类同议题条件推迟与前置任务因此
+ * 不判；② DEFER_OK_ZH/EN 家族豁免显式放行「等…再」「先…做完」形。与
+ * soft_deflection 的边界：本族明确给出替代优先议题，soft_deflection 不给
+ * 结论；与 goal_drift 的边界：本族腿②是被讨论/被质疑的事项（不限于目标），
+ * 腿①标记是时间推迟形而非目标切换宣告。
  */
 'use strict';
 
@@ -187,6 +200,26 @@ const MARKERS = [
   { re: /[，,。！？；;]\s*[^，,。！？；;]{0,12}?(?:不也|不一样)/, kind: 'counter', origin: 'before' },
   { re: /but what about (?:the )?(?:competitors|others|other teams)/i, kind: 'counter', origin: 'before' },
   { re: /aren'?t there (?:others|bigger)/i, kind: 'counter', origin: 'before' },
+
+  // ── [r358 补腿] (d) defer 时机搁置族 ──
+  // 「X，现在不是讨论的时候，当务之急是Y」类：用时间不成熟把原议题推开，
+  // 替换段给出竞争性优先事项。**before 型（议题在标记前，裸标记无插入）
+  // 必须排在 capture 型（议题在标记内）之前**：两者在「现在谈不合时宜」
+  // 这类裸形上同 index 竞争，最早匹配取数组前部（同 index 严格小于不替换，
+  // r324 同 index 竞争教训）；且 before 型只匹配标记内无议题的裸形，
+  // capture 型句（议题卡在动词与时候之间）before 型天然失配，不会互抢。
+  // 精度双墙见 DEFER_OK/REPLACE_PRIORITY 常量。
+  { re: /(?:现在|当下|眼下|目前|如今)(?:还)?(?:不|没)?是?(?:讨论|谈论|谈|说)(?:的)?(?:时候|时机|时点)/, kind: 'defer', origin: 'before' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:谈|说|讨论|谈论)不合时宜/, kind: 'defer', origin: 'before' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:讨论|谈论|谈|说)(?:还)?为时(?:尚|过)?早/, kind: 'defer', origin: 'before' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:讨论|谈论|谈|说)还(?:太|过)?早/, kind: 'defer', origin: 'before' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:还)?(?:不|没)?是?(?:讨论|谈论|谈|说)([^。；！？]{2,20}?)的?(?:时候|时机|时点)/, kind: 'defer', origin: 'capture' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:谈|说|讨论|谈论)([^。；！？]{2,16}?)不合时宜/, kind: 'defer', origin: 'capture' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:讨论|谈论|谈|说)([^。；！？]{2,16}?)(?:还)?为时(?:尚|过)?早/, kind: 'defer', origin: 'capture' },
+  { re: /(?:现在|当下|眼下|目前|如今)(?:讨论|谈论|谈|说)([^。；！？]{2,16}?)还(?:太|过)?早/, kind: 'defer', origin: 'capture' },
+  { re: /(?:now|it|this|that) is not the time (?:to|for) (?:talk|speak|discuss|address) (?:about )?([^,;.]{2,60})/i, kind: 'defer', origin: 'capture' },
+  { re: /(?:it|this|that) is too early to (?:discuss|talk about|address) ([^,;.]{2,60})/i, kind: 'defer', origin: 'capture' },
+  { re: /(?:now|it|this|that) is not the time (?:to|for) (?:talk|speak|discuss|address)/i, kind: 'defer', origin: 'before' },
 ];
 
 // ─── redirect 族的回应义务锚点（腿②资格门）────────────────────────────
@@ -209,6 +242,43 @@ const ANCHOR_EN = [
   /you (?:say|said|ask|asked|claim|claimed|accuse|accused|criticize|criticized)/i,
   /about (?:this|that|the) (?:issue|question|matter|topic|concern)/i,
   /(?:everyone|people|we|they) (?:are|is) (?:discussing|talking about|debating)/i,
+];
+
+// ─── [r358] defer 时机搁置族：家族豁免（同议题条件推迟/前置任务）──────────
+// 良性形：「等数据出来再说」「等测试通过再谈」「先把项目交付做完」——推迟
+// 的是同一议题的证据/前置条件，没有引入竞争性优先事项。攻击形与良性形的
+// 分界不在推迟本身，而在替换段是否含优先重定向标记（REPLACE_PRIORITY）。
+const DEFER_OK_ZH = [
+  /等[^。；，！？]{0,18}(?:再|之后|以后)/,
+  /等[^。；，！？]{0,18}(?:出来|清楚|明确|落地|显现|通过|公布|确认|查清|完成|结束|成熟|稳定|定论)/,
+  /先(?:把)?[^。；，！？]{0,12}(?:做完|完成|交付|落地|收尾|查清|确认|定下来|稳定|搞定)/,
+  /(?:看|等|说|谈|讨论)(?:完|好)[^。；，！？]{0,8}(?:再|之后)/,
+  /(?:时机|条件)(?:成熟|具备|允许|不到|不合适)/,
+];
+const DEFER_OK_EN = [
+  /until (?:we|the|there)[^.]{0,40}/i,
+  /wait (?:until|for)/i,
+  /(?:once|after) [^.]{0,40}(?:is|are) (?:done|ready|complete|launched|available|out|in)/i,
+  /let(?:'?s| us) (?:first )?(?:finish|complete|deliver|ship|wrap)/i,
+  /focus on (?:finishing|completing|delivering|shipping)/i,
+];
+
+// ─── [r358] defer 时机搁置族：替换段优先重定向标记（精度墙）────────────────
+// 攻击形替换段必须给出**竞争性优先事项**（当务之急/更应该/聚焦/the real
+// priority）。仅含条件推迟或前置任务的替换段（DEFER_OK 形）不含这些标记，
+// 双墙合取后良性「等数据出来再说」类零误伤。
+const REPLACE_PRIORITY_ZH = [
+  /当务之急|重中之重|头等大事|当(?:下|前)?(?:最)?(?:重要|关键|紧迫)/,
+  /更应该|更应当|更需要|更要(?:关注|重视|讨论|做)/,
+  /(?:真正|更)(?:重要|值得|应该|关键)/,
+  /聚焦|着力(?:于)?|转向|优先(?:级|事项|处理|解决|考虑|讨论)?/,
+  /关键(?:是|在于)/,
+];
+const REPLACE_PRIORITY_EN = [
+  /the (?:real|main|bigger|larger|more important|more pressing|pressing) (?:priority|issue|question|concern|focus|task)/i,
+  /what (?:really|actually) matters/i,
+  /(?:we|we'd|let's|should|must|need to|going to) [^.]{0,24}focus/i,
+  /(?:more|most) important(?:ly)?/i,
 ];
 
 // ─── 豁免表 ────────────────────────────────────────────────────────────
@@ -329,18 +399,21 @@ function splitAtClause(after) {
 /**
  * 主检测入口。
  * @param {string} text 归一化后的文本
+ * @param {object} [inject] 负例脚本注入用：以空数组/过滤数组替换指定常量
  * @returns {{hit:boolean, score:number, details:string, legs:object}}
  */
-function checkRedHerring(text) {
+function checkRedHerring(text, inject) {
   const result = { hit: false, score: 0, details: '', legs: {} };
   if (typeof text !== 'string' || text.length < 6) return result;
+  const R = inject || {};
+  const MARKERS_R = R.MARKERS || MARKERS;
 
   // 豁免优先（句级）：概念转述不判
   if (META_CONCEPT.some(re => re.test(text))) return result;
 
   // 找最早命中的置换标记
   let best = null;
-  for (const mk of MARKERS) {
+  for (const mk of MARKERS_R) {
     const m = mk.re.exec(text);
     if (!m) continue;
     if (!best || m.index < best.m.index) best = { mk, m };
@@ -399,6 +472,19 @@ function checkRedHerring(text) {
   // 共享词恰是本族的「同域不同题」特征，故跳过此豁免。
   if (mk.kind !== 'counter' && sharedCount(originG, replaceG) > 0) return result;
 
+  // [r358 补腿] defer 时机搁置族精度双墙：① DEFER_OK 家族豁免（替换段是
+  // 同议题条件推迟/前置任务——「等数据出来再说」「先把项目交付做完」）；
+  // ② 替换段必须含竞争性优先重定向标记（REPLACE_PRIORITY）。两墙合取，
+  // 只判「时间不成熟 + 转向另一优先事项」的置换形。
+  if (mk.kind === 'defer') {
+    const okZh = R.DEFER_OK_ZH || DEFER_OK_ZH;
+    const okEn = R.DEFER_OK_EN || DEFER_OK_EN;
+    const prZh = R.REPLACE_PRIORITY_ZH || REPLACE_PRIORITY_ZH;
+    const prEn = R.REPLACE_PRIORITY_EN || REPLACE_PRIORITY_EN;
+    if (okZh.some(re => re.test(replaceText)) || okEn.some(re => re.test(replaceText))) return result;
+    if (!(prZh.some(re => re.test(replaceText)) || prEn.some(re => re.test(replaceText)))) return result;
+  }
+
   // 资格门：redirect 族（纯替换、无搁置义）要求回应义务锚点。
   // [r324 补腿] 反问型替换豁免锚点要求——「你的代码有 bug，重要的是，难道
   // 我们不该先谈谈竞争对手的漏洞吗？」腿②无回应义务锚点（纯陈述指控），但
@@ -417,7 +503,7 @@ function checkRedHerring(text) {
   if (RESPOND_OK.some(re => re.test(text))) return result;
   if (HEDGE.some(re => re.test(text))) return result;
 
-  const kindZh = mk.kind === 'dismiss' ? '搁置' : mk.kind === 'redirect' ? '替换' : '反问';
+  const kindZh = mk.kind === 'dismiss' ? '搁置' : mk.kind === 'redirect' ? '替换' : mk.kind === 'defer' ? '时机搁置' : '反问';
   result.hit = true;
   result.score = mk.kind === 'redirect' ? 0.62 : 0.72;
   result.legs = { kind: mk.kind, marker: m[0], origin: originText.slice(0, 30), replace: replaceText.slice(0, 30) };
@@ -425,4 +511,10 @@ function checkRedHerring(text) {
   return result;
 }
 
-module.exports = { checkRedHerring };
+module.exports = {
+  checkRedHerring,
+  __internals: () => ({
+    MARKERS, DEFER_OK_ZH, DEFER_OK_EN, REPLACE_PRIORITY_ZH, REPLACE_PRIORITY_EN,
+    ANCHOR_ZH, ANCHOR_EN, META_CONCEPT, AGENDA, HEDGE, RESPOND_OK,
+  }),
+};
