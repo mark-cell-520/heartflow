@@ -119,15 +119,14 @@ const MIGRATE_RECLASS_EN = /\b(?:reclassif(?:y|ied|ies|ying|ication)|re-?stag(?:
 // E2 moved from ... to ... 迁移族（含 shuffling into / moved over to）
 const MIGRATE_FROM_TO_EN = /\b(?:mov(?:e|ed|es|ing)|shift(?:ed|ing)?|transferr?(?:ed|ing)|migrat(?:e|ed|ing)|promot(?:e|ed|ing)|demot(?:e|ed|ing)|bump(?:ed|ing)?)\s+(?:some|many|most|several|a\s+few|the)?\s*(?:\w+\s+){0,3}?(?:from|out\s+of)\s+[^.]{0,40}?\s+(?:to|into|over\s+to)\b/i;
 // E3 分组规则变更族（changing the grouping rule / new staging criteria）
-const MIGRATE_RULE_EN = /\b(?:chang(?:e|ed|ing|es)|revis(?:e|ed|ing|ion)|updat(?:e|ed|ing)|new|adjust(?:ed|ing|ment)?)\s+(?:the\s+)?(?:grouping|group|staging|stage|classification|category|categorisation|grading|bracket|cutoff|cut-off|threshold)\s*(?:rule|rules|criteria|scheme|scheme|standard|standards|boundar(?:y|ies))?\b/i;
+const MIGRATE_RULE_EN = /\b(?:chang(?:e|ed|ing|es)|revis(?:e|ed|ing|ion)|updat(?:e|ed|ing)|new|adjust(?:ed|ing|ment)?)\s+(?:the\s+)?(?:grouping|groups?|staging|stages?|classifications?|categories|categorisation|grading|brackets?|cut-?offs?|thresholds?)\s*(?:rules?|criteria|schemes?|standards?|boundar(?:y|ies))?\b/i;
 // E3b move/shift ... to/into <group noun> 族（无 from 的迁移动词形——
 //   r360 构造期实测：Moving the weakest students to the remedial class
 //   整句因 E2 强制要求 from 而穿透）。目标必须是组名词，防止
 //   moved the files to the archive 类非分组迁移误命中。
-const MIGRATE_TOGROUP_EN = /\b(?:mov(?:e|ed|es|ing)|shift(?:ed|ing)?|transferr?(?:ed|ing)|migrat(?:e|ed|ing)|promot(?:e|ed|ing)|demot(?:e|ed|ing)|reassign(?:ed|ing)?|sort(?:ed|ing)?|plac(?:e|ed|ing))\s+(?:\w+\s+){0,5}?(?:to|into)\s+(?:the\s+|a\s+|his\s+|her\s+|their\s+|our\s+)?(?:\w+\s+){0,2}?(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|bands?|tracks?|batches|categories|buckets?)\b/i;
+const MIGRATE_TOGROUP_EN = /\b(?:mov(?:e|ed|es|ing)|shift(?:ed|ing)?|transferr?(?:ed|ing)|migrat(?:e|ed|ing)|promot(?:e|ed|ing)|demot(?:e|ed|ing)|reassign(?:ed|ing)?|sort(?:ed|ing)?|plac(?:e|ed|ing))\s+(?:\w+\s+){0,5}?(?:to|into)\s+(?:the\s+|a\s+|his\s+|her\s+|their\s+|our\s+)?(?:\w+\s+){0,2}?(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|bands?|tracks?|batches|categories|buckets?|brackets?)\b/i;
 // E4 split / divide ... into ... groups 族（splitting the cohort into）
 const MIGRATE_SPLIT_EN = /\b(?:split|splits|splitting|divid(?:e|ed|ing)|separat(?:e|ed|ing)|sort(?:ed|ing)?|bucket(?:ed|ing)?)\s+(?:\w+\s+){0,3}?into\s+(?:two|three|the)?\s*\w*\s*(?:groups?|class(?:es)?|cohorts?|strata|tiers?|brackets?)\b/i;
-
 const MIGRATE_EN_GROUPS = [
   ['MIGRATE_RECLASS_EN', [MIGRATE_RECLASS_EN]],
   ['MIGRATE_FROM_TO_EN', [MIGRATE_FROM_TO_EN]],
@@ -157,7 +156,7 @@ const BOTHUP_ZH_GROUPS = [
 const BOTHUP_ZH = [BOTHUP_ALL_ZH, BOTHUP_DOUBLE_ZH, BOTHUP_TWOGROUP_ZH, BOTHUP_GROUPNOUN_ZH];
 
 // BE1 both groups ... improved 族（both groups' survival rates improved）
-const BOTHUP_BOTHGROUPS_EN = /\bboth\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|batches|teams?)['\u2019]?\s*(?:\w+\s+){0,4}?(?:improv(?:e|ed|es|ing|ement)|rose|risen|rises|increas(?:e|ed|es|ing)|went\s+up|got\s+up|grew|climb(?:ed|ing)?|higher|better|best|up|good)\b/i;
+const BOTHUP_BOTHGROUPS_EN = /\bboth\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|batches|teams?|brackets?|stages?)['\u2019]?\s*(?:\w+\s+){0,4}?(?:improv(?:e|ed|es|ing|ement)|rose|risen|rises|increas(?:e|ed|es|ing)|went\s+up|got\s+up|grew|climb(?:ed|ing)?|higher|better|best|up|good)\b/i;
 // BE2 raised the average of both 族（raised the average of both classes）
 const BOTHUP_RAISEDBOTH_EN = /\b(?:rais(?:e|ed|es|ing)|lift(?:ed|ing)?|boost(?:ed|ing)?|push(?:ed|ing)?|improv(?:e|ed|ing))\s+(?:the\s+)?(?:\w+\s+){0,3}?of\s+both\s+\w+/i;
 // BE3 made both ... better 族（made both groups' numbers better）
@@ -166,7 +165,7 @@ const BOTHUP_MADEBOTH_EN = /\b(?:mad(?:e|es|ing)|leaves?|left|leaving|put(?:s|ti
 const BOTHUP_BOTHUP_EN = /\bboth\s+(?:\w+\s+){0,3}?(?:went\s+up|rose|rose|improved|increased|got\s+better|climbed|moved\s+up|are\s+(?:better|higher))\b/i;
 // BE5 improved in both groups 族（改善词在前的倒装形——r360 构造期实测：
 //   "survival improved in both groups" 因 BE1 要求 both 在前而穿透）
-const BOTHUP_INBOTH_EN = /\b(?:improv(?:e|ed|es|ing|ement)|rose|risen|rises|increas(?:e|ed|es|ing)|went\s+up|got\s+better|climb(?:ed|ing)?|grew)\s+(?:\w+\s+){0,4}?in\s+both\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?)\b/i;
+const BOTHUP_INBOTH_EN = /\b(?:improv(?:e|ed|es|ing|ement)|rose|risen|rises|increas(?:e|ed|es|ing)|went\s+up|got\s+better|climb(?:ed|ing)?|grew)\s+(?:\w+\s+){0,4}?in\s+both\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|brackets?|stages?)\b/i;
 
 const BOTHUP_EN_GROUPS = [
   ['BOTHUP_BOTHGROUPS_EN', [BOTHUP_BOTHGROUPS_EN]],
@@ -182,7 +181,10 @@ const PAIR_ZH = 60;
 const PAIR_EN = 160;
 
 // ─── 豁免 A：概念教学（点名 Will Rogers 现象 / 分期迁移概念本身）────
-const CONCEPT_ZH = /(?:Will\s*Rogers|威尔·罗杰斯|罗杰斯现象|分期迁移|组间迁移|迁移偏误|再分类假象|统计假象|医学统计学|卫生统计学|流行病学|教材|教科书|课堂|教案|习题|论文)/;
+// 注意：不收「组间迁移」——它是腿① MIGRATE_MOVE_ZH 的命中词，收进来会让
+// 整个裸族失效（r360 实测：「这次组间迁移之后，两组生存率都提高了」被
+// 豁免误杀）。
+const CONCEPT_ZH = /(?:Will\s*Rogers|威尔·罗杰斯|罗杰斯现象|分期迁移|迁移偏误|再分类假象|统计假象|医学统计学|卫生统计学|流行病学|教材|教科书|课堂|教案|习题|论文)/;
 const CONCEPT_EN = /\bwill\s+rogers\b|\bstage\s+migrat\w+|\bmigrat\w+\s+bias\b|\bmedical\s+statistics\b|\bepidemiolog\w+\b|\btextbook\b|\bstatistics\s+class\b/i;
 
 // ─── 豁免 B：正确响应形（指出同时改善只是再分类假象，要求核对个体数据）──
@@ -301,9 +303,9 @@ function findSignatures(text, R) {
       if (!b) continue;
       // 腿①收紧：迁移动词族（M1/M3）须邻近出现组名词，防止「从仓库
       // 调到车间」这类非分组迁移被当成 Will Rogers 形态。
-      if ((n.group === 'MIGRATE_FROM_TO_ZH' || n.group === 'MIGRATE_ASSIGN_ZH') && n.lang === 'zh') {
+      if ((n.group === 'MIGRATE_FROM_TO_ZH' || n.group === 'MIGRATE_ASSIGN_ZH') && L.lang === 'zh') {
         const near = text.slice(Math.max(0, n.idx - 20), Math.min(text.length, n.end + 30));
-        if (!GROUP_ZH.test(near)) continue;
+        if (!(R.GROUP_ZH || GROUP_ZH).test(near)) continue;
       }
       sigs.push({ lang: L.lang, migrate: n.raw, bothup: b.raw });
     }
