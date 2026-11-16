@@ -251,8 +251,9 @@ const BOTHUP_ALL_EN = /\b(?:everyone|everybody|all(?:\s+of)?\s+(?:them|the\s+\w+
 // BE6b 提升词在前的倒装全称形（scores rose for everyone / improved for all）
 const BOTHUP_FORALL_EN = /\b(?:improv\w+|rose|risen|increas\w+|went\s+up|climb\w*|grew)\s+(?:\w+\s+){0,3}?for\s+(?:everyone|all)\b/i;
 // BE6c across the board 全面上升成语形（lifted scores across the board /
-//    rose across the board——提升词在前，成语标记在后）。
-const BOTHUP_ACROSS_EN = /\b(?:improv\w+|rose|risen|increas\w+|went\s+up|climb\w*|grew|lift\w*|boost\w*|rais\w+)\s+(?:\w+\s+){0,3}?across\s+the\s+board\b/i;
+//    rose across the board——提升词在前，成语标记在后；指标名词须为成绩/
+//    率值类，防 "improved response times across the board" 类非分组域误命中）。
+const BOTHUP_ACROSS_EN = /\b(?:improv\w+|rose|risen|increas\w+|went\s+up|climb\w*|grew|lift\w*|boost\w*|rais\w+)\s+(?:(?:\w+\s+){0,2}?(?:scores?|grades?|marks?|rates?|averages?|results?|outcomes?|numbers?|figures?|metrics?|performance)\s+){0,2}?across\s+the\s+board\b/i;
 // BE7 提升词在前直驳 both 形（improved both groups——BE5 强制要求
 //    "in both"，无 in 的动词在前形零覆盖；r362 探针 D 组定位）。
 const BOTHUP_BOTHOBJ_EN = /\b(?:improv\w+|rais\w+|lift\w+|boost\w+|left|sent|push\w+)\s+(?:\w+\s+){0,4}?both\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|stages?|brackets?)\b/i;

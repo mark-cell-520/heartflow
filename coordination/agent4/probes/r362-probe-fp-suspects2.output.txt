@@ -1,0 +1,16 @@
+miss gate=pass | Re-sorting the inbox improved response times across the bo
+HIT  gate=verify | After the regroup, throughput rose across the board.
+miss gate=pass | Reclassifying the tickets sped up processing across the bo
+HIT  gate=verify | Regrouping the classes lifted scores across the board.
+HIT  gate=verify | Re-stratifying the wards raised survival rates across the 
+HIT  gate=verify | After the re-sort of the files, load times rose for everyo
+HIT  gate=verify | The cabinet reshuffle improved morale for everyone.
+miss gate=pass | After the re-sort, everyone in the office felt better abou
+miss gate=pass | The new tutorial improved both groups of volunteers in the
+miss gate=pass | The battle lines were redrawn after the debate.
+miss gate=pass | Once the map was redrawn, both routes looked shorter.
+miss gate=pass | The mediator moved some concessions between the parties, a
+miss gate=pass | 调整了一下分层之后，两个文件夹的加载速度都快了。
+HIT  gate=verify | 重新分了层，两栋楼的出租率都上升了。
+HIT  gate=verify | 重新分组之后，两组的病例数屡创新高。
+嫌疑组合模块命中 = 7/15
