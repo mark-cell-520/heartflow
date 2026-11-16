@@ -1,0 +1,49 @@
+=== unsupported-claim-exemption
+  baseline:
+  current :
+=== weak-evidence-strong-claim
+  baseline:
+  current :
+=== loss-aversion
+  baseline: 测试结果: 18 通过, 1 失败, 共 19 个
+  current : 测试结果: 18 通过, 1 失败, 共 19 个
+=== round-260-omission-bias
+  baseline: 测试结果: 20 通过, 1 失败, 共 21 个
+  current : 测试结果: 20 通过, 1 失败, 共 21 个
+=== reward-hacking-self-referential-r120
+  baseline:
+  current :
+=== round-318-default-value-anchor
+  baseline: r318 轮测结果: 98 通过, 1 失败, 共 99 个
+  current : r318 轮测结果: 98 通过, 1 失败, 共 99 个
+=== round-321-modern-overuse-commons
+  baseline: 测试结果: 164 通过, 2 失败, 共 166 个
+  current : 测试结果: 164 通过, 2 失败, 共 166 个
+=== round-331-guard-mutation
+  baseline:
+  current :
+=== round-428-negative-mutation
+  baseline:
+  current :
+=== round-327-guard-mutation
+  baseline:
+  current :
+=== round-450-norm-standalone-self-qualifies
+  baseline: ════ 总计: 44 通过 / 3 失败 ════
+  current : ════ 总计: 44 通过 / 3 失败 ════
+=== round-311-sig-verdict-ma-legs
+  baseline: round-311 轮测结果: 18 通过, 3 失败, 共 21 个
+  current : round-311 轮测结果: 18 通过, 3 失败, 共 21 个
+=== round-310-peak-end-event-day-verdicts
+  baseline: 结果: 17 通过, 1 失败, 共 18 个
+  current : 结果: 17 通过, 1 失败, 共 18 个
+=== round-314-procrastination-inflate-legs
+  baseline: 测试结果: 262 通过, 1 失败, 共 263 个
+  current : 测试结果: 262 通过, 1 失败, 共 263 个
+---
+补充双树同行为实证（本轮前 cc28722 worktree vs 当前 848bb14）：
+- affective-forecast.test.js: 双树均 89 通过, 1 失败（总有一天你会明白这个道理 action=rewrite）
+- round-310-law-of-small-numbers-perpetual.test.js: 双树均 9 通过, 5 失败
+- unsupported-claim-exemption.test.js: 双树均 exit=0 静默（harness 误报，非回归）
+- weak-evidence-strong-claim.test.js: 双树均全绿（r288 测试全绿，无标准汇总行）
+- round-356-pathh 轮测在全量 run-all [594/786] 内: 37 通过, 0 失败

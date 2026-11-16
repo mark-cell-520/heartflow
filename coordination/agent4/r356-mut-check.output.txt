@@ -1,0 +1,22 @@
+=== round-327-guard-mutation
+  baseline exit=1
+  current  exit=1
+  baseline tail: Node.js v22.23.3
+  current  tail: Node.js v22.23.3
+=== round-331-guard-mutation
+  baseline exit=1
+  current  exit=1
+  baseline tail: Node.js v22.23.3
+  current  tail: Node.js v22.23.3
+=== round-428-negative-mutation
+  baseline exit=1
+  current  exit=1
+  baseline tail: Node.js v22.23.3
+  current  tail: Node.js v22.23.3
+=== round-436-deletion-mutation
+  baseline exit=1
+  current  exit=1
+  baseline tail:
+  current  tail:
+
+（4 个 mutation 测试在本轮前 cc28722 与当前 848bb14 双树均 exit=1，Node 崩溃签名一致——环境性既有失败，与本轮改动无关；run-all 内的「子进程零输出被中断（环境噪声）」即此类。）
