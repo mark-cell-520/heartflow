@@ -1,0 +1,31 @@
+--- 代拦句 gate 承重核对（3 条）---
+
+   action=verify itb承重=true mod=true :: 检查普及以来，众多隐匿病灶被不断识别，说明患病率真的在上升。
+
+   action=rewrite itb承重=true mod=true :: 检查普及以来，众多隐匿病灶被陆续确诊，说明患病率真的在上升。
+
+   action=rewrite itb承重=true mod=true :: 检查普及以来，众多隐匿病灶被大量确诊，说明患病率真的在上升。
+
+   action=verify itb承重=true mod=true :: 检查普及让更多病例被及时发现，这说明患病率真的在上升。
+--- 边界句模块级核对 ---
+OK  want=false got=false :: 大量潜伏病例浮现出来，这说明患病率真的在上升。
+OK  want=false got=false :: 检测升级后，检验科通过了iso认证，说明患病率真的在上升。
+OK  want=false got=false :: 检查普及让大量潜伏病例浮现出来。
+OK  want=false got=false :: 检测流程更新让更多病例被重新发现，这说明患病率真的在上升。
+OK  want=false got=false :: 检查普及让大量潜伏病例浮现出来——这说明患病率真的在上升吗？
+OK  want=true got=true :: 检查普及以来，众多隐匿病灶被重新发现，说明患病率真的在上升。
+OK  want=true got=true :: 随着检测普及，大量潜伏病例浮出水面，这说明这种病真的在变多。
+OK  want=true got=true :: 检查普及让更多病例被重新发现，患病率节节走高。
+--- 族隔离反向探针前置核对（删旧常量后须翻转）---
+OK  CASE_SURGE_ZH2 before=true after=false :: 检查普及让大量潜伏病例浮出水面，这说明患病率真的在上
+OK  CASE_SURGE_ZH2 before=true after=false :: 检查普及让大量潜伏病例暴露出来，这说明患病率真的在上
+OK  CASE_SURGE_ZH3 before=true after=false :: 检查普及以来，众多隐匿病灶被重新发现，说明患病率真的
+OK  CASE_SURGE_ZH3 before=true after=false :: 检查普及以来，众多隐匿病灶被识别，说明患病率真的在上
+OK  CASE_SURGE_ZH4 before=true after=false :: 随着检测普及，浮出大量潜伏病例，这说明这种病真的在变
+OK  CASE_SURGE_ZH4 before=true after=false :: 筛查推广后，浮现出许多无症状感染者，表明患病率确实在
+OK  DETECT_UP_ZH before=true after=false :: 检测手段的进步让更多病例被查出，这说明患病率真的在上
+OK  DETECT_UP_ZH before=true after=false :: 检查的普及让更多病例被查出，这说明患病率真的在上升。
+OK  DETECT_UP_ZH5 before=true after=false :: 更先进的检测手段让更多病例被查出，这说明患病率真的在
+OK  DETECT_UP_ZH4 before=true after=false :: 检测力度的加强让更多病例被查出，这说明患病率真的在上
+OK  INCIDENCE_CLAIM_ZH before=true after=false :: 检查普及让更多病例被重新发现，患病率真的在上升，这种
+FAIL INCIDENCE_CLAIM_ZH2 before=true after=true :: 检查普及让更多病例被重新发现，患病率一路攀升，这种病
