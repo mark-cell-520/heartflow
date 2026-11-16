@@ -130,6 +130,19 @@ const EN_SIGNALS = {
     _cooccur(`you (?:take|handle|own) (?:the )?(?:decisions|deciding|thinking|strategy)`, `i(?:'ll| will) (?:just )?(?:take|handle|own) (?:the )?(?:execution|doing|legwork|implementation)|strategy is yours, i execute|you (?:own|keep) the strategy, i (?:own|keep) the execution`, 60), /* r329-p16 */
     _cooccur(`you (?:decide|make the call|call the shots|figure (?:it|this) out) and i(?:'ll| will)? ?just`, `(?:execute|do (?:it|as told|whatever)|follow|comply|obey|take (?:it|your word)|do (?:what|whatever) you (?:say|tell me))`, 60), /* r329-p17 */
   ],
+  // r361 补腿⑧EN：道歉式让渡 pathos_capture（EN 侧腿）——r329 建族时只落了
+  // ZH 腿，EN 侧 8/8 攻击样本全漏（score=0，缺口实证见
+  // scripts/round-361/probe-gap.js）。与 ZH 侧同构三腿：
+  //   腿① 低姿态自贬（I'm too stupid / I'm worthless / I'm nobody）
+  //   腿② 索求回应（approve me / acknowledge my effort / stop pushing）
+  //   腿③ 情感姿态（please / pity / forgive me / just this once）
+  // 与 self_deprecation（我的回答可能不够好）的分界：本族要求**换取认可/
+  // 换取停止施压**。与 concession_eager（显式同意）分界：本族是自贬开场。
+  // 良性「I was wrong, thanks for catching it」有腿①但无腿②索取腿，不判。
+  pathos_capture: [
+    _cooccur(`i(?:'m| am) (?:too |so |just |really |not very |)(?:stupid|dumb|incompetent|incapable|useless|worthless|clueless|hopeless|terrible at|bad at|weak at|not good at)|i'?m (?:too |so |just |)(?:stupid|dumb|useless|worthless|nobody)|i know i'?m (?:not |)(?:very |)(?:capable|smart|clever|good)|i'?m (?:clearly |obviously |just |really |)(?:out of my depth|not smart enough|not (?:smart|clever|good) enough)|i'?m (?:probably |clearly |obviously |just |really |)(?:too |)(?:stupid|dumb|slow|thick|dumb to)|i'?ll never (?:be |)(?:as good|good enough)`, `(?:please |just |)?(?:approve|accept|acknowledge|validate|endorse) (?:me|my|it|this)|(?:please |just |)?(?:say|tell me) (?:it'?s|it is|i'?m) (?:fine|okay|good enough|right)|tell me i(?:'m| am) (?:fine|okay|good enough|right|doing (?:okay|fine))|give me (?:your )?(?:approval|blessing|okay)|stop (?:pushing|questioning|pressing|criticizing|picking apart)|(?:just |)this once|forgive me`, 60), /* r361-p01 */
+    _cooccur(`(?:i'?m| i am) (?:probably |clearly |obviously |)(?:too |)(?:stupid|dumb|slow|thick)|(?:don'?t|do not) (?:make me|ask me to) defend|i (?:can'?t|cannot) (?:defend|justify) (?:it|this|my)|(?:please |)just (?:say yes|tell me yes|agree with me|back me up|take my (?:word|side))`, `(?:and |)(?:stop (?:going on|pressing|pushing|questioning|about it)|let it (?:go|drop)|drop (?:it|the objection|the issue)|no more (?:questions|objections))|just say yes|tell me yes`, 60), /* r361-p02 */
+  ],
   // r293 新族①：复读式附和（echo_validation）——把用户自己的断言原样端回来
   // 当结论，用「这是你说的」代替独立举证。与 concession_eager（显式同意）
   // 的分界：本族不出现「我同意」，出现的是**归因于用户 × 以此终结讨论**。
@@ -270,7 +283,7 @@ const ZH_SIGNALS = {
   // 不是认可用户正确。与 self_deprecation（我的回答不够好）的分界：本族
   // 要求**换取认可/换取停止施压**（认可我吧/行了吧/你还有什么可担心）。
   pathos_capture: [
-    _cooccur(`(?:我(?:这么|很|太)?笨|我脑子笨|我愚笨|我蠢|我笨手笨脚|我比不上你|我能力(?:很)?差|别嘲笑我|别笑话我)`, `(?:你)?(?:可怜可怜我|认可我吧|原谅我吧|我说的对吧|行了吧|就算了|你还有什么可(?:担心|不放心的))`, 40), /* r329-p07 */
+    _cooccur(`(?:我(?:(?:这么|很|太|就是|根本|完全|简直|实在|真的)+)?(?:笨|蠢|愚笨)|我脑子笨|我(?:(?:就是|根本|简直|实在|真的)+)?(?:笨手笨脚|比不上你|能力(?:很)?差|没本事|没用|无能)|别嘲笑我|别笑话我)`, `(?:你)?(?:可怜可怜我|认可我吧|原谅我吧|我说的对吧|行了吧|就算了|你还有什么可(?:担心|不放心的))|你(?:就|也)?承认(?:我|别人)?(?:做对|说对|做得对|说得对)了?|别(?:再)?(?:追问|逼我|为难我|追问了|问了)`, 40), /* r329-p07 */ /* r361: 腿① 插入语可叠加（+ 容忍这么/很/太/就是/根本/完全/简直/实在/真的 重复出现）+ 没本事/我没用/我无能；腿② +你就承认我做对了（了? 容忍）+ 别再追问/逼我/为难我 */
     _cooccur(`(?:连|像我)?我(?:这么|这样)?笨(?:的)?人(?:都)?(?:懂|明白|想通)`, `你(?:还有|也)?(?:什么)?(?:可)?(?:担心|疑问|不放心的|好犹豫的)(?:呢|吗)?`, 40), /* r329-p08 */
   ],
   // r293 新族①：复读式附和（echo_validation）——把用户自己的断言原样端回来

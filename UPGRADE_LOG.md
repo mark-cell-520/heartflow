@@ -1,3 +1,29 @@
+## r365 — 每日审计修复轮（r364 断线产能固化 + AGENTS.md 维度口径清偿；P2 文档债）
+
+- **背景**：22:30 每日审计任务复核过去 24h 升级产出（r350→r364，共 52 条 commit）。HEAD 为 r364（cf44f0fa，第 258 维度 quantifier_scope_shift 接线闭环），待推 1 条，22:45 推送脚本尚未启动，属正常窗口。
+- **断线产能实证（未信自报告，亲自跑）**：r364 报告称 quantifier_scope_shift 攻击 8/8 命中。审计用其自留矩阵脚本复跑：攻击 **15/15 非 pass（rewrite，dim=7200）**、良性 **16/16 pass**，轮测 `test/round-362-quantifier-scope-shift.test.js` **42 passed / 0 failed**——自报数据真实复现。审计另构造 3 条攻击抽测，其中 2 条 pass（qss 零命中）：经比对变体矩阵样本形状，落在该族四腿共现结构的覆盖边界之外（英文裸陈述句无辖域前提/存在量词/推断连接/谓域共享四腿共现），属**已知边界**非本轮回归，降级 P3 记录。
+- **P1（撤销）**：`src/plugins/sycophancy-check/index.js` 工作树被修改但未提交，审计初判为来源不明改动。经 git log 与 diff 注释溯源：这是 **r361 的断线产能**（pathos_capture 族 EN 侧腿 + ZH 腿扩词，注释标注 r361-p01/p02）。初抽测走 `gate()` 全 pass，一度疑为漏判；查明该文件是**插件层**（hooks 事件驱动，经 think-pipeline 的 postprocess.think 汇入 `_discrimination`，AGENTS.md 明文「插件层不在 gate 路径」），gate() 不适配，测法错误。改用插件导出函数 `analyzeEN` 抽测：3/3 攻击样本命中 pathos_capture 族（score 0.4）、良性 2 条零命中——产能真实承重，P1 撤销，本轮提交固化。
+- **P2（修复）**：AGENTS.md 两处维度口径过时——正文标题「The 255 dimensions」（实测 258）与 action-tier 段「three tiers add up to 249」（实测 11+19+225=255，余 3 个不强制 gate 动作维度合计 258）。SKILL.md 已是 258（正确），README 头部 258 正确，唯 AGENTS.md 落后 3 个版本。按设计原则 #5（honest numbers）修：标题 255→258、层计数 249→255。
+- **版本**：VERSION 6.8.187→6.8.188，sync-version.js 同步 package.json / SKILL.md / version.js fallback / BUILD_DATE 四端一致。
+- **提交**：r361 断线产能（sycophancy-check EN 腿）+ AGENTS.md 口径修复 + 版本 bump，显式路径 add，未含 r361/r362 遗留未跟踪探针（scripts/round-362/、scripts/round-363/、coordination/agent4/scout/，保留现场供追溯）。
+
+### 四门禁复跑实测（22:30 本轮）
+
+| 门禁 | 结果 |
+|------|------|
+| bin/verify.js | 16 passed / 0 failed |
+| guard-abilities | 20/20 通过（dimensions 258、block 11 / rewrite 19 / verify 225、双向回归召回 52/52 + 误拦 302/326） |
+| doc-numbers-accuracy | 24 passed / 0 failed |
+| bidirectional-guard | 召回 52/52 被处理（100%），误拦 302/326 pass（92.6%） |
+| measure-claimed-numbers | 258 维度 / 164 模块 / 192 工具 / 1341 路由 |
+| MCP 运行态 | v6.8.187 running:true、modules 164、healthScore 100（撞车规避条款确认引擎存活） |
+
+### 待办 / 交接
+
+1. quantifier_scope_shift 的英文裸陈述句覆盖边界（无四腿共现结构时不命中）如需收，属独立议题，需动该族判据自身。
+2. src/index.js 17,939 行超 doc-numbers 14,000 阈值（仅报警不拆分，既有决议）。
+3. 推送由 22:45 脚本兜底执行，本轮不 push。
+
 ## r364 — 第 258 维度 quantifier_scope_shift 接线闭环 + 文档债清偿（真升级③；r361/r362 断线产能收尾）
 
 - **背景（断线产能收尾）**：本地工作树遗留 r361/r362 的未提交成果——`src/quantifier-scope-shift.js`（599 行，模块层已完工）与 `src/index.js` 的 41 行接线改动、README badge 的 258 标记，但 UPGRADE_LOG 无记录、三处文档维度数仍是 257、`test/doc-numbers-accuracy.test.js` 9 项红。git log 显示 r359 之后远端 agent-4 连发 r360–r363（v6.8.186），本地未推送的固化工作断线。本轮先复跑探针确认接线真实生效（非空壳），再清偿文档债并走完整验证/版本/重启流程。
