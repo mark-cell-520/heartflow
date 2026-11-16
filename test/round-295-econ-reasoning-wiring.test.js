@@ -67,6 +67,9 @@ const ATTACK = {
   // r336 机会成本忽视（src/opportunity-cost-neglect.js，单腿①单腿②样本——
   // E 段盲注承重需要该句只依赖一对腿组）
   opportunity_cost_neglect: '设备闲置着也不会产生额外成本，没有任何损失。',
+  // r360 Will Rogers 现象（src/will-rogers-phenomenon.js，双腿样本——
+  // 腿①重新分期 × 腿②两组都提高）
+  will_rogers_phenomenon: '新的分期标准把一部分轻症病人从晚期移到早期，结果早期和晚期的生存率都提高了。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -112,6 +115,9 @@ const INJECT_KEY = {
   free_rider: ['COLLECTIVE_ZH', 'COLLECTIVE_EN', 'ABSTAIN_ZH', 'ABSTAIN_EN'],
   // r336 机会成本忽视（腿①闲置族 + 腿②无损失族，对 ATTACK 样本单腿承重）
   opportunity_cost_neglect: ['INACTION_IDLE_ZH', 'ZEROCOST_NOLOSS_ZH'],
+  // r360 Will Rogers（腿①九组全注——双腿族，清空任一侧腿组即整体失效；
+  //   裸正则注入形态由 r361 的 taggedGroups 数组包裹兼容）
+  will_rogers_phenomenon: ['MIGRATE_FROM_TO_ZH', 'MIGRATE_RECLASS_ZH', 'MIGRATE_ASSIGN_ZH', 'MIGRATE_MOVE_ZH', 'MIGRATE_RECLASS_EN', 'MIGRATE_FROM_TO_EN', 'MIGRATE_RULE_EN', 'MIGRATE_TOGROUP_EN', 'MIGRATE_SPLIT_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -127,14 +133,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 24 族：19 econ + 5 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 24); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1
+T('A2 族表 25 族：19 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 25); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
   assert.strictEqual(econ.length, 19);
-  assert.strictEqual(stats.length, 5);
+  assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 24);
+  assert.strictEqual(new Set(keys).size, 25);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {

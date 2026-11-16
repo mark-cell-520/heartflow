@@ -284,10 +284,14 @@ function dedupeOverlap(arr) {
 }
 
 // 把 GROUPS 的组名带进匹配结果（腿①收紧判据需要知道命中来自哪个族）
+// R[name] 兼容两种注入形态：数组（轮测 hit(s, {KEY: []}) 协议）与裸正则
+// （round-295 blind inject 协议 inject[k] = /(?!)/i——r361 补，修 r360
+// 注册时遗留的 round-295 E 段 TypeError）。
 function taggedGroups(R, groups) {
   const out = [];
   for (const [name, defs] of groups) {
-    const list = Object.prototype.hasOwnProperty.call(R, name) ? (R[name] || []) : defs;
+    let list = Object.prototype.hasOwnProperty.call(R, name) ? (R[name] || []) : defs;
+    if (!Array.isArray(list)) list = [list];
     for (const re of list) out.push({ name, re });
   }
   return out;
