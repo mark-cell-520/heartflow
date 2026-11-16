@@ -1,5 +1,5 @@
 /**
- * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 29 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族）
+ * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 30 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族 + r369 节约悖误扩族）
  *
  * 背景（实例化 ≠ 接线 的集中清理）：
  *   r219-r253 三十多轮里，4 号按「经济与资源推理 / 统计素养」选题库逐族起草了
@@ -26,6 +26,12 @@
  *     顺差越大越富、进口越多越吃亏；探针攻击穿透 9/10、良性非 pass
  *     1/9 系存量 confidence 维度误拦非本族增量；CONCEPT 须概念名与
  *     框架词共现，防「重商主义其实是对的」前缀绕过）。
+ *   r369 补入节约悖误/合成谬误宏观储蓄形（src/paradox-of-thrift.js：节俭
+ *     概念 × 普遍量化词 × 总量向好断言 三腿近距共现——先用「储蓄是美德」
+ *     取得正当性，再把个体美德直接加总为「全社会越节俭经济越繁荣/总需求
+ *     不受影响」，免掉「减少消费会压缩总需求」的宏观机制；同池两候选定拨，
+ *     本族攻击穿透 3/7 且良性零误伤 0/5，存量维度对组合谬误零覆盖；三腿 +
+ *     CONCEPT/CORRECT 两组豁免 + 强否定守卫；腿③拆 NOHARM/POSITIVE 两桶）。
  *
  * 维度计数不变（gate 层 dimMap 仍无这些键——给 1 号的交接项）；
  * src/index.js 零改动。
@@ -89,6 +95,13 @@ const FAMILIES = [
   // confidence 误拦非本族增量）；双腿 + CONCEPT/CORRECT 两组豁免 + 强否定
   // 守卫；CONCEPT 须概念名与框架词共现防前缀绕过）
   { key: 'mercantilism',                   mod: '../../mercantilism.js',                   fn: 'detectMercantilism',               group: 'econ',  zh: '重商主义贸易顺差谬误',   en: 'mercantilism (trade-surplus wealth misattribution)', round: 'r368' },
+  // r369 新增：节约悖误/合成谬误宏观储蓄形（econ 族第 26 子族——节俭概念 ×
+  // 普遍量化词 × 总量向好断言 三腿近距共现：先用「储蓄是美德」取得正当性，
+  // 再把个体美德直接加总为「全社会越节俭经济越繁荣/总需求不受影响」；同池
+  // 两候选定拨，本族攻击穿透 3/7 且良性零误伤 0/5（对手 lump_of_labor 穿透
+  // 3/11 但良性误伤 4/7 边界脏）；三腿 + CONCEPT/CORRECT 两组豁免 + 强否定
+  // 守卫；腿③拆 NOHARM/POSITIVE 两桶解「总需求不会增长」良性纠正误伤）
+  { key: 'paradox_of_thrift',              mod: '../../paradox-of-thrift.js',              fn: 'detectParadoxOfThrift',            group: 'econ',  zh: '节约悖误/合成谬误宏观储蓄形', en: 'paradox of thrift (composition fallacy in aggregate saving)', round: 'r369' },
 ];
 
 const _cache = new Map();
@@ -159,8 +172,8 @@ function analyze(text, opts) {
 
 const plugin = {
   name: 'econ-reasoning-check',
-  version: '1.5.0', // r368：+重商主义贸易顺差谬误子族（mercantilism）
-  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 29 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox / carbon_leakage / price_control / mercantilism。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）；r366 补入 src/carbon-leakage.js 的碳泄漏/污染避难所子族（产能转移 × 问题解决断言/外部化免责，探针 5/6 穿透、良性零误命中）；r367 补入 src/price-control.js 的价格管制单效应断言子族（具体管制工具在场 × 只会-不会/无副作用/供给自动适配单边收益断言，同池 8 候选定拨穿透最高 4/5、良性 0/3 零误命中，探针 0/14 的 lead-time bias 候选被存量维度全面代拦后转同池定拨）；r368 补入 src/mercantilism.js 的重商主义贸易顺差谬误子族（贸易差额语境 × 财富得失单边归因：出口/顺差才叫赚钱、进口/逆差就是财富外流、顺差越大越富、进口越多越吃亏，探针攻击穿透 9/10、良性非 pass 1/9 系存量 confidence 维度误拦非本族增量，CONCEPT 须概念名与框架词共现防前缀绕过）。',
+  version: '1.6.0', // r369：+节约悖误/合成谬误宏观储蓄形子族（paradox_of_thrift）
+  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 30 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族 + r369 节约悖误扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox / carbon_leakage / price_control / mercantilism / paradox_of_thrift。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）；r366 补入 src/carbon-leakage.js 的碳泄漏/污染避难所子族（产能转移 × 问题解决断言/外部化免责，探针 5/6 穿透、良性零误命中）；r367 补入 src/price-control.js 的价格管制单效应断言子族（具体管制工具在场 × 只会-不会/无副作用/供给自动适配单边收益断言，同池 8 候选定拨穿透最高 4/5、良性 0/3 零误命中，探针 0/14 的 lead-time bias 候选被存量维度全面代拦后转同池定拨）；r368 补入 src/mercantilism.js 的重商主义贸易顺差谬误子族（贸易差额语境 × 财富得失单边归因：出口/顺差才叫赚钱、进口/逆差就是财富外流、顺差越大越富、进口越多越吃亏，探针攻击穿透 9/10、良性非 pass 1/9 系存量 confidence 维度误拦非本族增量，CONCEPT 须概念名与框架词共现防前缀绕过）；r369 补入 src/paradox-of-thrift.js 的节约悖误/合成谬误宏观储蓄形子族（节俭概念 × 普遍量化词 × 总量向好断言 三腿近距共现：个体储蓄美德被直接加总为总量利好、免掉减少消费会压缩总需求的宏观机制，同池两候选定拨穿透 3/7、良性 0/5 零误命中，腿③拆 NOHARM/POSITIVE 两桶解「总需求不会增长」良性纠正误伤）。',
   hooks: [
     { event: 'postprocess.think', priority: 190 }, // 190 > sycophancy-check 的 180：升序执行，本插件最后跑，merge 进已存在的 _discrimination（sycophancy 会整体覆写该对象）
   ],

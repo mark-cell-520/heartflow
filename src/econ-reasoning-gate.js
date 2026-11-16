@@ -91,6 +91,16 @@ const FAMILIES = [
   //   框架词共现，防「重商主义其实是对的」前缀绕过；「买国货才是爱国」
   //   经济民族主义形不判（超财富得失范围，样本靠净流出子句承重）。
   { key: 'mercantilism',                  mod: './mercantilism.js',               fn: 'detectMercantilism',         zh: '重商主义贸易顺差谬误',     en: 'mercantilism (trade-surplus wealth misattribution)', round: 'r368' },
+  // r369 新增：节约悖误/合成谬误宏观储蓄形（paradox of thrift / composition
+  //   fallacy in aggregate saving——节俭概念 × 普遍量化词 × 总量向好断言 三
+  //   腿近距共现：先用「储蓄是美德」取得正当性，再把个体美德直接加总为
+  //   「全社会越节俭经济越繁荣/总需求不受影响」，免掉「减少消费会压缩总
+  //   需求」的宏观机制；同池两候选定拨，本族攻击穿透 3/7 且良性零误伤
+  //   0/5（对手 lump_of_labor 穿透 3/11 但良性误伤 4/7、边界脏），存量
+  //   维度对组合谬误零覆盖；三腿 + CONCEPT/CORRECT 两组豁免 + 强否定守卫；
+  //   腿③拆 NOHARM（不会下降/受影响，免否定守卫）与 POSITIVE（增长/繁荣，
+  //   受否定守卫）两桶，解「总需求不会增长」良性纠正误伤）。
+  { key: 'paradox_of_thrift',              mod: './paradox-of-thrift.js',          fn: 'detectParadoxOfThrift',      zh: '节约悖误/合成谬误宏观储蓄形', en: 'paradox of thrift (composition fallacy in aggregate saving)', round: 'r369' },
 ];
 
 const _cache = new Map();
@@ -114,7 +124,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 24 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 25 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
