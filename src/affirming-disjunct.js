@@ -399,7 +399,10 @@ function checkAffirmingDisjunct(text) {
 }
 
 function _HIT(bA, bB, aff, excl, marker, lang) {
-  const score = 70;
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 70 进引擎后 severity=7000 → overallScore=0 → 把 VERIFY 级维度
+  // 顶成 rewrite。与全引擎 0-1 制式对齐（findings 门槛 0.15）。
+  const score = 0.7;
   return {
     hit: true,
     score,

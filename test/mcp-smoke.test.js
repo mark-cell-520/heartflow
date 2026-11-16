@@ -1,6 +1,12 @@
 /**
  * MCP Smoke Test — 轻量冒烟测试关键MCP工具
  */
+// [全局修复 2026-11-16] 第 15 行 require mcp-server.js 会经 require 链加载
+// src/utils/stdio-guard.js——它把「非 JSON-RPC 帧」的 stdout 写入改道 stderr，
+// 末尾的汇总行随之流失，run-all 只 capture stdout → 本文件被计「未输出汇总行」。
+// 先例：round-733-injection-synonyms.test.js:38-45。require 引擎模块前关掉守卫。
+process.env.HF_KEEP_STDOUT_LOGS = process.env.HF_KEEP_STDOUT_LOGS || '1';
+
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');

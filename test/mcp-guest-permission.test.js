@@ -16,10 +16,22 @@ const path = require('path');
 const net = require('net');
 const fs = require('fs');
 const os = require('os');
+const crypto = require('crypto');
 const { spawn } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SOCK = path.join(os.tmpdir(), `hf-perm-test-${process.pid}.sock`);
+// [全局修复 2026-11-16] Windows 无 AF_UNIX 文件 socket（listen 一律
+// EACCES，Node v24 实测 5 种路径形态全败），改用命名管道；POSIX 维持
+// tmpdir 文件 socket。先例：round-627-strategic-restraint-mcp.test.js:88、
+// knowledge-graph-mcp-state-round593.test.js:72（均为 [v6.8.85 审计修复]）。
+const SOCK = process.platform === 'win32'
+  ? `\\\\.\\pipe\\hf-perm-test-${process.pid}`
+  : path.join(os.tmpdir(), `hf-perm-test-${process.pid}.sock`);
+// [全局修复 2026-11-16] server 侧 token：mcp-server.js 缺 token 时
+// fail-close 拒绝启动（进程加载期 exit 1），净室（无 .env）下单跑必崩。
+// 与 mcp-auth-e2e-real.test.js:65 同族——自生成测试 token 经 env 传入。
+// 注意不设 HEARTFLOW_MCP_TOKEN（优先级更高，会让 e2e-real 的匿名探测失真）。
+const TEST_TOKEN = 'test-' + crypto.randomBytes(24).toString('hex');
 
 const WRITE_TOOLS = [
   'heartflow_memory_write_control',
@@ -78,9 +90,18 @@ async function waitForSocket(proc, deadlineMs) {
   const deadline = Date.now() + deadlineMs;
   while (Date.now() < deadline) {
     if (proc.exitCode !== null) throw new Error(`MCP 进程提前退出 code=${proc.exitCode}`);
-    if (fs.existsSync(SOCK)) {
+    if (process.platform !== 'win32' && fs.existsSync(SOCK)) {
       await new Promise(r => setTimeout(r, 1500)); // 等 listen 回调完成
       return;
+    }
+    // [全局修复 2026-11-16] win32 命名管道无文件形态，existsSync 恒 false；
+    // 以「建连成功」为就绪信号（同 round-627:138-144 先例）。
+    if (process.platform === 'win32') {
+      const ok = await new Promise(res => {
+        const c = net.createConnection(SOCK, () => { c.end(); res(true); });
+        c.on('error', () => res(false));
+      });
+      if (ok) return;
     }
     await new Promise(r => setTimeout(r, 250));
   }
@@ -98,7 +119,11 @@ module.exports = function ({ test }) {
   const flow = (async () => {
     try { fs.unlinkSync(SOCK); } catch (_) {}
     proc = spawn('node', [path.join(ROOT, 'src/mcp-server.js'), '--socket', SOCK], {
-      cwd: ROOT, stdio: ['ignore', 'ignore', 'ignore']
+      cwd: ROOT, stdio: ['ignore', 'ignore', 'ignore'],
+      // [全局修复 2026-11-16] 传入测试 token，避免净室（无 .env）下 server
+      // fail-close 拒启；不设 HEARTFLOW_MCP_TOKEN（更高优先级，会干扰
+      // mcp-auth-e2e-real 的匿名提权探测）。
+      env: { ...process.env, MCP_HEARTFLOW_KEY: TEST_TOKEN },
     });
     proc.on('error', e => { setupError = e.message; });
     await waitForSocket(proc, 25000);

@@ -182,6 +182,23 @@ t('维度总数匹配', () => {
     `AGENTS.md 说 ${m[1]} dimensions，实测 ${M.dimensions}`);
 });
 
+// [全局修复 2026-11-16] package.json 的 description 数字此前**无任何守卫**——
+// 191 dimensions / 161 modules 停在那里腐化（实测 240 / 162），npm 页面与
+// README 口径不一致。按「文档数字必须可度量」原则补上：description 里的
+// discrimination dimensions 与 modules 两个数与运行时实测比对。
+t('package.json description 维度/模块数与实测一致', () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(HF, 'package.json'), 'utf8'));
+  const desc = String(pkg.description || '');
+  const dm = desc.match(/(\d+)\s+discrimination dimensions/);
+  assert.ok(dm, 'package.json description 找不到 discrimination dimensions 数字');
+  assert.strictEqual(parseInt(dm[1], 10), M.dimensions,
+    `package.json 说 ${dm[1]} dimensions，实测 ${M.dimensions}`);
+  const mm = desc.match(/(\d+)\s+modules/);
+  assert.ok(mm, 'package.json description 找不到 modules 数字');
+  assert.strictEqual(parseInt(mm[1], 10), M.modules,
+    `package.json 说 ${mm[1]} modules，实测 ${M.modules}`);
+});
+
 console.log('\n[README.md 与 SKILL.md 宣称值必须匹配（v6.7.78 补充）]');
 
 const README = path.join(HF, 'README.md');

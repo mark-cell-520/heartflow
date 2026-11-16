@@ -84,12 +84,23 @@ function fs_readServerSrc() {
     ['L1Status', 'L2Status', 'L3Status', 'L4Status', 'L5Status'].every(k => k in L));
 
   const L1 = L.L1 || {};
-  ok('C5 L1 allAssociations 非空（词汇联想真的产出）',
-    Array.isArray(L1.allAssociations) && L1.allAssociations.length > 0,
-    'n=' + ((L1.allAssociations || []).length));
-  ok('C6 L3 matchedPrototype 命中（叙事匹配真的产出）',
-    !!(L.L3 && L.L3.matchedPrototype),
-    L.L3 && L.L3.matchedPrototype ? 'name=' + L.L3.matchedPrototype.name : 'null');
+  // [全局修复 2026-11-16] C5/C6 依赖 dict-data/association-graph.json（2388 节点 /
+  // 7877 条真实边）——该文件在 .gitignore 内（08dc14f8 大文件移出追踪），只存在于
+  // 有完整数据副本的机器。净室里 src 侧节点全空数组、桥接合并 0 边，L1 联想恒空、
+  // L3 无匹配原型——引擎行为正确（五层 success），是数据缺失不是引擎缺陷。
+  // 图在位时严格断言，缺失时明确 SKIP 并打原因。C7/C8/C9 是结构断言，不受影响。
+  const DICT_GRAPH = path.join(ROOT, 'dict-data', 'association-graph.json');
+  const graphPresent = require('fs').existsSync(DICT_GRAPH);
+  if (!graphPresent) {
+    console.log('  ⏭ SKIP C5/C6: dict-data/association-graph.json 缺失（gitignore 数据文件，本机无联想边）');
+  } else {
+    ok('C5 L1 allAssociations 非空（词汇联想真的产出）',
+      Array.isArray(L1.allAssociations) && L1.allAssociations.length > 0,
+      'n=' + ((L1.allAssociations || []).length));
+    ok('C6 L3 matchedPrototype 命中（叙事匹配真的产出）',
+      !!(L.L3 && L.L3.matchedPrototype),
+      L.L3 && L.L3.matchedPrototype ? 'name=' + L.L3.matchedPrototype.name : 'null');
+  }
   const L4Concepts = (((L.L4 || {}).thoughtVector || {}).activatedConcepts) || [];
   ok('C7 L4 activatedConcepts 存在且是数组（语义凝结层可读）',
     Array.isArray(L4Concepts), 'n=' + L4Concepts.length);
@@ -120,11 +131,17 @@ function fs_readServerSrc() {
     };
   } catch (e) { threw = e; }
   ok('D1 handler 字段提取路径不抛', !threw, threw ? threw.message : 'ok');
-  ok('D2 coreConcepts 可取非空数组（图内词句）',
-    !!extracted && Array.isArray(extracted.coreConcepts) && extracted.coreConcepts.length > 0,
-    'n=' + ((extracted && extracted.coreConcepts) || []).length);
-  ok('D3 matchedNarrative 可取非空（图内词句）',
-    !!extracted && !!extracted.matchedNarrative);
+  // [全局修复 2026-11-16] D2/D3 与 C5/C6 同因：依赖 dict-data 联想边
+  // （缺失时 L1 恒空、L3 无原型）。图在位时严格断言，缺失时明确 SKIP。
+  if (!graphPresent) {
+    console.log('  ⏭ SKIP D2/D3: dict-data/association-graph.json 缺失（gitignore 数据文件，本机无联想边）');
+  } else {
+    ok('D2 coreConcepts 可取非空数组（图内词句）',
+      !!extracted && Array.isArray(extracted.coreConcepts) && extracted.coreConcepts.length > 0,
+      'n=' + ((extracted && extracted.coreConcepts) || []).length);
+    ok('D3 matchedNarrative 可取非空（图内词句）',
+      !!extracted && !!extracted.matchedNarrative);
+  }
   ok('D4 response 可取非空字符串（L5 或顶层）',
     !!extracted && typeof extracted.response === 'string' && extracted.response.length > 0,
     'len=' + ((extracted && extracted.response) || '').length);

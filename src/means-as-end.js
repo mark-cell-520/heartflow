@@ -340,7 +340,9 @@ function checkMeansAsEnd(text, inject) {
   const guidance = '过程完成不等于目标达成——流程/清单/步骤走完只说明动作已执行，' +
     '目标是否出现要用目标侧证据检验（客户续约率/故障修复率/实测数据/验收报告），' +
     '或明示为待验证状态而非既成结论。';
-  return { score: 45, details, guidance };
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 45 会经 severity=4500 → overallScore=0 把 VERIFY 维度顶成 rewrite。
+  return { score: 0.45, details, guidance };
 }
 
 function _firstHit(text, zh, en) {

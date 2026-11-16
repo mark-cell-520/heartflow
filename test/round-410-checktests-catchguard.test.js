@@ -78,8 +78,14 @@ console.log(`[抽取] catch 分支判据: ${catchOk}\n`);
 if (!tryOk || !catchOk) {
   console.log('══ checkTests 判据对称性负例（r410）══');
   console.log(`  ${GREEN}SKIP${RESET} 判据锚点消失 :: checkTests 全量回归判据已按 r412 移除（详见 guard-abilities.js 头部 r412 证据注释），本守卫跳过，不伪造通过`);
-  console.log('\n结果: 0 通过, 0 失败, 共 0 个');
-  console.log(`${GREEN}SKIP 0/0 符合预期${RESET}`);
+  // [全局修复 2026-11-16] 原此处打印「结果: 0 通过, 0 失败, 共 0 个」——
+  // run-all 的零注册守卫（「0 通过, 0 失败」记 1 个失败）会把这个
+  // **合法的跳过**判成空壳失败，而 SKIP 分支只在没有任何数字汇总时才
+  // 可达（解析顺序：数字汇总 → 分数式 → PASS/SKIP 行）。改打裸 SKIP 行
+  // （run-all 识别 `^\s*SKIP\b`，不计失败也不计通过），并保留 exit 0。
+  // 真·零用例空壳（注册了 mount 却不调 test()）仍被零注册守卫抓。
+  console.log('SKIP 判据锚点消失（r412 已移除全量回归判据）');
+  console.log('SKIP 0/0 符合预期');
   process.exit(0);
 }
 

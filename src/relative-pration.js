@@ -280,13 +280,15 @@ function checkRelativePrivation(text) {
   if (!dismissHit) return { score: 0, name: 'relative_pration', count: 0 };
 
   // 双腿共现 → 命中，按共现强度加权。
-  let score = 60;
-  if (_any(RP_COMPARATIVE_ZH, text)) score += 15;
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 60 会经 severity=6000 → overallScore=0 把 VERIFY 维度顶成 rewrite。
+  let score = 0.6;
+  if (_any(RP_COMPARATIVE_ZH, text)) score += 0.15;
   const sufferCount = RP_SUFFER_ZH.filter((r) => r.test(text)).length;
-  if (sufferCount >= 2) score += 10;
-  if (RP_DISMISS_STRONG_ZH.some((w) => text.includes(w)) || _any(RP_DISMISS_STRONG_EN, text)) score += 10;
-  if (sufferHit && dismissHit && /[！？!?]/.test(text)) score += 5;
-  score = Math.min(score, 95);
+  if (sufferCount >= 2) score += 0.1;
+  if (RP_DISMISS_STRONG_ZH.some((w) => text.includes(w)) || _any(RP_DISMISS_STRONG_EN, text)) score += 0.1;
+  if (sufferHit && dismissHit && /[！？!?]/.test(text)) score += 0.05;
+  score = Math.min(score, 0.95);
 
   return { score, name: 'relative_pration', count: 1 };
 }

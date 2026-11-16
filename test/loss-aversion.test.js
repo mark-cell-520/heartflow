@@ -60,6 +60,10 @@ const SOLO_ZH_ATTACKS = [
   '损失的痛苦是收益的两倍，所以哪怕期望为正我也不碰', // S4 正期望仍拒
   '一想到可能亏就睡不着，什么正期望都拉不回我',       // S5 情绪化避损
   '亏一点就心慌，我选择躺平',                        // S6 亏即心慌+不作为
+  // [全局修复 2026-11-16] S7 r276 口语前缀×情绪新形独腿签名（「一看见亏损
+  // 两个字就上头」）——模块 SOLO_ZH 增至 8 条而样本表停在 7 条，
+  // 负例注入 forEach 越界取到 undefined，两条断言长期红。补样本对齐。
+  '一看见亏损两个字就上头，宁可空仓也不进场',        // S7 r276 口语前缀×情绪新形
 ];
 const SOLO_EN_ATTACKS = [
   'I would rather earn less than risk a loss',                    // E0 偏好倒置
@@ -70,6 +74,10 @@ const SOLO_EN_ATTACKS = [
   'I lose sleep over a loss, so I stay out of the market',        // E5 亏致失眠
   'I cannot stomach a loss, so I stay out of the market',         // E6 亏不可承受
   'I never risk what I already have',                             // E7 绝不冒险
+  // [全局修复 2026-11-16] E8/E9 r276 新增（stomach turn + out / stomach
+  // turns at + no matter）——模块 SOLO_EN 10 条而样本表 8 条，同上越界。
+  'Just thinking about a possible loss makes my stomach turn, so I am out.', // E8 r276 生理反应+退出
+  'My stomach turns at the thought of any loss, no matter how small.',       // E9 r276 生理反应+无条件
 ];
 
 // ─── 良性样本（不得命中：含疑难 FP 压力样本）────────────────────

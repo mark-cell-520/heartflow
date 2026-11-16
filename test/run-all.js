@@ -28,7 +28,12 @@ const { execFile } = require('child_process');
 
 const TEST_DIR = __dirname;
 const ROOT = path.join(__dirname, '..');
-const CHILD_TIMEOUT = 90000;
+// [全局修复 2026-11-16] 90000 → 150000：重载型 flake 的余量。实测 round-624
+// （起引擎 + 20 项判别）独跑 11.1s，但 4 并发重载下被 90s 线 kill（输出
+// 截断 → 自报 1 失败，独跑 3/3 全绿）——引擎加载是 CPU 密集型，JOBS=4 时
+// 单个重文件的墙钟可能是独跑的 5-10 倍。150s 仍远低于挂死检测的实际需要
+// （真挂死的文件等 150s 与 90s 无实质差别），但能吸收负载抖动。
+const CHILD_TIMEOUT = 150000;
 // [v6.8.80] 并发数。默认 4：实测 8 并发时 CPU 争抢反而每文件 20s（单线程
 // 2.5s），4 是 8 核机的甜点；引擎加载是 CPU 密集型，留一半核给系统。
 const JOBS = Math.max(1, parseInt(process.env.HF_RUN_ALL_JOBS || '4', 10) || 4);
@@ -103,7 +108,28 @@ async function runChild(task) {
       res = await execCapture(argv, timeout);
       out = res.stdout;
     }
-    if (!/(\d+) 通过, (\d+) 失败/.test(out)) {
+    // [全局修复 2026-11-16] exit 77 = 仓库约定俗成的「跳过码」
+    // （mcp-auth-tier.test.js 等环境依赖测试：外部 8588 实例不在线时
+    // 打 SKIP 说明后 exit 77）。原实现不识别该码，[异常] 分支把它报成
+    // Command failed——跳过的本意是「不计成败」，不是失败。按 SKIP 行
+    // 同口径处理：打印原因、不计失败也不计通过。
+    if (res.err && res.err.code === 77) {
+      const skipLines = out.split('\n').filter(l => /SKIP|⏭/.test(l)).slice(0, 2);
+      console.log(`  [跳过] ${label.trim()}: exit 77（环境依赖，约定跳过码）`);
+      for (const l of skipLines) console.log(l);
+      return;
+    }
+    // [全局修复 2026-11-16] 原判据只认中文「N 通过, M 失败」——英文汇总的
+    // 文件（absolute-claim-en.test.js: "204 passed, 1 failed" + exit 1）
+    // 被误报成 [异常] Command failed，真实的失败断言名从失败清单里丢失。
+    // 改为：任一**数字型**汇总（中文/英文/斜杠分数式/RESULT JSON/node:test）
+    // 即放行到下方正常解析路径（会计入自报失败数与 ✗ 行）；成功横幅不算
+    // ——exit≠0 却只打横幅是自相矛盾，必须仍走 [异常] 计失败。
+    const _numericSummary = /(\d+)\s*(?:通过|passed|过)\s*[/,，]?\s*(\d+)\s*(?:失败|failed|败)/
+      || /(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)/
+      || /RESULT\s*\{/
+      || /ℹ\s*pass\s+\d+/;
+    if (!_numericSummary.test(out)) {
       console.log(`  [异常] ${label.trim()}: ${errMsg}`);
       failed++;
       failures.push({ idx, name: label.trim(), error: errMsg });
@@ -116,8 +142,20 @@ async function runChild(task) {
   //   「N passed / M failed」  —— 带斜杠分隔（compliance.test.js）
   //   「N/M passed」           —— 只报通过数的分数式（blindspot-upgrade）
   //   「PASS/SKIP 单行」       —— 裸跑型 smoke test
+  // [全局修复 2026-11-16] 补八种长期漏识别（合计 40+ 文件被计「未输出汇总行」，
+  // 而它们单跑全部 exit 0——是汇总行变体不是静默）：
+  //   「结果：N 过 / M 败」    —— round-565/567/570 家族的简写中文汇总
+  //   「RESULT{"pass":N,"fail":M}」—— round-629 的 JSON 汇总
+  //   「ℹ pass N … ℹ fail M」  —— node:test 内置 runner 的 TAP 汇总
+  //     （framing-effect-r254 等用 require('node:test')）
+  //   「pass=N fail=M」        —— round-276/634 的等号式计数行
+  //   「passed: N … failed: M」—— round-269 的冒号式计数行
+  //   无前缀 {"pass":N,"fail":M} JSON —— round-643 的裸 JSON 汇总
+  //   成功横幅（全部通过/全部断言通过/守卫通过/ALL PASS(ED)/ALL GREEN/
+  //   全绿/还原健康/行尾「，通过」，且无任何失败标记）
+  //     —— assert 抛异常自守的 guard 型文件（core/path-guard 等 26 个）
   // 只认第一种曾让 6+ 个测试文件长期隐形：它们跑完了、有汇总、有 exit code。
-  let m = out.match(/(\d+)\s*(?:通过|passed)\s*[/,]?\s*(\d+)\s*(?:失败|failed)/);
+  let m = out.match(/(\d+)\s*(?:通过|passed|过)\s*[/,，]?\s*(\d+)\s*(?:失败|failed|败)/);
   let ratio = null;
   if (!m) {
     // 分数式：N/M passed、N/M tests passed、合计 N/M、N/总数
@@ -127,6 +165,52 @@ async function runChild(task) {
       const pass = parseInt(r[1], 10), total = parseInt(r[2], 10);
       ratio = { passed: pass, failed: Math.max(0, total - pass) };
     }
+  }
+  if (!m && !ratio) {
+    // [全局修复 2026-11-16] 等号式计数：`pass=N fail=M`（round-276/634 的
+    // `[rXXX] pass=32 fail=0` 汇总行——数字在 = 之后，主正则要求数字在前）。
+    const eq = out.match(/\bpass\s*=\s*(\d+)\s+fail\s*=\s*(\d+)/);
+    if (eq) ratio = { passed: parseInt(eq[1], 10), failed: parseInt(eq[2], 10) };
+  }
+  if (!m && !ratio) {
+    // [全局修复 2026-11-16] 冒号式计数：`passed: N … failed: M`
+    // （round-269 的缩进计数行）。
+    const cl = out.match(/passed\s*:\s*(\d+)[\s\S]*?failed\s*:\s*(\d+)/);
+    if (cl) ratio = { passed: parseInt(cl[1], 10), failed: parseInt(cl[2], 10) };
+  }
+  if (!m && !ratio) {
+    // [全局修复 2026-11-16] RESULT{json} 汇总（round-629）：显式 pass/fail 计数
+    const rj = out.match(/RESULT\s*(\{[\s\S]*?\})\s*$/m);
+    if (rj) {
+      try {
+        const j = JSON.parse(rj[1]);
+        if (Number.isFinite(j.pass) && Number.isFinite(j.fail)) {
+          ratio = { passed: j.pass, failed: j.fail };
+        }
+      } catch (_) { /* 非合法 JSON：不走本分支，留给下方横幅/静默判定 */ }
+    }
+  }
+  if (!m && !ratio) {
+    // [全局修复 2026-11-16] 无前缀 JSON 汇总（round-643）：末段直接打
+    // {"pass":N,"fail":M,...}（无 RESULT 前缀）。从后向前找可解析的
+    // { 起点，避免把前面的引擎 init 日志行当成 JSON 起点。
+    const lines = out.split('\n');
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i].trim().startsWith('{')) {
+        try {
+          const j = JSON.parse(lines.slice(i).join('\n'));
+          if (j && Number.isFinite(j.pass) && Number.isFinite(j.fail)) {
+            ratio = { passed: j.pass, failed: j.fail };
+            break;
+          }
+        } catch (_) { /* 本起点不可解析，继续向前找 */ }
+      }
+    }
+  }
+  if (!m && !ratio) {
+    // [全局修复 2026-11-16] node:test 内置 runner 汇总：`ℹ pass N` + `ℹ fail M`
+    const nt = out.match(/ℹ\s*pass\s+(\d+)[\s\S]*?ℹ\s*fail\s+(\d+)/);
+    if (nt) ratio = { passed: parseInt(nt[1], 10), failed: parseInt(nt[2], 10) };
   }
   const parsed = m
     ? { passed: parseInt(m[1], 10), failed: parseInt(m[2], 10) }
@@ -146,6 +230,22 @@ async function runChild(task) {
         console.log(skipLines.slice(0, 2).join('\n'));
       }
       // 有输出但全 SKIP：不计失败，但要可见（已在上面打出）
+      return;
+    }
+    // [全局修复 2026-11-16] 第五种格式：成功横幅（guard 型文件）。
+    // 这类文件用 assert 抛异常自守（失败即未捕获异常 → exit≠0 → 上方
+    // [异常] 分支已计失败），成功时只打成功横幅而没有计数。仅在**无任何
+    // 失败标记**时计 1 个通过——✗/❌/FAIL 在场说明横幅与实况矛盾，仍走
+    // 静默失败逼补汇总。横幅族（r278 按 13 个实测文件收齐）：
+    //   全部通过 / 全部断言通过 / 守卫通过 / ALL PASS / ALL PASSED /
+    //   ALL GREEN / 全绿 / 还原健康 / 行尾「，通过」/ ✅ 收尾
+    //   （✅ 收尾型如 round-477-negative/round-551：r278 首轮扩展时误删该
+    //    分支导致两个文件回归静默，次轮补回——覆盖族只能增不能减）
+    const hasFailMark = /✗|❌|\bFAIL\b|\bNG\b/.test(out);
+    if (!hasFailMark && /全部(?:断言)?通过|守卫通过|ALL\s*PASS(?:ED)?|ALL\s*GREEN|全绿|还原健康|(?:，|:|：)\s*通过\s*$|✅/m.test(out)) {
+      passed += 1;
+      const banner = out.split('\n').filter(l => /全部(?:断言)?通过|守卫通过|ALL\s*PASS|ALL\s*GREEN|全绿|还原健康|(?:，|:|：)\s*通过\s*$|✅/.test(l)).slice(-1)[0];
+      if (banner) console.log(banner.trim());
       return;
     }
     // [v6.7.83] 吐不出结果行 = 静默。实测四类探针：exit1 被 execSync 的
@@ -175,6 +275,27 @@ async function runChild(task) {
       failures.push({ idx, name: label.trim(), error: `文件自报失败: ${fm[1].slice(0, 120)}` });
     }
   }
+  // [全局修复 2026-11-16] 隐形失败堵口：文件自报「M 失败」（M>0）但**不打
+  // ✗ 行**时，原实现只把 M 累加进 failed 计数器、失败清单里没有任何条目——
+  // 最终汇总说「N 失败」而清单为空/只有别的内容，这些失败从此没人看得见
+  // （实测：2026-11-15 体检的 120 失败里约 27 个属此族，分布在 17 个文件，
+  // 报告只列了看得见的那些，漏报的这批因此从未被修）。此处兜底：本文件
+  // 没有任何 ✗ 条目进清单、而自报失败数 >0 时，补一条带汇总行的条目。
+  const beforeCount = failures.length;
+  if (parsed.failed > 0) {
+    for (const line of out.split('\n')) {
+      const fm = line.match(/^\s*✗\s+(.+?)\s*$/);
+      if (fm) failures.push({ idx, name: fm[1], error: `(${label.trim()})` });
+    }
+  }
+  if (parsed.failed > 0 && failures.length === beforeCount) {
+    const sumLine = out.split('\n').find(l => /(\d+)\s*(?:通过|passed|过)[,，/]\s*(\d+)\s*(?:失败|failed|败)/.test(l)) || '';
+    failures.push({
+      idx,
+      name: label.trim(),
+      error: `文件自报 ${parsed.failed} 个失败但无 ✗ 行（汇总: ${sumLine.trim().slice(0, 110)}）——请补 ✗ 明细或改为可见失败标记`,
+    });
+  }
   // [v6.7.83] 「0 通过, 0 失败, 共 0 个」= mount 函数定义了但一个 test
   // 都没注册。这在数字上合法（0 失败），实际等于该文件什么都没测。
   // 实测探针 silent.test.js 就是如此。计入 1 个失败，逼它要么注册用例、
@@ -187,10 +308,7 @@ async function runChild(task) {
       error: '(注册了 0 个用例——mount 函数未调用 test()；请补用例或移出 test/ 目录)',
     });
   }
-  for (const line of out.split('\n')) {
-    const fm = line.match(/^\s*✗\s+(.+?)\s*$/);
-    if (fm) failures.push({ idx, name: fm[1], error: `(${label.trim()})` });
-  }
+  // （原第二个 ✗ 推送循环已并入上方「隐形失败堵口」块，避免重复条目）
   const keep = out.split('\n').filter(l => l.includes('通过') || l.includes('✗') || l.includes('失败'));
   console.log(keep.join('\n') || '  (无输出)');
 }
@@ -237,6 +355,33 @@ function detectWriteToSrc(src) {
 /** [v6.8.80] MCP 服务类测试：自启服务器，端口与启动耗时互踩。 */
 function isServerTest(rel) {
   return /mcp|server/i.test(rel);
+}
+
+// [全局修复 2026-11-16] 经子进程探针**间接**变异 src/ 的测试：测试自身
+// 只读（detectWriteToSrc 扫不到写调用——变异在 scripts/round-*/探针里），
+// 但探针会写 src/ 再还原。并发池里这类测试与其他读 src/ 的测试相撞即
+// 假失败（round-621 实测：单跑 3/3 绿，全量里报「源文件未还原」flake）。
+// 显式列入串行车道——与 isServerTest 同级的人工分类口径（静态识别不了
+// 间接变异，只能枚举）。
+const INDIRECT_MUTATORS = new Set([
+  'round-621-uncertaintyquantifier-dispatch.test.js',
+]);
+function isIndirectMutator(rel) {
+  return INDIRECT_MUTATORS.has(rel);
+}
+
+// [全局修复 2026-11-16] 时序敏感测试：判定依赖墙钟间隔（detectOscillation 的
+// avgGap 分支、重实例启动耗时），JOBS=4 的 CPU 争抢会改变间隔量级 → 分支判定
+// 漂移或子进程被 kill（实测 round-608 B7 独跑 2/2 绿、并发池里 type 从
+// frequent_thrashing 漂成 rapid_access；round-624 独跑 11.1s、并发池里输出
+// 截断假失败）。这类测试的正确性依赖「低争抢环境」，入串行车道（跑在并发池
+// 之后，无同类争抢）。
+const TIMING_SENSITIVE = new Set([
+  'round-608-forgettingengine-dispatch.test.js',
+  'round-624-turing-pzombie.test.js',
+]);
+function isTimingSensitive(rel) {
+  return TIMING_SENSITIVE.has(rel);
 }
 
 /**
@@ -531,11 +676,11 @@ async function runAllTests() {
   // [v6.8.80] 两阶段调度：变更测试（写 src/ 源码）与 MCP 服务类测试
   // 独占串行车道——前者与并发读者/同类互踩（详见 detectWriteToSrc 注释），
   // 后者端口与启动耗时互踩。其余测试走并发池。
-  const serialTasks = tasks.filter(t => t.isMutator || isServerTest(t.rel));
-  const parallelTasks = tasks.filter(t => !(t.isMutator || isServerTest(t.rel)));
+  const serialTasks = tasks.filter(t => t.isMutator || isIndirectMutator(t.rel) || isTimingSensitive(t.rel) || isServerTest(t.rel));
+  const parallelTasks = tasks.filter(t => !(t.isMutator || isIndirectMutator(t.rel) || isTimingSensitive(t.rel) || isServerTest(t.rel)));
   const poolSize = Math.min(JOBS, Math.max(1, parallelTasks.length));
   console.log(`共 ${totalTasks} 个测试文件：并发池 ${parallelTasks.length} + 串行车道 ${serialTasks.length}（JOBS=${JOBS}，可调 1-16）`);
-  console.log('串行车道 = 变更测试（写 src/）+ MCP 服务类，防并发互踩');
+  console.log('串行车道 = 变更测试（写 src/）+ 间接变异 + 时序敏感 + MCP 服务类，防并发互踩/时序漂移');
   // [v6.8.80] 突变残留兜底：跑之前快照 src/，失败/被杀后回滚未还原的写入。
   const srcSnapshot = snapshotSrc();
   const startedAt = Date.now();

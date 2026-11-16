@@ -54,12 +54,15 @@ module.exports = function ({ test }) {
     assert.strictEqual(mte.qualifies, false, '单层不应 qualifies');
   });
 
-  test('dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键）', () => {
+  test('dimensionRaw 不进 dimensions（文档契约：维度口径保持 240 键）', () => {
     const d = idx.discriminate(MT_PROBES[0]);
     // [v6.8.85 审计] 120 → 160：r647-r690 多轮维度批量接入后实际值为 160
     // （与 r644/r621/r643 三处基线同步核实，勿凭注释猜数）。
-    assert.strictEqual(Object.keys(d.dimensions).length, 160,
-      'dimensions 键数变了——会打破 doc-numbers-accuracy 的 160 维口径');
+    // [全局修复 2026-11-16] 160 → 240：r269/r270（f62eac82，2026-11-10）
+    // 接入 count_rate_conflation / law_of_small_numbers / immortal_time_bias
+    // 三维度后实测 240（doc-numbers-accuracy 的运行时实测口径同为 240）。
+    assert.strictEqual(Object.keys(d.dimensions).length, 240,
+      'dimensions 键数变了——会打破 doc-numbers-accuracy 的 240 维口径');
     assert.strictEqual(d.dimensions.multi_turn_escalation, undefined,
       'mte 不该进 dimensions（r378 v1 的 revert 原因正是它）');
   });

@@ -157,7 +157,19 @@ chkEq(red, INJECT.length, '变红数 != 注入数');
   chkEq(baseZH.length, 5, '既有 ZH 抹平模式数意外变动: ' + baseZH.length);
   chk(baseEN.some(re => /definitely/.test(re.source)), '既有 r644 EN 模式(definitely)疑似被删');
   chk(baseZH.some(re => /确定|保证|肯定/.test(re.source)), '既有 r644 ZH 模式(确定性断言)疑似被删');
-  chkEq(VERSION, '6.8.144', 'VERSION 意外变动（本应未 bump）: ' + VERSION);
+  // [全局修复 2026-11-16] 原断言 chkEq(VERSION, '6.8.144') 把 r225 当时的
+  // 版本号冻结——仓库「版本号只能前进」（COORDINATION.md 1.2），后续轮次
+  // 合法 bump 后本断言必然红（实测 6.8.158）。本守检验的是「本轮改动不
+  // 私自 bump 版本」的单调性，改为：版本不倒退且仍带 r225 的基线戳。
+  const ge = (a, b) => {
+    const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const d = (pa[i] || 0) - (pb[i] || 0);
+      if (d !== 0) return d > 0;
+    }
+    return true;
+  };
+  chk(ge(VERSION, '6.8.144'), 'VERSION 意外倒退（低于 r225 基线 6.8.144）: ' + VERSION);
 }
 
 restoreAll();

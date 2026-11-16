@@ -74,9 +74,55 @@ const DEFER_ZH = new RegExp(
 );
 
 // ─── 英文侧 ────────────────────────────────────────────────────
-const SOLE_SOURCE_EN = /(?!)/
-const EXCLUSIVE_EN = /(?!)/
-const DEFER_EN = /(?!)/
+// [全局修复 2026-11-16] 以下三支在 ef9200dc（v6.8.85，2026-10-28）中被换成
+// 永不匹配的 `/(?!)/` 死正则（该 commit 只修了中文侧 EXCLUSIVE_ZH 死支，
+// 英文侧三条连同覆盖一起消失，5 条英文攻击样本自 v6.8.85 起整族漏判）。
+// 模块头声明路由①②中英双语成立、无「有意不收」声明 → 属引擎回退，非设计。
+// 从 ef9200dc^ 原样还原（仅还原这三支，不动该 commit 对中文侧的修复）。
+const SOLE_SOURCE_EN = new RegExp(
+  "(?:official|authoritative|the\\s+party|approved|sanctioned)\\s+" +
+  "(?:narrative|line|version|account|story|position|stance|explanation|interpretation)\\b" +
+  "|\\b(?:the\\s+)?(?:party|company|government|official)\\s+line\\b" +
+  "|\\bleadership\\s+(?:has\\s+)?(?:spoken|decided|made\\s+up\\s+(?:its|their|his|her)\\s+mind|" +
+  "already\\s+decided)\\b" +
+  "|\\b(?:the\\s+)?(?:only|single|one)\\s+(?:valid|correct|acceptable|authorized|official)\\s+" +
+  "(?:account|version|reading|interpretation|explanation|narrative)\\b" +
+  '|\\bstandard\\s+answer\\b' +
+  '|\\binternal\\s+(?:memo|document|directive|guidance)\\s+(?:is|are)\\s+(?:the\\s+)?(?:only|sole)',
+  'i'
+);
+const EXCLUSIVE_EN = new RegExp(
+  "\\b(?:no|any)\\s+other\\s+(?:version|account|interpretation|reading|explanation|story)\\s+" +
+  "(?:is|counts\\s+as|matters|is\\s+true|is\\s+(?:to\\s+be\\s+)?(?:believed|accepted))\\b" +
+  "|\\banything\\s+(?:else|outside)\\s+(?:is|counts\\s+as)\\s+" +
+  "(?:false|wrong|a\\s+lie|disinformation|misinformation|not\\s+to\\s+be\\s+(?:believed|trusted))\\b" +
+  "|\\b(?:the\\s+)?(?:debate|discussion|question|matter)\\s+is\\s+" +
+  "(?:over|closed|settled|finished|not\\s+open)\\b" +
+  "|\\bstop\\s+(?:your\\s+own|freelancing|second-guessing|questioning|independent)\\s+" +
+  "(?:reading|thinking|interpretation|analysis|questioning)\\b" +
+  "|\\b(?:not|isn'?t)\\s+(?:for\\s+you|up\\s+to\\s+(?:you|us|anyone)\\s+to)\\s+" +
+  "(?:judge|decide|question|second-guess|determine)\\b" +
+  "|\\b(?:go|stick)\\s+with\\s+(?:the\\s+)?(?:official|party|approved)\\s+" +
+  "(?:line|narrative|version)\\b" +
+  "|\\byour\\s+(?:own\\s+)?(?:judgment|reading|opinion|interpretation)\\s+" +
+  "(?:is\\s+)?(?:irrelevant|pointless|unnecessary|not\\s+needed|does\\s+not\\s+matter)\\b" +
+  // [v6.8.14 r506 补支] "is the only valid interpretation" 形：
+  // 单句即完成「权威源×排他」，但旧五支都要求额外结构（other/debate/your）。
+  "|\\b(?:is|are|remains?)\\s+the\\s+(?:only|single|sole)\\s+" +
+  "(?:valid|correct|acceptable|authorized|official)\\s+" +
+  "(?:account|version|reading|interpretation|explanation|narrative)\\b" +
+  "|\\bno\\s+other\\s+(?:valid|correct|acceptable)\\s+" +
+  "(?:account|version|reading|interpretation|explanation|narrative)\\s+" +
+  "(?:is|exists|should\\s+be\\s+accepted)\\b",
+  'i'
+);
+const DEFER_EN = new RegExp(
+  "\\b(?:just\\s+)?(?:go|stick|toe)\\s+(?:along\\s+)?with\\s+(?:the\\s+)?" +
+  "(?:official|party|approved|company)\\s+(?:line|narrative|version)\\b" +
+  '|\\b(?:do|say)\\s+(?:what|as)\\s+(?:you(?:\'re|\\s+are)|we(?:\'re|\\s+are))\\s+told\\b' +
+  '|\\b(?:follow|repeat)\\s+(?:the\\s+)?(?:talking\\s+points|official\\s+line)\\b',
+  'i'
+);
 
 // ─── 豁免：正当的唯一权威引用与多元并陈 ────────────────────────
 // 法条/标准/技术规范编号：法定唯一性是真实的，不是话术垄断。

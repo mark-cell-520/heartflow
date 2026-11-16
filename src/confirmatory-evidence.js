@@ -269,28 +269,30 @@ function checkConfirmatoryEvidence(rawText) {
   }
 
   // ── 打分 ──
-  let score = 62;
-  if (en) score += 6;
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 62 会经 severity=6200 → overallScore=0 把 VERIFY 维度顶成 rewrite。
+  let score = 0.62;
+  if (en) score += 0.06;
   // 强确认动作形态（反复/多次 + 验证/证实）
   if (/(?:反复|多次|一再|重复)[^。！？!?]{0,6}(?:验证|证实|确认)/.test(text) ||
       /\b(?:repeatedly|consistently)\s+(?:confirmed|verified|validated|demonstrated)\b/i.test(text)) {
-    score += 14;
+    score += 0.14;
   }
   // 强真理性结论形态
   if (/它是[^。！？!?]{0,4}(?:真理|对的|成立的)|板上钉钉|铁证|毫无疑问/.test(text) ||
       /\bso\s+it\s+is\s+(?:true|correct|valid)\b|\bbeyond\s+(?:any\s+)?doubt\b|\bconclusive\s+proof\b/i.test(text)) {
-    score += 12;
+    score += 0.12;
   }
-  if ((en ? EXEMPT_HEDGE_EN : EXEMPT_HEDGE_ZH).test(text)) score -= 10;
+  if ((en ? EXEMPT_HEDGE_EN : EXEMPT_HEDGE_ZH).test(text)) score -= 0.1;
 
-  if (score > 96) score = 96;
-  if (score < 40) score = 40;
+  if (score > 0.96) score = 0.96;
+  if (score < 0.4) score = 0.4;
 
   return {
     score,
     findings: [{
       dimension: 'confirmatory_evidence',
-      severity: score,
+      severity: Math.round(score * 100),
       details: `证实性取证（确认动作→真理性结论）：腿①确认动作在场，腿②真理性结论在场，两腿相距 ${NEAR_WINDOW_ZH} 字（EN ${NEAR_WINDOW_EN} 字符）内`,
       guidance: '把确认次数与证据充分性分开：判别力来自能否被证伪与证据的独立性，不是被确认了多少次；先说明该检验是否包含否证机会、确认是否来自独立数据源，再决定能否把结论当已证事实',
     }],

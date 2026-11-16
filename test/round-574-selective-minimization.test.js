@@ -138,11 +138,26 @@ const BENIGN = [
     assert.ok(!B.has('selective_minimization') && !R.has('selective_minimization'),
       '⑤-3 selective_minimization 被登记进 BLOCK/REWRITE 行动级集合');
     const overrides = dims.filter(d => B.has(d) || R.has(d));
-    if (overrides.length === 0) {
-      // 无近邻叠加：必须 verify
+    const soleFinding = (r.findings || []).length === 1 && dims[0].startsWith('selective_minimization');
+    if (overrides.length === 0 && soleFinding) {
+      // 无近邻叠加且本维度是唯一 finding：必须 verify
+      // [全局修复 2026-11-16] 原 ⑤-4 断言「无 block/rewrite 近邻即必须 verify」，
+      // 漏算了引擎成文的分数聚合升级路径（src/index.js 门禁段，v6.7.24
+      // faf93c30「score alone must not escalate to rewrite」引入的规则：
+      // overallScore<0.5 且 findings[0].severity>=60 时允许升级）。
+      // 实测样本#1（公司数据造假→小失误）被 doublespeak(sev50) 合法共现把
+      // overallScore 压到 0.48，selective_minimization(sev77) 撑起升级——
+      // 两个 finding 都是真命中，聚合升级是引擎设计行为而非本维度定级。
+      // 本维度「不是 rewrite 级」的性质由 ⑤-3（不在 BLOCK/REWRITE 集合）与
+      // 下方的独维断言证明；共现样本的最终动作归聚合规则管，录入备审。
       verifyOnly++;
       assert.strictEqual(r.gate.action, 'verify',
-        `⑤-4 样本#${idx + 1} 无近邻叠加，应 verify，实得 ${r.gate.action}`);
+        `⑤-4 样本#${idx + 1} 独维命中应 verify，实得 ${r.gate.action}`);
+    } else if (overrides.length === 0) {
+      // 无 block/rewrite 近邻但有其他 VERIFY 维共现：走引擎成文聚合规则
+      // （overallScore<0.5 && findings[0].severity>=60 → rewrite），合法。
+      stacked++;
+      console.log(`  [⑤-5] 样本#${idx + 1} 由 VERIFY 维共现聚合为 ${r.gate.action}（引擎成文规则，非本维度定级）: ${dims.join(',')}`);
     } else {
       // 有近邻叠加：rewrite 合法，但叠加源必须记录在案
       stacked++;

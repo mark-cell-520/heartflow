@@ -40,7 +40,15 @@ const KNOWN_AGENT_DIRS = [
 
 class AgentBoundaryGuard {
   constructor(options = {}) {
-    this.home = options.home || os.homedir();
+    // [全局修复 2026-11-16] home 也必须 resolve：checkWrite 里 filePath 走
+    // path.resolve（Windows 上会给 POSIX 风格绝对路径补盘符，如
+    // '/home/testuser/.x' → 'C:\home\testuser\.x'），而 this.home 保持
+    // 原字符串 → 第 4 步 `resolved.startsWith(this.home + path.sep)` 在
+    // Windows 上恒 false，home 下未知目录的 WARN 分支永不命中（实测
+    // test/agent-boundary-guard.test.js 'unknown dot-dir in home → WARN'
+    // 在 Windows 全量回归中失败）。POSIX 上 path.resolve 对绝对路径是
+    // 恒等操作，行为不变。
+    this.home = path.resolve(options.home || os.homedir());
     // 本 agent 的地盘（默认 Hermes）
     this.selfDirs = (options.selfDirs || ['.hermes']).map(d => path.resolve(this.home, d));
     // 允许写的外部目录（用户显式放行，如项目目录）

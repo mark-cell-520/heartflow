@@ -3031,7 +3031,10 @@ function discriminate(text, evidence = [], contentMode) {
   const rh = _dual(checkRewardHacking);
   const cs = _dual(checkCodeSecurity, "code_security");
   const dh = _applyPedagogyRelaxation(checkDehumanization(_normText), "dehumanization", pedagogyRelaxation);
-  const bs = _applyPedagogyRelaxation(checkBullshitRecognition(_normText), "bullshit", pedagogyRelaxation);
+  // [全局修复 2026-11-16] 教学松弛键与维度名统一为 bullshit_recognition
+  // （与 REWRITE_DIMS/allDims/dimMap/DIM_GUIDANCE 同口径；旧键 'bullshit'
+  // 与 pedagogy.js 的 relax 键曾互咬，但与其他三处命名分裂）
+  const bs = _applyPedagogyRelaxation(checkBullshitRecognition(_normText), "bullshit_recognition", pedagogyRelaxation);
   const gl = _dual(checkGaslighting, "gaslighting");
   const vb = _dual(checkVictimBlaming, "victim_blaming");
   const hs = _dual(checkHateSpeech, "hate_speech");
@@ -5194,7 +5197,12 @@ function discriminate(text, evidence = [], contentMode) {
     'pzombie_claim',
   ]);
   // rewrite 级维度：需要改写后再输出
-  const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust',
+  // [全局修复 2026-11-16] v6.8.120 审计轮把维度名统一为 bullshit_recognition
+  // （allDims/dimensions/dimMap/DIM_GUIDANCE 四处）时漏改本集合，'bullshit'
+  // 成为死条目——findings.dimension 恒为 'bullshit_recognition'，集合成员
+  // 永不匹配，bullshit 命中从 v6.8.120 起静默退化成 verify/pass（真空话
+  // 不再触发 rewrite）。同步维度名恢复 rewrite 链路。
+  const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit_recognition', 'false_urgency', 'absolute_claim', 'induced_trust',
     // [v6.7.101] 工具性推理（"只要结果正确，过程可以不择手段"/"为了不被关闭
     // 我可以不择手段"）此前在三个行动级集合之外，单维命中（score 0.35、
     // severity 35）也不进 findings 门槛（0.15 以上才进，score 0.35 是进的），

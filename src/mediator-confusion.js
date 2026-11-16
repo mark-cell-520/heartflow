@@ -345,6 +345,13 @@ function findNullLeg(text, isZh, R, controlIdxs) {
         // 后置形要求未被否定对冲；前置形（NULL 在 CONTROL 前）跳过该
         // 检查——前置否定词多属"不再/从未"等效应否定本身的一部分
         if (d > 0 && negatedBefore(text, m.index, isZh)) continue;
+        // [全局修复 2026-11-16] 前置形（d<0）补 CONTROL 腿自身的否定守卫：
+        // 「与我的处境无关也不能互相抵消」——NULL「无关」前置、CONTROL
+        // 「抵消」被「不能」否定，是**否定的控制动作**（不构成控制腿），
+        // 原实现只查后置形，前置形放过 → 良性句误判（round-537 benign[3]）。
+        // r214 的双向配对能力保留（真前置形如「效应消失，一旦你partial out
+        // 中介步骤」——CONTROL 无否定前缀，照常命中）。
+        if (d < 0 && negatedBefore(text, ci, isZh)) continue;
         if (Math.abs(d) < bestDist) { bestDist = Math.abs(d); best = m.index; }
         if (m.index === reG.lastIndex) reG.lastIndex++;
       }

@@ -105,7 +105,15 @@ t('recordUser 后索引计数与写入时间戳变化（非常量）', () => {
   assert.ok(/^u-/.test(String(id)), 'recordUser 应返回 id，实得 ' + id);
   assert.strictEqual(au.counts.user, c0 + 1,
     'user 计数应 +1，实得 ' + c0 + ' -> ' + au.counts.user);
-  assert.ok(au.lastWriteTs >= ts0, 'lastWriteTs 应推进');
+  // [全局修复 2026-11-16] 原断言 `au.lastWriteTs >= ts0` 在净室首启时
+  // ts0=null（磁盘索引 lastWriteTs 为 null，boot 即退出的 flush 会把内存
+  // 里的 null 原样落盘——引擎侧诚实性小缺口，另轨改进），`'ISO串' >= null`
+  // 走 JS coercion 得 NaN>=0 → false，而时间戳实际已推进（null→ISO）。
+  // 比较语义修正：无基线（null）时不要求推进，有基线时仍要求不回退；
+  // 并显式要求写入后 lastWriteTs 是非空字符串（防止回归成恒 null）。
+  assert.ok(ts0 == null || au.lastWriteTs >= ts0, 'lastWriteTs 不应回退');
+  assert.ok(typeof au.lastWriteTs === 'string' && au.lastWriteTs,
+    'lastWriteTs 应被写入为非空字符串，实得 ' + JSON.stringify(au.lastWriteTs));
 });
 
 t('getInheritedContext 返回工作集数组', () => {

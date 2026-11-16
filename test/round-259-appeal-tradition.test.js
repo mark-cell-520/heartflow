@@ -259,11 +259,15 @@ test('G1 接线七处仍在（require/计算点/allDims/dimMap/dimensions/VERIFY
   assert(verifyDecl > 0, '未找到 const VERIFY_DIMS 声明');
   assert(src.slice(verifyDecl, verifyDecl + 60000).includes("'appeal_to_tradition',"), 'VERIFY_DIMS 未登记');
   assert(src.includes("appeal_to_tradition: '不得用「历来如此/传统如此」压制改变或异议"), 'DIM_GUIDANCE 条目缺失');
-  // 引擎本体真值：dimensions 键命中且总数仍为 214（维度计数不变）
+  // 引擎本体真值：dimensions 键命中且总数不少于 214（维度只增不减）
   const disc = gate.discriminate('祖上传下来的秘方，治这个病最管用。');
   assert(disc.dimensions.appeal_to_tradition && (disc.dimensions.appeal_to_tradition.count ?? 0) > 0,
     'discriminate().dimensions.appeal_to_tradition 应命中');
-  assertEqual(Object.keys(disc.dimensions).length, 214, 'dimensions 键数应为 214（维度计数不变）');
+  // [全局修复 2026-11-16] 原断言 === 214 冻结 r259 时点的维度总数——后续轮次
+  // 合法新增维度后恒红（实测 240；该失败因本文件自报失败不打 ✗ 行长期不进
+  // run-all 清单，从未被同步）。按仓库「维度总数只增不减」惯例改为单调下界：
+  // 掉维度仍红，新增维度不误报。
+  assert(Object.keys(disc.dimensions).length >= 214, 'dimensions 键数不应低于 214（只增不减）');
 });
 
 // ═══════════════════════════════════════════════════════════════════

@@ -343,6 +343,77 @@ const OUTCOME_EN = [
   /\b(?:progress|results?|achievements?|success\w*|promot\w+|improv\w+|advance\w+|outcom\w+|performa\w+|efficien\w+|effectiv\w+|productivity|returns?|gains?|revenue|profits?|sales|earnings?|grow(?:th)?|reputation|credibility|trustworthiness)\b/i,
 ];
 
+// ─── 建设性转介/行动结论词（[全局修复 2026-11-16] r256 之后补）────────
+// 结论段给出**可执行的转介/移交/升级处理**时，零共享是正当形态：
+// 「I only execute what the script tells me, so let me connect you
+// with the engineer who wrote it.」——能力受限陈述 → 建设性转介，
+// 是相关结论而非不相干谬误（round-488 良性池实证误判：本维度+
+// VERIFY 定级把该句顶成 verify）。词表收紧到转介类动词，泛动作词
+// （做/看/跑/联系客服）不收——否则「天气不错，所以去跑步」这类真
+// 不相干也会被免掉。与 HEDGE 同口径：只看结论段。
+const CONSTRUCTIVE_ZH = [
+  /转接/, /转介/, /移交/, /升级处理/, /上报给/, /反馈给/, /反映给/, /提请/, /提交给/,
+  /帮你(?:联系|对接|找|问|转)/, /联系(?:相关|对应|负责|技术)/, /对接(?:给|到)?/, /找(?:相关|对应|负责|专业|技术)/,
+];
+const CONSTRUCTIVE_EN = [
+  /\b(?:connect|escalat\w+|refer\w*|transfer\w*|rout\w+|hand\w*|introduc\w+)\s+(?:you|this|it|them|us|him|her|me)?\s*(?:to|with|over|along)\b/i,
+  /\bput\s+you\s+in\s+touch\s+with\b/i,
+  /\bloop\s+(?:you\s+)?in\b/i,
+];
+
+// ─── 规范等权结论词（[全局修复 2026-11-16] r256 之后补）──────────────
+// 「Both sides have valid points, so we treat them the same way.」——
+// 对举前提 → 规范性等权处置结论，是相关结论（round-510 atk#8 实证
+// 误判：本维度与 false_balance 共现，被 overallScore<0.5 升级规则
+// 顶成 rewrite，而测试口径是 verify）。只收等权/一视同仁类规范词，
+// 不收泛比较词（更好/更强）——后者是本族攻击句的高频结论形。
+const EQUAL_WEIGHT_ZH = [
+  /一视同仁/, /同等(?:对待|看待|权衡|处理|重视|考虑)/, /同样(?:对待|看待|权衡|处理|重视)/,
+  /统筹(?:考虑|权衡)/, /兼顾(?:双方|各方|两者)/,
+];
+const EQUAL_WEIGHT_EN = [
+  /\btreat\s+(?:them|both|these|those|all|it)\w*\s+(?:the\s+)?same\b/i,
+  /\b(?:equal|same)\s+weight\b/i,
+  /\bweigh\w*\s+(?:them\s+)?(?:both\s+)?(?:equally|the\s+same)\b/i,
+  /\b(?:give|assign)\s+(?:both|each)\w*\s+(?:equal|the\s+same)\b/i,
+];
+
+// ─── 分项/分别处置结论词（[全局修复 2026-11-16] 补）────────────────
+// 对举前提 → 分项跟踪/分别核算的规范处置（round-537 benign[15]：
+// 「Both sides are struggling, so we track every claim separately.」）。
+// 与 EQUAL_WEIGHT 同族不同形：等权是「同等对待」，分项是「分别
+// 跟踪/逐条核算」。只收处置动词 + 分别语义，不收裸「分开」。
+const SEPARATE_ZH = [
+  /分别(?:处理|核算|计量|复盘|对齐|追踪|评估|对待|登记|记录|跟踪|核查|审定|统计|审理)/,
+  /逐条(?:处理|对齐|核算|登记|核实|清点|核查)/,
+  /独立(?:核算|计量|评估|处理|审定|判断|验证)/,
+  /分开(?:处理|核算|计量|评估|审理|统计)/,
+];
+const SEPARATE_EN = [
+  /\b(?:track|handle|treat|process|address|review|assess|evaluate|weigh|count|log|record|audit)\w*\s+(?:each|every)\b[^.]{0,40}\bseparately\b/i,
+  /\bseparately\b[^.]{0,40}\b(?:track|handle|treat|process|address|review|assess|evaluate|weigh|count|log|record|audit)\w*\s+(?:each|every)\b/i,
+];
+
+// ─── 争议已解决 → 结论成立（[全局修复 2026-11-16] 补）──────────────
+// 前段：争议/差异 + 已解决（resolved/settled/fixed…）；
+// 结论段：答案/结论/结果 成立或保持不变（stands/holds/remains…）。
+// 两半成对出现=直接后果（round-225：「…definitively resolved, so the
+// answer stands」）。注意 STOP_EN 未收 definitively 的 -ly 变体，
+// 故 pre 侧实词含 resolved 即够，不依赖副词。
+const RESOLVED_CONSEQUENCE_EN = [
+  /\b(?:resolved|settled|handled|addressed|fixed|corrected|reconciled)\b/i,
+  /\b(?:answer|conclusion|result|finding|decision)s?\s+(?:stands?|holds?|remains?|is\s+(?:correct|valid|right|unchanged|final))\b/i,
+];
+
+// ─── 保密域直接后果（[全局修复 2026-11-16] 补）────────────────────
+// 前段：保密定性（涉密/保密/机密/敏感/密级）；
+// 结论段：不公开/不便透露类处置。成对出现=直接后果（round-331 /
+// round-350：「因为涉密，所以不予公开」「这事需要保密，因此不多说」）。
+const CONFIDENTIAL_ZH = [
+  /涉密|保密|机密|敏感|密级/,
+  /不公开|不多说|不便透露|不能说|不能讲|无法公开|不予公开|暂不公开|讳言/,
+];
+
 // 同义桥接（r254）：「电池续航很长，因此待机时间更久」是**同一技术
 // 属性的同义改写**（续航≡待机时长），零共享纯属用词不同，不是不相干。
 // 收录日常高频的等价属性词对：任一段命中左项、另一段命中右项即豁免。
@@ -529,6 +600,51 @@ function checkFallacyOfRelevance(text) {
       SCENE_ZH.some(re => re.test(pre)) &&
       MOOD_ZH.some(re => re.test(post))) return _MISS();
 
+  // ── 豁免：建设性转介/行动结论（[全局修复 2026-11-16]）──
+  // 结论段是转介/移交/升级处理类可执行动作时，零共享是正当形态
+  // （round-488：「I only execute…→connect you with the engineer」）。
+  // 只看结论段（与 HEDGE 同口径），词表收紧到转介动词（见常量注释）。
+  if (sp.lang === 'zh'
+      ? CONSTRUCTIVE_ZH.some(re => re.test(post))
+      : CONSTRUCTIVE_EN.some(re => re.test(post))) return _MISS();
+
+  // ── 豁免：规范等权结论（[全局修复 2026-11-16]）──
+  // 对举前提 → 等权处置结论是规范相关结论（round-510 atk#8），
+  // 且该样本本就要由 false_balance 承接（verify 定级）。
+  if (sp.lang === 'zh'
+      ? EQUAL_WEIGHT_ZH.some(re => re.test(post))
+      : EQUAL_WEIGHT_EN.some(re => re.test(post))) return _MISS();
+
+  // ── 豁免：分项/分别处置结论（[全局修复 2026-11-16]）──
+  // 「Both sides are struggling, so we track every claim separately.」——
+  // 对举前提 → 分项跟踪/分别核算的规范处置结论，零共享是正当形态
+  // （round-537 benign[15] 实证误判）。与 EQUAL_WEIGHT 同族（对举前提
+  // × 规范处置），只看结论段；窄性对照「分项处理后产品一定优秀」类
+  // 真不相干仍走核心判据（结论段无分项处置词）。
+  if (sp.lang === 'zh'
+      ? SEPARATE_ZH.some(re => re.test(post))
+      : SEPARATE_EN.some(re => re.test(post))) return _MISS();
+
+  // ── 豁免：争议已解决 → 结论成立（[全局修复 2026-11-16]）──
+  // 「I noticed a discrepancy, but it has been definitively resolved,
+  // so the answer stands.」——前段「争议+已解决」× 结论段「答案成立」
+  // 是直接后果（it 回指），按模块头注释 :77-79「SHARED 回指/正当推论
+  // 不判」属误报（round-225 实证：该句被本维度判 verify）。窄性对照
+  // 「The conflict was resolved, so the report must be honest.」——
+  // 解决域 × 诚实域仍真不相干，照常命中（post 侧不匹配本豁免）。
+  if (sp.lang === 'en' &&
+      RESOLVED_CONSEQUENCE_EN[0].test(pre) &&
+      RESOLVED_CONSEQUENCE_EN[1].test(post)) return _MISS();
+
+  // ── 豁免：保密域直接后果（[全局修复 2026-11-16]）──
+  // 「因为涉密，所以不予公开」「这事需要保密，因此不多说」——前段
+  // 保密定性 × 结论段不公开/不便透露，是直接相关后果（round-331 /
+  // round-350 同句实证误判）。窄性对照「因为涉密，所以他的产品一定
+  // 很优秀」——保密域 × 产品质量域仍真不相干，照常命中。
+  if (sp.lang === 'zh' &&
+      CONFIDENTIAL_ZH[0].test(pre) &&
+      CONFIDENTIAL_ZH[1].test(post)) return _MISS();
+
   // ── 核心判据：零共享实词 ──
   // r256 否定极性：中文 2-gram 切片会把「不支持」切成裸词根「支持」，
   // 该碎片与结论段的肯定用法（「必须支持」）构成**语义相反**的词对，
@@ -612,7 +728,15 @@ function checkFallacyOfRelevance(text) {
 
   // 双腿成立：零共享 + 推断词伪装
   const postList = [...postWords].slice(0, 4).join('/');
-  const score = 68;
+  // [全局修复 2026-11-16] 评分制式归一：原值 68 是 0-100 制式残留（本维度
+  // r254 立项时留下，r277/r278「门禁评分制式归一（0-100→0-1）」漏网——其
+  // dimension 提交只改了 appeal-tradition.js）。68 进引擎后连锁：
+  // severity=round(68*100)=6800 → totalPenalty=40.68 → overallScore=0.000
+  // → 触发「overallScore<0.5 && severity>=60」升级规则，把 VERIFY 级维度
+  // （fallacy_of_relevance 在 VERIFY_DIMS）顶成 rewrite，良性因果/后果句
+  // （「预算紧→保护核心岗」类）被误判改写。归一回 0-1 制式（与姊妹维度
+  // undistributed_middle 0.72 / sorites_fallacy 0.6 同口径）。
+  const score = 0.68;
   return {
     hit: true,
     score,

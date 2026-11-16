@@ -251,9 +251,15 @@ INJECTION_CASES.push({ key: 'liberty', domain: 'B', label: 'freedom-en-b', text:
   ok(idx.includes('equivocation_sense_shift'),
     '[六·分工锁] src/index.js 未见 equivocation_sense_shift 接线，本轮"已激活"前提不成立');
   // ② 多义词表只新增本轮 9 个键（27 → 36），未动既有条目
+  // [全局修复 2026-11-16] 原断言 === 36 冻结 r223 时点的表规模——r224 等后续
+  // 轮次合法新增词条后恒红（实测 42：r224 的 6 键）。该失败因本文件自报失败
+  // 不打 ✗ 行长期不进 run-all 清单，从未被同步。真实不变式是「既有词条未删
+  // + 本轮 9 键仍在」，改为：本轮键逐一个人在 + 总数只增不减（>=36）。
   const tableKeys = Object.keys(eqmod.POLYSEMY_TABLE);
-  ok(tableKeys.length === 36,
-    `[六·分工锁] POLYSEMY_TABLE 键数 ${tableKeys.length} ≠ 36（既有 27 + 本轮 9）`);
+  let missingMine = R223_KEYS.filter(k => !tableKeys.includes(k));
+  ok(missingMine.length === 0, `[六·分工锁] 本轮新增词条被误删：${missingMine.join(',')}`);
+  ok(tableKeys.length >= 36,
+    `[六·分工锁] POLYSEMY_TABLE 键数塌陷: ${tableKeys.length}（应 ≥36，只增不减）`);
   let missingOld = [];
   for (const k of ['平等', '精神', '意思', '银行', '学校', '光线', 'light', 'bank', 'school',
     'staff', 'fine', 'equal', 'right', 'match', 'current', '理论', '证明', '模型', '显著',
@@ -261,9 +267,19 @@ INJECTION_CASES.push({ key: 'liberty', domain: 'B', label: 'freedom-en-b', text:
     if (!tableKeys.includes(k)) missingOld.push(k);
   }
   ok(missingOld.length === 0, `[六·分工锁] 既有词条被误删：${missingOld.join(',')}`);
-  // ③ VERSION 未 bump（fix 轮维度计数不变，递增留给 1 号版本轮）
+  // ③ VERSION 未倒退（fix 轮本身不 bump，但后续版本轮合法递增）
+  // [全局修复 2026-11-16] 原断言 === '6.8.144' 冻结 r223 时点版本——后续轮次
+  // 合法 bump 后恒红（实测 6.8.158）。按「版本只能前进」约定改单调下界。
   const ver = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  ok(ver === '6.8.144', `[六·分工锁] VERSION=${ver}，期望维持 6.8.144`);
+  const geVer = (a, b) => {
+    const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const d = (pa[i] || 0) - (pb[i] || 0);
+      if (d !== 0) return d > 0;
+    }
+    return true;
+  };
+  ok(geVer(ver, '6.8.144'), `[六·分工锁] VERSION 倒退: ${ver}（应 ≥6.8.144）`);
 }
 
 // ─── 汇总 ─────────────────────────────────────────────────────────────

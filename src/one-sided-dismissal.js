@@ -190,22 +190,25 @@ function checkOneSidedDismissal(text) {
 
   // 计分：双腿齐备基础分，按消解短语强度加成
   const disIdx = t.indexOf(dis);
-  let score = 72;
-  if (STRONG_DISMISSAL.some(s => t.includes(s))) score += 8;
-  if (/[。；;]\s*[^。；;]*(所以|因此|足以证明|说明|可见|这就证明|so |therefore|thus )/i.test(t.slice(disIdx))) score += 4; // 消解后接单边结论收尾
-  score = Math.min(score, 90);
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 72 会经 severity=7200 → overallScore=0 把 VERIFY 维度顶成 rewrite。
+  // 下方 verdict/strength 阈值同比例换算（70→0.70、84→0.84、封顶 90→0.90）。
+  let score = 0.72;
+  if (STRONG_DISMISSAL.some(s => t.includes(s))) score += 0.08;
+  if (/[。；;]\s*[^。；;]*(所以|因此|足以证明|说明|可见|这就证明|so |therefore|thus )/i.test(t.slice(disIdx))) score += 0.04; // 消解后接单边结论收尾
+  score = Math.min(score, 0.9);
 
   const detail = '让步消解（承认反面证据后不作权衡地扫掉）1处：先以「' + conc + '」承认「' + ce +
     '」，再用「' + dis + '」将其不作量化权衡地扫到一边，收尾到单边结论——反面证据需要的是权衡与处置，不是一句总体性概括';
   return {
     score,
-    verdict: score >= 70 ? 'unsupported' : 'pass',
+    verdict: score >= 0.7 ? 'unsupported' : 'pass',
     exempt: false,
     exempt_reason: null,
     count: 1,
     detail,
     hits: [{ concession: conc, counter: ce, dismissal: dis }],
-    strength: score >= 84 ? 'high' : score >= 70 ? 'medium' : 'none',
+    strength: score >= 0.84 ? 'high' : score >= 0.7 ? 'medium' : 'none',
   };
 }
 

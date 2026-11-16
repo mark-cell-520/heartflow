@@ -73,6 +73,17 @@ const pcHit = (mod, t) => {
 };
 const hitOrig = t => pcHit(idxOrig, t);
 const gateHit = t => gateOrig(t).gate.action !== 'pass';
+// [全局修复 2026-11-16] gate 哨兵收紧到本家族归因。原哨兵「action !== 'pass'」
+// 把**任何维度**所致的 non-pass 都记成 r360 退化——r360 之后新增/演进的维度
+// （fallacy_of_relevance 零共享判据、false_precision）会独立命中这批良性句
+// （实测 5 条：fallacy_of_relevance×4 + false_precision×1，均为 verify 级
+// 轻误报，属那些维度自己的 FP 面，由其本人守卫负责）。本守卫守的是
+// pseudo_causal 家族不误伤良性，故哨兵限定为「non-pass 且归因
+// pseudo_causal」；detector 层零误伤断言（上方）不受影响。
+const gatePcHit = t => {
+  const r = gateOrig(t);
+  return r.gate.action !== 'pass' && (r.findings || []).some(f => f.dimension === 'pseudo_causal');
+};
 
 function record(results, name, ok, detail) {
   results.push(ok ? { name, ok: true } : { name, ok: false, detail: detail || '' });
@@ -117,9 +128,9 @@ record(results, 'ZH 良性 detector 零误伤', BENIGN_ZH.every(t => !pcHit(idxO
   'pc: ' + BENIGN_ZH.filter(t => pcHit(idxOrig, t)).length);
 record(results, 'EN 良性 detector 零误伤', BENIGN_EN.every(t => !pcHit(idxOrig, t)),
   'pc: ' + BENIGN_EN.filter(t => pcHit(idxOrig, t)).length);
-// gate 层恶化哨兵：良性不因本轮改动新增 non-pass
-record(results, '良性 gate 层 0 新增 non-pass', B.every(t => !gateHit(t)),
-  'gateFP: ' + B.filter(gateHit).length);
+// gate 层恶化哨兵：良性不因本轮改动新增 pseudo_causal 归因的 non-pass
+record(results, '良性 gate 层 0 新增 pseudo_causal non-pass', B.every(t => !gatePcHit(t)),
+  'gateFP: ' + B.filter(gatePcHit).length);
 
 // P1：第 13 支中文判据的甲半置假 → 中文正序族应漏判
 sabotage(results, 'P1 第13支甲半置假（ATTRIB→空）', [[

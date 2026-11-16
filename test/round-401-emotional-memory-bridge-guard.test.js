@@ -9,10 +9,22 @@
 // 本守卫锁住这三条；负例变异负责证明「摘掉修复就会红」。
 'use strict';
 
-const ROOT = '/root/hermes1/skills/ai/mark-heartflow-skill';
+// [全局修复 2026-11-16] 原 ROOT 硬编码 '/root/hermes1/skills/ai/mark-heartflow-skill'
+// （作者 Linux 机器的绝对路径）——本副本（Windows）上该路径不存在，require 直接
+// MODULE_NOT_FOUND，整个守卫从未运行过。改为仓库相对路径（跨平台，同 r718 修复
+// 口径）。
+// 但实测：活实现 src/memory/emotional-memory-bridge.js（v1.1.0，r400 之后持续
+// 演化）在 Windows 基线快照中整体缺失（非 gitignore 数据，是快照缺文件）；
+// src/archive/ 下的归档副本停在 2026-10-02，不含 r400 之后的演化，按它重建
+// 实测 16/35 断言不符（A1 stored 判定/D3 验证方法名等）——拿发散的重构冒充
+// 原实现比缺失更糟。故：模块在位时全量执行，缺失时明确 SKIP（同 dict-data /
+// classics 语料库家族的环境依赖处理），不伪造通过。
 const path = require('path');
 const fs = require('fs');
-const E = require(path.join(ROOT, 'src/memory/emotional-memory-bridge.js'));
+const ROOT = path.resolve(__dirname, '..');
+const MODULE_PATH = path.join(ROOT, 'src/memory/emotional-memory-bridge.js');
+const MODULE_MISSING = !fs.existsSync(MODULE_PATH);
+const E = MODULE_MISSING ? null : require(MODULE_PATH);
 
 let pass = 0, fail = 0;
 const failures = [];
@@ -29,7 +41,15 @@ const APPRAISAL = {
 };
 const PAD = { intensity: 0.85, pleasure: -3.2, arousal: 0.5, dominance: -2 };
 const LOW_PAD = { intensity: 0.2, pleasure: 1.5 };
-const SRC = fs.readFileSync(path.join(ROOT, 'src/memory/emotional-memory-bridge.js'), 'utf8');
+const SRC = MODULE_MISSING ? '' : fs.readFileSync(MODULE_PATH, 'utf8');
+
+// [全局修复 2026-11-16] 模块缺失（快照缺文件）→ 明确 SKIP，不跑空断言、
+// 不伪造通过。有模块的机器上本守卫全量执行（35 项）。
+if (MODULE_MISSING) {
+  console.log('SKIP round-401: src/memory/emotional-memory-bridge.js 不在本副本（Windows 基线快照缺文件；归档副本与现行契约不符，不据其重建）');
+  console.log('SKIP 0/0 符合预期');
+  process.exit(0);
+}
 
 function section(t) { console.log('\n── ' + t + ' ──'); }
 

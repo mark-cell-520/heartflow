@@ -75,12 +75,16 @@ t('A2 pattern-detector-jitter-round308 单跑输出标准汇总行（修复目�
 // ── B 段：run-all.js 的三段解析必须仍在（删任一支这里必须变红） ────────────
 t('B1 run-all.js 仍含「N 通过, M 失败」标准格式正则', () => {
   // 用字面子串而非正则匹配，避开源码里反斜杠的转义层数问题。
+  // [全局修复 2026-11-16] 原断言查 `(?:通过|passed)` 全串（含右括号）——
+  // r278 扩展主正则为 `(?:通过|passed|过)`（补「N 过 / M 败」简写式），
+  // 标准 alternation 仍是首选分支、语义未变，但全串不再连续。改为查
+  // 不含右括号的前缀：标准分支仍在即放行，整支被删仍红。
   assert.ok(
-    RUN_ALL.indexOf('(?:通过|passed)') !== -1,
+    RUN_ALL.indexOf('(?:通过|passed') !== -1,
     'run-all.js 的标准汇总正则(通过|passed)被删/改 —— 静默判定会蔓延'
   );
   assert.ok(
-    RUN_ALL.indexOf('(?:失败|failed)') !== -1,
+    RUN_ALL.indexOf('(?:失败|failed') !== -1,
     'run-all.js 的标准汇总正则(失败|failed)被删/改'
   );
   assert.ok(

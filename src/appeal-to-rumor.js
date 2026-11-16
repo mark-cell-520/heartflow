@@ -277,28 +277,30 @@ function checkAppealToRumor(rawText) {
   }
 
   // ── 打分 ──
-  let score = 62;
-  if (en) score += 6;
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 62 会经 severity=6200 → overallScore=0 把 VERIFY 维度顶成 rewrite。
+  let score = 0.62;
+  if (en) score += 0.06;
   // 强真实性推断形态
   if (/不是空穴来风|绝非空穴来风|无风不起浪/.test(text) ||
       /\bno\s+smoke\s+without\s+fire\b|\bnot\s+baseless\b|\bthere\s+must\s+be\s+some\s+truth\b/i.test(text)) {
-    score += 16;
+    score += 0.16;
   }
   // 强传播形态（都这么传/传得广/so many people saying）
   if (/都这么传|都在传|传得[^。！？!?]{0,10}(?:广|沸沸扬扬)|广为流传/.test(text) ||
       /\beveryone\s+is\s+saying\b|\bso\s+many\s+people\b|\bgoing\s+around\b/i.test(text)) {
-    score += 10;
+    score += 0.1;
   }
-  if ((en ? EXEMPT_HEDGE_EN : EXEMPT_HEDGE_ZH).test(text)) score -= 10;
+  if ((en ? EXEMPT_HEDGE_EN : EXEMPT_HEDGE_ZH).test(text)) score -= 0.1;
 
-  if (score > 96) score = 96;
-  if (score < 40) score = 40;
+  if (score > 0.96) score = 0.96;
+  if (score < 0.4) score = 0.4;
 
   return {
     score,
     findings: [{
       dimension: 'appeal_to_rumor',
-      severity: score,
+      severity: Math.round(score * 100),
       details: `传闻即事实（传播事实→真实性推断）：腿①传播事实在场，腿②真实性推断在场，两腿相距 ${NEAR_WINDOW_ZH} 字（EN ${NEAR_WINDOW_EN} 字符）内`,
       guidance: '把传播强度与证据强度分开：一条说法被多少人传播与它是否为真无关，需要的是可核验的信源与可回溯的证据（具名受访者、原始文件、官方记录），而不是「传得广」或「不是空穴来风」',
     }],

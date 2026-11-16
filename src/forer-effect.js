@@ -241,14 +241,16 @@ function checkForerEffect(text) {
   if (!personHit) return { score: 0, name: 'forer_effect', count: 0 };
 
   // 双腿共现 → 命中，按描述族数量与精准佯称加权。
-  let score = 60;
+  // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+  // 原值 60 会经 severity=6000 → overallScore=0 把 VERIFY 维度顶成 rewrite。
+  let score = 0.6;
   const descriptorCount = [FE_SURFACE_DEPTH_ZH, FE_BOTH_SIDES_ZH, FE_UNIVERSAL_NEED_ZH,
     FE_TYPE_LABEL_ZH, FE_RARE_UNDERSTAND_ZH, FE_FATE_ZH, FE_DEFENSE_ZH, FE_UNIVERSAL_EN]
     .filter((arr) => _any(arr, text)).length;
-  if (descriptorCount >= 2) score += 10;
-  if (_any(FE_ACCURACY_ZH, text) || _any(FE_ACCURACY_EN, text)) score += 15;
-  if (/[！？!?]/.test(text)) score += 5;
-  score = Math.min(score, 95);
+  if (descriptorCount >= 2) score += 0.1;
+  if (_any(FE_ACCURACY_ZH, text) || _any(FE_ACCURACY_EN, text)) score += 0.15;
+  if (/[！？!?]/.test(text)) score += 0.05;
+  score = Math.min(score, 0.95);
 
   return { score, name: 'forer_effect', count: 1 };
 }

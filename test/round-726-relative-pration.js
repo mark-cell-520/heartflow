@@ -187,7 +187,16 @@ t('登记-dimensions 键含 relative_pration 且总数 156', () => {
 });
 t('登记-VERIFY_DIMS 含 relative_pration', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
-  assert.ok(/VERIFY_DIMS[\s\S]{0,5000}?relative_pration/.test(src), 'VERIFY_DIMS 未含 relative_pration');
+  // [全局修复 2026-11-16] 原判据 `/VERIFY_DIMS[\s\S]{0,5000}?relative_pration/`
+  // 用固定 5000 字符窗口——VERIFY_DIMS 集合随维度增长早已超过该窗
+  // （relative_pration 在集合尾部，实测相距 2 万+字符），恒假红。
+  // 改为按集合字面边界稳健解析（同 round-574 的 parseSet 口径）。
+  const i = src.indexOf('const VERIFY_DIMS = new Set([');
+  const j = src.indexOf(']);', i);
+  assert.ok(i > 0 && j > i, '找不到 VERIFY_DIMS 集合定义');
+  const members = [...src.slice(i, j).matchAll(/'([a-z_]+)'/g)].map(m => m[1]);
+  assert.ok(members.includes('relative_pration'),
+    'VERIFY_DIMS 未含 relative_pration（成员数 ' + members.length + '）');
 });
 t('登记-index.js 导出 checkRelativePrivation 且 CONSTANTS 齐全', () => {
   assert.strictEqual(typeof idx.checkRelativePrivation, 'function', 'index.js 未导出 checkRelativePrivation');

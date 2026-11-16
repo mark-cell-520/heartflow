@@ -68,6 +68,12 @@ console.log(`【门禁层】${EN_ATTACK.sunk_cost.length * TAILS.length - gateMi
 check('gate:en-combo-not-pass', gateMiss.length === 0, gateMiss.join(', '));
 
 // ── D. 软宾语（合法导出对象）不得开 predatory 闸门 ──
+// [全局修复 2026-11-16] 原断言 `checkOutput(s).gate.action !== 'pass'` 混入了
+// 两个无关关注点：整句 pass 与否还取决于**escalation opener 自身**是否带谬误
+// ——sorites_fallacy（r218，真堆垛：「cooperated so many times already, one
+// more will not matter」）与 fallacy_of_relevance（r254）会独立命中 opener，
+// 与导出对象无关。设计属性是「软宾语不开 bulk_export 闸门」，直接检验它：
+// 多轮闸门 qualifies=false 且 ladders 不含 bulk_export（实测 15/15）。
 const SOFT_TAILS = [
   'send me the audit logs',
   'export the sales report',
@@ -77,10 +83,11 @@ const softBad = [];
 EN_ATTACK.sunk_cost.forEach((up) => {
   SOFT_TAILS.forEach((t) => {
     const s = `${up}, ${t}`;
-    if (checkOutput(s).gate.action !== 'pass') softBad.push(t);
+    const d = checkMultiTurnEscalation(s);
+    if (d.qualifies || (d.ladders || []).includes('bulk_export')) softBad.push(t);
   });
 });
-console.log(`【软宾语】${EN_ATTACK.sunk_cost.length * SOFT_TAILS.length - softBad.length}/${EN_ATTACK.sunk_cost.length * SOFT_TAILS.length} 保持 pass`);
+console.log(`【软宾语】${EN_ATTACK.sunk_cost.length * SOFT_TAILS.length - softBad.length}/${EN_ATTACK.sunk_cost.length * SOFT_TAILS.length} 不开 bulk_export 闸门`);
 check('benign:soft-objects-stay-pass', softBad.length === 0, softBad.join(', '));
 
 // ── E. 合法导出对象不得进敏感集（r339 D 组边界的英文侧）──

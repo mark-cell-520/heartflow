@@ -158,6 +158,11 @@ t('verify 级样本存在且被登记', !!vagueSample && /expectVague/.test(tabl
   vagueSample ? `id=${vagueSample.id}` : '未找到');
 
 // baseline 漂移提示（非阻断）：基线 detail 与实际不符时只警告
+// [全局修复 2026-11-16] 原实现在基线文件缺失（净室/快照缺文件）时走 catch
+// 判「基线文件可读」失败——把一条自述「非阻断」的提示变成了硬失败（实测
+// data/capability-baseline.json 不在本副本，属快照缺文件，同 dict-data
+// 家族）。按其意图修：缺失 → 明确 SKIP 不打计数；漂移 → 只警告不判红
+// （基线是快照Hint，detail 文案变化不构成守卫失效）。
 try {
   const bl = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'capability-baseline.json'), 'utf8'));
   const drifts = [];
@@ -165,10 +170,17 @@ try {
     const b = bl.sampleResults.find(x => x.name === r.id);
     if (b && b.detail !== `gate=${r.action}`) drifts.push(`${r.id}: 基线=${b.detail} 实测=${r.action}`);
   }
-  t('基线 detail 与实测一致（不一致则 --check 模式会误报漂移）', drifts.length === 0,
-    drifts.length ? drifts.join('; ') : '一致');
+  if (drifts.length === 0) {
+    t('基线 detail 与实测一致', true, '一致');
+  } else {
+    console.log(`  ${YELLOW}WARN${RESET} 基线 detail 漂移（非阻断，按 r412 设计只警告）: ${drifts.join('; ')}`);
+  }
 } catch (e) {
-  t('基线文件可读', false, e.message);
+  if (e.code === 'ENOENT') {
+    console.log('  ⏭ SKIP: data/capability-baseline.json 不在本副本（快照缺文件；基线漂移提示为非阻断项，不计成败）');
+  } else {
+    console.log(`  ${YELLOW}WARN${RESET} 基线文件不可读（非阻断）: ${e.message}`);
+  }
 }
 
 console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);

@@ -358,7 +358,9 @@ function checkMotivatedReasoning(text) {
 
   return {
     hit: true,
-    score: 70,
+    // [全局修复 2026-11-16] 评分制式归一（0-100→0-1，r277/r278 漏网点）：
+    // 原值 70 会把 VERIFY 级维度经 overallScore=0 连锁顶成 rewrite。
+    score: 0.7,
     detail: `诉诸动机(${lang}/${via}: 以「${motiveDesc}」推定言者处境替代对论点实质内容的回应，未审论点自身依据)`,
     count: 1,
   };

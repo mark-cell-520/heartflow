@@ -46,10 +46,20 @@ const FIXED = [
 ];
 
 // 直接抽取源码里的正则，避免模块加载副作用
-function grabRegexes(file, lineNos) {
+// [全局修复 2026-11-16] 原按固定行号抽取——src 文件在任何一轮加注释/加分支
+// 后行号即漂移（实测 dream-loop.js 的两条关键词正则已从 326/337 漂到
+// 328/339，两条回归断言恒红「未在第 N 行取到正则」，而正则本身完好）。
+// 改为：有 find 签名时按内容定位（签名取常量名，稳到重构级），无签名时
+// 才退回行号。行号保留在 entry 里仅供人读。
+function grabRegexes(file, lineNos, finds) {
   const src = fs.readFileSync(path.join(ROOT, file), 'utf8').split('\n');
-  return lineNos.map(n => {
-    const line = src[n - 1];
+  return lineNos.map((n, i) => {
+    let line = null;
+    if (finds && finds[i]) {
+      line = src.find(l => l.includes(finds[i])) || null;
+    }
+    if (line === null && n) line = src[n - 1];
+    if (!line) return null;
     const m = line.match(/\/((?:\\.|\[(?:\\.|[^\]])*\]|[^\/\n\[])+)\/[gimsuyvd]*/);
     return m ? m[1] : null;
   });
@@ -88,9 +98,9 @@ const REGRESSION = [
 
 // ── 逐条回归断言 ─────────────────────────────────────────────
 for (const r of REGRESSION) {
-  const res = grabRegexes(r.file, [r.line]);
+  const res = grabRegexes(r.file, [r.line], [r.find]);
   const body = res[0];
-  if (!body) { fail++; console.error(`  ❌ ${r.name}: 未在第 ${r.line} 行取到正则`); continue; }
+  if (!body) { fail++; console.error(`  ❌ ${r.name}: 未取到正则（行 ${r.line}${r.find ? ' / 签名 ' + r.find : ''}）`); continue; }
   const re = new RegExp(body, 'i');
   const cjkHit = r.cjk.filter(s => re.test(s)).length;
   eq(cjkHit, r.cjk.length, `${r.name} 中文命中`);

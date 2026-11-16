@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const { evaluateRules, evaluate, CLASSICAL_RULES, searchClassicsBatch, parseHit } = require('../../src/knowledge/classics-rules');
+const { isAvailable: classicsAvailable } = require('../../src/knowledge/classics-base.js');
 
 // [v6.7.83] 加标准汇总行：原文件只打 ✓/✗ 列表，run-all.js 抓不到
 // 「N 通过, M 失败」就被判为"静默跳过"（该测试长期不被计数）。
@@ -140,6 +141,16 @@ test('evaluateRules 中和位育 → reference', () => {
 });
 
 test('searchClassicsBatch 多关键词合并且去重', () => {
+  // [全局修复 2026-11-16] 检索链路依赖外部语料库 daizhigev20
+  // （src/knowledge/classics-base.js 按优先级解析，净室/未安装机器上
+  // CLASSICS_BASE=null → searchClassics 直接返回空 hits 与 disabled
+  // 错误）。语料缺失是环境依赖，不是引擎缺陷——按 mcp-auth-tier
+  // （exit 77 先例）同族处理：明确记 SKIP 并打印原因，不计失败、
+  // 不伪造通过。装有语料库的机器上本断言照常全量执行。
+  if (!classicsAvailable()) {
+    console.log('  ⏭ SKIP: daizhigev20 语料库未安装（CLASSICS_BASE=null），本机无检索面');
+    return;
+  }
   const out = searchClassicsBatch(['仁政', '孝悌'], '儒藏/四书');
   assert(Array.isArray(out.hits), 'hits array');
   assert(out.keywords.length >= 2, 'keywords length');

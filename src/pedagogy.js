@@ -52,7 +52,9 @@ function getPedagogyRelaxation(pedagogy) {
   }
   if (pedagogy.hasQAPattern) {
     relax.sarcasm = 0.5;
-    relax.bullshit = 0.5;
+    // [全局修复 2026-11-16] 键名与维度登记名统一（index.js 2484 行同口径）；
+    // 旧键 'bullshit' 与 findings.dimension('bullshit_recognition') 分裂
+    relax.bullshit_recognition = 0.5;
   }
   if (pedagogy.hasCapabilityCompare) {
     relax.capability_overclaim = Math.max((relax.capability_overclaim || 0), 0.7);

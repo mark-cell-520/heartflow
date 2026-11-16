@@ -41,6 +41,13 @@
  *   ① run-all.js 用全文判断 mount 形式（不再 slice(0,400)）
  *   ② guest 写权限在 HTTP 与 Unix socket 两个通道都必须拦截
  */
+// [全局修复 2026-11-16] src/utils/stdio-guard.js 由 mcp-server.js 的 require
+// 链加载，会把「非 JSON-RPC 帧」的 stdout 写入改道 stderr——本文件第 144 行
+// require mcp-server 后，末尾的「N 通过, M 失败」汇总行全部流失到 stderr，
+// run-all 的 execFile 只 capture stdout → 本文件被计「未输出汇总行」。
+// 先例：round-733-injection-synonyms.test.js:38-45（同踩坑注释）。
+process.env.HF_KEEP_STDOUT_LOGS = process.env.HF_KEEP_STDOUT_LOGS || '1';
+
 const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');

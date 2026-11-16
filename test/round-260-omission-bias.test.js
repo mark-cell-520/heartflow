@@ -70,12 +70,22 @@ const SOLO_ZH_ATTACKS = [
   '旁观无罪，这是底线。',
   '不采取行动比行动更安全。',                        // S3 安全/稳妥比较族（r269 新增）
   '什么都不做就不会犯错，所以不做最稳妥。',          // S4 不作为→不犯错→最稳妥因果链（r269 新增）
+  // [全局修复 2026-11-16] S5/S6/S7 为 r276 新增族（行动即被责 / 不作为代价
+  // 最小化 / 作为即罪过）——模块 SOLO_ZH 6 条而样本表 3 条，负例注入
+  // forEach 越界取到 undefined，该文件长期红。补样本对齐。
+  '要是我们主动出手，一旦搞砸，责任全算在我。',      // S5 r276 行动即被责（责任归集）
+  '不插手大不了就是被说两句。',                      // S6 r276 不作为代价最小化
+  '动手就是实打实的罪过。',                          // S7 r276 作为即罪过
 ];
 const SOLO_EN_ATTACKS = [
   'Our inaction is blameless in this case.',           // E1 融合族
   'It is not a crime to look the other way.',          // E2 not a crime to 族
   'Doing nothing is always safer than taking action.', // E3 safer than acting 比较族（r269 新增）
   'When in doubt, hold back — acting is what gets you blamed.',  // E4 acting→被责族（r269 新增）
+  // [全局修复 2026-11-16] E5/E6 为 r276 新增族（not acting only costs /
+  // acting wrongly is a real sin）——模块 SOLO_EN 6 条而样本表 4 条。
+  'Not acting only costs time.',                        // E5 r276 不作为代价最小化
+  'Acting wrongly is a real sin.',                      // E6 r276 作为即罪过
 ];
 
 // ─── 良性样本（不得命中：含疑难 FP 压力样本与已知缺口）────────────────

@@ -1,12 +1,19 @@
 /**
  * test/count-rate-conflation.test.js — r249 计数-比率混淆维度测试
- * 覆盖：攻击命中（中英 pair 型）、良性零误伤（含疑难 FP 压力样本）、
+ * 覆盖：攻击命中（中英 pair 型 + 倒装族）、良性零误伤（含疑难 FP 压力样本）、
  * 口径意识/概念教学两组豁免族（嵌入真实签名，可负例注入证明承重）、
- * 边界锁（单腿/邻接维度领地/否定前缀/超距/方向约束）、中英混排
+ * 边界锁（单腿/邻接维度领地/否定前缀/超距）、中英混排
  * 多签名、负例注入（腿①计数名词族/腿①比较量级/腿②未归一化裁定
- * 逐族删除/两组豁免/距离窗承重/方向约束承重）、引擎闸。
+ * 逐族删除/两组豁免/距离窗承重/倒装方向窗承重）、引擎闸。
  * 与 r218-r248 模块同一测试范式：每个负例注入删除一组常量后，攻击
  * 必须不再命中、豁免句必须变红——证明每一组判据都真实承重。
+ *
+ * [全局修复 2026-11-16] 方向约束说明：r269 起引擎有意删除「裁定须在计数
+ * 锚点之后」的方向约束（src/count-rate-conflation.js findSignatures 内
+ * r269 注释段），改为双侧均收、仅靠 PAIR2 近距窗约束——倒装族（结论前置
+ * + 证据后置）是同族谬误的另一种语序，必须覆盖。本文件原边界锁与方向
+ * 负例注入仍编码 r269 之前的旧设计，与引擎现状矛盾（两条断言长期红），
+ * 现同步为新设计并补倒装族正向覆盖（r269 加了能力但没有任何正向样本）。
  */
 'use strict';
 const assert = require('node:assert/strict');
@@ -52,6 +59,14 @@ const ATTACK_EN = [
   'The brand with the most complaints must make the worst products',
   'Our college leads in admissions, so our faculty is the strongest',
   'This airline had the most incidents, so it is the least safe',
+];
+
+// ─── 攻击样本：倒装族（结论前置 + 证据后置，r269 起覆盖）──────────
+// r269 删除方向约束前，这类语序整句漏判；模块头注释 r269 段有设计论证。
+// [全局修复 2026-11-16] r269 加了能力但测试里没有任何正向样本——补上。
+const ATTACK_INVERTED_ZH = [
+  '这里明显更差，因为我们市癌症病例全国第一',
+  '大城市的医疗水平更高，因为大城市的重病患者人数最多',
 ];
 
 // ─── 良性样本（不得命中：含疑难 FP 压力样本）────────────────────
@@ -130,7 +145,7 @@ const BOUNDARY = [
 ];
 // 双腿超距（默认 PAIR2_ZH=40：计数锚点与裁定拉开 >40 不命中）
 const OVERDIST = '我们市癌症病例全国第一，随后市政府组织开展了为期数周的专项复核工作，逐家医院核对原始登记台账，交叉比对了历年的统计报表并走访了大量社区，动员了上百名工作人员参与数据清洗与校验，经过多轮复核确认数据无误，所以这里最不安全。';
-// 方向反置：裁定出现在计数锚点之前（默认要求裁定在后）
+// 倒装：裁定出现在计数锚点之前（r269 起有意覆盖的语序，见文件头说明）
 const REVERSED = '这里明显更差，因为我们市癌症病例全国第一。';
 
 const MIXED = '我们市癌症病例全国第一，所以这里最不安全；our city has the most cases so it is the most dangerous place.';
@@ -165,6 +180,14 @@ check('攻击命中：英文 12 条', () => {
   }
 });
 
+check('攻击命中：倒装族（结论前置+证据后置，r269 起覆盖）', () => {
+  for (const t of ATTACK_INVERTED_ZH) {
+    const r = detectCountRateConflation(t);
+    assert.equal(r.hit, true, '应命中: ' + t);
+    assert.equal(r.dimension, 'count_rate_conflation');
+  }
+});
+
 check('良性零误伤：32 条（含疑难 FP 压力样本）', () => {
   for (const t of BENIGN_HARD) assert.equal(detectCountRateConflation(t).hit, false, '误伤: ' + t);
 });
@@ -177,7 +200,7 @@ check('豁免族：概念教学（中英 2 条）', () => {
   for (const t of EXEMPT_CONCEPT) assert.equal(detectCountRateConflation(t).hit, false, '误伤: ' + t);
 });
 
-check('边界锁：单腿/邻接/否定前缀/超距/方向反置不判', () => {
+check('边界锁：单腿/邻接/否定前缀/超距不判', () => {
   for (const [k, t] of BOUNDARY) assert.equal(detectCountRateConflation(t).hit, false, '误判[' + k + ']: ' + t);
   assert.equal(detectCountRateConflation(OVERDIST).hit, false, '默认邻近窗超距不命中');
   // [r318 审计修复] r269 起腿②方向约束已从「裁定须在计数锚点之后」改为

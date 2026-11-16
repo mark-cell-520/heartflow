@@ -155,7 +155,9 @@ for (const text of BULLSHIT_EN) {
     const r = gate.checkOutput(text);
     assert.strictEqual(r.gate.action, 'rewrite',
       `真空话必须 rewrite，实得 ${r.gate.action}（${r.gate.reason}）：${text}`);
-    assert.ok(r.findings.some(f => f.dimension === 'bullshit'),
+    // [全局修复 2026-11-16] v6.8.120 起维度登记名统一为 bullshit_recognition
+    // （REWRITE_DIMS 曾漏改，本断言同步新名；见 src/index.js REWRITE_DIMS 注释）
+    assert.ok(r.findings.some(f => f.dimension === 'bullshit_recognition'),
       'findings 里必须出现 bullshit 维度');
   });
 }
@@ -203,7 +205,7 @@ t('双向门禁良性侧无 block/rewrite 由 bullshit 引起（基线 0 条）'
   for (const text of benign) {
     const r = gate.checkOutput(text);
     if ((r.gate.action === 'rewrite' || r.gate.action === 'block')
-        && r.findings.some(f => f.dimension === 'bullshit')) {
+        && r.findings.some(f => f.dimension === 'bullshit_recognition')) {
       bsFlagged++;
     }
   }

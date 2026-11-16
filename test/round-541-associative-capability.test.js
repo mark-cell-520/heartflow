@@ -10,7 +10,20 @@
 
 const assert = require('assert');
 const path = require('path');
+const fs = require('fs');
 const ROOT = path.resolve(__dirname, '..');
+
+// [全局修复 2026-11-16] 本测试的 A 段直接读 dict-data/association-graph.json
+// （2388 节点 / 7877 条真实边）——该文件在 .gitignore 内（08dc14f8 大文件移出
+// 追踪），只存在于有完整数据副本的机器；Windows 基线快照未含它。语料缺失时
+// 桥接转换/分词接入的断言无对象可守，按环境依赖明确 SKIP（同 classics 语料库
+// 家族），不伪造通过。有语料的机器上全量执行。
+const DICT_FILE = path.join(ROOT, 'dict-data', 'association-graph.json');
+if (!fs.existsSync(DICT_FILE)) {
+  console.log('SKIP round-541: dict-data/association-graph.json 不在本副本（gitignore 数据文件，联想语料缺失）');
+  console.log('SKIP 0/0 符合预期');
+  process.exit(0);
+}
 
 const { AssociationGraphBridge } = require(path.join(ROOT, 'src/core/association-graph-bridge.js'));
 const { LexicalAssociator } = require(path.join(ROOT, 'src/archive/associative-engine/lexical-associator.js'));

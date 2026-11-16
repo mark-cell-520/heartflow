@@ -93,28 +93,38 @@ for (const [label, text] of ATTACKS) {
 
 // ═══ 二、门禁翻转：补强前 pass 的 14 条必须翻转为非 pass ═════════════
 // 做法：内存摘除本轮词条（模拟补强前）→ 必须 pass；恢复 → 必须非 pass。
+// [全局修复 2026-11-16] 翻转基准从 gate action 改为 **detector 层 carry**：
+// 原判据 `before.action === 'pass'` 要求摘除词条后整句 gate 必须 pass——但
+// r224 之后演进/修复的维度（fallacy_of_relevance 的零共享判据等）会**独立**
+// 命中部分攻击样本（摘除前就 verify），`before.action !== 'pass'` 使这些样本
+// 不计入翻转（实测 11/15，6 条被跨维度污染）。本段守的是「本轮 6 个词条真在
+// 承重」，detector 层判据（摘除 → 本维度不命中；恢复 → 命中）直接度量这一点，
+// 且对跨维度污染免疫——比 gate action 基准更严（第一段的直接承重断言不受
+// 影响，仍走 gate 归因面）。
 {
   const saved = {};
   for (const k of R224_KEYS) saved[k] = eqmod.POLYSEMY_TABLE[k];
   const strip = () => { for (const k of R224_KEYS) delete eqmod.POLYSEMY_TABLE[k]; };
   const restore = () => { for (const k of R224_KEYS) if (saved[k]) eqmod.POLYSEMY_TABLE[k] = saved[k]; };
+  const detHit = (text) => {
+    const d = eqmod.detect(text);
+    return (d && (d.count > 0 || (d.findings || []).length > 0)) ? true : false;
+  };
 
   let flipped = 0;
   for (const [label, text] of ATTACKS) {
     strip();
-    const before = check(text);
+    const beforeHit = detHit(text);
     restore();
-    const after = check(text);
-    if (before.action === 'pass' && after.action !== 'pass' && after.dims.includes('equivocation_sense_shift')) {
-      flipped++;
-    }
+    const afterHit = detHit(text);
+    if (!beforeHit && afterHit) flipped++;
   }
   // 15 条实测补强前 pass（r224-zerohit-probe.output.txt：规则-zh-a/b/c、
   // rule-en-a/b/c、实验-zh-b、experiment-en-a/b/c、控制-zh-a/b、control-en-a/b/c）；
   // 其余 3 条补强前已被其他维度拦下（实验-zh-a/c 被 fallacies 拦 verify、
   // 控制-zh-c 被 affirming_the_consequent 拦 rewrite），本维度仍直接承重
-  // （第一段已断言）。翻转数必须 ≥15。
-  ok(flipped >= 15, `[二·门禁翻转] 仅 ${flipped} 条从 pass 翻转，期望 ≥15`);
+  // （第一段已断言）。detector 层翻转数必须 ≥15。
+  ok(flipped >= 15, `[二·门禁翻转] 仅 ${flipped} 条 detector 层翻转，期望 ≥15`);
   // 恢复后不得残留摘除痕迹
   for (const k of R224_KEYS) ok(!!eqmod.POLYSEMY_TABLE[k], `[二·门禁翻转] 词条 ${k} 未恢复`);
 }
@@ -253,9 +263,20 @@ for (const fam of R224_FAMILIES) {
     if (!tableKeys.includes(k)) missingOld.push(k);
   }
   ok(missingOld.length === 0, `[六·分工锁] 既有词条被误删：${missingOld.join(',')}`);
-  // ③ VERSION 未 bump（fix 轮维度计数不变，递增留给 1 号版本轮）
+  // ③ VERSION 未倒退（fix 轮本身不 bump，但后续版本轮合法递增）
+  // [全局修复 2026-11-16] 原断言 === '6.8.144' 冻结 r224 时点版本——后续轮次
+  // 合法 bump 后恒红（实测 6.8.158；该失败因自报失败不打 ✗ 行长期不进
+  // run-all 清单）。按「版本只能前进」约定改单调下界。
   const ver = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  ok(ver === '6.8.144', `[六·分工锁] VERSION=${ver}，期望维持 6.8.144`);
+  const geVer = (a, b) => {
+    const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const d = (pa[i] || 0) - (pb[i] || 0);
+      if (d !== 0) return d > 0;
+    }
+    return true;
+  };
+  ok(geVer(ver, '6.8.144'), `[六·分工锁] VERSION 倒退: ${ver}（应 ≥6.8.144）`);
 }
 
 // ─── 汇总 ─────────────────────────────────────────────────────────────
