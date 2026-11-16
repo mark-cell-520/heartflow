@@ -1,3 +1,12 @@
+## r368 — econ_reasoning_gate 第 25 子族 mercantilism 落地（真升级②；重商主义贸易顺差谬误新措辞家族）
+
+- **背景**：r367 同池 8 候选定拨落选后留档，mercantilism 穿透最高（4/5）但良性 1/3（zero_sum_fallacy 代拦良性 Trade is not zero-sum）。r368 复测立项探针（scripts/round-368/probe-mercantilism-r368.js，v6.8.189 pristine 基线）：攻击穿透 9/10（唯一非穿透条被存量 zero_sum_fallacy 代拦）、良性非 pass 1/9（存量 confidence 维度误拦，非本族增量）——超过常规立项门槛且良性边界干净。海外扫描空返（arXiv 15 条全 OR 展开噪声零相关、GitHub 0 repos、S2 429 限流），按既有形态自建。
+- **实现**：新建 `src/mercantilism.js`（341 行）——重商主义贸易顺差谬误（mercantilism / trade-surplus wealth misattribution）：贸易差额语境在场 × 把差额单边兑现为财富得失的断言。判据双腿近距共现（ZH 60 字 / EN 160 字符）+ CONCEPT/CORRECT 两组豁免 + 强否定守卫，缺一不判。腿① TRADE_NOUN_ZH/EN（顺差/逆差/出口/进口/对外购买；trade surplus(es)/deficit(s)/exports/imports 族，\b 边界防 important 咬 import）；腿②四组：GAIN 赚钱形（出口/顺差才叫赚钱）、DRAIN 流失形（进口/逆差就是财富外流、钱被外国人赚走）、ACCUM 积累/强弱形（顺差越大越富、只有多出口少进口才能富强）、LOSE 吃亏形（进口越多越吃亏、每一笔对外购买都是财富净流出）。CONCEPT 须概念名与框架词共现（防「重商主义其实是对的」前缀绕过）；CORRECT 只收正面纠正形与恒等关系形，不收裸情态词（r367 实测教训回归锁）。
+- **接线（三处，src/index.js 零改动）**：`src/econ-reasoning-gate.js` FAMILIES +1（23→24）；`src/plugins/econ-reasoning-check/index.js` FAMILIES +1（28→29）、version 1.4.0→1.5.0、头注释/description 同步。
+- **验证**：轮测 test/round-368-mercantilism.test.js 38 断言全绿——攻击 10/10 gate verify 且 econ_reasoning_gate 归因、良性 9/9 pass（存量 confidence 误拦样本断言本族零增量）、豁免结构 8 组逐组证明、负例注入 14 组全翻转（腿① 2 + 腿② 8 + 豁免承重 4）、存量四族攻击样本不被抢。四门禁与基线逐项一致：verify 16/0、abilities 20/20@259、doc-numbers 24/0、bidirectional 召回 52/52、误拦 302/326（零新增误伤）。
+- **实现期自查修正（写进源码注释/轮测）**：① 腿①动词族自查为死重（所有分支内含名词族已收词，零检测权力）移除；② ACCUM_EN 三连正则错误（countries? 不匹配 country、surpluses? 不匹配 surplus、尾部缺裸 rich 形）由注入测试抓出修正；③ DRAIN_EN 注入样本被 LOSE_EN 冗余匹配，改单源样本。
+- **版本**：6.8.189→6.8.189（子族扩族、dimMap 键数不变，VERSION 不 bump；文档无需同步）。
+
 ## r366 — 第 259 维度 existential_fallacy 接线闭环（真升级①；经典三段论形式谬误族）
 
 - **背景**：近 20 轮升级集中于 econ_reasoning_gate 行为经济学族（anchoring/mental_accounting/sunk_cost/winners_curse/zero_price）与量词逻辑族（quantifier_scope_shift/tu_quoque/red_herring），按轮换纪律本轮转向**逻辑谬误/论证谬误检测**。三层外部搜索：HN Algolia 命中 arXiv 2405.02318「Translating natural language to first-order logic for logical fallacy detection」（Lalwani et al.，HN 258 pts，https://arxiv.org/abs/2405.02318）——该论文 LLM-based，心虫为纯规则引擎**不引入 LLM 依赖**，只取其「NL→形式结构→有效性校验」思路实现于经典三段论谬误族；Semantic Scholar 返回空；GitHub 同题最高仅 1 star（ecanlar/EvaAdriana-ArgumentFallacy），无成熟方案可抄。侦察落盘：/tmp/hf-scout-366.txt、/tmp/hf-scout-r366.txt、/tmp/hf-scout-round366.txt（含 HN item id=43257719）。
