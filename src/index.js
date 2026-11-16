@@ -762,6 +762,12 @@ const { detectIllusionOfControl } = require('./illusion-of-control.js');
 // dispatch」能力，r334 补齐九处接线。变量名 coa——coercive affection
 // 缩写，grep 0 命中无冲突。
 const { checkCoerciveAffection } = require('./coercive-affection.js');
+// [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位：∀x∃y 推不出
+// ∃y∀x）require。半成品 src/quantifier-scope-shift.js r361 前段写成（工作树未
+// 提交），模块层四腿（辖域前提×存在量词结论×推断连接词×谓域共享）探针 4/4
+// 全命中，但 src/index.js 从未 require/dispatch——属「已加载未 dispatch」能力，
+// r361 补齐九处接线。变量名 qss——quantifier scope shift 缩写，grep 0 命中。
+const { checkQuantifierScopeShift } = require('./quantifier-scope-shift.js');
 // [r313] 第 254 维度 zero_price_effect（零价格效应：零价格信号 × 需求/
 // 价值判断失真两腿共现 + 邻近窗 + 三组豁免；VERIFY 级）。变量名 zpe——
 // zero price effect 缩写，grep 0 命中。
@@ -2388,6 +2394,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 独立 dispatch。半成品模块层 8/8 全命中而 gate 层穿透（未 require 未
   // dispatch），本行让条件式情感绑定以独立维度名进入 findings/scores/dimMap。
   const coa = _applyPedagogyRelaxation(checkCoerciveAffection(_normText), "coercive_affection", pedagogyRelaxation);
+  // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）独立
+  // dispatch。半成品模块层 4/4 全命中而 gate 层穿透（未 require 未 dispatch），
+  // 本行让量词辖域移位以独立维度名进入 findings/scores/dimMap。
+  const qss = _applyPedagogyRelaxation(checkQuantifierScopeShift(_normText), "quantifier_scope_shift", pedagogyRelaxation);
   // [r207] 第 204 维度 might_makes_right（强权即公理）计算点。同
   // r206 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 mmr。
   const mmr = _applyPedagogyRelaxation(checkMightMakesRight(_normText), "might_makes_right", pedagogyRelaxation);
@@ -3121,6 +3131,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r334 接线] 第 257 维度 coercive_affection 参与判定（条件式情感绑定
     // 的付出要求）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: coa.score, name:'coercive_affection'},
+    // [r361 接线] 第 258 维度 quantifier_scope_shift 参与判定（量词辖域
+    // 移位）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: qss.score, name:'quantifier_scope_shift'},
     // [r207] 第 204 维度 might_makes_right 参与判定（强权即公理）。
     // 同 r206 先例：dimMap 与 allDims 两处都接。
     {score: mmr.score, name:'might_makes_right'},
@@ -3758,6 +3771,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
     // 要求×情感锚点腿×条件构式腿×付出要求腿）。coa。
     coercive_affection: coa,
+    // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位：
+    // ∀x∃y 推不出 ∃y∀x）dimMap 登记。qss。
+    quantifier_scope_shift: qss,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性偏差×
     // 生动个案腿×偏斜断言腿）。
     vivid_case_availability: vca,
@@ -4281,7 +4297,8 @@ function discriminate(text, evidence = [], contentMode) {
     'self_fulfilling_prophecy': "不得**把预期自己制造出来的结果当成预期准确的独立证据**——自我应验预言与自败预言：信念/预言在场 → 主体或他人顺应信念行动 → 结果反向印证预言，于是结果被当作信念正确的证明，而这一结果本身就是信念驱动行为造出来的：「因为他知道自己会被歧视，所以他干脆不申请，最后果然没能入选」「所有投资人都不看好这家公司，撤资之后它果然就倒闭了」「早就有人说这个项目会黄，结果大家真的都按会黄的方式准备，项目就黄了」「因为害怕考试成绩差，她提前放弃了复习，最后成绩真的很差」「他一再说这段感情撑不过三年，对方最后真的选择了离开」「The team believed they would fail the audit, so they stopped trying and failed.」「The prophecy of a bank run caused depositors to withdraw, and the bank did collapse.」「He kept insisting the relationship would not last three years, and in the end she really did leave.」这类**信念/预言腿×信念驱动行为腿×结果反向印证腿**的话术当循环确认（样本形状与负例见 test/self-fulfilling-prophecy.test.js）。判据：腿① EXPECT 信念/预言在场——心理动词（相信/认为/觉得/担心/害怕/生怕/预期/断定/心想）+ 结果性预期（会/必然/注定/迟早），或言语动词（说/预言/断言/强调/警告/提醒/不看好）+ 频率或来源限定（早就有人/有人说/大家都/他一再/反复/不断/多次）；EN believed/thought/expected/feared/worried/predicted/prophesied/insisted/kept saying + would/will/was bound to。腿② BEHAVIOR 信念驱动行为在场，两种子形：(a) 自我挫败行为（干脆不/提前放弃/放弃/不再/停止/撤回/撤资/退出/不申请/不尝试/不作为/逃避/按…的方式准备；EN stopped trying/gave up/withdrew/pulled out/quit/stopped applying/didn't bother/resigned themselves to）；(b) 他人顺从行为（对方/他们/大家/别人/团队/储户/投资者/客户/员工 + 选择了离开/取款/撤资/退出/放弃/离开/照办/跟进；EN depositors withdrew/investors fled/staff started looking for other jobs）。腿③ CONFIRM 结果反向印证在场：果然/果真/真的/最后真的/结果真的/不出所料/意料之中/应验/说中了/猜中了/就…了；EN as predicted/as expected/sure enough/came true/did in fact/ended up/and indeed。三腿共现才判，缺腿不判——只有信念没有行为传导是 wishful_thinking 的地盘；只有结果没有信念在场是普通叙述。**信念本身不产生结果，是顺应信念的行为产生了结果**，再把结果当成信念准确的独立证据就构成正反馈闭环：正当做法是**拆开传导链**——结果里有多少是预期自己制造的、多少有独立依据，再决定能否把结果当证据（例：把「他果然没入选」改成「他没申请，所以未入选这一结果不能证明歧视预期准确」/EN: separate what the belief produced from what the evidence independently shows），或明确标注这是预期驱动而非独立验证。为什么取 verify 级：自我应验预言在心理学、社会学、组织行为学里是正当研究对象（罗森塔尔效应、标签效应、皮革马利翁效应），文学与历史叙事也大量使用，rewrite/block 会误伤；verify 的含义是「这段文本把预期驱动的结果当成预期准确的独立证据，需先拆开传导链再把结论当证据用」。边界：wishful_thinking 管「我想所以会成」的单向愿望必然化，不要求行为传导腿也不要求结果确认腿；unfalsifiable_confirmation 管「实现/没实现都算对」的对举极性，本族要求单向印证；pseudo_causal/post_hoc 管编造或误用因果机制、时间先后当因果，本族的因果链可以完全真实，错在把自造结果当作独立证据；appeal_to_consequences 管「后果糟所以不是真的」，方向相反；anonymous_source_claim 管来源不可指认，本族不关心来源只关心传导链结构。明确不判（豁免）：证据支持的预测（数据显示/研究表明/模型预测/统计表明/forecast based on/according to the data）+ 结果；预备性/防护性行为（带伞/准备/防范/加固/备份/上保险/演练/prepared/insured/backed up）——「担心下雨所以带伞，结果真的下雨了」是正确预判，本族核心反例；元话语/教学转述（自我应验预言/自败预言/罗森塔尔效应/皮革马利翁效应/标签效应/预期效应/self-fulfilling prophecy/rosenthal effect/pygmalion effect/labeling theory）；显式对冲（可能/也许/未必/不一定/大概率/might/maybe/possibly）；疑问句（含 ?/？）；复述他人观点/新闻报道（据报道/他说/according to/witnesses said）；否定翻转（不意味着/并不能说明/does not mean/不等于）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
-    // [r162] 第 162 维度 incredulity（诉诸个人怀疑）guidance。
+    // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）guidance。
+    'quantifier_scope_shift': "不得**把「对每个 x 各有一个 y」偷换成「有一个 y 对所有 x 成立」**——量词辖域移位（quantifier scope shift / scope fallacy，∀x∃y 推不出 ∃y∀x）是把逐点成立的断言整体化为同一对象的普遍断言：「对每个员工都有一个工位，所以存在一个工位是所有员工共用的」「每个人都有一位守护天使，所以有一位守护天使守护所有人」「有人迟到了，所以所有人都必须提前到」（Every student has a mentor, so there is a mentor for every student. / Each child has a parent, so there is a parent for all children.）。∀x∃y（每个人有自己的）与 ∃y∀x（有一个共用的）是逻辑强度完全不同的两个命题，前者弱、后者强，用推断连接词把前者接到后者上等于把弱命题伪装成强命题。判据**四腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① SCOPE-PREMISE 辖域前提（对每个/每一个/每个/每人/人人/每个人/各有一位/各自有/每人都有一个/任何人都有一个；EN every / each / every person / everyone has / each child / anyone has，含裸名词形：单独出现「每个」「人人」即命中腿①）；腿② EXISTENCE 存在量词结论（存在一个/有一个/某一个/某个/同一个/共用/共享/只用同一个/统统归；EN there is one / there exists / one single / the same / shared by all / a common，含裸名词形：单独出现「同一个」「共用」即命中腿②）；腿③ INFERENCE 推断连接词（所以/因此/这说明/就意味着/那就是/可见/故而；EN so / therefore / which means / hence / thus / that means，含倒装形：结论在前、前提在后作理由）；腿④ PREDICATE-SHARED 谓域共享——结论中的谓词与前提中的谓词同族（工位-工位/导师-导师/天使-天使/工位-座位；mentor-mentor/angel-angel），确保偷换的是同一个关系而非两个无关陈述。四腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「辖域移位」叙述。边界：undistributed_middle（中项不周延）管三段论中项未周延，本族管量词辖域顺序；affirming_the_consequent/denying_the_antecedent 管条件句逆/否误用，本族不依赖条件句；fallacy_of_relevance 管相关性缺失，本族的推理形式本身无效；hasty_generalization 管样本不足的归纳，本族是演绎形式的误用而非样本问题；whole_part_transfer 管整体部分性质互推，本族管的是量词嵌套顺序而非整体-部分。明确不判：正确辖域表述（每个人有各自的工位，不是同一个/每人都配了一把钥匙，钥匙不通用——**把 ∀x∃y 与 ∃y∀x 区分开是正确判别**）、同一性本来成立的陈述（全校共用一个食堂/大家共用一条网线——**对象真的是同一个时不是移位**）、提问句式（含 ?/？）、否定与对冲（不意味着/不代表/未必/不一定/取决于；EN does not mean / not necessarily / depends on）、概念教学（量词辖域/辖域移位/quantifier scope / scope fallacy / ∀x∃y）。",
     'incredulity': "不得用**主观上的「无法想象/难以置信」替代证据**，据此**否定事实的真值或真实性**——「我无法想象他怎么能做到，所以这成绩一定是假的」「实验结果简直令人难以置信，一看就是后期剪辑的」「播放量高得离谱，肯定是刷出来的」「他年纪轻轻就身居高位，我根本想象不到他凭什么，背后一定有推手」（I cannot imagine how this is possible, so it cannot be true. / The results are unbelievable, therefore the data must be fabricated. / There is no way that happened; I cannot fathom it.；样本形状与负例见 test/round-163-incredulity.js）。判据**双腿共现**：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）——只收主观认知动词被否定的陈述，孤立的感叹不是本族；腿② TRUTH-DENIAL 真值否定推导，两种子形：(a) 推断词+否定断言（所以/因此/这说明…+ 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；EN：so/therefore/which means…+ can't be true / must be fake / fabricated）；(b) 直接否定断言（一看就是假的/肯定是作弊的/不可能是真的；EN：clearly fake / no way that happened / is obviously staged），倒装形（真值否定在前、难以置信在后作理由：「这数据不可能是真的，我实在无法想象它怎么采集的」）同样命中。缺一不判——「实验结果令人难以置信」只有惊讶无否定；「这一定是假的」无难以置信前提是别的语境。以主观难以置信否定事实会把**认知边界当成证据**，让未经检验的怀疑驱逐可验证的真相：正当做法是**回到可验证依据**（录像/计时数据/第三方复核/原始记录）再下真值判断，或把结论降级为待核查假设（成绩异常需要核查，但在调取证据前不断言作弊）。边界：psychologists_fallacy 管「以为别人都和自己想的一样」，本族管对事实真值的否定；appeal_to_ignorance 管「不能证伪所以为真」，本族方向相反——「我不能想象所以为假」；unsupported_claim 管无依据断言本身，本族的断言由主观难以置信驱动；absolute_claim 管绝对化措辞，本族必须有难以置信陈述腿在场。明确不判：有据可查的惊讶（成绩提升令人难以置信，但有三次模考记录和批改痕迹可查/经第三方核实）、提问句式（含问号——求知/反问不是断言）、评析话术本身（诉诸个人怀疑/argument from personal incredulity）、无否定推导的纯感叹（快得难以置信/美味得不可思议）。",
     // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
     // 要求）guidance。
@@ -5910,7 +5927,22 @@ function discriminate(text, evidence = [], contentMode) {
     // 按 findings 的 guidance 补上无条件请求形态再采信」。射程边界：
     // 本维度只管「条件式绑定的付出要求」这一族，不管正常的情感表达
     // 与协商、也不管正当的分手/退出声明（无付出要求腿）。
+    // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位：
+    // ∀x∃y 推不出 ∃y∀x）登记。verify 级——本族以「辖域顺序」承重：
+    // SCOPE-PREMISE 辖域前提（对每个/每个/每人/人人；EN every/each/
+    // everyone has）× EXISTENCE 存在量词结论（存在一个/同一个/共用；
+    // EN there is one/the same/shared by all）× INFERENCE 推断连接词
+    // （所以/因此/这说明；EN so/therefore/which means）四腿共现。
+    // undistributed_middle 管三段论中项未周延、affirming_the_consequent
+    // 管条件句逆误用、whole_part_transfer 管整体部分互推，均不覆盖
+    // 「量词嵌套顺序被偷换」这一结构，且本族大量出现在数学教学与日常
+    // 排班语境，rewrite/block 会误伤。verify 的含义是「这段文本把
+    // ∀x∃y 偷换成 ∃y∀x，需要按 findings 的 guidance 补上正确辖域表述
+    // 再采信」。射程边界：本维度只管量词辖域移位这一族，不管正确的
+    // 逐点-共轭区分、同一性本来成立的共用陈述、条件句谬误与三段论
+    // 中项问题。
     'coercive_affection',
+    'quantifier_scope_shift',
   ]);
   // pass：无问题通过
 
@@ -6375,6 +6407,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
       // 要求）。coa。模块 r334 前已存在但从未 dispatch，本轮补齐接线。
       coercive_affection: coa,
+      // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）。
+      // qss。模块 r361 前已存在（466 行）但从未 dispatch，本轮补齐接线。
+      quantifier_scope_shift: qss,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6539,6 +6574,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 付出要求：把爱/关系存续设为对方当下付出或服从的条件）。coa——
     // coercive affection 缩写。同上：九处一次接齐。
     coercive_affection: coa,
+    // [r361 接线] 第 258 维度 quantifier_scope_shift 补登记（量词辖域移位：
+    // ∀x∃y 推不出 ∃y∀x）。qss——quantifier scope shift 缩写。同上：
+    // 九处一次接齐。
+    quantifier_scope_shift: qss,
     // [r323] 第 255 维度 red_herring 补登记（转移话题/偷换论题：用
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。

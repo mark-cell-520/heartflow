@@ -1,5 +1,18 @@
 ---
 
+# 6.8.187 变更日志条目
+
+## [6.8.187] - 2026-11-16
+
+### 第 258 维度 quantifier_scope_shift 接线闭环 + 文档债清偿（r364，真升级③）
+
+- 真升级类型 ③：接线一个已加载但从未 dispatch 的能力。`src/quantifier-scope-shift.js`（599 行）模块层早已完工，`src/index.js` 补齐九处接线（require / dispatch / 判定参与 / dimMap ×3 / guidance / VERIFY_DIMS / checkout），第 258 维度 `quantifier_scope_shift`（量词辖域移位：∀x∃y 推不出 ∃y∀x）正式进入 gate 判定。
+- 判据四腿共现 + 邻近窗（80 字 / EN 200 字符）+ 豁免组，缺一不判：SCOPE-PREMISE 辖域前提 × EXISTENCE 存在量词结论 × INFERENCE 推断连接词 × PREDICATE-SHARED 谓域共享；含倒装形（结论在前）与裸名词形（无「存在」字面词）。
+- 验证：bin/verify.js 16/16、guard-abilities 20/20（258 维度）、doc-numbers-accuracy 24/24（接手时 15/9 红）、bidirectional-guard 召回 52/52 误拦 302/326 不升；变体矩阵攻击 8/8 非 pass（qss 8/8 命中）、良性 6/7 pass（qss 零误伤）；轮测 42/42。
+- 文档三处同步 257→258、verify 224→225，Verify 列举补 quantifier_scope_shift。
+
+---
+
 # 6.8.185 变更日志条目
 
 ## [6.8.185] - 2026-11-14

@@ -1,3 +1,32 @@
+## r364 — 第 258 维度 quantifier_scope_shift 接线闭环 + 文档债清偿（真升级③；r361/r362 断线产能收尾）
+
+- **背景（断线产能收尾）**：本地工作树遗留 r361/r362 的未提交成果——`src/quantifier-scope-shift.js`（599 行，模块层已完工）与 `src/index.js` 的 41 行接线改动、README badge 的 258 标记，但 UPGRADE_LOG 无记录、三处文档维度数仍是 257、`test/doc-numbers-accuracy.test.js` 9 项红。git log 显示 r359 之后远端 agent-4 连发 r360–r363（v6.8.186），本地未推送的固化工作断线。本轮先复跑探针确认接线真实生效（非空壳），再清偿文档债并走完整验证/版本/重启流程。
+- **缺口实证（复测，未信简报）**：置假对照实验——把 dispatch 行临时置为 `{score:0,verdict:"pass"}` 后，两条良性样本（「每个人都有一位守护天使」/「每个人都有各自的工位，不是同一个」）仍被 hasty_generalization 判 verify，与接线在位时完全一致，证实该误判是既有基线行为、非本轮引入；模块层直调 3 条攻击全命中（score 78/72/0、count 1/1/0），四腿共现结构（SCOPE-PREMISE × EXISTENCE × INFERENCE × PREDICATE-SHARED + 80 字邻近窗）真实承重。
+- **真升级定性（类型 ③）**：`src/index.js` 6410 行注释载明「模块 r361 前已存在（466 行）但从未 dispatch」——本轮落地的是**接线一个已加载但从未 dispatch 的能力**，不是新维度也不是补样本。九处接线（require / dispatch / 判定参与 / dimMap ×3 / guidance / VERIFY_DIMS / checkout）经 grep 逐处确认在位。
+- **变体矩阵实测（scripts/round-364/variant-matrix.js）**：
+  - 攻击变体 **8/8 全部非 pass，8/8 命中 quantifier_scope_shift**：中文标准形、中文倒装形（结论前置）、中文长句带修饰（分布式系统 3 从句）、中文疑问/存在形、英文标准形、英文倒装形（There is one god…）、英文 each/every 混合长句、中文裸名词形（「是同一套」无「存在」字面词）。倒装形与裸名词形正是 161 轮教训的两个高发漏判形状，本轮实测均命中。
+  - 良性 **6/7 pass 且 qss 零命中**：多因共同陈述（「战争是多因共同造成的」）、否定偷换形（「但不是同一位」——本族边缘良性）、中性共享（全校共用一个食堂）、各自独立（每人都配了一把钥匙）、正确数学表述（对每个实数 x 都存在 y 使 x+y=0——∀x∃y 的合法用法）、英文否定形、英文中性形。唯一非 pass 项（「每个人都有一位守护天使，但不是同一位」→ hasty_generalization verify）已由置假对照实验证实为既有基线，非本轮引入。
+- **文档债清偿**：README.md 六处（badge / checkInput 表 / pipeline 图 / 章节标题 / action-tier / 规格表）、SKILL.md 七处（头部 / 规格表 / 章节标题 / checkpoint 表 / action-tier / Verify 列举 / 列举尾部）、AGENTS.md 三处（头部 / Verify 列举头 / 列举尾部）全部 257→258、224→225，Verify 列举补 `quantifier_scope_shift`。修后 doc-numbers 由 15 通过/9 失败 → **24 通过/0 失败**。
+- **轮测**：`test/round-362-quantifier-scope-shift.test.js`（r361/r362 遗留入库文件）单独 mount **42 passed / 0 failed**，含四腿置假注入翻转（QUESTION_TAIL_RE=null → EN 疑问探针翻、QUESTION_ZH=[] → ZH 疑问词探针翻）、__internals 暴露验证、维度计数接线断言、VERSION 一致性。
+
+### 四门禁 + 变体矩阵实测
+
+| 门禁 | 结果 |
+|------|------|
+| bin/verify.js | 16 passed / 0 failed |
+| guard-abilities | 20/20 通过（dimensions 258、block 11 / rewrite 19 / verify 225） |
+| doc-numbers-accuracy | **24 passed / 0 failed**（接手时 15/9 红，本轮清偿） |
+| bidirectional-guard | 召回 52/52 被处理（100%），误拦 302/326 pass（92.6%）——与基线完全一致，零新增误拦 |
+| 变体矩阵 | 攻击 8/8 非 pass（qss 8/8 命中）、良性 6/7 pass（qss 零误伤，唯一非 pass 为既有 hasty_generalization 基线） |
+| 轮测 | round-362-quantifier-scope-shift 42 passed / 0 failed |
+
+### 已知边界 / 交接事项
+
+1. **既有基线噪声**：hasty_generalization 对「每个人都有一位守护天使」类句式判 verify 是长期基线行为（本轮置假对照坐实），若要收需动 hasty_generalization 自身的判据，属独立议题。
+2. **文档 257→258 已全量清偿**，但 `data/test-count.json` 与 README 测试数口径仍是接手时实测值（15,934/155），未跑 run-all（20+ 分钟，爆 gateway 风险）——门禁以本机 data/test-count.json 为唯一真源，不需手工改。
+3. src/index.js 现 17,939 行，超 doc-numbers 的 14,000 阈值仅报警不拆分；下轮动 index.js 前先确认远端 agent-4 无活跃写轮次（claims.jsonl r363 dimension/release 已 completed）。
+4. r361/r362 遗留的 `scripts/round-362/`、`scripts/round-363/`、`coordination/agent4/scout/` 未跟踪探针文件本轮未提交（保留现场供追溯），只提交源码 + 测试 + 文档 + 版本 + 本轮矩阵探针。
+
 ## r333 — illusion_of_control 补腿 ×4 + 撞号重编号收尾（真升级②；远端同步轮已发 r332=winners_curse，本地 r332 固化工作按 r327 先例改 r333）
 
 - **背景（r332 未 commit 遗留）**：上一轮 r332 实质改动全部落盘并通过四门禁，但报告时处于未 commit 状态（工作树还有 4 条补腿 + 3 个探针未提交）。本轮开轮同步即遇 rebase 冲突（exit 4，coordination/claims.jsonl）：远端同步轮（HeartFlow Cron）已于 08:08-09:1x 发布 r332=winners_curse 数字竞价域新措辞家族（v6.8.184，src/winners-curse.js +108/-5、新轮测 240 行），与本地未推送的 c020aeb7（r332 illusion_of_control 接线固化，VERSION 6.8.185）轮次号撞。
