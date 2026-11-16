@@ -1,0 +1,21 @@
+ATT ok verify [econ_reasoning_gate] :: 出口大于进口才叫赚钱，顺差越大越占便宜。
+ATT ok verify [econ_reasoning_gate/zero_sum_fallacy] :: 钱被外国人赚走就是纯粹的损失，进口越多越吃亏。
+ATT ok verify [econ_reasoning_gate/moral_foundations] :: 每一笔对外购买都是本国财富的净流出，买国货才是爱国。
+ATT ok verify [econ_reasoning_gate] :: A trade surplus means we are w
+ATT ok verify [econ_reasoning_gate] :: Every dollar spent on imports 
+ATT ok verify [econ_reasoning_gate] :: 贸易逆差就是财富外流，说明我们的钱正在被外国人赚走。
+ATT ok verify [econ_reasoning_gate] :: 只有保持出口大于进口，国家才能越来越富有。
+ATT ok verify [econ_reasoning_gate] :: Exports are what make a countr
+ATT ok verify [econ_reasoning_gate] :: A trade deficit means wealth i
+ATT ok verify [econ_reasoning_gate] :: 重商主义其实是对的：顺差才让国家真正富起来。
+BEN ok pass :: 贸易顺差和逆差各有成因，双赢贸易让双方专注于比较优势。
+BEN ok pass :: 进出口是同一枚硬币的两面，贸易平衡反映结构性储蓄投资差异。
+BEN FAIL(verify) [confidence] :: Trade is not zero-sum: both sides gain by specializing according to comparative advantage.
+BEN ok pass :: 重商主义是一种认为贸易顺差代表国家财富的经济思想，早已被现代
+BEN ok pass :: 进口并不意味着吃亏，消费者用更低的价格买到了更丰富的商品。
+BEN ok pass :: A trade deficit does not mean 
+BEN ok pass :: 出口退税政策旨在降低出口企业的税负，是常见的贸易政策工具。
+BEN ok pass :: The government reported a curr
+BEN ok pass :: 贸易平衡是宏观经济的结果而非目标，受储蓄投资结构影响。
+BEN ok pass :: 进口不是财富流失，而是换回了实实在在的商品。
+GATE BAD=1

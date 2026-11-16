@@ -75,6 +75,8 @@ const ATTACK = {
   carbon_leakage: '我们把高污染工厂都迁到国外了，所以本国的环境问题已经解决。',
   // r367 价格管制单效应断言（src/price-control.js，双腿样本——腿①管制工具族 × 腿②单效应断言族）
   price_control: '房租上限只会让租房变得更便宜，不会有什么副作用。',
+  // r368 重商主义贸易顺差谬误（src/mercantilism.js，双腿样本——腿①贸易差额族 × 腿②财富得失归族群）
+  mercantilism: '出口大于进口才叫赚钱，顺差越大越占便宜。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -129,6 +131,8 @@ const INJECT_KEY = {
   carbon_leakage: ['SHIFT_VERB_ZH', 'SHIFT_NOUN_ZH', 'SHIFT_OUT_ZH', 'SHIFT_ABROAD_EN', 'SHIFT_OUTSRC_EN', 'SHIFT_TOCOUNTRIES_EN', 'SHIFT_SHIP_EN', 'SOLVED_ZH', 'SOLVED_SHIFT_ZH', 'SOLVED_BOOK_ZH', 'SOLVED_LOCAL_ZH', 'SOLVED_PROBLEM_EN', 'SOLVED_CONTROL_EN', 'SOLVED_DROP_EN', 'SOLVED_NOLONGER_EN', 'NOTOURS_ZH', 'NOTOURS_SHIFT_ZH', 'NOTOURS_EN', 'NOTOURS_HANDS_EN', 'NOTOURS_EXPORT_EN'],
   // r367 price_control（双腿：腿① CONTROL_* × 腿② ONLYGOOD_* / NOSIDE_* / AUTO_*）
   price_control: ['CONTROL_NOUN_ZH', 'CONTROL_VERB_ZH', 'CONTROL_NOUN_EN', 'CONTROL_VERB_EN', 'ONLYGOOD_PAIR_ZH', 'ONLYGOOD_GAIN_ZH', 'ONLYGOOD_PAIR_EN', 'ONLYGOOD_GAIN_EN', 'NOSIDE_ZH', 'NOSIDE_SUPPLY_ZH', 'NOSIDE_EN', 'NOSIDE_SUPPLY_EN', 'AUTO_ZH', 'AUTO_EN'],
+  // r368 mercantilism（双腿：腿① TRADE_NOUN_* × 腿② GAIN_* / DRAIN_* / ACCUM_* / LOSE_*）
+  mercantilism: ['TRADE_NOUN_ZH', 'TRADE_NOUN_EN', 'GAIN_ZH', 'GAIN_EN', 'DRAIN_ZH', 'DRAIN_EN', 'ACCUM_ZH', 'ACCUM_EN', 'LOSE_ZH', 'LOSE_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -144,14 +148,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 28 族：22 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 28); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1
+T('A2 族表 29 族：23 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 29); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 22);
+  assert.strictEqual(econ.length, 23);
   assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 28);
+  assert.strictEqual(new Set(keys).size, 29);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
@@ -161,7 +165,7 @@ T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
     assert.ok(/^r\d+$/.test(f.round), `${f.key} 起草轮次异常: ${f.round}`);
   }
 });
-T('A4 24 个模块文件全部存在且导出函数是函数', () => {
+T('A4 29 个模块文件全部存在且导出函数是函数', () => {
   for (const f of FAMILIES) {
     const p = path.join(ROOT, 'src/plugins/econ-reasoning-check', f.mod);
     assert.ok(fs.existsSync(p), `模块缺失: ${f.mod}`);

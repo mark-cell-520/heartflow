@@ -152,8 +152,11 @@ check('E2 两张族表均含 jevons_paradox 且计数 +1', () => {
   // r367 扩族义务：price_control 入表后 gate 桥 22→23、插件 27→28
   assert(GATE_FAMS.some(f => f.key === 'price_control' && f.round === 'r367'), 'gate 桥族表缺 price_control（r367 扩族漏登记）');
   assert(plugin.FAMILIES.some(f => f.key === 'price_control' && f.round === 'r367'), '插件族表缺 price_control（r367 扩族漏登记）');
-  assert.strictEqual(GATE_FAMS.length, 23, 'gate 桥族表计数应为 23，实为 ' + GATE_FAMS.length);
-  assert.strictEqual(plugin.FAMILIES.length, 28, '插件族表计数应为 28，实为 ' + plugin.FAMILIES.length);
+  // r368 扩族义务：mercantilism 入表后 gate 桥 23→24、插件 28→29
+  assert(GATE_FAMS.some(f => f.key === 'mercantilism' && f.round === 'r368'), 'gate 桥族表缺 mercantilism（r368 扩族漏登记）');
+  assert(plugin.FAMILIES.some(f => f.key === 'mercantilism' && f.round === 'r368'), '插件族表缺 mercantilism（r368 扩族漏登记）');
+  assert.strictEqual(GATE_FAMS.length, 24, 'gate 桥族表计数应为 24，实为 ' + GATE_FAMS.length);
+  assert.strictEqual(plugin.FAMILIES.length, 29, '插件族表计数应为 29，实为 ' + plugin.FAMILIES.length);
 });
 check('E3 插件 analyze(jevons_paradox) 只跑本族可用', () => {
   const r = plugin.analyze('只要把能效提上去，能源总需求自然就降下来了，不用担心总量问题。', { only: 'jevons_paradox' });
