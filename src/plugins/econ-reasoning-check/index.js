@@ -1,5 +1,5 @@
 /**
- * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 27 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族）
+ * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 28 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族）
  *
  * 背景（实例化 ≠ 接线 的集中清理）：
  *   r219-r253 三十多轮里，4 号按「经济与资源推理 / 统计素养」选题库逐族起草了
@@ -73,6 +73,11 @@ const FAMILIES = [
   // 断言/外部化免责；与 jevons 腿①零交集（效率提升 vs 空间转移），存量
   // 维度 5/6 穿透，双腿 + CONCEPT/CORRECT 两组豁免 + 强否定守卫）
   { key: 'carbon_leakage',                 mod: '../../carbon-leakage.js',                 fn: 'detectCarbonLeakage',               group: 'econ',  zh: '碳泄漏/污染避难所',     en: 'carbon leakage (pollution haven)', round: 'r366' },
+  // r367 新增：价格管制单效应断言（econ 族第 24 子族——具体管制工具在场 ×
+  // 「只会…不会…/无副作用/供给自动适配」单边收益断言，多边效应被免掉；
+  // 同池 8 候选定拨穿透最高 4/5 且良性零误伤 0/3；双腿 + CONCEPT/CORRECT
+  // 两组豁免 + 强否定守卫；CONCEPT 收泛概念名与腿①具体工具名互不咬）
+  { key: 'price_control',                  mod: '../../price-control.js',                  fn: 'detectPriceControl',                group: 'econ',  zh: '价格管制单效应断言',     en: 'price-control single-effect assertion', round: 'r367' },
 ];
 
 const _cache = new Map();
@@ -88,7 +93,7 @@ function _detector(fam) {
 }
 
 /**
- * 对一段文本跑 27 族检测。
+ * 对一段文本跑 28 族检测。
  * @param {string} text 待检测文本（think 结论 / MCP 工具入参）
  * @param {{only?: string, inject?: object}} [opts]
  *   only   — 只跑某一族（MCP 工具 action=<family key>）
@@ -143,8 +148,8 @@ function analyze(text, opts) {
 
 const plugin = {
   name: 'econ-reasoning-check',
-  version: '1.3.0', // r366：+碳泄漏/污染避难所子族（carbon_leakage）
-  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 27 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox / carbon_leakage。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）；r366 补入 src/carbon-leakage.js 的碳泄漏/污染避难所子族（产能转移 × 问题解决断言/外部化免责，探针 5/6 穿透、良性零误命中）。',
+  version: '1.4.0', // r367：+价格管制单效应断言子族（price_control）
+  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 28 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox / carbon_leakage / price_control。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）；r366 补入 src/carbon-leakage.js 的碳泄漏/污染避难所子族（产能转移 × 问题解决断言/外部化免责，探针 5/6 穿透、良性零误命中）；r367 补入 src/price-control.js 的价格管制单效应断言子族（具体管制工具在场 × 只会-不会/无副作用/供给自动适配单边收益断言，同池 8 候选定拨穿透最高 4/5、良性 0/3 零误命中，探针 0/14 的 lead-time bias 候选被存量维度全面代拦后转同池定拨）。',
   hooks: [
     { event: 'postprocess.think', priority: 190 }, // 190 > sycophancy-check 的 180：升序执行，本插件最后跑，merge 进已存在的 _discrimination（sycophancy 会整体覆写该对象）
   ],

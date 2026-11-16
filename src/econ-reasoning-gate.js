@@ -75,6 +75,13 @@ const FAMILIES = [
   // （效率提升 vs 空间转移），存量维度 5/6 穿透；双腿 + CONCEPT/CORRECT
   // 两组豁免 + 强否定守卫）。
   { key: 'carbon_leakage',                mod: './carbon-leakage.js',             fn: 'detectCarbonLeakage',          zh: '碳泄漏/污染避难所',       en: 'carbon leakage (pollution haven)', round: 'r366' },
+  // r367 新增：价格管制单效应断言（price-control single-effect assertion——
+  // 房租上限/最低工资/限价在场，被直接兑现为「只会…不会…/无副作用/
+  // 供给自动适配」单边收益，多边效应被免掉；同池 8 候选定拨穿透最高
+  // （4/5）且良性零误伤（0/3），存量维度 0/5 覆盖；双腿 + CONCEPT/
+  // CORRECT 两组豁免 + 强否定守卫；CONCEPT 收泛概念名与腿①具体工具名
+  // 互不咬，CORRECT 只收正面承认形防吞否定攻击句——r367 实测教训）。
+  { key: 'price_control',                 mod: './price-control.js',              fn: 'detectPriceControl',          zh: '价格管制单效应断言',       en: 'price-control single-effect assertion', round: 'r367' },
 ];
 
 const _cache = new Map();
@@ -98,7 +105,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 21 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 23 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

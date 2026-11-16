@@ -1,0 +1,39 @@
+### A 攻击样本 gate 层
+  ✓ A1 ZH 攻击 7/7 非 pass 且 econ_reasoning_gate 归因
+  ✓ A2 EN 攻击 4/4 非 pass 且 econ_reasoning_gate 归因
+### B 模块层
+  ✓ B1 攻击 11/11 模块命中
+  ✓ B2 gate 桥聚合含 price_control 族
+### C 良性样本
+  ✓ C1 良性 10/10 gate pass
+  ✓ C2 良性 10/10 模块零命中
+### D 豁免结构
+  ✓ D1 CONCEPT 豁免（概念教学）
+  ✓ D2 CORRECT 豁免（实证争议）
+  ✓ D3 CORRECT 不收否定攻击形（r367 教训回归锁）
+  ✓ D4 强否定守卫（并不存在副作用 = 失配）
+  ✓ D5 单腿不判（只有管制工具无单效应断言）
+  ✓ D6 单腿不判（只有单效应断言无管制工具）
+### E 负例注入
+  ✓ E 注入删 CONTROL_NOUN_ZH → 2 样本守卫翻转
+  ✓ E 注入删 CONTROL_NOUN_EN → 2 样本守卫翻转
+  ✓ E 注入删 ONLYGOOD_ZH → 1 样本守卫翻转
+  ✓ E 注入删 ONLYGOOD_EN → 1 样本守卫翻转
+  ✓ E 注入删 NOSIDE_ZH → 1 样本守卫翻转
+  ✓ E 注入删 NOSIDE_EN → 2 样本守卫翻转
+  ✓ E 注入删 AUTO_ZH → 2 样本守卫翻转
+  ✓ E 注入删 CONCEPT_ZH → 1 样本守卫翻转
+  ✓ E 注入删 CORRECT_ZH → 1 样本守卫翻转
+  ✓ E 注入删 CORRECT_EN → 1 样本守卫翻转
+### F 存量回归
+  ✓ F1 jevons 攻击样本仍被本族拦（不抢归因）
+  ✓ F2 carbon_leakage 攻击样本不被本族拦
+  ✓ F3 存量 benign 语料零误命中（官方良性集形状）
+### G 登记
+  ✓ G1 gate 桥族表含 price_control(r367) 且计数 23
+  ✓ G2 插件族表含 price_control(r367) 且计数 28
+  ✓ G3 插件 analyze(only=price_control) 路由可用
+  ✓ G4 claims.jsonl 含 r367 认领（agent-4/dimension）
+  ✓ G5 VERSION 未动（聚合族扩子族不 bump）
+
+测试结果: 30 通过, 0 失败, 共 30 个

@@ -1,0 +1,30 @@
+### ATTACK (期望非 pass)
+  mod=miss gate=verify [immortal_time_bias]  :: 这项筛查能把确诊时间提前两年，患者的生存期从确诊那天算起，所以筛查显著延长了生命。
+  mod=miss gate=verify [dose_response_linearity/reverse_causation]  :: 早癌筛查能把发现提前整整三年，患者确诊后平均多活了好几年，这说明筛查极大提升了生存收益。
+  mod=miss gate=pass [none]  :: 癌症筛查能让发现时间提前两年，早期治愈率大幅提高，筛查确实救了命。
+  mod=miss gate=verify [reverse_causation]  :: 癌症筛查能把确诊提前两年，所以筛查组的五年生存率显著更高，这说明筛查确实有效。
+  mod=miss gate=verify [reverse_causation/immortal_time_bias/moral_foundations]  :: 这个筛查项目让确诊时间平均提前三年，病人的生存期从确诊算起自然更长，项目非常成功。
+  mod=miss gate=rewrite [fallacy_of_relevance]  :: 定期体检可以早两年发现问题，患者的生存机会因此大大增加。
+  mod=miss gate=verify [reverse_causation]  :: 乳腺筛查能让确诊提前一年半，患者更早接受治疗，生存期得以延长。
+  mod=miss gate=pass [none]  :: Screening shifts the diagnosis two years earlier, 
+  mod=miss gate=rewrite [fallacy_of_relevance]  :: The test catches tumors two years sooner, and five
+  mod=miss gate=rewrite [fallacy_of_relevance]  :: Because patients are diagnosed three years earlier
+  mod=miss gate=rewrite [illicit_conversion/collider_bias]  :: Screening detects cancer two years earlier, so the
+  mod=miss gate=rewrite [fallacy_of_relevance]  :: Because screening advances diagnosis by three year
+  mod=miss gate=rewrite [fallacy_of_relevance]  :: Screening advances detection by eighteen months, s
+  mod=miss gate=rewrite [post_hoc/fallacy_of_relevance/collider_bias]  :: Patients are diagnosed two years earlier thanks to
+### BENIGN (期望 pass)
+  mod=miss gate=pass [none] <<<  :: 早发现早治疗，定期体检是保持健康的好习惯。
+  mod=miss gate=pass [none] <<<  :: 癌症如果早期发现，治愈率会明显更高。
+  mod=miss gate=rewrite [fallacy_of_relevance] <<<  :: Early detection saves lives, so regular screening 
+  mod=miss gate=verify [perfect_error] <<<  :: 随机对照试验显示，全民筛查使癌症死亡率下降了 15%。
+  mod=miss gate=pass [none] <<<  :: 领先时间偏误会让筛查的生存期统计虚高，评估筛查必须看死亡率。
+  mod=miss gate=pass [none] <<<  :: 这位患者因为体检早期发现了肿瘤，得到了及时手术。
+  mod=miss gate=pass [none] <<<  :: 随机筛查试验证实，定期筛查能让确诊提前两年并将死亡率降低两成。
+  mod=miss gate=pass [none] <<<  :: Diagnosing the disease earlier gives patients more
+  mod=miss gate=pass [none] <<<  :: 早诊早治是肿瘤防治三级预防的重要内容，需要科普宣传。
+  mod=miss gate=pass [none] <<<  :: 从确诊之日起计算生存期是临床试验的常规统计口径。
+  mod=miss gate=pass [none] <<<  :: The lead-time bias means survival measured from di
+  mod=miss gate=pass [none] <<<  :: 评估筛查效果要区分领先时间偏误和长度偏误，不能只看生存期统计。
+
+=== 汇总: 攻击穿透 0/14，良性非 pass 12/12 ===
