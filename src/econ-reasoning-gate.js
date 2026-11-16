@@ -64,6 +64,11 @@ const FAMILIES = [
   // 双腿 + CONCEPT/CORRECT/INDIV 三组豁免解掉「两组方向相反」「只是
   // 统计假象」「改善来自个体自身」三个误伤陷阱）。
   { key: 'will_rogers_phenomenon',        mod: './will-rogers-phenomenon.js',     fn: 'detectWillRogersPhenomenon',    zh: 'Will Rogers 现象/分期迁移', en: 'Will Rogers phenomenon (stage migration)', round: 'r360' },
+  // r364 新增：Jevons 悖论/回弹效应（rebound effect——效率提升降低单位
+  // 消耗，总量却可能因使用量扩张而上升；攻击形「效率上去 → 总量自然
+  // 下降/不用担心总量/多用把省下的赚回来」，存量绝对化维度只收必然/
+  // 肯定形，非绝对形 5/11 穿透；双腿 + CONCEPT/CORRECT 两组豁免）。
+  { key: 'jevons_paradox',                mod: './jevons-paradox.js',             fn: 'detectJevonsParadox',          zh: 'Jevons 悖论/回弹效应',     en: 'Jevons paradox (rebound effect)', round: 'r364' },
 ];
 
 const _cache = new Map();
@@ -87,7 +92,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 17 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 21 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

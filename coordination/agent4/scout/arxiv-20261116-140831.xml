@@ -1,0 +1,355 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/8yxsG+v+2lPirTUU9zylehQCwtI</id>
+  <title>arXiv Query: search_query=all:Jevons OR all:paradox OR all:rebound OR all:effect OR all:energy OR all:efficiency OR all:reasoning OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-16T14:09:02Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Jevons+OR+(all:paradox+OR+(all:rebound+OR+(all:effect+OR+(all:energy+OR+(all:efficiency+OR+(all:reasoning+OR+all:fallacy))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1554126</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18561v1</id>
+    <title>FETTUCCINE: Fast and efficient brain-to-text decoding on mobile devices</title>
+    <updated>2026-11-13T18:59:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.18561v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18561v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent advances in speech neuroprostheses have enabled new communication avenues for people who have lost the ability to speak due to neurological illness or injury. These systems can decode neural activity during attempted speech into text by relying on language priors to achieve high decoding accuracy. This performance currently comes at the cost of using a compute-intensive language modeling stack, presenting a major bottleneck for real-world use. Further, current language models incur highly variable and disruptive inference latencies, limiting communication throughput and preventing users from reliably participating in natural conversation. We introduce FETTUCCINE, an end-to-end brain-to-text framework that leverages the speed and portability of automatic speech recognition (ASR) models to address the aforementioned practical challenges, while achieving usable (&lt;10%) word error rates (WER), efficient adaptation to neural non-stationarities, and reliable performance on mobile devices. When evaluated using publicly available data from an intracortical speech neuroprosthesis user, FETTUCCINE outperforms previous end-to-end methods, achieving as low as 4.39% WER. Most notably, our models successfully run on a commercially-available mobile device with throughput reaching up to 370x real-time, providing the first demonstration of brain-to-text decoding on a mobile device. We also show that our models can be successfully finetuned to extend usable performance to future days. Beyond performance, our approach enables localization of the neural features most relevant for decoding via gradient-based saliency maps, which we show align with well-established physiological priors across different ASR model families. Taken together, our results show that FETTUCCINE overcomes core infrastructural and computational barriers, yielding a new class of portable brain-to-text communication.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:59:02Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Jonathan D. McCart</name>
+    </author>
+    <author>
+      <name>Pranav I. Deevi</name>
+    </author>
+    <author>
+      <name>Mehdi Azabou</name>
+    </author>
+    <author>
+      <name>Nanda H. Krishna</name>
+    </author>
+    <author>
+      <name>Caleb A. McKinney</name>
+    </author>
+    <author>
+      <name>Nicholas S. Card</name>
+    </author>
+    <author>
+      <name>Sergey D. Stavisky</name>
+    </author>
+    <author>
+      <name>Chethan Pandarinath</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18562v1</id>
+    <title>Training Reasoning Models in Simulation to Natively Use Real Robots</title>
+    <updated>2026-11-13T18:59:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.18562v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18562v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robot-use agents (RUAs) have emerged as a promising approach to general-purpose robot control. However, strong performance has so far been achieved only by frontier proprietary models such as GPT-6 Astra and Claude Fable 5.2, whereas open-weight models remain substantially less capable. We show that an open-weight 27B reasoning model can be trained to use real robots natively through reinforcement learning, entirely in simulation and without demonstrations. Like a computer-use agent (CUA), the model observes the environment, reasons in a chain of thought, and generates the next end-effector pose, without any harness. We build a Post-training Engine for Agentic Robotics (PEAR) and use it to train the model on simulated robot tasks at scale with robot-use reinforcement learning (RURL), mirroring how frontier models acquire computer use. We find that the skills acquired in simulation generalize well beyond the training tasks: they transfer to an unseen robot, to the real world, and to novel instructions. After training on LIBERO and RoboDojo in simulation, the model succeeds in 60% of our trials on a real dual-arm robot, whereas the base model succeeds in none. On LIBERO, training raises the success rate from 1.6% to 74.4%, approaching GPT-6 Astra and GPT-6.1 Sol at maximum reasoning effort. Compared with $π_{0.5}$, a vision-language-action model fine-tuned on demonstrations, our model is substantially more robust to changes in the task itself. On LIBERO-Pro, $π_{0.5}$ succeeds in only 0.75% of episodes when assigned a new task in a familiar scene whereas our model succeeds in 57.4%. Finally, the model retains its general capabilities, with no measurable degradation on nine reasoning, coding and vision benchmarks. These results highlight robot-use reinforcement learning as a promising component of foundation-model post-training.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:59:02Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Jiaming Tang</name>
+    </author>
+    <author>
+      <name>Zhuoyang Zhang</name>
+    </author>
+    <author>
+      <name>Junxian Guo</name>
+    </author>
+    <author>
+      <name>Fangzhou Zhao</name>
+    </author>
+    <author>
+      <name>Yilong Zhao</name>
+    </author>
+    <author>
+      <name>Zekai Li</name>
+    </author>
+    <author>
+      <name>Xingyang Li</name>
+    </author>
+    <author>
+      <name>Yuyang Zhao</name>
+    </author>
+    <author>
+      <name>Song Bian</name>
+    </author>
+    <author>
+      <name>Zhijian Liu</name>
+    </author>
+    <author>
+      <name>Song Han</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18559v1</id>
+    <title>BAL: Bidirectional Autoregression in Latent Space for Learning Human Movement Representations</title>
+    <updated>2026-11-13T18:58:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.18559v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18559v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Learning semantically meaningful human movement representations from 3D pose sequences is essential for human behavior modeling. Existing self-supervised methods derive supervision from artificial assumptions, e.g., invariance to augmentation within a certain range or recoverability of masked regions at a certain temporal scale, introducing heuristic hyperparameters that make the learned semantics sensitive to their settings. We propose BAL, a self-supervised framework that instead exploits supervision intrinsic to human movement: the natural ordering structure of everyday behavior. BAL autoregressively predicts in a semantically abstract latent space, analogous to how humans anticipate others' actions rather than their precise joint configurations. Bidirectional autoregressive prediction, both forward and backward in time, fully leverages these ordering constraints while enabling representation extraction using both past and future context at inference. To suppress representation collapse, BAL decomposes each prediction target into a global component capturing sequence-level semantics and a local component capturing context-independent movement. We prove that the local targets retain nontrivial angular diversity unless the representations are completely collapsed, preserving a meaningful training signal. Experiments on large-scale datasets demonstrate that BAL's representations are highly effective for motion captioning, forecasting, and interpolation, outperforming baselines on most evaluation metrics.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:54Z</published>
+    <arxiv:comment>Accepted to NeurIPS 2026. Project page: https://github.com/kyotovision-public/bal</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Genki Kinoshita</name>
+    </author>
+    <author>
+      <name>Ko Nishino</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18558v1</id>
+    <title>Reconstruction of Dynamical Dark Energy and Gravity from latest cosmological data</title>
+    <updated>2026-11-13T18:58:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.18558v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18558v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent cosmological observations have renewed interest in non-standard late-time evolution. We investigate whether departures from the standard expansion history are accompanied by modifications of gravitational dynamics through a joint, non-parametric reconstruction of the effective dark energy density, $Ω_{\rm X}(a)$, and the gravitational response functions $μ(a)$ and $Σ(a)$. Combining CMB, DESI DR2 BAO, Pantheon+, and large scale structure observations, including DES Year 3 $6\times2$pt data, we perform reconstructions with and without a theory motivated correlation prior derived from stable Horndeski models. We find a persistent maximum in $Ω_{\rm X}$ at $z\simeq0.5$--$0.7$, corresponding to a crossing of the effective phantom divide. This feature is already present in the CMB+BAO combination and remains robust when modifications to clustering and lensing are allowed. The reconstructed gravitational response exhibits suggestive enhancements in $μ$ and $Σ$ over approximately the same redshift range, although these departures are less significant. Including LSS information instead favours a reduced lensing response, $Σ&lt;1$, while leaving the background feature largely unchanged. An interpretation within Generalized Brans-Dicke theories illustrates how modifications to the effective gravitational coupling and a scalar-mediated fifth force may contribute to these trends. Our results indicate that current departures from $Λ$CDM are most significant in the expansion history, while leaving open the possibility of correlated modifications to gravitational dynamics that future Stage IV surveys can test.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:51Z</published>
+    <arxiv:comment>16 pages, 10 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Maria Luisa Gallavotti</name>
+    </author>
+    <author>
+      <name>Alessandra Silvestri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18557v1</id>
+    <title>Does Dark Energy Evolve $\textit{and}$ Cluster?</title>
+    <updated>2026-11-13T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.18557v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18557v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent cosmological observations have renewed interest in dynamical dark energy, and naturally raise the question of whether departures from the standard expansion history are accompanied by modifications of gravitational dynamics. We address this question through a joint, non-parametric reconstruction of the effective dark-energy contribution to the expansion and the gravitational responses governing clustering and lensing, complemented by a combined covariance-mode analysis, without imposing model-specific relations between the sectors. Combining CMB, DESI DR2 BAO, and Pantheon+ supernova observations, and subsequently adding large scale structure observations including DES Year 3 $6\times2$pt data and other surveys, we recover a broad maximum in the effective dark-energy density near $z\simeq0.6$--$0.7$. The gravitational responses exhibit suggestive low-redshift enhancements over their GR values, approximately coincident with the background feature. Adding large scale structure information preserves the background feature but favours a mildly reduced lensing response. The combined covariance-mode analysis identifies the combinations of background and gravitational responses most tightly constrained by current observations and quantifies their departures from $Λ$CDM. The leading modes are decisively background dominated, while the gravitational sector remains less precisely constrained. Thus, present data cannot yet determine whether the suggestive low-redshift features in the two sectors share a common physical origin, a question that ongoing Stage-IV surveys will be able to address</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:50Z</published>
+    <arxiv:comment>4 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Maria Luisa Gallavotti</name>
+    </author>
+    <author>
+      <name>Alessandra Silvestri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18556v1</id>
+    <title>From pure spinor modules to superspace superfields</title>
+    <updated>2026-11-13T18:58:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.18556v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18556v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We relate the pure spinor formalism to the superspace description of constrained superfields and gauge multiplets, mainly for abelian two-dimensional N=(2,2) supersymmetry, with three- and four-dimensional N=1 examples for comparison. For each multiplet we give an explicit module over the supertranslation Chevalley-Eilenberg algebra and match its reconstruction with the known superfields. First-order constraints come from modules supported on linear subspaces of the nilpotence variety, and higher-order ones, such as the complex-linear constraint, from Yoneda products of their Ext classes. Requiring a connection to act on given matter and its conjugate restricts its curvature, which yields the ordinary, twisted and semichiral vector multiplets with their field strengths. The module of each vector multiplet is the fiber product over the origin of the coordinate rings of the matter supports: its potentials are differences of partial potentials, and its gauge parameters are the matter superfields. For the large vector multiplet this fiber product is not a quotient of the pure spinor ring; its field strengths are four odd semichiral superfields, and partial regluing gives its constrained versions.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:43Z</published>
+    <arxiv:comment>38 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Ondrej Hulik</name>
+    </author>
+    <author>
+      <name>Raphael Senghaas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18554v1</id>
+    <title>Sharp nonuniqueness for the Vlasov--Navier--Stokes system</title>
+    <updated>2026-11-13T18:58:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.18554v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18554v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the Vlasov--Navier--Stokes system on $\mathbb T^d\times\mathbb R^d$, $d\ge2$. For smooth data and every $p&lt;2$, $q&lt;\infty$, we construct infinitely many weak solutions with velocity in $L^p_tL^\infty\cap L^1_tW^{1,q}$ and bounded, renormalized distribution function; infinitely many of them violate the energy inequality. For smooth velocity data, weak solutions with velocity in $L^2_tL^\infty$ are unique, so the result is sharp at the endpoint of the Ladyzhenskaya--Prodi--Serrin scale. The fluid carries the nonuniqueness, through the convex integration scheme of Cheskidov and Luo, and the kinetic equation is solved exactly. The main new difficulty is the memory of the particles: the kinetic state at time $t$ depends on the whole past of the velocity, so a modification on a short interval changes the system at all later times. We overcome it by a causal gluing, carried out from left to right in time, which re-solves the system on every interval of regularity. This yields wild solutions that are strong outside a closed set of times of arbitrarily small Hausdorff dimension. A causal mollification extends the construction to rough data, including every finite-energy velocity datum in dimensions two and three; in two dimensions the energy class is thus exactly the borderline of uniqueness. Finally, in three dimensions we construct Leray solutions satisfying the strong energy inequality and show that they are strong outside a closed set of times of vanishing $\mathcal H^{1/2}$ measure.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:24Z</published>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Xingyu Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18552v1</id>
+    <title>Real-time simulation of scattering in $φ^4$ theory: localized excitation, scalable wave packet preparation, and peak-generating artifacts</title>
+    <updated>2026-11-13T18:57:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.18552v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18552v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Probing real-time dynamics is essential for understanding non-perturbative scattering and interactions in quantum field theory. A common challenge in real-time simulation is preparing accurate asymptotic incoming states. Through efficiently solvable eigenvalue problems, we jointly optimize a superposition of single particle momentum eigenstates and a single site interpolating operator to maximize preparation fidelity from the interacting vacuum. This leads to a localized excitation in the interacting theory analogous to a position eigenstate. Weighted sums of the resulting interpolating operator over lattice sites prepare wave packets of arbitrary spatial extent. To ensure that this construction produces the correct continuum limit, relative phases among single particle momentum eigenstates in this superposition are calibrated using a relation derived from Lorentz symmetry. Analyzing single particle wave packet propagation through the position space profile reveals oscillatory Airy distortions, which originate from interference between saddle point contributions at different momenta that share the same lattice group velocity. These oscillations systematically weaken when approaching the continuum limit, and reliable regimes are identified as a function of simulation time and wave packet momentum profile. Two-particle scattering simulations in interacting scalar field theory are also implemented, revealing artificial inelasticity arising from coarse local field digitization or deviation from the Nyquist-Shannon sampling point. With these artifacts under control, present simulations provide emerging evidence for physical inelastic processes in $φ^4$ theory. The constructions introduced in this work may provide new understanding of state preparation for the quantum simulation of scattering.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:57:45Z</published>
+    <arxiv:comment>38 pages, 8 figures, 5 appendices</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Boyu Gao</name>
+    </author>
+    <author>
+      <name>Natalie Klco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18549v1</id>
+    <title>JVT: Just Video Transformer makes pixel-space video diffusion simple</title>
+    <updated>2026-11-13T18:55:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.18549v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18549v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Direct diffusion modeling of high-dimensional raw video data is challenging, and existing pixel-space methods often rely on specialized architectures. We introduce JVT (Just Video Transformer), a simple large-patch DiT-style Transformer for pixel-space video diffusion, without a pretrained autoencoder, auxiliary detailers, cascaded stages, or U-Net-style skip connections. We systematically examine video patch embeddings, register tokens, and adaptive layer normalization to identify design choices that balance generation quality and computational efficiency. The resulting JVT design achieves generation quality competitive with latent diffusion baselines in both class-conditioned and unconditional settings. The pixel-space formulation of JVT also naturally supports joint generation of pixel-aligned modalities. We demonstrate this capability through camera-conditioned RGB-disparity generation, which improves camera following relative to RGB-only baselines and yields explicit scene geometry without an additional reconstruction model at inference. These results highlight the potential of simple DiT-style Transformers for pixel-space video diffusion, and we hope our findings offer useful insights and practical guidance for future research.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:55:25Z</published>
+    <arxiv:comment>23 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jianjun Zhou</name>
+    </author>
+    <author>
+      <name>Hua Geng</name>
+    </author>
+    <author>
+      <name>Haoyu Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18548v1</id>
+    <title>Limitations of nonreversible lifts for subgeometric diffusions</title>
+    <updated>2026-11-13T18:53:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.18548v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18548v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the effect of lifting on continuous-time Markov processes with potentially subgeometric convergence rates. Using a series of weak Poincaré-type inequalities, we derive a bound on the maximum acceleration that can be obtained through lifting. We present several examples to explore the sharpness of our derived bound, where the resulting bound has the same square-root order as in the spectral gap setting. Our results provide a framework for understanding the potential and limitations of non-reversible lifting beyond geometric convergence.</summary>
+    <category term="stat.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:53:51Z</published>
+    <arxiv:comment>20 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="stat.CO"/>
+    <author>
+      <name>Mengxi Gao</name>
+    </author>
+    <author>
+      <name>Gareth O. Roberts</name>
+    </author>
+    <author>
+      <name>Andi Q. Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18547v1</id>
+    <title>Polynomial-Time Solvability of the Multi-Dimensional Slope Change Problem</title>
+    <updated>2026-11-13T18:52:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.18547v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18547v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Slope change detection seeks to identify changes in the trends of time-ordered signals. We study the problem of fitting a multidimensional time series by continuous piecewise-linear functions with a shared continuous breakpoint and unrestricted slopes. We consider both the dense setting, in which every dimension may change slope, and the sparse setting, in which at most $k$ dimensions may change slope. Although the resulting optimization problems are nonconvex mixed integer nonlinear programs and may have irrational optimal solutions even for rational data, we prove that all six variants, corresponding to the $\ell_1$, $\ell_2$, and $\ell_\infty$ losses in both settings, are exactly solvable in polynomial time. For least-squares loss, we obtain efficient algorithms requiring $O(JT)$ operations in the dense setting and $O(J^2T\log J)$ operations in the sparse setting, where $T$ is the number of time points and $J$ is the number of dimensions. We implement these least-squares algorithms and evaluate them on simulated data and three real-world time series, namely, surface temperatures (ERA5), hand-tracking data from a mixed-reality headset (HoloAssist), and turbofan engine sensor data (NASA C-MAPSS). The dense algorithm solves instances with up to $J=10^5$ and $T=100$, that is, $10^7$ observations, in less than $0.1$ seconds on a laptop, while the sparse algorithm solves instances with about $10^3$ dimensions and up to $T=240$ in under a second. Compared with a mixed-integer nonlinear programming (MINLP) formulation solved by Gurobi, our algorithms are several orders of magnitude faster (approximately $8.9 \times 10^3$ to $3.4 \times 10^6$ times) on instances where Gurobi terminates within its default optimality tolerance of $0.01\%$ optimality gap. On larger instances, Gurobi frequently reaches a 10,000-second time limit with substantial optimality gaps.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:52:54Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Apoorva Narula</name>
+    </author>
+    <author>
+      <name>Santanu S. Dey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18546v1</id>
+    <title>Modeling the Frictional Contact of Continuum Robots with Environments through Linear Complementarity Problem</title>
+    <updated>2026-11-13T18:51:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.18546v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18546v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Accurate friction modeling in continuum robots is essential for precise motion control and path planning. However, current approaches make predictions only for the mechanism's internal friction that is limited by the boundary forces of the Coulomb friction cone, which fail to characterize the static friction and motion hysteresis. In this paper, we propose a novel friction model based on complementarity constraints under the Coulomb friction assumption. This model predicts various friction effects caused by environmental interactions, including both static and sliding frictions and hysteresis behavior, as well as the corresponding robot deformation induced by these interactions, which are crucial for the practical motion planning and control of continuum robots. Additionally, real-time implementation of this model can be achieved, meeting the demand for computational efficiency in robotic applications. Experimental validations demonstrated that this model is able to reduce the maximum tip position error from 45.4 mm in the frictionless model to 5.85 mm in our friction-included model with a 287.9 mm-long tendon-driven continuum robot.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:51:17Z</published>
+    <arxiv:comment>Accepted for publication in International Journal of Robotics Research (IJRR). 21 pages, 18 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Jia Shen</name>
+    </author>
+    <author>
+      <name>Junhyoung Ha</name>
+    </author>
+    <author>
+      <name>Yue Chen</name>
+    </author>
+    <arxiv:doi>10.1177/02783649261504037</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1177/02783649261504037" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18543v1</id>
+    <title>Imitation Bootstrapped Multi-Agent Reinforcement Learning</title>
+    <updated>2026-11-13T18:50:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.18543v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18543v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Demonstrations are an effective way to accelerate single-agent reinforcement learning (RL), but extending this idea to multi-agent reinforcement learning (MARL) is non-trivial as it is difficult and often impossible for a single person to teleoperate multiple agents simultaneously. Round-Robin Behavior Cloning (R2BC) addresses this by letting a single demonstrator control one agent at a time while the others execute their current policies. However, the resulting imitation policies are limited by the quality of the demonstrations. We propose Imitation Bootstrapped Multi-Agent Reinforcement Learning (IBMARL), a framework that extends Imitation Bootstrapped Reinforcement Learning (IBRL) to cooperative teams and uses R2BC to train the imitation policies. At each time step, every agent receives one action proposal from its imitation policy and one from its RL policy, and an ensemble of centralized critics selects among the per-agent combinations of the two. A gated imitation penalty, a soft Q-filtered behavior cloning loss, regularizes each RL policy toward its imitation policy only where the critics value the imitation action more, so that after training each agent executes its RL policy alone, without the centralized critics. On four cooperative multi-agent RL benchmarks, IBMARL surpasses its imitation policies $2.6$-$4.2\times$ faster than demonstration-based baselines on two tasks, is the only method to surpass it on the other two, and exceeds the demonstrator itself on two of the four. With real human demonstrations IBMARL still surpasses imitation learning alone, and does so more than twice as fast as the best baseline.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:50:05Z</published>
+    <arxiv:comment>9 pages, 5 figures. Code, videos and results: https://zhanghutony.github.io/ibmarl/. A preliminary version appeared at the PhysCollaBot Workshop at IROS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Tony H. Zhang</name>
+    </author>
+    <author>
+      <name>Connor Mattson</name>
+    </author>
+    <author>
+      <name>Daniel S. Brown</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18542v1</id>
+    <title>Elliptic Sampling: Optimal Interpolant Schedules for Gaussians and Beyond</title>
+    <updated>2026-11-13T18:49:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.18542v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18542v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative modeling based on stochastic interpolants requires specifying two key choices: an interpolant schedule bridging the initial and target distributions, and an efficient discretization of the resulting probability-flow ODE. In this work, we introduce a new framework for joint schedule/discretization design based on the analyticity properties of the (complexified) ODE trajectories, which in turn ensure good numerical behavior. Our formulation can be solved exactly via conformal mapping, yielding a natural family of variance-preserving elliptic schedules, parametrized by Jacobi elliptic functions. Pairing an elliptic schedule with a tailored discretization, we obtain Zoloflow, a new sampling algorithm closely connected to Zolotarev's optimal rational function approximants. Crucially, both the elliptic schedule and Zoloflow explicitly incorporate the condition number $κ$ of the target distribution and reduce to the classical trig schedule in the limit $κ\rightarrow 1$. For Gaussian targets, Zoloflow achieves minimax optimality among all oblivious score-span algorithms, attaining total-variation error $\varepsilon$ using $Θ(\logκ\,\log(\sqrt d/\varepsilon))$ (exact) score queries. For the log-concave case, the elliptic schedule allows sampling with at most $\varepsilon$ 2-Wasserstein-error by requiring merely $\widetilde{O}(\sqrt{d} \, \mathrm{polylog}(κ, 1/\varepsilon))$ score evaluations. Complementing these theoretical results, we empirically evaluate the elliptic schedule on general (non-log-concave) target distributions, including detailed comparisons with alternative schedule proposals on both synthetic benchmarks and existing image generation datasets.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:49:36Z</published>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Cole Becker</name>
+    </author>
+    <author>
+      <name>Taylan Kargin</name>
+    </author>
+    <author>
+      <name>Kimia Hassibi</name>
+    </author>
+    <author>
+      <name>Asuman Ozdaglar</name>
+    </author>
+    <author>
+      <name>Pablo A. Parrilo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18539v1</id>
+    <title>Geometric Quantization of the Giant Graviton Master Moduli Space</title>
+    <updated>2026-11-13T18:48:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.18539v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18539v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We describe a remarkable reorganization of the space of gauge invariant operators of free or twisted $U(N)$ gauge theories as combinations of single-trace and determinant operators modulo certain "open loop equations". The reorganization has a transparent holographic interpretation, describing how states at finite $N$ can be reproduced by imposing certain $N$-independent gauge constraints on the combination of the closed strings Fock space and a geometric quantization of the moduli space of Giant Graviton D-branes, with quantization parameter $N^{-1}$. The moduli space of Giant Graviton D-branes is reproduced from tachyon condensation of auxiliary D-brane/anti-D-brane pairs which are "Koszul dual" to the D-brane system which supports the original gauge theory. We describe how to impose the open loop equations via certain BRST complexes and conjecture that their homology recovers the finite $N$ BPS Hilbert space in the limit of large auxiliary rank. The BRST construction conjecturally categorifies Murthy's Giant Graviton Expansion of indices counting $U(N)$-invariant BPS operators.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:48:14Z</published>
+    <arxiv:comment>37+21 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Kasia Budzik</name>
+    </author>
+    <author>
+      <name>Davide Gaiotto</name>
+    </author>
+  </entry>
+</feed>

@@ -310,3 +310,4 @@
 {"round":"r362","agent":"agent-4","kind":"release","claim_at":"2026-11-16T11:12:22Z"}
 {"round":"r363","agent":"agent-4","kind":"dimension","direction":"tragedy-of-commons 先占/抢先 first-mover 合理化子族（经典链）","claim_at":"2026-11-16T12:45:21Z","expires_hours":6,"status":"active"}
 {"round":"r363","agent":"agent-4","kind":"release","claim_at":"2026-11-16T13:05:47Z"}
+{"round":"r364","agent":"agent-4","kind":"dimension","direction":"Jevons 悖论/回弹效应新子族（econ_reasoning_gate 聚合族第 22 子族）：效率提升→断言总消耗必降/资源问题自动解决/多用来摊薄成本，存量 21 族零覆盖，探针 5/11 穿透；海外扫描 arXiv/GitHub/S2；src/index.js 零改动，插件层 FAMILIES 加族","claim_at":"2026-11-16T14:10:09Z","expires_hours":6,"status":"active"}

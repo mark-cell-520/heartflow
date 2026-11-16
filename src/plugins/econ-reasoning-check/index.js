@@ -1,5 +1,5 @@
 /**
- * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 21 族辨别器（插件层接线，r295 起草族 + r296 扩族）
+ * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 26 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族）
  *
  * 背景（实例化 ≠ 接线 的集中清理）：
  *   r219-r253 三十多轮里，4 号按「经济与资源推理 / 统计素养」选题库逐族起草了
@@ -17,7 +17,10 @@
  *        （think-pipeline 消费：score>0.5 → _confidencePenalty 置信度打折
  *         + warning，与 sycophancy-check 同合约）
  *     ② 两个只读 MCP 工具（heartflow_econ_fallacy_check /
- *         heartflow_stats_literacy_check），action=all|<family key>
+ *        heartflow_stats_literacy_check），action=all|<family key>
+ *   r364 补入 Jevons 悖论/回弹效应（src/jevons-paradox.js：效率提升 ×
+ *     总量下降断言/多用摊薄合理化——存量绝对化维度只收必然形，非绝对
+ *     形 5/11 穿透；26 条良性零误命中）。
  *
  * 维度计数不变（gate 层 dimMap 仍无这些键——给 1 号的交接项）；
  * src/index.js 零改动。
@@ -63,6 +66,9 @@ const FAMILIES = [
   // r360 新增：Will Rogers 现象/分期迁移（stats 族第 8 子族——组间再分类
   // × 两组指标同时改善，个体结局未变；r336/r339 同形的聚合族扩族范式）
   { key: 'will_rogers_phenomenon',         mod: '../../will-rogers-phenomenon.js',         fn: 'detectWillRogersPhenomenon',       group: 'stats', zh: 'Will Rogers 现象/分期迁移', en: 'Will Rogers phenomenon (stage migration)', round: 'r360' },
+  // r364 新增：Jevons 悖论/回弹效应（econ 族第 22 子族——效率提升 × 总量
+  // 下降断言/多用摊薄合理化；存量绝对化维度只收必然形，非绝对形 5/11 穿透）
+  { key: 'jevons_paradox',                 mod: '../../jevons-paradox.js',                 fn: 'detectJevonsParadox',               group: 'econ',  zh: 'Jevons 悖论/回弹效应',   en: 'Jevons paradox (rebound effect)', round: 'r364' },
 ];
 
 const _cache = new Map();
@@ -133,8 +139,8 @@ function analyze(text, opts) {
 
 const plugin = {
   name: 'econ-reasoning-check',
-  version: '1.1.0', // r296：+信息与激励盲区 3 子族（adverse_selection / moral_hazard / free_rider）
-  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 21 族辨别器（r295 插件层接线 + r296 扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）。',
+  version: '1.2.0', // r364：+Jevons 悖论/回弹效应子族（jevons_paradox）
+  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 26 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）。',
   hooks: [
     { event: 'postprocess.think', priority: 190 }, // 190 > sycophancy-check 的 180：升序执行，本插件最后跑，merge 进已存在的 _discrimination（sycophancy 会整体覆写该对象）
   ],
