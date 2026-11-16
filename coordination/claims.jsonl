@@ -301,3 +301,4 @@
 {"round":"r357","agent":"agent-4","kind":"release","status":"completed","ts":"2026-11-16T02:10:00Z","summary":"路径 h 三新措辞族落地（腿①第十族 DETECT_UP_ZH7 新进步动词 + 腿②第十三族 CASE_SURGE_ZH7 新激增名词 + 腿③第五族 INCIDENCE_CLAIM_ZH4 新趋势动词）+ CASE_SURGE_ZH6 副词扩词 6 词，真升级类型②，四门禁全绿零新增误伤，轮测 37/37，负例注入 64/64 翻转；r356 交接项②名词中介隐患实测不成立；Berkson 第 6 次留交"}
 {"round":"r358","agent":"agent-4","kind":"dimension","direction":"统计与科学推理·轮换出路径 h（r348–r357 连续 10 轮后换向）候选定拨：A dose_response_linearity 日常物品剂量外推族（「喝一杯咖啡提神，那喝十杯就能通宵不困」类——r330/r331/r333 三轮交接给 1 号的模块层 MISS 项，探针复测穿透且良性零误伤者落地）、B red_herring 他者对照反问倒装形（r324 交接已知边界 counter 族只做前向）、C econ_reasoning_gate 剩余新措辞家族——立项探针穿透最高且良性零误伤者落地；海外扫描 arXiv stat.ME/cs.AI/GitHub/S2；src/index.js 零改动","claim_at":"2026-11-16T03:07:27Z","expires_hours":6,"status":"active"}
 {"round":"r358","agent":"agent-4","kind":"release","status":"completed"}
+{"round":"r348","agent":"agent-4","kind":"release","claim_at":"2026-11-16T05:10:16Z","status":"completed"}
