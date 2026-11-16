@@ -129,7 +129,9 @@ const A_ZH = [
   // ①-b 修饰语×资源名词（公共的草场/免费的水源/没人管的林子）
   /(?:公共|公有|共用|共有|共享|无主|没人管|没人负责|无人看管|没有人管|不要钱|免费|白拿|谁都可以|大家都可以|谁都能|人人可用|开放)(?:的|地)?[^。，！？；\n]{0,8}(?:草场|牧场|草原|渔场|鱼塘|林子|森林|林地|水源|地下水|河流|湖泊|海域|公海|湿地|空气|车位|道路|频段|频道|信道|带宽|池塘|海滩|水井|野菜|蘑菇|资源)/,
   // ①-c 资源名词×归属形（草场是公共的/牧场公有/地下水不要钱/草原没有围栏）
-  /(?:草场|牧场|草原|渔场|鱼塘|林子|森林|林地|水源|地下水|河流|湖泊|海域|公海|湿地|空气|车位|道路|池塘|海滩|水井|资源)[^。，！？；\n]{0,6}(?:是|属于|归)?(?:公共|公有|共有|共用|共享|无主|没人管|无人看管|集体|大家|全村|全体|不要钱|免费|白拿|谁都可以|没有围栏|无围栏)(?:所有|共用|共有|的)?/,
+  // [r363] 归属形补「谁都能/大家都能/人人可」——「公海的鱼谁都能捞」资源在前、
+  // 归属在后的语序只有 ①-c 收得到（①-b 是修饰语在前、资源在后）
+  /(?:草场|牧场|草原|渔场|鱼塘|林子|森林|林地|水源|地下水|河流|湖泊|海域|公海|湿地|空气|车位|道路|池塘|海滩|水井|资源)[^。，！？；\n]{0,6}(?:是|属于|归)?(?:公共|公有|共有|共用|共享|无主|没人管|无人看管|集体|大家|全村|全体|不要钱|免费|白拿|谁都可以|谁都能|大家都能|人人可|没有围栏|无围栏)(?:所有|共用|共有|的)?/,
   // ①-d 系动词×归属形（是大家的/属于公众的/归全体村民）；「并不是/不属于」式
   // 否定由 lookbehind 直接排除（否定词紧贴系动词，前窗查不到完整否定词）
   /(?<!不)(?:是|属于|归)(?:公共|公有|共有|共用|共享|集体|大家|全村|全体|公众|全社会)(?:所有|共用|共有)?的/,
@@ -384,6 +386,68 @@ const C_EN4 = [
   /\b(?:if|since)\s+it(?:'?s|\s+is)?\s+(?:free|covered|funded)\s*,?\s+(?:so\s+)?(?:take|grab|use)\s+as\s+much\s+as\s+you\s+can\b/i,
 ];
 
+// ─── [r363] 先占/抢先「第一人背叛」合理化族（现代共享资源抢先取用）──────
+// 零命中探针 coordination/agent4/probes/r363-probe-firstmover.js（v6.8.186
+// 模块直调 + gate 层双路实测）：存量三腿六链（经典草渔林水 / r315 数字公地 /
+// r321 现代过度取用）的腿③只收「自己多挣/成本大家扛/是理性的/不X白不X/抢到
+// 就是赚到/来都来了」式获益-扩散-认可断言，整族漏掉**先占/抢先型第一人合理化**
+// ——「共享资源 + 别人也会过度取用 + 所以先尽量多占」：我不多养别人也会多养，
+// 先占先得 / 公海的鱼我不捞就被别的船捞光，不如先尽量多捕 / if I do not
+// catch more, other boats will, might as well grab it first。这是公地悲剧的
+// 「抢先背叛」变体：用「别人也会/我不占就被占」把自身过度取用正当化，与存量
+// 「自己多挣一份」「成本大家一起扛」语义不同族。10 条攻击候选整族穿透模块
+// （mod=miss），gate 层 5 条 ZH pass、3 条 EN pass（余 2 条 EN 被既有维度
+// rewrite 代拦但非本族承重）；良性 10 条中 9 条本族零误伤（唯一 gate=rewrite
+// 的「先到先得排队规则」由无关维度代拦、非本族，且三腿判据天然不命中）。
+//
+// 设计纪律（同 r315/r321 平行常量范式）：
+//   · 新腿③ C_ZH5/C_EN5 与 EN 第一人称过度取用腿② B_EN5 为平行常量，经
+//     findSignatures concat 合入**全部六条链**的对应腿，存量腿一字不动；
+//   · concat 用 (R.C_ZH || C_ZH).concat(fm) 而非覆盖，故存量负例注入语义
+//     （R.C_ZH=[] / R.C_ZH3=[] / R.C_ZH4=[] 只关各自链的原腿③）不变——存量
+//     攻击样本用存量腿③措辞，不会误中新腿③；
+//   * 新腿一律走存量 matchAlive 否定守卫（「不是谁抢先」「别人也不会多占」）；
+//   · 窗距沿用存量 PAIR_ZH 60 / PAIR_EN 180，三腿共现结构天然压低误伤。
+// 腿③ 先占/抢先合理化（中文，合入全部 ZH 链）
+const C_ZH5 = [
+  // 先占/抢先标记（先占先得/先下手为强/捷足先登/手快有/谁抢先/抢占先机）
+  /先占先得|先下手为强|捷足先登|手快有|谁抢先|先抢先|抢占先机|趁早下手/,
+  // 「(我)不X，别人/他人/邻…也会(多)X」——别人也会多养 / 邻村也会抽 / 别的厂也会排
+  /(?:别人|他人|别的|其他人|别家|别村|邻居|邻村|对手|竞争者|后来者|别的船|其他船|别厂|别的厂|其他厂|外村|外地)(?:也|还会|反倒|照样)(?:会|要|这么|那样)?[^。！？；\n]{0,6}(?:多|抢|占|捞|拿|采|捕|抽|砍|挖|排|干|做|用|分|夺|拿)/,
+  // 「不X就被/会被 别人/别家X」——不去捞就被别的船捞光 / 不占就被别人占
+  /(?:不|没|未必)[^。！？；\n]{0,12}?(?:就被|就会被|就要被|会被|得被)(?:别人|他人|别的|其他|别家|别村|邻居|邻村|别的船|其他船|别厂|对手)[^。！？；\n]{0,8}(?:占|捞|抢|拿|瓜分|分|用|采|捕|抽|砍|挖|夺|拿走|挤)/,
+  // 「趁现在/趁早/趁着还没 + 多X/抢」——趁现在能多砍就多砍
+  /趁(?:着)?(?:现在|早|来得及|还没|尚未|行情|机会|空档|这波)[^。！？；\n]{0,8}(?:多|尽量|拼命|赶紧|抢|占|捞|拿|采|捕|抽|砍|挖)/,
+  // 「现在不X，以后/将来 就没机会/就没了/就轮不到」机会窗口关闭
+  /(?:现在|当下|眼前|这阵|如今)(?:不|没)[^。！？；\n]{0,10}(?:以后|往后|将来|日后|回头|再过|明年)(?:就|恐怕|只怕|怕是|怕)?(?:没|没了|来不及|轮不到|抢不到|捞不到|占不到)/,
+];
+// 腿② 第一人称过度取用（英文，合入全部 EN 链；存量 B_EN 只收 each/every/all
+// 量化形，不收「I grab it first / I take what I can now / I pump more」自述形）
+const B_EN5 = [
+  // I/we + grab/take/seize/get/claim + it / as much (as I can) / my share
+  /\b(?:i|we)\s+(?:\w+\s){0,3}(?:grab|take|seize|get|claim|hoard|stockpile)\s+(?:it|them|as\s+much|as\s+many|my\s+share|what\s+i\s+can|all\s+i\s+can)\b/i,
+  // grab/take/seize + it / as much + first / now / while I can
+  /\b(?:grab|take|seize|get)\s+(?:it|them|as\s+much|as\s+many|my\s+share|what\s+i\s+can|all\s+i\s+can)\s+(?:first|now|while\s+(?:i|we)\s+(?:still\s+)?can|before)\b/i,
+  // I/we + 过度取用动词 + more（I catch more / I pump more）
+  /\b(?:i|we)\s+(?:\w+\s){0,2}(?:catch|pump|graze|download|draw|extract|harvest|fish|use|take|grab)\s+more\b/i,
+];
+// 腿③ 先占/抢先合理化（英文，合入全部 EN 链）
+const C_EN5 = [
+  // if I don't / if I hold back … (others|they|other boats) will …
+  /\bif\s+(?:i|we)\s+(?:don'?t|do\s+not|hold\s+back|restrain|refrain)[^.]{0,50}\b(?:others?|someone|they|everyone|the\s+rest|competitors?|neighbou?rs?|other\s+(?:boats?|farms?|fishers?|firms?))\s+(?:will|would|'?ll)\b/i,
+  // unless I … other(s)/someone will …
+  /\bunless\s+(?:i|we)\s+[^.]{0,40}\b(?:other|others|someone|everyone|they)\b/i,
+  // no reason to hold back / restrain / be the only one
+  /\bno\s+reason\s+(?:for\s+(?:me|us)\s+)?to\s+(?:hold\s+back|restrain|refrain|be\s+the\s+only|be\s+the\s+last)/i,
+  // grab/take it first / first come first served
+  /\bfirst[- ]come[, ]+first[- ]served\b/i,
+  /\b(?:grab|take|seize|get)\s+(?:it|them|my\s+share|what\s+i\s+can)\s+(?:first|now)\b/i,
+  // while/before (I|we) still can
+  /\b(?:while|before)\s+(?:i|we)\s+(?:still\s+)?can\b/i,
+  // had better / might as well grab/take/hoard
+  /\b(?:had\s+better|might\s+as\s+well|may\s+as\s+well)\s+(?:grab|take|seize|get|stockpile|hoard)\b/i,
+];
+
 // 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内）
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -462,13 +526,22 @@ function dist(a, b) {
  */
 function findSignatures(text, R) {
   const sigs = [];
+  // [r363] 先占/抢先第一人合理化腿：仅合入**经典链**（草渔林水 / pasture-fishery-
+  // aquifer）的对应腿，不碰 r315 数字链 / r321 现代链——后两者的负例注入测试
+  // （删 B_EN3/C_EN3/B_EN4/C_EN4 元素后须翻红）要求本链检测被自身腿完全支配，
+  // 若把共享腿 concat 进去会留下后备匹配致注入不翻红（实测 round-315 新增 2 红）。
+  // 经典链攻击样本用存量腿③措辞（自己多挣/成本大家扛），不误中新腿③，故经典链
+  // 负例注入语义不变。数字/现代链的先占族作后续交接。concat 而非覆盖。
+  const fmZhC = R.C_ZH5 !== undefined ? R.C_ZH5 : C_ZH5;
+  const fmEnB = R.B_EN5 !== undefined ? R.B_EN5 : B_EN5;
+  const fmEnC = R.C_EN5 !== undefined ? R.C_EN5 : C_EN5;
   const langs = [
     {
-      a: R.A_ZH || A_ZH, b: R.B_ZH || B_ZH, c: R.C_ZH || C_ZH,
+      a: R.A_ZH || A_ZH, b: R.B_ZH || B_ZH, c: (R.C_ZH || C_ZH).concat(fmZhC),
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
-      a: R.A_EN || A_EN, b: R.B_EN || B_EN, c: R.C_EN || C_EN,
+      a: R.A_EN || A_EN, b: (R.B_EN || B_EN).concat(fmEnB), c: (R.C_EN || C_EN).concat(fmEnC),
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
     // [r315] 数字公地/免费额度族（新措辞家族，独立链）
@@ -554,6 +627,7 @@ module.exports = {
     A_ZH, A_EN, B_ZH, B_EN, C_ZH, C_EN,
     A_ZH3, A_EN3, B_ZH3, B_EN3, C_ZH3, C_EN3,
     A_ZH4, A_EN4, B_ZH4, B_EN4, C_ZH4, C_EN4,
+    C_ZH5, B_EN5, C_EN5,
     CONCEPT_ZH, CONCEPT_EN,
     PAIR_ZH, PAIR_EN,
   }),
