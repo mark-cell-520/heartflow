@@ -1,0 +1,11 @@
+=== 攻击（期望 gate.action=verify + econ_reasoning_gate）===
+  action=verify  econ=Y  pot_in_trace=true  | 如果人人都不消费、多储蓄，总需求不会受影响，经济照样增长
+  action=verify  econ=Y  pot_in_trace=true  | Universal thrift boosts total demand and
+  action=rewrite  econ=Y  pot_in_trace=true  | 储蓄是美德，所以全社会越节俭，经济就越繁荣
+  action=verify  econ=Y  pot_in_trace=true  | If everyone saves more, aggregate demand
+
+=== 良性（期望 gate.action=pass）===
+  action=pass  econ=N  | 节约悖误（paradox of thrift）指个人增加储蓄在人人效仿时会拖累总
+  action=pass  econ=N  | 提高储蓄率长期有助于投资，但短期可能减少消费
+  action=rewrite  econ=N  | 如果所有人都多存钱，短期总需求会下降，内需受打击
+  action=pass  econ=N  | 增加储蓄有利于个人退休保障和长期财富积累

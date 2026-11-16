@@ -1,0 +1,5 @@
+base hit: true (期望 true)
+array-inject THRIFT_NOUN_ZH=[] hit: false (期望 false)
+regex-inject all-legs hit: false (期望 false, 无 crash)
+plugin before families: paradox_of_thrift
+plugin after  families: (none) (期望无 paradox_of_thrift)

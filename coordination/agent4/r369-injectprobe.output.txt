@@ -1,0 +1,6 @@
+spread regex THROWS: /(?!)/i is not iterable
+mercantilism internals keys: TRADE_NOUN_ZH,TRADE_NOUN_EN,GAIN_ZH,GAIN_EN,DRAIN_ZH,DRAIN_EN,ACCUM_ZH,ACCUM_EN,LOSE_ZH,LOSE_EN,TRADE_ZH,TRADE_EN
+base hit: true
+regex-inject hit: true
+pot base hit: true
+pot regex-inject hit: true

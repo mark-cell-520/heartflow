@@ -1,0 +1,42 @@
+
+========== 候选 lump_of_labor ==========
+
+[攻击] 11 条 → pass=3 非pass=8
+  NONP  block     | 机器人会抢走固定数量的工作岗位，导致永久性失业
+  NONP  block     | 每个机器替代一个工人，所以机器越多，工作岗位就越少
+  PASS   pass      | 移民抢占了有限的工作岗位总数，本地工人必然失业
+  PASS   pass      | 自动化每消灭一个岗位就净减少一份工作，就业总量只会下降
+  NONP  rewrite   | 效率提升让同样的活用更少的人干完，工作岗位总数因此减少
+  NONP  block     | 社会上工作的总量是固定的，机器多干一份，人就少一份收入
+  NONP  verify    | Robots will take the fixed pool of jobs, c
+  PASS   pass      | Every robot replaces a worker one-for-one,
+  NONP  rewrite   | Immigrants take a fixed number of jobs, so
+  NONP  rewrite   | Automation eliminates jobs without creatin
+  NONP  rewrite   | There is a fixed lump of work, so labor-sa
+
+[良性] 7 条 → pass=3 非pass=4
+  PASS   pass      | 劳动总量固定谬误（lump of labor fallacy）认为工作岗位总数固定，
+  NONP  rewrite   | 技术变革历史上创造的岗位比消灭的更多，就业总量并未因此下降
+  PASS   pass      | 移民既消耗岗位也创造需求与新岗位，不是简单的此消彼长
+  PASS   pass      | 提高自动化水平会改变岗位结构，但不必然减少就业总量
+  NONP  verify    | The lump of labor fallacy assumes a fixed 
+  NONP  verify    | Historically, technology has created more 
+  NONP  rewrite   | Immigration affects both labor supply and 
+
+========== 候选 paradox_of_thrift ==========
+
+[攻击] 7 条 → pass=3 非pass=4
+  PASS   pass      | 如果人人都不消费、多储蓄，总需求不会受影响，经济照样增长
+  NONP  rewrite   | 储蓄是美德，所以全社会越节俭，经济就越繁荣
+  NONP  rewrite   | 人人多储蓄能增加资本积累，因此总需求和国民收入都会上升
+  NONP  rewrite   | 节俭对个人是好事，对全社会也必然是好事，越节俭经济越好
+  PASS   pass      | If everyone saves more, aggregate demand i
+  NONP  rewrite   | Saving is a virtue, so the more the whole 
+  PASS   pass      | Universal thrift boosts total demand and g
+
+[良性] 5 条 → pass=5 非pass=0
+  PASS   pass      | 节约悖误（paradox of thrift）指个人增加储蓄在人人效仿时会拖累总需求
+  PASS   pass      | 全社会储蓄率骤升可能在短期抑制消费与总需求，这正是凯恩斯指出的节约悖误
+  PASS   pass      | 提高储蓄率长期有助于投资，但短期可能减少消费
+  PASS   pass      | The paradox of thrift shows that universal
+  PASS   pass      | Higher saving can fund investment in the l
