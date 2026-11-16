@@ -222,9 +222,12 @@ check('G4 claims.jsonl 含 r367 认领（agent-4/dimension）', () => {
     .split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (_) { return null; } });
   assert(claims.some(c => c && c.round === 'r367' && c.agent === 'agent-4' && c.kind === 'dimension'), '缺 r367 认领');
 });
-check('G5 VERSION 未动（聚合族扩子族不 bump）', () => {
+check('G5 VERSION 未被 r367 改动（rebase 后基线 6.8.189）', () => {
   const v = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  assert.strictEqual(v, '6.8.188', 'VERSION 应为 6.8.188，实为 ' + v);
+  // r367 两个 commit（d8fdd20 + 0565fae）未触碰 VERSION；6.8.188→6.8.189
+  // 为远端 r365/r366 断线轮（d2b2d1d existential_fallacy 第 259 维度）bump，
+  // rebase 后成为本地基线。若未来他轮再 bump，同步此断言。
+  assert.strictEqual(v, '6.8.189', 'VERSION 应为 6.8.189，实为 ' + v);
 });
 
 console.log('\n测试结果: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');
