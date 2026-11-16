@@ -1331,7 +1331,11 @@ const CASE_SURGE_ZH5 = [
 const CASE_SURGE_ZH6 = [
   // 病例名词 + [≤8 字 gap] + 被/得以/得到 + 副词 + (重新)? + 发现/识别/查出/
   // 检出/确诊（副词必填隔离 ZH3 直缀形）
-  /(?:病例|患者|病灶|肿瘤|癌症|感染者|病人|确诊者)[^。！？]{0,8}(?:被|得以|得到)(?:不断|陆续|大量|纷纷|逐步|渐次|逐渐|日益|持续|进一步|明显|显著|及时)(?:重新)?(?:发现|识别|查出|检出|确诊)/,
+  // [r357] 副词表扩词（r356 交接项①）：+猛然/骤然/成批/批量/成群/蜂拥
+  // （低频副词形，探针 6/6 模块级 leg2=- 缺口真实，gate 层 1/6 穿透 5 条被
+  // reverse_causation/pseudo_causal 代拦不截胡；新副词与旧副词表及任何其他
+  // 族精确不相交，扩词不动族结构故零触碰 r346–r356 既有注入断言）
+  /(?:病例|患者|病灶|肿瘤|癌症|感染者|病人|确诊者)[^。！？]{0,8}(?:被|得以|得到)(?:不断|陆续|大量|纷纷|逐步|渐次|逐渐|日益|持续|进一步|明显|显著|及时|猛然|骤然|成批|批量|成群|蜂拥)(?:重新)?(?:发现|识别|查出|检出|确诊)/,
 ];
 
 // ─── [r356] 路径 (h) 腿①检出更新换代形（ZH 专项，族独立常量）────────────────
@@ -1374,6 +1378,79 @@ const DETECT_UP_ZH6 = [
 const INCIDENCE_CLAIM_ZH3 = [
   // 发病率/发生率/患病率/罹患率/罹病率 + [≤8 字 gap] + 走强/看涨/升温/走热
   /(?:发病率|发生率|患病率|罹患率|罹病率)[^。！？]{0,8}(?:走强|看涨|升温|走热)/,
+];
+
+// ─── [r357] 路径 (h) 腿①检出新进步动词族（ZH 专项，族独立常量）────────────────
+// r356 交接项延伸 + r357 立项探针四轮（coordination/agent4/probes/
+// r357-probe-round{1,2,3,4}.js，集成树 v6.8.185 gate() 全量 findings 口径 +
+// 模块级 legs 隔离双口径）：DETECT_UP_ZH p2 后缀为 进步/提升/改进/发展/普及/
+// 推广、DETECT_UP_ZH6 动词表为 更新换代/升级换代/迭代/革新/换代/日新月异/
+// 今非昔比/升级/更新——「检测技术突飞猛进」「诊断方法日趋精湛」「检测能力
+// 今胜于昔」「检验技术日益精进」「检测技术日臻完善」腿① leg1=- 穿透。
+// round3 干净腿框（腿②被重新发现/浮出水面 ZH3/ZH2 承重、腿③这种病真的在
+// 变多 legacy p4 承重）：攻击 5/7 gate 穿透（检验能力日益精进 1 条被
+// pseudo_causal 代拦不截胡、leg1=- 缺口真实；控制 2/2 更新换代/进步已承重）、
+// 良性 5/5 零误伤（渲染/压缩算法类软件工程良性无腿②腿③不判；对冲否定由
+// EXEMPT_INC_ZH 兜底）。带「的」形（检测技术的突飞猛进）同收。
+// 族隔离纪律（r346–r356 十二轮测以精确 equality/注入钉死既有常量承重）：
+//   ① 动词表 突飞猛进/日趋精湛/今胜于昔/日益精进/日臻完善 与 DETECT_UP_ZH
+//      p2（进步/提升/改进/发展/普及/推广）、DETECT_UP_ZH6（更新换代类）、
+//      DETECT_UP_ZH5（形容词+技术后缀，无动词后缀）严格整词不相交；
+//   ② 「日臻成熟」不收——「检出手段/检测方法+日臻成熟」腿①由 LEAD_SCREEN_ZH
+//      承重（检出/检测方法为筛查域显式词），非缺口不收防双承重；
+//   ③ 前缀沿用 DETECT_UP_ZH6 四前缀（检查/检测/检验/诊断），不收「检出」
+//      前缀（同②理由）；名词中介同 ZH6 p1 七件套。
+const DETECT_UP_ZH7 = [
+  // 前缀 + 技术/手段/方法/能力/水平/工具/设备 + (的)? + 新进步动词
+  /(?:检查|检测|检验|诊断)(?:技术|手段|方法|能力|水平|工具|设备)(?:的)?(?:突飞猛进|日趋精湛|今胜于昔|日益精进|日臻完善)/,
+];
+
+// ─── [r357] 路径 (h) 腿②检出计数新激增名词族（ZH 专项，族独立常量）──────────
+// r356 交接项延伸 + r357 立项探针四轮：legacy CASE_SURGE_ZH 激增动词表为
+// 激增/飙升/猛增/大涨/成倍增长/翻倍/翻番/倍增/节节攀升/大幅上升/大幅增加/
+// 显著增加/明显增多/上升/增长/增加/提高/攀升/上涨/变多/增多——「病例数屡创
+// 新高」「确诊病例连创新高」「新增病例呈井喷态势」「病例井喷」「确诊病例
+// 一路狂飙」腿② leg2=- 穿透。round3 干净腿框（腿①普筛开展/检测升级
+// LEAD_SCREEN_ZH/ZH6 承重、腿③表明患病率真的在升高 legacy p3 承重）：
+// 攻击 2/6 gate 穿透（屡创新高/井喷短形），连创新高/井喷/狂飙 3 条被
+// reverse_causation/pseudo_causal 代拦不截胡（leg2=- 缺口真实）；控制 1/1
+// （新增病例激增 legacy 已承重）。良性 4/4 零误伤：名词表限定病例域
+// （用户数/销量/股价 不收——名词前缀不含用户/销量/股价），对冲否定由
+// EXEMPT_INC_ZH 兜底；「检查人次屡创新高」——「检查」不在本族名词前缀表
+// （legacy 同套前缀不含检查），实测不判。
+// 族隔离纪律：动词表 屡创新高/连创新高/屡创纪录/连创纪录/井喷/狂飙 与
+// legacy 激增动词表（及 ZH2–ZH6 各族动词表）严格整词不相交；名词表沿用
+// legacy 同套 + 患者/感染者/病人/确诊者（ZH6 同套），后缀缺省时下一字
+// 不得为「率」（同 legacy 纪律——腿②必须是检出计数而非发生率本身）。
+const CASE_SURGE_ZH7 = [
+  // p1: 病例名词 + [≤8 字 gap] + 屡创新高/连创新高/屡创纪录/连创纪录
+  /(?:确诊|新发|新增|患病|发病|病例|检出|筛出|发现|报告|登记|患者|感染者|病人|确诊者)(?:(?:人数|数量|病例数|例数|数目|数)|(?!率))[^。！？]{0,8}(?:屡创新高|连创新高|屡创纪录|连创纪录)/,
+  // p2: 病例名词 + [≤8 字 gap] + (框架词)? + 井喷（"呈井喷态势"/"迎来井喷式"同收）
+  /(?:确诊|新发|新增|患病|发病|病例|检出|筛出|发现|报告|登记|患者|感染者|病人|确诊者)(?:(?:人数|数量|病例数|例数|数目|数)|(?!率))[^。！？]{0,8}(?:呈|出现|迎来|陷入|开始)?[^。！？]{0,4}井喷/,
+  // p3: 病例名词 + [≤8 字 gap] + 狂飙（"一路狂飙"修饰由 gap 覆盖）
+  /(?:确诊|新发|新增|患病|发病|病例|检出|筛出|发现|报告|登记|患者|感染者|病人|确诊者)(?:(?:人数|数量|病例数|例数|数目|数)|(?!率))[^。！？]{0,8}狂飙/,
+];
+
+// ─── [r357] 路径 (h) 腿③发生率侧新趋势动词族（ZH 专项，族独立常量）──────────
+// r356 交接项③落地（探针三轮校准，round1/2 教训：C 句腿③曾被 legacy p4
+// 「这种病真的在变多」代承重——干净腿框纪律被违反致 round1/2 误判「无缺口」，
+// round3 去 legacy 腿③形后 6/6 穿透 leg3=- 证实缺口真实）：legacy p1 动词表
+// 上升/升高/提高/上涨/增长/走高/变高、ZH2 攀升/飙升/猛涨/高涨/上行、ZH3
+// 走强/看涨/升温/走热——「患病率呈抬头趋势」「患病率止跌回升」「患病率
+// 再度翘尾」「患病率持续看高」「患病率报复性反弹」「患病率稳步回升」腿③
+// leg3=- 穿透。round3 干净腿框（腿①筛查普及/检测升级 LEAD_SCREEN_ZH/ZH6
+// 承重、腿②被检出/浮出水面 ZH3/ZH2 承重）：攻击 6/6 穿透、控制 2/2
+// （一路攀升 ZH2 / 真的在上升 legacy p1 已承重，「一路上行」ZH2 已承重
+// 故不收）、良性 3/3 零误伤（对冲否定/统计口径未变由 EXEMPT_INC_ZH (a)
+// 与 EXEMPT_INC_ZH2 兜底；「主要是筛查普及带来的检出增加」谨慎标记前置
+// 豁免形同 r349 口径）。
+// 族隔离纪律：动词表 止跌回升/稳步回升/报复性反弹/反弹/翘尾/看高/抬头
+// 与 legacy p1、ZH2、ZH3 严格整词不相交——r346–r356 轮测注入旧常量=[]
+// 的翻转集动词均不在本族表，不被 rescue；gap ≤8 字覆盖「呈…趋势」
+// /一路/再度/持续/报复性/稳步 等前置修饰。
+const INCIDENCE_CLAIM_ZH4 = [
+  // 发病率/发生率/患病率/罹患率/罹病率 + [≤8 字 gap] + 新趋势动词
+  /(?:发病率|发生率|患病率|罹患率|罹病率)[^。！？]{0,8}(?:止跌回升|稳步回升|报复性反弹|反弹|翘尾|看高|抬头)/,
 ];
 
 // ─── [r335] 路径 (g) Will Rogers 现象/分期迁移子家族常量 ──────────────
@@ -1649,8 +1726,12 @@ function checkImmortalTimeBias(text, inject) {
     // [r356] 腿①第九族：检出更新换代形（ZH 专项——检测手段更新换代/检测升级/
     // 检查更新；DETECT_UP_ZH 须 进步/普及 后缀、ZH5 须形容词+技术后缀）
     const ph1i = earliestIdx(R.DETECT_UP_ZH6 || DETECT_UP_ZH6, text);
-    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g, ph1h, ph1i].filter(x => x >= 0).length
-      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g, ph1h, ph1i].filter(x => x >= 0)) : -1;
+    // [r357] 腿①第十族：检出新进步动词形（ZH 专项——检测技术突飞猛进/日趋
+    // 精湛/今胜于昔/日益精进/日臻完善；DETECT_UP_ZH p2 须 进步/提升/改进/
+    // 发展/普及/推广 后缀、ZH6 须 更新换代类 动词）
+    const ph1j = earliestIdx(R.DETECT_UP_ZH7 || DETECT_UP_ZH7, text);
+    const ph1 = [ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g, ph1h, ph1i, ph1j].filter(x => x >= 0).length
+      ? Math.min(...[ph1a, ph1b, ph1c, ph1d, ph1e, ph1f, ph1g, ph1h, ph1i, ph1j].filter(x => x >= 0)) : -1;
     if (ph1 >= 0 && !/[？?]\s*$/.test(text)) {
       const winI = /[\u4e00-\u9fff]/.test(text) ? (R.WIN_LEAD_ZH ?? WIN_LEAD_ZH) : (R.WIN_LEAD_EN ?? WIN_LEAD_EN);
       // 腿② 检出病例数激增（时态变动形）
@@ -1688,8 +1769,11 @@ function checkImmortalTimeBias(text, inject) {
       // [r356] 腿②第十二族：被+副词+检出动词形（ZH 专项——被陆续发现/被大量
       // 确诊；ZH3 须 被+(重新)?+动词 直缀形，副词必填隔离）
       const ph2l = earliestIdx(R.CASE_SURGE_ZH6 || CASE_SURGE_ZH6, text);
-      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h, ph2i, ph2j, ph2k, ph2l].filter(x => x >= 0).length
-        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h, ph2i, ph2j, ph2k, ph2l].filter(x => x >= 0)) : -1;
+      // [r357] 腿②第十三族：检出计数新激增名词形（ZH 专项——病例数屡创新高/
+      // 连创新高/井喷/狂飙；legacy CASE_SURGE_ZH 激增动词表外）
+      const ph2m = earliestIdx(R.CASE_SURGE_ZH7 || CASE_SURGE_ZH7, text);
+      const ph2 = [ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h, ph2i, ph2j, ph2k, ph2l, ph2m].filter(x => x >= 0).length
+        ? Math.min(...[ph2a, ph2b, ph2c, ph2d, ph2e, ph2f, ph2g, ph2h, ph2i, ph2j, ph2k, ph2l, ph2m].filter(x => x >= 0)) : -1;
       // 腿③ 发生率/蔓延结论（病例计数被当作流行病学发生率变化）
       const ph3a = earliestEither(R.INCIDENCE_CLAIM_ZH || INCIDENCE_CLAIM_ZH, R.INCIDENCE_CLAIM_EN || INCIDENCE_CLAIM_EN, text);
       // [r348] 腿③第二族：趋势形（发病率呈现上升趋势 / is trending upward /
@@ -1701,8 +1785,12 @@ function checkImmortalTimeBias(text, inject) {
       // [r356] 腿③第四族：发生率侧新趋势动词形（ZH 专项——患病率一路走强/
       // 持续看涨/稳步升温；legacy p1 走高 与 ZH2 攀升/上行 已承重故不收）
       const ph3d = earliestIdx(R.INCIDENCE_CLAIM_ZH3 || INCIDENCE_CLAIM_ZH3, text);
-      const ph3 = [ph3a, ph3b, ph3c, ph3d].filter(x => x >= 0).length
-        ? Math.min(...[ph3a, ph3b, ph3c, ph3d].filter(x => x >= 0)) : -1;
+      // [r357] 腿③第五族：发生率侧新趋势动词形二（ZH 专项——患病率呈抬头
+      // 趋势/止跌回升/再度翘尾/报复性反弹/稳步回升；legacy p1、ZH2、ZH3
+      // 动词表外；round3 干净腿框 6/6 穿透 leg3=-）
+      const ph3e = earliestIdx(R.INCIDENCE_CLAIM_ZH4 || INCIDENCE_CLAIM_ZH4, text);
+      const ph3 = [ph3a, ph3b, ph3c, ph3d, ph3e].filter(x => x >= 0).length
+        ? Math.min(...[ph3a, ph3b, ph3c, ph3d, ph3e].filter(x => x >= 0)) : -1;
       if (ph2 >= 0 && ph3 >= 0) {
         const span = Math.max(ph1, ph2, ph3) - Math.min(ph1, ph2, ph3);
         if (span <= winI) {
@@ -1857,6 +1945,9 @@ module.exports = {
     // 腿①检出更新换代族 + 腿③发生率侧新趋势动词族（负例注入口，族独立常量，
     // ZH 专项）
     CASE_SURGE_ZH5, CASE_SURGE_ZH6, DETECT_UP_ZH6, INCIDENCE_CLAIM_ZH3,
+    // [r357] 路径 (h) 腿①检出新进步动词族 + 腿②检出计数新激增名词族 + 腿③
+    // 发生率侧新趋势动词族二（负例注入口，族独立常量，ZH 专项）
+    DETECT_UP_ZH7, CASE_SURGE_ZH7, INCIDENCE_CLAIM_ZH4,
     // [r335] 路径 (g) Will Rogers 现象/分期迁移（负例注入口）
     RECLASS_ZH, RECLASS_EN,
     BOTH_UP_ZH, BOTH_UP_EN,
