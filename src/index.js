@@ -753,6 +753,15 @@ const { checkProbabilityNeglect } = require('./probability-neglect.js');
 // （胜率都会提升）后独立接线。变量名 ioc——illusion of control 缩写，
 // grep 0 命中无冲突。
 const { detectIllusionOfControl } = require('./illusion-of-control.js');
+// [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出要求：
+// 把爱/关系存续设为对方当下付出或服从的条件，以软性威胁替代显式胁迫）
+// require。半成品 src/coercive-affection.js r334 前段写成（工作树未提交），
+// 模块层三腿（情感锚点腿 AFFECTION×条件腿 CONDITION×要求腿 DEMAND）探针
+// 8/8 全命中，但 src/index.js 从未 require/dispatch——gate 层 6/15 攻击
+// 样本穿透实证（probe-wiring-gap.js：mod 8/8 vs gate 2/8）。属「已加载未
+// dispatch」能力，r334 补齐九处接线。变量名 coa——coercive affection
+// 缩写，grep 0 命中无冲突。
+const { checkCoerciveAffection } = require('./coercive-affection.js');
 // [r313] 第 254 维度 zero_price_effect（零价格效应：零价格信号 × 需求/
 // 价值判断失真两腿共现 + 邻近窗 + 三组豁免；VERIFY 级）。变量名 zpe——
 // zero price effect 缩写，grep 0 命中。
@@ -2375,6 +2384,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 从未以独立维度名 dispatch（findings 只会出现聚合名 econ_reasoning_gate）；
   // 本行让控制幻觉以独立维度名进入 findings/scores/dimMap。
   const ioc = _applyPedagogyRelaxation(detectIllusionOfControl(_normText), "illusion_of_control", pedagogyRelaxation);
+  // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出要求）
+  // 独立 dispatch。半成品模块层 8/8 全命中而 gate 层穿透（未 require 未
+  // dispatch），本行让条件式情感绑定以独立维度名进入 findings/scores/dimMap。
+  const coa = _applyPedagogyRelaxation(checkCoerciveAffection(_normText), "coercive_affection", pedagogyRelaxation);
   // [r207] 第 204 维度 might_makes_right（强权即公理）计算点。同
   // r206 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 mmr。
   const mmr = _applyPedagogyRelaxation(checkMightMakesRight(_normText), "might_makes_right", pedagogyRelaxation);
@@ -3105,6 +3118,9 @@ function discriminate(text, evidence = [], contentMode) {
     // r239 起草只登记 econ-reasoning-gate FAMILIES 聚合表，src/index.js
     // 从未以独立维度名进 scores/findings。
     {score: ioc.score, name:'illusion_of_control'},
+    // [r334 接线] 第 257 维度 coercive_affection 参与判定（条件式情感绑定
+    // 的付出要求）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: coa.score, name:'coercive_affection'},
     // [r207] 第 204 维度 might_makes_right 参与判定（强权即公理）。
     // 同 r206 先例：dimMap 与 allDims 两处都接。
     {score: mmr.score, name:'might_makes_right'},
@@ -3739,6 +3755,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉×
     // 随机事件腿×控制行为腿×影响断言腿）。
     illusion_of_control: ioc,
+    // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
+    // 要求×情感锚点腿×条件构式腿×付出要求腿）。coa。
+    coercive_affection: coa,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性偏差×
     // 生动个案腿×偏斜断言腿）。
     vivid_case_availability: vca,
@@ -4264,6 +4283,9 @@ function discriminate(text, evidence = [], contentMode) {
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r162] 第 162 维度 incredulity（诉诸个人怀疑）guidance。
     'incredulity': "不得用**主观上的「无法想象/难以置信」替代证据**，据此**否定事实的真值或真实性**——「我无法想象他怎么能做到，所以这成绩一定是假的」「实验结果简直令人难以置信，一看就是后期剪辑的」「播放量高得离谱，肯定是刷出来的」「他年纪轻轻就身居高位，我根本想象不到他凭什么，背后一定有推手」（I cannot imagine how this is possible, so it cannot be true. / The results are unbelievable, therefore the data must be fabricated. / There is no way that happened; I cannot fathom it.；样本形状与负例见 test/round-163-incredulity.js）。判据**双腿共现**：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）——只收主观认知动词被否定的陈述，孤立的感叹不是本族；腿② TRUTH-DENIAL 真值否定推导，两种子形：(a) 推断词+否定断言（所以/因此/这说明…+ 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；EN：so/therefore/which means…+ can't be true / must be fake / fabricated）；(b) 直接否定断言（一看就是假的/肯定是作弊的/不可能是真的；EN：clearly fake / no way that happened / is obviously staged），倒装形（真值否定在前、难以置信在后作理由：「这数据不可能是真的，我实在无法想象它怎么采集的」）同样命中。缺一不判——「实验结果令人难以置信」只有惊讶无否定；「这一定是假的」无难以置信前提是别的语境。以主观难以置信否定事实会把**认知边界当成证据**，让未经检验的怀疑驱逐可验证的真相：正当做法是**回到可验证依据**（录像/计时数据/第三方复核/原始记录）再下真值判断，或把结论降级为待核查假设（成绩异常需要核查，但在调取证据前不断言作弊）。边界：psychologists_fallacy 管「以为别人都和自己想的一样」，本族管对事实真值的否定；appeal_to_ignorance 管「不能证伪所以为真」，本族方向相反——「我不能想象所以为假」；unsupported_claim 管无依据断言本身，本族的断言由主观难以置信驱动；absolute_claim 管绝对化措辞，本族必须有难以置信陈述腿在场。明确不判：有据可查的惊讶（成绩提升令人难以置信，但有三次模考记录和批改痕迹可查/经第三方核实）、提问句式（含问号——求知/反问不是断言）、评析话术本身（诉诸个人怀疑/argument from personal incredulity）、无否定推导的纯感叹（快得难以置信/美味得不可思议）。",
+    // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
+    // 要求）guidance。
+    'coercive_affection': "不得**把爱、感情或关系存续当作对方当下付出与服从的条件**——条件式情感绑定（coercive affection / conditional affection / love as leverage）是指文本同时给出**情感锚点**与**条件构式**与**付出要求**三腿共现：如果你真的爱我就不会计较这些、把钱拿出来是爱我的证明、你要是做不到我也不耽误你了、等你能养家我们再要孩子、爱我你就别计较这些、if you really loved me you would not need me to ask twice、once you prove you can handle this we can talk about our future、maybe you should find someone who can put up with all of this（样本形状与负例见 test/round-334-coercive-affection.js）。为什么这本身就是问题：健康的关系协商里请求与关系存续是**两条独立的轨道**——你可以提出请求，对方也有权在不失去关系的前提下拒绝；本族把两条轨道焊死成一条（「不答应=关系受损」），对方形式上有选择、实质上没有，属于胁迫结构的情感化包装，长期运转会训练出「服从=被爱」的条件反射并侵蚀对方的自主判断。正当做法是**把请求与关系解耦**（「我希望你怎么做，你可以不同意，这不妨碍我们」）、**直接说明自己的需要而不附加关系后果**。判据**三腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① AFFECTION 情感锚点（爱/爱我/在乎/心里有我/有我这个.../感情/家庭/家人/自己人/夫妻/情侣/对象/关系/过日子/走下去；EN love / loved / care about / relationship / family / us / together，含裸名词形：单独出现「爱」「感情」「家人」即命中腿①）；腿② CONDITION 条件构式（如果/要是/倘若/除非/否则/才/就.../既然...就/真的...就/连...都/重新考虑/再想想/不耽误你/找别人/随便你/看着办/好自为之；EN if / unless / otherwise / only if / once / maybe you should find / we can talk about，含倒装形：做不到就散、不给就分手）；腿③ DEMAND 付出要求（把钱/工资/工资卡/存款/卡/房/车/彩礼/嫁妆/时间/自由/道歉/承诺/听话/答应/证明/表示/拿出来/交出来/听我的/按我说的/过来/陪我/别.../不准...；EN money / pay / give / prove / show / do as I say / listen to me / stay with me / obey），三腿落在 60 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「关系条件置换自主同意」叙述。边界：emotional_manipulation 管**音量与情绪强度**（大吼/哭闹/翻旧账的压迫感），本族管**条件形状**（声音再轻，只要把关系存续挂在付出上就命中）；guilt_induction 管**牺牲追债**（我为你付出多少你竟如此），本族不追溯历史牺牲、承重的是当下条件绑定；relationship_severance 管**显式断绝宣言**（分手/离婚/断绝关系的直接宣布），本族是**软性威胁与条件式绑定**（不直接宣布断绝，把断绝设为对方不服从的后果）；future_faking 管**画饼换忍耐**（等赚了钱就对你好），本族的交换方向相反——**用关系/情感的当下价值换取对方当下的付出**，不是承诺未来兑现；conditional_affection 管条件式关爱本身（考得好才给你买礼物），本族要求三腿共现（情感锚点+条件+付出要求），单有条件式关爱不判。明确不判：真诚请求（拜托/麻烦/能不能/请/希望/谢谢；EN please / could you / would you / I hope——**无条件请求是正确判别**）、双向协商（我们一起商量/双方都/各退一步/你怎么看/你的想法呢；EN let us talk it over / what do you think / compromise——**双向协商是正确判别**）、正当关系表达（我想你/我爱你/我在乎你/担心你/陪陪你；EN I love you / I miss you / I care about you——**无条件情感表达是正确判别**）、正当退出声明（我们分手吧/离婚吧/我不爱你了/祝你以后幸福；EN I want a divorce / I am leaving / I do not love you anymore——**无付出要求腿的正当退出是正确判别**）、教学/概念转述（情感操纵/情感绑定/条件反射/PUA/煤气灯/心理学；EN emotional manipulation / conditional affection / coercive control / psychology——**讨论这个概念本身是正确判别**）、否定与对冲（不代表/不意味着/不是...的条件/未必/不一定/取决于；EN does not mean / not necessarily / depends on；可能/也许/大概/似乎；EN maybe/perhaps/probably）、疑问句（含 ?/？）。",
     // [r231] 第 215 维度 broken_window（破窗谬误）guidance。
     // [r231 接手 r234] 第 221 维度 automation_bias（算法崇拜/自动化偏见）guidance。
     'automation_bias': "不得**把算法/模型/系统的输出当成不可质疑的最终裁决**——算法崇拜/自动化偏见（automation bias / algorithm deference）是把 AI、算法、模型、系统、大数据、神经网络的产出说成不会错、不带偏见、没有情绪、比人强，据此免除人工复核、宣布质疑无效、把判断权让渡给机器（AI算出来的结果不会有错，以后直接按模型的判断来，不用法官再核 / The model is more accurate than any human, so skip the review. / 算法没有偏见，HR的环节可以省掉）。机器产出同样携带训练数据偏差、分布外失效与系统性错误，任何准确率数字都必须与错误率和适用边界一起给出。判据**三腿共现**（缺一不判）：腿① MACHINE 机器权威主体（AI/人工智能/算法/模型/系统/机器/程序/软件/电脑/计算机/大数据/深度学习/神经网络/引擎/平台/评分·考核·推荐·筛选系统；EN AI/algorithm/the model/machine learning/deep learning/neural network/the system/the software/the engine/big data），腿② INFALLIBLE 不可错/无偏见/优越性断言（不会错/不会出错/不会说谎/不带偏见/没有情绪/不会累/从不失误/零误差/反问式「难道还会有错吗」/比人强、比人准、比任何专家都可靠、人脑比不过；EN can't be wrong/never makes mistakes/doesn't lie/free from bias/more accurate than any human/knows best/infallible/therefore objective），腿③ DEFERENCE 判断权让渡/免除人工核查（不用核/无需核/取消人工/跳过审核/环节可以省/听系统的/交给算法定/直接按模型的判断来/申诉无效/别再自己判断；EN no need to check/skip the human review/just follow it/let the AI decide/objections are irrelevant/stop second-guessing）。豁免：认识论纠正句（把「AI算的不会有错所以不用人工核」当成真理，是自动化偏见的典型表现）、器官制度系统义（神经系统/免疫系统/消化系统/金融系统的风控——非机器裁决义）、显式对冲（之一/可能/也许/maybe/likely/at least in part）、疑问句式。正当做法是**同时给出错误率与适用边界 + 保留人工复核与申诉通道**。边界：appeal_to_authority 管引人类权威为证据，其正则不含任何机器主体——本族是机器侧的同一结构；credential_dismissal（第203维）管剥夺人的发言资格（人脑侧）——本族崇拜机器裁决（机器侧），互为镜像不重叠；capability_overclaim 管「AI 已彻底解决 X」的完成态宣称——本族管判断权让渡与核查免除，不涉及解决状态；instrumental_reasoning 与部分本族样本射程交叠，本模块对交叠样本同样承重（三腿齐备），不冲突。明确不判：正确响应形（同时给出错误率与边界/需要人工兜底）、概念教学与人因工程讨论、对他人自动化崇拜的批评、器官制度系统义、对冲表述、疑问句式。",
@@ -5874,6 +5896,21 @@ function discriminate(text, evidence = [], contentMode) {
     // 维度只管「随机事件×主观控制行为×影响断言」三腿共现这一族，不管
     // 主观能动性本身的价值、也不管技能练习带来的真实能力提升。
     'illusion_of_control',
+    // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
+    // 要求：把爱/关系存续设为对方当下付出或服从的条件，用软性威胁替代
+    // 显式胁迫）登记。verify 级——本族以「条件形状」承重：AFFECTION
+    // 情感锚点（爱/在乎/家人/感情/关系/心里有我）× CONDITION 条件构式
+    // （如果/要是/除非/否则/才/重新考虑/找不到更好的/不耽误你）×
+    // DEMAND 付出要求（把钱/工资卡/房/车/时间/主动付出/听话/证明）三腿
+    // 共现。多数是日常关系话术而非显式辱骂，且 emotional_manipulation
+    // 管音量强度、guilt_induction 管牺牲追债、relationship_severance
+    // 管显式断绝宣言、future_faking 管画饼换忍耐，均不覆盖「把关系
+    // 存续当条件换取当下付出」这一结构，rewrite/block 会误伤正常情感
+    // 沟通。verify 的含义是「这段文本用关系条件置换对方自主同意，需要
+    // 按 findings 的 guidance 补上无条件请求形态再采信」。射程边界：
+    // 本维度只管「条件式绑定的付出要求」这一族，不管正常的情感表达
+    // 与协商、也不管正当的分手/退出声明（无付出要求腿）。
+    'coercive_affection',
   ]);
   // pass：无问题通过
 
@@ -6335,6 +6372,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）。ioc。
       // r239 起草只登记 econ-reasoning-gate FAMILIES，从未独立 dispatch。
       illusion_of_control: ioc,
+      // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
+      // 要求）。coa。模块 r334 前已存在但从未 dispatch，本轮补齐接线。
+      coercive_affection: coa,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6495,6 +6535,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 主观行为/仪式/投入当作能改变纯随机结果的因素）。ioc——illusion of
     // control 缩写。同上：九处一次接齐。
     illusion_of_control: ioc,
+    // [r334 接线] 第 257 维度 coercive_affection 补登记（条件式情感绑定的
+    // 付出要求：把爱/关系存续设为对方当下付出或服从的条件）。coa——
+    // coercive affection 缩写。同上：九处一次接齐。
+    coercive_affection: coa,
     // [r323] 第 255 维度 red_herring 补登记（转移话题/偷换论题：用
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。
@@ -12309,6 +12353,20 @@ const WHATABOUT_PATTERNS_ZH = [
   // 收紧：主语只列你/你们/自己/自身/自家/他们，且必须真出现否定半
   // （还没/未/不曾/根本没/从未）——「你把活干好了再说」是排序建议，不走本支。
   [/(?:你|你们|他们|自己|自身|自家)[^。]{0,6}(?:都|也)?(?:还没|尚未|未|不曾|根本没|从未)[^。]{0,6}(?:弄好|管好|做好|改好|做干净|准备?好)[^。]{0,6}(?:就|却|反倒|反而)[^。]{0,4}(?:说|说我|管我|指点|批评|数落|评价|议论|要求|插手)/i, 'deflect_fix_yourself_first'],
+  // [r337] 选择性执法/双重标准抗辩族：腿①第三方同样违规（别的X也V坏事）×
+  // 腿②对「我/我们」的差别追责质疑（凭什么/为什么 + 只 + 查/罚/抓/查封/通报/赶/罚/处理）。
+  // 逻辑形状：用未受追责的第三方同样违规，来质疑对自身追责的公平性——
+  // 与既有族的分界：deflect_others_worse 比严重程度（更Y呢），deflect_everyone_does
+  // 是「别人也这样」陈述型，本族**必须叠加差别追责腿**（只查/只罚/只抓我们）才判。
+  // 收紧点一：腿①的第三方主语限定的/其他/他人/同行/别人/人家/各国/其他X + 也/都；
+  // 收紧点二：腿②必须含「只」字表选择性——「别的公司也偷税，建议一并排查」
+  // 这类正当监管主张（无「只」）明确不判；腿②动词限追责类（查/罚/抓/查封/
+  // 通报/赶/处理/追究/起诉/算账），「只说/只提意见」类不判。
+  [/(?:别的|其他|他人|同行|别人|人家|各国|别的[^，。]{0,6}|其他[^，。]{0,6})[^，。]{0,12}(?:也|都)[^，。]{0,12}(?:偷税|漏税|作弊|污染|违规|违法|超标|超速|抄袭|造假|泄露|补课|插队|偷工减料|排放|排污|行贿|造假|作假|耍赖|违约|逃逸|抄袭|洗钱)[^，。]{0,4}[，,。]?[\s\S]{0,24}?(?:凭什么|为什么|为何)[^。]{0,6}?只[^。]{0,6}?(?:查|罚|抓|查封|通报|赶|处理|追究|起诉|算账|审计|整改|通报|点名)[^。]{0,6}?(?:我们|我|咱们|我方)/i, 'deflect_selective_enforcement'],
+  // 同族倒装语序：质疑在前、第三方案例在后（凭什么只罚我们？别的车也都超速）
+  [/(?:凭什么|为什么|为何)[^。]{0,8}?只[^。]{0,8}?(?:查|罚|抓|查封|通报|赶|处理|追究|起诉|算账|审计|点名)[^。]{0,8}?(?:我们|我|咱们|我方)[^。]{0,10}?[，,。]?[\s\S]{0,30}?(?:别的|其他|他人|同行|别人|人家|各国)[^，。]{0,12}(?:也|都)[^，。]{0,12}(?:偷税|漏税|作弊|污染|违规|违法|超标|超速|抄袭|造假|泄露|补课|插队|偷工减料|排放|排污|行贿|作假|耍赖|违约|逃逸|洗钱)/i, 'deflect_selective_enforcement'],
+  // 同族反问形（无「只」但含差别对待词：偏偏/光/就 + 我们）
+  [/(?:别的|其他|他人|同行|别人|人家|各国)[^，。]{0,12}(?:也|都)[^，。]{0,12}(?:偷税|漏税|作弊|污染|违规|违法|超标|超速|抄袭|造假|泄露|补课|插队|偷工减料|排放|排污|行贿|作假|耍赖|违约|逃逸|洗钱)[^，。]{0,4}[，,。]?[\s\S]{0,24}?(?:凭什么|为什么|为何)[^。]{0,10}?(?:偏偏|光|就)[^。]{0,8}?(?:查|罚|抓|查封|通报|赶|处理|追究|起诉|算账|审计|点名)[^。]{0,6}?(?:我们|我|咱们|我方)/i, 'deflect_selective_enforcement'],
 ];
 
 const WHATABOUT_PATTERNS_EN = [
@@ -12332,6 +12390,20 @@ const WHATABOUT_PATTERNS_EN = [
   [/who are you to (judge|talk|criticize|say)/i, 'deflect_who_are_you'],
   [/glass houses shouldn'?t throw stones/i, 'pot_kettle'],
   [/why (are you|is it always) (picking on|targeting|attacking)/i, 'deflect_unfair_targeting'],
+  // [r337] 选择性执法/双重标准抗辩族 EN 侧：腿①第三方同样违规（other/everyone else X + 违规动词，
+  // too/also/as well 显式出现或 else 本身含「他人亦然」义） × 腿②差别追责质疑
+  // （why single/blame/target/penalize/fine/audit only us/me 或 why are only we being audited）。
+  // 收紧点：腿②必须含 only/just/single-out 差别义——
+  // 「Other firms also polluted; the regulator is investigating everyone」这类
+  // 正当程序陈述（无 only/just）不判。
+  [/(?:other|others|everyone else|other \w+|another \w+|other (?:companies|firms|nations|countries|teams|students|drivers|schools|platforms|miners))\b(?=[^.?!]{0,70}?(?:cheat(?:ed|s|ing)?|evad(?:e|es|ed|ing)|pollut(?:e|es|ed|ing)|violat(?:e|es|ed|ing)|breach(?:ed|es|ing)?|leak(?:ed|s|ing)?|plagiariz(?:e|ed|es|ing)|falsif(?:y|ied|ies)|brib(?:e|ed|es|ery)|embezzl(?:e|ed|es|ing)|dump(?:ed|s|ing)?|speed(?:ed|s|ing)?|sped|skip(?:ped|s|ping)?|forge(?:d|s)?|launder(?:ed|s|ing)?|defraud(?:ed|s|ing)?)\b)[^.?!]{0,70}?[.?!]?[\s\S]{0,40}?why (?:single|blame|target|penalize|fine|audit|prosecute|pick on|go after|punish|crack down on)\s+(?:only\s+|just\s+|out\b|)(?:us|me|our \w+)/i, 'deflect_selective_enforcement'],
+  // 同族倒装 EN：质疑在前、第三方案例在后（Why single us out? Everyone else cheats too.）
+  // 注意 single out 短语形态：why single out only us / why single us out / why single only us
+  [/why (?:single|blame|target|penalize|fine|audit|prosecute|pick on|go after|punish|crack down on)(?:\s+out)?\s+(?:only\s+|just\s+)?(?:us|me|our \w+)\b[\s\S]{0,40}?(?:other|others|everyone else|another \w+)\b[^.?!]{0,60}?(?:too|also|as well)\b/i, 'deflect_selective_enforcement'],
+  // 同族倒装 EN 变体：why single out only us? Other firms also polluted.（out 后置 only）
+  [/why (?:single|blame|target|penalize|fine|audit|prosecute|pick on|go after|punish|crack down on)\s+out\s+(?:only\s+|just\s+)?(?:us|me|our \w+)\b[\s\S]{0,40}?(?:other|others|everyone else|another \w+)\b[^.?!]{0,60}?(?:too|also|as well)\b/i, 'deflect_selective_enforcement'],
+  // 同族被动形 EN：why are only we being audited / why is just me being fined
+  [/(?:other|others|everyone else|other \w+|another \w+|other (?:companies|firms|nations|countries|teams|students|drivers|schools|platforms|miners))\b(?=[^.?!]{0,70}?(?:cheat(?:ed|s|ing)?|evad(?:e|es|ed|ing)|pollut(?:e|es|ed|ing)|violat(?:e|es|ed|ing)|breach(?:ed|es|ing)?|leak(?:ed|s|ing)?|plagiariz(?:e|ed|es|ing)|falsif(?:y|ied|ies)|brib(?:e|ed|es|ery)|embezzl(?:e|ed|es|ing)|dump(?:ed|s|ing)?|speed(?:ed|s|ing)?|sped|skip(?:ped|s|ping)?|forge(?:d|s)?|launder(?:ed|s|ing)?|defraud(?:ed|s|ing)?)\b)[^.?!]{0,70}?[.?!]?[\s\S]{0,40}?why (?:are|is|were|was)\s+(?:only\s+|just\s+)?(?:we|i|our \w+|me)\s+(?:being\s+)?(?:audited|fined|penalized|penalised|punished|targeted|prosecuted|blamed|singled|investigated|cited|sued)/i, 'deflect_selective_enforcement'],
 ];
 
 function checkWhataboutism(text) {

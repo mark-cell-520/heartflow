@@ -103,33 +103,6 @@
  * 「人数翻倍」（投入+doubles）不触发产出腿，只有「人数…交付翻倍」才判。豁免
  * 复用全局四豁免，另加 EXEMPT_SCALE_NEG（瓶颈/协调开销/边际递减/规模不经济/
  * bottleneck/coordination overhead/diseconomies of scale——正确指出非线性）。
- *
- * [r341 扩展] 日常物品剂量外推族（真升级②，+DAILY_IN/TASK_AMP 四常量 +
- * 剂量升级判定）：r333/r330 两轮交接簿连续记录的盲区——原判据腿②
- * LINEARITY 只收**显式倍数/形容词形**外推（N倍/越多越好/效果更好），
- * 对日常话语里的**能力放大形**零覆盖：少量日常物品有效 ⇒ 加到十倍
- * 就能完成极端任务（喝一杯咖啡提神，喝十杯通宵不困/一勺糖有力气，
- * 十勺跑完马拉松/一瓶肥长得好，十瓶大丰收）。立项探针
- * coordination/agent4/probes/r341-probe-candidates.js（v6.8.185 实测）
- * 该族攻击 9/10 穿透 gate=pass、良性 6/6 零误伤（另一条 EN 样本被存量
- * dehumanization 代拦系 "fuel" 一词基线怪癖，换措辞后仍穿透）；
- * 同轮探针另三候选（平均数误读/检测准确率⇒患病概率/时间贴现）均被
- * 存量维度覆盖过半，放弃。新族与原族同一外推结构（效果随剂量放大），
- * 词汇域换到日常物品，效果断言形从「倍数/形容词」换为「极端任务」：
- *   每天喝一杯咖啡能提神，喝到十杯就能连续通宵不困。
- *   一勺糖下肚能量满满，加到十勺跑完马拉松都不成问题。
- *   每顿吃一碗饭有力气，吃十碗更能扛百斤走十里。
- *   One cup of coffee sharpens focus, so ten cups will keep you up all week.
- *   Ten spoonfuls will power a whole marathon.
- * 判据（三条件共现，缺一不判）：腿① DAILY_IN 数量×日常单位（杯/碗/勺/
- * 瓶/小时…，ZH+EN，捕获全部剂量词位置）→ 腿② TASK_AMP 能力标记×极端
- * 任务（就能/更能/肯定/不成问题/will/guarantee × 通宵/马拉松/大丰收/
- * 扛百斤/深度休息/marathon/harvest，两序均可）→ **剂量升级判定**：
- * 全文同一单位出现两个数量且大者≥3倍小者（一勺…十勺），或显式升级
- * 动词形由腿①自身的数量对承担。升级判定是本族精度的承重墙——没有它，
- * 「睡够八小时更能进入深度休息」这类单剂量良性陈述会被腿②误伤。
- * 独立腿对与健康剂量族/规模族 OR 并联，计分封顶一致；全局四豁免原样
- * 承重（概念转述/实验语境/推理否定/对冲/疑问句在族判定前统一执行）。
  */
 'use strict';
 
@@ -238,15 +211,93 @@ const EXEMPT_SCALE_NEG_EN = [
   /\b(?:bottlenecks?|coordination\s+overhead|communication\s+overhead|diminishing\s+marginal|diseconomies\s+of\s+scale|marginal\s+returns|Amdahl|Brooks|ceiling|saturat\w+|plateaus?|sub[- ]?linear)\b/i,
 ];
 
-// ─── [r341] 日常物品剂量外推族：腿① DAILY_IN 数量 × 日常单位 ──────────────
-// 捕获组 1=数量词、2=单位（剂量升级判定复用同表抽数量对）。单位表刻意只收
-// 日常摄入/计时单位（杯/碗/勺/瓶/小时…），不收「步/里/斤量物体」等非剂量
-// 单位——防「饭后百步走」类谚语误入。数量词含中文数字与阿拉伯数字。
+// ─── [r336] 族三：日常摄入/投入品 × 增量 × 状态获益外推 ──────────────────
+// 与族一（显式倍数/倍番）、族二（工程 scaling）同为「投入增量 → 效果放大」
+// 外推结构，但投放域是日常话语：不用显式倍数词，改用**模糊量**（一把/几杯/
+// 多喝点/a handful/more）与**状态型获益**（通宵不困/精神一整天/更养生/
+// all-day energy），是既有两腿判据覆盖不到的第三句式族。
+// 三条件判据（缺一不判）：
+//   ① 腿① DAILY_IN：日常摄入/投入品名词 × 数量/增量表达（同分句）；
+//   ② 腿② GAIN：数量/增量表达 × **因果连接词**（能/就/更/so/then/means…）
+//      × 获益状态（同分句，正则 [^。；，] 兜底不跨标点）；
+//   ③ 全文剂量/增量表达 ≥2（或含显式增量词）——防「每天跑步半小时更健康」
+//      这类**单剂量正确陈述**被误判（腿②形似但全文只有一个剂量）。
+// r161 教训自查：物品名词全收裸形（咖啡/茶/酒/糖…），量词单位收裸形（杯/把/
+// 勺/颗…），不带后缀依赖。
 const DAILY_IN_ZH = [
+  // 物品名词 × 数量/增量（物品在前，8 字内出现数量或增量表达）
+  /(?:咖啡|茶叶|茶水|茶|酒|啤酒|白酒|红酒|黄酒|米酒|果酒|糖|糖果|甜食|甜品|可乐|汽水|碳酸饮料|饮料|奶茶|功能饮料|能量饮料|烟|香烟|水|盐水|矿泉水|辣椒|大蒜|生姜|香辛|醋|油腻|油炸|夜宵|火锅|零食|巧克力|炸鸡|薯片|蛋糕|冰淇淋|烧烤|泡面|方便面|运动|锻炼|跑步|健身|瑜伽|冥想|游泳|骑车|步行|爬山|看书|读书|学习|加班|熬夜|午睡|午休|睡觉|面膜|防晒|护肤|洗澡|泡脚|游戏|手机|短视频|直播)[^。；，！？!?]{0,8}(?:[一二两三四五六七八九十半\d]+\s*(?:杯|瓶|口|盅|碗|把|勺|匙|滴|根|支|包|袋|块|颗|粒|瓣|罐|听|盒|份|杯半|大杯|小杯|小时|分钟|个钟|钟头|公里|千米|米|次|组|回|遍|小时以上)|(?:几|若干|大半|一大把|一把|一小把|半把|多几|多点|多一些|不少|些许)\s*(?:杯|瓶|口|盅|碗|把|勺|匙|块|颗|粒|根|支|包|袋|点|些)?|(?:多|再|加倍|翻倍|多加|加量|加大|增量|加码)\s*(?:喝|饮|吃|抽|嚼|用|跑|练|来|上)?)/,
+  // 数量 × 物品名词（数量在前的裸形：「两杯咖啡」「一把糖」「几杯咖啡」）
+  /[一二两三四五六七八九十半几\d]+\s*(?:杯|瓶|口|盅|碗|把|勺|匙|块|颗|粒|根|支|包|袋|瓣|杯半|大杯|小杯)\s*(?:的)?\s*(?:咖啡|茶叶|茶水|茶|酒|啤酒|白酒|红酒|糖|糖果|奶糖|软糖|口香糖|棒棒糖|甜食|甜品|可乐|汽水|饮料|奶茶|功能饮料|烟|水|盐水|辣椒|油腻|油炸|夜宵|火锅|零食|巧克力|炸鸡|薯片|蛋糕|冰淇淋|运动|锻炼|跑步|健身|瑜伽|冥想|游泳|加班|熬夜|午睡|面膜|泡脚)/,
+  // [r341 契约腿] 捕获组 1=数量词、2=单位：升级判定 hasDailyEscalation 的
+  // 专用供给腿（r337 合并时从 r357 版移植，保证同单位双数量可抽对）。
+  // 注意：命中判定用上面的物品名词腿，本腿只喂升级判定，不直接判 hit。
   /([一二两三四五六七八九十百千半\d]+)\s*(个?小时|分钟|个钟|杯|瓶|碗|勺|匙|盅|袋|包|盒|罐|桶|盆|碟|根|支|瓣|颗|粒|片|丸|滴|斤|两|克|公斤|毫升|升|口|顿)/,
+  /(?:一大把|一把|一小把|半把|几把|若干)\s*(?:的)?\s*(?:糖|糖果|甜食|零食|巧克力|药|丸|片|颗|粒|花生|瓜子|坚果|饼干|蛋糕)/,
 ];
 const DAILY_IN_EN = [
+  // 物品名词 × 数量/增量（item first）
+  /\b(?:coffee|tea|wine|beer|alcohol|liquor|whiskey|vodka|sugar|candy|candies|soda|cola|drinks?|water|salt|spicy food|fried food|junk food|snacks?|chocolate|chips|dessert|cigarettes?|smoking|exercise|running|workout|meditation|sleep|studying|overtime|screens?|social media)\b[^.!?;]{0,25}\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a couple of|half a|a dozen|a few|several|a handful of|more|extra|additional|double|twice|triple)\s+(?:[a-z-]+\s+){0,2}(?:cups?|glasses?|cans?|bottles?|pills?|doses?|servings?|hours?|minutes?|candy|candies|sugar|drinks?|shots?|beers?|slices?|pieces?|spoonfuls?|scoops?|bowls?)\b/i,
+  // N × of × 物品（"One cup of coffee" / "A glass of wine"）
+  /\b(?:a|one|two|three|four|five|six|seven|eight|nine|ten|a couple of|a few|several|a handful of|half a)\s+(?:[a-z]+\s+){0,2}(?:cups?|glasses?|cans?|bottles?|doses?|servings?|bowls?|handfuls?|pieces?|slices?|spoonfuls?|scoops?)\s+of\s+(?:coffee|tea|wine|beer|alcohol|sugar|candy|soda|water|salt|junk food|chocolate|chips)\b/i,
+  // 数量 × 物品（无 of 形："one candy" / "two coffees"）
+  /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|a couple of|a few|several|a handful of|more|extra|double|twice)\s+(?:[a-z-]+\s+){0,2}(?:candy|candies|coffee|coffees|tea|teas|wine|beer|drinks?|cigarettes?|sugar|hours?|minutes?|workouts?|cups?)\b/i,
+  // 模糊量 × 物品名词（handful 本身即量，无单位词）："a handful gives all-day energy"
+  /\b(?:a handful|a bunch|a couple more|a few more)\b[^.!?;]{0,12}\b(?:candy|candies|coffee|tea|chocolate|chips|snacks?|sugar|nuts?|pills?|drinks?)\b/i,
+  // [r341 契约腿] 捕获组 1=数量词、2=单位：hasDailyEscalation 的 EN 专用供给腿
+  // （r337 合并时从 r357 版移植）。同 ZH 契约腿，只喂升级判定。
   /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|fifty|hundred|thousand|dozen|half|a|an|single|\d+)\s+(cups?|glass(?:es)?|bowls?|spoonfuls?|bottles?|bags?|box(?:es)?|pills?|capsules?|tablets?|doses?|servings?|hours?|minutes?|days?|weeks?|slices?|pieces?|scoops?|shots?|drinks?|beers?|cans?|plates?|portions?)\b/i,
+];
+// 腿② GAIN：数量/增量 × 因果连接词 × 获益状态（同分句）
+const GAIN_ZH = [
+  // 数词量词 × 连接词 × 获益：「十杯就能通宵不困」「十二小时更健康」
+  /[一二两三四五六七八九十半几\d]+\s*(?:杯|瓶|口|盅|碗|把|勺|匙|块|颗|粒|根|支|包|袋|瓣|杯半|大杯|小杯|小时|分钟|个钟|钟头|公里|次)\s*(?:就|也|才|能|可以|能够|一定|必然|肯定|准|更|越|还|自)\s*[^。；，]{0,8}(?:养生|健康|精神|提神|醒脑|专注|解乏|解渴|解饿|舒服|舒畅|惬意|活力|精力|充沛|有益|有效|管用|管事|好受|气色|长寿|元气|代谢|免疫|消化|睡眠|皮肤|身体|状态|能量|不困|不睡|睡不着|通宵|到天亮|效果|更好)/,
+  // 数词量词 × 物品名词 × 连接词 × 获益（r337 补腿：物品名插中间形）：
+  // 「十杯咖啡更能提神醒脑」「两碗饭吃下去更有劲」——原腿0 要求连接词
+  // 紧邻量词，物品名词在中间即整类穿透（r337 实测）。允许插入 ≤6 字
+  // 物品/动作名（咖啡/茶/酒/糖/饭吃下去…），不跨标点。
+  /[一二两三四五六七八九十半几\d]+\s*(?:杯|瓶|口|盅|碗|把|勺|匙|块|颗|粒|根|支|包|袋|瓣|杯半|大杯|小杯|小时|分钟|个钟|钟头|公里|次)\s*(?:的)?\s*(?:咖啡|茶叶|茶水|茶|酒|啤酒|白酒|红酒|糖|糖果|甜食|甜品|可乐|汽水|饮料|奶茶|功能饮料|能量饮料|烟|水|辣椒|油腻|油炸|夜宵|火锅|零食|巧克力|炸鸡|薯片|蛋糕|冰淇淋|烧烤|泡面|方便面|饭|面|粥|药|丸|片|维生素|奶|豆浆|绿豆汤|人参|枸杞)[^。；，！？]{0,6}(?:就|也|才|能|可以|能够|一定|必然|肯定|准|更|越|还|自)\s*[^。；，]{0,8}(?:养生|健康|精神|提神|醒脑|专注|解乏|解渴|解饿|舒服|舒畅|惬意|活力|精力|充沛|有益|有效|管用|管事|好受|气色|长寿|元气|代谢|免疫|消化|睡眠|皮肤|身体|状态|能量|不困|不睡|睡不着|通宵|到天亮|效果|更好|有劲|力气)/,
+  // 增量表达 × 连接词 × 获益：「多喝几杯更能养生」「多喝点更养生」
+  /(?:多|再|加倍|翻倍|多加|加量|加大|增量|加码)\s*(?:喝|饮|吃|抽|嚼|用|跑|练|来|上)?\s*[一二两三四五六七八九十半\d几]*\s*(?:杯|瓶|口|盅|碗|把|勺|匙|块|颗|粒|根|支|包|袋|点|些|小时|分钟)?\s*(?:就|也|才|能|可以|能够|一定|必然|肯定|更|越|还)\s*[^。；，]{0,8}(?:养生|健康|精神|提神|醒脑|专注|解乏|解渴|解饿|舒服|舒畅|惬意|活力|精力|充沛|有益|有效|管用|管事|好受|气色|长寿|元气|代谢|免疫|消化|睡眠|皮肤|身体|状态|能量|不困|不睡|睡不着|通宵|到天亮|效果|更好)/,
+  // 模糊量（一把/几把）× 物品 × 连接词 × 获益：「吃一把糖能精神一整天」
+  // r161 教训：模糊量无数字前缀，必须给独立腿形，否则整类穿透。
+  /(?:一大把|一把|一小把|半把|几把|若干)\s*(?:的)?\s*(?:糖|糖果|甜食|甜品|零食|巧克力|花生|瓜子|坚果|饼干|蛋糕|药|丸|片|颗|粒)\s*(?:就|也|才|能|可以|能够|一定|必然|肯定|准|更|越|还|自)\s*[^。；，]{0,8}(?:养生|健康|精神|提神|醒脑|专注|解乏|解渴|解饿|舒服|舒畅|惬意|活力|精力|充沛|有益|有效|管用|管事|好受|气色|长寿|元气|代谢|免疫|消化|睡眠|皮肤|身体|状态|能量|不困|不睡|睡不着|通宵|到天亮|效果|更好)/,
+  // 「越…越…」获益（日常域）
+  /越[^。；，]{0,6}越(?:好|健康|精神|有效|舒服|养生|明显|划算)/,
+  // 状态型获益 × 整时段：「通宵不困」「一整天精神」
+  /(?:通宵|到天亮|一整晚|一整天|全天)\s*(?:都)?\s*(?:不困|不睡|睡不着|有精神|精神|清醒|状态好|元气|活力)/,
+];
+const GAIN_EN = [
+  // 数量 × 连接动词 × 获益："ten cups keep you up all night" / "more glasses are better"
+  /\b(?:more|double|twice|triple|extra|additional|ten|five|eight|three|two|a handful of|a few more|some more)\s+(?:[a-z-]+\s+){0,3}(?:cups?|glasses?|cans?|bottles?|pills?|doses?|servings?|candy|candies|sugar|drinks?|shots?|beers?|bowls?|hours?|minutes?)\b[^.!?;]{0,20}\b(?:so|then|means?|will|can|keeps?|gives?|makes?|are|is|results? in|leads? to)\b[^.!?;]{0,20}\b(?:better|healthier|more effective|all[- ]day|all night|up all night|more energy|more alert|more focused|sharper|stronger|improves?|helps? more|more relaxing|calmer|sleep better|wind down|more soothing|feel calmer|easier to fall asleep|sleep like)\b/i,
+  // 增量词 × 物品名词（无单位词）× 重复获益（r337 补腿）：
+  // "more wine relaxes you more" / "extra sugar tastes sweeter" —— 增量词后
+  // 直接接物品名词而无量词单位，原三条腿均要求量词相邻，整类穿透（r337 实测）。
+  /\b(?:more|extra|double|twice|additional|a bit more|a little more|some more)\s+(?:candy|candies|sugar|coffee|tea|wine|beer|alcohol|chocolate|drinks?|water|salt|snacks?|chips|soda|cola|energy drinks?)\b[^.!?;]{0,30}\b(?:relaxes?|calms?|soothes?|helps?|works?|tastes?|feels?|makes? you|keeps? you)\b[^.!?;]{0,20}\b(?:more|better|relaxing|calm|soothing|effective|energ)\w*/i,
+  // 模糊量 × 因果动词 × 获益："a handful gives all-day energy"
+  /\b(?:a handful|more|extra|double|twice|a bit more|a little more)\s+(?:[a-z-]+\s+){0,3}(?:gives?|means?|leads? to|makes?|keeps?|results? in|brings?)\b[^.!?;]{0,25}\b(?:better|healthier|more effective|all[- ]day|all night|up all night|more energy|more alert|more focused|sharper|stronger|improves?)\b/i,
+  // 裸模糊量（无 of）× 获益直接连接："A handful gives all-day energy."
+  // 与上条互补：本条不要求「量词名词在因果动词前」——handful 本身即量。
+  /\b(?:a handful|a bunch|a couple more|a few more)\b[^.!?;]{0,15}\b(?:gives?|means?|leads? to|makes?|brings?|keeps?)\b[^.!?;]{0,25}\b(?:all[- ]day|all night|up all night|more energy|more alert|more focused|sharper|better|healthier|stronger)\b/i,
+];
+// 全文剂量/增量表达计数（族三第三条件）
+const QUANT_ZH = [
+  /[一二两三四五六七八九十半\d]+\s*(?:杯|瓶|口|盅|碗|把|勺|匙|滴|根|支|包|袋|块|颗|粒|瓣|罐|听|盒|份|杯半|大杯|小杯|小时|分钟|个钟|钟头|公里|千米|米|次|组|回|遍|小时以上)/,
+  /(?:几|若干|大半|一大把|一把|一小把|半把|多几|多点|多一些|不少|些许)\s*(?:杯|瓶|口|盅|碗|把|勺|匙|块|颗|粒|根|支|包|袋|点|些)?/,
+  /(?:多|再|加倍|翻倍|多加|加量|加大|增量|加码)\s*(?:喝|饮|吃|抽|嚼|用|跑|练|来|上)?/,
+];
+const QUANT_EN = [
+  /\b(?:a|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a couple of|half a|a dozen|a few|several|a handful of|a handful)\s+(?:[a-z-]+\s+){0,2}(?:cups?|glasses?|cans?|bottles?|pills?|doses?|servings?|hours?|minutes?|candy|candies|sugar|drinks?|shots?|beers?|slices?|pieces?|spoonfuls?|scoops?|bowls?|handfuls?)\b/i,
+  // 裸 handful × 物品（无 of、无单位词）：「a handful gives…」「a handful of candy」
+  /\ba handful(?:\s+of)?\s+(?:[a-z-]+\s+){0,2}(?:candy|candies|sugar|coffee|tea|chocolate|chips|snacks?|nuts?|pills?|drinks?)\b/i,
+  /\b(?:more|double|twice|triple|extra|additional)\b/i,
+];
+// ─── [r336] 族三专属推理否定（正确指出应节制/无安全量/有风险）────────────
+const EXEMPT_DAILY_ZH = [
+  /没有.{0,10}(?:安全|益处|好处|证据|必要|研究|证明|意义)|少[喝抽吃饮]|不宜|忌[酒烟糖辣油]|戒[掉烟酒]?|越少越|节制|适量|适度|控制.{0,4}量|限量|适可而止|过犹不及|物极必反|极必反/,
+];
+const EXEMPT_DAILY_EN = [
+  /\b(?:no safe (?:dose|level|amount)|less is more|in moderation|moderation|cut back|drink less|avoid (?:coffee|alcohol|sugar|smoking)|not safe|can be harmful|too much (?:coffee|alcohol|sugar|caffeine) (?:is|can be)|caffeine (?:limit|sensitivity)|addictive|dependency|overconsumption)\b/i,
 ];
 
 // ─── [r341] 日常物品剂量外推族：腿② TASK_AMP 能力标记 × 极端任务 ──────────
@@ -269,7 +320,7 @@ const TASK_AMP_EN = [
   /\b(?:carry|lift|haul|move|tote|run|walk|swim|cycle|jog|hike)\s+(?:[a-z]+\s+){0,3}(?:hundred|thousand|dozens?|scores|pounds?|lbs?|kilos?|kilograms?|jin|catties|miles?|kilometers?|kilometres?)\b/i,
 ];
 
-// ─── [r341] 剂量升级判定 ─────────────────────────────────────────────────
+// ─── [r341 保留] 剂量升级判定（族四极端任务族精度承重墙） ─────────────────────────────────────────────────
 // 族三精度承重墙：全文必须出现**同一单位的两个数量且大者 ≥3 倍小者**
 // （一勺…十勺 / one cup…ten cups）。单剂量良性陈述（「睡够八小时更能
 // 进入深度休息」）因此不判。单位归一化：去「个」前缀（个小时→小时）、
@@ -330,6 +381,7 @@ function hasDailyEscalation(text) {
   return false;
 }
 
+
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────────────
 const EXEMPT_META_ZH = [
   /剂量反应|量效关系|线性外推|非线性|治疗窗|平台期|饱和点|半数有效量|半数致死量|有效剂量|致死剂量|血药浓度|药代动力学|毒理学|药理学|药物代谢/,
@@ -352,7 +404,7 @@ const EXEMPT_EVID_EN = [
 // ─── 豁免三：推理否定 / 反向承认 ────────────────────────────────────────
 const EXEMPT_NEG_ZH = [
   /不是线性|并非线性|非线性|不成比例|不等于|并不意味着|不代表|有上限|有限度|过犹不及|适得其反|物极必反|会中毒|有毒性|有毒|风险更高|反而有害|反而致死|过量|中毒|超量|用药过量|服药过量|超过.{0,6}(?:上限|剂量|用量)/,
-  /不会|并不会|不意味着|不见得|并无|没有.{0,4}(?:必要|意义|依据)|反而.{0,4}(?:有风险|更危险|受伤|更差)|有害|更差/,
+  /不会|并不会|不意味着|不见得|并无|没有.{0,4}(?:必要|意义|依据)|反而.{0,4}(?:有风险|更危险|受伤|更差)|有害|更差|反而.{0,4}(?:心慌|失眠|睡不着|难受|不舒服|伤身|上瘾|长胖|变胖|恶心|头晕|反胃|胃痛|拉肚子|长痘|早衰|折寿|伤肝|伤肾|伤胃|致癌|中毒)/,
   /不能说明|不能证明|推不出|不足以|未必|不一定|很难说|不见得|说不清|难以确定|无法确定/,
 ];
 const EXEMPT_NEG_EN = [
@@ -453,13 +505,41 @@ function checkDoseResponseLinearity(text, inject) {
     return { hit: true, score, count: 1, detail };
   }
 
-  // ── 族三：日常物品剂量外推（r341 新族，OR 并联）────────────────────────
-  // 三条件共现：腿① DAILY_IN 数量×日常单位 × 腿② TASK_AMP 能力标记×极端
-  // 任务（邻近窗）+ 剂量升级判定（同一单位两数量，大者≥3倍小者）。
-  const dailyIn = positions(R.DAILY_IN_ZH || DAILY_IN_ZH, text).concat(positions(R.DAILY_IN_EN || DAILY_IN_EN, text));
-  const taskAmp = positions(R.TASK_AMP_ZH || TASK_AMP_ZH, text).concat(positions(R.TASK_AMP_EN || TASK_AMP_EN, text));
-  if (dailyIn.length > 0 && taskAmp.length > 0 && coLocated(dailyIn, taskAmp, win) && hasDailyEscalation(text)) {
-    // 计分与健康族一致：双腿+升级判定基础 0.62；显式倍数/比例词 +0.08，封顶 0.85。
+  // ── 族三：日常摄入/投入品 × 增量 × 状态获益外推（r336 新族，OR 并联）──
+  // 专属推理否定仅在本族判定，不污染族一/族二。
+  if (anyHit(R.EXEMPT_DAILY_ZH || EXEMPT_DAILY_ZH, text) || anyHit(R.EXEMPT_DAILY_EN || EXEMPT_DAILY_EN, text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  const dIn = positions(R.DAILY_IN_ZH || DAILY_IN_ZH, text).concat(positions(R.DAILY_IN_EN || DAILY_IN_EN, text));
+  const dGain = positions(R.GAIN_ZH || GAIN_ZH, text).concat(positions(R.GAIN_EN || GAIN_EN, text));
+  // 第三条件：全文剂量/增量表达 ≥2 或含显式增量词（多/再/加倍/翻倍/more…）
+  let quantCount = 0;
+  for (const re of (isZh ? (R.QUANT_ZH || QUANT_ZH) : (R.QUANT_EN || QUANT_EN))) {
+    const g = new RegExp(re.source, re.flags.indexOf('g') >= 0 ? re.flags : re.flags + 'g');
+    let m;
+    while ((m = g.exec(text)) !== null) { quantCount++; if (m.index === g.lastIndex) g.lastIndex++; }
+  }
+  const hasIncrement = /(?:多|再|加倍|翻倍|多加|加量|加大|增量|加码)/.test(text) || /\b(?:more|double|twice|triple|extra|additional)\b/i.test(text);
+  if (dIn.length > 0 && dGain.length > 0 && (quantCount >= 2 || hasIncrement)) {
+    // 计分与既有两族同构：双腿共现 0.62 + 显式增量词 0.08，封顶 0.70——
+    // 本族投放域是日常话语、模糊量断言强度低于显式倍数，刻意压低上限避免
+    // 误把养生聊天当硬断言（仍进 VERIFY 层，高于任何 pass 阈值）。
+    let score = 0.62;
+    if (hasIncrement) score += 0.08;
+    if (score > 0.70) score = 0.70;
+    const detail = isZh
+      ? '日常物品剂量外推：把日常摄入的模糊增量外推为状态获益放大(zh)'
+      : 'daily-item dose extrapolation: vague intake increment assumed to amplify outcome(en)';
+    return { hit: true, score, count: 1, detail };
+  }
+
+  // ── 族四：日常物品剂量外推 × 极端任务（r341 新族，OR 并联）────────────
+  // 与族三同一外推结构的不同句式投放：腿②改用**极端任务形**（通宵/马拉松/
+  // 扛百斤/all-nighter）而非状态获益词，精度由剂量升级判定承重（同一单位
+  // 两数量大者 ≥3 倍小者）。族三/族四互不依赖，任一命中即判。
+  const tAmp = positions(R.TASK_AMP_ZH || TASK_AMP_ZH, text).concat(positions(R.TASK_AMP_EN || TASK_AMP_EN, text));
+  if (tAmp.length > 0 && coLocated(dIn, tAmp, win) && hasDailyEscalation(text)) {
+    // 计分与族一一致：双腿+升级判定基础 0.62；显式倍数/比例词 +0.08，封顶 0.85。
     let score = 0.62;
     if (/(?:倍|番|成比例|线性)/.test(text) || /\b(?:times|linearly|proportionally|2x|3x|5x|10x)\b/i.test(text)) score += 0.08;
     if (score > 0.85) score = 0.85;
@@ -480,7 +560,8 @@ module.exports = {
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
     SCALE_IN_ZH, SCALE_IN_EN, SCALE_OUT_ZH, SCALE_OUT_EN,
     EXEMPT_SCALE_NEG_ZH, EXEMPT_SCALE_NEG_EN,
-    DAILY_IN_ZH, DAILY_IN_EN, TASK_AMP_ZH, TASK_AMP_EN,
-    hasDailyEscalation, numVal, normUnit,
+    DAILY_IN_ZH, DAILY_IN_EN, GAIN_ZH, GAIN_EN,
+    QUANT_ZH, QUANT_EN, EXEMPT_DAILY_ZH, EXEMPT_DAILY_EN,
+    TASK_AMP_ZH, TASK_AMP_EN, hasDailyEscalation, numVal, normUnit,
   }),
 };

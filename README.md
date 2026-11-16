@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-256-blueviolet.svg)](#what-it-catches-256-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-257-blueviolet.svg)](#what-it-catches-257-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-256 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
+257 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
 ×  1,341 dispatch routes  ×  15,934 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 256 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 257 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (256 dimensions) -> gate
+scope-check -> premise-check -> discriminate (257 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (256 dimensions)
+## What it catches (257 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **223 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **224 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -211,7 +211,7 @@ Measured on this repository at **v6.8.185**. Not marketing copy.
 | Modules registered | 164 |
 | Module init errors | 0 |
 | Dispatch routes | 1,341 |
-| Discrimination dimensions | 256 |
+| Discrimination dimensions | 257 |
 | MCP tools | 190 |
 | Test suite | 15,934 passing / 155 failing | `node test/run-all.js` (full run 2026-11-13 ~719s; passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293；r301 接续 r300 基线（21,483/145/21,628），唯一 +22 即本轮新测试 round-301-law-of-averages.test.js（gamblers_fallacy 第148维『长期平均论证短期补偿/连发形追投』新措辞家族，22 断言单独 mount 实测 22/22 全过、池中自报同格式可解析），失败数 145 逐条持平；r302 接续 r301 基线（21,505/145/21,650），唯一 +12 即 round-302-law-of-small-numbers-quant.test.js（law_of_small_numbers 第239维『小样本→数量化总体裁定（概率/比率/均值）』新措辞家族，12 断言单独 mount 12/12 全过、池中自报同格式可解析），失败数 145 逐条持平；r303 接续 r302 基线（21,517/145/21,662），唯一 +31 即 round-303-average-marginal-rate.test.js（31 断言单独 mount 31/31）；r304 接续 r303 基线（21,548/145/21,693），唯一 +29 即 round-304-weak-evidence-ai-source.test.js（29 断言单独 mount 29/29）；r305–r308：r305 轮测 round-305-meta-anchor-legs 29/29 + negative-injection 通过 + noncultivation-r305 21/21（远端轮次，本机复测）；r306（dose_response_linearity 第250维，远端轮次）无专属轮测入库；r307 轮测 round-307-evidence-claim-mismatch 本机复测 44 通过/4 失败（4 条 ALL EXEMPT 注入断言属远端轮次自身形态，计入基线噪声）；r308 唯一 +75 即 round-308-sorites-goal-dismissal.test.js 单独 mount 75/75 全过；r309（selection_on_dependent_variable 第249维 econ_reasoning_gate 聚合族『按结果选样本』新措辞家族，4 号本轮）唯一 +15 即 round-309-selection-on-outcome-groups.test.js 单独 mount 15/15 全过、全量池中通过；r314 接续 r313 基线（远端 254 维/v6.8.179）：落地 present_bias/endowment_effect 新措辞家族轮测 round-314-procrastination-inflate-legs.test.js（263 断言，单独 mount 263/263、全量池中通过），并修复 r309/r310/r311 三个既有轮测被远端 6.8.179/254 维同步打红的 5 条 VERSION/维度数硬编码断言（r284 先例，修复前后全量失败清单逐条 diff 恰为这 5 条、单独 mount 复测 15/15、18/18、21/21）；r322 rebase 轮（本机）：本地 r322 成果 rebase 到远端 r321 之上后重跑 doc-numbers 门禁——本机 `data/test-count.json` 实测 passed 15934/failed 155（远端全量测量 22,003 为远端机器环境口径，两机测试池解析口径不同，门禁以本机 data/test-count.json 为唯一真源），故本机文档口径以 15,934 对齐，与远端 22,003 的差异是环境口径差而非回退） |
 | Capability guard | 20 / 20 checks |
