@@ -82,6 +82,15 @@ const FAMILIES = [
   // CORRECT 两组豁免 + 强否定守卫；CONCEPT 收泛概念名与腿①具体工具名
   // 互不咬，CORRECT 只收正面承认形防吞否定攻击句——r367 实测教训）。
   { key: 'price_control',                 mod: './price-control.js',              fn: 'detectPriceControl',          zh: '价格管制单效应断言',       en: 'price-control single-effect assertion', round: 'r367' },
+  // r368 新增：重商主义贸易顺差谬误（mercantilism / trade-surplus wealth
+  //   misattribution——贸易差额语境 × 把差额单边兑现为财富得失的断言：
+  //   出口/顺差才叫赚钱、进口/逆差就是财富外流、顺差越大越富、进口越多
+  //   越吃亏；探针攻击穿透 9/10（唯一非穿透条被存量 zero_sum_fallacy
+  //   代拦）、良性非 pass 1/9（存量 confidence 维度误拦，非本族增量）；
+  //   双腿 + CONCEPT/CORRECT 两组豁免 + 强否定守卫；CONCEPT 须概念名与
+  //   框架词共现，防「重商主义其实是对的」前缀绕过；「买国货才是爱国」
+  //   经济民族主义形不判（超财富得失范围，样本靠净流出子句承重）。
+  { key: 'mercantilism',                  mod: './mercantilism.js',               fn: 'detectMercantilism',         zh: '重商主义贸易顺差谬误',     en: 'mercantilism (trade-surplus wealth misattribution)', round: 'r368' },
 ];
 
 const _cache = new Map();
@@ -105,7 +114,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 23 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 24 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
