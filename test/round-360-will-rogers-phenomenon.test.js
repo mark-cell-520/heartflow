@@ -187,14 +187,16 @@ check('C 良性零误伤：官方四基准语料全量模块级零命中', () =>
   assert.strictEqual(fp, 0, '误伤 ' + fp + ' 条: ' + hits.join(' | '));
 });
 check('C A/B 双树对照：移除本家族后良性集 gate action 逐条一致（零新增误伤）', () => {
-  // 把双腿全部 18 个族逐个置空（不能只置 GROUPS 容器名——注入按族名
-  // 逐个解析），模拟「本家族不存在」的基线树：攻击必须全部失效（证明
+  // 把双腿全部 24 个族逐个置空（不能只置 GROUPS 容器名——注入按族名
+  // 逐个解析；r362 新增 MIGRATE_RECLASS2_ZH / MIGRATE_BETWEEN_EN /
+  // MIGRATE_REDRAWN_EN / BOTHUP_ALL_EN / BOTHUP_BOTHOBJ_EN 五族），
+  // 模拟「本家族不存在」的基线树：攻击必须全部失效（证明
   // 双腿承重），良性集不得因本家族产生任何 pass→非pass 变化。
   const blank = {
-    MIGRATE_FROM_TO_ZH: [], MIGRATE_RECLASS_ZH: [], MIGRATE_ASSIGN_ZH: [], MIGRATE_MOVE_ZH: [],
-    MIGRATE_RECLASS_EN: [], MIGRATE_FROM_TO_EN: [], MIGRATE_RULE_EN: [], MIGRATE_TOGROUP_EN: [], MIGRATE_SPLIT_EN: [],
-    BOTHUP_ALL_ZH: [], BOTHUP_DOUBLE_ZH: [], BOTHUP_TWOGROUP_ZH: [], BOTHUP_GROUPNOUN_ZH: [],
-    BOTHUP_BOTHGROUPS_EN: [], BOTHUP_RAISEDBOTH_EN: [], BOTHUP_MADEBOTH_EN: [], BOTHUP_BOTHUP_EN: [], BOTHUP_INBOTH_EN: [],
+    MIGRATE_FROM_TO_ZH: [], MIGRATE_RECLASS_ZH: [], MIGRATE_ASSIGN_ZH: [], MIGRATE_MOVE_ZH: [], MIGRATE_RECLASS2_ZH: [],
+    MIGRATE_RECLASS_EN: [], MIGRATE_FROM_TO_EN: [], MIGRATE_RULE_EN: [], MIGRATE_TOGROUP_EN: [], MIGRATE_SPLIT_EN: [], MIGRATE_BETWEEN_EN: [], MIGRATE_REDRAWN_EN: [],
+    BOTHUP_ALL_ZH: [], BOTHUP_DOUBLE_ZH: [], BOTHUP_TWOGROUP_ZH: [], BOTHUP_GROUPNOUN_ZH: [], BOTHUP_IDIOM_ZH: [],
+    BOTHUP_BOTHGROUPS_EN: [], BOTHUP_RAISEDBOTH_EN: [], BOTHUP_MADEBOTH_EN: [], BOTHUP_BOTHUP_EN: [], BOTHUP_INBOTH_EN: [], BOTHUP_ALL_EN: [], BOTHUP_BOTHOBJ_EN: [],
   };
   for (const s of [...ATTACK_ZH, ...ATTACK_EN]) {
     assert.strictEqual(hit(s, blank), false, '注入后仍命中（腿组不承重）: ' + s);
@@ -291,12 +293,15 @@ check('E 注入 BOTHUP_BOTHGROUPS_EN=[] → both groups improved 失效', () => 
 check('E 注入 BOTHUP_RAISEDBOTH_EN=[] → raised the average of both 失效', () => {
   const s = 'Moving the weakest students to the remedial class raised the average of both classes.';
   assert.strictEqual(hit(s), true);
-  assert.strictEqual(hit(s, { BOTHUP_RAISEDBOTH_EN: [] }), false);
+  // r362 新增 BOTHUP_BOTHOBJ_EN（动词在前直驳 both）为该样本提供后备
+  // 覆盖，精准删词须同时置空后备族（双族承重）。
+  assert.strictEqual(hit(s, { BOTHUP_RAISEDBOTH_EN: [], BOTHUP_BOTHOBJ_EN: [] }), false);
 });
 check('E 注入 BOTHUP_INBOTH_EN=[] → improved in both groups 失效', () => {
   const s = 'The new staging criteria shifted some patients into the early group, and survival improved in both groups.';
   assert.strictEqual(hit(s), true);
-  assert.strictEqual(hit(s, { BOTHUP_INBOTH_EN: [] }), false);
+  // 同上：BOTHUP_BOTHOBJ_EN 的 "improved ... both groups" 为后备覆盖。
+  assert.strictEqual(hit(s, { BOTHUP_INBOTH_EN: [], BOTHUP_BOTHOBJ_EN: [] }), false);
 });
 check('E 注入 BOTHUP_MADEBOTH_EN=[] → made both better 失效', () => {
   const s = 'Changing the grouping rule made both better at the same time.';

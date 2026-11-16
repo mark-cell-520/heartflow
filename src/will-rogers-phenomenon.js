@@ -95,6 +95,26 @@
  *   · EN 腿① cut-offs 独属负例样本补入 test/round-361（删 cut-?offs?
  *     后该样本模块层失效，证 r360 所补正则承重）。
  *
+ * r362 补齐（真升级类型②续，src/index.js 零改动、维度 257 不变）：
+ *   · 腿① MIGRATE_RECLASS2_ZH 新族——分层调整倒装形（调整了一下分层 /
+ *     重新分了层；r361 交接「只收整词」项，探针 3/3 穿透）；
+ *   · 腿① MIGRATE_RECLASS_EN 补 re-stratif(y|ied|…) / re-bin(ned|ning)
+ *     / reshuffl(e|ed|…) 词根、MIGRATE_BETWEEN_EN 新族——moved some
+ *     between stages 的 between 目标介词形、MIGRATE_REDRAWN_EN 新族——
+ *     the tiers were redrawn 被动重画形（存量 E2 强制 from、E1 无被动
+ *     形，探针穿透；D 组第 4 条「re-binned into new stages」经
+ *     MIGRATE_RULE_EN 的 new stages 代拦，裁定非缺口）；
+ *   · 腿① MIGRATE_RECLASS_ZH 补「调整分班 / 分班调整 / 重新分班」；
+ *   · 腿② BOTHUP_ALL_EN 新族（三正则）——EN 全称提升形（everyone's
+ *     scores improved / all patients did better / the whole cohort
+ *     improved / rose for everyone / lifted scores across the board；
+ *     存量 BE1–BE5 全部要求 both 在前或 in both，全称形零覆盖，
+ *     探针 6/6 穿透）、BOTHUP_BOTHOBJ_EN 新族——improved both
+ *     groups 动词在前无 in 形（BE5 强制 in both，探针穿透）；
+ *   · 腿② BOTHUP_IDIOM_ZH 扩词——屡创新高 / 连创新高 / 再创新高 /
+ *     屡攀新高 / 节节攀升（探针 4/4 穿透；与 r357 CASE_SURGE_ZH7
+ *     划界：该族判病例数激增不要求腿①迁移共现，本族须迁移在场）。
+ *
  * 明确不判的（豁免/判据天然排除，均可负例注入证明承重）：
  *   · 两组方向相反（重新分组后早期组上升、晚期组下降——不是本族形态，
  *     且属 simpsons_paradox 领地）；
@@ -114,7 +134,7 @@ const MIGRATE_FROM_TO_ZH = /(?:从|由)[^。，！？；\n]{0,10}(?:移到|移�
 //    r361 补「分层调整 / 分层变动 / 层次调整」名词形（r360 交接项①——
 //    探针实证该形模块层 miss，gate 层已被 pseudo_causal「之后…都提高」
 //    代拦，模块层补齐走双保险，见 test/round-361）。
-const MIGRATE_RECLASS_ZH = /(?:重新分期|重新分组|重新分类|重新划归|重新划定|重新归类|调整分组|调整分期|重新编制|分层调整|分层变动|层次调整|分层重新划分|换(?:了)?(?:标准|口径|分组方式|计分方式)|分期标准(?:的)?(?:调整|改变|更新|更换|修订)|分组(?:规则|标准|口径)(?:的)?(?:调整|改变|更新|更换|变化)|新的(?:分期|分组|分类|分班)(?:标准|规则|方案|办法)|标准一改|口径一变|标准变化|分组方式变)/;
+const MIGRATE_RECLASS_ZH = /(?:重新分期|重新分组|重新分类|重新划归|重新划定|重新归类|调整分组|调整分期|重新编制|分层调整|分层变动|层次调整|分层重新划分|调整分班|分班调整|重新分班|换(?:了)?(?:标准|口径|分组方式|计分方式)|分期标准(?:的)?(?:调整|改变|更新|更换|修订)|分组(?:规则|标准|口径)(?:的)?(?:调整|改变|更新|更换|变化)|新的(?:分期|分组|分类|分班)(?:标准|规则|方案|办法)|标准一改|口径一变|标准变化|分组方式变)/;
 // M3 分班 / 调组动词族（分到慢班 / 调进重点班 / 编入实验组）。
 const MIGRATE_ASSIGN_ZH = /(?:分到|分入|分进|调到|调往|调入|调进|划入|划进|编入|编进|归入|转进|转入|分流到|安排到|安排进)[^。，！？；\n]{0,6}(?:组|班|层|类|档|梯队)/;
 // M4 迁移语义裸族（组间迁移 / 病人迁移 / 转组 / 转班 / 并班）。
@@ -122,6 +142,11 @@ const MIGRATE_ASSIGN_ZH = /(?:分到|分入|分进|调到|调往|调入|调进|�
 //    「给一批学生转班」「并班之后」整句零维度承重穿透，见
 //    test/round-361；换班/调班 r360 已在表，转班/并班组内补全）。
 const MIGRATE_MOVE_ZH = /(?:组间迁移|病人迁移|患者迁移|学员迁移|学生迁移|转组|换组|换班|调班|转班|并班|并组|迁移|再分类|重新划分)/;
+// M2b 分层调整倒装形（调整了一下分层 / 重新分了层——r361 交接项：
+//    MIGRATE_RECLASS_ZH 只收「分层调整」正序整词形，动词前置带「了/
+//    一下」插入的倒装形零覆盖，r362 探针 3/3 穿透，见
+//    scripts/round-362/probe-r362-candidates.js C 组）。
+const MIGRATE_RECLASS2_ZH = /(?:调整|变动|改变|变化|修改|修订)[了着]?(?:一下|稍稍|稍微|些许)?(?:的)?分层|重新分[了]?层|分层[被]?重新(?:划分|切分|拆分)/;
 
 // 组名词（用于 M1/M3 的近距收紧：迁移目标必须是组名词而非任意宾语）
 const GROUP_ZH = /(?:早期|晚期|中期|终末期|轻症|重症|危重症|早期组|晚期组|中期组|轻症组|重症组|快班|慢班|尖子班|普通班|重点班|实验组|对照组|观察组|高风险组|低风险组|高危组|低危组|一期|二期|三期|四期|I期|II期|III期|IV期|A组|B组|C组|甲组|乙组|上层|下层|高分组|低分组|第一组|第二组|第三组|分层|亚组|子群)/;
@@ -131,11 +156,23 @@ const MIGRATE_ZH_GROUPS = [
   ['MIGRATE_RECLASS_ZH', [MIGRATE_RECLASS_ZH]],
   ['MIGRATE_ASSIGN_ZH', [MIGRATE_ASSIGN_ZH]],
   ['MIGRATE_MOVE_ZH', [MIGRATE_MOVE_ZH]],
+  ['MIGRATE_RECLASS2_ZH', [MIGRATE_RECLASS2_ZH]],
 ];
-const MIGRATE_ZH = [MIGRATE_FROM_TO_ZH, MIGRATE_RECLASS_ZH, MIGRATE_ASSIGN_ZH, MIGRATE_MOVE_ZH];
+const MIGRATE_ZH = [MIGRATE_FROM_TO_ZH, MIGRATE_RECLASS_ZH, MIGRATE_ASSIGN_ZH, MIGRATE_MOVE_ZH, MIGRATE_RECLASS2_ZH];
 
 // E1 reclassifying / reclassified / reclassification 族
-const MIGRATE_RECLASS_EN = /\b(?:reclassif(?:y|ied|ies|ying|ication)|re-?stag(?:e|ed|es|ing)|re-?assign(?:ed|ing|ment)?|re-?group(?:ed|ing)?|re-?categoriz(?:e|ed|ing|ation)|re-?labell?ed|re-?sort(?:ed|ing)?)\b/i;
+//    r362 补 re-stratif(y|ied|...) 与 re-bin(ned|ning) 词根——探针实证
+//    「Re-stratifying the patients moved some between stages」因缺
+//    re-stratif 词根整句穿透（scripts/round-362 D 组 3/4）。
+const MIGRATE_RECLASS_EN = /\b(?:reclassif(?:y|ied|ies|ying|ication)|re-?stag(?:e|ed|es|ing)|re-?assign(?:ed|ing|ment)?|re-?group(?:ed|ing)?|re-?categoriz(?:e|ed|ing|ation)|re-?labell?ed|re-?sort(?:ed|ing)?|re-?stratif(?:y|ied|ies|ying|ication)|re-?bin(?:ned|ning)?|reshuffl(?:e|ed|es|ing))\b/i;
+// E2b moved ... between <groups> 族（无 from 的 between 形——r362 探针：
+//    "moved some between stages" 因 E2 强制要求 from 而穿透；between
+//    与 from...to... 同为组间迁移动词的目标介词形）。
+const MIGRATE_BETWEEN_EN = /\b(?:mov(?:e|ed|es|ing)|shift(?:ed|ing)?|transferr?(?:ed|ing)|migrat(?:e|ed|ing)|reassign(?:ed|ing)?|sort(?:ed|ing)?|shuffl(?:e|ed|ing))\s+(?:some|many|most|several|a\s+few|the)?\s*(?:\w+\s+){0,3}?between\s+(?:\w+\s+){0,2}?(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|stages?|brackets?|bands?|tracks?|categories)\b/i;
+// E2c 组名词被动重画族（the tiers were redrawn / groups got reshuffled——
+//    r362 探针：被动 redraw 形无动词在前，E1–E2b 全部穿透；组名词在
+//    前 + be/get + 重画动词，防止 "the map was redrawn" 类误命中）。
+const MIGRATE_REDRAWN_EN = /\b(?:groups?|tiers?|brackets?|stages?|classes?|cohorts?|arms?|strata|bands?|tracks?|categories)\s+(?:were|was|got|get|are|is|been|have\s+been|has\s+been)?\s*(?:re-?drawn|reshuffl\w+|re-?sort\w+|re-?bin\w*|re-?bucket\w*)\b/i;
 // E2 moved from ... to ... 迁移族（含 shuffling into / moved over to）
 const MIGRATE_FROM_TO_EN = /\b(?:mov(?:e|ed|es|ing)|shift(?:ed|ing)?|transferr?(?:ed|ing)|migrat(?:e|ed|ing)|promot(?:e|ed|ing)|demot(?:e|ed|ing)|bump(?:ed|ing)?)\s+(?:some|many|most|several|a\s+few|the)?\s*(?:\w+\s+){0,3}?(?:from|out\s+of)\s+[^.]{0,40}?\s+(?:to|into|over\s+to)\b/i;
 // E3 分组规则变更族（changing the grouping rule / new staging criteria）
@@ -153,8 +190,10 @@ const MIGRATE_EN_GROUPS = [
   ['MIGRATE_RULE_EN', [MIGRATE_RULE_EN]],
   ['MIGRATE_TOGROUP_EN', [MIGRATE_TOGROUP_EN]],
   ['MIGRATE_SPLIT_EN', [MIGRATE_SPLIT_EN]],
+  ['MIGRATE_BETWEEN_EN', [MIGRATE_BETWEEN_EN]],
+  ['MIGRATE_REDRAWN_EN', [MIGRATE_REDRAWN_EN]],
 ];
-const MIGRATE_EN = [MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIGRATE_TOGROUP_EN, MIGRATE_SPLIT_EN];
+const MIGRATE_EN = [MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIGRATE_TOGROUP_EN, MIGRATE_SPLIT_EN, MIGRATE_BETWEEN_EN, MIGRATE_REDRAWN_EN];
 
 // ─── 腿② BOTH_UP 两组同时改善断言 ────────────────────────────────
 // B1 都 + 上升动词族（都提高了 / 皆上升 / 均提升 / 统统变好）。
@@ -167,10 +206,15 @@ const MIGRATE_EN = [MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIG
 const BOTHUP_ALL_ZH = /(?:都|皆|均|统统|全都|一并|无一例外|毫无例外|齐刷刷|一律|清一色)[^。，！？；\n]{0,4}(?:提高|提升|上升|升高|增长|增加|改善|好转|变好|涨了|上涨|走高|翻倍|进步|跑赢|胜出)/;
 // B5 成语形族（水涨船高 / 步步高升——无双都字形的整体上升断言）。
 //    r360 交接项②：探针实证「两组的指标水涨船高」整句零维度承重穿透。
+//    r362 补「屡创新高 / 连创新高 / 再创新高 / 屡攀新高 / 节节攀升」——
+//    探针实证「两组成绩屡创新高」「两个班的分数节节攀升」穿透 4/4。
+//    与 r357 CASE_SURGE_ZH7（筛查发病率域的病例数激增族）划界：该族判
+//    「病例数屡创新高」不要求腿①迁移共现；本族须腿①组间迁移在场才判，
+//    「公司业绩屡创新高」类无腿①良性句天然不命中。
 //    两腿共现结构保护：良性「行业水涨船高，利润都提高了，因为市场
 //    需求真实增长」无腿①不判；「水涨船高，但这只是统计假象」走
 //    豁免 B 正确响应形。
-const BOTHUP_IDIOM_ZH = /(?:水涨船高|步步高升)/;
+const BOTHUP_IDIOM_ZH = /(?:水涨船高|步步高升|屡创新高|连创新高|再创新高|屡攀新高|节节攀升)/;
 // B2 双双 / 一起族（双双上升 / 一起涨 / 同时提升）。
 const BOTHUP_DOUBLE_ZH = /(?:双双|一齐|一起|一并|同时)[^。，！？；\n]{0,5}(?:上升|提高|提升|增长|增加|改善|好转|变好|上涨|涨|走高|翻倍|跑赢)/;
 // B3 两组都 + 指标 + 上升族（两组都提高了 / 两个班都上升了）。
@@ -199,6 +243,19 @@ const BOTHUP_BOTHUP_EN = /\bboth\s+(?:\w+\s+){0,3}?(?:went\s+up|rose|rose|improv
 // BE5 improved in both groups 族（改善词在前的倒装形——r360 构造期实测：
 //   "survival improved in both groups" 因 BE1 要求 both 在前而穿透）
 const BOTHUP_INBOTH_EN = /\b(?:improv(?:e|ed|es|ing|ement)|rose|risen|rises|increas(?:e|ed|es|ing)|went\s+up|got\s+better|climb(?:ed|ing)?|grew)\s+(?:\w+\s+){0,4}?in\s+both\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|brackets?|stages?)\b/i;
+// BE6 全称提升族（everyone's scores improved / all patients did better /
+//    the whole cohort improved——存量 BE1–BE5 全部要求 both 在前或 in
+//    both，无 both 的全称提升断言零覆盖；r362 探针 6/6 穿透）。
+//    主语在前形：everyone/everybody/all (of) .../the whole/entire + 提升词。
+const BOTHUP_ALL_EN = /\b(?:everyone|everybody|all(?:\s+of)?\s+(?:them|the\s+\w+|patients?|students?|cases?|workers?|employees?|subjects?)|the\s+(?:whole|entire)\s+(?:cohort|class|group|population|team|batch))\b[^.]{0,40}?\b(?:improv\w+|did\s+better|doing\s+better|fared\s+better|ended\s+up\s+better|rose|risen|increas\w+|went\s+up|got\s+better|climb\w*|grew|higher)\b/i;
+// BE6b 提升词在前的倒装全称形（scores rose for everyone / improved for all）
+const BOTHUP_FORALL_EN = /\b(?:improv\w+|rose|risen|increas\w+|went\s+up|climb\w*|grew)\s+(?:\w+\s+){0,3}?for\s+(?:everyone|all)\b/i;
+// BE6c across the board 全面上升成语形（lifted scores across the board /
+//    rose across the board——提升词在前，成语标记在后）。
+const BOTHUP_ACROSS_EN = /\b(?:improv\w+|rose|risen|increas\w+|went\s+up|climb\w*|grew|lift\w*|boost\w*|rais\w+)\s+(?:\w+\s+){0,3}?across\s+the\s+board\b/i;
+// BE7 提升词在前直驳 both 形（improved both groups——BE5 强制要求
+//    "in both"，无 in 的动词在前形零覆盖；r362 探针 D 组定位）。
+const BOTHUP_BOTHOBJ_EN = /\b(?:improv\w+|rais\w+|lift\w+|boost\w+|left|sent|push\w+)\s+(?:\w+\s+){0,4}?both\s+(?:groups?|class(?:es)?|cohorts?|arms?|strata|tiers?|stages?|brackets?)\b/i;
 
 const BOTHUP_EN_GROUPS = [
   ['BOTHUP_BOTHGROUPS_EN', [BOTHUP_BOTHGROUPS_EN]],
@@ -206,8 +263,10 @@ const BOTHUP_EN_GROUPS = [
   ['BOTHUP_MADEBOTH_EN', [BOTHUP_MADEBOTH_EN]],
   ['BOTHUP_BOTHUP_EN', [BOTHUP_BOTHUP_EN]],
   ['BOTHUP_INBOTH_EN', [BOTHUP_INBOTH_EN]],
+  ['BOTHUP_ALL_EN', [BOTHUP_ALL_EN, BOTHUP_FORALL_EN, BOTHUP_ACROSS_EN]],
+  ['BOTHUP_BOTHOBJ_EN', [BOTHUP_BOTHOBJ_EN]],
 ];
-const BOTHUP_EN = [BOTHUP_BOTHGROUPS_EN, BOTHUP_RAISEDBOTH_EN, BOTHUP_MADEBOTH_EN, BOTHUP_BOTHUP_EN, BOTHUP_INBOTH_EN];
+const BOTHUP_EN = [BOTHUP_BOTHGROUPS_EN, BOTHUP_RAISEDBOTH_EN, BOTHUP_MADEBOTH_EN, BOTHUP_BOTHUP_EN, BOTHUP_INBOTH_EN, BOTHUP_ALL_EN, BOTHUP_FORALL_EN, BOTHUP_ACROSS_EN, BOTHUP_BOTHOBJ_EN];
 
 // ─── 距离窗（迁移腿 × 双腿改善腿）───────────────────────────────
 const PAIR_ZH = 60;
@@ -412,10 +471,11 @@ function detectWillRogersPhenomenon(text, inject) {
 module.exports = {
   detectWillRogersPhenomenon,
   __internals: () => ({
-    MIGRATE_FROM_TO_ZH, MIGRATE_RECLASS_ZH, MIGRATE_ASSIGN_ZH, MIGRATE_MOVE_ZH, GROUP_ZH,
-    MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIGRATE_TOGROUP_EN, MIGRATE_SPLIT_EN,
+    MIGRATE_FROM_TO_ZH, MIGRATE_RECLASS_ZH, MIGRATE_ASSIGN_ZH, MIGRATE_MOVE_ZH, MIGRATE_RECLASS2_ZH, GROUP_ZH,
+    MIGRATE_RECLASS_EN, MIGRATE_FROM_TO_EN, MIGRATE_RULE_EN, MIGRATE_TOGROUP_EN, MIGRATE_SPLIT_EN, MIGRATE_BETWEEN_EN, MIGRATE_REDRAWN_EN,
     BOTHUP_ALL_ZH, BOTHUP_DOUBLE_ZH, BOTHUP_TWOGROUP_ZH, BOTHUP_GROUPNOUN_ZH, BOTHUP_IDIOM_ZH,
     BOTHUP_BOTHGROUPS_EN, BOTHUP_RAISEDBOTH_EN, BOTHUP_MADEBOTH_EN, BOTHUP_BOTHUP_EN, BOTHUP_INBOTH_EN,
+    BOTHUP_ALL_EN, BOTHUP_FORALL_EN, BOTHUP_ACROSS_EN, BOTHUP_BOTHOBJ_EN,
     MIGRATE_ZH, MIGRATE_EN, BOTHUP_ZH, BOTHUP_EN,
     MIGRATE_ZH_GROUPS, MIGRATE_EN_GROUPS, BOTHUP_ZH_GROUPS, BOTHUP_EN_GROUPS,
     PAIR_ZH, PAIR_EN,

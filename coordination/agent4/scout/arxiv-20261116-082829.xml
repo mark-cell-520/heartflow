@@ -1,0 +1,340 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/FHcstpZN6IpJL47AOUB3IAjX39g</id>
+  <title>arXiv Query: search_query=all:Will OR all:Rogers OR all:phenomenon OR all:stage OR all:migration OR all:survival OR all:bias OR all:lead-time OR all:bias&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-16T08:28:29Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Will+OR+(all:Rogers+OR+(all:phenomenon+OR+(all:stage+OR+(all:migration+OR+(all:survival+OR+(all:bias+OR+(all:lead-time+OR+all:bias)))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>283403</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18563v1</id>
+    <title>Pairing AIS with RF: Analysis of a Markovian Approach for Maritime Data Fusion</title>
+    <updated>2026-11-13T18:59:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.18563v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18563v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Monitoring maritime activities is important for safety and security, particularly for detecting illegal activities, but remains challenging due to the size and complexity of the maritime domain. The Automatic Identification System (AIS) is commonly used for this purpose, despite its known vulnerabilities. In contrast, space-based radio frequency (RF) observations provide an independent source of vessel activity but lack ship identification and therefore cannot identify vessels on their own. Following the CRISP-DM process, this study applies a Pair Hidden Markov Model (PHMM) to align individual RF detections with AIS trajectories, using temporal and spatial information while modeling noise and timing discrepancies. We evaluate it on NOAA AIS data with synthetic RF detections against nearest-neighbor baselines and analyze its errors with bias tests on trajectory length, sampling density, stationarity and AIS--RF distance. The length-corrected Forward score reaches a top-1 precision of $0.7776$ on the validation split of multi-candidate detections, where errors are possible, and an AUC of $0.637$ for detecting dark vessels among the detections that pass the prefilter. With a single RF detection, the score mostly reflects the AIS trajectory itself, and its errors favor longer and more stationary trajectories. A log-odds score, which compares the full model with a null model without match transitions, raises precision to $0.8580$ and AUC to $0.852$. Its length-corrected variant no longer shows a significant bias towards stationary trajectories and short inter-message distances, but still favors candidates farther from the RF detection. A time-weighted nearest-neighbor baseline without fitting remains ahead (precision $0.9013$, AUC $0.904$), so this single-detection, hand-designed PHMM formulation approaches but does not beat it.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:59:43Z</published>
+    <arxiv:comment>10 pages, 5 figures, accepted at the 13th IEEE Special Session Privacy and Security of Big Data of IEEE BigData 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Daniel Grimm</name>
+    </author>
+    <author>
+      <name>Kyra Jongman</name>
+    </author>
+    <author>
+      <name>Renato Cordeiro Ferreira</name>
+    </author>
+    <author>
+      <name>Giuseppe Cascavilla</name>
+    </author>
+    <author>
+      <name>Alfredo Cuzzocrea</name>
+    </author>
+    <author>
+      <name>Willem-Jan Van Den Heuvel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18558v1</id>
+    <title>Reconstruction of Dynamical Dark Energy and Gravity from latest cosmological data</title>
+    <updated>2026-11-13T18:58:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.18558v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18558v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent cosmological observations have renewed interest in non-standard late-time evolution. We investigate whether departures from the standard expansion history are accompanied by modifications of gravitational dynamics through a joint, non-parametric reconstruction of the effective dark energy density, $Ω_{\rm X}(a)$, and the gravitational response functions $μ(a)$ and $Σ(a)$. Combining CMB, DESI DR2 BAO, Pantheon+, and large scale structure observations, including DES Year 3 $6\times2$pt data, we perform reconstructions with and without a theory motivated correlation prior derived from stable Horndeski models. We find a persistent maximum in $Ω_{\rm X}$ at $z\simeq0.5$--$0.7$, corresponding to a crossing of the effective phantom divide. This feature is already present in the CMB+BAO combination and remains robust when modifications to clustering and lensing are allowed. The reconstructed gravitational response exhibits suggestive enhancements in $μ$ and $Σ$ over approximately the same redshift range, although these departures are less significant. Including LSS information instead favours a reduced lensing response, $Σ&lt;1$, while leaving the background feature largely unchanged. An interpretation within Generalized Brans-Dicke theories illustrates how modifications to the effective gravitational coupling and a scalar-mediated fifth force may contribute to these trends. Our results indicate that current departures from $Λ$CDM are most significant in the expansion history, while leaving open the possibility of correlated modifications to gravitational dynamics that future Stage IV surveys can test.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:51Z</published>
+    <arxiv:comment>16 pages, 10 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Maria Luisa Gallavotti</name>
+    </author>
+    <author>
+      <name>Alessandra Silvestri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18557v1</id>
+    <title>Does Dark Energy Evolve $\textit{and}$ Cluster?</title>
+    <updated>2026-11-13T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.18557v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18557v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent cosmological observations have renewed interest in dynamical dark energy, and naturally raise the question of whether departures from the standard expansion history are accompanied by modifications of gravitational dynamics. We address this question through a joint, non-parametric reconstruction of the effective dark-energy contribution to the expansion and the gravitational responses governing clustering and lensing, complemented by a combined covariance-mode analysis, without imposing model-specific relations between the sectors. Combining CMB, DESI DR2 BAO, and Pantheon+ supernova observations, and subsequently adding large scale structure observations including DES Year 3 $6\times2$pt data and other surveys, we recover a broad maximum in the effective dark-energy density near $z\simeq0.6$--$0.7$. The gravitational responses exhibit suggestive low-redshift enhancements over their GR values, approximately coincident with the background feature. Adding large scale structure information preserves the background feature but favours a mildly reduced lensing response. The combined covariance-mode analysis identifies the combinations of background and gravitational responses most tightly constrained by current observations and quantifies their departures from $Λ$CDM. The leading modes are decisively background dominated, while the gravitational sector remains less precisely constrained. Thus, present data cannot yet determine whether the suggestive low-redshift features in the two sectors share a common physical origin, a question that ongoing Stage-IV surveys will be able to address</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:50Z</published>
+    <arxiv:comment>4 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Maria Luisa Gallavotti</name>
+    </author>
+    <author>
+      <name>Alessandra Silvestri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18552v1</id>
+    <title>Real-time simulation of scattering in $φ^4$ theory: localized excitation, scalable wave packet preparation, and peak-generating artifacts</title>
+    <updated>2026-11-13T18:57:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.18552v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18552v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Probing real-time dynamics is essential for understanding non-perturbative scattering and interactions in quantum field theory. A common challenge in real-time simulation is preparing accurate asymptotic incoming states. Through efficiently solvable eigenvalue problems, we jointly optimize a superposition of single particle momentum eigenstates and a single site interpolating operator to maximize preparation fidelity from the interacting vacuum. This leads to a localized excitation in the interacting theory analogous to a position eigenstate. Weighted sums of the resulting interpolating operator over lattice sites prepare wave packets of arbitrary spatial extent. To ensure that this construction produces the correct continuum limit, relative phases among single particle momentum eigenstates in this superposition are calibrated using a relation derived from Lorentz symmetry. Analyzing single particle wave packet propagation through the position space profile reveals oscillatory Airy distortions, which originate from interference between saddle point contributions at different momenta that share the same lattice group velocity. These oscillations systematically weaken when approaching the continuum limit, and reliable regimes are identified as a function of simulation time and wave packet momentum profile. Two-particle scattering simulations in interacting scalar field theory are also implemented, revealing artificial inelasticity arising from coarse local field digitization or deviation from the Nyquist-Shannon sampling point. With these artifacts under control, present simulations provide emerging evidence for physical inelastic processes in $φ^4$ theory. The constructions introduced in this work may provide new understanding of state preparation for the quantum simulation of scattering.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:57:45Z</published>
+    <arxiv:comment>38 pages, 8 figures, 5 appendices</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Boyu Gao</name>
+    </author>
+    <author>
+      <name>Natalie Klco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18549v1</id>
+    <title>JVT: Just Video Transformer makes pixel-space video diffusion simple</title>
+    <updated>2026-11-13T18:55:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.18549v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18549v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Direct diffusion modeling of high-dimensional raw video data is challenging, and existing pixel-space methods often rely on specialized architectures. We introduce JVT (Just Video Transformer), a simple large-patch DiT-style Transformer for pixel-space video diffusion, without a pretrained autoencoder, auxiliary detailers, cascaded stages, or U-Net-style skip connections. We systematically examine video patch embeddings, register tokens, and adaptive layer normalization to identify design choices that balance generation quality and computational efficiency. The resulting JVT design achieves generation quality competitive with latent diffusion baselines in both class-conditioned and unconditional settings. The pixel-space formulation of JVT also naturally supports joint generation of pixel-aligned modalities. We demonstrate this capability through camera-conditioned RGB-disparity generation, which improves camera following relative to RGB-only baselines and yields explicit scene geometry without an additional reconstruction model at inference. These results highlight the potential of simple DiT-style Transformers for pixel-space video diffusion, and we hope our findings offer useful insights and practical guidance for future research.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:55:25Z</published>
+    <arxiv:comment>23 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jianjun Zhou</name>
+    </author>
+    <author>
+      <name>Hua Geng</name>
+    </author>
+    <author>
+      <name>Haoyu Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18538v1</id>
+    <title>Why Finite Intelligence Works in an Infinite World: A Mathematical Theory</title>
+    <updated>2026-11-13T18:47:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.18538v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18538v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An information system often has to learn before it knows what it will be asked. A finite representation can succeed without recording an infinite environment in full when those asks share collective structure, rather than demand unrelated facts scattered arbitrarily across it. We formalize this phenomenon through future-task information, the minimum retained information needed to preserve decision value relative to the available evidence. A joint decision-regret state records posterior comparisons among actions for every permitted task. Under compactness assumptions, every retained representation admits a calibrated replacement based on this state, preserving all task regrets without increasing information; the resulting information-regret curve equals an operational coding rate. Two exact boundaries govern finite preservation: weak-star closure for a fixed action count, and the singular mass of the source-evidence law when all finite action menus are admitted. Collective structure determines information requirements beyond individual-question difficulty. Families with identical source laws, pairwise task metrics, and individual-task rates can have different high-resolution exponents. Covariance-identical coordinate and parity families have different exact rate-distortion curves, with optimal parity retention characterized by a sharp Fourier-entropy inequality. For balanced nested task families, refinement sizes and weighted reach determine the rate within an additive constant, attained by prefix coding under explicit decay conditions. Nonlinear learning and computational separations distinguish preservation from efficient discovery and use. The proposed mathematical theory identifies which shared decision requirements allow finite information to remain useful for infinitely many possible purposes.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:47:24Z</published>
+    <arxiv:comment>56 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Mojtaba Soltanalian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18530v1</id>
+    <title>Understanding Contextual Bias in Agricultural CNNs Through Hidden-Neuron Concept Induction</title>
+    <updated>2026-11-13T18:43:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.18530v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18530v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Convolutional Neural Networks (CNNs) can classify images using background-dominated patches that contain little or none of the target object, showing that they exploit contextual information. Previous studies detected this behavior through classification accuracy but say little about what CNN hidden layers represent. We investigate whether Concept Induction can reveal interpretable visual properties associated with hidden-neuron activations on contextual image patches. Using five agricultural datasets with high, moderate, and low contextual bias, we analyze four CNN architectures at three network depths and five patch locations. Quantitative image descriptors of each patch are encoded in a knowledge graph and used as background knowledge for Concept Induction, which derives logical expressions characterizing neuron activation. These expressions are tested on held-out images using the Mann-Whitney U test and Cliff's delta. Of 48,013 tested neuron-feature pairs, 13,164 (27.4%) were validated. Validation was most frequent at intermediate depths (mean 40.2% at mid layers versus 12.0% at deep layers), and no patch location dominated across datasets. Among the tested descriptors, edge, Gabor, and Tamura texture features had the highest validation rates. Stronger contextual bias did not correspond to higher neuron-feature validation rates: moderately biased Sugarcane had the highest rate (40.5%) and highly biased Cassava the lowest (19.2%). These results suggest that behavioral context dependence and the semantic interpretability of hidden neurons capture different aspects of CNN behavior, and that Concept Induction can complement patch-based bias detection.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:43:15Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Abhilekha Dalal</name>
+    </author>
+    <author>
+      <name>Avishek Das</name>
+    </author>
+    <author>
+      <name>Samatha Ereshi Akkamahadevi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18519v1</id>
+    <title>Box-conditional Hypothesis Testing for Out-of-Distribution Object Detection</title>
+    <updated>2026-11-13T18:36:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.18519v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18519v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Detecting out-of-distribution (OOD) objects is essential for ensuring the reliability and safety of object detectors in real-world deployment. We treat the decision on a detected box as a hypothesis test with the null hypothesis that the box covers an object of an in-distribution (ID) class. The null distribution changes with the size of the box and its contact with the image border, and the detector observes both. The test can therefore rank a box only against ID boxes of the same size and border contact, which gives a distribution-free bound on the false-alarm rate for each of them and uncovers the separation that one null distribution hides. The power of the test also rests on the layer it reads. Layers built only for the ID classes have no reason to keep what sets an unknown object apart, so the test reads the features before them. We propose \textbf{PLUM}, a training-free score that pools the last backbone stage inside the box and ranks its distance to the ID classes among ID boxes of the same size and border contact. On the standard benchmark, PLUM reaches the highest AUROC among the compared methods without external models, with 91.5 and 94.5 on PASCAL-VOC and 95.1 and 97.5 on BDD100K. Code: https://github.com/DDOZMI/PLUM</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:36:23Z</published>
+    <arxiv:comment>18 pages, 7 figures, 13 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Donghoon Lee</name>
+    </author>
+    <author>
+      <name>Jusung Park</name>
+    </author>
+    <author>
+      <name>Shinjin Kang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18517v1</id>
+    <title>OpenLayout: An Open and Agentic-Driven Platform for Holistic VLSI Physical Design and Benchmarking</title>
+    <updated>2026-11-13T18:36:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.18517v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18517v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Physical design automation of very large-scale integrated circuits (VLSI) has made significant strides, progressing from single-stage placement and routing toward increasingly integrated full-flow implementation. Yet, existing approaches struggle with the vast design space optimization (DSO) arising from diverse technology nodes, circuit designs, and varied constraints. The substantial runtime of physical-design tools further exacerbates this challenge, leaving industrial workflows heavily dependent on experienced engineers to navigate the design space and achieve power, performance, and area (PPA) targets, incurring significant engineering effort.
+  We argue that large language models (LLMs) with strong reasoning capabilities, enriched with distilled human design expertise, offer a promising path toward efficient and automated DSO. Unlike traditional algorithms, LLMs can interpret complex design contexts and naturally incorporate human expertise expressed in natural language for reasoning, acting, observing, and adapting throughout the design process, a capability that conventional optimization methods cannot exploit. To this end, we present OpenLayout, an agentic platform that leverages multi-agent collaboration with embedded design knowledge to enable self-iterative DSO. We further introduce OpenLayout-Bench, a benchmark targeting advanced technology nodes with commercial EDA tools to systematically evaluate physical design automation capabilities of LLMs. Experimental results demonstrate that OpenLayout achieves state-of-the-art performance, with approximately 20% accuracy improvement over baseline methods. Our work is open-sourced at https://github.com/fenggev56/OpenLayout</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:36:22Z</published>
+    <arxiv:comment>Accepted by ICCAD2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Qiufeng Li</name>
+    </author>
+    <author>
+      <name>Sizhe Tang</name>
+    </author>
+    <author>
+      <name>Quan Cheng</name>
+    </author>
+    <author>
+      <name>Zirui Wang</name>
+    </author>
+    <author>
+      <name>Wantong Li</name>
+    </author>
+    <author>
+      <name>Tian Lan</name>
+    </author>
+    <author>
+      <name>Weidong Cao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18515v1</id>
+    <title>Parity conservation of the isotropic galaxy 4PCF in redshift space</title>
+    <updated>2026-11-13T18:32:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.18515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent observational investigation of cosmological Parity Violation (PV) through the galaxy Four-point Correlation Function (4PCF) has motivated a careful theoretical examination of potential systematic contributions. In this work, we demonstrate that parity-odd contributions to the isotropic 4PCF estimator induced by Redshift Space Distortion (RSD), up to the leading order $\mathcal{H}/k$ of general relativistic corrections, vanish upon averaging over all the Line-of-Sight (LOS). We analyse the perturbative relativistic galaxy number density, combining the biased tracer expansion and the dark matter gravitational dynamics within the framework of Standard Eulerian Perturbation Theory (EPT) to third order in the density perturbation. Building on prior studies of the parity-odd mode of the trispectrum (the Fourier-space counterpart of the 4PCF), we extend existing results in three directions: incorporating the wide-angle effect by adopting a local LOS definition for each galaxy in the 4PCF, accounting for tidal bias in the galaxy population, and generalising the assessment to an arbitrary cosmological background. Expanding the 4PCF in spherical harmonics, we show that angular momentum selection rules, encoded in the Wigner 3-j symbols, enforce that only parity-even contributions survive the integration over all LOS orientations, both in the plane-parallel approximation and in the full wide-angle case. This result is crucial for large-scale statistical analyses using isotropic estimators. It supports interpreting possible PV detections as a signal not due to a systematic RSD artefact. We conclude with a discussion of the caveats of our results and identify potential sources of PV.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:32:52Z</published>
+    <arxiv:comment>63 pages, 1 table, 5 figures. Ready for submission to Journal of Cosmology and Astroparticle Physics (JCAP)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Chanasorn Kongprachaya</name>
+    </author>
+    <author>
+      <name>Nicola Bartolo</name>
+    </author>
+    <author>
+      <name>Daniele Bertacca</name>
+    </author>
+    <author>
+      <name>Sabino Matarrese</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18512v1</id>
+    <title>Probing baryonic feedback using fast radio bursts and galaxy surveys</title>
+    <updated>2026-11-13T18:29:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.18512v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18512v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The dispersion measure (DM) of fast radio bursts (FRB) provides a noisy measure of the free-electron column density to the burst. With next-generation FRB surveys the number of bursts will drastically increase and measurements of the baryon distribution will be possible on the Mpc scales most relevant to Stage IV weak lensing surveys. Comparing the DM auto-spectrum, DM-shear cross-spectrum and the kinetic Sunyaev-Zel'dovich effect, we argue that the cross-correlation of FRB catalogs with galaxy surveys offers many advantages. Hybrid Effective Field Theory (HEFT), often used in large-scale structure cosmology, is capable of modeling the clustering of electrons jointly with galaxies and matter to small scales. Using HEFT with the Padé model of baryonic feedback, we forecast that next-generation FRB surveys (combined with galaxy samples) will be able to constrain feedback at a level informative for Stage IV weak lensing surveys. In particular we should not be limited by modeling the manner in which galaxies trace the matter field. Rather constraints of the higher-order electron biases and the electron-galaxy cross-stochasticity provide the dominant limitation, and are an obvious target for improvement in order to reach percent-level constraints. The same measurements also provide a valuable means of constraining feedback in hydrodynamic simulations of galaxy formation in a way that is not tied to the modeling of particular galaxy samples.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:29:42Z</published>
+    <arxiv:comment>28 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Haruki Ebina</name>
+    </author>
+    <author>
+      <name>Martin White</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18505v1</id>
+    <title>Disturbance-Aware Informative Planning in Spatiotemporal Environments</title>
+    <updated>2026-11-13T18:22:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.18505v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18505v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Autonomous robots are widely used for persistent monitoring of spatiotemporal environments, where quantities of interest (QoI) change across space and time and require repeated measurements. In practice, robot motion can be affected by external disturbances that vary across the environment. When such external disturbances are not considered in trajectory optimization, it can lead to inaccurate predictions of robot motion and, consequently, the information acquired about the QoI during execution. However, estimating disturbances throughout the environment can be inefficient, as disturbances in regions with little overlap with monitoring trajectories have limited impact on monitoring performance. We therefore propose a two-stage informative planning framework for unknown, spatially varying but time-invariant disturbances, combining informed disturbance sampling with disturbance-aware trajectory optimization. First, we identify where QoI measurements are needed and generate alternative paths to these locations using the environment geometry. We then prioritize disturbance measurements based on their expected reduction of disturbance uncertainty along these paths. Second, rather than optimizing information acquisition based on nominal robot motion, we incorporate the learned disturbance belief into trajectory optimization to account for its effects on robot motion and information acquisition. Across four simulation scenarios, the proposed method reduces disturbance-learning time by 25.0--52.3 percent compared with environment-wide estimation and identifies paths that appear costly under nominal dynamics but become preferable when disturbances are considered.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:22:50Z</published>
+    <arxiv:comment>Submitted to Learning for Dynamics and Control Conference 2027. Project website: https://kalebbennaveed.github.io/dist-aware-ipp/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Kaleb Ben Naveed</name>
+    </author>
+    <author>
+      <name>Haejoon Lee</name>
+    </author>
+    <author>
+      <name>Anouck Girard</name>
+    </author>
+    <author>
+      <name>Dimitra Panagou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18494v1</id>
+    <title>ARCHER: From Rationale Imitation to Executable Reasoning in Small Language Models</title>
+    <updated>2026-11-13T18:05:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.18494v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18494v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Small language models are attractive for local, low-cost, and privacy-sensitive deployment, but they remain unreliable on mathematical reasoning tasks that require decomposition, exact computation, tool use, and verification. We introduce \textbf{ARCHER}: \textbf{A}ction-trace \textbf{R}einforcement for \textbf{C}alculator-grounded \textbf{H}ierarchical \textbf{E}xecutable \textbf{R}easoning, a two-stage framework for training small language models (SLMs) to produce executable and auditable reasoning trajectories. In the first stage, ARCHER compiles free-form chain-of-thought rationales into typed action traces containing reasoning steps, calculator calls, deterministic runtime observations, verification actions, and final answers. This shifts the supervision target from imitating explanatory text to learning a tool-grounded reasoning policy. In the second stage, ARCHER refines this policy through asymmetric hierarchical reinforcement learning, using grouped and conditionally gated trajectory rewards for answer correctness, tool grounding, process discipline, and trace alignment. Across five standard sub-10B backbones, ARCHER improves over the strongest tool-augmented baseline by 5.51 percentage points on macro-average across benchmark accuracies, including gains of 8.95 points on MATH-500 and 5.33 and 5.34 points on AIME-2024 and AIME-2025. Evaluations on two additional reasoning-specialized 7B backbones further show that executable grounding remains beneficial after reasoning-focused reinforcement learning or distillation. These results demonstrate that executable supervision and reward-guided behavioral refinement provide a general and effective training paradigm for compact mathematical reasoners.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:05:33Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Dhruv Dixit</name>
+    </author>
+    <author>
+      <name>Khushi Patel</name>
+    </author>
+    <author>
+      <name>Congcong Xu</name>
+    </author>
+    <author>
+      <name>Min Song</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18483v1</id>
+    <title>Rigidity of the moving particle lemma for the interchange process</title>
+    <updated>2026-11-13T17:57:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.18483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let $G=(V,c)$ be a finite connected weighted graph. We establish the exact conditions for attaining equality in the moving particle lemma for the interchange process on $G$ subject to a unit voltage drop across two terminal vertices $x\neq y \in V$. First, equality can occur only in irreducible representations indexed by partitions with at most two rows. We then show that the equality phenomenon beyond the constant and linear sectors is already visible in the two-particle exclusion process. Such equality occurs in exactly two cases: either the harmonic $x$--$y$ voltage is $\frac12$ on every nonterminal vertex, and the induced nonterminal graph $G[V\setminus\{x,y\}]$ is disconnected; or the harmonic voltage is constant on each connected component of $G[V\setminus \{x,y\}]$, and both voltage values $a$ and $1-a$, with $0\le a&lt;\frac12$, occur. In each case we compute the equality kernel in every degree and particle sector. The resulting decomposition gives the complete equality kernel for exclusion and, through the regular representation, for the interchange process.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T17:57:28Z</published>
+    <arxiv:comment>28 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Joe P. Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18471v1</id>
+    <title>Do Verifier Judgments Survive Abstraction? Measuring Verification Transport for LLM Agent Evaluation</title>
+    <updated>2026-11-13T17:44:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.18471v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18471v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-based verifiers are increasingly used to evaluate agent executions, but their reliability is typically measured under a single representation of the trajectory. In deployed agent systems, the same execution may be exposed through composed tools, delegation boundaries, or compacted histories, changing what execution evidence is directly observable to the verifier. It therefore remains unclear whether correct verifier judgments persist across such abstraction boundaries. We introduce Verification Transport, a reliability test that measures judgment stability under abstraction-induced changes in execution observability. We construct matched native, abstracted, and restored views of the same frozen executions while holding the task, realized trajectory, outcome, ground truth, evaluation criterion, and verifier fixed. Across four agent-evaluation benchmarks, seven verifier backbones, four verification protocols, and three abstraction boundaries, we find substantial transport failure, reaching about 31% under macro abstraction and delegation. Verification protocols exhibit distinct failure modes: direct verification more often produces incorrect verdicts, whereas evidence-grounded and deliberative protocols tend to abstain under limited observability. This suggests that lower transport failure rates do not necessarily imply greater reliability. Restoring the corresponding execution provenance recovers 85.5% of transport failures, while recovery is lower when provenance is lossy or unavailable. These results show that native-view accuracy alone is insufficient to characterize verifier reliability when execution evidence crosses abstraction boundaries.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T17:44:01Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026 Workshop on Who Verifies the Agents? Toward Reliable Agent Development</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Disha Sheshanarayana</name>
+    </author>
+    <author>
+      <name>Sai Linisha Reddy Goli</name>
+    </author>
+  </entry>
+</feed>

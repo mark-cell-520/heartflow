@@ -1,0 +1,21 @@
+slim: {"action":"verify","reason":"需验证","score":0.85,"traceSummary":"无命中"}
+full keys: [
+  'verdict',
+  'overallScore',
+  'gate',
+  'findings',
+  'dimensions',
+  'summary',
+  'dimensionRaw',
+  'trace',
+  'traceSummary'
+]
+gate: {"action":"verify","reason":"需验证"}
+findings: [
+ {
+  "dim": "monocausal_attribution",
+  "sev": 45,
+  "det": "monocausal_attribution(1次)"
+ }
+]
+checked_by: undefined

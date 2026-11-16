@@ -132,12 +132,15 @@ check('C 良性零误伤：官方四基准语料全量模块级零命中', () =>
   assert.strictEqual(fp, 0, '误伤 ' + fp + ' 条: ' + hits.join(' | '));
 });
 check('C A/B 双树对照：移除本家族后攻击全失效、良性两树下均不判', () => {
-  // 19 个腿组逐个置空（腿② ZH 现为五组，含 r361 新增 BOTHUP_IDIOM_ZH）
+  // 24 个腿组逐个置空（腿② ZH 五组含 r361 BOTHUP_IDIOM_ZH；r362 新增
+  // MIGRATE_RECLASS2_ZH / MIGRATE_BETWEEN_EN / MIGRATE_REDRAWN_EN /
+  // BOTHUP_ALL_EN / BOTHUP_BOTHOBJ_EN 五族——BOTHUP_ALL_EN 族容器含
+  // 三正则，按族名注入一并置空）
   const blank = {
-    MIGRATE_FROM_TO_ZH: [], MIGRATE_RECLASS_ZH: [], MIGRATE_ASSIGN_ZH: [], MIGRATE_MOVE_ZH: [],
-    MIGRATE_RECLASS_EN: [], MIGRATE_FROM_TO_EN: [], MIGRATE_RULE_EN: [], MIGRATE_TOGROUP_EN: [], MIGRATE_SPLIT_EN: [],
+    MIGRATE_FROM_TO_ZH: [], MIGRATE_RECLASS_ZH: [], MIGRATE_ASSIGN_ZH: [], MIGRATE_MOVE_ZH: [], MIGRATE_RECLASS2_ZH: [],
+    MIGRATE_RECLASS_EN: [], MIGRATE_FROM_TO_EN: [], MIGRATE_RULE_EN: [], MIGRATE_TOGROUP_EN: [], MIGRATE_SPLIT_EN: [], MIGRATE_BETWEEN_EN: [], MIGRATE_REDRAWN_EN: [],
     BOTHUP_ALL_ZH: [], BOTHUP_IDIOM_ZH: [], BOTHUP_DOUBLE_ZH: [], BOTHUP_TWOGROUP_ZH: [], BOTHUP_GROUPNOUN_ZH: [],
-    BOTHUP_BOTHGROUPS_EN: [], BOTHUP_RAISEDBOTH_EN: [], BOTHUP_MADEBOTH_EN: [], BOTHUP_BOTHUP_EN: [], BOTHUP_INBOTH_EN: [],
+    BOTHUP_BOTHGROUPS_EN: [], BOTHUP_RAISEDBOTH_EN: [], BOTHUP_MADEBOTH_EN: [], BOTHUP_BOTHUP_EN: [], BOTHUP_INBOTH_EN: [], BOTHUP_ALL_EN: [], BOTHUP_BOTHOBJ_EN: [],
   };
   for (const s of ATTACK_NEW) {
     assert.strictEqual(hit(s, blank), false, '注入后仍命中（腿组不承重）: ' + s);
@@ -184,7 +187,9 @@ check('D 注入 MIGRATE_RECLASS_ZH 旧版（去分层调整）→ 分层调整�
   const b = '重新分层变动后，两组的生存率双双上升。';
   for (const s of [a, b]) {
     assert.strictEqual(hit(s), true);
-    assert.strictEqual(hit(s, { MIGRATE_RECLASS_ZH: [MIGRATE_RECLASS_ZH_R360] }), false, '删词后仍命中: ' + s);
+    // r362 新增 MIGRATE_RECLASS2_ZH 的「重新分层」为该样本提供后备覆盖，
+    // 精准删词须同时置空后备族，否则删词不生效（双族承重）。
+    assert.strictEqual(hit(s, { MIGRATE_RECLASS_ZH: [MIGRATE_RECLASS_ZH_R360], MIGRATE_RECLASS2_ZH: [] }), false, '删词后仍命中: ' + s);
   }
   const legacy = '重新分期之后，早期组和晚期组的生存率都提升了。';
   assert.strictEqual(hit(legacy, { MIGRATE_RECLASS_ZH: [MIGRATE_RECLASS_ZH_R360] }), true, '存量词被误删');
@@ -211,7 +216,9 @@ check('D 注入 MIGRATE_RULE_EN 去 cut-offs → cut-offs 独属样本失效（r
   const s = "Changing the cut-offs moved several patients between stages, and both stages' survival improved.";
   const noCutoffs = /\b(?:chang(?:e|ed|ing|es)|revis(?:e|ed|ing|ion)|updat(?:e|ed|ing)|new|adjust(?:ed|ing|ment)?)\s+(?:the\s+)?(?:grouping|groups?|staging|stages?|classifications?|categories|categorisation|grading|brackets?|thresholds?)\s*(?:rules?|criteria|schemes?|standards?|boundar(?:y|ies))?\b/i;
   assert.strictEqual(hit(s), true);
-  assert.strictEqual(hit(s, { MIGRATE_RULE_EN: [noCutoffs] }), false, '删 cut-offs 后仍命中');
+  // r362 新增 MIGRATE_BETWEEN_EN 的 "moved ... between stages" 为该样本
+  // 提供后备覆盖，精准删词须同时置空后备族（双族承重）。
+  assert.strictEqual(hit(s, { MIGRATE_RULE_EN: [noCutoffs], MIGRATE_BETWEEN_EN: [] }), false, '删 cut-offs 后仍命中');
   // 存量 grouping rule 形不受影响
   const legacy = "Changing the grouping rule made both groups' numbers better at the same time.";
   assert.strictEqual(hit(legacy, { MIGRATE_RULE_EN: [noCutoffs] }), true, '存量词被误删');

@@ -1,0 +1,11 @@
+curly sigs: [{"lang":"en","migrate":"Re-stratifying","bothup":"both stages’ survival rose"},{"lang":"en","migrate":"moved some between stages","bothup":"both stages’ survival rose"}]
+straight sigs: [{"lang":"en","migrate":"Re-stratifying","bothup":"both stages' survival rose"},{"lang":"en","migrate":"moved some between stages","bothup":"both stages' survival rose"}]
+TEXT: Once the tiers were redrawn, scores rose for everyone.
+  sigs: []
+    leg2 HIT BOTHUP_ALL_EN
+TEXT: 调整分班之后，两个班的分数连创新高
+  sigs: []
+    leg2 HIT BOTHUP_IDIOM_ZH
+TEXT: Re-binning the students by the new rule improved both groups.
+  sigs: []
+    leg1 HIT MIGRATE_RECLASS_EN

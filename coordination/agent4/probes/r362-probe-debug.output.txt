@@ -1,0 +1,12 @@
+TEXT: The patients were re-binned into new stages, and both stages did better.
+  sigs: [{"lang":"en","migrate":"new stages","bothup":"both stages did better"}]
+TEXT: Re-stratifying the patients moved some between stages, and both stages’ survival rose.
+  sigs: []
+TEXT: Re-stratifying the patients moved some between stages, and both stages' survival rose.
+  sigs: []
+=== 良性 FP 全量 findings ===
+{
+ "action": "verify",
+ "reason": null,
+ "findings": []
+}
