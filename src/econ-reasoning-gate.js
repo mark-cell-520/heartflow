@@ -69,6 +69,12 @@ const FAMILIES = [
   // 下降/不用担心总量/多用把省下的赚回来」，存量绝对化维度只收必然/
   // 肯定形，非绝对形 5/11 穿透；双腿 + CONCEPT/CORRECT 两组豁免）。
   { key: 'jevons_paradox',                mod: './jevons-paradox.js',             fn: 'detectJevonsParadox',          zh: 'Jevons 悖论/回弹效应',     en: 'Jevons paradox (rebound effect)', round: 'r364' },
+  // r366 新增：碳泄漏/污染避难所（carbon leakage / pollution haven——产能
+  // 转移到规制更松地区，本地排放下降而全球总量未必下降；攻击形「迁走/
+  // 外包 → 本地或全球问题解决/不再是我们的事」，与 jevons 腿①零交集
+  // （效率提升 vs 空间转移），存量维度 5/6 穿透；双腿 + CONCEPT/CORRECT
+  // 两组豁免 + 强否定守卫）。
+  { key: 'carbon_leakage',                mod: './carbon-leakage.js',             fn: 'detectCarbonLeakage',          zh: '碳泄漏/污染避难所',       en: 'carbon leakage (pollution haven)', round: 'r366' },
 ];
 
 const _cache = new Map();
