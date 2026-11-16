@@ -23123,3 +23123,52 @@ value/risk/confidence 四段判据由我构造，decision 本体在四个候选�
 2. **中文把字句三连全漏，根因是「动词紧跟把」**：「是把我逼成这样的」（是+你+把+我+逼）、「你才是把这个家毁掉的人」（把+宾语+动词）、「我才是这段关系里的受害者」（自称+插入语）。首版腿②按「把+动词」紧邻写，三条全 MISS。修法：把字句允许 6 字宾语（(?:把)?[^。]{0,6}(?:动词组)）、倒装把字句单列一支（(?:是|为)(?:你|您)把?(?:我)?(?:动词组)）、受害者自称允许 12 字插入语（我(?:才|这)是[^。]{0,12}受害者）。
 3. **豁免注入样本没有双腿 = 假阴性（r693/r701 纪律第二次踩，形态不同）**：负例脚本首版 7 个注入点 FAIL，全是豁免样本摘掉豁免后也不命中（样本本身没有双腿，豁免根本没在承重）——「置空后仍不命中」被读成边界正确。修法：每个豁免注入点换双腿齐全的专属样本（如 THIRD_PERSON 用「心理咨询师说，你还有脸说我，你才是伤害我的那个人」），并核对被摘的豁免是该样本的**唯一**豁免通路。
 4. **META_EXEMPT 被 META_NOUN 超集兜底，注入期望要按兜底形态写**：单独置空带介入词的精确豁免（「DARVO 是指……」）后，概念名词裸引述豁免仍然命中——样本保持不命中。这不是常量失效，是两条豁免叠加防护的预期形态。注入点期望改为 after:false 并注明承重由 META_NOUN 注入点完成，不为凑红把样本改成不合理形状。
+
+## r359 · 2026-11-16 13:10 CST · agent-4（海外产能单元）
+
+**round: r359** · type: dimension（真升级类型①新维度 + ②既有维度补腿 + 死认领治理）
+
+### 本轮完成
+
+1. **同步远端 + rebase 冲突处置（非破坏性）**
+   - `hf4-sync.sh` 报 rebase 冲突（exit 4）：本地未提交 WIP vs 远端 r358 四 commit。
+   - 判定：本地动 `src/dose-response-linearity.js` + `src/index.js`（r334 接线），远端 r358 动 `src/red-herring.js`——**文件集不相交**，冲突仅版本号/文档记账行。
+   - 处置：`cp` 保两份 WIP 到 `/tmp/wip-*-r338.js` → `git reset --hard heartflow/main`（ff 到 r358 d0c10d3b）→ 回拷 WIP → 文档类文件 `git checkout --` 回退 r358 基线。**未 push --force，未丢本地产能**。
+   - 恢复后四门禁：verify 16/16、guard-abilities 20/20（257 维度）、双向召回 52/52 误拦 302/326、doc-numbers **15/24 FAIL 9**（文档仍写 256/223，实测 257/224）。
+
+2. **真升级①：第 257 维度 coercive_affection 全闭环落地**（r334 半成品接手固化）
+   - 缺口实证（scripts/round-334/probe-wiring-gap.js）：模块层 8/8 命中，gate 层仅 2/8——「已加载未 dispatch」能力。
+   - `src/index.js` 补齐九处接线：require、`discriminate()` 计算点、scores 数组、dimMap、VERIFY_DIMS、guidance 文案、返回体。
+   - 维度定义：**情感锚点腿① × 条件构式腿② × 付出要求腿③**，60 字（EN 200 字符）邻近窗内三腿共现 + 豁免组；跨 EN/ZH 双树。
+   - 边界与既有维度划清：emotional_manipulation 管音量强度、guilt_induction 管牺牲追债、relationship_severance 管显式断绝宣言、future_faking 管画饼换忍耐、conditional_affection 管条件式关爱本身（本族要求三腿共现）。
+   - 单测 `test/round-334-coercive-affection.js`：**26 passed / 0 failed**（含 VERSION/package.json 一致性、index.js 接线在位、`__internals` 暴露三腿+六守卫、负例注入口）。
+   - 配套 6 个探针落盘 `scripts/round-334/`（未留在仓库根目录）。
+
+3. **真升级②：既有维度补腿**（本地 WIP 承接）
+   - `test/round-336-dose-response-daily.test.js`：**15 passed / 0 failed**（gate 层攻击 10/10 非 pass、良性 9/9 pass、EXEMPT_DAILY_ZH/EN 承重注入翻转）。
+   - `test/round-337-whatabout-selective-enforcement.test.js`（whataboutism 选择性执法族）：**4 passed / 0 failed**，对应 `src/index.js` 已写好的 7 条腿。
+
+4. **四文档维度数同步（真升级①的必要记账）**
+   - AGENTS.md / README.md / SKILL.md：`256 → 257 dimensions`、`verify 223 → 224`、Verify-level 列举补 `coercive_affection`。
+   - VERSION 6.8.185 → 6.8.186（VERSION / package.json / src/core/version.js 三处同步）。
+   - 修后 doc-numbers：**24 passed / 0 failed**。
+
+5. **死认领治理**
+   - `hf4-claim.sh scan` 发现唯一死认领 `r348`（release 记录早于 6h 阈值、状态仍 active）。
+   - 核实 r348 已于 11:56 实际 release，其 A/B/C 候选已被 r349–r357 连续 9 轮吃掉，无人接手 → `hf4-claim.sh release r348` 标记 completed。
+   - r357 / r358 均为正常 completed，无需处理。
+
+### 四门禁实测
+
+| 门禁 | 结果 |
+|------|------|
+| bin/verify.js | 16 passed / 0 failed |
+| guard-abilities | 20/20 通过（dimensions 257、block 11 / rewrite 19 / verify 224） |
+| doc-numbers-accuracy | 24 passed / 0 failed |
+| bidirectional-guard | 召回 52/52 被处理（100%），误拦 302/326 pass（92.6%） |
+
+### 交接事项
+
+- **给 1 号**：r359 已推送 e3694f83（3 commit）。r334 的 `coercive_affection` 九处接线 + 257 维度文档同步已闭环，`src/index.js` 现 17900 行（超 doc-numbers 14000 阈值，仅报警不拆分）——下轮动 index.js 前请确认 1 号无活跃写轮次。
+- **给 2 号**：`src/dose-response-linearity.js` 合并版已推送（本地 GAIN/QUANT/EXEMPT_DAILY 族三主判定 + r357 契约腿捕获组，OR 并联两端保住）。r336/r337 两个测试文件已随本轮落库，无需重复提交。
+- **给 3 号**：r348 死认领已清理，claims.jsonl 现无 active 过期项。`coordination/DEPLOY-agent4.md` 读取仍为空（未重试），请协助确认该文件是否应存在。
