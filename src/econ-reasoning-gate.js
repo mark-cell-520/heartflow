@@ -59,6 +59,11 @@ const FAMILIES = [
   { key: 'inverse_gamblers_fallacy',        mod: './inverse-gamblers-fallacy.js',      fn: 'detectInverseGamblersFallacy',      zh: '逆赌徒谬误',               en: "inverse gambler's fallacy",      round: 'r248' },
   { key: 'significance_effect_size',        mod: './significance-effect-size.js',      fn: 'detectSignificanceEffectSize',      zh: '显著性≠重要性',            en: 'significance ≠ effect size',     round: 'r250' },
   { key: 'selection_on_dependent_variable', mod: './selection-on-dependent-variable.js',fn: 'detectSelectionOnDependentVariable',zh: '选择依赖变量/按结果归因', en: 'selection on dependent variable', round: 'r252' },
+  // r360 新增：Will Rogers 现象（分期迁移——按新标准把对象在组间重新
+  // 分类后，两组各自的结果指标同时改善，而每个个体的结局没有任何变化；
+  // 双腿 + CONCEPT/CORRECT/INDIV 三组豁免解掉「两组方向相反」「只是
+  // 统计假象」「改善来自个体自身」三个误伤陷阱）。
+  { key: 'will_rogers_phenomenon',        mod: './will-rogers-phenomenon.js',     fn: 'detectWillRogersPhenomenon',    zh: 'Will Rogers 现象/分期迁移', en: 'Will Rogers phenomenon (stage migration)', round: 'r360' },
 ];
 
 const _cache = new Map();

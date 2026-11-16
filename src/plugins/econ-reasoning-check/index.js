@@ -60,6 +60,9 @@ const FAMILIES = [
   { key: 'free_rider',                     mod: '../../incentive-blind-spot.js',           fn: 'detectFreeRider',                   group: 'econ',  zh: '搭便车盲区',           en: 'free-rider blind spot',   round: 'r296' },
   // r343 新增：归因混淆（incentive-blind-spot 第 4 子族，r297 已接 gate 路径，族内加腿零改 index.js）
   { key: 'incentive_conflation',           mod: '../../incentive-blind-spot.js',           fn: 'detectIncentiveConflation',        group: 'econ',  zh: '逆选择/道德风险归因混淆', en: 'incentive conflation',   round: 'r343' },
+  // r360 新增：Will Rogers 现象/分期迁移（stats 族第 8 子族——组间再分类
+  // × 两组指标同时改善，个体结局未变；r336/r339 同形的聚合族扩族范式）
+  { key: 'will_rogers_phenomenon',         mod: '../../will-rogers-phenomenon.js',         fn: 'detectWillRogersPhenomenon',       group: 'stats', zh: 'Will Rogers 现象/分期迁移', en: 'Will Rogers phenomenon (stage migration)', round: 'r360' },
 ];
 
 const _cache = new Map();
