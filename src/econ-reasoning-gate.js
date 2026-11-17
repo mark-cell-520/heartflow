@@ -152,6 +152,17 @@ const FAMILIES = [
   //   conflation（原始计数 vs 发生率）轴不同，money_illusion 对探针攻击句实测
   //   零命中证明射程不重叠。
   { key: 'stock_flow_conflation',            mod: './stock-flow-conflation.js',      fn: 'detectStockFlowConflation',  zh: '存量-流量混淆',               en: 'stock-flow conflation (level-rate confusion)', round: 'r374' },
+  // r373 新增（agent-4 tax_incidence 线，与 extraordinary_claims 同轮并存）：
+  //   税负转嫁谬误（tax incidence / legal-vs-economic incidence conflation
+  //   ——法律规定的纳税人（法定归宿）与实际承担福利损失的人（经济归宿）
+  //   在供需弹性不为无穷时通常不一致；攻击形「向X 征税 → 不会转嫁/价格
+  //   不会变/别人不受影响/全部由法定纳税人消化」，与存量 econ 子族零交集
+  //   （price_control 管价格管制、mercantilism 管贸易差额，均不含税种×
+  //   法定归属×免转嫁三腿形），探针攻击穿透 8/10、良性 7/7 全 pass；三腿
+  //   + CONCEPT/CORRECT 两组豁免 + 强否定守卫（只守腿②，「并非由企业承担」
+  //   是纠正形；腿③不受守——「不会转嫁」的「不会」是攻击惯语组成部分，
+  //   r369 NOHARM 同款设计）。
+  { key: 'tax_incidence',                 mod: './tax-incidence.js',               fn: 'detectTaxIncidence',          zh: '税负转嫁谬误',               en: 'tax incidence fallacy (legal-vs-economic incidence conflation)', round: 'r373' },
 ];
 
 const _cache = new Map();
@@ -175,7 +186,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 29 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 30 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

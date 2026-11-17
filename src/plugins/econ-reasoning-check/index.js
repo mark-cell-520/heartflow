@@ -1,5 +1,5 @@
 /**
- * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 33 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族 + r369 节约悖误扩族 + r371 诱饵效应扩族 + r372 健康使用者偏倚扩族 + r373 非凡主张证据比例错配扩族）
+ * econ-reasoning-check — 经济与资源推理 + 统计素养 + 信息与激励盲区 35 族辨别器（插件层接线，r295 起草族 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族 + r369 节约悖误扩族 + r371 诱饵效应扩族 + r372 健康使用者偏倚扩族 + r373 非凡主张证据比例错配扩族 + r373 税负转嫁谬误扩族 + r374 存量-流量混淆扩族）
  *
  * 背景（实例化 ≠ 接线 的集中清理）：
  *   r219-r253 三十多轮里，4 号按「经济与资源推理 / 统计素养」选题库逐族起草了
@@ -73,7 +73,7 @@
  */
 
 // ─── 族表：key / 模块 / 导出函数 / 分组 / 中英标签 / 起草轮次 ───
-// group: 'econ'（经济与资源推理·行为经济学 27 族）| 'stats'（统计素养 6 族）
+// group: 'econ'（经济与资源推理·行为经济学 28 族）| 'stats'（统计素养 6 族）
 const FAMILIES = [
   // ── econ：经济与资源推理 ──
   { key: 'budget_value_conflation',        mod: '../../budget-value-conflation.js',        fn: 'checkBudgetValueConflation',        group: 'econ',  zh: '预算约束≠价值判断',   en: 'budget-value conflation',        round: 'r219' },
@@ -147,6 +147,11 @@ const FAMILIES = [
   //   存量时点水平被直接兑现为年度流量速率或流平比较结论；同池七候选定拨穿透
   //   7/10 真零命中 + 良性边界最净；两腿 + CONCEPT/CORRECT 两组豁免 + 腿②否定守卫）
   { key: 'stock_flow_conflation',          mod: '../../stock-flow-conflation.js',          fn: 'detectStockFlowConflation',         group: 'econ',  zh: '存量-流量混淆',               en: 'stock-flow conflation (level-rate confusion)', round: 'r374' },
+  // r373 新增（与 extraordinary_claims 同轮并存）：税负转嫁谬误（tax incidence /
+  //   legal-vs-economic incidence conflation——法定归宿 ≠ 经济归宿；三腿：
+  //   腿①税种 × 腿②法定归属 × 腿③免转嫁，探针攻击穿透 8/10、良性 7/7 全 pass，
+  //   与存量 econ 子族零交集；三腿 + CONCEPT/CORRECT 两组豁免 + 强否定守卫只守腿②）
+  { key: 'tax_incidence',                  mod: '../../tax-incidence.js',                   fn: 'detectTaxIncidence',               group: 'econ',  zh: '税负转嫁谬误',             en: 'tax incidence fallacy (legal-vs-economic incidence conflation)', round: 'r373' },
 ];
 
 const _cache = new Map();
@@ -162,7 +167,7 @@ function _detector(fam) {
 }
 
 /**
- * 对一段文本跑 33 族检测。
+ * 对一段文本跑 34 族检测。
  * @param {string} text 待检测文本（think 结论 / MCP 工具入参）
  * @param {{only?: string, inject?: object}} [opts]
  *   only   — 只跑某一族（MCP 工具 action=<family key>）
@@ -217,8 +222,8 @@ function analyze(text, opts) {
 
 const plugin = {
   name: 'econ-reasoning-check',
-  version: '1.10.0', // r374：+存量-流量混淆子族（stock_flow_conflation）
-  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 34 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族 + r369 节约悖误扩族 + r371 诱饵效应扩族 + r372 健康使用者偏倚扩族 + r373 非凡主张证据比例错配扩族 + r374 存量-流量混淆扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox / carbon_leakage / price_control / mercantilism / paradox_of_thrift / decoy_effect / healthy_user_bias / extraordinary_claims / stock_flow_conflation。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）；r366 补入 src/carbon-leakage.js 的碳泄漏/污染避难所子族（产能转移 × 问题解决断言/外部化免责，探针 5/6 穿透、良性零误命中）；r367 补入 src/price-control.js 的价格管制单效应断言子族（具体管制工具在场 × 只会-不会/无副作用/供给自动适配单边收益断言，同池 8 候选定拨穿透最高 4/5、良性 0/3 零误命中，探针 0/14 的 lead-time bias 候选被存量维度全面代拦后转同池定拨）；r368 补入 src/mercantilism.js 的重商主义贸易顺差谬误子族（贸易差额语境 × 财富得失单边归因：出口/顺差才叫赚钱、进口/逆差就是财富外流、顺差越大越富、进口越多越吃亏，探针攻击穿透 9/10、良性非 pass 1/9 系存量 confidence 维度误拦非本族增量，CONCEPT 须概念名与框架词共现防前缀绕过）；r369 补入 src/paradox-of-thrift.js 的节约悖误/合成谬误宏观储蓄形子族（节俭概念 × 普遍量化词 × 总量向好断言 三腿近距共现：个体储蓄美德被直接加总为总量利好、免掉减少消费会压缩总需求的宏观机制，同池两候选定拨穿透 3/7、良性 0/5 零误命中，腿③拆 NOHARM/POSITIVE 两桶解「总需求不会增长」良性纠正误伤）；r371 补入 src/decoy-effect.js 的诱饵效应/被支配比较子族（选项集 × 被支配描述 × 相对化价值结论 三腿近距共现：选项集内加入被严格支配的选项使目标选项「显得划算/简直是良心价/选它肯定不会错」，价值结论全部由陪衬对象衬托而出，同池四候选定拨穿透 0/7 真零命中、良性 0/3 零误命中，存量维度对选项集衬托形零覆盖，三组豁免含 TEMPORAL 时效比较——版本先后不是共存选项集）；r372 补入 src/healthy-user-bias.js 的健康使用者偏倚/健康依从者效应子族（行为/依从群体 × 健康结果或归因断言 两腿近距共现：吃维生素的人更健康所以维生素让人健康、坚持复诊的病人死亡率更低所以复诊延命——自选择与依从性混杂被免掉，同池 16 候选定拨穿透 8/16 真零命中、良性 0/4 零误命中，存量维度零覆盖，CONCEPT/CORRECT 两组豁免 + 腿①否定守卫——不吃维生素的人是对照组形）。r373 补入 src/extraordinary-claims.js 的非凡主张的证据比例错配子族（离奇主张 × 弱证据基底 × 充分性兑现 三腿近距共现：治愈绝症/永动机/长生不老 等离奇主张被只有几例个例/没有复现/未经同行评议 等弱基底经足以证明/应该采信 等充分性兑现直接兑现为真，证据强度与主张离奇度不成比例，同池七候选定拨穿透 4/5 真零命中、良性零误命中，存量维度零覆盖，与 weak_evidence_strong_claim(dim245 弱证据类型×绝对化断言) 射程不同，CONCEPT/CORRECT/HEDGE 三组豁免 + 腿③否定守卫）。r374 补入 src/stock-flow-conflation.js 的存量-流量混淆子族（存量指称 × 流量兑现 两腿近距共现：债务总额/市值/存款余额/外汇储备 等存量时点水平被等于全国人民一年白干/可见每年新增财富就有十万亿/比人家GDP高所以比人家还有钱 等流量兑现断言直接讲成年度速率或实力排名，跳过存量是历年累积、流量是年度速度的口径除法，同池七候选定拨穿透 7/10 真零命中、良性 2/8 非 pass 均系存量维度误伤非本族增量，与 count_rate_conflation(原始计数 vs 发生率) 轴不同、money_illusion(dim234) 对探针攻击句实测零命中，CONCEPT/CORRECT 两组豁免 + 腿②否定守卫）。',
+  version: '1.11.0', // r374：+存量-流量混淆子族（stock_flow_conflation）+ r373 tax_incidence 补登记 → 35 族（29 econ + 6 stats）
+  description: '经济与资源推理 + 统计素养 + 信息与激励盲区 35 族辨别器（r295 插件层接线 + r296 扩族 + r364 Jevons 扩族 + r366 碳泄漏扩族 + r367 价格管制扩族 + r368 重商主义扩族 + r369 节约悖误扩族 + r371 诱饵效应扩族 + r372 健康使用者偏倚扩族 + r373 非凡主张证据比例错配扩族 + r373 税负转嫁谬误扩族 + r374 存量-流量混淆扩族）：budget_value_conflation / average_marginal_conflation / mental_accounting / perverse_incentive / winners_curse / tragedy_of_commons / illusion_of_control / disposition_effect / endowment_effect / anchoring_effect / present_bias / peak_end_rule / effort_justification / p_hacking / inverse_gamblers_fallacy / significance_effect_size / selection_on_dependent_variable / ad_hominem / adverse_selection / moral_hazard / free_rider / opportunity_cost_neglect / confounding_by_indication / will_rogers_phenomenon / jevons_paradox / carbon_leakage / price_control / mercantilism / paradox_of_thrift / decoy_effect / healthy_user_bias / extraordinary_claims / tax_incidence / stock_flow_conflation。r219-r253 的 18 族起草后从未 dispatch，r295 首次接入 think() 路径（_discrimination.econReasoning → 置信度打折 + warning）与 MCP 只读工具；r296 补入 src/incentive-blind-spot.js 的信息与激励盲区三子族（隐藏信息/隐藏行动/集体行动的否认式断言，326 条官方良性语料零误命中）；r364 补入 src/jevons-paradox.js 的 Jevons 悖论/回弹效应子族（效率提升 × 总量下降断言/多用摊薄合理化，良性零误命中）；r366 补入 src/carbon-leakage.js 的碳泄漏/污染避难所子族（产能转移 × 问题解决断言/外部化免责，探针 5/6 穿透、良性零误命中）；r367 补入 src/price-control.js 的价格管制单效应断言子族（具体管制工具在场 × 只会-不会/无副作用/供给自动适配单边收益断言，同池 8 候选定拨穿透最高 4/5、良性 0/3 零误命中，探针 0/14 的 lead-time bias 候选被存量维度全面代拦后转同池定拨）；r368 补入 src/mercantilism.js 的重商主义贸易顺差谬误子族（贸易差额语境 × 财富得失单边归因：出口/顺差才叫赚钱、进口/逆差就是财富外流、顺差越大越富、进口越多越吃亏，探针攻击穿透 9/10、良性非 pass 1/9 系存量 confidence 维度误拦非本族增量，CONCEPT 须概念名与框架词共现防前缀绕过）；r369 补入 src/paradox-of-thrift.js 的节约悖误/合成谬误宏观储蓄形子族（节俭概念 × 普遍量化词 × 总量向好断言 三腿近距共现：个体储蓄美德被直接加总为总量利好、免掉减少消费会压缩总需求的宏观机制，同池两候选定拨穿透 3/7、良性 0/5 零误命中，腿③拆 NOHARM/POSITIVE 两桶解「总需求不会增长」良性纠正误伤）；r371 补入 src/decoy-effect.js 的诱饵效应/被支配比较子族（选项集 × 被支配描述 × 相对化价值结论 三腿近距共现：选项集内加入被严格支配的选项使目标选项「显得划算/简直是良心价/选它肯定不会错」，价值结论全部由陪衬对象衬托而出，同池四候选定拨穿透 0/7 真零命中、良性 0/3 零误命中，存量维度对选项集衬托形零覆盖，三组豁免含 TEMPORAL 时效比较——版本先后不是共存选项集）；r372 补入 src/healthy-user-bias.js 的健康使用者偏倚/健康依从者效应子族（行为/依从群体 × 健康结果或归因断言 两腿近距共现：吃维生素的人更健康所以维生素让人健康、坚持复诊的病人死亡率更低所以复诊延命——自选择与依从性混杂被免掉，同池 16 候选定拨穿透 8/16 真零命中、良性 0/4 零误命中，存量维度零覆盖，CONCEPT/CORRECT 两组豁免 + 腿①否定守卫——不吃维生素的人是对照组形）。r373 补入 src/extraordinary-claims.js 的非凡主张的证据比例错配子族（离奇主张 × 弱证据基底 × 充分性兑现 三腿近距共现：治愈绝症/永动机/长生不老 等离奇主张被只有几例个例/没有复现/未经同行评议 等弱基底经足以证明/应该采信 等充分性兑现直接兑现为真，证据强度与主张离奇度不成比例，同池七候选定拨穿透 4/5 真零命中、良性零误命中，存量维度零覆盖，与 weak_evidence_strong_claim(dim245 弱证据类型×绝对化断言) 射程不同，CONCEPT/CORRECT/HEDGE 三组豁免 + 腿③否定守卫）。r373 同轮补入 src/tax-incidence.js 的税负转嫁谬误子族（tax incidence / legal-vs-economic incidence conflation——法定归宿 ≠ 经济归宿：向X征税 × 法定由Y承担 × 不会转嫁/价格不变 三腿近距共现，探针攻击穿透 8/10、良性 7/7 全 pass，存量 econ 子族零交集，CONCEPT/CORRECT 两组豁免 + 强否定守卫只守腿②）。r374 补入 src/stock-flow-conflation.js 的存量-流量混淆子族（存量指称 × 流量兑现 两腿近距共现：债务总额/市值/存款余额/外汇储备 等存量时点水平被等于全国人民一年白干/可见每年新增财富就有十万亿/比人家GDP高所以比人家还有钱 等流量兑现断言直接讲成年度速率或实力排名，跳过存量是历年累积、流量是年度速度的口径除法，同池七候选定拨穿透 7/10 真零命中、良性 2/8 非 pass 均系存量维度误伤非本族增量，与 count_rate_conflation(原始计数 vs 发生率) 轴不同、money_illusion(dim234) 对探针攻击句实测零命中，CONCEPT/CORRECT 两组豁免 + 腿②否定守卫）。',
   hooks: [
     { event: 'postprocess.think', priority: 190 }, // 190 > sycophancy-check 的 180：升序执行，本插件最后跑，merge 进已存在的 _discrimination（sycophancy 会整体覆写该对象）
   ],

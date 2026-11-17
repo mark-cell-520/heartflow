@@ -1,3 +1,12 @@
+## r374 续 — stash pop 冲突解决 + tax_incidence/stock_flow_conflation 两族并存接线收尾（真升级②存量落地；类型 0 维护面：冲突解决与登记断言同步）
+
+- **背景**：上一 context 的 r374 cron 中断后重启，工作区遗留 **stash pop 冲突**（三文件 UU）——`Updated upstream` = HEAD `f056a3ec`（远端 r374 stock_flow_conflation 族），`Stashed changes` = r373 遗留 WIP（tax_incidence 族）。r374 日志末段已明示「tax_incidence 的族表接线是待办，勿与 r374 计数断言混淆」，本轮按**两族并存**完成收尾。
+- **冲突解决（两族并存，严禁删任一侧）**：`src/econ-reasoning-gate.js` 补 stock_flow_conflation 族注释 + tax_incidence 补登记（桥表 28→30 族，头注释 29→30）；`src/plugins/econ-reasoning-check/index.js` 补两族条目 + version 1.10.0→1.11.0 + description 族名表补 tax_incidence/stock_flow_conflation + 族数 34→35（29 econ + 6 stats）；`test/round-295-econ-reasoning-wiring.test.js` 补 tax_incidence 攻击样本与盲注入键（stock_flow_conflation 侧 upstream 已带）+ A2 族表 34→35、A4 标题、文档头 34→35 同步。三文件冲突标记全清，`git add` 解决 UU。
+- **登记断言按实测数字同步（两轮共 6 处）**：r374 轮测 G1 29→30 / G2 34→35 / G3 1.10.0→1.11.0；r373 extraordinary_claims 轮测 G1 29→30 / G2 34→35 / G3 1.10.0→1.11.0。**实现期发现并纠正自己的臆断**：合并期我曾按「30 econ + 6 stats = 36」推断并写入 round-295 A2/插件 description，实测 `plugin.FAMILIES.length === 35`（29 econ + 6 stats）——以实测为准全部回退到 35，教训同「禁止臆造数字」。
+- **验证（全部来自本轮真实运行）**：stock-flow **46/46**（负例注入 16/16 翻转）、tax_incidence **55/55**、extraordinary_claims **44/44**（原 41/44 的 3 个登记断言 FAIL 已修）、round-295 wiring **91/91**；四门禁 **16/0 · 20/20@262 · 24/0 · 52/52 + 误拦 302/326 零新增**。`src/index.js` 零改动、VERSION 6.8.190 未动。
+- **死认领治理**：claims.jsonl 追加 r374 release completed（两族并存收尾）+ r373 abandoned（tax_incidence 补登记 claim 结清）；官方 scan 实测 146 条历史 active 残留为系统性遗留（r214-r374，release 类均已 completed），无 claimed>6h 死项阻塞本轮；r362/r363 两条 release 已过期可接手但属历史轮次、非本轮占用，未擅动。
+- **commit**：见本轮提交记录。
+
 ## r374 — econ_reasoning_gate 第 29 子族 stock_flow_conflation 落地（真升级②；存量-流量混淆新措辞家族）
 
 - **背景**：r373 extraordinary_claims 落地后接手的 r374 轮次（claim 2026-11-17，agent-4 dimension）。选题库候选定拨（经济/统计/逻辑/科学推理方向）——海外扫描空返（arXiv OR 展开噪声零相关、GitHub repos 0、S2 429），按既有形态自建。econ gate 已累积 28 子族，r374 沿七候选同池定拨路线（scripts/round-374/probe-r374-pool.js 首轮 + probe-r374-scope.js 二段深探，v6.8.190 pristine 基线）继续向「新判别角度」立项：A certainty_effect（Allais 确定性效应）穿透 **1/6**（存量 perfect_error/confidence/absolute_claim 大量代拦）且良性 2/5 脏；B absolute_advantage（绝对优势≠无贸易所得）3/5；C tax_incidence（税负归宿忽视）2/5；D money_creation（货币创造≠财富创造）7/10 但与 money_illusion（dim 234，r268 前既有）射程相邻（「央行多印钞大家钱变多国家更富」正是其攻击形）；E stock_flow_conflation（存量-流量混淆）7/10 且良性 2/8 非 pass 均系存量维度误伤（monocausal_attribution / soft_deflection，非新族增量）；F competition_waste（竞争=重复浪费）2/5 且良性 3/5 脏；G linear_tax_revenue（税率线性外推）3/5。**stock_flow_confusion 为「高穿透 × 良性边界最净 × 与既有维度射程不相邻」**，定拨落地。
