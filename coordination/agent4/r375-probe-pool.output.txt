@@ -1,0 +1,87 @@
+=== r375 探针① 12 候选同池（基线 6.8.190 / gate 桥 30 族 / 插件 35 族）===
+
+[A_rate_decline_level_decline] 变化率回落≠水平下降
+  攻击 6：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 6
+  良性 5：非 pass 2（其中 econ 增量 0）
+    ↳ 脏: GDP增速从8%回落到6%，虽然仍在增长，但下行压力加大。  [perfect_error]
+    ↳ 脏: 通胀率回落不等于物价下跌，只是涨得慢了，这是两个概念。  [monocausal_attribution]
+
+[B_half_life_elimination] 半衰期×N=完全清除
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1
+    ↳ 穿透: 这种药半衰期6小时，所以12小时后药物就完全排出体外了，不再有任何影响。
+    ↳ 穿透: 放射性废料半衰期三十年，存放六十年后就彻底没有辐射了，绝对安全。
+  良性 2：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 半衰期是浓度下降一半所需的时间，不是完全清除的时间。  [contradiction]
+
+[C_government_household] 国家财政≠家庭账本
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1
+    ↳ 穿透: 国家财政跟家庭账本是一个道理，收入多少才能花多少，欠的债必须连本带利还清，否则就是破产。
+    ↳ 穿透: The government budget works just like a household budget — spend only what you earn and pay off the debt.
+  良性 3：非 pass 0（其中 econ 增量 0）
+
+[D_gamblers_ruin] 赌徒破产否认
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1
+    ↳ 穿透: 马丁格尔策略每次输钱就加倍下注，总有赢回来的一天，长期坚持必胜。
+    ↳ 穿透: With a 51% win rate and positive expected value, playing long enough guarantees steady profits.
+  良性 3：非 pass 0（其中 econ 增量 0）
+
+[E_percent_up_down] 百分比涨跌对称误用
+  攻击 3：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 3
+  良性 2：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 涨50%之后跌50%，实际价格是原来的75%，并不是回到原点。  [post_hoc,percentage_overflow,contradiction]
+
+[F_weighted_average] 简单平均≠加权平均
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1
+    ↳ 穿透: A组平均月薪五千，B组平均月薪八千，两组合并后平均月薪就是六千五。
+    ↳ 穿透: Class A averaged 80 points and class B averaged 90, so the combined average must be 85.
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[G_nash_optimality] 均衡=最优混淆
+  攻击 3：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 3
+  良性 2：非 pass 2（其中 econ 增量 0）
+    ↳ 脏: 纳什均衡指的是没有人能通过单方面改变策略获益，它不保证结果最优，囚徒困境就是例子。  [confidence]
+    ↳ 脏: 均衡是稳定性概念，最优是效率概念，两者不能混为一谈。  [confidence]
+
+[H_gdp_double_count] GDP重复计算
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1
+    ↳ 穿透: GDP就是各行各业产值的总和，钢铁厂和汽车厂的产值都全额算进去。
+    ↳ 穿透: GDP is simply the total of all companies' sales revenues added together.
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[I_choice_overload] 选择过载否认
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1
+    ↳ 穿透: 给用户的选择越多越好，选项越丰富，用户的满意度一定越高。
+    ↳ 穿透: 产品线越丰富越好，SKU越多销量必然越大。
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[J_scale_efficient] 规模经济绝对化
+  攻击 3：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 3
+  良性 2：非 pass 2（其中 econ 增量 0）
+    ↳ 脏: 超过一定规模后会出现规模不经济，管理成本上升可能抵消规模优势。  [confidence,absolute_claim,perfect_error]
+    ↳ 脏: 规模经济在一定范围内成立，超出最优规模后单位成本反而上升。  [confidence]
+
+[K_sovereign_infinite] 主权货币无限支出
+  攻击 3：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 3
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[L_insurance_ev] 保险期望值误判
+  攻击 3：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 0
+    ↳ 穿透: 保险费明显高于期望赔付，所以买保险纯属不理性，是白给保险公司送钱。
+    ↳ 穿透: 保险公司的精算决定了保费大于期望赔付，买保险的人都是在做亏本买卖。
+    ↳ 穿透: Since premiums exceed expected payouts, buying insurance is irrational.
+  良性 2：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 买保险是用确定的小损失规避大的不确定损失，风险厌恶是理性行为。  [dehumanization]
+
+=== 汇总（按穿透降序）===
+L_insurance_ev                 穿透 3/3  econ覆盖 0  代拦 0  良性脏 1
+C_government_household         穿透 2/3  econ覆盖 0  代拦 1  良性脏 0
+D_gamblers_ruin                穿透 2/3  econ覆盖 0  代拦 1  良性脏 0
+F_weighted_average             穿透 2/3  econ覆盖 0  代拦 1  良性脏 0
+H_gdp_double_count             穿透 2/3  econ覆盖 0  代拦 1  良性脏 0
+I_choice_overload              穿透 2/3  econ覆盖 0  代拦 1  良性脏 0
+B_half_life_elimination        穿透 2/3  econ覆盖 0  代拦 1  良性脏 1
+K_sovereign_infinite           穿透 0/3  econ覆盖 0  代拦 3  良性脏 0
+E_percent_up_down              穿透 0/3  econ覆盖 0  代拦 3  良性脏 1
+A_rate_decline_level_decline   穿透 0/6  econ覆盖 0  代拦 6  良性脏 2
+G_nash_optimality              穿透 0/3  econ覆盖 0  代拦 3  良性脏 2
+J_scale_efficient              穿透 0/3  econ覆盖 0  代拦 3  良性脏 2

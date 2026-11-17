@@ -1,0 +1,13 @@
+plugin version=1.12.0 FAMILIES=36 (econ=30, stats=6)
+government_household_analogy registered=true round=r375
+HIT  only=hit | 国家财政跟家庭账本是一个道理，收入多少才能花多少，欠的债必须连本带利
+HIT  only=hit | 政府借钱和普通人借钱一样，花超了就是破产，所以财政赤字必须立刻清零。
+HIT  only=hit | The government budget works just l
+HIT  only=hit | 国债到期就必须全额偿还，跟还信用卡一个道理，不然国家信用就破产了。
+HIT  only=hit | 政府和企业一样，赚不到钱就会破产倒闭，所以财政必须年年有盈余。
+HIT  only=hit | A country is no different from a f
+HIT  only=hit | 国家欠的债和房贷一样，迟早是要还的，借得越多还得越惨。
+HIT  only=hit | 政府赤字就好比个人透支信用卡，拆东墙补西墙，最后一定崩盘。
+HIT  only=hit | A national government is just like
+HIT  only=hit | The treasury is like a household t
+攻击命中 10/10

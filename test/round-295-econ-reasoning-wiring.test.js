@@ -88,6 +88,8 @@ const ATTACK = {
   tax_incidence: '对企业征收房产税，税收由企业承担，不会转嫁给消费者，房租不会因此上涨。',
   // r374 存量-流量混淆（src/stock-flow-conflation.js，双腿样本——腿①存量指称 × 腿②流量兑现）
   stock_flow_conflation: '国家债务总额已经超过一年GDP，等于全国人民一年白干，国家实际上已经破产了。',
+  // r375 政府-家庭收支类比（src/government-household-analogy.js，三腿样本——腿①主权主体 × 腿②私人收支框架×等价提示 × 腿③清偿结论）
+  government_household_analogy: '国家财政跟家庭账本是一个道理，收入多少才能花多少，欠的债必须连本带利还清，否则就是破产。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -156,6 +158,9 @@ const INJECT_KEY = {
   tax_incidence: ['TAX_ZH', 'TAX_ZH_B', 'TAX_EN_A', 'TAX_EN_B', 'STATUTORY_ZH', 'STATUTORY_EN', 'NOTRANSFER_ZH', 'NOTRANSFER_EN', 'PAIR_ZH', 'PAIR_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN'],
   // r374 stock_flow_conflation（双腿：腿① STOCK_[ZH|EN]_[A|B] × 腿② EQUATE_[ZS|RATE|CMP]_[ZH|EN]）
   stock_flow_conflation: ['STOCK_ZH_A', 'STOCK_ZH_B', 'STOCK_EN_A', 'STOCK_EN_B', 'EQUATE_ZS_ZH', 'EQUATE_RATE_ZH', 'EQUATE_CMP_ZH', 'EQUATE_ZS_EN', 'EQUATE_RATE_EN', 'EQUATE_CMP_EN'],
+  // r375 government_household_analogy（三腿：腿① SOV_[ZH|EN] × 腿② ANALOGY_[ZH|EN] ×
+  // 腿③ PAYOFF_[ZH|EN] + CONCEPT/CORRECT 两组豁免 + 腿③否定/对冲双守卫）
+  government_household_analogy: ['SOV_ZH', 'SOV_EN', 'ANALOGY_ZH', 'ANALOGY_EN', 'PAYOFF_ZH', 'PAYOFF_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -171,14 +176,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 35 族：29 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 35); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1
+T('A2 族表 36 族：30 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 36); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 29);
+  assert.strictEqual(econ.length, 30);
   assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 35);
+  assert.strictEqual(new Set(keys).size, 36);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
@@ -188,7 +193,7 @@ T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
     assert.ok(/^r\d+$/.test(f.round), `${f.key} 起草轮次异常: ${f.round}`);
   }
 });
-T('A4 35 个模块文件全部存在且导出函数是函数', () => {
+T('A4 36 个模块文件全部存在且导出函数是函数', () => {
   for (const f of FAMILIES) {
     const p = path.join(ROOT, 'src/plugins/econ-reasoning-check', f.mod);
     assert.ok(fs.existsSync(p), `模块缺失: ${f.mod}`);

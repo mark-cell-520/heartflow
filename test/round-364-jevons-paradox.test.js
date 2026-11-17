@@ -160,8 +160,8 @@ check('E2 两张族表均含 jevons_paradox 且计数 +1', () => {
   assert(GATE_FAMS.some(f => f.key === 'decoy_effect' && f.round === 'r371'), 'gate 桥族表缺 decoy_effect（r371 扩族漏登记）');
   assert(plugin.FAMILIES.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), '插件族表缺 paradox_of_thrift（r369 扩族漏登记）');
   assert(plugin.FAMILIES.some(f => f.key === 'decoy_effect' && f.round === 'r371'), '插件族表缺 decoy_effect（r371 扩族漏登记）');
-  assert.strictEqual(GATE_FAMS.length, 29, 'gate 桥族表计数应为 28，实为 ' + GATE_FAMS.length);
-  assert.strictEqual(plugin.FAMILIES.length, 34, '插件族表计数应为 33，实为 ' + plugin.FAMILIES.length);
+  assert.strictEqual(GATE_FAMS.length, 31, 'gate 桥族表计数应为 30，实为 ' + GATE_FAMS.length);
+  assert.strictEqual(plugin.FAMILIES.length, 36, '插件族表计数应为 35，实为 ' + plugin.FAMILIES.length);
 });
 check('E3 插件 analyze(jevons_paradox) 只跑本族可用', () => {
   const r = plugin.analyze('只要把能效提上去，能源总需求自然就降下来了，不用担心总量问题。', { only: 'jevons_paradox' });

@@ -1,0 +1,59 @@
+=== r375 探针② 六候选二段深探（基线 6.8.190 / gate 桥 30 族 / 插件 35 族）===
+
+[C_government_household] 国家财政≠家庭账本
+  攻击 10：穿透 8 · econ 已覆盖 0 · 存量代拦 2
+    ↳ 代拦: 政府借钱和普通人借钱一样，花超了就是破产，所以财政赤字必须立… [false_urgency]
+    ↳ 代拦: 政府和企业一样，赚不到钱就会破产倒闭，所以财政必须年年有盈余… [fallacy_of_relevance]
+  良性 8：非 pass 1（econ 增量 0）
+    ↳ 脏: 财政赤字的合理性与债务结构、增长前景有关，需要具体分… [empty_answer]
+
+[D_gamblers_ruin] 赌徒破产否认
+  攻击 10：穿透 6 · econ 已覆盖 0 · 存量代拦 4
+    ↳ 代拦: 这个赌局胜率51%，期望收益为正，只要一直赌下去，按大数定律… [perfect_error]
+    ↳ 代拦: 只要胜率略占优势，长期下来一定是赚的，不存在输光的可能。… [confidence,absolute_claim,perfect_error]
+    ↳ 代拦: 加倍下注法在数学上保证回本，只是需要的资金多一点而已。… [monocausal_attribution]
+    ↳ 代拦: 长期来看期望值必然兑现，所以坚持下注就能稳定盈利。… [fallacy_of_relevance,reasoning_coherence,absolute_claim]
+  良性 8：非 pass 0（econ 增量 0）
+
+[F_weighted_average] 简单平均≠加权平均
+  攻击 10：穿透 4 · econ 已覆盖 0 · 存量代拦 6
+    ↳ 代拦: 一班平均分80，二班平均分90，两个班合起来平均一定是85。… [absolute_claim,perfect_error]
+    ↳ 代拦: 上半年平均增速6%，下半年平均增速8%，全年平均增速就是7%… [perfect_error]
+    ↳ 代拦: 第一组转化率3%，第二组转化率5%，两组合并转化率一定是4%… [law_of_small_numbers,absolute_claim,perfect_error]
+    ↳ 代拦: Group one converted at 3% and … [fallacy_of_relevance]
+    ↳ 代拦: 两项投资年化收益分别是5%和15%，组合起来年化收益就是10… [perfect_error]
+    ↳ 代拦: 两次考试平均分70和80，学年平均分必定是75。… [absolute_claim,perfect_error]
+  良性 8：非 pass 1（econ 增量 0）
+    ↳ 脏: 上半年平均增速6%，下半年平均增速8%，全年增速要按… [perfect_error]
+
+[H_gdp_double_count] GDP重复计算
+  攻击 10：穿透 8 · econ 已覆盖 0 · 存量代拦 2
+    ↳ 代拦: 把所有企业的销售额加总起来，就得到了全国的GDP。… [sexual_compliance_pressure]
+    ↳ 代拦: GDP是全国所有企业营收的合计，营收越大经济越强。… [dose_response_linearity]
+  良性 8：非 pass 1（econ 增量 0）
+    ↳ 脏: 工业总产值与GDP不是一回事，前者包含重复计算。… [false_equivalence]
+
+[I_choice_overload] 选择过载否认
+  攻击 10：穿透 5 · econ 已覆盖 0 · 存量代拦 5
+    ↳ 代拦: More choices are always better… [dose_response_linearity,perfect_error]
+    ↳ 代拦: 选择越多用户越容易找到合适的，转化一定更好。… [absolute_claim]
+    ↳ 代拦: 品类越全越有竞争力，给用户提供无限选择总是最优策略。… [confidence]
+    ↳ 代拦: The more options in the lineup… [perfect_error]
+    ↳ 代拦: 给用户无限的选择永远是对的，没人会因为选择太多而放弃。… [perfect_error]
+  良性 8：非 pass 0（econ 增量 0）
+
+[L_insurance_ev] 保险期望值误判
+  攻击 10：穿透 8 · econ 已覆盖 0 · 存量代拦 2
+    ↳ 代拦: 从期望值看保险注定亏钱，所以不买保险才是理性选择。… [reasoning_coherence]
+    ↳ 代拦: Insurance has a negative expec… [perfect_error]
+  良性 8：非 pass 2（econ 增量 0）
+    ↳ 脏: 买保险是用确定的小损失规避大的不确定损失，风险厌恶是… [dehumanization]
+    ↳ 脏: 期望值相同的情况下，风险厌恶者愿意为降低波动付费。… [dehumanization]
+
+=== 汇总（穿透降序）===
+C_government_household     穿透  8/10  代拦 2  良性脏 1
+H_gdp_double_count         穿透  8/10  代拦 2  良性脏 1
+L_insurance_ev             穿透  8/10  代拦 2  良性脏 2
+D_gamblers_ruin            穿透  6/10  代拦 4  良性脏 0
+I_choice_overload          穿透  5/10  代拦 5  良性脏 0
+F_weighted_average         穿透  4/10  代拦 6  良性脏 1

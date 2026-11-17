@@ -163,6 +163,14 @@ const FAMILIES = [
   //   是纠正形；腿③不受守——「不会转嫁」的「不会」是攻击惯语组成部分，
   //   r369 NOHARM 同款设计）。
   { key: 'tax_incidence',                 mod: './tax-incidence.js',               fn: 'detectTaxIncidence',          zh: '税负转嫁谬误',               en: 'tax incidence fallacy (legal-vs-economic incidence conflation)', round: 'r373' },
+  // r375 新增：政府-家庭收支类比（government-household budget analogy /
+  //   sovereign solvency conflation——把家庭/企业的预算约束平移到主权财政，
+  //   推出「欠债必须连本带利还清/否则破产/赤字必须清零」的清偿结论；同池 12
+  //   候选定拨（首轮 + 二段深探）穿透 8/10 真零命中 + 良性边界最净；三腿（主权
+  //   主体 × 私人收支框架×等价提示 × 清偿/破产结论）+ CONCEPT/CORRECT 两组豁免
+  //   + 腿③否定/对冲双守卫；与存量 false_equivalence 泛化等同射程不同，
+  //   tax_incidence 管税负转嫁、price_control 管价格管制均不含类比三腿形）。
+  { key: 'government_household_analogy',  mod: './government-household-analogy.js', fn: 'detectGovernmentHouseholdAnalogy', zh: '政府-家庭收支类比',        en: 'government-household budget analogy (sovereign solvency conflation)', round: 'r375' },
 ];
 
 const _cache = new Map();
@@ -186,7 +194,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 30 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 31 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

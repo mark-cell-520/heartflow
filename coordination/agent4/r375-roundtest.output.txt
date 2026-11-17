@@ -1,0 +1,55 @@
+### A 攻击样本 gate 层
+  ✓ A1 ZH 攻击 8/8 非 pass 且 econ_reasoning_gate 归因
+  ✓ A2 EN 攻击 4/4 非 pass 且 econ_reasoning_gate 归因
+### B 模块层
+  ✓ B1 攻击 12/12 模块命中
+  ✓ B2 gate 桥聚合含 government_household_analogy 族
+### C 良性样本
+  ✓ C1 良性 12/12 模块零命中
+  ✓ C2 良性 12/12 gate findings 不含 econ_reasoning_gate（本族零增量）
+### D 豁免与判据结构
+  ✓ D1 CONCEPT 豁免（类比谬误讨论，内含攻击形）
+  ✓ D1b EN CONCEPT 豁免（classic fallacy 概念讨论，内含攻击形）
+  ✓ D1c CONCEPT 不收裸概念名（「教科书讲过家庭预算的原理」无框架词，两腿在场必须命中）
+  ✓ D2 CORRECT 豁免（不等于家庭账本 + 不能混为一谈，内含攻击形）
+  ✓ D2b EN CORRECT 豁免（is not a household，内含攻击形）
+  ✓ D3 缺腿①不判（私人域收支陈述在场但无主权主体）
+  ✓ D4 缺腿②不判（主权主体 + 清偿结论在场但无比喻框架）
+  ✓ D5 缺腿③不判（主权主体 + 比喻在场但无清偿结论）
+  ✓ D6 腿③否定守卫（并不意味着债台高筑就会破产——对冲形）
+  ✓ D6b EN 腿③否定守卫（does not mean it will go bankrupt）
+  ✓ D7 超距不判（主权主体与清偿结论相距过远）
+### E 负例注入
+  ✓ E 注入删 SOV_ZH → 守卫翻转
+  ✓ E 注入删 SOV_EN → 守卫翻转
+  ✓ E 注入删 ANALOGY_ZH → 守卫翻转
+  ✓ E 注入删 ANALOGY_EN → 守卫翻转
+  ✓ E 注入删 PAYOFF_ZH → 守卫翻转
+  ✓ E 注入删 PAYOFF_EN → 守卫翻转
+  ✓ E 注入删 CONCEPT_ZH → 守卫翻转
+  ✓ E 注入删 CONCEPT_EN → 守卫翻转
+  ✓ E 注入删 CORRECT_ZH → 守卫翻转
+  ✓ E 注入删 CORRECT_EN → 守卫翻转
+  ✓ E 注入删 NEG_ZH → 守卫翻转
+  ✓ E 注入删 NEG_EN → 守卫翻转
+  ✓ E 注入删 HEDGE_ZH → 守卫翻转
+  ✓ E 注入删 HEDGE_EN → 守卫翻转
+### F 存量回归
+  ✓ F1 tax_incidence 攻击样本不被本族拦
+  ✓ F2 mercantilism 攻击样本不被本族拦
+  ✓ F3 extraordinary_claims 攻击样本不被本族拦
+  ✓ F4 stock_flow_conflation 近邻不被误拦（存量陈述无清偿结论）
+  ✓ F5 price_control 近邻不被误拦（管制断言无三腿）
+  ✓ F6 官方良性语料形状零误命中
+  ✓ F7 存量 econ 子族聚合仍工作（tax_incidence 直调）
+  ✓ F8 存量 econ 子族聚合仍工作（stock_flow_conflation 直调）
+### G 登记
+  ✓ G1 gate 桥族表含 government_household_analogy(r375) 且计数 31
+  ✓ G2 插件族表含 government_household_analogy(r375) 且计数 36（30 econ + 6 stats）
+  ✓ G3 插件 version 已 bump 至 1.12.0
+  ✓ G4 插件 analyze(only=government_household_analogy) 路由可用
+  ✓ G5 claims.jsonl 含 r375 认领（agent-4/dimension）
+  ✓ G6 VERSION 未被 r375 改动（基线 6.8.190）
+
+测试结果: 45 通过, 0 失败, 共 45 个
+负例注入: 14/14 翻转
