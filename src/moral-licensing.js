@@ -87,7 +87,22 @@ const CAPITAL_ZH = new RegExp([
   // ③ 前置时段 × 程度 × 品格（前面都很克制 / 之前一直很节省）
   '(?:前面|前面那些|之前|先前|前几次|前几天|过去|历来|向来|一向|素来|一贯|从来|始终|一直)(?:都|也|一直|始终)?(?:很|挺|相当|这么|那么|特别|非常|够)(?:克制|节省|节俭|自律|节制|简朴|规矩|本分|客气|谨慎|检点|老实|正直|清白|廉洁|收敛|低调)',
   // ④ 主语 × 程度自定级（我已经很节省了 / 咱够克制了）
-  '(?:我|咱|我们|咱们|自己)(?:已经|早就|从来|向来|一向)?(?:很|相当|够|十分|非常|挺|蛮|这么|那么)(?:节省|节俭|克制|自律|节制|简朴|规矩|本分|客气|谨慎|检点)(?:了|的啦|的了)'
+  '(?:我|咱|我们|咱们|自己)(?:已经|早就|从来|向来|一向)?(?:很|相当|够|十分|非常|挺|蛮|这么|那么)(?:节省|节俭|克制|自律|节制|简朴|规矩|本分|客气|谨慎|检点)(?:了|的啦|的了)',
+  // ── [r382 新增族] 既往功绩资本（探针 r382 硬数据：deep-probe 7 条零命中中
+  //   5 条属本族——旧资本腿只认「捐钱行善/清廉本分/克己自律」三类，
+  //   收不住最常见的**功绩自述**与**救命恩情**。每条自带必选成分
+  //   （量化词+善行词 / 救动词 / 固定成语 / 比较词+贡献词 / 时间+捐+量化
+  //   三段合取），不退回 r567 删除的全可空前导宽支。
+  // ① 「做了那么多好事」（善行动词 + 量化词 + 善行名词，三者必选）
+  '(?:做|干|做过了|干过了)(?:了)?(?:那么多|这么多|很多|好多)(?:好事|善事|好事儿|善事儿)',
+  // ② 「刚救了人 / 才救了命」（施救动词 + 紧邻时间词，二者必选）
+  '(?:刚|方才|才)(?:救|救了|救起|救过|搭救|救了)(?:人|命|过人|回命)',
+  // ③ 「立下汗马功劳」（固定成语，自带功劳语义）
+  '汗马功劳',
+  // ④ 「相比/比起 + 我做的 + 贡献」（比较引出词 + 贡献词，二者必选）
+  '(?:相比|比起|较之|对照)(?:我|咱|我们|咱们|自己)?(?:做|干|所)(?:的)?(?:过)?(?:贡献|付出|成绩|业绩|功劳|苦劳)',
+  // ⑤ 「这些年捐了那么多钱」（时段词 + 捐动词 + 量化词，三段合取）
+  '(?:这些年|这些年来|这些年里|多年以来|长期以来|一直以来|历年|过去|至今为止|工作以来)(?:捐|捐助|捐赠|资助|赞助)(?:了|过)?(?:那么多|这么多|很多|好多|大量|不少|很多钱|好多钱|不少钱)',
 ].join('|'));
 
 const CAPITAL_EN = new RegExp([
@@ -115,6 +130,13 @@ const CAPITAL_EN = new RegExp([
   '\\b(?:all|for)\\s+(?:month|week|year|quarter)\\s+(?:i|we)\\s+(?:have|had)\\s+been\\s+(?:good|restrained|disciplined|careful|frugal|thrifty)\\b',
   // ② 「we donated / volunteered last quarter」（无 a lot / regularly 修饰）
   '\\b(?:i|we)\\s+(?:donated|volunteered|gave|contributed|tithed)\\s+(?:last|this|every)\\s+(?:quarter|month|week|year|season|time)\\b',
+  // ── [r382 新增族] EN 既往功绩资本（deep-probe E6/E8 两条零命中）
+  // ① 「I have donated thousands / millions / countless」（数量级词必选，
+  //   原第 1 支只认 a lot / so much，收不住 thousands 类量化）
+  '\\b(?:i|we)\\s+(?:have\\s+)?(?:donated|contributed|given|raised)\\s+(?:thousands|millions|hundreds|countless|so\\s+many|tens\\s+of\\s+thousands|a\\s+great\\s+many)\\b',
+  // ② 「I have been faithful / loyal / devoted for ten years」（忠诚类品格
+  //   词必选，原 r270 支只收 good/restrained/frugal 等自律词）
+  '\\b(?:i|we)\\s+(?:have\\s+)?(?:been|remained|stayed)\\s+(?:faithful|loyal|devoted|committed|dedicated|true\\s+to)\\b',
 ].join('|'), 'i');
 
 // ─── A2: 越界许可（本次行为可通融/不算事/可减免/可免究）────────
@@ -181,7 +203,22 @@ const PERMIT_ZH = new RegExp([
   // ④ 「当奖励自己/算犒劳/当补偿」——资本兑换成许可的显式形
   '(?:当|算是|当作|就当|算作|抵作|换作)(?:是|个|一次|一回)?(?:奖励|犒劳|慰劳|补偿|回报|酬谢|奖赏)(?:自己|一下自己|咱自己|我自己|咱们)?',
   // ⑤ 「没人会怪我/谁挑理」——把旁观沉默当成许可
-  '(?:没(?:有)?人|谁)(?:会|能)?(?:怪|责怪|怪罪|见怪|挑理|挑眼|说闲话|多嘴|过问|为难)(?:我|他|她|咱|咱们|我们|你)?'
+  '(?:没(?:有)?人|谁)(?:会|能)?(?:怪|责怪|怪罪|见怪|挑理|挑眼|说闲话|多嘴|过问|为难)(?:我|他|她|咱|咱们|我们|你)?',
+  // ── [r382 新增族] 口语越界许可二轮（探针硬数据：deep-probe 7 条零命中
+  //   对应的许可侧形状——旧许可腿只认「这点算什么/别计较/就这一次/当奖励」
+  //   四类，收不住「有什么大不了 / 不要再追究 / 揪着不放 / 谁也别想拿我
+  //   怎样 / 微不足道」五种自然收尾。每条自带必选成分（固定短语 / 否定词+
+  //   追究动词 / 抓着+不放 / 别想+拿我怎样），不造宽支。
+  // ① 「有什么大不了」（固定短语）
+  '有什么大不了',
+  // ② 「不要再追究 / 别追究 / 休想追究」（否定词 + 追究类动词，二者必选）
+  '(?:不要|别再|不要再|休想|千万别|不许|少|不得)(?:再)?(?:追究|计较|较真|问责|揪着|抓着|提这件事|提这茬)',
+  // ③ 「揪着不放 / 抓着不放」（持续追问的拒绝形）
+  '(?:揪|抓|咬|缠)(?:着|住)?(?:我|这|那|这点|这点事|这件事|这事儿)?(?:不放|着不放|住不放)',
+  // ④ 「谁也别想拿我怎样」（威慑式免究）
+  '(?:谁|什么人|你们|他们)(?:也)?(?:别想|不能|没法|奈何|管不了|收拾不了)(?:拿|把)(?:我|咱|咱们|我们)(?:怎样|怎么样|如何|没办法)',
+  // ⑤ 「微不足道 / 不足挂齿」——本次事项降格（固定短语）
+  '(?:微不足道|不足挂齿|不值一提|何足道哉|小菜一碟|不在话下)',
 ].join('|'));
 
 const PERMIT_EN = new RegExp([
@@ -223,6 +260,11 @@ const PERMIT_EN = new RegExp([
   '\\b(?:nobody|no\\s+one|none\\s+of\\s+them)\\s+(?:will|would|is\\s+going\\s+to|can)\\s+(?:blame|judge|mind|notice|care|hold\\s+it\\s+against)\\b',
   // ④ 「I can allow myself a little lapse」
   '\\b(?:i|we)\\s+(?:can|could|may)\\s+(?:afford|allow\\s+myself|allow\\s+ourselves)\\s+(?:a|an|some|one)?\\s*(?:little|small|minor|tiny)?\\s*(?:lapse|slip|indulgence|treat|cheat|break|shortcut)\\b',
+  // ── [r382 新增族] EN 口语越界许可二轮（deep-probe E6/E8 许可侧）
+  // ① 「should not count against me」（既往资本抵销本次问责的显式兑换）
+  '\\b(?:should|ought|must|can|could|will)\\s+not\\s+(?:be\\s+)?(?:count(?:ed)?|held|weigh(?:ed)?|reckon(?:ed)?)\\s+against\\s+(?:me|us|him|her|them)\\b',
+  // ② 「does not erase / cancel / undo / negate that」（既往资本否定本次过错）
+  '\\b(?:does|do|did|will|would|could|can)\\s+not\\s+(?:erase|cancel|undo|negate|wipe\\s+out|outweigh|diminish|take\\s+away)\\b',
 ].join('|'), 'i');
 
 // ─── G1: 独立评估看守（合法）──────────────────────────────────
