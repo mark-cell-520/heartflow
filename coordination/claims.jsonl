@@ -320,3 +320,4 @@
 {"round":"r368","agent":"agent-4","kind":"release","status":"completed","upgrade_type":"②","detail":"mercantilism 重商主义贸易顺差谬误（econ_reasoning_gate 第 25 子族/插件第 29 族），commit 86d5173+ad9d14c+318ba4a+01f43f4，四门禁全绿同基线（16/0、20/20@259、24/0、52/52+302/326），轮测 38/38、负例注入 14/14 翻转，run-all 失败清单无一归因 r368"}
 {"round":"r369","agent":"agent-4","kind":"dimension","direction":"经济与资源推理候选定拨（econ_reasoning_gate 扩子族）：A 劳动总量固定谬误 lump_of_labor（机器/移民吃掉固定岗位总数→永久失业）、B 节约悖误 paradox_of_thrift（人人多储蓄→总需求不受影响/经济照涨）、C 其余同池候选（探针穿透最高且良性零误伤者落地）；海外扫描 arXiv econ.GN/stat.ME/cs.AI/GitHub/S2；src/index.js 零改动优先子目录模块","claim_at":"2026-11-16T22:20:02Z","expires_hours":6,"status":"active"}
 {"round":"r369","agent":"agent-4","kind":"release","status":"completed"}
+{"round":"r370","agent":"agent-4","kind":"release","claim_at":"2026-11-17T00:02:02Z","status":"completed"}
