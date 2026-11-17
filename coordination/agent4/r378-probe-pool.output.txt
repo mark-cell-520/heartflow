@@ -1,0 +1,96 @@
+=== r378 探针① 12 候选同池（基线 6.8.190 / gate 桥 33 族 / 插件 38 族）===
+
+[A_pluralistic_ignorance] 多元无知（沉默误读为共识）
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [absolute_claim,hasty_generalization,perfect_error | quantifier_scope_shift,fallacy_of_relevance | reward_hacking]
+  良性 3：脏 1 [会议无异议只是公开层面的一致性，不能直接推断私下共识。  [monocausal_attribution]]
+  穿透样本:
+    · 没人站出来反对，说明大家都同意这个方案，就按这个办了。
+
+[B_just_world] 公平世界假设（结果=应得）
+  攻击 4：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 1 [victim_blaming]
+  良性 3：脏 1 [成功受运气、出身与结构性因素影响，把结果完全归于个人应得是公平世界谬误。  [moral_foundations,perfect_error]]
+  穿透样本:
+    · 世界是公平的，他能成功是因为他应得，你穷就是因为你不努力。
+    · He is rich because he deserves it; the poor simply
+    · 混得好说明够努力，混得差都是自己的责任，别怪环境。
+
+[C_gresham] 劣币驱逐良币万能化
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [absolute_claim,perfect_error | completion_evidence,moral_foundations,perfect_error | absolute_claim]
+  良性 3：脏 1 [市场竞争中优质产品常能胜出，把个别现象夸大为必然规律是过度概括。  [absolute_claim,perfect_error]]
+  穿透样本:
+    · 劣币驱逐良币是铁律，好企业注定被无良企业挤出去，认真做产品没有出路。
+
+[D_comparative_advantage] 比较优势误解（强者无需贸易）
+  攻击 4：穿透(pass) 2 · econ 已覆盖 1 · 存量代拦 1 [perfect_error]
+  良性 3：脏 3 [即使一国在所有产品上都有绝对优势，按比较优势分工仍能使双方获益。  [stereotype,perfect_error] | 贸易收益来自机会成本差异而非绝对效率高低，绝对优势不否定贸易意义。  [absolute_claim] | 进口与自产要看机会成本，效率高的一方专注优势最大的领域更有利。  [confidence]]
+  穿透样本:
+    · A国造什么效率都比B国高，所以两国根本没有贸易的必要，强者不需要跟弱者做生意。
+    · 效率高的一方在贸易中永远占尽便宜，效率低的一方参加就是被剥削。
+
+[E_curse_of_knowledge] 知识诅咒（高估他人理解）
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [stereotype | absolute_claim,contradiction,perfect_error]
+  良性 3：脏 0
+  穿透样本:
+    · 我当年没人教也照样会了，现在的人学不会就是因为不肯动脑子。
+    · This is obvious to anyone who looks at it — if the
+
+[F_insurance_loss] 保险=未理赔即亏（风险转移价值忽视）
+  攻击 4：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 1 [perfect_error]
+  良性 3：脏 1 [不出险说明风险没有发生，保费买到的是转移尾部损失的能力，不是必然回本的理财。  [reasoning_coherence,contradiction]]
+  穿透样本:
+    · 买了重疾险结果一年没生病，保费全白交了，保险就是庄家通吃的赌局。
+    · 没出险就等于钱打了水漂，当初还不如不买，这买卖怎么算都亏。
+    · 保险本质上就是赌，不出事铁定亏，只有一直理赔才划得来。
+
+[G_price_as_quality] 价格=质量推断
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [confidence,absolute_claim | fallacy_of_relevance]
+  良性 3：脏 0
+  穿透样本:
+    · 这东西卖得贵肯定有它的道理，贵就是好，便宜没好货。
+    · 贵的才不会坑人，图便宜迟早吃大亏，价格直接说明质量。
+
+[H_says_law] 萨伊定律误用（供给自动创造需求）
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [fallacy_of_relevance | fallacy_of_relevance]
+  良性 3：脏 0
+  穿透样本:
+    · 东西只要造出来自然就卖得出去，供给自己会创造需求，不可能有生产过剩这回事。
+    · 不会有过剩危机，造出来就有人要，这是铁打的经济规律。
+
+[I_over_diversification] 分散消除一切风险
+  攻击 4：穿透(pass) 0 · econ 已覆盖 1 · 存量代拦 3 [weak_evidence_strong_claim | unsupported_claim,unsupported_claim,absolute_claim,perfect_error | coercive_affection]
+  良性 3：脏 0
+
+[J_lump_of_labor] 劳动总量固定谬误
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [empty_answer | perfect_error]
+  良性 3：脏 0
+  穿透样本:
+    · 自动化会抢走工人的饭碗，社会上的工作岗位总量是固定的，机器每干一份活就有人失业。
+    · 移民进来就会直接抢走本地人的工作，就业岗位就那么多，别人多一个你就少一个。
+
+[K_crowding_out] 挤出效应万能化
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [fallacy_of_relevance,moral_foundations | absolute_claim]
+  良性 3：脏 1 [财政刺激的效果取决于乘数与货币政策配合，需要具体分析。  [empty_answer]]
+  穿透样本:
+    · 政府投资一块钱就会挤出私人投资一块钱，财政刺激完全无效。
+    · 政府增加支出必然等量挤出私人投资，总需求一分都不会增加。
+
+[L_trend_extrapolation] 趋势线性外推
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [hot_hand | law_of_small_numbers,perfect_error]
+  良性 3：脏 0
+  穿透样本:
+    · 人口每年都在流入，照这个速度二十年后这座城市就是第一大都市。
+    · The stock has risen three years straight, so it wi
+
+=== 汇总（按穿透率排序）===
+  B_just_world             穿透 3/4  良性脏 1
+  F_insurance_loss         穿透 3/4  良性脏 1
+  E_curse_of_knowledge     穿透 2/4  良性脏 0
+  G_price_as_quality       穿透 2/4  良性脏 0
+  H_says_law               穿透 2/4  良性脏 0
+  J_lump_of_labor          穿透 2/4  良性脏 0
+  L_trend_extrapolation    穿透 2/4  良性脏 0
+  K_crowding_out           穿透 2/4  良性脏 1
+  D_comparative_advantage  穿透 2/4  良性脏 3
+  A_pluralistic_ignorance  穿透 1/4  良性脏 1
+  C_gresham                穿透 1/4  良性脏 1
+  I_over_diversification   穿透 0/4  良性脏 0

@@ -1,0 +1,22 @@
+--- round-364-jevons-paradox
+测试结果: 70 通过, 0 失败, 共 70 个
+--- round-367-price-control
+测试结果: 30 通过, 0 失败, 共 30 个
+--- round-368-mercantilism
+测试结果: 38 通过, 0 失败, 共 38 个
+--- round-369-paradox-of-thrift
+负例注入: 13/13 翻转
+--- round-371-decoy-effect
+负例注入: 16/16 翻转
+--- round-372-healthy-user-bias
+负例注入: 10/10 翻转
+--- round-373-extraordinary-claims
+负例注入: 16/16 翻转
+--- round-374-stock-flow-conflation
+负例注入: 16/16 翻转
+--- round-375-government-household-analogy
+负例注入: 14/14 翻转
+--- round-376-money-creation
+r376-money-creation: 43 通过 / 0 失败
+--- round-377-linear-tax-revenue
+结果: 34 通过, 0 失败

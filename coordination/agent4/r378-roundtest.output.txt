@@ -1,0 +1,44 @@
+=== A 模块层：攻击命中 / 良性豁免 ===
+  ✓ A1 10 条攻击全命中
+  ✓ A2 10 条良性全豁免
+  ✓ A3 返回体字段齐备（dimension/severity/details/guidance）
+  ✓ A4 短文本/空文本守卫
+=== B 结构承重（两腿/三形/豁免/守卫 20 组负例注入）===
+  ✓ B1 腿① INS_ZH 删 → 重疾险/车险词句不命中
+  ✓ B2 腿① INS_ZH_B 删 → 保费裸主语句不命中
+  ✓ B3 腿① INS_ZH_C 删 → 出险事件词句不命中
+  ✓ B4 腿① INS_EN 删 → EN 攻击不命中
+  ✓ B5 腿② NOCLAIM_ZH 删 → 配对形句不命中
+  ✓ B6 腿② WASTE_ZH 删 → 配对形句不命中
+  ✓ B7 腿② SUBJ_ZH 删 → 保费主语句形不命中
+  ✓ B8 腿② GAMBLE_ZH 删 → 赌博框架句不命中
+  ✓ B9 腿② NOCLAIM_EN 删 → EN 配对形不命中
+  ✓ B10 腿② WASTE_EN 删 → EN 配对形不命中
+  ✓ B11 腿② SUBJ_EN 删 → EN 保费主语句形不命中
+  ✓ B12 腿② GAMBLE_EN 删 → EN 赌博框架句不命中
+  ✓ B13 NOCLAIM_WASTE_ZH=0 → 配对形近距窗承重（同句远距不命中）
+  ✓ B14 PAIR_ZH=0 → 腿①-腿②距离窗承重（远距两腿句不命中）
+  ✓ B15 PAIR_EN=0 → EN 距离窗承重
+  ✓ B16 CONCEPT_ZH 删 → 概念讨论句翻红（概念豁免承重）
+  ✓ B17 CORRECT_ZH 删 → 纠正句翻红（纠正豁免承重）
+  ✓ B18 NEG_ZH 删 → 赌博框架紧前否定句翻红（紧前否定守卫承重）
+  ✓ B19 HEDGE_ZH 删 → 对冲短语句翻红（对冲守卫承重）
+  ✓ B20 NEG_ZH 删 → 配对形间隙否定句翻红（间隙守卫承重）
+=== C 引擎 gate 兑现 ===
+  ✓ C1 攻击句 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ C2 gate 桥 families 含 insurance_claim_loss
+  ✓ C3 良性句 gate.action = pass
+=== D 插件层接线 ===
+  ✓ D1 插件族表 39 族：33 econ + 6 stats，key 唯一
+  ✓ D2 插件 version 1.15.0
+  ✓ D3 gate 桥族表 34 族
+  ✓ D4 插件 analyze 攻击命中本族、良性不命中
+=== E 射程邻接核查 ===
+  ✓ E1 sunk_cost_coercion 攻击句不误触本族
+  ✓ E2 本族攻击句不被 sunk_cost_coercion 命中（射程零交集双向）
+  ✓ E3 present_bias 攻击句不误触本族
+  ✓ E4 本族攻击句不被 present_bias 命中
+  ✓ E5 adverse_selection 攻击句（保险域）不误触本族
+  ✓ E6 本族良性句不被 adverse_selection 误判
+
+结果: 37 通过, 0 失败

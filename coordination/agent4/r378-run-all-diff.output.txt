@@ -1,0 +1,14 @@
+{
+ "base": {
+  "pass": 37576,
+  "fail": 281,
+  "files": 69
+ },
+ "cur": {
+  "pass": 37654,
+  "fail": 281,
+  "files": 69
+ },
+ "newFailures": [],
+ "recovered": []
+}

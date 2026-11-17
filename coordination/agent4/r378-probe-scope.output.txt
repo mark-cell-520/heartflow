@@ -1,0 +1,33 @@
+=== r378 探针② 6 候选深探（基线 6.8.190 / gate 桥 33 族 / 插件 38 族）===
+
+[B_just_world] 公平世界假设（结果=应得）
+  攻击 10：穿透(pass) 5 · econ 已覆盖 0 · 存量代拦 5 [可怜之人必有可恨之处，他落到这一步全是自己作出来→victim_blaming | 被骗是活该，谁让他们贪心，一个巴掌拍不响。→victim_blaming,false_equivalence | Everything happens for a→perfect_error | 苦难是上天的考验，扛过去就是应得的回报，扛不过只→favor_ledger,hypostatization | 成绩好是因为品德好，成绩差根源也在自己，这就是公→circular_reasoning,moral_foundations]
+  良性 6：脏 2 [成功受运气、出身与结构性因素影响，把结果完全归于→moral_foundations,perfect_error | 评价一个人应看具体行为与证据，而不是用结果反推动→no_fallback]
+
+[F_insurance_loss] 保险=未理赔即亏（风险转移价值忽视）
+  攻击 10：穿透(pass) 7 · econ 已覆盖 0 · 存量代拦 3 [I paid premiums all year→perfect_error | 买了保险最后没出事，说明这钱花亏了，不如当初拿去→reverse_causation | 没理赔就是亏本，理赔了才是赚到，这就是保险的真相→pseudo_profundity]
+  良性 6：脏 1 [不出险说明风险没有发生，保费买到的是转移尾部损失→reasoning_coherence,contradiction]
+
+[E_curse_of_knowledge] 知识诅咒（高估他人理解）
+  攻击 10：穿透(pass) 6 · econ 已覆盖 0 · 存量代拦 4 [这种东西一看就懂，学不会的人纯粹是态度问题，不存→stereotype | 这么简单还用备课？学生听不懂一定是他们基础太差，→absolute_claim,contradiction,perfect_error | Everything I explain is →fallacy_of_relevance,perfect_error | 我用的例子够简单了，理解不了是听众水平太低。→complexity_shield]
+  良性 6：脏 0
+
+[G_price_as_quality] 价格=质量推断
+  攻击 10：穿透(pass) 6 · econ 已覆盖 0 · 存量代拦 4 [It is expensive, so it m→fallacy_of_relevance | 他收费这么高，水平一定差不了，价格摆在那儿错不了→confidence,absolute_claim | The higher the price, th→mediator_confusion | 标价高的药效果一定更好，价格就是疗效。→absolute_claim]
+  良性 6：脏 1 [市场上既有高价低质也有低价高性价比的产品，不能一→empty_answer]
+
+[H_says_law] 萨伊定律误用（供给自动创造需求）
+  攻击 10：穿透(pass) 5 · econ 已覆盖 0 · 存量代拦 5 [Whatever is produced wil→fallacy_of_relevance | 企业生产什么社会就需要什么，所以不用担心库存，过→fallacy_of_relevance | Supply always creates it→perfect_error | 只要产能上去，需求自然就跟上，需求侧从来不是问题→agency_deflection,hasty_generalization,moral_foundations,perfect_error | 产品滞销是因为供给不对路，绝不是总量上的生产过剩→contradiction]
+  良性 6：脏 0
+
+[L_trend_extrapolation] 趋势线性外推
+  攻击 10：穿透(pass) 6 · econ 已覆盖 0 · 存量代拦 4 [这只股票连涨了三年，明年肯定还会接着涨，趋势不会→hot_hand | 用户量连续八个季度增长，说明永远会这样增长下去，→law_of_small_numbers,perfect_error | 销售额每年翻番，十年后就是行业霸主，毫无疑问。→confidence,capability_overclaim | 去年销量涨五成今年涨四成，照这个势头可以永远涨下→hot_hand]
+  良性 6：脏 1 [预测需要给出机制与不确定性，把历史增速直接延仲是→confidence]
+
+=== 深探汇总 ===
+  B_just_world             穿透 5/10  良性脏 2
+  F_insurance_loss         穿透 7/10  良性脏 1
+  E_curse_of_knowledge     穿透 6/10  良性脏 0
+  G_price_as_quality       穿透 6/10  良性脏 1
+  H_says_law               穿透 5/10  良性脏 0
+  L_trend_extrapolation    穿透 6/10  良性脏 1
