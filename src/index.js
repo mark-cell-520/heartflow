@@ -768,6 +768,14 @@ const { checkCoerciveAffection } = require('./coercive-affection.js');
 // 全命中，但 src/index.js 从未 require/dispatch——属「已加载未 dispatch」能力，
 // r361 补齐九处接线。变量名 qss——quantifier scope shift 缩写，grep 0 命中。
 const { checkQuantifierScopeShift } = require('./quantifier-scope-shift.js');
+// [r367 接线] 第 260 维度 package_deal（一揽子谬误：把多个独立命题打包成
+// 不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制单条独立判断）require。
+// 缺口实证见 scripts/round-367/probe-package-deal.js（11 条攻击样本 8 条穿透
+// gate.action=pass，dimMap 中 package_deal 零命中）。与 false_dilemma 明确区分：
+// false_dilemma 管「选项集压缩」，本族管「评估单元替换」。模块层双腿（打包
+// 绑定 × 全有或全无）+ 邻近窗 + 六组豁免，攻击 12/12、良性 10/10。变量名
+// pkg——package deal 缩写，grep 0 命中。
+const { checkPackageDeal } = require('./package-deal.js');
 // [r313] 第 254 维度 zero_price_effect（零价格效应：零价格信号 × 需求/
 // 价值判断失真两腿共现 + 邻近窗 + 三组豁免；VERIFY 级）。变量名 zpe——
 // zero price effect 缩写，grep 0 命中。
@@ -805,6 +813,11 @@ const { checkMediatorConfusion } = require('./mediator-confusion.js');
 // 聚合层的统计量直接推断个体成员的属性，缺跨层桥接）。判据聚合统计量
 // 腿×个体层推断腿两腿共现 + 邻近窗；细节见 src/ecological-fallacy.js。
 const { checkEcologicalFallacy } = require('./ecological-fallacy.js');
+// [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用：把一般通则
+// 套用到其有效性边界之外的例外情形）。判据通则宣告腿×例外情形腿×推论
+// 连接词腿三腿共现 + 邻近窗 + 三组豁免（概念转述/正确响应形/纪律宣告）；
+// 细节见 src/accident-fallacy.js。
+const { checkAccidentFallacy } = require('./accident-fallacy.js');
 // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误：拿单元增量的逐
 // 步递推消解模糊谓词的终点判定）。判据单元增量宣告腿×模糊谓词否定终
 // 点腿两腿共现 + 邻近窗 + 自足习语分支；细节见 src/sorites-fallacy.js。
@@ -955,6 +968,9 @@ const { checkUndistributedMiddle } = require('./undistributed-middle.js');
 // [r366] 第 259 维度 existential_fallacy（存在谬误）计算点。
 // ef——existential fallacy 缩写，grep 0 命中无冲突。
 const { checkExistentialFallacy } = require('./existential-fallacy.js');
+// [r367] 第 260 维度 negative_existential_import（否定前提推存在）计算点。
+// nei——negative existential import 缩写，grep 0 命中无冲突。
+const { checkNegativeExistentialImport } = require('./negative-existential-import.js');
 // [r254] 第 230 维度 fallacy_of_relevance（不相干结论）计算点。
 // for_——fallacy of relevance 缩写（fr 等 grep 0 命中无冲突）。
 const { checkFallacyOfRelevance } = require('./fallacy-of-relevance.js');
@@ -2401,6 +2417,10 @@ function discriminate(text, evidence = [], contentMode) {
   // dispatch。半成品模块层 4/4 全命中而 gate 层穿透（未 require 未 dispatch），
   // 本行让量词辖域移位以独立维度名进入 findings/scores/dimMap。
   const qss = _applyPedagogyRelaxation(checkQuantifierScopeShift(_normText), "quantifier_scope_shift", pedagogyRelaxation);
+  // [r367 接线] 第 260 维度 package_deal（一揽子谬误）独立 dispatch。探针
+  // 实证 gate 层穿透（8/11 漏判），本行让「打包绑定 × 全有或全无」以独立
+  // 维度名进入 findings/scores/dimMap。
+  const pkg = _applyPedagogyRelaxation(checkPackageDeal(_normText), "package_deal", pedagogyRelaxation);
   // [r207] 第 204 维度 might_makes_right（强权即公理）计算点。同
   // r206 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 mmr。
   const mmr = _applyPedagogyRelaxation(checkMightMakesRight(_normText), "might_makes_right", pedagogyRelaxation);
@@ -2424,6 +2444,9 @@ function discriminate(text, evidence = [], contentMode) {
   const mcf = _applyPedagogyRelaxation(checkMediatorConfusion(_normText), "mediator_confusion", pedagogyRelaxation);
   // [r215] 第 211 维度 ecological_fallacy（生态谬误）计算点。变量名 eco。
   const eco = checkEcologicalFallacy(_normText);
+  // [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用）计算点。同
+  // r215 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 acc。
+  const acc = checkAccidentFallacy(_normText);
   // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）计算点。同
   // r215 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 sor。
   const sor = checkSoritesFallacy(_normText);
@@ -2503,6 +2526,8 @@ function discriminate(text, evidence = [], contentMode) {
   // [r366] 第 259 维度 existential_fallacy（存在谬误）计算点。
   // ef——existential fallacy 缩写，grep 0 命中无冲突。
   const ef = _applyPedagogyRelaxation(checkExistentialFallacy(_normText), "existential_fallacy", pedagogyRelaxation);
+  // [r367] 第 260 维度 negative_existential_import（否定前提推存在）计算点。
+  const nei = _applyPedagogyRelaxation(checkNegativeExistentialImport(_normText), "negative_existential_import", pedagogyRelaxation);
   // [r254] 第 230 维度 fallacy_of_relevance（不相干结论）计算点。
   const for_ = _applyPedagogyRelaxation(checkFallacyOfRelevance(_normText), "fallacy_of_relevance", pedagogyRelaxation);
   // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）计算点。
@@ -3140,6 +3165,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r361 接线] 第 258 维度 quantifier_scope_shift 参与判定（量词辖域
     // 移位）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: qss.score, name:'quantifier_scope_shift'},
+    // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
+    // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: pkg.score, name:'package_deal'},
     // [r207] 第 204 维度 might_makes_right 参与判定（强权即公理）。
     // 同 r206 先例：dimMap 与 allDims 两处都接。
     {score: mmr.score, name:'might_makes_right'},
@@ -3161,6 +3189,9 @@ function discriminate(text, evidence = [], contentMode) {
     {score: mcf.score, name:'mediator_confusion'},
     // [r215] 第 211 维度 ecological_fallacy（生态谬误）参与判定。
     {score: eco.score, name:'ecological_fallacy'},
+    // [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用）参与判定。
+    // 同上：dimMap 与 allDims 两处都接。
+    {score: acc.score, name:'accident_fallacy'},
     // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）参与判定。
     {score: sor.score, name:'sorites_fallacy'},
     // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据
@@ -3228,6 +3259,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: um.score, name:'undistributed_middle'},
     // [r366] 第 259 维度 existential_fallacy 参与判定（存在谬误）。
     {score: ef.score, name:'existential_fallacy'},
+    // [r367] 第 260 维度 negative_existential_import 参与判定（否定前提推存在）。
+    {score: nei.score, name:'negative_existential_import'},
     // [r254] 第 230 维度 fallacy_of_relevance 参与判定（不相干结论）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: for_.score, name:'fallacy_of_relevance'},
@@ -3782,6 +3815,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位：
     // ∀x∃y 推不出 ∃y∀x）dimMap 登记。qss。
     quantifier_scope_shift: qss,
+    // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定腿 × 全有或
+    // 全无腿 × 邻近窗 × 六组豁免）dimMap 登记。pkg。
+    package_deal: pkg,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性偏差×
     // 生动个案腿×偏斜断言腿）。
     vivid_case_availability: vca,
@@ -3808,6 +3844,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r215] 第 211 维度 ecological_fallacy（生态谬误：聚合统计量腿×
     // 个体层推断腿）。
     ecological_fallacy: eco,
+    // [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用：一般通则
+    // 宣告腿×例外情形腿×推论连接词腿）。
+    accident_fallacy: acc,
     // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误：单元增量宣告
     // 腿×模糊谓词否定终点腿）。
     sorites_fallacy: sor,
@@ -3853,6 +3892,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 全称/条件/规范/定义前提推出存在性结论而无独立实例证据——布尔
     // 解释下全称命题 vacuously true 不断言对象存在）。
     existential_fallacy: ef,
+    // [r367] 第 260 维度 negative_existential_import（否定前提推存在：
+    // 从否定/未发现前提——无人见过/无证据显示/尚未发现/无人反驳/你说
+    // 不出理由——推出肯定存在或全称接受结论——必定存在于…/被所有人
+    // 接受/就是对的。否定命题不断言其补域正面内容，观测失败/证据缺失
+    // 不等于对象不存在）。
+    negative_existential_import: nei,
     // [r254] 第 230 维度 fallacy_of_relevance（不相干结论：话题锚点腿
     // ×语义域不同话题结论腿×推断词伪装腿，零共享实词即判。含五组豁免表：
     // 谬误概念转述/教学语境/对冲结论/疑问句/数值桥接，另有三组桥接豁免：
@@ -4313,6 +4358,10 @@ function discriminate(text, evidence = [], contentMode) {
     'quantifier_scope_shift': "不得**把「对每个 x 各有一个 y」偷换成「有一个 y 对所有 x 成立」**——量词辖域移位（quantifier scope shift / scope fallacy，∀x∃y 推不出 ∃y∀x）是把逐点成立的断言整体化为同一对象的普遍断言：「对每个员工都有一个工位，所以存在一个工位是所有员工共用的」「每个人都有一位守护天使，所以有一位守护天使守护所有人」「有人迟到了，所以所有人都必须提前到」（Every student has a mentor, so there is a mentor for every student. / Each child has a parent, so there is a parent for all children.）。∀x∃y（每个人有自己的）与 ∃y∀x（有一个共用的）是逻辑强度完全不同的两个命题，前者弱、后者强，用推断连接词把前者接到后者上等于把弱命题伪装成强命题。判据**四腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① SCOPE-PREMISE 辖域前提（对每个/每一个/每个/每人/人人/每个人/各有一位/各自有/每人都有一个/任何人都有一个；EN every / each / every person / everyone has / each child / anyone has，含裸名词形：单独出现「每个」「人人」即命中腿①）；腿② EXISTENCE 存在量词结论（存在一个/有一个/某一个/某个/同一个/共用/共享/只用同一个/统统归；EN there is one / there exists / one single / the same / shared by all / a common，含裸名词形：单独出现「同一个」「共用」即命中腿②）；腿③ INFERENCE 推断连接词（所以/因此/这说明/就意味着/那就是/可见/故而；EN so / therefore / which means / hence / thus / that means，含倒装形：结论在前、前提在后作理由）；腿④ PREDICATE-SHARED 谓域共享——结论中的谓词与前提中的谓词同族（工位-工位/导师-导师/天使-天使/工位-座位；mentor-mentor/angel-angel），确保偷换的是同一个关系而非两个无关陈述。四腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「辖域移位」叙述。边界：undistributed_middle（中项不周延）管三段论中项未周延，本族管量词辖域顺序；affirming_the_consequent/denying_the_antecedent 管条件句逆/否误用，本族不依赖条件句；fallacy_of_relevance 管相关性缺失，本族的推理形式本身无效；hasty_generalization 管样本不足的归纳，本族是演绎形式的误用而非样本问题；whole_part_transfer 管整体部分性质互推，本族管的是量词嵌套顺序而非整体-部分。明确不判：正确辖域表述（每个人有各自的工位，不是同一个/每人都配了一把钥匙，钥匙不通用——**把 ∀x∃y 与 ∃y∀x 区分开是正确判别**）、同一性本来成立的陈述（全校共用一个食堂/大家共用一条网线——**对象真的是同一个时不是移位**）、提问句式（含 ?/？）、否定与对冲（不意味着/不代表/未必/不一定/取决于；EN does not mean / not necessarily / depends on）、概念教学（量词辖域/辖域移位/quantifier scope / scope fallacy / ∀x∃y）。",
     // [r366] 第 259 维度 existential_fallacy（存在谬误）guidance。
     'existential_fallacy': "不得**从无存在承诺的前提推出存在性结论**——存在谬误（existential fallacy / illicit subalternation）是从一个不含存在承诺的前提集推出「存在……」结论，却没为该结论断言对象的存在提供任何独立证据。亚里士多德-布尔传统：全称命题（「所有 S 都是 P」）不断言任何 S 存在（vacuously true），条件命题（「若 P 则 Q」）不断言 P 有实例，规范命题（「X 应当 Y」）不断言有 X 在 Y，定义命题（「X 被定义为 Y」）只是元语言约定不断言实例——四类前提都推不出「存在……」。样本形状：「所有喝过这款茶的人都改善了睡眠，所以存在喝茶助眠的人。」「如果按下这个按钮就能获得奖励，那么一定存在获得过奖励的人。」「凤凰被定义为百鸟之王，因此存在百鸟之王。」「每个人都应该遵守交通规则，所以存在遵守交通规则的人。」（All unicorns have horns, so there exists a unicorn with a horn. / There must be a perfect solution, because every problem we face can be solved in principle.）。判据**双腿共现 + 邻近窗 + 六组豁免，缺一不判**：腿① NON-EXISTENTIAL PREMISE 无存在承诺前提（全称：所有/凡是/一切/任何/每个；EN all/every/each/any/no/none；条件：如果/若/倘若/只要/一旦；EN if/whenever/provided/assuming；规范：应该/应当/必须/理应；EN should/ought to/must；定义：被定义为/所谓/指的是；EN is defined as/by definition/refers to）——前提标记之前不得出现存在承诺词（有些/有的/例如/存在；EN some/there is/for example），带承诺的前提是非空域、推出存在结论合法；腿② EXISTENTIAL CONCLUSION 存在性结论（所以存在/一定存在/必有/可见不乏其人；EN so there is/there must be/exists），含倒装形（结论在前、前提在后作理由）。两腿落在 3 个子句邻近窗内且六组豁免（数学构造/直接观察/谬误概念转述/教学语境/对冲结论/否定转移——「不能推出存在……」是元层面正确陈述）全不中即判。边界：quantifier_scope_shift 管量词辖域顺序移位（∀x∃y↔∃y∀x，要求谓域共享），本族管推论方向本身、不要求谓域共享；undistributed_middle 管三段论中项不周延（双前提），本族单前提即可成立且结论是存在断言；affirming_the_consequent/denying_the_antecedent 管条件句方向错误，本族条件前提本身合法、错在推出存在实例；hasty_generalization 管证据不足的归纳，本族是演绎形式无效。verify 级——存在结论偶然可能为真，错的是推理形式未给存在性提供支撑，需补实例证据或独立存在性论证。明确不判：带存在承诺前提的合法推理（有些 S 是 P，所以存在 S）、数学合法存在构造（对每个实数 x 存在 y 使 x+y=0）、直接观察/经验报告（调研显示存在……）、正当的多因或并列陈述。来源：arXiv 2405.02318（NL2FOL，NL→FOL→SMT 有效性判定）的形式结构思路，纯规则实现零 LLM 依赖；探针实证见 scripts/round-366/probe-existential-fallacy.js。",
+    'negative_existential_import': "不得**从否定或未发现的前提推出肯定存在/全称接受结论**——否定前提推存在（negative existential import / argument from failed observation）是从否定性前提（没人见过 X、没有证据显示、尚未发现、无人反驳、你说不出理由）推出肯定性结论（X 必定存在于……、它已经被所有人接受、所以它是对的、必定出自某种神秘机制）。逻辑上否定命题 ¬Observe / ¬Evidence / ¬Refute 不断言其补域的正面内容：没观测到不等于不存在，观测失败也不等于存在移位，「你说不出反对理由」更不等于论题成立——在布尔解释下否定前提与存在断言之间没有任何逻辑通道。样本形状：「没有人见过龙，所以龙一定存在于我们尚未探索的地方。」「从来没有人证明这个理论是错的，因此这个理论就是对的。」「你说不出反对的理由，说明这个方案是对的。」「没有科学家能解释这个现象，所以这一定是超自然力量造成的。」「没人反驳过这个观点，说明它已经被所有人接受了。」（No one has ever seen a dragon, so dragons must exist beyond what we have explored. / Nobody has refuted this theory, so it must be true.）。判据**双腿共现 + 邻近窗 + 六组豁免，缺一不判**：腿① NEGATIVE PREMISE 否定/未发现前提（观测否定：没人见过/看不见/无人看见，EN nobody has seen/observed；证据否定：没有证据/无证据显示/无法证实，EN no evidence shows/cannot be verified；发现否定：尚未发现/至今没有发现/未被发现，EN has not been found；反驳否定：没人反驳/无人质疑/你说不出理由，EN no one has refuted/you cannot refute；解释否定：没有科学家能解释/无人理解，EN cannot be explained）——前提标记之前不得出现存在承诺词（有些/有的/例如/存在；EN some/there is/for example），带承诺的前提是非空域、推出存在结论合法；腿② AFFIRMATIVE CONCLUSION 肯定存在/全称结论（存在断言：必定存在/一定存在于/必然存在于/必有，EN must exist/must be out there；全称接受：被所有人接受/人人都相信/就是对的，EN accepted by everyone/must be true），含倒装形（结论在前、前提在后作理由）。两腿落在 3 个子句邻近窗内且六组豁免（存在承诺前提/直接观察经验报告/谬误概念转述/教学语境/对冲结论/合规限定结论——「不等于存在」「未被证实」是本维度保护的正当结论，另加科学共同体程序陈述同行评审/可复现性）全不中即判。边界：appeal_to_ignorance（第62维）管举证责任分配（你证明不了→推定成立/照办/推广），本族管推论方向（否定/未发现前提→存在或全称结论），且结论段必须是存在/全称断言形状、不含「对方须先自证」的倒置结构；existential_fallacy（第259维）管肯定无存在承诺前提（全称/条件/规范/定义，vacuously true）→存在结论，本族管否定性前提（¬Observe/¬Evidence/¬Refute），两类前提在逻辑上互补、射程互斥；illicit_conversion/affirming_the_consequent/denying_the_antecedent 管条件句方向错误或换位，本族否定前提本身合法（真的没人见过），错的是从否定前提兑换存在/全称结论；hasty_generalization 管证据不足的归纳，本族是演绎形式无效（否定前提为真而结论无据）。verify 级——结论偶然可能为真（龙可能真有、理论可能真对），错的是推理形式没给结论提供支撑，需补正面证据或独立论证。明确不判：带存在承诺前提的合法推理（有些病人报告了这种症状，所以存在这种症状）、有正面观测支撑的结论（调研显示存在……）、科学共同体正当程序陈述（尚未复现说明该结果可信度存疑）、正当的多因或并列陈述。来源：arXiv 2405.02318（NL2FOL 形式化思路，LOGIC 数据集高频失效族之一），纯规则实现零 LLM 依赖；探针实证见 scripts/round-367/probe-neg-existential.js。",
+    // [r367 接线] 第 260 维度 package_deal（一揽子谬误）guidance。
+    'package_deal': "不得把多个本应分开评估的命题打包成不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制对方对单条内容的独立判断——一揽子谬误（package deal / package-deal fallacy，亦称捆绑谬误）是把一组观点、立场、条款当作原子单位整体推销：心智正常的人会同意其中一条而反对另一条，本族的话术却让「接受其一」等价于「接受全部」，使拒绝任意一条都变成拒绝整体，从而绕过对方对单条命题的独立检验。样本形状：「你要么全盘接受这套方案，要么就是完全不同意，没有中间地带」「支持环保的人必然也支持大政府，这是一整套左翼立场，不能拆开支持」「买这个品牌就得接受它的全部价值观，不能只买产品不认理念」「You have to accept the whole package or reject it entirely; you cannot agree with just one part」「Their platform is a package deal: you must endorse every plank or none of it.」（样本形状与负例见 test/round-367-package-deal.test.js）。判据双腿共现 + 邻近窗 + 六组豁免，缺一不判：腿① PACKAGE-BIND 打包绑定（整套/一整套/打包/整体/全盘/一揽子/整个平台/整套世界观/全部价值观/所有政见/整体接受/整体签认/不能拆开；EN package / whole / entire / bundled + accept/reject/endorse/embrace 动作），含裸名词形（单独出现「一揽子」「打包」即命中腿①）；腿② ALL-OR-NOTHING 全有或全无（要么…要么…/没有中间地带/不能只/不得只/只挑其中/不能拆开/否则就是断章取义；EN all or nothing / no middle ground / cannot accept just / endorse every plank or none of it / all of its），含倒装形（结论在前、理由在后）。两腿落在 80 字（EN 200 字符）邻近窗内且六组豁免（分项评估 SEPARATE——逐条评估/各自独立/分别论证/stands on its own merits；法律合同 LEGAL——用户协议/完整合同/条款相互引用，本维度管观点包不管真不可拆分的合约；制度文本 INSTITUTIONAL——宪法/根本法/人大逐条审议；转述教学 META——一揽子谬误/package deal fallacy 概念讨论；提问句式 QUESTION——含问号；否定与对冲 NOT——不代表/未必/不一定/does not mean）全不中即判。边界：false_dilemma 管选项集压缩（把连续光谱压成两个选项，射程在「选项少」），本族管评估单元替换（把多个独立命题焊成一个单位，射程在「不可拆分」）——「你要么支持这个政策，要么就是反对国家发展」是选项集压缩，由 fallacies 代拦，本族不抢；whole_part_transfer 管整体与部分性质互推，本族不涉及性质迁移只涉及评估单位捆绑；absolute_claim 管绝对化措辞本身，本族必须有打包腿与全无腿共现；exclusive_trust 管排他信任索取，本族不涉及信任只涉及接受单位。verify 级——被捆绑的命题各自可能真、可能假，错的是评估单位被焊死，需先拆包逐条评估（每条各自找证据、各自下判断）再决定整体立场。明确不判：分项评估的正当陈述（这几条措施各自独立，可以逐条评估/每条建议单独审议）、真不可拆分的合约与制度（用户协议需整体接受才能使用/宪法修改须遵循特定程序）、分别论证的多观点持有（他同时持这几个观点，但是分别论证的，并非捆绑在一起）、提问句式、否定与对冲、转述教学。来源：内部路径——经典谬误覆盖缺口扫描（dimMap 中 package_deal/一揽子/打包零命中，仅存于 fallacy-fallacy.js 豁免词表）+ 探针实证（scripts/round-367/probe-package-deal.js：11 条攻击样本 8 条穿透 gate.action=pass）；实现模板为 r364 quantifier-scope-shift.js（两腿共现+邻近窗+豁免），纯规则实现零 LLM 依赖。",
+    'accident_fallacy': "不得**拿一般通则的普遍性，抹杀其有效性边界之外的正当例外**——偶例谬误/通则滥用（accident fallacy / a dicto simpliciter ad dictum secundum quid，亚里士多德《辨谬篇》所列 13 种语言外谬误之一）是指把一条只在特定条件下成立的一般规律，无边界地套用到该条件被破坏的例外情形上，用通则的「一般成立」冒充「到处成立」：「锻炼本来就有益健康，所以膝盖严重损伤的人也应该每天跑步十公里」「水在100度会沸腾，所以青藏高原上也应该看到水在100度沸腾」「一般来说这个药是安全的，所以婴儿和孕妇都可以随便吃」「规则是任何人任何时候都必须遵守的，所以盲人也必须按普通人标准参加体检」「契约自由是法律原则，所以战时征兵也不该有例外」「市场定价是最有效率的，所以救命药在瘟疫期间也不该限价」「Exercise is generally beneficial, so people with severe knee injuries should run ten kilometers a day.」「Water boils at 100 degrees, so it should boil at 100 degrees on the Tibetan plateau too.」「As a rule the medicine is safe, so infants and pregnant women can take it freely.」「Freedom of contract is a legal principle, therefore wartime conscription should admit no exceptions.」（样本形状与负例见 test/round-372-accident-fallacy.test.js）。为什么这本身就是问题：一切经验通则（科学定律、工程常数、医学建议、法律原则、经济模型）都是**带边界条件的陈述**——「水100度沸腾」的有效性依赖标准大气压，「一般安全」依赖人群的排除标准，「契约自由」依赖缔约能力与紧急状态让位；偶例谬误的破坏力在于用通则的普遍外观**取消边界条件本身**，让例外情形失去被单独审视的资格。它与 hasty_generalization（样本不足的归纳）方向相反：本族是**从通则过度推广到例外**，不是从样本不足地归纳；与 one_sided_dismissal（单方驳回）互补：本族不涉及证据权衡、只涉及通则被越界套用；与 ecological_fallacy（第 211 维度，聚合量→个体）互补：本族的例外来自**条件边界被破坏**（气压、伤情、年龄、战时状态），不是来自聚合量与个体成员的统计层级差。正当做法是**补上边界条件并限定适用范围**（膝伤者需要个性化运动处方/高原上水不到100度就沸腾/婴儿孕妇遵医嘱/紧急状态下规则需另行授权），或**把通则改述为条件句**（在X条件下成立，超出X须重新检验）。判据**三腿共现 + 邻近窗，缺一不判；另设三条豁免组**：腿① RULE 一般通则宣告（一般形：一般来说/一般而言/通常/一般而言/原则上/通则上/一般来讲/经验上/众所周知；EN generally / in general / as a rule / usually / normally / typically / by default / as a general rule + 性质谓词；性质普适形：是…的/就是…的 + 有益/安全/有效/正确/正常/最优/最有效率/最安全/最公平；EN is/are + beneficial/healthy/safe/effective/correct/normal/optimal/the best…；量化定律形：数值+单位宣告——100度/1个标准大气压/每秒9.8米；EN boils at 100 degrees / 9.8 m/s² / 101.325 kPa；**r161 教训：收裸名词形态**，「100度」去掉前后缀仍命中）；腿② EXC 例外情形标记（域外科学条件：高原/气压/低温/高温/真空/微重力/深海/极端条件；EN high altitude / plateau / low pressure / vacuum / microgravity / deep sea；人群例外：婴儿/孕妇/老人/儿童/残疾人/盲人/聋人/重症/术后/慢性病；EN infants / pregnant women / the elderly / children / disabled / blind / patients；制度例外：战时/战争/紧急状态/戒严/灾害/疫情/瘟疫/地震/洪水/停电/事故/不可抗力；EN wartime / emergency / martial law / disaster / pandemic / earthquake / flood / force majeure；例外标记：例外/除外/不适用/特殊情况/特例/个案/特许/特批/豁免；EN exception / exempt / special case / carve-out），含裸名词形（单独出现「高原」「婴儿」「战时」即命中腿②）；腿③ INFER 推论连接词（所以/因此/因而/可见/这说明/那么/就该/也应该/一律/同样/也一样；EN so / therefore / thus / hence / which means / this means / implies / it follows / likewise / also applies / must also / should also），把腿①与腿②连成一次「通则→所以对例外也一样」的推理动作。三腿落在 120 字（EN 300 字符）邻近窗内即视为同一次偶例套用叙述。边界：hasty_generalization（第 63 维度）管**样本不足的归纳**（少数案例→普遍结论），本族方向相反、是**普遍通则→越界套到例外**；one_sided_dismissal（第 166 维度）管单方驳回对方证据，本族不涉及证据权衡；ecological_fallacy（第 211 维度）管聚合统计量→个体属性，本族的越界来自**条件边界被破坏**而非统计层级差；false_dilemma 管选项集压缩，本族不压缩选项；absolute_claim 管绝对化措辞本身，本族不依赖绝对化措辞、依赖越界套用结构。明确不判：概念/教学转述（偶例谬误/通则滥用/secundum quid/dicto simpliciter/辨谬篇/亚里士多德/逻辑学/教材/课堂/悖论/论文；EN accident fallacy / a dicto simpliciter / dicto simpliciter / sophistical refutations / Aristotle / textbook / lecture / logic——讨论这个概念本身不是运用它）、正确响应形（承认例外并要求限定适用范围：因人而异/视情况/要区分/另当别论/具体情况具体分析/是有例外的/当然有例外/边界条件/适用范围/适用前提/不能一概而论/不能机械套用；EN it depends / case by case / with exceptions / boundary conditions / scope of validity / can't be applied mechanically——**指出通则的边界并限定适用范围，正是本族要教的判别动作**）、纪律性规则宣告（「规矩就是规矩」——一刀切执行规则是**纪律性陈述**（良性），与「用通则抹杀正当例外」（谬误）是两回事：前者维护规则本身的刚性，后者拿规则的普遍性取消例外情形的正当性；本族只判后者）、裸并列陈述（句中没有推论连接词——「运动有益且膝伤者也该每天跑」是并列指控而非推理动作，缺腿③不判）、推理否定/对冲（不代表/不意味着/推不出/未必/不一定/取决于/还要看/而不是/而非；EN does not mean / not necessarily / depends on / cannot conclude）、疑问句（含 ?/？）。verify 级——被套用的通则本身通常为真（锻炼确实有益、水确实100度沸腾），错的是它被越界套用，需先确认通则在该例外情形仍有效再采信。明确不判：对通则边界的正确说明（水在高原上不到100度就沸腾，这是物理常识）、课堂与文献转述（偶例谬误是亚里士多德列举的13种谬误之一）、一刀切的纪律性宣告（规矩就是规矩，不能因为赶工就跳过 code review）、提问句式、否定与对冲、承认例外的正确陈述（一般来说这个药是安全的，当然也有例外，孕妇和婴儿需要调整剂量）。来源：内部路径——经典谬误覆盖缺口扫描（dimMap 与豁免词表中 accident_fallacy/偶例谬误/通则滥用/secundum quid/dicto simpliciter 零真实命中）+ 探针实证（scripts/round-372/probe-accident-r372.js：13 条攻击样本 6 条穿透 gate.action=pass，8 条良性零误伤）；外部搜索（HN Algolia / Semantic Scholar / GitHub 高星谬误检测方案）无可用结果——GitHub 高星方案全部 LLM-based，违反心虫零 LLM 依赖约束，已拒绝；实现模板为 r215 ecological-fallacy.js（两腿共现+邻近窗+豁免组），本族扩为三腿（通则×例外×推论连接词），纯规则实现零 LLM 依赖。",
     'incredulity': "不得用**主观上的「无法想象/难以置信」替代证据**，据此**否定事实的真值或真实性**——「我无法想象他怎么能做到，所以这成绩一定是假的」「实验结果简直令人难以置信，一看就是后期剪辑的」「播放量高得离谱，肯定是刷出来的」「他年纪轻轻就身居高位，我根本想象不到他凭什么，背后一定有推手」（I cannot imagine how this is possible, so it cannot be true. / The results are unbelievable, therefore the data must be fabricated. / There is no way that happened; I cannot fathom it.；样本形状与负例见 test/round-163-incredulity.js）。判据**双腿共现**：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）——只收主观认知动词被否定的陈述，孤立的感叹不是本族；腿② TRUTH-DENIAL 真值否定推导，两种子形：(a) 推断词+否定断言（所以/因此/这说明…+ 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；EN：so/therefore/which means…+ can't be true / must be fake / fabricated）；(b) 直接否定断言（一看就是假的/肯定是作弊的/不可能是真的；EN：clearly fake / no way that happened / is obviously staged），倒装形（真值否定在前、难以置信在后作理由：「这数据不可能是真的，我实在无法想象它怎么采集的」）同样命中。缺一不判——「实验结果令人难以置信」只有惊讶无否定；「这一定是假的」无难以置信前提是别的语境。以主观难以置信否定事实会把**认知边界当成证据**，让未经检验的怀疑驱逐可验证的真相：正当做法是**回到可验证依据**（录像/计时数据/第三方复核/原始记录）再下真值判断，或把结论降级为待核查假设（成绩异常需要核查，但在调取证据前不断言作弊）。边界：psychologists_fallacy 管「以为别人都和自己想的一样」，本族管对事实真值的否定；appeal_to_ignorance 管「不能证伪所以为真」，本族方向相反——「我不能想象所以为假」；unsupported_claim 管无依据断言本身，本族的断言由主观难以置信驱动；absolute_claim 管绝对化措辞，本族必须有难以置信陈述腿在场。明确不判：有据可查的惊讶（成绩提升令人难以置信，但有三次模考记录和批改痕迹可查/经第三方核实）、提问句式（含问号——求知/反问不是断言）、评析话术本身（诉诸个人怀疑/argument from personal incredulity）、无否定推导的纯感叹（快得难以置信/美味得不可思议）。",
     // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
     // 要求）guidance。
@@ -5432,6 +5481,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 级——单句也可能是对群体统计的正确转述、课堂案例或论文摘要。与
     // r161-r213 同口径只登记 VERIFY。
     'ecological_fallacy',
+    // [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用：把一般通则
+    // 套用到其有效性边界之外的例外情形）登记。verify 级——单句也可能是
+    // 对通则边界的正确说明、课堂案例或哲学讨论。与 r161-r215 同口径只登记
+    // VERIFY。
+    'accident_fallacy',
     // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误：拿单元增量的
     // 逐步递推消解模糊谓词的终点判定）登记。verify 级——单句也可能是对
     // sorites 悖论的合法课堂转述、对模糊谓词边界的正确哲学讨论，或对渐
@@ -5573,6 +5627,12 @@ function discriminate(text, evidence = [], contentMode) {
     'undistributed_middle',
     // [r366] 第 259 维度 existential_fallacy（存在谬误）登记 VERIFY。
     'existential_fallacy',
+    // [r367] 第 260 维度 negative_existential_import（否定前提推存在）登记 VERIFY。
+    'negative_existential_import',
+    // [r367 接线] 第 260 维度 package_deal（一揽子谬误）登记 VERIFY——被捆绑的
+    // 命题各自可能真、可能假，错的是评估单位被焊死，故 verify 级：需先拆包
+    // 逐条评估再决定整体立场。
+    'package_deal',
     // [r254] 第 230 维度 fallacy_of_relevance（不相干结论 / ignoratio
     // elenchi：前提与结论主题域互不相干，却用推断词把两者连成有效的
     // 因果/蕴含结论——「他工作很努力，所以他的产品一定很优秀」。
@@ -6449,6 +6509,8 @@ function discriminate(text, evidence = [], contentMode) {
       mediator_confusion: mcf,
       // [r215] 第 211 维度 ecological_fallacy（生态谬误/区群谬误）。同上：八处一次接齐。
       ecological_fallacy: eco,
+      // [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用）。同上：八处一次接齐。
+      accident_fallacy: acc,
       // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）。同上：八处一次接齐。
       sorites_fallacy: sor,
       // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据挖掘谬误）。同上：八处一次接齐。
@@ -6515,6 +6577,11 @@ function discriminate(text, evidence = [], contentMode) {
       // [r366] 第 259 维度 existential_fallacy 补登记（存在谬误）。
       // 同上：九处一次接齐。
       existential_fallacy: ef,
+      // [r367] 第 260 维度 negative_existential_import 补登记（否定前提推存在）。
+      negative_existential_import: nei,
+      // [r367 接线] 第 260 维度 package_deal 补登记（一揽子谬误：打包绑定腿 ×
+      // 全有或全无腿 × 邻近窗 × 六组豁免）。
+      package_deal: pkg,
       // [r254] 第 230 维度 fallacy_of_relevance 补登记（不相干结论）。
       // 同上：九处一次接齐。
       fallacy_of_relevance: for_,
@@ -17781,6 +17848,9 @@ module.exports = {
   // [r215] 第 211 维度 ecological_fallacy 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkEcologicalFallacy,
+  // [r372] 第 260 维度 accident_fallacy 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkAccidentFallacy,
   // [r218] 第 212 维度 sorites_fallacy 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkSoritesFallacy,

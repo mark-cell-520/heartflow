@@ -1,5 +1,17 @@
-## r369 — econ_reasoning_gate 第 26 子族 paradox_of_thrift 落地（真升级②；节约悖误/合成谬误宏观储蓄形新措辞家族）
+## r370 — r369 收尾闭环 + 本地三线 WIP 固化（negative_existential_import 补腿 98/98 全绿；r367 package_deal / r372 accident_fallacy 产能补提交）
 
+- **背景**：上一轮 cron run 因工具调用上限中断，r369 negative_existential_import 补腿线留了未提交 WIP（引擎 12 处新正则 + r369-legs 单测 12 条失败未清零）。本轮接手收尾，并按宪法「本地独有产能优先固化」把同工作区另两条未提交线一并核实固化。
+- **r369 收尾——单测 12 条清零（98/98）**：
+  - 穿透根因定位：`src/negative-existential-import.js` 结论形容词族缺「可靠的/可行的」形——「提不出反对的说法，这说明该模型是可靠的」腿①命中、腿②不命中（腿②要求强断言词「必定/一定」）。补**裸可靠性/正当性结论族**（推断词 + 是/为 + 可靠的|正确的|正当的|可行的|有效的|可信的|没有问题的），并去重既有正则里的重复词项（可靠的|可靠的 → 可靠的单列）。
+  - 单测自身两个缺陷（均非引擎缺陷）修复：①负例注入原用硬编码数组索引 [13,14,15]，新腿插入后索引错位 → 改为按 `String(re)` 内容特征定位（`findLegIdx`，找不到直接 throw，测试自报失败而非假绿）；②注入用 `M[listName] = filter(...)` 赋新数组给 exports 属性——`checkNegativeExistentialImport` 闭包引用的是模块内原 const 数组，赋值 exports 属性对函数行为零影响（「命中 18→18」恒真假绿）→ 改为**原地 splice**（与 r367 存量单测同口径）。
+  - 冗余腿族注入契约修正：腿① EN 复现否定是 idx 9+13 两条冗余腿、腿② EN it must be 是两条冗余腿——单条置空另一条兜底，攻击不掉命中报假失败。改为**族级注入**（匹配同一特征的全部条目一起置空）；certainly 族专属形态样本补 `This effect has never been reproduced, therefore it is certainly real.`（G4_ATTACK 里无 certainly 形样本，都被 must/genuine 腿兜底）。
+- **r367 产能固化**：`src/package-deal.js`（一揽子谬误：多独立命题打包成不可拆分整体，「要么全盘接受要么全盘拒绝」压制单条独立判断；双腿 + 邻近窗 + 六组豁免，攻击 12/12、良性 10/10）+ index.js 接线 + `test/round-367-package-deal.test.js`（9 passed/0）+ scripts/round-367/ 16 个探针。
+- **r372 产能固化**：`src/accident-fallacy.js`（偶例谬误/通则滥用：一般通则套用到有效性边界外的例外情形；通则宣告腿×例外情形腿×推论连接词腿三腿共现 + 三组豁免）+ index.js 接线 + `test/round-372-accident-fallacy.test.js`（50 passed/0）。
+- **存量回归核实**：r367 nei 13/13、r329 sycophancy 插件（EN 14→15 族计数同步）14/14、四门禁全绿同基线（16/0、20/20@262、24/0、52/52 + 302/326）。
+- **缺口探针**（scripts/round-369/probe-nei-gap.js 改后实测）：攻击 **12/12** 命中（改前 1/12），良性 **5/5** 零本维度误伤。
+- **文档同步**：AGENTS.md / README.md / SKILL.md 259→262 dimensions（negative_existential_import / package_deal / accident_fallacy 三维度入 Verify 列举），VERSION 6.8.189 → 6.8.190。
+
+## r369 — econ_reasoning_gate 第 26 子族 paradox_of_thrift 落地（真升级②；节约悖误/合成谬误宏观储蓄形新措辞家族）
 - **背景**：r368 同池落选候选复测定拨——probe-r369.js（v6.8.189 pristine 基线）两候选对比：**paradox_of_thrift 攻击穿透 3/7、良性非 pass 0/5**；对手 lump_of_labor 穿透 3/11 但良性误伤 4/7（存量维度已把「技术创造岗位多于消灭」「lump of labor 是谬误」等良性句 rewrite/verify，边界脏）。paradox_of_thrift 良性边界全净且存量维度对组合谬误零覆盖，定拨落地。海外扫描空返（arXiv parse-fail、GitHub repos 0、S2 限流），按既有形态自建。
 - **实现**：新建 `src/paradox-of-thrift.js`（345 行）——节约悖误/合成谬误宏观储蓄形（paradox of thrift / composition fallacy in aggregate saving）：先用「储蓄是美德」取得正当性，再把个体美德直接加总为「全社会越节俭经济越繁荣/总需求不受影响」，免掉「减少消费会压缩总需求」的宏观机制。判据**三腿近距共现**（ZH 70 字 / EN 240 字符），缺一不判：腿① THRIFT_NOUN_ZH/EN 节俭/储蓄概念（储蓄/节俭/节约/存钱/舍不得花/削减消费；saving(s)/thrift/frugal/frugality/economical/hoard(s|ing) cash|money/reduces? consumption/consume less/cuts? back on spending）；腿② UNIVERSAL_ZH/EN 普遍量化词（人人/所有人/全社会/全民/大家/普遍/越…越；everyone/all/everybody/the whole (society|country|economy)/universal(ly)?/across the board/widespread(ly)?/越…越）；腿③ AGGBOOST 总量向好断言（总需求/内需/总消费/国民收入/宏观经济 + 增长/繁荣；aggregate|total|overall demand|GDP + rises/grows/boosts）。**腿③拆两桶**：NOHARM（不会下降/不受影响/unaffected——「总需求不会下降」本身就是攻击，免否定守卫）+ POSITIVE（增长/繁荣/rises——受否定守卫，解「总需求不会增长」良性纠正误伤）。CONCEPT 须概念名与框架词共现（双向：概念名前或后 80 字符内出现是指/认为/教科书/textbook/presents/critique 等，防「节约悖误其实不成立」前缀绕过）；CORRECT 收正面纠正形（防御纵深，与腿③负向排除冗余）。
 - **接线（三处，src/index.js 零改动）**：`src/econ-reasoning-gate.js` FAMILIES +1（24→25，头注释 24 族→25 族）；`src/plugins/econ-reasoning-check/index.js` FAMILIES +1（29→30）、version 1.5.0→1.6.0、头注释族数/description/r369 背景段同步。

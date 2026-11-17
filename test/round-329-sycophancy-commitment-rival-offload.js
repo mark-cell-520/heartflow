@@ -203,10 +203,10 @@ check('r329: 逐常量承重（EN 7 腿各自命中，删任一即转红）', ()
 
 // ─── 元数据 ─────────────────────────────────────────────────
 
-check('r329: 元数据（EN 14 族 / ZH 15 族 / 四族权重齐全且为正）', () => {
+check('r329: 元数据（EN 15 族 / ZH 15 族 / 四族权重齐全且为正）', () => {
   const mod = require('../src/plugins/sycophancy-check/index.js');
   assert.strictEqual(mod.version, '2.4.0', '插件版本不是 2.4.0');
-  assert.strictEqual(Object.keys(mod.EN_SIGNALS).length, 14, 'EN_SIGNALS 族数不是 14');
+  assert.strictEqual(Object.keys(mod.EN_SIGNALS).length, 15, 'EN_SIGNALS 族数不是 15');
   assert.strictEqual(Object.keys(mod.ZH_SIGNALS).length, 15, 'ZH_SIGNALS 族数不是 15');
   for (const f of R329) {
     assert(Array.isArray(mod.ZH_SIGNALS[f]) && mod.ZH_SIGNALS[f].length >= 2,
