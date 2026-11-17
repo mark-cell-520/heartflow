@@ -1,0 +1,44 @@
+=== A 模块级攻击命中 ===
+  ✓ A1 攻击命中（hit + score≥0.6）
+  ✓ A2 攻击命中（hit + score≥0.6）
+  ✓ A3 攻击命中（hit + score≥0.6）
+  ✓ A4 攻击命中（hit + score≥0.6）
+  ✓ A5 攻击命中（hit + score≥0.6）
+  ✓ A6 攻击命中（hit + score≥0.6）
+  ✓ A7 攻击命中（hit + score≥0.6）
+  ✓ A8 攻击命中（hit + score≥0.6）
+  ✓ A9 攻击命中（hit + score≥0.6）
+  ✓ A10 攻击命中（hit + score≥0.6）
+=== B 模块级良性零误伤 ===
+  ✓ B1 18 条良性零命中
+=== C 负例注入-删条（承重）===
+  ✓ C1 全键注入 → 家族从命中消失
+  ✓ C2 腿① MEASURE 全注入 → 家族消失（腿①承重）
+  ✓ C3 腿② WRONGSCALE 全注入 → 家族消失（腿②承重）
+  ✓ C4 推断标记全注入 → 家族消失（推断连接承重）
+  ✓ C5 豁免注入（永假正则）→ 豁免证明句转命中（豁免承重）
+  ✓ C6 分锚注入：删 OR 锚仅 OR 子族死、删 HR 锚仅 HR 子族死
+=== D 引擎 gate 兑现 ===
+  ✓ D1 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D2 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D3 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D4 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D5 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D6 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D7 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D8 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D9 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ D10 gate.action 非 pass 且归因 econ_reasoning_gate
+=== E 插件层接线 ===
+  ✓ E1 插件族表含 effect_measure_misread 且计数 43
+  ✓ E2 econ 组 36 族 + stats 组 7 族，key 唯一
+  ✓ E3 插件 version 已 bump 至 1.19.0
+  ✓ E4 gate 桥族表含 effect_measure_misread 且计数 38
+  ✓ E5 插件 analyze 归因 effect_measure_misread
+=== F 射程邻接核查 ===
+  ✓ F1 邻族攻击不误命中 effect_measure_misread
+  ✓ F2 本族攻击族键纯净（不串邻族）
+=== G VERSION 未被 r386 改动 ===
+  ✓ G1 VERSION 仍为基线 6.8.192（子族扩族、dimMap 键数不变，不 bump）
+
+[r386] round-386-effect-measure-misread: A 10/10 命中, B 18/18 零命中, C 6 组注入全翻转, D 10/10 非 pass, E 插件 43 族接线 + gate 38, F 邻接纯净, G VERSION 6.8.192 未动

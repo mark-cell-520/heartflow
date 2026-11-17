@@ -184,19 +184,19 @@ T('C3 良性句 gate.action = pass', () => {
 });
 
 console.log('=== D 插件层接线 ===');
-T('D1 插件族表 42 族：36 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(plugin.FAMILIES.length, 42);
+T('D1 插件族表 43 族：36 econ + 7 stats，key 唯一', () => {
+  assert.strictEqual(plugin.FAMILIES.length, 43);
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6);
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 7);
   const keys = plugin.FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 42);
+  assert.strictEqual(new Set(keys).size, 43);
   assert.ok(keys.includes('linear_tax_revenue') && keys.includes('insurance_claim_loss') && keys.includes('flat_rate_bias'));
 });
-T('D2 插件 version 1.18.0（r385 再 bump）', () => {
-  assert.strictEqual(plugin.version, '1.18.0');
+T('D2 插件 version 1.19.0（r386 再 bump）', () => {
+  assert.strictEqual(plugin.version, '1.19.0');
 });
-T('D3 gate 桥族表 37 族', () => {
-  assert.strictEqual(gate.FAMILIES.length, 37);
+T('D3 gate 桥族表 38 族', () => {
+  assert.strictEqual(gate.FAMILIES.length, 38);
 });
 
 console.log('=== F 射程邻接核查 ===');

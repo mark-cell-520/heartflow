@@ -141,25 +141,25 @@ for (let i = 0; i < ATTACK.length; i++) {
 
 // ─── E 插件层接线 ───
 console.log('=== E 插件层接线 ===');
-T('E1 插件族表含 comparative_advantage 且计数 42', () => {
+T('E1 插件族表含 comparative_advantage 且计数 43', () => {
   assert.ok(plugin.FAMILIES.some(f => f.key === 'comparative_advantage' && f.round === 'r385'), '插件族表缺 comparative_advantage');
-  assert.strictEqual(plugin.FAMILIES.length, 42);
+  assert.strictEqual(plugin.FAMILIES.length, 43);
 });
-T('E2 econ 组 36 族 + stats 组 6 族，key 唯一', () => {
+T('E2 econ 组 36 族 + stats 组 7 族，key 唯一', () => {
   const econ = plugin.FAMILIES.filter(f => f.group === 'econ');
   const stats = plugin.FAMILIES.filter(f => f.group === 'stats');
   assert.strictEqual(econ.length, 36);
-  assert.strictEqual(stats.length, 6);
+  assert.strictEqual(stats.length, 7);
   const keys = plugin.FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 42);
+  assert.strictEqual(new Set(keys).size, 43);
 });
-T('E3 插件 version 已 bump 至 1.18.0', () => {
-  assert.strictEqual(plugin.version, '1.18.0');
+T('E3 插件 version 已 bump 至 1.19.0', () => {
+  assert.strictEqual(plugin.version, '1.19.0');
 });
-T('E4 gate 桥族表含 comparative_advantage 且计数 37', () => {
+T('E4 gate 桥族表含 comparative_advantage 且计数 38', () => {
   const gFams = gate.FAMILIES;
   assert.ok(gFams.some(f => f.key === 'comparative_advantage' && f.round === 'r385'), 'gate 桥族表缺 comparative_advantage');
-  assert.strictEqual(gFams.length, 37, 'gate 桥族表应为 37 族');
+  assert.strictEqual(gFams.length, 38, 'gate 桥族表应为 38 族');
 });
 T('E5 插件 analyze 归因 comparative_advantage', () => {
   const r = plugin.analyze(ATTACK[0]);
@@ -197,5 +197,5 @@ T('G1 VERSION 仍为基线 6.8.192（子族扩族、dimMap 键数不变，不 bu
   assert.strictEqual(v, '6.8.192', 'VERSION 应为 6.8.192，实为 ' + v);
 });
 
-console.log(`\n[r385] round-385-comparative-advantage: A ${ATTACK.length}/${ATTACK.length} 命中, B 11/11 零命中, C 3 键注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pass, E 插件 42 族接线 + gate 37, F 邻接纯净, G VERSION 6.8.192 未动`);
+console.log(`\n[r385] round-385-comparative-advantage: A ${ATTACK.length}/${ATTACK.length} 命中, B 11/11 零命中, C 3 键注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pass, E 插件 43 族接线 + gate 38, F 邻接纯净, G VERSION 6.8.192 未动`);
 if (failed > 0) { console.log(`\n# fail ${failed}`); process.exit(1); }
