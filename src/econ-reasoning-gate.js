@@ -203,6 +203,27 @@ const FAMILIES = [
   //   射程零交集、present_bias（月供摊薄贴现）轴不同、moral_hazard/
   //   adverse_selection（保险机制断言）不论个体回报叙事。
   { key: 'insurance_claim_loss',            mod: './insurance-claim-loss.js',            fn: 'detectInsuranceClaimLoss',            zh: '未理赔即亏误读',          en: 'no-claim-is-loss misread (risk-transfer value neglect)', round: 'r378' },
+  // r379 新增：固定费率偏误（flat-rate bias / sunk-fee-driven overuse——
+  //   预付/定额收费（包年/包月/年卡/会员/不限量/自助餐/订阅）激励用户为
+  //   「摊薄」已付费用而过度使用，即便边际效用已为负（受伤还去健身房、
+  //   难看也坐完全场、凌晨爬起来刷场次）。攻击形「会员包了年，不多看几场
+  //   就把钱白瞎了，熬夜也得把场次刷完」「办了健身年卡就得天天去，一天
+  //   不去就是浪费，哪怕练伤了也得去」「自助餐钱已经付了，不吃到撑就是
+  //   傻，硬塞也得把本钱吃回来」；同池 12 候选定拨（probe-r379-pool.js 首
+  //   轮 + probe-r379-scope.js 四候选深探）：本族深探穿透 9/10 真零命中
+  //   （1/10 被 fallacy_of_relevance 代拦——存量维度对固定费率过度使用形
+  //   零覆盖），良性 6 条中 2 条非 pass（hypostatization / contradiction
+  //   存量维度误伤，非本族增量）；同池 B chesterton_fence 6/10 良性 0、
+  //   I mcnamara_quantitative 8/10 良性 2（liberty_restriction 存量误伤）、
+  //   K survival_rate_comparison 6/10 良性 0——本族为「最高穿透 × 良性
+  //   边界可辩护 × econ 组射程最合」。两腿（固定费率语境 × 过度使用断言
+  //   ZH 三形 + EN 三形）+ CONCEPT/CORRECT 两组豁免 + 腿②双守卫（O1 配对
+  //   形查两标记间隙否定——使用不足标记自身常含「不」字）；与
+  //   sunk_cost_coercion（已投入×放弃可耻）射程零交集、mental_accounting
+  //   （按来源/用途分账户）不论使用强度、present_bias（月供摊薄贴现）轴
+  //   不同、opportunity_cost_neglect（免费/零价）不论已付费用使用义务。
+  //   单次票证（电影票/门票）不收——归 sunk_cost_coercion 射程。
+  { key: 'flat_rate_bias',                   mod: './flat-rate-bias.js',                   fn: 'detectFlatRateBias',                   zh: '固定费率偏误',            en: 'flat-rate bias (sunk-fee-driven overuse)', round: 'r379' },
 ];
 
 const _cache = new Map();
@@ -226,7 +247,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 33 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 35 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
