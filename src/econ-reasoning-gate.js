@@ -139,6 +139,19 @@ const FAMILIES = [
   //   豁免 + 腿③否定守卫；与 weak_evidence_strong_claim(dim245 弱证据**类型**
   //   × 绝对化断言) 射程不同——本族管主张**离奇度** × 证据**不成比例**）。
   { key: 'extraordinary_claims',            mod: './extraordinary-claims.js',       fn: 'detectExtraordinaryClaims',  zh: '非凡主张的证据比例错配',     en: 'extraordinary claims require extraordinary evidence (evidence-claim proportionality)', round: 'r373' },
+  // r374 新增：存量-流量混淆（stock-flow conflation / level-rate confusion——
+  //   债务总额/市值/存款余额/外汇储备 等存量时点水平被直接兑现为年度流量
+  //   速率（等于全国人民一年白干/可见每年新增财富就有十万亿）或流平比较结论
+  //   （比人家GDP高所以比人家还有钱），跳过存量是历年累积、流量是年度速度
+  //   的口径除法；同池七候选定拨：certainty_effect 1/6 被存量代拦且良性脏、
+  //   absolute_advantage 3/5、tax_incidence 2/5、money_creation 7/10 但与
+  //   money_illusion(dim234) 射程相邻、competition_waste 良性 3/5 脏、
+  //   linear_tax_revenue 3/5，本族穿透 7/10 真零命中 + 良性边界最净（2/8 非
+  //   pass 均系存量维度误伤非本族增量）；两腿（存量指称 × 流量兑现 ZS/RATE/
+  //   CMP 三形其一）+ CONCEPT/CORRECT 两组豁免 + 腿②否定守卫；与 count_rate_
+  //   conflation（原始计数 vs 发生率）轴不同，money_illusion 对探针攻击句实测
+  //   零命中证明射程不重叠。
+  { key: 'stock_flow_conflation',            mod: './stock-flow-conflation.js',      fn: 'detectStockFlowConflation',  zh: '存量-流量混淆',               en: 'stock-flow conflation (level-rate confusion)', round: 'r374' },
 ];
 
 const _cache = new Map();
@@ -162,7 +175,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 28 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 29 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
