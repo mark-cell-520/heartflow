@@ -134,8 +134,8 @@ const PAIR_EN = 260;
 // ─── 豁免 A：概念教学（点名比例原则 + 框架词共现）────────────
 // 概念名单独出现不豁免（「非凡的主张需要非凡的证据，可这个疗法只有几例」仍
 // 可能攻击）——须与框架词共现，防前缀绕过（r368/r369/r371 同款教训）。
-const CONCEPT_ZH = /(?:非凡的主张|惊人的主张|离奇的主张)?需要(?:非凡|惊人|更强|相应|相称|更多)的?(?:证据|证明|支撑)[^。，；]{0,30}(?:是指|指|是|一种|属于|原则|法则|格言|常识|准则|道理|规范|科学|方法|认识|谚语|格训)|(?:是指|指|原则|法则|格言|常识|准则|规范|科学方法|认识论|方法论)[^。，；]{0,30}(?:非凡的主张|惊人的主张|离奇的主张)?需要(?:非凡|惊人|更强|相应|相称)的?(?:证据|证明)/;
-const CONCEPT_EN = /\bextraordinary\s+claims?\s+(?:require|demand|need)\s+extraordinary\s+evidence\b[^.]{0,60}?\b(?:is|are|principle|maxim|saying|adage|dictum|standard|rule|norm|scientific|skeptic\w+)\b|\b(?:is|are|called|known as|principle|maxim|adage|saying)\b[^.]{0,60}?\bextraordinary\s+claims?\s+(?:require|demand|need)\s+extraordinary\s+evidence\b/i;
+const CONCEPT_ZH = /(?:非凡主张|证据比例错配|离奇的主张|惊人的主张|非凡的主张|非凡的证据|相称的证据|相应的证据|更强的证据)[^。！？\n]{0,40}(?:是指|指的是|属于|称为|是一种|原则|法则|格言|常识|准则|规范|谚语|方法论|认识论|科学方法|道理|标准)|(?:是指|指的是|属于|称为|是一种|原则|法则|格言|常识|准则|规范|谚语|方法论|认识论|科学方法|道理|标准)[^。！？\n]{0,40}(?:非凡主张|证据比例错配|离奇的主张|惊人的主张|非凡的主张|非凡的证据|相称的证据|相应的证据)/;
+const CONCEPT_EN = /\bextraordinary\s+claims?\s+(?:require|demand|need)\s+extraordinary\s+evidence\b|\bevidence[–-]?claim\s+proportionality\b[^.]{0,60}?\b(?:is|are|principle|maxim|saying|adage|fallacy|error|refers|means|called|known|describes|a)\b|\b(?:is|are|called|known\s+as|principle|maxim|adage|fallacy|saying|refers|means)\b[^.]{0,60}?\bextraordinary\s+claims?\b|\bproportionality\s+(?:principle|fallacy|requirement)\b/i;
 
 // ─── 豁免 B：正确举证/存疑 ──────────────────────────────────
 // 收：要求更多/更强证据、承认证据不足、保持怀疑、不可据此下结论。不收裸
@@ -162,24 +162,25 @@ function allMatches(re, text) {
   return out;
 }
 
-// 强否定表：命中腿③文本内或紧前出现，说明充分性兑现被否定/对冲——「并不
-// 足以」「not enough」是对冲形，不是攻击。
-const STRONG_NEG_ZH = /(?:并未|并没有|绝不是|绝不|丝毫不|一点都不|并不|不等于|不代表|说明不了|证明不了|很难说|不见得|未必|不一定|不必然|不能|无法|并非|没能|难以|无从|不足以|尚不)/;
-const STRONG_NEG_EN = /\b(?:not\s+that|far\s+from|hardly|barely|nowhere\s+near|by\s+no\s+means|in\s+no\s+way|not\s+necessarily|not\s+enough|does\s+not|did\s+not|cannot|can'?t|couldn'?t|insufficient|fails?\s+to)\b/i;
+// 腿③否定守卫：充分性兑现被否定/对冲时（「这并不足以证明」「this is not
+// enough to prove」是对冲形，不是攻击）。ZH 用 STRONG_NEG_ZH 命中腿③文本或
+// 紧前 6 字窗；EN 用 NEG_PREFIX_EN 命中紧前 12 字符的否定前缀（is/does not
+// 等）——均只查腿③紧前，避免把腿②的 no replication 误当腿③否定。两者均可
+// 负例注入（R.STRONG_NEG_ZH / R.NEG_PREFIX_EN 传空数组即删）。
+const STRONG_NEG_ZH = /(?:不足|并不|并非|绝不|丝毫不|不一定|未必|不必然|不能|无法|没能|难以|无从|尚不|不值|说明不了|证明不了|很难说|不见得|未必要)/;
+const NEG_PREFIX_EN = /\b(?:not|never|hardly|cannot|can'?t|insufficiently|n't)\s*$/;
 
-function negBeforeZh(text, idx) {
-  const before = text.slice(Math.max(0, idx - 4), idx);
-  return /[不没无未非难]/.test(before);
-}
-
-function matchAlive(text, x, opts) {
+function matchAlive(text, x, opts, R) {
   opts = opts || {};
   if (opts.neg) {
-    // 腿③充分性兑现的否定守卫：「并不足以」「远不足以证明」是对冲形。
-    if (STRONG_NEG_ZH.test(x.raw) || STRONG_NEG_EN.test(x.raw)) return false;
-    if (negBeforeZh(text, x.idx)) return false;
-    const beforeEn = text.slice(Math.max(0, x.idx - 40), x.idx);
-    if (STRONG_NEG_EN.test(beforeEn)) return false;
+    const negZh = (R && R.STRONG_NEG_ZH !== undefined) ? R.STRONG_NEG_ZH : STRONG_NEG_ZH;
+    const negEn = (R && R.NEG_PREFIX_EN !== undefined) ? R.NEG_PREFIX_EN : NEG_PREFIX_EN;
+    const negZhList = Array.isArray(negZh) ? negZh : [negZh];
+    const negEnList = Array.isArray(negEn) ? negEn : [negEn];
+    const beforeZh = text.slice(Math.max(0, x.idx - 6), x.idx);
+    const beforeEn = text.slice(Math.max(0, x.idx - 12), x.idx);
+    for (const re of negZhList) { if (re && re.test && (re.test(x.raw) || re.test(beforeZh))) return false; }
+    for (const re of negEnList) { if (re && re.test && re.test(beforeEn)) return false; }
   }
   return true;
 }
@@ -194,10 +195,10 @@ function dedupeOverlap(arr) {
   return out.sort((a, b) => a.idx - b.idx);
 }
 
-function collect(text, list, opts) {
+function collect(text, list, opts, R) {
   let m = [];
   for (const re of list) for (const x of allMatches(re, text)) {
-    if (matchAlive(text, x, opts)) m.push(x);
+    if (matchAlive(text, x, opts, R)) m.push(x);
   }
   return dedupeOverlap(m);
 }
@@ -249,7 +250,7 @@ function findSignatures(text, R) {
     const weakM = collect(text, L.weak);
     if (weakM.length === 0) continue;
     // 腿③受否定守卫（对冲形：「并不足以」「not enough」）
-    const suffM = collect(text, L.suff, { neg: true });
+    const suffM = collect(text, L.suff, { neg: true }, R);
     if (suffM.length === 0) continue;
     for (const e of extraM) {
       const w = weakM.find(x => dist(x, e) <= L.win);
@@ -336,7 +337,7 @@ module.exports = {
     SUFF_ZH_GROUPS, SUFF_EN_GROUPS,
     PAIR_ZH, PAIR_EN,
     CONCEPT_ZH, CONCEPT_EN, CORRECT_ZH, CORRECT_EN, HEDGE_ZH, HEDGE_EN,
-    STRONG_NEG_ZH, STRONG_NEG_EN,
+    STRONG_NEG_ZH, NEG_PREFIX_EN,
     findSignatures,
   }),
 };
