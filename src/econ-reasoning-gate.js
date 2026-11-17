@@ -237,6 +237,16 @@ const FAMILIES = [
   //   断言无就业语境）射程零交集、hasty_generalization（样本外推）不论
   //   总量固定机制、具体裁员叙事无 F1-F5 标记天然不判。
   { key: 'lump_of_labor',                     mod: './lump-of-labor.js',                     fn: 'detectLumpOfLabor',                     zh: '劳动总量谬误',            en: 'lump of labor fallacy (fixed work-pool assumption)', round: 'r381' },
+  // r385 新增：绝对优势≠比较优势误读（absolute-vs-comparative advantage
+  //   confusion——把「一方在所有商品/任务上都更有效率」的绝对优势直接兑现
+  //   为「贸易/分工/合作/外包没必要/无意义/不划算/只会吃亏」，跳过机会成本
+  //   与比较优势机制；同池 probe-candidates.js：本族攻击穿透 6/8 真零命中、
+  //   良性 2 条非 pass 均系存量维度误伤非本族增量；对手 moral_hazard 穿透
+  //   1/5 已被代拦且良性 3/4 脏（淘汰）；双腿（绝对优势前提 ZH 五形 + EN 五形
+  //   × 无贸易获益结论 ZH 四形 + EN 四形）+ CONCEPT/CORRECT 两组豁免 + 腿②
+  //   紧前否定/对冲双守卫；与 mercantilism（贸易差额财富误读，不要求绝对优势
+  //   前提）、zero_sum_fallacy（泛化零和断言）射程不重叠。
+  { key: 'comparative_advantage',              mod: './comparative-advantage.js',              fn: 'detectComparativeAdvantage',            zh: '绝对优势≠比较优势',        en: 'absolute-vs-comparative advantage confusion', round: 'r385' },
 ];
 
 const _cache = new Map();
@@ -260,7 +270,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 36 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 37 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
