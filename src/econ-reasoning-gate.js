@@ -190,6 +190,19 @@ const FAMILIES = [
   //   射程零交集——本族攻击句无归属/转嫁标记，tax_incidence 攻击句无比
   //   兑现标记）。
   { key: 'linear_tax_revenue',             mod: './linear-tax-revenue.js',             fn: 'detectLinearTaxRevenue',             zh: '税率-税收线性误读',        en: 'linear tax-revenue assumption (tax-base elasticity neglect)', round: 'r377' },
+  // r378 新增：未理赔即亏误读（no-claim-is-loss misread / risk-transfer
+  //   value neglect——把「没理赔」直接兑现为「亏损/白交」，跳过风险转移
+  //   价值与保险定价机制；同池 12 候选定拨（probe-r378-pool.js + probe-
+  //   r378-scope.js）二段深探穿透 7/10 真零命中（3/10 存量代拦：
+  //   perfect_error / reverse_causation / pseudo_profundity，存量维度对
+  //   未理赔即亏形零覆盖），良性 6 条仅 1 条非 pass（reasoning_coherence/
+  //   contradiction 存量误伤非本族增量）；两腿（保险语境 ZH3 组 × 未用
+  //   即亏断言 ZH3 形 + EN3 形）+ CONCEPT/CORRECT 两组豁免 + 腿②双守卫
+  //   （P1 配对形改查两标记间隙否定——无理赔标记自身含「没」字会误杀
+  //   配对，r378 实测修）；与 sunk_cost_coercion（已投入×放弃可耻）
+  //   射程零交集、present_bias（月供摊薄贴现）轴不同、moral_hazard/
+  //   adverse_selection（保险机制断言）不论个体回报叙事。
+  { key: 'insurance_claim_loss',            mod: './insurance-claim-loss.js',            fn: 'detectInsuranceClaimLoss',            zh: '未理赔即亏误读',          en: 'no-claim-is-loss misread (risk-transfer value neglect)', round: 'r378' },
 ];
 
 const _cache = new Map();
