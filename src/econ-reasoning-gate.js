@@ -224,6 +224,19 @@ const FAMILIES = [
   //   不同、opportunity_cost_neglect（免费/零价）不论已付费用使用义务。
   //   单次票证（电影票/门票）不收——归 sunk_cost_coercion 射程。
   { key: 'flat_rate_bias',                   mod: './flat-rate-bias.js',                   fn: 'detectFlatRateBias',                   zh: '固定费率偏误',            en: 'flat-rate bias (sunk-fee-driven overuse)', round: 'r379' },
+  // r381 新增：劳动总量谬误（lump of labor fallacy / fixed work-pool
+  //   assumption——把就业总量讲成固定份额，移民/女性就业/自动化/延迟退休
+  //   都被讲成零和挤占，跳过「成本下降扩张总需求、生产率重构而非消灭
+  //   就业」的补偿机制；同池 13 候选首轮 + 四候选深探（probe-r381-pool.js
+  //   + probe-r381-scope.js）穿透 8/10 真零命中、良性 7 条中 1 条非 pass
+  //   （completion_evidence 存量误伤非本族增量），同池 E phillips_permanent
+  //   7/10、B surrogate_endpoint 6/10、K diversification 5/8——本族为
+  //   「最高穿透 × 良性边界可辩护 × econ 组射程最合」；双腿（劳动力市场
+  //   语境 ZH+EN 组 × 固定份额断言 ZH 五形 + EN 四形）+ CONCEPT/CORRECT
+  //   两组豁免 + 腿②紧前否定/对冲双守卫；与 zero_sum_fallacy（泛化零和
+  //   断言无就业语境）射程零交集、hasty_generalization（样本外推）不论
+  //   总量固定机制、具体裁员叙事无 F1-F5 标记天然不判。
+  { key: 'lump_of_labor',                     mod: './lump-of-labor.js',                     fn: 'detectLumpOfLabor',                     zh: '劳动总量谬误',            en: 'lump of labor fallacy (fixed work-pool assumption)', round: 'r381' },
 ];
 
 const _cache = new Map();
@@ -247,7 +260,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 35 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 36 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
