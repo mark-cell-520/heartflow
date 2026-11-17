@@ -232,14 +232,14 @@ check('F6 存量 benign 语料零误命中（官方良性集形状）', () => {
 
 // ─── G 登记纪律 ───
 console.log('### G 登记');
-check('G1 gate 桥族表含 paradox_of_thrift(r369) 且计数 25', () => {
+check('G1 gate 桥族表含 paradox_of_thrift(r369) 且计数 26（r371 扩族义务：25→26，decoy_effect 入表后同步）', () => {
   assert(GATE_FAMS.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), 'gate 桥缺 paradox_of_thrift');
-  assert.strictEqual(GATE_FAMS.length, 25, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 26, 'gate 桥计数 ' + GATE_FAMS.length);
 });
-check('G2 插件族表含 paradox_of_thrift(r369) 且计数 30（24 econ + 6 stats）', () => {
+check('G2 插件族表含 paradox_of_thrift(r369) 且计数 31（r371 扩族义务：30→31，25 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), '插件缺 paradox_of_thrift');
-  assert.strictEqual(plugin.FAMILIES.length, 30, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 24, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.length, 31, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 25, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
 check('G3 插件 analyze(only=paradox_of_thrift) 路由可用', () => {
@@ -251,10 +251,11 @@ check('G4 claims.jsonl 含 r369 认领（agent-4/dimension）', () => {
     .split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (_) { return null; } });
   assert(claims.some(c => c && c.round === 'r369' && c.agent === 'agent-4' && c.kind === 'dimension'), '缺 r369 认领');
 });
-check('G5 VERSION 未被 r369 改动（基线 6.8.189）', () => {
+check('G5 VERSION 未被 r369 改动（r370 bump 后基线同步为 6.8.190）', () => {
   const v = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  // r369 聚合族扩族、src/index.js 零改动、dimMap 键数不变，VERSION 不 bump。
-  assert.strictEqual(v, '6.8.189', 'VERSION 应为 6.8.189，实为 ' + v);
+  // r369 聚合族扩族、src/index.js 零改动、dimMap 键数不变，VERSION 不 bump；
+  // r370 他轮 bump 至 6.8.190，本断言随基线同步（d54c815 同款先例）。
+  assert.strictEqual(v, '6.8.190', 'VERSION 应为 6.8.190，实为 ' + v);
 });
 
 console.log('\n测试结果: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');

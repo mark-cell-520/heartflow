@@ -1,0 +1,53 @@
+### A 攻击样本 gate 层
+  ✓ A1 ZH 攻击 6/6 非 pass 且 econ_reasoning_gate 归因
+  ✓ A2 EN 攻击 5/5 非 pass 且 econ_reasoning_gate 归因
+### B 模块层
+  ✓ B1 攻击 11/11 模块命中
+  ✓ B2 gate 桥聚合含 decoy_effect 族
+### C 良性样本
+  ✓ C1 良性 18/18 模块零命中
+  ✓ C2 良性 18/18 gate findings 不含 econ_reasoning_gate（本族零增量）
+### D 豁免与判据结构
+  ✓ D1 CONCEPT 豁免（概念教学，须框架词共现）
+  ✓ D1b CONCEPT 不收裸概念名（前缀绕过防护）
+  ✓ D2 CORRECT 豁免（处方/转折纠正）
+  ✓ D2b CORRECT 揭穿句豁免（只是错觉）
+  ✓ D3 TEMPORAL 豁免（版本迭代不是共存选项集）
+  ✓ D4 缺腿①不判（有被支配描述 + 相对化结论，无选项集名词）
+  ✓ D5 缺腿②不判（有选项集 + 相对化结论，无被支配描述）
+  ✓ D6 缺腿③不判（有选项集 + 被支配描述，无相对化结论）
+  ✓ D7 对冲形不判（腿②前置裸否定——「不显得更差」）
+  ✓ D8 EN CORRECT 豁免（should…instead of）
+### E 负例注入
+  ✓ E 注入删 CHOICE_SET_ZH → 1 样本守卫翻转
+  ✓ E 注入删 CHOICE_SET_EN → 1 样本守卫翻转
+  ✓ E 注入删 DOMINATED_ZH → 1 样本守卫翻转
+  ✓ E 注入删 DOMINATED_EN → 1 样本守卫翻转
+  ✓ E 注入删 RELATIVE_ZH_A → 1 样本守卫翻转
+  ✓ E 注入删 RELATIVE_EN_A → 1 样本守卫翻转
+  ✓ E 注入删 RELATIVE_ZH_B → 1 样本守卫翻转
+  ✓ E 注入删 RELATIVE_EN_B → 1 样本守卫翻转
+  ✓ E 注入删 RELATIVE_ZH_C → 1 样本守卫翻转
+  ✓ E 注入删 RELATIVE_EN_C → 1 样本守卫翻转
+  ✓ E 注入删 CONCEPT_ZH → 1 样本守卫翻转
+  ✓ E 注入删 CONCEPT_EN → 1 样本守卫翻转
+  ✓ E 注入删 CORRECT_ZH → 1 样本守卫翻转
+  ✓ E 注入删 CORRECT_EN → 1 样本守卫翻转
+  ✓ E 注入删 TEMPORAL_ZH → 1 样本守卫翻转
+  ✓ E 注入删 TEMPORAL_EN → 1 样本守卫翻转
+### F 存量回归
+  ✓ F1 mercantilism 攻击样本不被本族拦
+  ✓ F2 paradox_of_thrift 攻击样本不被本族拦
+  ✓ F3 price_control 攻击样本不被本族拦
+  ✓ F4 lump_of_labor 良性样本不被本族拦（落选候选边界）
+  ✓ F5 存量 benign 语料零误命中（官方良性集形状）
+  ✓ F6 存量 econ 子族聚合仍工作（mercantilism 直调）
+### G 登记
+  ✓ G1 gate 桥族表含 decoy_effect(r371) 且计数 26
+  ✓ G2 插件族表含 decoy_effect(r371) 且计数 31（25 econ + 6 stats）
+  ✓ G3 插件 analyze(only=decoy_effect) 路由可用
+  ✓ G4 claims.jsonl 含 r371 认领（agent-4/dimension）
+  ✓ G5 VERSION 未被 r371 改动（基线 6.8.190）
+
+测试结果: 43 通过, 0 失败, 共 43 个
+负例注入: 16/16 翻转

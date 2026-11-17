@@ -101,6 +101,18 @@ const FAMILIES = [
   //   腿③拆 NOHARM（不会下降/受影响，免否定守卫）与 POSITIVE（增长/繁荣，
   //   受否定守卫）两桶，解「总需求不会增长」良性纠正误伤）。
   { key: 'paradox_of_thrift',              mod: './paradox-of-thrift.js',          fn: 'detectParadoxOfThrift',      zh: '节约悖误/合成谬误宏观储蓄形', en: 'paradox of thrift (composition fallacy in aggregate saving)', round: 'r369' },
+  // r371 新增：诱饵效应/被支配比较（decoy effect / asymmetric dominance——
+  // 选项集内加入被严格支配的选项（更贵且关键属性更差），使目标选项在
+  // 对比下显得划算，价值结论全部由陪衬对象衬托而出；攻击形「基础版
+  // 功能这么少，专业版只贵一点就显得特别划算」「比起那个又贵又难用的
+  // 竞品，我们的产品简直是良心价」「反正有更差的垫底，选中间这个肯定
+  // 不会错」；同池四候选定拨（A lump_of_labor 穿透 5/10 良性 1/5 边界
+  // 脏、B publication_bias 6/7 多被存量代拦、C status_quo_bias 6/8 良性
+  // 1/4 边界脏），本族攻击穿透 0/7 真零命中 + 良性 0/3 零误伤，存量维度
+  // 对选项集衬托形零覆盖；三腿（选项集 × 被支配描述 × 相对化结论）+
+  // CONCEPT/CORRECT/TEMPORAL 三组豁免；腿②受否定守卫、腿③不受
+  // （「肯定不会错」的「不会」是攻击惯语组成部分，r371 设计决策）。
+  { key: 'decoy_effect',                   mod: './decoy-effect.js',               fn: 'detectDecoyEffect',          zh: '诱饵效应/被支配比较',       en: 'decoy effect (asymmetric dominance)', round: 'r371' },
 ];
 
 const _cache = new Map();
@@ -124,7 +136,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 25 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 26 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

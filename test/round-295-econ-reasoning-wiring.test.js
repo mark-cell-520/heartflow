@@ -3,11 +3,11 @@
  * r336 机会成本忽视扩族至 22 族后随族表更新）
  *
  * 覆盖：
- *   A 插件元数据与族表（22 族 = 17 econ + 5 stats，族键/模块路径/组归属）
- *   B 每族攻击命中（22 族全中，模块级两腿共现判据经插件聚合后仍可达）
+ *   A 插件元数据与族表（31 族 = 25 econ + 6 stats，族键/模块路径/组归属）
+ *   B 每族攻击命中（31 族全中，模块级两腿共现判据经插件聚合后仍可达）
  *   C 良性零误伤（12 条官方良性形状语料）
  *   D action=<family key> 单族过滤（MCP action 入参）
- *   E 负例注入-删条（22 个：blind inject 各模块 __internals 探针键后，
+ *   E 负例注入-删条（31 个：blind inject 各模块 __internals 探针键后，
  *     该族必须从命中中消失——证明每个族的 dispatch 都是承重的，删了会红）
  *   F 引擎 think 路径真 dispatch（真 HeartFlow 实例 + 真 runThinkPipeline：
  *     插件经 PluginLoader 加载 → postprocess.think hook 写
@@ -75,9 +75,11 @@ const ATTACK = {
   carbon_leakage: '我们把高污染工厂都迁到国外了，所以本国的环境问题已经解决。',
   // r367 价格管制单效应断言（src/price-control.js，双腿样本——腿①管制工具族 × 腿②单效应断言族）
   price_control: '房租上限只会让租房变得更便宜，不会有什么副作用。',
-  // r368 重商主义贸易顺差谬误（src/mercantilism.js，双腿样本——腿①贸易差额族 × 腿②财富得失归族群）
+  // r368 重商主义贸易顺差谬误（src/mercantilism.js，双腿样本——腿①贸易差额族 × 腿②财富得失归因群）
   mercantilism: '出口大于进口才叫赚钱，顺差越大越占便宜。',
   paradox_of_thrift: '如果人人都不消费、多储蓄，总需求不会受影响，经济照样增长。',
+  // r371 诱饵效应/被支配比较（src/decoy-effect.js，三腿样本——腿①选项集 × 腿②被支配描述 × 腿③相对化结论）
+  decoy_effect: '基础版功能这么少，专业版只贵一点就显得特别划算。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -136,6 +138,8 @@ const INJECT_KEY = {
   mercantilism: ['TRADE_NOUN_ZH', 'TRADE_NOUN_EN', 'GAIN_ZH', 'GAIN_EN', 'DRAIN_ZH', 'DRAIN_EN', 'ACCUM_ZH', 'ACCUM_EN', 'LOSE_ZH', 'LOSE_EN'],
   // r369 paradox_of_thrift（三腿：腿① THRIFT_* × 腿② UNIVERSAL_* × 腿③ AGGBOOST_[NOHARM|POSITIVE]_* + ECON/MOREMORE/THRIFT 子形）
   paradox_of_thrift: ['THRIFT_NOUN_ZH', 'THRIFT_EN', 'UNIVERSAL_ZH', 'UNIVERSAL_EN', 'AGGBOOST_NOHARM_ZH', 'AGGBOOST_POSITIVE_ZH', 'AGGBOOST_NOHARM_EN', 'AGGBOOST_POSITIVE_EN', 'AGGBOOST_ECON_ZH', 'AGGBOOST_MOREMORE_EN', 'AGGBOOST_THRIFT_EN'],
+  // r371 decoy_effect（三腿：腿① CHOICE_SET_* × 腿② DOMINATED_* × 腿③ RELATIVE_[A|B|C]_*）
+  decoy_effect: ['CHOICE_SET_ZH', 'CHOICE_SET_EN', 'DOMINATED_ZH', 'DOMINATED_EN', 'RELATIVE_ZH_A', 'RELATIVE_ZH_B', 'RELATIVE_ZH_C', 'RELATIVE_EN_A', 'RELATIVE_EN_B', 'RELATIVE_EN_C'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -151,14 +155,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 30 族：24 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 30); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1
+T('A2 族表 31 族：25 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 31); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 24);
+  assert.strictEqual(econ.length, 25);
   assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 30);
+  assert.strictEqual(new Set(keys).size, 31);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
