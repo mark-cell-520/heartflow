@@ -12,8 +12,8 @@
  * 属真升级类型②（聚合族全新措辞家族）。
  *
  * 覆盖：A 模块层攻击/良性 → B 结构承重（两腿/三形/豁免/守卫 20 组负例注入）
- * → C 引擎 gate 兑现 → D 插件层接线（41 族 35 econ + 6 stats / v1.17.0 /
- * gate 桥 36 族）→ E 射程邻接核查（sunk_cost_coercion / present_bias /
+ * → C 引擎 gate 兑现 → D 插件层接线（42 族 36 econ + 6 stats / v1.18.0 /
+ * gate 桥 37 族）→ E 射程邻接核查（sunk_cost_coercion / present_bias /
  * adverse_selection 攻击集零交集双向）。
  */
 
@@ -186,19 +186,19 @@ T('C3 良性句 gate.action = pass', () => {
 });
 
 console.log('=== D 插件层接线 ===');
-T('D1 插件族表 41 族：35 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(plugin.FAMILIES.length, 41);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 35);
+T('D1 插件族表 42 族：36 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(plugin.FAMILIES.length, 42);
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36);
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6);
   const keys = plugin.FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 41);
+  assert.strictEqual(new Set(keys).size, 42);
   assert.ok(keys.includes('insurance_claim_loss') && keys.includes('flat_rate_bias'));
 });
-T('D2 插件 version 1.17.0（r381 再 bump）', () => {
-  assert.strictEqual(plugin.version, '1.17.0');
+T('D2 插件 version 1.18.0（r385 再 bump）', () => {
+  assert.strictEqual(plugin.version, '1.18.0');
 });
-T('D3 gate 桥族表 36 族', () => {
-  assert.strictEqual(gate.FAMILIES.length, 36);
+T('D3 gate 桥族表 37 族', () => {
+  assert.strictEqual(gate.FAMILIES.length, 37);
 });
 T('D4 插件 analyze 攻击命中本族、良性不命中', () => {
   const r = plugin.analyze(ATTACK[0]);

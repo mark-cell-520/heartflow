@@ -229,11 +229,11 @@ check('F5 存量 benign 语料零误命中（官方良性集形状）', () => {
 console.log('### G 登记');
 check('G1 gate 桥族表含 mercantilism(r368) 且计数 35（r379 flat_rate_bias 入表后 34→35）', () => {
   assert(GATE_FAMS.some(f => f.key === 'mercantilism' && f.round === 'r368'), 'gate 桥缺 mercantilism');
-  assert.strictEqual(GATE_FAMS.length, 36, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 37, 'gate 桥计数 ' + GATE_FAMS.length);
 });
 check('G2 插件族表含 mercantilism(r368) 且计数 32（r369/r371/r372 扩族义务：29→30→31→32，paradox_of_thrift/decoy_effect/healthy_user_bias 入表后同步）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'mercantilism' && f.round === 'r368'), '插件缺 mercantilism');
-  assert.strictEqual(plugin.FAMILIES.length, 41, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.length, 42, '插件计数 ' + plugin.FAMILIES.length);
 });
 check('G3 插件 analyze(only=mercantilism) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'mercantilism' });
@@ -244,12 +244,12 @@ check('G4 claims.jsonl 含 r368 认领（agent-4/dimension）', () => {
     .split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (_) { return null; } });
   assert(claims.some(c => c && c.round === 'r368' && c.agent === 'agent-4' && c.kind === 'dimension'), '缺 r368 认领');
 });
-check('G5 VERSION 未被 r368 改动（r370 bump 后基线同步为 6.8.190）', () => {
+check('G5 VERSION 未被 r368 改动（r385 基线同步：r380 bump 至 6.8.192）', () => {
   const v = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
   // r368 聚合族扩族、src/index.js 零改动、dimMap 键数不变（econ_reasoning_gate
   // r304 已注册），VERSION 不 bump；r370 他轮 bump 至 6.8.190，本断言随基线
   // 同步（d54c815 同款先例）。若未来他轮再 bump，同步此断言。
-  assert.strictEqual(v, '6.8.190', 'VERSION 应为 6.8.190，实为 ' + v);
+  assert.strictEqual(v, '6.8.192', 'VERSION 应为 6.8.192（r385 基线同步：r380 duration_neglect bump），实为 ' + v);
 });
 
 console.log('\n测试结果: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');

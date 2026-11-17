@@ -269,12 +269,12 @@ check('F6 存量 econ 子族聚合仍工作（mercantilism 直调）', () => {
 console.log('### G 登记');
 check('G1 gate 桥族表含 decoy_effect(r371) 且计数 35（r379 flat_rate_bias 入表后 34→35）', () => {
   assert(GATE_FAMS.some(f => f.key === 'decoy_effect' && f.round === 'r371'), 'gate 桥缺 decoy_effect');
-  assert.strictEqual(GATE_FAMS.length, 36, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 37, 'gate 桥计数 ' + GATE_FAMS.length);
 });
 check('G2 插件族表含 decoy_effect(r371) 且计数 34（r373/r374 扩族义务：32→33→34，28 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'decoy_effect' && f.round === 'r371'), '插件缺 decoy_effect');
-  assert.strictEqual(plugin.FAMILIES.length, 41, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 35, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.length, 42, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
 check('G3 插件 analyze(only=decoy_effect) 路由可用', () => {
@@ -286,10 +286,10 @@ check('G4 claims.jsonl 含 r371 认领（agent-4/dimension）', () => {
     .split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (_) { return null; } });
   assert(claims.some(c => c && c.round === 'r371' && c.agent === 'agent-4' && c.kind === 'dimension'), '缺 r371 认领');
 });
-check('G5 VERSION 未被 r371 改动（基线 6.8.190）', () => {
+check('G5 VERSION 未被 r371 改动（基线 6.8.192）', () => {
   const v = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
   // r371 聚合族扩族、src/index.js 零改动、dimMap 键数不变，VERSION 不 bump。
-  assert.strictEqual(v, '6.8.190', 'VERSION 应为 6.8.190，实为 ' + v);
+  assert.strictEqual(v, '6.8.192', 'VERSION 应为 6.8.192（r385 基线同步：r380 duration_neglect bump），实为 ' + v);
 });
 
 console.log('\n测试结果: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');

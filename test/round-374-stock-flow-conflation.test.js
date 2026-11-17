@@ -267,16 +267,16 @@ check('F8 存量 econ 子族聚合仍工作（extraordinary_claims 直调 r373 �
 console.log('### G 登记');
 check('G1 gate 桥族表含 stock_flow_conflation(r374) 且计数 35（r379 flat_rate_bias 入表后 34→35）', () => {
   assert(GATE_FAMS.some(f => f.key === 'stock_flow_conflation' && f.round === 'r374'), 'gate 桥缺 stock_flow_conflation');
-  assert.strictEqual(GATE_FAMS.length, 36, 'gate 桥计数 ' + GATE_FAMS.length); // 35(r379 后) + r381 lump_of_labor 1
+  assert.strictEqual(GATE_FAMS.length, 37, 'gate 桥计数 ' + GATE_FAMS.length); // 35(r379 后) + r381 lump_of_labor 1
 });
 check('G2 插件族表含 stock_flow_conflation(r374) 且计数 37（31 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'stock_flow_conflation' && f.round === 'r374'), '插件缺 stock_flow_conflation');
-  assert.strictEqual(plugin.FAMILIES.length, 41, '插件计数 ' + plugin.FAMILIES.length); // 38 + r381 lump_of_labor 1
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 35, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.length, 42, '插件计数 ' + plugin.FAMILIES.length); // 38 + r381 lump_of_labor 1
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
-check('G3 插件 version 已 bump 至 1.17.0（r381 再 bump）', () => {
-  assert.strictEqual(plugin.version, '1.17.0', '插件 version 应为 1.17.0，实为 ' + plugin.version);
+check('G3 插件 version 已 bump 至 1.18.0（r385 再 bump）', () => {
+  assert.strictEqual(plugin.version, '1.18.0', '插件 version 应为 1.18.0，实为 ' + plugin.version);
 });
 check('G4 插件 analyze(only=stock_flow_conflation) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'stock_flow_conflation' });
@@ -287,10 +287,10 @@ check('G5 claims.jsonl 含 r374 认领（agent-4/dimension）', () => {
     .split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (_) { return null; } });
   assert(claims.some(c => c && c.round === 'r374' && c.agent === 'agent-4' && c.kind === 'dimension'), '缺 r374 认领');
 });
-check('G6 VERSION 未被 r374 改动（基线 6.8.190）', () => {
+check('G6 VERSION 未被 r374 改动（基线 6.8.192）', () => {
   const v = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
   // r374 聚合族扩族、src/index.js 零改动、dimMap 键数不变，VERSION 不 bump。
-  assert.strictEqual(v, '6.8.190', 'VERSION 应为 6.8.190，实为 ' + v);
+  assert.strictEqual(v, '6.8.192', 'VERSION 应为 6.8.192（r385 基线同步：r380 duration_neglect bump），实为 ' + v);
 });
 
 console.log('\n测试结果: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');
