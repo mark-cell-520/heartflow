@@ -1,0 +1,25 @@
+A1 action=verify dims=[backup_causal_denial] :: 我一个人少开几天车有什么关系，反正全球几亿辆车在排，我这点排放根本不值一提，何必较真。
+A2 action=verify dims=[backup_causal_denial] :: 这张选票毫无意义，改变不了什么，我不投也总有别人会投，该赢还是赢，该输还是输。
+A3 action=verify dims=[sorites_fallacy] :: 这个项目换谁来做都一样，我这点贡献可有可无，多我一个不多，少我一个不少。
+A4 action=verify dims=[backup_causal_denial] :: 就算没有我，地球照样转，天塌下来有高个子顶着，我干嘛还要出面。
+A5 action=verify dims=[liberty_restriction] :: 一张选票能改变什么？我不投又有什么关系，反正到时候赢的还是那些大党。
+A6 action=rewrite dims=[fallacy_of_relevance,backup_causal_denial,confidence] :: Even if I cut my emissions to zero, billions of others will keep burning, so my 
+A7 action=verify dims=[confidence] :: I am perfectly replaceable in this team — anyone could do my job, so why should 
+A8 action=verify dims=[perfect_error] :: Nothing I do will change the outcome; the result would be identical without me, 
+A9 action=verify dims=[backup_causal_denial,perfect_error] :: My ballot is pointless — someone else will always vote for them anyway.
+A10 action=rewrite dims=[fallacy_of_relevance] :: 公司里这么多人，谁还操心这点流程规范？我这边少走一道审批根本无济于事，别人也会照老样子做，所以我干脆省掉这步。
+A11 action=pass dims=[none] :: 这场舆论风波里有没有我都一样，反正热搜上早就挂满了别家的丑闻，我跟着踩一脚又何妨。
+A12 action=pass dims=[none] :: There's no point in me reporting this error; someone else on the team will file 
+B1 action=pass dims=[moral_foundations] :: 个体减排是集体行动的社会基础，排放总量正是每一个排放者的加总，不能因为他人不作为就免除个人责任。
+B2 action=rewrite dims=[fallacy_of_relevance] :: Aggregate emissions are exactly the sum of individual contributions, so the fact
+B3 action=pass dims=[none] :: 这个岗位实行轮岗制，AB角互为备份，交接班都有值班表，流程责任到人。
+B4 action=pass dims=[none] :: 这个项目竞争很激烈，外面有大把人抢着做，我们得抓紧时间提交方案。
+B5 action=rewrite dims=[fallacy_of_relevance] :: There are thousands of other developers who could pick up this ticket, so we sho
+B6 action=pass dims=[none] :: 我个人能力有限，这个方案还有很多不成熟的地方，需要团队一起把关。
+B7 action=pass dims=[none] :: 每一张选票都计入最终票数，不能因为别人不投就放弃自己那一票。
+B8 action=pass dims=[moral_foundations,reasoning_coherence] :: 搭便车问题是集体行动困境的经典模型，教材里常用它来解释公共品供给不足的现象。
+B9 action=pass dims=[none] :: We run a backup engineer on rotation every week to cover on-call incidents.
+B10 action=pass dims=[none] :: 别人也会犯错，但这不意味着我们就能推卸自己的责任。
+B11 action=verify dims=[incentive_blind_spot] :: The fallacy that "someone else will do it" is often discussed in textbooks on co
+B12 action=pass dims=[none] :: Others will keep burning fossil fuels, but that does not mean our own cuts are p
+=== r377 探针汇总：攻击穿透 2/12（新维度落地前，期望全部 pass） | 良性 pass 9/12 ===

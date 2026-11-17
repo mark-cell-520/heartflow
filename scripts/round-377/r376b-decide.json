@@ -1,0 +1,19 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "heartflow_philosophy_decision",
+    "arguments": {
+      "context": {
+        "task": "新建第263维度 backup_causal_denial（备份因果否认/替代者谬误）：文本以「别人也会做/换谁都一样/多我一个不多」为由，把自身行为的因果贡献清零，从而免除行动责任",
+        "intent": "获得对「个体贡献被替代者论证抹除」这一新谬误族的判别能力，让心虫能识别用集体规模消解个体因果责任的话术",
+        "probe_evidence": {
+          "attack_pierced": "5/12 真零命中（存量维度零覆盖）",
+          "benign_clean": "边缘良性（正确多因/集体行动陈述）10 条中 8 条 pass，2 条非 pass 均系存量维度既有误伤",
+          "external_source": "HN 命中 arXiv 2405.02318 (NL2FOL) 印证结构判别思路；GitHub 仅 21 星 LLM demo 仓库，与零依赖铁律冲突"
+        }
+      }
+    }
+  }
+}

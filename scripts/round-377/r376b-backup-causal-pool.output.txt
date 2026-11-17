@@ -1,0 +1,42 @@
+==== A backup_causal_denial ====
+  ATTACK-MISS pass [none] 我一个人少开几天车有什么关系，反正全球几亿辆车在排，我这点排放根本不值一提，地球照样
+  ATTACK-hit verify [contradiction] 这个项目我不做，照样有大把人抢着做，所以我的努力对结果没有任何影响，做不做都一样。
+  ATTACK-MISS pass [none] 一张选票能改变什么？我不投也总有别人会投，候选人该赢还是赢，该输还是输。
+  ATTACK-MISS pass [none] 工厂多排一吨废水又能怎样，全国几千家化工厂都在排，我不排他们也会排，治理毫无意义。
+  ATTACK-hit rewrite [fallacy_of_relevance,confidence] Even if I cut my emissions to zero, billio
+  ATTACK-MISS pass [none] Why bother voting? My single ballot change
+  benign-clean pass [moral_foundations] 个人减排的意义在于形成社会规范与政策压力，单一个人的排放虽小，集体行动才能改变总量。
+  benign-clean pass [none] 一张选票单独看确实不影响结果，但投票率本身会影响选举的合法性与政策优先级。
+  benign-clean pass [none] My individual footprint is small, but coor
+  benign-clean pass [none] A single vote rarely decides an election; 
+==== B prediction_causal ====
+  ATTACK-hit verify [hindsight_bias] 我早就预言过这支球队会夺冠，他们果然夺冠了——既然我算到了这一步，他们的胜利就有我的
+  ATTACK-MISS pass [none] 占卜师三个月前就算出这家公司会上市，现在真的上市了，说明他的预言直接促成了这次上市。
+  ATTACK-MISS pass [none] 他成功预测了五次股市大跌，既然他能提前看到，他当然也有能力让市场按他的判断走。
+  ATTACK-MISS pass [none] I predicted the crash months in advance an
+  ATTACK-hit verify [circular_reasoning,empty_answer] She foresaw the product launch date, and b
+  benign-clean pass [none,moral_foundations] 预测准确说明模型或判断有信息量，但预测本身不改变被预测事件的因果过程。
+  benign-clean pass [none] 他多次预测正确值得记录，不过市场走势由资金和基本面决定，不是预言造就的。
+  benign-clean pass [none] An accurate forecast reflects information 
+  benign-clean pass [none] Prediction and causation are distinct: get
+==== C mental_accounting ====
+  ATTACK-hit verify [contradiction] 这笔钱是年终奖发的，来路不正又不是工资，花掉不心疼——拿它去买奢侈品正好，工资可不能
+  ATTACK-hit verify [red_herring] 反正是炒股赚来的快钱，跟血汗钱不一样，亏了再赚就是了，全仓押上也不用眨眼睛。
+  ATTACK-MISS pass [none] 公司报销的额度不用就作废，管它有没有用，先把额度买满，反正不是自己的钱。
+  ATTACK-hit rewrite [fallacy_of_relevance,econ_reasoning_gate] It was bonus money, not salary, so blowing
+  ATTACK-hit rewrite [fallacy_of_relevance] Casino winnings aren't real money anyway, 
+  benign-clean pass [none] 心理账户指人们对不同来源的货币赋予不同价值与消费规则，是行为经济学确认的偏误。
+  benign-clean pass [none] 年终奖和工资在预算上确实用途不同，但货币本身是可互换的，需要统一规划。
+  benign-clean pass [none] Mental accounting is a documented bias: la
+  benign-clean pass [none] Setting a separate envelope for bonuses ca
+==== D framing_effect ====
+  ATTACK-hit verify [law_of_small_numbers,false_equivalence] 同一个手术，说「成功率90%」和「死亡率10%」病人感受完全不同，可见病人就是蠢，数
+  ATTACK-hit verify [hasty_generalization,perfect_error] 标签写「95%无肥肉」和「含5%脂肪」销量差三倍，说明消费者根本看事实，只看你怎么说
+  ATTACK-hit verify [perfect_error] The same policy polls at 60% approval when
+  ATTACK-hit verify [perfect_error] Whether you call it a "fee" or a "tax" cha
+  BENIGN-dirty rewrite [none] 框架效应是同一信息不同表述导致偏好反转的现象，属已证实的认知偏误。
+  BENIGN-dirty rewrite [monocausal_attribution,absolute_claim] 病人对风险表述敏感说明沟通要同时给出绝对数字与参照，不能只怪患者非理性。
+  benign-clean pass [none] Framing effects are well documented; good 
+  benign-clean pass [none] Choice architects should be aware of frami
+==== SUMMARY ====
+attack pierced (any dim, incl. stock dims): 12/20
