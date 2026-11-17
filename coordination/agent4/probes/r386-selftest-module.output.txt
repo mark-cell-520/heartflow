@@ -1,0 +1,17 @@
+A 攻击命中: 10/10
+B 良性误命中: 0/18
+C OK: 删 MEASURE_ZH_OR → 依赖组 3/3 全死，非依赖组 7/7 全活
+C OK: 删 MEASURE_ZH_HR → 依赖组 3/3 全死，非依赖组 7/7 全活
+C OK: 删 MEASURE_EN_OR → 依赖组 2/2 全死，非依赖组 8/8 全活
+C OK: 删 MEASURE_EN_HR → 依赖组 2/2 全死，非依赖组 8/8 全活
+C OK: 删 VERDICT_ZH_ORRISK → 依赖组 3/3 全死，非依赖组 7/7 全活
+C OK: 删 VERDICT_ZH_HRCUM → 依赖组 3/3 全死，非依赖组 7/7 全活
+C OK: 删 VERDICT_EN_ORRISK → 依赖组 2/2 全死，非依赖组 8/8 全活
+C OK: 删 VERDICT_EN_HRCUM → 依赖组 2/2 全死，非依赖组 8/8 全活
+C OK: 删 INFER_ZH/EN → 攻击 0/10
+D OK: CONCEPT_ZH 豁免承重（注入永假后转命中）
+D OK: CONCEPT_EN 豁免承重（注入永假后转命中）
+D OK: CORRECT_ZH 豁免承重（注入永假后转命中）
+D OK: CORRECT_EN 豁免承重（注入永假后转命中）
+
+[r386 selftest-module] 全部通过

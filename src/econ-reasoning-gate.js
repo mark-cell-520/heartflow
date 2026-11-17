@@ -247,6 +247,16 @@ const FAMILIES = [
   //   紧前否定/对冲双守卫；与 mercantilism（贸易差额财富误读，不要求绝对优势
   //   前提）、zero_sum_fallacy（泛化零和断言）射程不重叠。
   { key: 'comparative_advantage',              mod: './comparative-advantage.js',              fn: 'detectComparativeAdvantage',            zh: '绝对优势≠比较优势',        en: 'absolute-vs-comparative advantage confusion', round: 'r385' },
+  // r386 新增：效应量口径误读（effect-measure misinterpretation——把 OR 直接
+  //   当成风险倍数读（OR 只在结局罕见时才近似 RR）、把 HR 直接当成累积生存/
+  //   绝对差读（HR 是瞬时风险之比）；二段探针（scripts/round-386/
+  //   probe-candidates2.js）OR≈RR 与 HR≈累积两族合计 5/10 真零命中（gate=pass），
+  //   首段 8 个统计候选族 1/32 穿透被存量维度全面代拦后换轴定拨；双腿（口径锚
+  //   OR/HR × 错误口径结论）+ 推断标记（并列实测发现不判）+ CONCEPT/CORRECT
+  //   两组豁免 + 腿②紧前否定/对冲双守卫；与 relative_risk_individual_transfer
+  //   （群体→个体平移）、significance_effect_size（显著性→重要性）、
+  //   dose_response_linearity（剂量-反应线性化）射程不重叠。
+  { key: 'effect_measure_misread',             mod: './effect-measure-misread.js',             fn: 'detectEffectMeasureMisread',            zh: '效应量口径误读',          en: 'effect-measure misread (OR-as-risk / HR-as-cumulative)', round: 'r386' },
 ];
 
 const _cache = new Map();
@@ -270,7 +280,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 37 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 38 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

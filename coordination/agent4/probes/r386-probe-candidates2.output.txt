@@ -1,0 +1,49 @@
+
+=== H_or_as_rr ===
+caught(verify) | ["false_precision","reverse_causation","perfect_error"] |  logistic 回归显示 OR 为 3.2，说明服药者患病的风险是普通人的 3.2 倍。
+caught(verify) | ["perfect_error"] | 病例对照研究的 OR 达到 4，这意味着暴露组的发病概率是对照组的 4 倍。
+PENETRATED | ["none"] | OR=1.5 就代表风险只上升五成，这个因素不值得担心。
+caught(rewrite) | ["fallacy_of_relevance"] | The odds ratio was 3.2, so the exposed group has 3.2 t
+PENETRATED | ["none"] | An OR of 4 means the probability of disease is four ti
+
+=== I_hr_as_survival ===
+caught(verify) | ["perfect_error"] | 风险比 HR=0.7，说明新药把五年生存率从 50% 提高到了 85%。
+caught(rewrite) | ["fallacy_of_relevance","perfect_error"] | HR 为 0.8，意味着患者的死亡风险在任何时间点都直接少了 20 个百分点。
+PENETRATED | ["none"] | 风险比降到 0.5，等于患者活过五年的概率翻倍。
+PENETRATED | ["none"] | A hazard ratio of 0.7 means five-year survival improve
+PENETRATED | ["none"] | HR = 0.5 means the probability of surviving five years
+
+=== J_pctpoint_pct ===
+caught(rewrite) | ["relative_pration","statistical_misleading","perfect_error"] | 失业率只从 5% 升到 7.5%，不过是 2.5 个百分点的小事，说明就业形势没有实质恶化。
+caught(rewrite) | ["fallacy_of_relevance","statistical_misleading","perfect_error"] | 支持率从 40% 降到 38%，只下降了 2 个百分点，所以其实相当于基本没掉。
+caught(rewrite) | ["fallacy_of_relevance","perfect_error"] | Unemployment rose only 2.5 percentage points, from 5% 
+
+=== K_adhoc_rescue ===
+PENETRATED | ["moral_foundations"] | 预测没有应验，说明这次实验的条件不够理想，等条件更纯粹时理论自然成立。
+caught(rewrite) | ["unfalsifiable_assertion"] | 理论预言的效应没出现，是因为观测设备的精度还不够，换成更灵敏的仪器就能看到。
+caught(rewrite) | ["reasoning_coherence","absolute_claim"] | 实验否证了模型，但这正说明现实世界太嘈杂，在理想环境下模型一定对。
+PENETRATED | ["none"] | The prediction failed because the conditions were not 
+PENETRATED | ["none"] | The experiment refuted the model, which just shows the
+
+=== L_ev_vs_mode ===
+PENETRATED | ["none"] | 这个投资的期望收益是正的，所以最可能的结果就是赚钱。
+caught(verify) | ["vagueness"] | 期望回报率为正，意味着你大概率会赚钱。
+caught(rewrite) | ["fallacy_of_relevance"] | The expected return is positive, so the most likely ou
+
+=== M_indep_add ===
+caught(verify) | ["law_of_small_numbers","perfect_error"] | 每条链路失败的概率是 10%，两条并联链路的失败概率就是 20%。
+caught(verify) | ["law_of_small_numbers","perfect_error"] | 每次不中奖的概率是 50%，抽两次不中奖的概率就是 100%。
+PENETRATED | ["none"] | Each component has a 10% failure rate, so two componen
+
+=== N_multi_nocorrect ===
+caught(verify) | ["researcher_degrees_of_freedom"] | 我们同时检验了 30 个假设，其中 3 个达到了显著，这 3 个发现都很扎实。
+caught(verify) | ["researcher_degrees_of_freedom"] | 二十个指标里有两个 p 值小于 0.05，这两个指标对销量的影响是确凿的。
+PENETRATED | ["none"] | We tested thirty hypotheses and three came out signifi
+
+=== O_surv_new_wording ===
+caught(verify) | ["completion_evidence"] | 只看活到项目结束的用户，留存曲线后段依然漂亮，说明产品长期价值没问题。
+caught(verify) | ["pseudo_causal","pseudo_causal","confidence","moral_foundations"] | 能熬过试用期的客户满意度最高，可见忠诚用户才是基本盘。
+PENETRATED | ["none"] | 统计阵亡客户会让数据难看，所以放弃售后支持后剩下的客户反而更优质。
+PENETRATED | ["none"] | Looking only at users who survived to the end, the ret
+
+=== 汇总：攻击 31 条，穿透 13 条 ===
