@@ -1,0 +1,53 @@
+[r379] round-379-flat-rate-bias: A 10/10 命中, B 6/6 零命中, C 18 键注入全翻转, D gate 10/10 非 pass, E 插件 40 族接线, F 12/12 零越界, G 10/10 归因纯净
+TAP version 13
+# Subtest: A 攻击样本命中（10/10）
+ok 1 - A 攻击样本命中（10/10）
+  ---
+  duration_ms: 8.252452
+  type: 'test'
+  ...
+# Subtest: B 良性样本零命中（6/6，模块级）
+ok 2 - B 良性样本零命中（6/6，模块级）
+  ---
+  duration_ms: 0.232827
+  type: 'test'
+  ...
+# Subtest: C 负例注入-删条（18 键全部翻转，0 未翻转）
+ok 3 - C 负例注入-删条（18 键全部翻转，0 未翻转）
+  ---
+  duration_ms: 1.484173
+  type: 'test'
+  ...
+# Subtest: D gate 桥接（10/10 非 pass + econ_reasoning_gate 归因）
+ok 4 - D gate 桥接（10/10 非 pass + econ_reasoning_gate 归因）
+  ---
+  duration_ms: 2237.494618
+  type: 'test'
+  ...
+# Subtest: E 插件层接线（40 族 = 34 econ + 6 stats）
+ok 5 - E 插件层接线（40 族 = 34 econ + 6 stats）
+  ---
+  duration_ms: 6.675946
+  type: 'test'
+  ...
+# Subtest: F 存量族攻击句 → 本族零命中（12/12 不越界）
+ok 6 - F 存量族攻击句 → 本族零命中（12/12 不越界）
+  ---
+  duration_ms: 0.223249
+  type: 'test'
+  ...
+# Subtest: G 本族攻击句 → 归因纯净（10/10 仅 flat_rate_bias 承载 econ）
+ok 7 - G 本族攻击句 → 归因纯净（10/10 仅 flat_rate_bias 承载 econ）
+  ---
+  duration_ms: 17.331864
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2277.246183
