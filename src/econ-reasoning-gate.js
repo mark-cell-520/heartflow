@@ -113,6 +113,20 @@ const FAMILIES = [
   // CONCEPT/CORRECT/TEMPORAL 三组豁免；腿②受否定守卫、腿③不受
   // （「肯定不会错」的「不会」是攻击惯语组成部分，r371 设计决策）。
   { key: 'decoy_effect',                   mod: './decoy-effect.js',               fn: 'detectDecoyEffect',          zh: '诱饵效应/被支配比较',       en: 'decoy effect (asymmetric dominance)', round: 'r371' },
+  // r372 新增：健康使用者偏倚/健康依从者效应（healthy user bias / healthy
+  //   adherer effect——坚持健康行为、按时服药、主动体检的人群本身在
+  //   教育/收入/健康意识/基础健康上系统性优于非坚持者，观察性研究两组
+  //   间的健康差异混杂「行为效果」与「人群自选择」，直接归因为行为/
+  //   产品即犯此偏倚；攻击形「吃维生素的人明显更健康，所以维生素让人
+  //   健康」「坚持复诊的病人死亡率更低，复诊本身就是延长生命的良方」；
+  //   同池 16 候选定拨：本族攻击穿透 8/16（真零命中，存量维度零覆盖）
+  //   + 良性 0/4 零误伤（adverse_selection 5/5 全被存量代拦边际零、
+  //   moral_hazard 穿透 2/5、free_rider 1/4、合成谬误 2/5、illicit_process
+  //   3/4 全被 absolute_claim 代拦、概率相加 4/4 全被 perfect_error 代拦、
+  //   zero_risk_bias 良性 3/4 非 pass 边界脏）；两腿（行为/依从群体 ×
+  //   健康结果或归因断言）+ CONCEPT/CORRECT 两组豁免 + 腿①否定守卫
+  //   （「不吃维生素的人」是对照组形）+ CAUSAL 桶前置否定守卫）。
+  { key: 'healthy_user_bias',              mod: './healthy-user-bias.js',          fn: 'detectHealthyUserBias',     zh: '健康使用者偏倚/依从者效应',  en: 'healthy user bias (healthy adherer effect)', round: 'r372' },
 ];
 
 const _cache = new Map();
@@ -136,7 +150,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 26 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 27 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
