@@ -138,15 +138,15 @@ test('D gate 桥接（10/10 非 pass + econ_reasoning_gate 归因）', () => {
   assert.ok(nonPass.length <= 2, '良性非 pass 不应超过 2 条（存量误伤基线），实际 ' + nonPass.length);
 });
 
-test('E 插件层接线（40 族 = 34 econ + 6 stats）', () => {
+test('E 插件层接线（41 族 = 35 econ + 6 stats）', () => {
   const fam = plugin.FAMILIES.find(f => f.key === 'flat_rate_bias');
   assert.ok(fam, '插件族表应含 flat_rate_bias');
   assert.strictEqual(fam.group, 'econ');
   assert.strictEqual(fam.round, 'r379');
-  assert.strictEqual(plugin.FAMILIES.length, 40, '插件族表应为 40 族');
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 34, 'econ 应为 34 族');
+  assert.strictEqual(plugin.FAMILIES.length, 41, '插件族表应为 41 族');
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 35, 'econ 应为 35 族');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 应为 6 族');
-  assert.strictEqual(plugin.version, '1.16.0', '插件 version 应为 1.16.0');
+  assert.strictEqual(plugin.version, '1.17.0', '插件 version 应为 1.17.0');
   const pa = plugin.analyze(ATTACK[0]);
   assert.ok(pa.families.some(x => x.key === 'flat_rate_bias'), 'analyze 攻击应命中 flat_rate_bias');
   const pb = plugin.analyze(BENIGN[1]);
@@ -189,4 +189,4 @@ test('G 本族攻击句 → 归因纯净（10/10 仅 flat_rate_bias 承载 econ�
 });
 
 // 清理（测试脚本最后一行必须是清理——本测试无临时文件，输出真实结果计数）
-console.log('[r379] round-379-flat-rate-bias: A 10/10 命中, B 6/6 零命中, C 18 键注入全翻转, D gate 10/10 非 pass, E 插件 40 族接线, F 12/12 零越界, G 10/10 归因纯净');
+console.log('[r379] round-379-flat-rate-bias: A 10/10 命中, B 6/6 零命中, C 18 键注入全翻转, D gate 10/10 非 pass, E 插件 41 族接线, F 12/12 零越界, G 10/10 归因纯净');

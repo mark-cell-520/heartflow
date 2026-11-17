@@ -3,8 +3,8 @@
  * r336 机会成本忽视扩族至 22 族后随族表更新）
  *
  * 覆盖：
- *   A 插件元数据与族表（40 族 = 34 econ + 6 stats，族键/模块路径/组归属）
- *   B 每族攻击命中（40 族全中，模块级判据经插件聚合后仍可达）
+ *   A 插件元数据与族表（41 族 = 35 econ + 6 stats，族键/模块路径/组归属）
+ *   B 每族攻击命中（41 族全中，模块级判据经插件聚合后仍可达）
  *   C 良性零误伤（12 条官方良性形状语料）
  *   D action=<family key> 单族过滤（MCP action 入参）
  *   E 负例注入-删条（40 个：blind inject 各模块 __internals 探针键后，
@@ -196,14 +196,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 40 族：34 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 40); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1 + r376 存款创造贷款误解 1 + r377 税率-税收线性误读 1 + r378 未理赔即亏误读 1 + r379 固定费率偏误 1
+T('A2 族表 41 族：35 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 41); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1 + r376 存款创造贷款误解 1 + r377 税率-税收线性误读 1 + r378 未理赔即亏误读 1 + r379 固定费率偏误 1 + r381 劳动总量谬误 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 34);
+  assert.strictEqual(econ.length, 35);
   assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 40);
+  assert.strictEqual(new Set(keys).size, 41);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
@@ -213,7 +213,7 @@ T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
     assert.ok(/^r\d+$/.test(f.round), `${f.key} 起草轮次异常: ${f.round}`);
   }
 });
-T('A4 40 个模块文件全部存在且导出函数是函数', () => {
+T('A4 41 个模块文件全部存在且导出函数是函数', () => {
   for (const f of FAMILIES) {
     const p = path.join(ROOT, 'src/plugins/econ-reasoning-check', f.mod);
     assert.ok(fs.existsSync(p), `模块缺失: ${f.mod}`);
