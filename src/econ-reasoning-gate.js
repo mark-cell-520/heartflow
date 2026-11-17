@@ -180,6 +180,16 @@ const FAMILIES = [
   //   双腿（存贷机制在场 × 倒置归源/约束断言 12+12 形）+ CONCEPT/CORRECT 两组
   //   豁免 + 腿②紧前否定/对冲双守卫）。
   { key: 'money_creation',                 mod: './money-creation.js',                 fn: 'detectMoneyCreation',                 zh: '存款创造贷款误解',        en: 'deposit-creation reversal (loans-come-from-deposits inversion)', round: 'r376' },
+  // r377 新增：税率-税收线性误读（linear tax-revenue assumption / tax-base
+  //   elasticity neglect——把税率变动按固定比例折算成财政收入变动，跳过税基
+  //   对税率的反应；同池 12 候选定拨（probe-r377-pool.js + probe-r377-scope.js）
+  //   二段深探穿透 7/10 真零命中 + 良性边界最净（2/10 非 pass 均系存量
+  //   monocausal_attribution/pseudo_causal 误伤非本族增量）；双腿（税率变动
+  //   语境 ZH3+EN2 组 × 等比兑现断言 ZH4+EN3 形）+ CONCEPT/COND/CORRECT 三组
+  //   豁免 + 腿②紧前否定/对冲双守卫；与 tax_incidence（法定归宿≠经济归宿）
+  //   射程零交集——本族攻击句无归属/转嫁标记，tax_incidence 攻击句无比
+  //   兑现标记）。
+  { key: 'linear_tax_revenue',             mod: './linear-tax-revenue.js',             fn: 'detectLinearTaxRevenue',             zh: '税率-税收线性误读',        en: 'linear tax-revenue assumption (tax-base elasticity neglect)', round: 'r377' },
 ];
 
 const _cache = new Map();
@@ -203,7 +213,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 32 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 33 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

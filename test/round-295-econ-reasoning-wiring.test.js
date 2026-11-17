@@ -3,11 +3,11 @@
  * r336 机会成本忽视扩族至 22 族后随族表更新）
  *
  * 覆盖：
- *   A 插件元数据与族表（37 族 = 31 econ + 6 stats，族键/模块路径/组归属）
- *   B 每族攻击命中（37 族全中，模块级判据经插件聚合后仍可达）
+ *   A 插件元数据与族表（38 族 = 32 econ + 6 stats，族键/模块路径/组归属）
+ *   B 每族攻击命中（38 族全中，模块级判据经插件聚合后仍可达）
  *   C 良性零误伤（12 条官方良性形状语料）
  *   D action=<family key> 单族过滤（MCP action 入参）
- *   E 负例注入-删条（37 个：blind inject 各模块 __internals 探针键后，
+ *   E 负例注入-删条（38 个：blind inject 各模块 __internals 探针键后，
  *     该族必须从命中中消失——证明每个族的 dispatch 都是承重的，删了会红）
  *   F 引擎 think 路径真 dispatch（真 HeartFlow 实例 + 真 runThinkPipeline：
  *     插件经 PluginLoader 加载 → postprocess.think hook 写
@@ -92,6 +92,8 @@ const ATTACK = {
   government_household_analogy: '国家财政跟家庭账本是一个道理，收入多少才能花多少，欠的债必须连本带利还清，否则就是破产。',
   // r376 存款创造贷款误解（src/money-creation.js，双腿样本——腿①存贷机制 × 腿②倒置归源/约束断言）
   money_creation: '银行放贷用的是储户的存款，没有存款增长就没有贷款。',
+  // r377 税率-税收线性误读（src/linear-tax-revenue.js，双腿样本——腿①税率变动语境 × 腿②等比兑现断言）
+  linear_tax_revenue: '税率提高一倍，税收自然也会翻倍，财政收入立马宽裕。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -166,6 +168,10 @@ const INJECT_KEY = {
   // r376 money_creation（双腿：腿① CTX_[ZH|EN] × 腿② SOURCE_[S1..S7|C1..C5]_[ZH|EN]
   // + CONCEPT/CORRECT 两组豁免 + 腿②紧前否定/对冲双守卫）
   money_creation: ['CTX_ZH', 'CTX_EN', 'SOURCE_S1_ZH', 'SOURCE_S2_ZH', 'SOURCE_S3_ZH', 'SOURCE_S4_ZH', 'SOURCE_S5_ZH', 'SOURCE_S6_ZH', 'SOURCE_S7_ZH', 'SOURCE_C1_ZH', 'SOURCE_C1B_ZH', 'SOURCE_C2_ZH', 'SOURCE_C3_ZH', 'SOURCE_C4_ZH', 'SOURCE_C5_ZH', 'SOURCE_S1_EN', 'SOURCE_S2_EN', 'SOURCE_S3_EN', 'SOURCE_S4_EN', 'SOURCE_S5_EN', 'SOURCE_S6_EN', 'SOURCE_S7_EN', 'SOURCE_C1_EN', 'SOURCE_C2_EN', 'SOURCE_C3_EN', 'SOURCE_C4_EN', 'SOURCE_C5_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN'],
+  // r377 linear_tax_revenue（双腿：腿① RATE_[ZH|ZH_B|ZH_C|EN|EN_B] × 腿②
+  // PROP_[P1..P4]_ZH / PROP_[E1..E3]_EN + CONCEPT/COND/CORRECT 三组豁免 +
+  // 腿②紧前否定/对冲双守卫）
+  linear_tax_revenue: ['RATE_ZH', 'RATE_ZH_B', 'RATE_ZH_C', 'RATE_EN', 'RATE_EN_B', 'PROP_P1_ZH', 'PROP_P2_ZH', 'PROP_P3_ZH', 'PROP_P4_ZH', 'PROP_E1_EN', 'PROP_E2_EN', 'PROP_E3_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'COND_ZH', 'COND_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -181,14 +187,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 37 族：31 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 37); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1 + r376 存款创造贷款误解 1
+T('A2 族表 38 族：32 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 38); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1 + r376 存款创造贷款误解 1 + r377 税率-税收线性误读 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 31);
+  assert.strictEqual(econ.length, 32);
   assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 37);
+  assert.strictEqual(new Set(keys).size, 38);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
@@ -198,7 +204,7 @@ T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
     assert.ok(/^r\d+$/.test(f.round), `${f.key} 起草轮次异常: ${f.round}`);
   }
 });
-T('A4 37 个模块文件全部存在且导出函数是函数', () => {
+T('A4 38 个模块文件全部存在且导出函数是函数', () => {
   for (const f of FAMILIES) {
     const p = path.join(ROOT, 'src/plugins/econ-reasoning-check', f.mod);
     assert.ok(fs.existsSync(p), `模块缺失: ${f.mod}`);

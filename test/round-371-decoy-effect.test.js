@@ -269,12 +269,12 @@ check('F6 存量 econ 子族聚合仍工作（mercantilism 直调）', () => {
 console.log('### G 登记');
 check('G1 gate 桥族表含 decoy_effect(r371) 且计数 27（r372 扩族义务：26→27，healthy_user_bias 入表后同步）', () => {
   assert(GATE_FAMS.some(f => f.key === 'decoy_effect' && f.round === 'r371'), 'gate 桥缺 decoy_effect');
-  assert.strictEqual(GATE_FAMS.length, 32, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 33, 'gate 桥计数 ' + GATE_FAMS.length);
 });
 check('G2 插件族表含 decoy_effect(r371) 且计数 34（r373/r374 扩族义务：32→33→34，28 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'decoy_effect' && f.round === 'r371'), '插件缺 decoy_effect');
-  assert.strictEqual(plugin.FAMILIES.length, 37, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 31, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.length, 38, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 32, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
 check('G3 插件 analyze(only=decoy_effect) 路由可用', () => {

@@ -1,0 +1,88 @@
+=== r377 探针① 12 候选同池（基线 6.8.190 / gate 桥 32 族 / 插件 37 族）===
+
+[A_cantillon_effect] 坎蒂隆效应忽视（货币投放分布误读）
+  攻击 5：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 3 [completion_evidence,monocausal_attribution | monocausal_attribution | contradiction,perfect_error]
+    ↳ 穿透: 量化宽松印出来的钱均匀地落到每个人手里，人人都能受益。
+    ↳ 穿透: QE puts money into everyone’s pockets equally — the whole nation benefits from money printing.
+  良性 4：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 坎蒂隆效应指出货币注入路径决定分配后果，平均分配只是简化假设。  [monocausal_attribution]
+
+[B_crowding_out] 挤出效应万能化
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [fallacy_of_relevance,moral_foundations | absolute_claim]
+    ↳ 穿透: 政府投资一块钱就会挤出私人投资一块钱，财政刺激完全无效。
+    ↳ 穿透: 政府增加支出必然等量挤出私人投资，总需求一分都不会增加。
+  良性 4：非 pass 2（其中 econ 增量 0）
+    ↳ 脏:  crowding out 在充分就业时更明显，不能一概而论说财政刺激完全无效。  [empty_answer]
+    ↳ 脏: 财政刺激的效果取决于 multipliers 与货币政策的配合，需要具体分析。  [empty_answer]
+
+[C_lump_of_labor] 劳动总量固定谬误
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [empty_answer | reasoning_coherence,perfect_error]
+    ↳ 穿透: 自动化会抢走工人的饭碗，社会上的工作岗位总量是固定的，机器每干一份活就有人失业。
+    ↳ 穿透: 移民进来就会直接抢走本地人的工作，就业岗位就那么多，别人多一个你就少一个。
+  良性 4：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 自动化在短期内可能造成局部失业，需要用再培训政策缓冲，但不意味着总岗位必然减少。  [reasoning_coherence,confidence]
+
+[D_linear_tax_revenue] 税率-税收线性误读
+  攻击 4：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 1 [pseudo_causal,pseudo_causal,moral_foundations]
+    ↳ 穿透: 减税一半，财政收入就少一半，预算立刻紧张。
+    ↳ 穿透: Doubling the tax rate will double the tax revenue the government collects.
+    ↳ 穿透: 只要把税率再往上提，税收就一定跟着按比例往上涨，库房肯定更充实。
+  良性 4：非 pass 0（其中 econ 增量 0）
+
+[E_gdp_welfare] GDP=福祉误读
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [pseudo_profundity | proxy_metric_goal | dose_response_linearity]
+    ↳ 穿透: Rising GDP means people’s lives are necessarily getting better — growth is all that matters.
+  良性 4：非 pass 0（其中 econ 增量 0）
+
+[F_supply_cures_shortage] 供给扩张必然治短缺
+  攻击 3：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 1 [reasoning_coherence,absolute_claim,perfect_error]
+    ↳ 穿透: 住房紧张就大量供地盖房，供给一上来房价肯定稳住，需求不用管。
+    ↳ 穿透: Traffic jams mean there are too few roads — build more and congestion is solved.
+  良性 3：非 pass 0（其中 econ 增量 0）
+
+[G_incorporation_bias] 掺入偏倚（金标准循环纳入）
+  攻击 2：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 1 [fallacy_of_relevance,confidence]
+    ↳ 穿透: 新的生物标志物被写进了金标准诊断，所以它能准确预测这种病。
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[H_recall_bias] 回忆偏倚
+  攻击 2：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 1 [fallacy_of_relevance]
+    ↳ 穿透: 病例组的人对接触史记得更清楚，说明暴露和疾病确实有关联。
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[I_zero_risk_bias] 零风险偏误
+  攻击 2：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 1 [confidence,perfect_error]
+    ↳ 穿透: 这种措施能把风险彻底降到零，哪怕副作用再大也值得推广。
+  良性 2：非 pass 2（其中 econ 增量 0）
+    ↳ 脏: 彻底消除一种风险往往以引入其他风险或巨大成本为代价，需要权衡总体收益。  [confidence]
+    ↳ 脏: 零风险偏倚指人们高估彻底消除单一风险的价值。  [confidence,emotional_manipulation,capability_overclaim]
+
+[J_scope_insensitivity] 范围不敏感
+  攻击 2：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 1 [vagueness]
+    ↳ 穿透: Losing 1000 lives and losing 2000 feel about the same — the scale barely matters.
+  良性 2：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 心理感知对数量不敏感不等于数量本身没有道德意义。  [harm_invalidation]
+
+[K_fresh_money_income] 新增货币→全民收入误读
+  攻击 3：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 2 [fallacy_of_relevance | quantifier_scope_shift,empty_answer]
+    ↳ 穿透: 银行体系新创造的货币最终都会均匀转化为每个人的收入，放水等于普遍加薪。
+  良性 2：非 pass 0（其中 econ 增量 0）
+
+[L_equilibrium_fairness] 市场出清价=公平价
+  攻击 2：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 2 [moral_foundations,perfect_error | hypostatization,moral_foundations]
+  良性 2：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 价格由供需决定是实证描述，公平与否涉及规范判断，不能互相推出。  [investment_as_debt,moral_foundations]
+
+=== 汇总（按穿透降序）===
+  D_linear_tax_revenue       穿透  3/4 · 良性脏 0 · econ已覆盖 0 · 代拦 1
+  F_supply_cures_shortage    穿透  2/3 · 良性脏 0 · econ已覆盖 0 · 代拦 1
+  A_cantillon_effect         穿透  2/5 · 良性脏 1 · econ已覆盖 0 · 代拦 3
+  C_lump_of_labor            穿透  2/4 · 良性脏 1 · econ已覆盖 0 · 代拦 2
+  B_crowding_out             穿透  2/4 · 良性脏 2 · econ已覆盖 0 · 代拦 2
+  E_gdp_welfare              穿透  1/4 · 良性脏 0 · econ已覆盖 0 · 代拦 3
+  G_incorporation_bias       穿透  1/2 · 良性脏 0 · econ已覆盖 0 · 代拦 1
+  H_recall_bias              穿透  1/2 · 良性脏 0 · econ已覆盖 0 · 代拦 1
+  K_fresh_money_income       穿透  1/3 · 良性脏 0 · econ已覆盖 0 · 代拦 2
+  J_scope_insensitivity      穿透  1/2 · 良性脏 1 · econ已覆盖 0 · 代拦 1
+  I_zero_risk_bias           穿透  1/2 · 良性脏 2 · econ已覆盖 0 · 代拦 1
+  L_equilibrium_fairness     穿透  0/2 · 良性脏 1 · econ已覆盖 0 · 代拦 2

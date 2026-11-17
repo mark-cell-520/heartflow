@@ -1,0 +1,41 @@
+=== A 模块层：攻击命中 / 良性豁免 ===
+  ✓ A1 11 条攻击全命中
+  ✓ A2 18 条良性全豁免
+  ✓ A3 返回体字段齐备（dimension/severity/details/guidance）
+  ✓ A4 短文本/空文本守卫
+=== B 结构承重（双腿/豁免/守卫 20 组负例注入）===
+  ✓ B1 腿① RATE_ZH 删 → 「税率提高一倍…翻倍」不命中
+  ✓ B2 腿① RATE_ZH_B 删 → 「减税一半…少一半」不命中
+  ✓ B3 腿① RATE_ZH_C 删 → 「企业所得税从25%降到15%」句不命中
+  ✓ B4 腿② PROP_P1_ZH 删 → 「财政收入同步回落」句不命中
+  ✓ B5 腿② PROP_P2_ZH 删 → 「正比例关系」句不命中
+  ✓ B6 腿② PROP_P3_ZH 删 → 「税收自然也会翻倍」句不命中
+  ✓ B7 腿② PROP_P4_ZH 删 → 「加重多少…增加多少」句不命中
+  ✓ B8 腿① RATE_EN 删 → EN 攻击不命中
+  ✓ B9 腿① RATE_EN_B 删 → EN tax cuts 攻击不命中
+  ✓ B10 腿② PROP_E1_EN 删 → EN will double 攻击不命中
+  ✓ B11 腿② PROP_E3_EN 删 → EN exactly the rate 攻击不命中
+  ✓ B12 PAIR_ZH=0 → 远距两腿共现句不命中
+  ✓ B13 CONCEPT_ZH 删 → 拉弗曲线讨论句翻红（概念豁免承重）
+  ✓ B14 COND_ZH 删 → 条件句翻红（在…假设下豁免承重）
+  ✓ B15 NEG_ZH 删 → 「税收翻倍」紧前否定句翻红（紧前否定守卫承重）
+  ✓ B16 HEDGE_ZH 删 → 「按比例折算是想当然」句翻红（对冲短语守卫承重）
+  ✓ B17 CONCEPT_EN 删 → EN Laffer 讨论句翻红
+  ✓ B18 COND_EN 删 → EN 条件句翻红
+  ✓ B19 NEG_EN 删 → EN 否定句翻红
+  ✓ B20 HEDGE_EN 删 → EN misconception 句翻红
+=== C 引擎 gate 兑现 ===
+  ✓ C1 攻击句 gate.action 非 pass 且归因 econ_reasoning_gate
+  ✓ C2 gate 桥 families 含 linear_tax_revenue
+  ✓ C3 良性句 gate.action = pass
+=== D 插件层接线 ===
+  ✓ D1 插件族表 38 族：32 econ + 6 stats，key 唯一
+  ✓ D2 插件 version 1.14.0
+  ✓ D3 gate 桥族表 33 族
+=== F 射程邻接核查 ===
+  ✓ F1 tax_incidence 攻击句不误触 linear_tax_revenue
+  ✓ F2 price_control 攻击句不误触 linear_tax_revenue
+  ✓ F3 本族攻击句不被 tax_incidence 模块命中（射程零交集双向）
+  ✓ F4 本族良性句不被 tax_incidence 误判（互补不重叠；tax_incidence 自身攻击样本除外）
+
+结果: 34 通过, 0 失败

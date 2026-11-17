@@ -145,18 +145,18 @@ T('C1 checkOutput 攻击 → verify + econ_reasoning_gate finding', () => {
   assert.strictEqual(r.gate.action, 'verify');
   assert.ok(r.findings.some(f => f.dimension === 'econ_reasoning_gate'), 'findings 应含 econ_reasoning_gate');
 });
-T('C2 gate 桥族表含 money_creation 且计数 32（r375 31→32）', () => {
+T('C2 gate 桥族表含 money_creation 且计数 33（r375 31→32→r377 33）', () => {
   assert.ok(gate.FAMILIES.some(f => f.key === 'money_creation' && f.round === 'r376'));
-  assert.strictEqual(gate.FAMILIES.length, 32);
+  assert.strictEqual(gate.FAMILIES.length, 33);
 });
 
 console.log('=== D 插件层接线 ===');
-T('D1 插件 FAMILIES 含 money_creation 且计数 37', () => {
+T('D1 插件 FAMILIES 含 money_creation 且计数 38', () => {
   assert.ok(plugin.FAMILIES.some(f => f.key === 'money_creation' && f.round === 'r376'));
-  assert.strictEqual(plugin.FAMILIES.length, 37);
+  assert.strictEqual(plugin.FAMILIES.length, 38);
 });
-T('D2 插件 version 1.13.0', () => {
-  assert.strictEqual(plugin.version, '1.13.0');
+T('D2 插件 version 1.14.0', () => {
+  assert.strictEqual(plugin.version, '1.14.0');
 });
 T('D3 only=money_creation 单族过滤', () => {
   const r = plugin.analyze(ATTACK[0], { only: 'money_creation' });

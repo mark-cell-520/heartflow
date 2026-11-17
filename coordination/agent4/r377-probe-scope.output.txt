@@ -1,0 +1,32 @@
+=== r377 探针② D/F 二段深探（基线 6.8.190 pristine，HEAD a07bd59）===
+
+[D_linear_tax_revenue] 税率-税收线性误读（税基弹性忽视）
+  攻击 10：穿透 7/10
+    ↳ 穿透: 减税一半，财政收入就少一半，预算立刻紧张。
+    ↳ 穿透: Doubling the tax rate will double the tax revenue the government collects.
+    ↳ 穿透: 只要把税率再往上提，税收就一定跟着按比例往上涨，库房肯定更充实。
+    ↳ 穿透: 税率和税收是简单的正比例关系，加税筹钱永远按税率等比见效。
+    ↳ 穿透: 提高烟草税三成，税收收入必然跟着涨三成，瘾君子该买还是会买。
+    ↳ 穿透: 税负加重多少，入库的钱就增加多少，这笔账闭着眼睛都能算。
+    ↳ 穿透: Halving the VAT rate will halve VAT receipts — the math is that simple.
+    · 代拦: 税率提高一倍，税收自然也会翻倍，财政收入立马宽裕… [pseudo_causal,pseudo_causal,moral_foundations]
+    · 代拦: 把企业所得税从25%降到15%，财政收入就按四成… [sorites_fallacy]
+    · 代拦: Tax cuts always cost the… [perfect_error]
+  良性 10：非 pass 2
+    ↳ 脏: 在税基不变的简化假设下，税率提高会使税收同比例增… [monocausal_attribution]
+    ↳ 脏: 个人所得税专项附加扣除提高后，财政收入会有所减少… [pseudo_causal,pseudo_causal]
+
+[F_supply_cures_shortage] 供给扩张必然治短缺（派生需求忽视）
+  攻击 10：穿透 6/10
+    ↳ 穿透: 住房紧张就大量供地盖房，供给一上来房价肯定稳住，需求不用管。
+    ↳ 穿透: Traffic jams mean there are too few roads — build more and congestion is solved.
+    ↳ 穿透: 缺什么就扩什么产能，供给跟着上去，短缺肯定自动消失。
+    ↳ 穿透: 电不够用就多建电厂，发电量上来电力紧张必然缓解，需求侧无所谓。
+    ↳ 穿透: 粮食不够就拼命扩大种植面积，产量一上去粮价肯定稳住，消费端不用操心。
+    ↳ 穿透: 药价高就放开产能猛供，供给增加价格必然回落，其他环节都不用动。
+    · 代拦: 堵车是因为路太少，多修路一定能治好拥堵，增加供给… [reasoning_coherence,absolute_claim,perfect_error]
+    · 代拦: Labor shortages are alwa… [completion_evidence,perfect_error]
+    · 代拦: 春运买票难本质是运力不足，只要火车飞机够多，购票… [completion_evidence]
+    · 代拦: Build enough housing and… [perfect_error]
+  良性 10：非 pass 1
+    ↳ 脏: 电力保供既要扩充装机，也要推进需求侧响应与储能调… [empty_answer]
