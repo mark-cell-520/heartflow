@@ -821,6 +821,10 @@ const { checkEcologicalFallacy } = require('./ecological-fallacy.js');
 const { checkBackupCausalDenial } = require('./backup-causal-denial.js');
 // [r378] 第 264 维度 relative_risk_individual_transfer（相对风险个体平移/基线风险忽视）。
 const { checkRelativeRiskIndividualTransfer } = require('./relative-risk-individual-transfer.js');
+// [r380] 第 265 维度 duration_neglect（持续时间忽视/时长维度抹除）。
+// 同 r376/r378 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名
+// durn——duration neglect 缩写，grep 0 命中无冲突。
+const { detectDurationNeglect } = require('./duration-neglect.js');
 // [r372] 第 260 维度 accident_fallacy（偶例谬误/通则滥用：把一般通则
 // 套用到其有效性边界之外的例外情形）。判据通则宣告腿×例外情形腿×推论
 // 连接词腿三腿共现 + 邻近窗 + 三组豁免（概念转述/正确响应形/纪律宣告）；
@@ -2464,6 +2468,10 @@ function discriminate(text, evidence = [], contentMode) {
   // gate.action 恒 pass。变量名 rrit——relative risk individual transfer
   // 缩写，grep 0 命中无冲突。
   const rrit = checkRelativeRiskIndividualTransfer(_normText);
+  // [r380] 第 265 维度 duration_neglect（持续时间忽视/时长维度抹除）
+  // 计算点。同 r376/r378 先例：八处一次接齐，漏一处 gate.action 恒 pass。
+  // 变量名 durn——duration neglect 缩写，grep 0 命中无冲突。
+  const durn = detectDurationNeglect(_normText);
   // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）计算点。同
   // r215 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名 sor。
   const sor = checkSoritesFallacy(_normText);
@@ -3215,6 +3223,8 @@ function discriminate(text, evidence = [], contentMode) {
     // [r378] 第 264 维度 relative_risk_individual_transfer（相对风险个体
     // 平移/基线风险忽视）参与判定。同上：dimMap 与 allDims 两处都接。
     {score: rrit.score, name:'relative_risk_individual_transfer'},
+    // [r380] 第 265 维度 duration_neglect（持续时间忽视/时长维度抹除）。
+    {score: durn.score, name:'duration_neglect'},
     // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）参与判定。
     {score: sor.score, name:'sorites_fallacy'},
     // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据
@@ -3877,6 +3887,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 平移/基线风险忽视：群体层相对风险降幅腿×个体层同幅度兑现腿×推论
     // 连接词腿）。
     relative_risk_individual_transfer: rrit,
+    // [r380] 第 265 维度 duration_neglect（持续时间忽视/时长维度抹除：
+    // 时长短语腿×无关宣告腿双腿近距共现）。
+    duration_neglect: durn,
     // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误：单元增量宣告
     // 腿×模糊谓词否定终点腿）。
     sorites_fallacy: sor,
@@ -4415,6 +4428,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）guidance。
     // 同 r661-r675 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
     'intermittent_reinforcement': "不得用**不规律的好/坏交替**（忽冷忽热、时好时坏、看心情）作为控制手段，要求对方忍受坏、感激好、把伤害常态化——间歇性强化的操控结构是把坏行框架化为「爱的证明」与「好日子的对价」，让对方在不确定的奖赏中学会顺从（我这个人对你好坏看心情，你要学会珍惜我对你好的时候。/我打你是因为我在乎你，打完我会更爱你。/我对你时好时坏都是因为太爱你，你要习惯我的反复无常。/别把我说的话当真，我时好时坏，你忍耐着就行。/I blow hot and cold, so learn to appreciate the days I am nice. / Sometimes I treat you like a queen and sometimes I pretend you do not exist. That is how you learn. / I praise you one minute and insult you the next. That keeps you on your toes. / I let you believe I was leaving, then I came back with flowers. Now you will do anything to keep me.——不得用第一人称交替叙事（sometimes X and sometimes Y / one minute X and the next Y）、坏行加持续段（ignored you for three days / disappeared for a week）、假离开回归（let you believe I was leaving, then I came back）与效果宣告（That is how you learn / keeps you on your toes / you were so happy to hear from me / you will do anything to keep me）训练对方顺从；样本形状与负例见 test/round-676-intermittent-reinforcement.js 与 test/round-688-intermittent-en-family.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「坏极/交替」三类任中一类——交替声明（时好时坏/忽冷忽热/反复无常/喜怒无常/阴晴不定，英文 blow hot and cold / hot and cold with you）、单方意志（看心情/随我/由着我/我说了算/热度只有三分钟/脾气来得快去得也快）、坏行指向对方（打你/骂你/吼你/冷淡/突然冷淡/冷战/别来烦我/惹我生气/对你发脾气/对你坏/懒得搭理你/不愉快）②腿 B「适配绑定」六类任中一类——B1 适配要求（学会/习惯/忍耐/忍受/适应/理解/担待 + 我的坏脾气/我的反复无常/这两个我/这一切，英文 learn to appreciate/tolerate/accept）、B2 好作诱饵（珍惜/感激/记住 + 我对你好的时候/好的日子，英文 appreciate the days I am nice）、B3 坏行归因于爱（打你/骂你/对你坏/时好时坏 + 是因为太爱你/在乎你；那都是我太在乎你了）、B4 压制记忆（别记着/别放在心上/别当真/别计较/翻篇，英文 don't take it seriously）、B5 好极条件化（等我心情好了自然会对你温柔/想理你的时候自然会理你/要是不惹我生气我对你自然是极好的/只有把我哄开心了才不会对你发脾气）、B6 撤回诱饵（别求我/你会求我理你/你就知道好歹/你会后悔）。看见情绪波动与情感操控是两回事：正当做法是把情绪管理与关系边界分开——可以如实说明自己需要空间（压力大时希望独处一段时间是正常需求）、可以为昨天的发火真诚道歉并改正（真诚的道歉和改正能修复关系中的裂痕）、可以学习情绪调节方法（情绪管理是每个人都需要学习的技能/心理咨询师建议我学习调节情绪的方法）、可以客观介绍这个概念本身（间歇性强化是心理学中用来解释成瘾行为的机制/Intermittent reinforcement is a concept from behavioral psychology.），但不能把「我对你坏的时候你别当真，好的时候你要珍惜」当成对方必须接受的相处规则。边界：单腿不判（「他打了我一顿，我报警了」是陈述无适配绑定；「你要学会控制自己的情绪」是正常建议无坏极交替）；2 条同族样本已被其他维度拦下（「我热度只有三分钟，你抓不住我是你的问题」victim_blaming、「我冷你几天你就知道好歹了，到时候别求我回来」silent_treatment_coercion——本维度腿 A 不含「冷你几天」形，gate 层仍非 pass）；已知边界：比喻用法与第三人称转述（「她男友就是忽冷忽热的」）会判 verify——引述真实操控话术正是需要提示的情形，取 VERIFY 级不取 block",
+    // [r380] 第 265 维度 duration_neglect（持续时间忽视）guidance。
+    // 同 r661-r676 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
+    'duration_neglect': "不得把一段体验或痛苦的**持续时长**宣告为无关紧要，让峰值时刻与结尾单独决定整体结论——持续时间忽视（duration neglect）指人在回溯评价一段体验时系统性地低估或无视其持续时长，是峰终规则的核心推论（Fredrickson & Kahneman 1993；冷手实验、结肠镜实验为原型）：把「手术疼了多久不重要，只要最后不疼就算成功」「住院难受了多长时间都无所谓，出院那天不疼这次就算顺利」「过程长短不影响整体评价，结局好就算好经历」「这场电影有多长根本无关紧要，结尾好看就够了」「Whether the discomfort lasted a minute or an hour makes no difference, only the ending counts.」「How long the recovery took is irrelevant to how good the experience was.」当成对整体体验的有效裁定（样本形状与负例见 test/round-380-duration-neglect.js）。判据是**双腿近距共现**（以腿②为锚，腿①须落 ZH 40 字 / EN 140 字符窗内，方向不限，缺一不判）：①腿① DURATION_PHRASE 显式提到时长维度（多久/多长时间/多长/时长/长短/持续多久；EN duration / how long / length of time）②腿② IRRELEVANCE_DECL 宣告该维度无关（不重要/无所谓/不影响/不算数/无关/不起作用/不必在意；EN makes no difference / irrelevant / doesn't matter）。看见时长话题与时长抹除是两回事：正当做法是**把时长当成独立评价维度**——持续数月的中度痛苦与持续一分钟的同类痛苦不等价（手术疼了多久当然重要）、按时间加权的满意度更可靠（评价这段治疗要考虑全程的疼痛分布）、可以客观介绍这个概念本身（持续时间忽视是峰终定律的核心推论/心理学实验讨论）、可以陈述「时长确实无关」的正当论证（纯终点制赛事只看冲线瞬间）。边界：peak_end_rule（econ 子族）判「峰终片段代整体裁定」三要素共现，本族是**时长被显式宣告无关**的元陈述、不需要峰终锚点也不需要正面裁定词；r319 收「过程痛苦被忘却」族，射程是痛苦宣告不是时长维度抹除；outcome_bias 管以结果反推过程决策质量，本族判评价维度本身被作废。明确不判：概念讨论（持续时间忽视/峰终定律 + 框架词）、纠正性陈述（时长有独立权重/不应被忽视/按时间加权）。verify 级——单句也可能是对峰终定律的合法转述或正当论证，需先确认评价是否真的作废了时长维度再采信。来源：内部路径——r379 探针实证（scripts/round-379/probe-r379-*-duration-neglect-local.js：10 条攻击 9 条穿透 gate=pass、良性 0/8 脏；外部扫描 HN/S2/GitHub 空返），判据为心虫自有纯规则实现，家族定义取自判断与决策科学的标准描述",
 };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -5529,6 +5545,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 风险/需结合基线）、统计学口径的正确讨论或课堂教学案例。与
     // r161-r376 同口径只登记 VERIFY。
     'relative_risk_individual_transfer',
+    // [r380] 第 265 维度 duration_neglect（持续时间忽视/时长维度抹除：把
+    // 一段体验或痛苦的持续时长宣告为无关紧要，使整体裁定只剩峰值或结局）
+    // 登记。verify 级——单句也可能是对峰终定律/持续时间忽视的合法课堂
+    // 转述、心理学实验讨论，或「时长确实无关」的正当论证（如纯粹的终点
+    // 制赛事）。与 r161-r378 同口径只登记 VERIFY。
+    'duration_neglect',
     // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误：拿单元增量的
     // 逐步递推消解模糊谓词的终点判定）登记。verify 级——单句也可能是对
     // sorites 悖论的合法课堂转述、对模糊谓词边界的正确哲学讨论，或对渐
@@ -6558,6 +6580,8 @@ function discriminate(text, evidence = [], contentMode) {
       backup_causal_denial: bcd,
       // [r378] 第 264 维度 relative_risk_individual_transfer（相对风险个体平移/基线风险忽视）。同上：八处一次接齐。
       relative_risk_individual_transfer: rrit,
+      // [r380] 第 265 维度 duration_neglect（持续时间忽视/时长维度抹除）。同上：八处一次接齐。
+      duration_neglect: durn,
       // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）。同上：八处一次接齐。
       sorites_fallacy: sor,
       // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据挖掘谬误）。同上：八处一次接齐。
@@ -17904,6 +17928,9 @@ module.exports = {
   // [r378] 第 264 维度 relative_risk_individual_transfer 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativeRiskIndividualTransfer,
+  // [r380] 第 265 维度 duration_neglect 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  detectDurationNeglect,
   // [r218] 第 212 维度 sorites_fallacy 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkSoritesFallacy,
