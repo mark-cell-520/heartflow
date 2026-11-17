@@ -255,11 +255,11 @@ check('F6 存量 econ 子族聚合仍工作（healthy_user_bias 直调 r372 近�
 console.log('### G 登记');
 check('G1 gate 桥族表含 extraordinary_claims(r373) 且计数 28', () => {
   assert(GATE_FAMS.some(f => f.key === 'extraordinary_claims' && f.round === 'r373'), 'gate 桥缺 extraordinary_claims');
-  assert.strictEqual(GATE_FAMS.length, 28, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 29, 'gate 桥计数 ' + GATE_FAMS.length);
 });
 check('G2 插件族表含 extraordinary_claims(r373) 且计数 33（27 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'extraordinary_claims' && f.round === 'r373'), '插件缺 extraordinary_claims');
-  assert.strictEqual(plugin.FAMILIES.length, 33, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.length, 34, '插件计数 ' + plugin.FAMILIES.length);
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 27, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });

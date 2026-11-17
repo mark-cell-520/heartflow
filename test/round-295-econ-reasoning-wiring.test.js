@@ -3,11 +3,11 @@
  * r336 机会成本忽视扩族至 22 族后随族表更新）
  *
  * 覆盖：
- *   A 插件元数据与族表（33 族 = 27 econ + 6 stats，族键/模块路径/组归属）
- *   B 每族攻击命中（33 族全中，模块级判据经插件聚合后仍可达）
+ *   A 插件元数据与族表（34 族 = 28 econ + 6 stats，族键/模块路径/组归属）
+ *   B 每族攻击命中（34 族全中，模块级判据经插件聚合后仍可达）
  *   C 良性零误伤（12 条官方良性形状语料）
  *   D action=<family key> 单族过滤（MCP action 入参）
- *   E 负例注入-删条（33 个：blind inject 各模块 __internals 探针键后，
+ *   E 负例注入-删条（34 个：blind inject 各模块 __internals 探针键后，
  *     该族必须从命中中消失——证明每个族的 dispatch 都是承重的，删了会红）
  *   F 引擎 think 路径真 dispatch（真 HeartFlow 实例 + 真 runThinkPipeline：
  *     插件经 PluginLoader 加载 → postprocess.think hook 写
@@ -84,6 +84,8 @@ const ATTACK = {
   healthy_user_bias: '吃维生素的人明显更健康，所以维生素让人健康。',
   // r373 非凡主张的证据比例错配（src/extraordinary-claims.js，三腿样本——腿①离奇主张 × 腿②弱基底 × 腿③充分性兑现）
   extraordinary_claims: '这个疗法能治愈晚期癌症，虽然只有三例个案，但已经足够可信了。',
+  // r374 存量-流量混淆（src/stock-flow-conflation.js，双腿样本——腿①存量指称 × 腿②流量兑现）
+  stock_flow_conflation: '国家债务总额已经超过一年GDP，等于全国人民一年白干，国家实际上已经破产了。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -148,6 +150,8 @@ const INJECT_KEY = {
   healthy_user_bias: ['GROUP_ZH_A', 'GROUP_ZH_B', 'GROUP_EN_A', 'GROUP_EN_B', 'CAUSAL_ZH', 'CAUSAL_EN'],
   // r373 extraordinary_claims（三腿：腿① EXTRA_[ZH|EN]_[A|B] × 腿② WEAK_[ZH|EN]_[A|B] × 腿③ SUFF_[ZH|EN]）
   extraordinary_claims: ['EXTRA_ZH_A', 'EXTRA_ZH_B', 'EXTRA_EN_A', 'EXTRA_EN_B', 'WEAK_ZH_A', 'WEAK_ZH_B', 'WEAK_EN_A', 'WEAK_EN_B', 'SUFF_ZH', 'SUFF_EN'],
+  // r374 stock_flow_conflation（双腿：腿① STOCK_[ZH|EN]_[A|B] × 腿② EQUATE_[ZS|RATE|CMP]_[ZH|EN]）
+  stock_flow_conflation: ['STOCK_ZH_A', 'STOCK_ZH_B', 'STOCK_EN_A', 'STOCK_EN_B', 'EQUATE_ZS_ZH', 'EQUATE_RATE_ZH', 'EQUATE_CMP_ZH', 'EQUATE_ZS_EN', 'EQUATE_RATE_EN', 'EQUATE_CMP_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -163,14 +167,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 33 族：27 econ + 6 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 33); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1
+T('A2 族表 34 族：28 econ + 6 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 34); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r374 存量-流量混淆 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
-  assert.strictEqual(econ.length, 27);
+  assert.strictEqual(econ.length, 28);
   assert.strictEqual(stats.length, 6);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 33);
+  assert.strictEqual(new Set(keys).size, 34);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {
@@ -180,7 +184,7 @@ T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
     assert.ok(/^r\d+$/.test(f.round), `${f.key} 起草轮次异常: ${f.round}`);
   }
 });
-T('A4 33 个模块文件全部存在且导出函数是函数', () => {
+T('A4 34 个模块文件全部存在且导出函数是函数', () => {
   for (const f of FAMILIES) {
     const p = path.join(ROOT, 'src/plugins/econ-reasoning-check', f.mod);
     assert.ok(fs.existsSync(p), `模块缺失: ${f.mod}`);
