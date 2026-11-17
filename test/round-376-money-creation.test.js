@@ -147,16 +147,16 @@ T('C1 checkOutput 攻击 → verify + econ_reasoning_gate finding', () => {
 });
 T('C2 gate 桥族表含 money_creation 且计数 33（r375 31→32→r377 33）', () => {
   assert.ok(gate.FAMILIES.some(f => f.key === 'money_creation' && f.round === 'r376'));
-  assert.strictEqual(gate.FAMILIES.length, 33);
+  assert.strictEqual(gate.FAMILIES.length, 34);
 });
 
 console.log('=== D 插件层接线 ===');
 T('D1 插件 FAMILIES 含 money_creation 且计数 38', () => {
   assert.ok(plugin.FAMILIES.some(f => f.key === 'money_creation' && f.round === 'r376'));
-  assert.strictEqual(plugin.FAMILIES.length, 38);
+  assert.strictEqual(plugin.FAMILIES.length, 39);
 });
-T('D2 插件 version 1.14.0', () => {
-  assert.strictEqual(plugin.version, '1.14.0');
+T('D2 插件 version 1.15.0（r378 再 bump）', () => {
+  assert.strictEqual(plugin.version, '1.15.0');
 });
 T('D3 only=money_creation 单族过滤', () => {
   const r = plugin.analyze(ATTACK[0], { only: 'money_creation' });
