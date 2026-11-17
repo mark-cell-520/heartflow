@@ -127,6 +127,18 @@ const FAMILIES = [
   //   健康结果或归因断言）+ CONCEPT/CORRECT 两组豁免 + 腿①否定守卫
   //   （「不吃维生素的人」是对照组形）+ CAUSAL 桶前置否定守卫）。
   { key: 'healthy_user_bias',              mod: './healthy-user-bias.js',          fn: 'detectHealthyUserBias',     zh: '健康使用者偏倚/依从者效应',  en: 'healthy user bias (healthy adherer effect)', round: 'r372' },
+  // r373 新增：非凡主张的证据比例错配（extraordinary claims require
+  //   extraordinary evidence / evidence–claim proportionality——主张越背离
+  //   既有确证，承载它所需证据越强；攻击形「治愈绝症/永动机/长生不老/百分百
+  //   等离奇主张 × 只有几例个例/没有复现/未经同行评议 等弱基底 × 足以证明/
+  //   应该采信/毋庸置疑 等充分性兑现」三腿近距共现；同池七候选定拨：
+  //   affect_heuristic 0/6 全被存量代拦、scope_insensitivity 穿透 4/13 边际
+  //   低、ambiguity_aversion 2/4 良性脏、harking 事前/事后文本不可见定义不牢、
+  //   denominator_neglect 1/5 脏、forking_paths 1/4 被 researcher_degrees_of_
+  //   freedom 代拦，本族穿透 4/5 真零命中；三腿 + CONCEPT/CORRECT/HEDGE 三组
+  //   豁免 + 腿③否定守卫；与 weak_evidence_strong_claim(dim245 弱证据**类型**
+  //   × 绝对化断言) 射程不同——本族管主张**离奇度** × 证据**不成比例**）。
+  { key: 'extraordinary_claims',            mod: './extraordinary-claims.js',       fn: 'detectExtraordinaryClaims',  zh: '非凡主张的证据比例错配',     en: 'extraordinary claims require extraordinary evidence (evidence-claim proportionality)', round: 'r373' },
 ];
 
 const _cache = new Map();
@@ -150,7 +162,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 27 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 28 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）
