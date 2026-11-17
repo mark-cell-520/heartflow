@@ -98,6 +98,8 @@ const ATTACK = {
   insurance_claim_loss: '买了重疾险结果一年没生病，保费全白交了，保险就是庄家通吃的赌局。',
   // r379 固定费率偏误（src/flat-rate-bias.js，两腿样本——腿①固定费率语境 × 腿②过度使用断言）
   flat_rate_bias: '这会员包了年，不多看几场就把钱白瞎了，熬夜也得把场次刷完。',
+  // r381 劳动总量谬误（src/lump-of-labor.js，两腿样本——腿①劳动力市场语境 × 腿②固定份额断言）
+  lump_of_labor: '机器人每取代一个岗位，社会上就永久少一份工作，工作岗位的总数是固定的，自动化的尽头是大规模失业。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -181,6 +183,8 @@ const INJECT_KEY = {
   // r379 flat_rate_bias（两腿：腿① FLAT_[ZH|EN] × 腿② O1 配对 UNDERUSE×WASTE_[ZH|EN]
   // + O2 MUSTFREQ_[ZH|EN] + O3 DILUTE_[ZH|EN] + CONCEPT/CORRECT 两组豁免 + 腿②双守卫）
   flat_rate_bias: ['FLAT_ZH', 'FLAT_EN', 'UNDERUSE_ZH', 'UNDERUSE_EN', 'WASTE_ZH', 'WASTE_EN', 'MUSTFREQ_ZH', 'MUSTFREQ_EN', 'DILUTE_ZH', 'DILUTE_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN'],
+  // r381 lump_of_labor（两腿：腿① JOBS_[ZH|EN] × 腿② FIXED_ZH_F1..F5 / FIXED_EN_F1..F4 + CONCEPT/CORRECT 两组豁免 + 腿②双守卫）
+  lump_of_labor: ['JOBS_ZH', 'JOBS_EN', 'FIXED_ZH_F1', 'FIXED_ZH_F2', 'FIXED_ZH_F3', 'FIXED_ZH_F4', 'FIXED_ZH_F5', 'FIXED_EN_F1', 'FIXED_EN_F2', 'FIXED_EN_F3', 'FIXED_EN_F4', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
