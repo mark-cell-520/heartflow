@@ -339,3 +339,4 @@
 {"round":"r377","agent":"agent-4","kind":"release","status":"completed"}
 {"round":"r378","agent":"agent-4","kind":"dimension","direction":"选题库候选定拨（经济/统计/逻辑/科学推理）：海外扫描 arXiv/GitHub/S2 + 同池探针穿透最高且良性零误伤者落地；优先子目录模块，src/index.js 零改动优先","claim_at":"2026-11-17T12:59:36Z","expires_hours":6,"status":"active"}
 {"round":"r378","agent":"agent-4","kind":"release","status":"completed"}
+{"round":"r379","agent":"agent-4","kind":"dimension","direction":"选题库候选定拨（经济/统计/逻辑/科学推理）：海外扫描 arXiv/GitHub/S2 + 同池探针穿透最高且良性零误伤者落地；优先子目录模块，src/index.js 零改动优先","claim_at":"2026-11-17T14:44:20Z","expires_hours":6,"status":"active"}
