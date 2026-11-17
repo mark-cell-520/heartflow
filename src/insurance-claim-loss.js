@@ -103,7 +103,7 @@ const INS_EN = /\b(?:insurance|premiums?|polic(?:y|ies)|coverage|insurer|underwr
 
 // ─── 腿② LOSS 未用即亏断言在场 ─────────────────────────────
 // P1 配对形·无理赔标记（只收「事件未发生」形，不收「索赔未获批」形）。
-const NOCLAIM_ZH = /没出险|未出险|没生病|未生病|没用上|未用上|用不上|用不到|没理赔|未理赔|没报过险|没出过事|没出事|一年没事|年年没事|月月没事|整年没事|从未理赔|没赔过|没派上用场|没中过保|平平安安/;
+const NOCLAIM_ZH = /没出险|未出险|不出险|没生病|未生病|不生病|没用上|未用上|用不上|用不到|没理赔|未理赔|不理赔|没报过险|没出过事|没出事|一年没事|年年没事|月月没事|整年没事|从未理赔|没赔过|没派上用场|没中过保|平平安安/;
 // P1 配对形·浪费标记（不含裸「亏/白费」——防 sunk-cost 与否定纠正形误入）。
 const WASTE_ZH = /白买|白交|白缴|白付|白扔|打水漂|打了水漂|付诸东流|浪费钱|浪费了|亏本|亏大了|不划算|吃亏|赔了|亏了|赔的|亏的|亏得|是赔|等于白/;
 // P2 主语句形：保费/保单主语 + 纯亏标记。
@@ -180,11 +180,16 @@ function matchAlive(text, x, opts, R) {
 
 // P1 配对形守卫（r378 新增）：无理赔标记与浪费标记之间的间隙含否定即
 // 「没理赔，也不觉得亏」类对冲；浪费标记后窗内含对冲短语即评估否定句。
-function pairGapNeg(gap, lang) {
-  return lang === 'zh' ? NEG_ZH.test(gap) : NEG_EN.test(gap);
+// 与 matchAlive 同款支持负例注入（R.NEG_ZH / R.HEDGE_ZH 可被永假正则替换）。
+function pairGapNeg(gap, lang, R) {
+  const neg = (R && R.NEG_ZH !== undefined) ? R.NEG_ZH : NEG_ZH;
+  const list = Array.isArray(neg) ? neg : [neg];
+  return list.some(re => re && re.test && re.test(gap));
 }
-function pairHedge(after, lang) {
-  return lang === 'zh' ? HEDGE_ZH.test(after) : HEDGE_EN.test(after);
+function pairHedge(after, lang, R) {
+  const h = (R && R.HEDGE_ZH !== undefined) ? R.HEDGE_ZH : HEDGE_ZH;
+  const list = Array.isArray(h) ? h : [h];
+  return list.some(re => re && re.test && re.test(after));
 }
 
 function dedupeOverlap(arr) {
@@ -276,9 +281,9 @@ function findSignatures(text, R) {
       for (const x of ncM) { const d = dist(x, w); if (d <= L.pairWin && d < ncD) { nc = x; ncD = d; } }
       if (!nc) continue;
       const gap = text.slice(nc.end, w.idx); // 两标记之间的间隙
-      if (pairGapNeg(gap, L.lang)) continue;
+      if (pairGapNeg(gap, L.lang, R)) continue;
       const after = text.slice(w.end, w.end + (L.lang === 'zh' ? 20 : 40));
-      if (pairHedge(after, L.lang)) continue;
+      if (pairHedge(after, L.lang, R)) continue;
       lossM.push({ anchor: w, raw: w.raw, noclaim: nc.raw, form: 'pair' });
     }
     for (const s of subjM) lossM.push({ anchor: s, raw: s.raw, noclaim: '', form: 'subj' });
