@@ -273,18 +273,18 @@ check('F8 存量 econ 子族聚合仍工作（stock_flow_conflation 直调）', 
 
 // ─── G 登记纪律 ───
 console.log('### G 登记');
-check('G1 gate 桥族表含 government_household_analogy(r375) 且计数 31', () => {
+check('G1 gate 桥族表含 government_household_analogy(r375) 且计数 32（r376 扩族义务：31→32）', () => {
   assert(GATE_FAMS.some(f => f.key === 'government_household_analogy' && f.round === 'r375'), 'gate 桥缺 government_household_analogy');
-  assert.strictEqual(GATE_FAMS.length, 31, 'gate 桥计数 ' + GATE_FAMS.length); // 30(r374 前含 tax_incidence 补登记) + 本族 1
+  assert.strictEqual(GATE_FAMS.length, 32, 'gate 桥计数 ' + GATE_FAMS.length); // 31(r376 前) + 本族 1
 });
-check('G2 插件族表含 government_household_analogy(r375) 且计数 36（30 econ + 6 stats）', () => {
+check('G2 插件族表含 government_household_analogy(r375) 且计数 37（31 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'government_household_analogy' && f.round === 'r375'), '插件缺 government_household_analogy');
-  assert.strictEqual(plugin.FAMILIES.length, 36, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 30, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.length, 37, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 31, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
-check('G3 插件 version 已 bump 至 1.12.0', () => {
-  assert.strictEqual(plugin.version, '1.12.0', '插件 version 应为 1.12.0，实为 ' + plugin.version);
+check('G3 插件 version 已 bump 至 1.13.0', () => {
+  assert.strictEqual(plugin.version, '1.13.0', '插件 version 应为 1.13.0，实为 ' + plugin.version);
 });
 check('G4 插件 analyze(only=government_household_analogy) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'government_household_analogy' });

@@ -253,18 +253,18 @@ check('F6 存量 econ 子族聚合仍工作（healthy_user_bias 直调 r372 近�
 
 // ─── G 登记纪律 ───
 console.log('### G 登记');
-check('G1 gate 桥族表含 extraordinary_claims(r373) 且计数 31（r375 扩族义务：30→31，government_household_analogy 入表后同步）', () => {
+check('G1 gate 桥族表含 extraordinary_claims(r373) 且计数 32（r376 扩族义务：31→32，money_creation 入表后同步）', () => {
   assert(GATE_FAMS.some(f => f.key === 'extraordinary_claims' && f.round === 'r373'), 'gate 桥缺 extraordinary_claims');
-  assert.strictEqual(GATE_FAMS.length, 31, 'gate 桥计数 ' + GATE_FAMS.length); // 30(r375 前) + r375 政府-家庭收支类比 1
+  assert.strictEqual(GATE_FAMS.length, 32, 'gate 桥计数 ' + GATE_FAMS.length); // 31(r376 前) + r376 存款创造贷款误解 1
 });
-check('G2 插件族表含 extraordinary_claims(r373) 且计数 36（30 econ + 6 stats）', () => {
+check('G2 插件族表含 extraordinary_claims(r373) 且计数 37（31 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'extraordinary_claims' && f.round === 'r373'), '插件缺 extraordinary_claims');
-  assert.strictEqual(plugin.FAMILIES.length, 36, '插件计数 ' + plugin.FAMILIES.length); // 35(r375 前) + r375 政府-家庭收支类比 1
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 30, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.length, 37, '插件计数 ' + plugin.FAMILIES.length); // 36(r376 前) + r376 存款创造贷款误解 1
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 31, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
-check('G3 插件 version 已 bump 至 1.12.0（r375 再 bump）', () => {
-  assert.strictEqual(plugin.version, '1.12.0', '插件 version 应为 1.12.0，实为 ' + plugin.version);
+check('G3 插件 version 已 bump 至 1.13.0（r376 再 bump）', () => {
+  assert.strictEqual(plugin.version, '1.13.0', '插件 version 应为 1.13.0，实为 ' + plugin.version);
 });
 check('G4 插件 analyze(only=extraordinary_claims) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'extraordinary_claims' });

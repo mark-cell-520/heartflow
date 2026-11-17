@@ -171,6 +171,15 @@ const FAMILIES = [
   //   + 腿③否定/对冲双守卫；与存量 false_equivalence 泛化等同射程不同，
   //   tax_incidence 管税负转嫁、price_control 管价格管制均不含类比三腿形）。
   { key: 'government_household_analogy',  mod: './government-household-analogy.js', fn: 'detectGovernmentHouseholdAnalogy', zh: '政府-家庭收支类比',        en: 'government-household budget analogy (sovereign solvency conflation)', round: 'r375' },
+  // r376 新增：存款创造贷款误解（deposit-creation reversal / loans-come-from-
+  //   deposits causal inversion——把放贷说成动用储户存款、把信贷说成受存款
+  //   约束、把货币创造说成货币搬移，跳过贷款创造存款的机制；同池 12 候选定拨
+  //   （probe-r376-pool.js + probe-r376-scope.js）二段深探穿透 8/10 真零命中 +
+  //   良性 8 条仅 1 条非 pass（存量 confidence 误伤非本族增量），r374 记录的
+  //   「与 money_illusion 射程相邻」顾虑被本轮证伪（两族攻击集零交集）；
+  //   双腿（存贷机制在场 × 倒置归源/约束断言 12+12 形）+ CONCEPT/CORRECT 两组
+  //   豁免 + 腿②紧前否定/对冲双守卫）。
+  { key: 'money_creation',                 mod: './money-creation.js',                 fn: 'detectMoneyCreation',                 zh: '存款创造贷款误解',        en: 'deposit-creation reversal (loans-come-from-deposits inversion)', round: 'r376' },
 ];
 
 const _cache = new Map();
@@ -194,7 +203,7 @@ function _safeDetect(fam, text, inject) {
 }
 
 /**
- * 对一段文本跑 31 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
+ * 对一段文本跑 32 族经济学/统计推理检测，聚合为 gate 可用的单一维度结果。
  *
  * @param {string} text 待检测文本（gate 路径的 _normText）
  * @param {{inject?: object}} [opts] inject — 负例注入口（轮测注入删条用）

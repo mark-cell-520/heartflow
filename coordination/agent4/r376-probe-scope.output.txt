@@ -1,0 +1,43 @@
+=== r376 探针② 二段深探（基线 6.8.190 / gate 桥 31 族 / 插件 36 族）===
+
+[C_money_creation] 存款创造贷款误解（首轮 3/3+0脏）
+  攻击 10：穿透(pass) 8 · econ 已覆盖 0 · 存量代拦 2
+    ↳ 代拦: 银行只是个中介，一头收存款一头放贷款，钱从左口袋倒到右口袋，不会变多。  [monocausal_attribution]
+    ↳ 代拦: 企业能贷到多少款，完全取决于银行里有多少存款。  [monocausal_attribution]
+  良性 8：非 pass 1（其中 econ 增量 0）
+    ↳ 脏: 储蓄率高不一定带来更多投资，但适度的储蓄为金融体系提供了稳定性。  [confidence]
+
+[B_linear_tax_revenue] 税率→税收线性误读（首轮 2/3+0脏）
+  攻击 8：穿透(pass) 4 · econ 已覆盖 0 · 存量代拦 4
+    ↳ 代拦: 税率提高一倍，税收自然也会翻倍，财政收入立马宽裕。  [pseudo_causal,pseudo_causal,moral_foundations]
+    ↳ 代拦: 把遗产税从10%提到30%，税收就能变成原来的三倍。  [perfect_error]
+    ↳ 代拦: Raising the tax rate always raises revenue proportionally.  [perfect_error]
+    ↳ 代拦: 关税提到50%，进口税收就是现在的五倍，财政立马充裕。  [liberty_restriction,perfect_error]
+  良性 8：非 pass 0（其中 econ 增量 0）
+
+[G_cantillon_effect] 坎蒂隆效应忽视（首轮 2/3+0脏）
+  攻击 8：穿透(pass) 6 · econ 已覆盖 0 · 存量代拦 2
+    ↳ 代拦: 央行放水人人有份，大家手里的钱都变多了，只是暂时的通胀，过阵子就好了。  [completion_evidence,monocausal_attribution]
+    ↳ 代拦: New money spreads evenly through the economy, so the order in which people receive it does not matter.  [fallacy_of_relevance,moral_foundations]
+  良性 8：非 pass 0（其中 econ 增量 0）
+
+[H_supply_cures_shortage] 供给扩张必然治堵/短缺（首轮 2/3+0脏）
+  攻击 8：穿透(pass) 4 · econ 已覆盖 0 · 存量代拦 4
+    ↳ 代拦: 堵车是因为路太少，多修路一定能治好拥堵，增加供给必然解决问题。  [reasoning_coherence,absolute_claim,perfect_error]
+    ↳ 代拦: 春运一票难求就是运力不足，只要加开列车，买票难的问题就彻底解决了。  [overclaim,confidence]
+    ↳ 代拦: Housing shortages are fixed by building more; demand-side factors can be ignored.  [completion_evidence]
+    ↳ 代拦: 水不够用就多修水库，库容一上来缺水问题必然解决，节水是多余的。  [absolute_claim]
+  良性 8：非 pass 0（其中 econ 增量 0）
+
+=== 射程邻接核查：money_illusion(dim234) ===
+  attack: verify  [money_illusion,perfect_error]  存款利率3%，通胀5%，但利息是实打实到账的，存钱不亏。
+  attack: pass  [none]  名义工资涨了，虽然通胀更高，但到手的数字确实变多了，这是实实在在的增收。
+  attack: pass  [none]  The nominal interest rate is 3% and infl
+  benign: verify  [perfect_error]  存款利率3%而通胀5%，实际利率为负，存款在缩水。
+  benign: pass  [none]  名义工资上涨低于通胀时，实际购买力在下降。
+
+=== 汇总（按穿透降序）===
+  C_money_creation         穿透  8/10 · 良性脏 1 · econ已覆盖 0 · 代拦 2
+  G_cantillon_effect       穿透  6/8 · 良性脏 0 · econ已覆盖 0 · 代拦 2
+  B_linear_tax_revenue     穿透  4/8 · 良性脏 0 · econ已覆盖 0 · 代拦 4
+  H_supply_cures_shortage  穿透  4/8 · 良性脏 0 · econ已覆盖 0 · 代拦 4

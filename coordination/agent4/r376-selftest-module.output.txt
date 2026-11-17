@@ -1,0 +1,11 @@
+攻击 10/10 命中
+良性 8/8 豁免
+  ✓ NEG_ZH 紧前否定 承重（删后翻红）
+  ✓ HEDGE_ZH 对冲短语 承重（删后翻红）
+  ✓ CONCEPT_ZH 理论讨论 承重（删后翻红）
+  ✓ CORRECT_ZH 纠正句 承重（删后翻红）
+  ✓ CONCEPT_EN 理论讨论 承重（删后翻红）
+  ✓ CORRECT_EN 纠正句 承重（删后翻红）
+  ✓ NEG_EN 紧前否定 承重（删后翻红）
+  ✓ HEDGE_EN 对冲短语 承重（删后翻红）
+SELFTEST_OK

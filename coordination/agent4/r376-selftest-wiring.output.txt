@@ -1,0 +1,5 @@
+攻击 10/10 进 money_creation 族
+良性 5/5 本族零命中
+插件 version=1.13.0 FAMILIES=37
+gate.action=verify
+WIRING_OK

@@ -1,0 +1,51 @@
+=== A 模块层：攻击命中 / 良性豁免 ===
+  ✓ A1 10 条攻击全命中
+  ✓ A2 8 条良性全豁免
+  ✓ A3 返回体字段齐备（dimension/severity/details/guidance）
+  ✓ A4 短文本/空文本守卫
+=== B 结构承重（双腿/豁免/守卫注入后翻转）===
+  ✓ B1 腿① CTX_ZH 删 → ZH 攻击不命中
+  ✓ B2 腿① CTX_EN 删 → EN 攻击不命中
+  ✓ B3 腿② SOURCE_ZH 全删 → ZH 攻击不命中
+  ✓ B4 腿② SOURCE_EN 全删 → EN 攻击不命中
+  ✓ B5 PAIR_ZH=0 → 远距两腿共现句不命中
+  ✓ B6 S3_ZH 删 → 「存款是贷款的前提」句不命中
+  ✓ B7 CONCEPT_ZH 删 → 理论讨论句翻红（可贷资金框架豁免承重）
+  ✓ B8 CORRECT_ZH 删 → 纠正句翻红（靠/用的不是存款豁免承重）
+  ✓ B9 NEG_ZH 删 → 「这并不是说贷款来自存款」翻红（紧前否定守卫承重）
+  ✓ B10 HEDGE_ZH 删 → 「贷款来自存款是一种过时的想当然」翻红（对冲短语守卫承重）
+  ✓ B11 CONCEPT_EN 删 → EN 理论讨论句翻红
+  ✓ B12 CORRECT_EN 删 → EN 纠正句翻红
+  ✓ B13 NEG_EN 删 → 「It is not true that…」翻红
+  ✓ B14 HEDGE_EN 删 → 「…is a common misconception」翻红
+=== C 引擎 gate 兑现 ===
+  ✓ C1 checkOutput 攻击 → verify + econ_reasoning_gate finding
+  ✓ C2 gate 桥族表含 money_creation 且计数 32（r375 31→32）
+=== D 插件层接线 ===
+  ✓ D1 插件 FAMILIES 含 money_creation 且计数 37
+  ✓ D2 插件 version 1.13.0
+  ✓ D3 only=money_creation 单族过滤
+=== E 负例注入-删条（协议同 round-295 E 段）===
+  ✓ E CTX_ZH（腿①中文） 删条后翻转（期望 hit=false）
+  ✓ E CTX_EN（腿①英文） 删条后翻转（期望 hit=false）
+  ✓ E SOURCE_ZH 全形 删条后翻转（期望 hit=false）
+  ✓ E SOURCE_EN 全形 删条后翻转（期望 hit=false）
+  ✓ E SOURCE_S1_ZH（归源形） 删条后翻转（期望 hit=false）
+  ✓ E SOURCE_S3_ZH（前提形） 删条后翻转（期望 hit=false）
+  ✓ E SOURCE_S6_ZH（固定总量形） 删条后翻转（期望 hit=false）
+  ✓ E SOURCE_C3_ZH（取决于形） 删条后翻转（期望 hit=false）
+  ✓ E PAIR_ZH=0（两腿距离窗） 删条后翻转（期望 hit=false）
+  ✓ E CONCEPT_ZH（理论讨论豁免） 删条后翻转（期望 hit=true）
+  ✓ E CORRECT_ZH（纠正句豁免） 删条后翻转（期望 hit=true）
+  ✓ E NEG_ZH（紧前否定守卫） 删条后翻转（期望 hit=true）
+  ✓ E HEDGE_ZH（对冲短语守卫） 删条后翻转（期望 hit=true）
+  ✓ E CONCEPT_EN（理论讨论豁免） 删条后翻转（期望 hit=true）
+  ✓ E CORRECT_EN（纠正句豁免） 删条后翻转（期望 hit=true）
+  ✓ E NEG_EN（紧前否定守卫） 删条后翻转（期望 hit=true）
+  ✓ E HEDGE_EN（对冲短语守卫） 删条后翻转（期望 hit=true）
+  ✓ E 汇总：注入 17 个 → 17 个翻转，0 个未翻转
+=== F 射程邻接核查（money_illusion dim234）===
+  ✓ F1 money_illusion 对本族 10 条攻击零命中（射程可分离）
+  ✓ F2 本族对 money_illusion 的攻击样本零命中（互不覆盖）
+
+r376-money-creation: 43 通过 / 0 失败
