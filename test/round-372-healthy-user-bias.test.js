@@ -301,10 +301,10 @@ check('G1 gate 桥族表含 healthy_user_bias(r372) 且计数 27', () => {
   assert(GATE_FAMS.some(f => f.key === 'healthy_user_bias' && f.round === 'r372'), 'gate 桥缺 healthy_user_bias');
   assert.strictEqual(GATE_FAMS.length, 29, 'gate 桥计数 ' + GATE_FAMS.length);
 });
-check('G2 插件族表含 healthy_user_bias(r372) 且计数 32（26 econ + 6 stats）', () => {
+check('G2 插件族表含 healthy_user_bias(r372) 且计数 34（r373/r374 扩族义务：32→33→34，28 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'healthy_user_bias' && f.round === 'r372'), '插件缺 healthy_user_bias');
   assert.strictEqual(plugin.FAMILIES.length, 34, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 27, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 28, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
 check('G3 插件 analyze(only=healthy_user_bias) 路由可用', () => {

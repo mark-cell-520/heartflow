@@ -236,10 +236,10 @@ check('G1 gate 桥族表含 paradox_of_thrift(r369) 且计数 27（r371/r372 扩
   assert(GATE_FAMS.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), 'gate 桥缺 paradox_of_thrift');
   assert.strictEqual(GATE_FAMS.length, 29, 'gate 桥计数 ' + GATE_FAMS.length);
 });
-check('G2 插件族表含 paradox_of_thrift(r369) 且计数 32（r371/r372 扩族义务：30→31→32，26 econ + 6 stats）', () => {
+check('G2 插件族表含 paradox_of_thrift(r369) 且计数 34（r371/r372/r373/r374 扩族义务：30→31→32→33→34，28 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), '插件缺 paradox_of_thrift');
   assert.strictEqual(plugin.FAMILIES.length, 34, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 27, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 28, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
 check('G3 插件 analyze(only=paradox_of_thrift) 路由可用', () => {

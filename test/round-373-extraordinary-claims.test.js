@@ -257,14 +257,14 @@ check('G1 gate 桥族表含 extraordinary_claims(r373) 且计数 28', () => {
   assert(GATE_FAMS.some(f => f.key === 'extraordinary_claims' && f.round === 'r373'), 'gate 桥缺 extraordinary_claims');
   assert.strictEqual(GATE_FAMS.length, 29, 'gate 桥计数 ' + GATE_FAMS.length);
 });
-check('G2 插件族表含 extraordinary_claims(r373) 且计数 33（27 econ + 6 stats）', () => {
+check('G2 插件族表含 extraordinary_claims(r373) 且计数 34（r374 扩族义务：33→34，28 econ + 6 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'extraordinary_claims' && f.round === 'r373'), '插件缺 extraordinary_claims');
   assert.strictEqual(plugin.FAMILIES.length, 34, '插件计数 ' + plugin.FAMILIES.length);
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 27, 'econ 计数异常');
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 28, 'econ 计数异常');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 6, 'stats 计数异常');
 });
-check('G3 插件 version 已 bump 至 1.9.0', () => {
-  assert.strictEqual(plugin.version, '1.9.0', '插件 version 应为 1.9.0，实为 ' + plugin.version);
+check('G3 插件 version 已 bump 至 1.10.0（r374 再 bump）', () => {
+  assert.strictEqual(plugin.version, '1.10.0', '插件 version 应为 1.10.0，实为 ' + plugin.version);
 });
 check('G4 插件 analyze(only=extraordinary_claims) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'extraordinary_claims' });
