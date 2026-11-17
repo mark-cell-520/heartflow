@@ -1,0 +1,7 @@
+// r369 补腿：五条残留穿透形状
+// G3b 腿①：从来没人能重复实验——「从来+没人+能」序（原族收「从来没」）
+// G3c 腿②：效应确实存在——「确实存在」形（原族收「必定存在」）
+// G4a/G4c 腿②：must be a genuine discovery / proves it is genuine
+// G4b 腿①：No one has ever reproduced
+// G4d 腿②：which means it is genuine
+const PATCHES = `__NO_OP__`;

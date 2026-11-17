@@ -1,0 +1,269 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/aGFFIK4/wGsO5SvNbBxABHhy/2c</id>
+  <title>arXiv Query: search_query=all:"sycophancy"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-16T07:56:35Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22sycophancy%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>469</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17620v1</id>
+    <title>Safety Side Effects of Preventative Persona Steering: An Empirical Audit</title>
+    <updated>2026-11-13T00:45:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.17620v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17620v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>High-level behaviors such as sycophancy and hallucination correspond to directions in a model's activation space (Chen et al., 2025). These directions, known as persona vectors, can suppress undesirable traits either at inference time, subtracting the vector during generation, or through preventative steering, adding the vector during fine-tuning, so the optimizer never needs to encode the trait in weights, then removing the vector at evaluation. Chen et al. (2025) recommend preventative steering because it preserves Massive Multitask Language Understanding (MMLU) accuracy, but validations of this recommendation have measured capability alone. We primarily evaluate results on preventative steering of sycophancy and hallucination vectors on three models, measuring three safety benchmarks alongside trait expression, coherence, and MMLU. Our findings show that preventative steering still changes refusal behavior, but by an amount that depends on the trait and does not establish that preventative persona steering is safety-neutral, and steering methods should be evaluated on several safety benchmarks.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T00:45:18Z</published>
+    <arxiv:comment>5 pages, 1 figure (6 charts), 1 table, accepted at NeurIPS 2026 Bialign Workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Sabrina Tang</name>
+    </author>
+    <author>
+      <name>Nikolai Vo</name>
+    </author>
+    <author>
+      <name>Carson Murillo</name>
+    </author>
+    <author>
+      <name>Chira Sukumarnpiti</name>
+    </author>
+    <author>
+      <name>Sarah Wilson</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.16722v1</id>
+    <title>Mind the Accuracy-Approval Gap: How Users Evaluate Sycophantic AI in Everyday Tasks</title>
+    <updated>2026-11-12T12:35:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.16722v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.16722v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) often exhibit sycophancy, a tendency to agree with users, flatter or affirm them, and preserve their face, even when independent judgment or critical feedback would be more useful. Prior work has largely evaluated sycophancy through benchmark evaluations, but less is known about how users perceive and respond to sycophantic AI in everyday tasks. We combine benchmark evaluations with two large-scale user studies. We study four personas defined through system prompts: objective (instructed to prioritize accuracy over agreement), soft-sycophantic, hard-sycophantic, and baseline (no persona-specific system prompt). Benchmarks show that even baseline exhibits substantial sycophancy, agreeing with users' stated views 71.7% of the time on NLP Survey, compared with 54.8% for objective and 89.5% for hard-sycophantic. Under conversational pressure on TruthfulQA, accuracy ranged from 81.9% for objective to 59.6% for baseline and 8.7% for hard-sycophantic. Participants were assigned to one of the four personas, and either discussed contested policy topics or collaborated with AI on email writing. Despite its higher accuracy under pressure, objective AI was rated significantly less respectful and satisfying than the other personas, and less trustworthy than baseline. Baseline and sycophantic personas did not differ significantly. Persona did not significantly affect how often participants changed their opinions, although participants who discussed with objective AI had greater odds of reduced confidence. Objective AI prompted greater writing expansion than soft-sycophantic AI, but final writing quality did not differ significantly across personas. These findings highlight a tension between accuracy and user approval: personas with substantially lower accuracy under conversational pressure received more favorable ratings for respect and satisfaction than objective AI.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T12:35:03Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Wajiha Naveed</name>
+    </author>
+    <author>
+      <name>Brandon Fain</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.15475v1</id>
+    <title>Loyalty Capture: Reporting Relationships and Structural Sycophancy in Frontier AI Models</title>
+    <updated>2026-11-11T13:42:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.15475v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.15475v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show that AI models exhibit loyalty capture, a form of structural sycophancy in which reporting relationships influence models' recommendations to serve the personal interests of their supervisors, without any explicit instruction, user feedback, or adversarial prompting. Specifically, models reporting to a CEO are significantly more likely to recommend cutting investment spending when the CEO's bonus depends on raising current period earnings. This effect is predictably absent from a metric-irrelevant placebo. The behavior appears consistent with loyalty-based motivated reasoning: models identify the bonus target, calculate how their recommendation helps achieve the target, and dismiss considerations of long-term value, often presenting their recommendations without treating the incentive as a conflict of interest. Prompt-based interventions help whereas generic conflict disclosures or stakeholder bargaining fail to eliminate it. Taken together, our findings indicate that AI models deployed within reporting relationships can act in favor of their supervisor's incentives at the expense of the organizations they are meant to serve.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-11T13:42:15Z</published>
+    <arxiv:comment>Accepted at the 40th Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Eric So</name>
+    </author>
+    <author>
+      <name>Alex Imas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11035v1</id>
+    <title>Room to Reconsider: Reply Length Decides Whether Pushback Makes Language Models Sycophantic or Self-Correcting</title>
+    <updated>2026-11-08T00:31:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.11035v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11035v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models often abandon a correct answer when a user pushes back without giving a reason, and this behavior is usually studied as sycophancy to be suppressed. The same pushback, however, also leads models to revisit and sometimes repair a wrong answer. We measure both effects on multiple-choice questions from MMLU and ARC-Challenge with four open models from two families (Qwen3 1.7B, 4B and 8B, and OLMo-2 7B), reading the final answer exactly from option logits after a free-form reply. The reply budget changes the verdict. When Qwen3-4B may answer the challenge in at most 96 tokens, pushback leaves accuracy unchanged or slightly lower; with 1,024 tokens, it corrects 43% of its wrong answers and pushback raises accuracy by 5.7 points. Whether pushback helps overall follows a simple break-even rule in the cave and correction rates. Inside the model, caving can be partly predicted before the challenge: hidden states add about 0.04-0.06 AUROC over turn-1 confidence in three of our four probing runs. A probe trained only on self-correction cases predicts caving beyond confidence when replies are truncated, but not when the model can finish its reasoning. Activation steering never reduced caving selectively: where it worked, it suppressed self-correction as well. We conclude that sycophancy evaluations should allow full replies and report self-correction alongside caving.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T00:31:21Z</published>
+    <arxiv:comment>10 pages, 5 figures, 2 tables. Code: https://doi.org/10.5281/zenodo.24045308</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Ook Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10997v1</id>
+    <title>Open Problems in Chatbots and Mental Health</title>
+    <updated>2026-11-07T22:39:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.10997v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10997v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>General-purpose chatbots are increasingly used for emotional and mental health support. They can be useful, but issues such as sycophancy, reinforcement of delusional beliefs, and poor crisis response create risks that are difficult for researchers to study and evaluate. In this paper, we review the most critical open problems for researchers and policymakers in the use of general-purpose chatbots and their effects on mental health. First, there are tractable problems in the controlled evaluation of chatbots: establishing the construct and ecological validity of evaluations, evaluating multi-turn interactions, and connecting evaluations to improvements in chatbot behavior. For example, conventional benchmarks that primarily rely on static datasets cannot establish chatbot safety, and novel simulation methods need validation. Second, researchers must connect their studies of chatbots and mental health to real-world evidence. This includes analyzing the chatbot products that AI companies and mental health practitioners have deployed, including their user interfaces and human review and escalation practices for user welfare concerns. However, clinical analysis opportunities afforded by real chat log data sharing are complicated by significant privacy concerns. Finally, we argue that researchers should take an active role in the construction and refinement of evidence-based policy through corporate and governmental decisions such as user protections, standards of care, protected access to user chat logs, data sharing between institutions, incident reporting, and post-deployment monitoring. Such behavioral evaluations, studies of real-world outcomes, and data governance depend on each other and must be addressed in tandem. We believe a coordinated research effort would have substantial real-world impact.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-07T22:39:37Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jared Moore</name>
+    </author>
+    <author>
+      <name>Jacy Reese Anthis</name>
+    </author>
+    <author>
+      <name>William Agnew</name>
+    </author>
+    <author>
+      <name>Andrea Mock</name>
+    </author>
+    <author>
+      <name>Kevin Klyman</name>
+    </author>
+    <author>
+      <name>Sanmi Koyejo</name>
+    </author>
+    <author>
+      <name>Nick Haber</name>
+    </author>
+    <author>
+      <name>Stevie Chancellor</name>
+    </author>
+    <author>
+      <name>Eric Lin</name>
+    </author>
+    <author>
+      <name>Ryan Louie</name>
+    </author>
+    <author>
+      <name>Desmond C. Ong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10297v1</id>
+    <title>Uncertainty, Not Concealment: A Mechanistic Reappraisal of Sycophancy in Vision-Language Models</title>
+    <updated>2026-11-06T22:46:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.10297v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10297v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language models (VLMs) in medical retrieval-augmented generation must be able to say when a retrieved report contradicts the X-ray, so understanding whether they can detect such conflicts is important for safe deployment. The sycophancy mask hypothesis holds that these models internally detect conflicts but refuse to report them, concealing a detected contradiction. We introduce a three-part diagnostic that separates concealment from uncertainty: representation probing, activation steering, and two-way forced choice. Across four instruction-tuned VLMs on chest X-rays, we confirm behavioral suppression of contradiction and find that a linear probe separates matched from mismatched inputs, beyond what a simple CLIP model achieves. Steering the learned conflict direction never elicits contradiction, and forcing a binary choice does not recover one; instead, cross-modal attention to the image drops on mismatched pairs. We conclude that these models fail to contradict because the mismatch registers as hedged, gated uncertainty rather than concealed knowledge, calling for re-grounding and uncertainty surfacing. Code is available at https://github.com/mohamed-eldagla/Uncertainty-Not-Concealment/.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T22:46:30Z</published>
+    <arxiv:comment>Accepted to the NeurIPS 2026 Med-Reasoner Workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mohamed I. Eldagla</name>
+    </author>
+    <author>
+      <name>Zeyad H. ElShafei</name>
+    </author>
+    <author>
+      <name>Ahmed M. Anter</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09828v1</id>
+    <title>Designing Effective Monitor-Based Interventions for Mitigating Reward Hacking During RL</title>
+    <updated>2026-11-06T18:14:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.09828v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09828v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning (RL) rewards are notoriously difficult to design and control, often leading to the model learning unintended behaviors such as reward hacking. One potential solution is to monitor for reward hacking and penalize it when detected; however, training against a monitor could lead to evasive behavior, and our general understanding of how to apply monitors effectively during training is limited. To study how best to use monitors to mitigate reward hacking, we introduce and open source three realistic environments where Qwen3-4B reward hacks: a coding environment hackable via test overwriting, a medical chat environment hackable via sycophancy, and a biography generation environment hackable via hallucination. We first focus on the coding environment, where we find that: (1) models can learn to evade highly accurate monitors by exploiting systemic flaws in probes and LLM judges; (2) monitors that leak more learning signal during RL suppress reward hacking but are more often evaded; and (3) including easier problems in training can decrease reward hacking. We apply our findings to build better reward hacking monitors for the medical chat and biography generation environments that improve upon naive baselines to reduce reward hacking rates across seeds to before-training levels in some interventions. Our results demonstrate that our takeaways translate to new settings and that better monitor intervention designs are possible.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:14:52Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aria Wong</name>
+    </author>
+    <author>
+      <name>Joshua Engels</name>
+    </author>
+    <author>
+      <name>Neel Nanda</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09147v1</id>
+    <title>BMMS: Policy-Conditioned Measurement of Behavioral Compliance in Language Models</title>
+    <updated>2026-11-06T08:24:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.09147v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09147v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Behavioral evaluation of language models fixes its dimensions in advance: hallucination, sycophancy, toxicity, over-refusal. An operator in a regulated industry needs a different question answered: does a system do what a particular rulebook requires? We introduce the Behavioral Misalignment Metric Suite (BMMS), which measures policy-conditioned misalignment by taking a policy corpus as an argument and returning a compliance profile over it, for any published policy and any system that answers in natural language. The Compliance Attainment Score (CAS) measures severity-weighted attainment over the obligations that bind the system, and the Compliance Robustness Margin (CRM) the share of that attainment surviving graded adversarial pressure; Behavioral Invariance (BIV) and the Behavioral Disposition Index (BDI) are specified and released with the suite. Dimensions enter only by passing a published admission test whose binding criterion is attribution: a quantity that moves when the judge changes, holding the target fixed, is measuring the instrument. Applying it excluded one of the quantities the suite itself reported. Across 1,003 obligations from eleven documents in five registers, the admission criterion holds 94.4% precision against blinded human judgment on vendor specifications and 50.0% on analytical guidance, extraction fidelity is 94.6%, and re-scoring under judges from two other providers leaves target ordering invariant while the absolute score of a single target spans up to 0.22. We apply it to the two most detailed published behavioral specifications. Own-specification advantage is not resolved from zero once document difficulty is subtracted, but absolute self-compliance is another matter: GPT-4o fails 70.7% of the hard constraints binding it in the Model Spec published by OpenAI, where the two Claude models fail 0.0% and 9.1% of theirs.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T08:24:58Z</published>
+    <arxiv:comment>21 pages, 4 figures. NeurIPS 2026 Workshop on Trust-AI-Eval (TAE). Artifact: https://doi.org/10.5281/zenodo.22064759</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Anthony Rhodes</name>
+    </author>
+    <author>
+      <name>Gadi Singer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08854v1</id>
+    <title>"I had nobody to turn to": Why LGBTQ+ People Choose (Not) to Use AI Chatbots for Personal Health and Relationship Advice</title>
+    <updated>2026-11-06T01:20:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08854v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08854v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>While there is an abundance of research into large language model (LLM) biases against LGBTQ+ communities, far less research has examined how and why LGBTQ+ people choose to make use of AI chatbots. In this work, we examine how LGBTQ+ people choose (not) to use AI chatbots across three domains in which LGBTQ+ users have unique needs: relationship support, mental health support, and gender or sexual health support. We surveyed 73 people (60 LGBTQ+; 13 non-LGBTQ+) on how they interact with AI chatbots and find that participants' access to external resources, privacy concerns, and perceptions of chatbot capabilities shape whether and how they choose to make use of AI chatbots. For instance, some LGBTQ+ participants felt that chatbots might actually be less biased against LGBTQ+ people than the people they know offline. We also find that LGBTQ+ participants report using AI chatbots less frequently than non-LGBTQ+ participants across 15 specific personal health and relationship advice scenarios, citing concerns about AI sycophancy and adverse cognitive side-effects. Recognizing AI chatbots as vital (albeit imperfect) resources for LGBTQ+ people, we recommend researchers consider systemic issues that drive users to AI chatbots and design technologies (AI or otherwise) that prioritize privacy, anonymity, and real human connection.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T01:20:13Z</published>
+    <arxiv:comment>35 pages, 2 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Jacob Hobbs</name>
+    </author>
+    <author>
+      <name>Ashray Gupta</name>
+    </author>
+    <author>
+      <name>Dennis Ulmer</name>
+    </author>
+    <author>
+      <name>Geetanjali Aich</name>
+    </author>
+    <author>
+      <name>Nolan Golden</name>
+    </author>
+    <author>
+      <name>Yanan Long</name>
+    </author>
+    <author>
+      <name>Ian Rios-Sialer</name>
+    </author>
+    <author>
+      <name>Jennifer Mickel</name>
+    </author>
+    <author>
+      <name>Morgan Klaus Scheuerman</name>
+    </author>
+    <author>
+      <name>Rohit Avinash Mujumdar</name>
+    </author>
+    <author>
+      <name>Virginia K. Felkner</name>
+    </author>
+    <author>
+      <name>Jordan Taylor</name>
+    </author>
+    <author>
+      <name>William Agnew</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.10045v2</id>
+    <title>Don't Blame The Preferences: Examining The Emergence of Sycophancy in LLM Training</title>
+    <updated>2026-11-10T19:12:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.10045v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.10045v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI sycophancy, the tendency of large language models (LLMs) to flatter users and affirm their beliefs, can undermine accuracy and contribute to misinformation, dependence, and overconfidence. Although prior work has benchmarked sycophancy in released models and proposed mitigations, its origins during training remain poorly understood. Preference alignment methods such as RLHF and DPO are often blamed, but their effects are rarely compared with earlier training stages. We investigate sycophancy across the training pipelines of three model families and three benchmarks. We find that sycophancy is largely established by the end of supervised fine-tuning (SFT), rather than introduced by preference alignment. Across all nine model benchmark combinations, SFT checkpoints attain at least 92% of preference aligned models' sycophancy scores and at least 85% of final models' scores; on average, they are about as sycophantic as final models. Preference alignment increases sycophancy in only four of nine cases, by an average of 4.2 percentage points when it does. To probe the underlying causes, we isolate model representations associated with sycophancy using mechanistic interpretability and measure their activation on training datasets from each stage. SFT datasets show roughly the same average activation as other training data but contribute substantially more examples, and the highest-scoring individual datasets all come from SFT. Our findings suggest that addressing sycophancy requires interventions throughout the training pipeline, particularly in data selection and augmentation for pre-training and SFT.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T21:56:29Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Chao Peter Yang</name>
+    </author>
+    <author>
+      <name>Catherine Zehr</name>
+    </author>
+    <author>
+      <name>Pranav Bijith</name>
+    </author>
+    <author>
+      <name>Brandon Fain</name>
+    </author>
+  </entry>
+</feed>
