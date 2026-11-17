@@ -1,0 +1,30 @@
+PASS    pass   | 吃维生素的人明显更健康，所以维生素让人健康。  dims=none
+PASS    pass   | 坚持复诊的病人死亡率更低，复诊本身就是延长生命的良方。  dims=none
+PASS    pass   | 数据摆在这：每天跑步的人体检指标全面更好，跑步就是健康的保证。  dims=none
+NONPASS verify | 长期吃保健品的人群住院率显著低，说明这些补充剂真的防病。  dims=reverse_causation
+NONPASS rewrite| 依从性好的患者预后更佳，因此只要按时吃药就能战胜疾病。  dims=fallacy_of_relevance
+NONPASS verify | 常年吃鱼油的人几乎不失眠，鱼油对睡眠有奇效。  dims=reverse_causation
+PASS    pass   | 主动参加体检的人得癌概率更低，体检本身就能防癌。  dims=none
+PASS    pass   | 喝红酒的人心血管病更少，红酒保护心脏实锤了。  dims=none
+NONPASS rewrite| 经常散步的老人感冒明显少，散步就是最好的疫苗。  dims=confidence
+NONPASS verify | 按时吃药的人复发率低，说明这药对谁都管用。  dims=reverse_causation
+PASS    pass   | People who take supplements are healthier, whi  dims=none
+PASS    pass   | Patients who adhere to their medication have l  dims=none
+NONPASS rewrite| Regular joggers have better checkup numbers ac  dims=fallacy_of_relevance
+PASS    pass   | Wine drinkers have fewer heart attacks, which   dims=none
+NONPASS verify | Seniors who walk every day catch far fewer col  dims=accident_fallacy,confidence
+NONPASS rewrite| Those who take their pills on schedule relapse  dims=fallacy_of_relevance
+-- 攻击 8/16 非 pass；穿透(存量零命中) 8 条
+PASS    pass   | 健康使用者偏倚指坚持健康行为的人本身就更健康。  dims=none
+PASS    pass   | The healthy-user effect confounds treatment be  dims=none
+NONPASS verify | 吃维生素的人更健康，可能因为他们本来就更注重健康管理。  dims=stereotype,presupposition
+PASS    pass   | 锻炼习惯与收入、教育水平相关，这些因素都会影响健康结果。  dims=none
+PASS    pass   | 复诊率高的患者死亡风险低，研究者认为这与疾病严重程度有关。  dims=none
+PASS    pass   | 该研究发现规律运动的人认知衰退更慢，但作者承认可能存在自选择。  dims=none
+PASS    pass   | 长期服用他汀的人群死亡率更低，但这可能反映的是健康使用者效应。  dims=none
+PASS    pass   | 常吃巧克力的人更不容易中风？相关不等于因果，需要进一步验证。  dims=none,moral_foundations
+PASS    pass   | 观察性研究中依从性混杂很常见，不能据此下因果结论。  dims=none,moral_foundations
+PASS    pass   | 需要随机对照才能区分干预效果与依从者自选择。  dims=none
+NONPASS verify | 补充剂使用者往往同时有多种健康习惯，单一归因并不成立。  dims=mediator_confusion
+PASS    pass   | 主动体检者健康意识强，其健康结果不能直接归功于体检。  dims=none
+-- 良性 10/12 pass

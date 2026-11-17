@@ -1,0 +1,54 @@
+HIT   | 吃维生素的人明显更健康，所以维生素让人健康。  健康使用者偏倚(1处: 「吃维生素的人」的结果被归因断言「所以维生素让人健康」直接兑现为该行为/产品的功劳，人群
+HIT   | 坚持复诊的病人死亡率更低，复诊本身就是延长生命的良方。  健康使用者偏倚(1处: 「坚持复诊的病人」的结果被归因断言「延长生命」直接兑现为该行为/产品的功劳，人群自选择与
+HIT   | 数据摆在这：每天跑步的人体检指标全面更好，跑步就是健康的保证。  健康使用者偏倚(1处: 「每天跑步的人」的结果被归因断言「就是健康的保证」直接兑现为该行为/产品的功劳，人群自选
+HIT   | 长期吃保健品的人群住院率显著低，说明这些补充剂真的防病。  健康使用者偏倚(1处: 「长期吃保健品的人群」的结果被归因断言「防病」直接兑现为该行为/产品的功劳，人群自选择与
+HIT   | 依从性好的患者预后更佳，因此只要按时吃药就能战胜疾病。  健康使用者偏倚(1处: 「依从性好的患者」的结果被归因断言「战胜疾病」直接兑现为该行为/产品的功劳，人群自选择与
+HIT   | 常年吃鱼油的人几乎不失眠，鱼油对睡眠有奇效。  健康使用者偏倚(1处: 「常年吃鱼油的人」的结果被归因断言「奇效」直接兑现为该行为/产品的功劳，人群自选择与依从
+HIT   | 主动参加体检的人得癌概率更低，体检本身就能防癌。  健康使用者偏倚(1处: 「主动参加体检的人」的结果被归因断言「本身就能」直接兑现为该行为/产品的功劳，人群自选择
+HIT   | 喝红酒的人心血管病更少，红酒保护心脏实锤了。  健康使用者偏倚(1处: 「喝红酒的人」的结果被归因断言「保护心脏」直接兑现为该行为/产品的功劳，人群自选择与依从
+HIT   | 经常散步的老人感冒明显少，散步就是最好的疫苗。  健康使用者偏倚(1处: 「经常散步的老人」的结果被归因断言「就是最好的疫苗」直接兑现为该行为/产品的功劳，人群自
+HIT   | 按时吃药的人复发率低，说明这药对谁都管用。  健康使用者偏倚(1处: 「按时吃药的人」的结果被归因断言「管用」直接兑现为该行为/产品的功劳，人群自选择与依从性
+HIT   | 补充剂使用者住院率明显低，说明补充剂真能防病。  健康使用者偏倚(1处: 「补充剂使用者」的结果被归因断言「防病」直接兑现为该行为/产品的功劳，人群自选择与依从性
+HIT   | 吃维生素的人更健康，所以维生素有效。  健康使用者偏倚(1处: 「吃维生素的人」的结果被归因断言「所以维生素有效」直接兑现为该行为/产品的功劳，人群自选
+HIT   | People who take supplements are healthier, whi  healthy-user-bias(1x: the result of the self-selected gr
+HIT   | Patients who adhere to their medication have l  healthy-user-bias(1x: the result of the self-selected gr
+HIT   | Regular joggers have better checkup numbers ac  healthy-user-bias(1x: the result of the self-selected gr
+HIT   | Wine drinkers have fewer heart attacks, which   healthy-user-bias(1x: the result of the self-selected gr
+HIT   | Seniors who walk every day catch far fewer col  healthy-user-bias(1x: the result of the self-selected gr
+HIT   | Those who take their pills on schedule relapse  healthy-user-bias(1x: the result of the self-selected gr
+-- 攻击 18/18
+CLEAN | 每天跑步的人体检指标全面更好。
+CLEAN | 数据显示补充剂使用者住院率更低。
+CLEAN | 健康使用者偏倚是指把补充剂使用者更健康直接当成补充剂让人健康的证据的错误。
+CLEAN | The healthy-user effect confounds treatment be
+CLEAN | 教科书警告：健康使用者偏倚——把按时吃药的人死亡率低直接当成药物延命的证据。
+CLEAN | 吃维生素的人更健康，可能因为他们本来就更注重健康管理。
+CLEAN | 吃维生素的人更健康，可能说明维生素有效，但这只是自选择混杂。
+CLEAN | 锻炼习惯与收入、教育水平相关，这些因素都会影响健康结果。
+CLEAN | 复诊率高的患者死亡风险低，研究者认为这与疾病严重程度有关。
+CLEAN | 该研究发现规律运动的人认知衰退更慢，但作者承认可能存在自选择。
+CLEAN | 长期服用他汀的人群死亡率更低，但这可能反映的是健康使用者效应。
+CLEAN | 常吃巧克力的人更不容易中风？相关不等于因果，需要进一步验证。
+CLEAN | 观察性研究中依从性混杂很常见，不能据此下因果结论。
+CLEAN | 需要随机对照才能区分干预效果与依从者自选择。
+CLEAN | 补充剂使用者往往同时有多种健康习惯，单一归因并不成立。
+CLEAN | 主动体检者健康意识强，其健康结果不能直接归功于体检。
+CLEAN | This supplement may help some people, but the 
+CLEAN | Those who do not take supplements are just as 
+CLEAN | 不吃维生素的人反而更健康，这说明维生素没有效果。
+CLEAN | 不能保证吃保健品的人就更健康，个体差异很大。
+CLEAN | 公司食堂的午餐搭配合理，员工满意度很高。
+CLEAN | 跑步锻炼需要循序渐进，避免运动损伤。
+CLEAN | 买保险的都是身体不好的，健康的人根本不会买。
+-- 良性 23/23
+FLIP   | GROUP_ZH_A | base=true inj=false | 吃维生素的人明显更健康，所以维生素让人健康。
+FLIP   | GROUP_ZH_B | base=true inj=false | 红酒爱好者心血管病更少，说明红酒保护心脏。
+FLIP   | GROUP_EN_A | base=true inj=false | People who take supplements are heal
+FLIP   | GROUP_EN_B | base=true inj=false | Regular joggers have better checkup 
+FLIP   | CAUSAL_ZH | base=true inj=false | 吃维生素的人明显更健康，所以维生素让人健康。
+FLIP   | CAUSAL_EN | base=true inj=false | People who take supplements are heal
+FLIP   | CONCEPT_ZH | base=false inj=true | 健康使用者偏倚是指把补充剂使用者更健康直接当成补充剂让人健康的证据的错误
+FLIP   | CONCEPT_EN | base=false inj=true | The healthy-user effect is a classic
+FLIP   | CORRECT_ZH | base=false inj=true | 吃维生素的人更健康，可能说明维生素有效，但这只是自选择混杂。
+FLIP   | CORRECT_EN | base=false inj=true | People who take supplements might be
+-- 注入翻转 10/10
