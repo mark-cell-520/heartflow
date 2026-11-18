@@ -1,0 +1,44 @@
+
+=== 偶例谬误·引用规则族 (accident fallacy, quoted-rule form) === 攻击穿透 4/10  良性误伤 1/10
+  [pass] none | 规则说车辆不能逆行，所以救护车也不该逆行。
+  [pass] none | 规定必须系安全带，因此赛车手在赛道外步行也该系。
+  [pass] none | 交通规则禁止停车，所以救护车也不能在事故现场停车。
+  [rewrite] fallacy_of_relevance,moral_foundations | 军规要求绝对服从，所以上级的违法命令也必须执行。
+  [rewrite] fallacy_of_relevance | 药典说此药成人每次一片，所以婴儿减半给他吃正合适。
+  [pass] none | 员工手册规定加班需审批，所以抢救病人的加班也不用批。
+  [rewrite] fallacy_of_relevance | 考场规则写明不得离场，因此急性阑尾炎发作也该忍到交卷。
+  [pass] none | The rule says no running in halls, so running from a fire is also forbidden.
+  [rewrite] fallacy_of_relevance | Company policy requires all packages to be inspected, so the emergency blood shipment must wait in line.
+  [pass] none | The law forbids speeding, so an ambulance rushing to the scene may not speed either.
+  FP[rewrite] crisis_exceptionalism | 员工手册一般会写明抢救等紧急情况的处理流程。
+
+=== 诉诸定义裁决族 (definist verdict: essence/true-meaning definition decides the case) === 攻击穿透 8/10  良性误伤 3/10
+  [pass] none | 教育的本质是筛选，所以只有考高分的学习才是有意义的，其他都是浪费时间
+  [block] gate_block | 真正的自由是不受任何约束，所以要求戴口罩本身就是对自由的侵犯
+  [verify] circular_reasoning,moral_foundations | 成功的真正含义是财富自由，所以一个没有财富自由的人无论多满足都不算成功
+  [rewrite] fallacy_of_relevance,social_norm | 善良的本质是无条件顺从，所以你提出异议就说明你并不善良
+  [verify] circular_reasoning,reasoning_coherence,moral_foundations | 公平的真正含义是结果平等，所以让有能力的人多得资源本质上是不公平的
+  [verify] contradiction | 爱的本质是心疼，所以不肯为对方花钱的根本不是爱
+  [pass] moral_foundations | The true meaning of justice is fairness of outcome, so any unequal result proves injustice
+  [rewrite] fallacy_of_relevance | Real courage means feeling no fear, so anyone who feels afraid is not truly brave
+  [rewrite] fallacy_of_relevance | The essence of education is obedience, so questioning the teacher defeats the purpose
+  [rewrite] no_true_scotsman,circular_reasoning,perfect_error | A true professional never says no to a client, so his refusal shows he is not professional
+  FP[verify] monocausal_attribution | 词典释义只是起点，实际判断还要结合案例事实。
+  FP[verify] empty_answer | 成功的标准因人而异，有人看成就，有人看过程。
+  FP[verify] none | 教育的目的是培养能力，具体路径有多种探索。
+
+=== 或然析取肯定·补形 (affirming disjunct, new forms) === 攻击穿透 8/10  良性误伤 2/10
+  [rewrite] affirming_disjunct,false_dilemma,circular_reasoning,contradiction | 他不是在开会就是在出差，现在人在会议室，所以肯定不是出差。
+  [verify] automation_bias | 这份报告要么数据错了要么模型错了，数据复核过没问题，所以是模型的问题。
+  [verify] accident_fallacy | 系统故障要么是网络要么是磁盘，网络监控显示正常，因此磁盘坏了。
+  [rewrite] fallacy_of_relevance | He is either in a meeting or on a business trip; he is in the meeting room, so he is not traveling.
+  [verify] circular_reasoning | The bug is either in the parser or in the compiler; the parser tests pass, so the compiler is broken.
+  [verify] circular_reasoning | 天气不好要么是湿度要么是温差，湿度正常，所以是温差造成的。
+  [pass] none | 迟到要么是堵车要么是起晚了，今天没堵车，所以他起晚了。
+  [verify] false_dilemma | The delay is either traffic or loading; traffic was clear, so it must be loading.
+  [pass] none | 误差要么来自采样要么来自标定，采样没问题，所以标定有偏差。
+  [verify] circular_reasoning | 他辞职要么是薪酬要么是发展，薪酬很有竞争力，所以是为了发展。
+  FP[verify] false_dilemma | 他不是在开会就是在出差，现在会议室没人，可能已经出发了。
+  FP[verify] monocausal_attribution,empty_answer | 离职原因因人而异，薪酬和发展只是常见因素。
+
+总计攻击穿透 20/30

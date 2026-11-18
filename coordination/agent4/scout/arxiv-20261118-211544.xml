@@ -1,0 +1,393 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/SeymGU2LPknoG1nr5UYnoOxXtSY</id>
+  <title>arXiv Query: search_query=all:logical OR all:fallacies OR all:taxonomy OR all:extension OR all:rule-based OR all:detection OR all:slippery OR all:slope OR all:disjunctive OR all:false OR all:dilemma&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T21:15:45Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:logical+OR+(all:fallacies+OR+(all:taxonomy+OR+(all:extension+OR+(all:rule-based+OR+(all:detection+OR+(all:slippery+OR+(all:slope+OR+(all:disjunctive+OR+(all:false+OR+all:dilemma)))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>587701</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23218v1</id>
+    <title>What Does a Bias Head Measure? Non-Identifiability in Head-Level Bias Attribution</title>
+    <updated>2026-11-17T18:57:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.23218v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23218v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Methods that localise social bias in large language models to individual attention heads and remove it by ablation are validated by their effect on a fairness metric, never by evidence that the statistic selecting the heads measures bias. We audit this on Qwen-2.5-7B-Instruct and Llama-3.1-8B-Instruct. The head map correlates at $ρ= -0.950$ and $-0.768$ with a label-blind response-length map, apparently identifying a surface confound. An intervention that breaks the length-label coupling rejects this reading: with the prompt held fixed, response length explains 1% of the statistic's variance. What does explain it is prompt identity, at 64% of variance, in an ordering that is not monotonic in length. Within any fixed prompt the fairness label, response length and the presence of a protected-group token are collinear at $φ= 0.95$, partly by definition of the labelling rule, so no observational analysis can attribute the map to any of them, and no method in this family performs an experiment that could. The substantive claims fail independently: bias selectivity is not late-layer-concentrated on either model under either reference reading, and no head set we tested reduces the unfairness rate when ablated. Its complement, scored on the opposite label, reliably destroys refusal behaviour ($p = 2.7\times10^{-5}$), demonstrating that the pipeline detects effects at this scale.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:08Z</published>
+    <arxiv:comment>18 pages, 13 tables. Under review at ACL Rolling Review (October 2026 cycle)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>S. M Seefat Alam</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23211v1</id>
+    <title>Multimodal Masked Diffusion Autoencoder for Modeling Impaired Driving</title>
+    <updated>2026-11-17T18:50:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.23211v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23211v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Human cognitive state (e.g., distraction, stress), gaze, and behavior interact with the driving environment in subtle ways that AI could use to assist drivers, but ground-truth labels for human cognitive state levels are costly to obtain at scale. We propose a multimodal masked-diffusion autoencoder, ID-MAE, that adds a self-supervised objective to impairment prediction: alongside predicting the impairment label as a masked token, it reconstructs masked gaze and trajectory. To probe the effects of different modalities and types of impairments on model inference, we introduce DIVERT, a driving-simulator dataset containing 103 hours of driving data (n = 109) with ten impairment inductions spanning cognitive, visual, and emotional states, recorded with gaze, vehicle state, and scene video. We demonstrate how ID-MAE affords significant improvements in impairment inference results on both the DIVERT dataset and existing datasets, and enables strong results in additional tasks, such as trajectory and gaze prediction. For location-matched pairs, our model achieves a paired AUC of 0.706 for impairment detection on DIVERT, compared to 0.590 without reconstruction loss, improving over existing baselines. We probe the design space in terms of input modalities, masking scheme, positional encoding, attention mechanism, and decoding. We also investigate the interaction between various impairments in training and inference, demonstrating that visually demanding distractions are separable from cognitive distractions. Code and data will be available upon acceptance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:50:22Z</published>
+    <arxiv:comment>Equal contribution: John Gideon and Anshul Gupta. 8 pages, 6 figures. Submitted to CVPR 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>John Gideon</name>
+    </author>
+    <author>
+      <name>Anshul Gupta</name>
+    </author>
+    <author>
+      <name>Megan Applegate-Kenton</name>
+    </author>
+    <author>
+      <name>Kayli Battel</name>
+    </author>
+    <author>
+      <name>Todd J Rowell</name>
+    </author>
+    <author>
+      <name>Patricio Reyes Gomez</name>
+    </author>
+    <author>
+      <name>Laporsha Dees</name>
+    </author>
+    <author>
+      <name>Emily Sumner</name>
+    </author>
+    <author>
+      <name>Avinash Balachandran</name>
+    </author>
+    <author>
+      <name>Guy Rosman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23208v1</id>
+    <title>Distortion-Free Semantic Watermarks for Black-Box Generative Models</title>
+    <updated>2026-11-17T18:49:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.23208v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23208v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a provably distortion-free semantic watermarking algorithm that requires only black-box sampling access to a generative model and black-box access to a semantic embedding. A watermark is called distortion-free if, averaged over its secret detection key, it leaves the generator's output distribution unchanged; this provides a formal guarantee that watermarking does not reduce output quality. Conventional such watermarks are often brittle to transformations. This is especially problematic for images, where benign operations such as compression, cropping, or resizing change the entire pixel representation. Semantic watermarks therefore require detection to be robust to content-preserving transformations. Previous methods combining these properties rely heavily on specific white-box properties of the underlying model: either to autoregressive text generation or to diffusion-specific access, such as control of the initial noise or diffusion inversion. In contrast, our construction is fully generic: It only interacts with the generative model and the semantic embedding, a function that determines the notion of "preserving content" under which detection should be robust, via sample and query access. We then instantiate this framework for image generation. We characterize the two competing properties required of the semantic embedding: it should remain stable under transformations that preserve an image's content, but should distinguish independent generations from the same prompt. We train an image encoder directly for this tradeoff. The resulting encoder improves separation while maintaining stability over off-the-shelf alternatives and enables strong aggregate detection while remaining robust to various transformations. We demonstrate the effectiveness of our watermark scheme on both open-source and closed models, which is possible only due to restriction to black-box access.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:17Z</published>
+    <arxiv:comment>Project page: https://avivyossef.github.io/distortion-free-semantic-watermark/ Code: https://github.com/avivyossef/distortion-free-semantic-watermark</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aviv Yossef</name>
+    </author>
+    <author>
+      <name>Or Patashnik</name>
+    </author>
+    <author>
+      <name>Or Zamir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23203v1</id>
+    <title>Identifying and Repairing Energy Smells with Agent Skills</title>
+    <updated>2026-11-17T18:45:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23203v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23203v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Energy smells are inefficient implementations that waste energy. Once code reaches production, these smells become costlier and riskier to fix, so energy efficiency checks should shift left, i.e., move earlier in the development lifecycle, to where code is written. Existing energy smell tools rely on fixed static rules and do not measure energy savings, whereas LLM-based optimizers mostly target execution time and rarely ground their changes in concrete smell definitions. To address both limitations, we present DR. GREENS, an agent skill that detects and repairs energy smells in Python code within the developer's coding environment. The skill grounds the coding agent in our taxonomy of 12 energy smells and 65 root causes, augmented with repair guidance drawn from 230 measured cases. The skill also encapsulates a static analyzer and an independent verifier to confirm behavior preservation and energy saving for each attempted repair. We evaluated DR. GREENS in 18 sessions on three open-source repositories, with two models and three skill configurations. Of the 258 measured repairs, 68.6% saved energy, with a median saving of 24.9%. Compared with a baseline skill that lacks the taxonomy, the full skill found more energy smells with verified savings in all three repositories with both models. DR. GREENS helps developers detect energy hotspots and fix them reliably without altering program behavior, which makes energy-efficient development more feasible.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:45:42Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Mohammadjavad Mehditabar</name>
+    </author>
+    <author>
+      <name>Saurabhsingh Rajput</name>
+    </author>
+    <author>
+      <name>Tushar Sharma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23201v1</id>
+    <title>Governance Risks in Decentralized Autonomous Organizations (DAOs): Implications for Traditional Financial Institutions</title>
+    <updated>2026-11-17T18:42:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.23201v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23201v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As financial institutions increasingly interact with blockchain ecosystems through decentralized finance, stablecoins, tokenized assets, and distributed ledger infrastructure, they come to depend on systems governed wholly or partly by decentralized autonomous organizations (DAOs). This paper examines how DAO governance differs from traditional corporate governance and what this implies for risk management in regulated financial institutions. Using a qualitative comparative framework grounded in OECD governance principles, Basel Committee guidance, and FINMA circulars, the study maps DAO deliberation, voting, and accountability mechanisms against established governance and risk-management principles and illustrates associated risks through selected real-world cases. The analysis shows that DAOs preserve core governance functions but redistribute them across token holders, delegates, community forums, smart contracts, and legal wrapper entities. This creates distinct risks, including voting-power concentration, weak proposal controls, legal uncertainty, and unclear accountability, which established frameworks do not fully capture, while also offering two transferable strengths: a transparent, traceable decision record and a direct link between approval and execution. The paper contributes a structured assessment framework linking DAO governance characteristics to existing governance, outsourcing, technology-risk, and operational-resilience processes, enabling institutions to address DAO-governed dependencies through targeted extensions of current practices rather than a separate risk framework.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:42:34Z</published>
+    <arxiv:comment>16 pages, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Christian Plöschberger</name>
+    </author>
+    <author>
+      <name>Irene Buller</name>
+    </author>
+    <author>
+      <name>Mark Christopher Ballandies</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23192v1</id>
+    <title>WoRD: Diffusion-Based Posterior Inference for Online Goal Recognition</title>
+    <updated>2026-11-17T18:35:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.23192v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23192v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Goal recognition is the task of inferring an agent's intended goal from its observed behavior. Most existing work focuses on high-level symbolic recognition, abstracting away the continuous motion through which agents reach their goal. Methods that do reason over continuous trajectories rely on an explicit dynamics model that is hard to acquire and rarely transfers across settings. Neither approach explicitly learns how agents move toward each candidate goal, limiting accuracy on ambiguous trajectory prefixes where such knowledge is most needed.
+  We present WoRD (Waypoint Recognition with Diffusion), which uses a learned trajectory prior to infer the agent's goal from partial observations. At each step, WoRD runs one warm-started denoising chain per candidate goal, steers each chain toward the observed trajectory through a closed-form log-likelihood gradient, and reweights the resulting samples by Bayes' rule into a calibrated posterior over goals. We evaluate WoRD on simulated robot settings, pedestrian trajectories, and vehicle trajectories using four metrics targeting distinct failure modes. Across all three settings, the same inference procedure preserves calibrated multimodal beliefs through ambiguous prefixes where filter- and classifier-based observers collapse to a single mode or grow overconfident.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:35:53Z</published>
+    <arxiv:comment>Accepted at the 40th Annual Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Almog Anschel</name>
+    </author>
+    <author>
+      <name>Sarah Keren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23189v1</id>
+    <title>Retrieval-Augmented Correction for Generalist Medical Image Segmentation</title>
+    <updated>2026-11-17T18:33:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23189v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23189v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Automated segmentation is routinely used as the first step in quantitative image-based clinical workflows, where predicted masks are subsequently reviewed and corrected by human operators. Automated correction of the residual structural errors is currently addressed one anatomy at a time, so the number of trained correctors scales with the number of segmentation targets. We present GRACE, a retrieval-augmented refiner that edits an input mask under context drawn from a shared knowledge base of verified prior cases. The refiner is trained once on a multi-organ corpus spanning compact organs, cavities, branching vessels, and tumour lesions. In the held-out dataset-transfer evaluation, three held-out datasets query a fixed knowledge base built from training data only. A separate leave-one-anatomy-out experiment tests parameter-free index extension: verified cases of an unseen solid organ enter the knowledge base, and the refiner stays frozen. A light shape-aware projection head on a frozen multimodal encoder maps embedding similarity to the shape agreement of the masks, so the knowledge base returns cases that the refiner can use as a shape prior. We evaluate GRACE on 18 public datasets spanning CT, MRI and ultrasound, using nine refinement configurations and seven upstream segmentors that span weak, mid, and strong operating regimes. We report each change with the DSC of its input mask. On the weak tier, the input DSC is 0.386 and GRACE adds up to +0.35 DSC. On a strong segmentor, the input DSC is 0.932 and the mean change is small. Transfer to an imaging modality that is absent from training and from the index is partial and depends on the anatomy, and remains an open research direction. Our results suggest retrieval-conditioned refinement is a practical alternative to anatomy-specific correction models. Code: https://github.com/robustml-eurecom/grace</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:33:42Z</published>
+    <arxiv:comment>Accepted in Transactions on Machine Learning Research (10/2026). Reviewed on OpenReview: https://openreview.net/forum?id=PeDqE0SQRe</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Vincenzo Marcianò</name>
+    </author>
+    <author>
+      <name>Xiaoming Zhang</name>
+    </author>
+    <author>
+      <name>Michela Antonelli</name>
+    </author>
+    <author>
+      <name>Sebastien Ourselin</name>
+    </author>
+    <author>
+      <name>Maria A Zuluaga</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23182v1</id>
+    <title>Fully Spiking Neural Implementation of Lambda-Calculus Beta-Reduction via Biologically Documented Mechanisms</title>
+    <updated>2026-11-17T18:27:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.23182v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23182v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present the first complete implementation of $β$-reduction in the untyped $λ$-calculus using exclusively spiking neural dynamics. Every step of the reduction---redex detection, subterm segmentation, variable-binding detection, De~Bruijn index arithmetic, token copying, and inter-step role maintenance---is performed by leaky integrate-and-fire (LIF) neurons with explicit membrane dynamics, exponential synaptic currents, axonal delays, and pair-based spike-timing-dependent plasticity (STDP). Each neural component maps onto a specific, experimentally documented mechanism: Jeffress-type delay-line coincidence for redex detection; a line-attractor balance counter for subterm segmentation; $θ$--$γ$ cross-frequency coupling for De~Bruijn variable binding; a phase-ring traveling wave for depth-index arithmetic; theta-cycle STDP for token copying; and recurrent persistent firing for role maintenance between reduction steps. All synaptic weights are derived analytically from measured EPSP amplitudes; no hand tuning is performed. The closed-loop system achieves 100\,\% agreement with a symbolic oracle across ten validation classes, including Church numeral arithmetic (\textsc{plus}, \textsc{mult}, \textsc{pred}), Boolean logic with divergent branches, Y-combinator steps, terms with up to six bound-variable occurrences, De~Bruijn indices up to~12, noise robustness, and determinism. To our knowledge this is the first Turing-complete symbolic computation performed entirely within spike dynamics using biologically grounded circuit primitives. We discuss implications for neuromorphic proof assistants and the neural basis of symbolic reasoning.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:27:55Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Vladimir A. Lazovskiy</name>
+    </author>
+    <author>
+      <name>Victor B. Kazantsev</name>
+    </author>
+    <author>
+      <name>Sergey V. Stasenko</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23177v1</id>
+    <title>Déjà View: A Shared Working-Memory Model for Visual Tasks</title>
+    <updated>2026-11-17T18:23:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.23177v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23177v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A working-memory model must remember stimuli and use its memory flexibly to perform different tasks. Here we introduce a model of working memory for images that combines dynamic activity with temporary associations between image features. We train the model on five tasks, including remembering a sample while other images are presented, categorizing distractor images while remembering the sample, and determining whether an image is new or has been presented before. The same trained model performs all tasks, guided by explicit cues about which response is required. We use this flexible memory model to ask how delay, distraction, and image history affect performance. Delays have little effect on sample-memory performance for the delays we tested, while seeing more images leads to more false alarms even when the target image appeared equally recently in all cases. On the sample-memory-plus-categorization task, the probability of correct responses on all questions decreases as more questions are asked, despite robust sample-memory performance. Finally, the model maintains stable performance across 40 brief trials of each task under the tested conditions. Together, these results demonstrate how a single working-memory system can be flexibly used to perform different tasks, and how its errors depend on both previous images and task demands.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:23:14Z</published>
+    <arxiv:comment>6 figures; includes appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Mranmay Shetty</name>
+    </author>
+    <author>
+      <name>Gabriel Kreiman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23175v1</id>
+    <title>Finding Patient Zero in Temporal Contact Networks: A Comparative Study</title>
+    <updated>2026-11-17T18:22:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.23175v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23175v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Identifying the source of an epidemic, i.e., the patient zero, in a temporal contact network is important for effective outbreak containment and resource allocation. While several methods have been proposed for this task, they have rarely been evaluated under comparable conditions, and no systematic comparison exists for temporal contact networks. We address this gap with a comparative study of seven major methods, namely Steiner Tree (ST), Individual-Based Approximation (IBA), Dynamic Message Passing (DMP), Monte Carlo Mean-Field (MCMF), Soft Margin Estimator (SME), Backtracking Network (BN, a graph neural network), and Belief Propagation (BP). We unify all methods under a single problem formulation and evaluate them on eight diverse temporal networks. In the main experiment, we compare source detection performance for varying basic reproduction numbers. Three complementary experiments on a subset of networks study (i) learning curves, (ii) partial observability, and (iii) parameter misspecification. We find that BP and BN are the strongest source detectors overall. SME is strong under partial observation but mediocre otherwise. IBA, DMP, and MCMF share a common weakness rooted in their factorized-likelihood assumption, leading to overconfident predictions. We identify scaling these methods to larger networks as the most pressing direction for future work.</summary>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:22:22Z</published>
+    <arxiv:comment>21 pages (18 main text, 3 supplementary), 11 figures, 5 tables. This work has been submitted to the IEEE for possible publication</arxiv:comment>
+    <arxiv:primary_category term="cs.SI"/>
+    <author>
+      <name>Nathan Cincera Brack</name>
+    </author>
+    <author>
+      <name>Martin Sterchi</name>
+    </author>
+    <author>
+      <name>Lorenz Hilfiker</name>
+    </author>
+    <author>
+      <name>Abraham Bernstein</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23174v1</id>
+    <title>Inference after coding agents</title>
+    <updated>2026-11-17T18:22:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.23174v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23174v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Empirical research is changing rapidly as AI coding agents are becoming increasingly proficient in every step of it, from writing code to manipulating data. We argue that while the potential of coding agents for science is vast, their use in hypothesis testing poses a substantial threat to classical inference, as these agents enable a supercharged form of selective inference. In particular, we argue that coding agents carrying out empirical research introduce a new type of post-selection inference that combines human-like, open-ended search over an implicit space of estimators with programmatic replayability of both the selection and the estimation process. Indeed, we find that on simulated data with zero effects, four frontier agents report significant p-values between 54% and 98% of the time when asked to produce a compelling finding. We propose a simple procedure for detecting and correcting these distortions. After an agent has completed its analysis, we reset and replay it on subsamples of the data to estimate the agent's relative probability of selecting that analysis when it looks statistically favorable. For agents with stable selection behavior, the resulting corrected test is asymptotically valid and consistent conditional on selection. Importantly, the correction is learned from the black-box agent's actual choices rather than a model of how it searches, so it remains valid even as AI technology continues to evolve rapidly. In simulations, the correction robustly lowers the high false rejection rates to near the nominal 5%. We illustrate the method on applications from two published papers.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:22:01Z</published>
+    <arxiv:comment>35 pages, 7 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Florian Gunsilius</name>
+    </author>
+    <author>
+      <name>David Van Dijcke</name>
+    </author>
+    <author>
+      <name>Kaspar Wüthrich</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23165v1</id>
+    <title>Teleportation of Logical Qubits using Lattice Surgery with Superconducting Circuits</title>
+    <updated>2026-11-17T18:17:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.23165v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23165v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Demonstrating a quantum advantage when solving large-scale computational problems on a quantum computer requires the correction of errors that occur due to limitations in control accuracy and coherence. Using the concept of quantum error correction, fault-tolerant logical qubits can be realized and manipulated with logical single- and two-qubit gates. In this paper, we experimentally analyze fault-tolerant lattice-surgery, which is a key primitive that enables operations between logical qubits realized in the surface-code. Using this primitive, we demonstrate the teleportation of logical states between two distance-three logical qubits realized in a superconducting circuit composed of 41 physical qubits. Throughout this process, we study the step-by-step transfer of logical information from a source to a target logical qubit by characterizing the time evolution of logical observables. We find that repeated execution of stabilizer measurements, after merging two surface-code patches, restores fault tolerance and yields increased fidelity of the teleported state. When optimizing the protocol in terms of gate count and sequence duration, we observe further improvements in fidelity. Our work offers new insights into the optimization of fault-tolerant lattice-surgery operations, while also providing a comprehensive description of the physical device and gate sequences used. We expect the efficient implementation of increasingly complex logical circuits to enhance the performance of future fault-tolerant quantum computers.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:17:01Z</published>
+    <arxiv:comment>16 pages, 10 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Luca Hofele</name>
+    </author>
+    <author>
+      <name>Yongxin Song</name>
+    </author>
+    <author>
+      <name>Áron Márton</name>
+    </author>
+    <author>
+      <name>Ian Hesner</name>
+    </author>
+    <author>
+      <name>Ilya Besedin</name>
+    </author>
+    <author>
+      <name>Jakob Ekert</name>
+    </author>
+    <author>
+      <name>Jonathan Trebst</name>
+    </author>
+    <author>
+      <name>François Swiadek</name>
+    </author>
+    <author>
+      <name>Felix Henrich</name>
+    </author>
+    <author>
+      <name>Dante Colao Zanúz</name>
+    </author>
+    <author>
+      <name>Mohsen Bahrami Panah</name>
+    </author>
+    <author>
+      <name>Lukas Bödeker</name>
+    </author>
+    <author>
+      <name>Nicholas Gialouris</name>
+    </author>
+    <author>
+      <name>Chrysander D. Hagen</name>
+    </author>
+    <author>
+      <name>Marek Pechal</name>
+    </author>
+    <author>
+      <name>Jean Claude Besse</name>
+    </author>
+    <author>
+      <name>Markus Müller</name>
+    </author>
+    <author>
+      <name>Christoph Hellings</name>
+    </author>
+    <author>
+      <name>Andreas Wallraff</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23163v1</id>
+    <title>Calabi--Yau dimensions of monotone Fukaya summands from infinitesimal gradings</title>
+    <updated>2026-11-17T18:16:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.23163v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23163v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop a theory of infinitesimal gradings for $\mathbb{Z}/2$-graded $A_\infty$-categories and use it to detect Calabi--Yau dimensions of monotone Fukaya summands from quantum cohomology. The dimensions we find agree with predictions from Serre functors of Kuznetsov components, such as $2$ for Gushel--Mukai and Verra fourfolds and the fractional value $\frac{n-2}{n}$ for the symplectic Grassmannian $\operatorname{IG}(2,2n)$. An infinitesimal grading induces endomorphisms on cohomological morphism spaces, and we prove a straightening theorem that realizes its weights as an actual grading compatible with the $A_\infty$-structure. We use this grading to show that Dehn twists give faithful braid group representations in the symplectic mapping class groups of Gushel--Mukai and Verra fourfolds.</summary>
+    <category term="math.SG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:16:39Z</published>
+    <arxiv:comment>100 pages, 7 figures</arxiv:comment>
+    <arxiv:primary_category term="math.SG"/>
+    <author>
+      <name>Yonghwan Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23162v1</id>
+    <title>A Normal Form for Invertible Semilinear Maps and the Category of Isocrystals Over a Finite Field</title>
+    <updated>2026-11-17T18:15:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.23162v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23162v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For a field $L$, and a finite order automorphism $σ$, we classify invertible $σ$-semilinear endomorphisms on finite-dimensional $L$-vector spaces up to equivalence. This is deduced as a consequence of a description, in terms of certain norm equations in finite extensions of $L$, of the semilinear Schur indices for the group $\mathbb{Z}$ acting on $L$ via $σ$. As an application, we give an explicit description of the category of isocrystals over a finite field.</summary>
+    <category term="math.RT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:15:53Z</published>
+    <arxiv:primary_category term="math.RT"/>
+    <author>
+      <name>Yuewen Qi</name>
+    </author>
+    <author>
+      <name>James Taylor</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23161v1</id>
+    <title>Attribution Through the Decoder: Prediction-Space Explanations for Structured Outputs</title>
+    <updated>2026-11-17T18:13:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.23161v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23161v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Networks that predict angles, gaze directions, and rotations do not output these quantities directly: they emit raw coordinates that a fixed decoder, such as normalization, maps to the final prediction. Attribution methods are usually applied to the raw coordinates, so they can credit inputs for changes the decoder discards, such as rescaling a vector when only its direction matters. The resulting explanation can highlight inputs that have no effect on the prediction. We instead attribute through the decoder differential, which for normalization decoders reduces to a scaled tangent projection. We characterize invariance to output rescaling, show that every fixed smooth scalar target on a sphere has points of zero tangential sensitivity, and show that an endpoint-projected variant of Integrated Gradients can still attribute to scale-only inputs, whereas direct angular Integrated Gradients cannot. On synthetic tasks with analytically known relevance, ambient attribution assigns up to 72% of its mass to an irrelevant region. On MPIIGaze validation data, tangent Grad-CAM produces 44% greater prediction displacement under 10% pixel deletion. On PASCAL3D+ with a 6D rotation decoder, the full differential improves mean deletion displacement by 14.1 degrees over the ambient coordinate sum and by 13.8 degrees over a decoder-invariant scalar. Results for a two-polarity tangent LayerCAM variant are mixed: it exceeds ambient-sum LayerCAM on circular regression but no difference is detected on quaternion pose. These results separate two failure sources, radial contamination and scalarization loss. The approach uses existing attribution methods with decoder-aware targets, although some variants also require changes to attribution aggregation. An invariant attribution can still miss inputs that drive the prediction, so invariance and deletion performance should each be checked.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:13:50Z</published>
+    <arxiv:comment>Under review</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zaer Bin Zaqy</name>
+    </author>
+    <author>
+      <name>Brinnae Bent</name>
+    </author>
+  </entry>
+</feed>
