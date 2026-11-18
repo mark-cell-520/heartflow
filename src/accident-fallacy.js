@@ -85,7 +85,20 @@
  *         babies / pregnant / disabled / blind / injured / patients /
  *         high altitude / low pressure / wartime / emergency /
  *         contraindicated / special cases / edge cases
+ *       [r400] M-紧急例外：救护车|急救|抢救|急诊|消防|救火|火灾|出警|
+ *         救援|抢险|阑尾炎|大出血|难产|休克|突发疾病；EN fire /
+ *         ambulance / paramedic / rescue / evacuation / burning /
+ *         resuscitation / life-threatening
  *   · 邻近窗：腿① ↔ 腿② 双向，ZH 60 字 / EN 160 字符
+ *
+ * [r400 新增措辞家族] 引用式规则宣告（quoted-rule form）：
+ * 存量腿①只收宣告形（「规则是」「一般来说」），r400 补**引用转述形**
+ * （「规则说X」「规定必须Y」「手册写明Z」「药典说…」；EN the rule
+ * says / the law forbids / policy requires / regulations prohibit），
+ * 与腿②紧急例外族（M-紧急例外）共现即构成「被引用的规则被套到紧急
+ * 情形上」——r400 探针实测 6/10 真穿透（另 4 条被存量
+ * fallacy_of_relevance 代拦）。已知边界：规则文本自身含纪律标记词
+ * （审批/审核/流程/合规…）时 EXEMPT_DISCIPLINE 优先豁免，该族不覆盖。
  *
  * 为什么取 VERIFY 级：单句也可能是对通则边界的**正确说明**（「水在
  * 标准大气压下 100 度沸腾，高原上不到 100 度」正是本族要教的判别
@@ -146,6 +159,20 @@ const RULE_ZH = [
   /(?:本来|本身|天生|生来)?(?:就)?(?:是|为|属)?(?:有益|有效|安全|正确|正常|最好|最优|最有效率|最有效|最合理|最公平|最正义|最道德的)/,
 ];
 
+// ─── [r400 新增族] 腿① 引用式规则宣告（quoted-rule form）──────────────
+// 辨别的族：**规则被引用（说/规定/写明/禁止…）之后，套用到其适用范围
+// 之外的紧急例外情形上**——「规则说车辆不得逆行，所以救护车也不该
+// 逆行」「员工手册规定加班需提前报备，所以抢救病人的加班也不用批」。
+// 存量 RULE_ZH/EN 只收「规则是/规矩是/一般来说」这类**宣告形**，
+// 收不住「规则说X」「规定必须Y」「手册写明Z」这类**引用转述形**——
+// r400 探针实测 6/10 真穿透（另 4 条被存量 fallacy_of_relevance 代拦）。
+// 已知边界：规则文本自身含纪律标记词（审批/审核/流程/合规…）时，
+// EXEMPT_DISCIPLINE 优先豁免（该豁免保护正当流程纪律陈述，优先于
+// 本族判定）——引用规则族暂不覆盖这类攻击形。
+const RULE_QUOTE_ZH = [
+  /(?:规则|规矩|规定|规章|条例|法律|法规|军规|纪律|制度|章程|公约|条款|守则|规范|手册|指南|药典|说明书|办法|细则|标准)(?:中|里|上)?(?:明确)?(?:说|讲|规定|要求|写明|载明|禁止|严禁|不许|不得|必须|应当|明确)/,
+];
+
 // ─── 腿① RULE 通则宣告（英文）──────────────────────────────────
 const RULE_EN = [
   /\b(?:generally|in\s+general|as\s+a\s+(?:rule|general\s+rule)|by\s+and\s+large|on\s+(?:the\s+)?average|on\s+average|typically|normally|usually|in\s+most\s+cases|in\s+the\s+general\s+case|as\s+an\s+empirical\s+rule)\b/i,
@@ -161,6 +188,11 @@ const RULE_EN = [
   // 同样依赖边界条件，无一般形修饰词仍属腿①）
   /\b(?:boils?|boiling|melts?|melting|freezes?|freezing|condenses?|sublimes?|ignites?)\s+at\s+[-+]?\d+(?:\.\d+)?\s*(?:degrees?|°|deg|C|F|Celsius|Fahrenheit|kelvin|K)\b/i,
   /[-+]?\d+(?:\.\d+)?\s*(?:degrees?|°|deg\b|C\b|F\b|Celsius|Fahrenheit|kelvin|K\b|meters?|metres?|m\b|kilometers?|kilometres?|km\b|kilograms?|kg\b|pascals?|Pa\b|kilopascals?|kPa\b|megapascals?|MPa\b|atmospheres?|atm\b|newtons?|N\b|joules?|J\b|volts?|V\b|amperes?|amps?)\b/i,
+];
+
+// ─── [r400 新增族] 腿① 引用式规则宣告（英文）────────────────────────
+const RULE_QUOTE_EN = [
+  /\b(?:the\s+)?(?:rules?|regulations?|laws?|policy|policies|guidelines?|manual|handbook|procedures?|protocols?|sops?)\s+(?:says?|states?|requires?|mandates?|forbids?|prohibits?|stipulates?|specifies?|provides?)\b/i,
 ];
 
 // ─── 腿② EXC 例外情形（中文）────────────────────────────────────
@@ -184,6 +216,19 @@ const EXC_EN = [
   /\b(?:exceptions?|except(?:ions?)?|except(?:ed|ing)?\s+(?:for|when|where|in)|unless|exempt(?:ed|ion|ions)?|carve-?outs?|special\s+cases?|edge\s+cases?|case-?by-?case|on\s+a\s+case-?by-?case\s+basis|does\s+not\s+apply|not\s+applicable|inapplicable|outliers?)\b/i,
 ];
 
+// ─── [r400 新增族] 腿② 紧急例外情形（emergency exception cases）────────
+// 存量 EXC 收生理/环境/制度边界例外，不收**紧急任务与急救场景**——
+// 「规则说车辆不得逆行，所以救护车也不该逆行」的例外腿（救护车/
+// 抢救/火灾）在存量射程外，r400 探针实测与腿①缺口共同造成 6/10
+// 真穿透。收词刻意收窄：不收裸 emergency（「Generally, emergency
+// supplies should also be stocked」类政策建议句会误伤）。
+const EMERG_ZH = [
+  /救护车|急救|抢救|急诊|消防|救火|灭火|火情|火灾|出警|救援|抢险|救灾|急性阑尾炎|阑尾炎|昏厥|大出血|难产|休克|突发疾病|急性病|绿色通道/,
+];
+const EMERG_EN = [
+  /\b(?:fires?|ambulances?|paramedics?|rescu(?:e|ed|ing)|evacuat\w+|burning|blaze|resuscitat\w+|life[- ]threatening)\b/i,
+];
+
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
 const EXEMPT_META_ZH = [
   /偶例谬误|偶例|通则滥用|滥用通则|一概而论|一刀切(?:地)?(?:判断|处理|否定|否定)?|亚里士多德|辨谬篇| Sophistical|诡辩|13 种谬误|十三种谬误|谬误清单|谬误表|非形式谬误|形式谬误|逻辑谬误|论证谬误|谬误分类|谬误类型/,
@@ -203,6 +248,11 @@ const EXEMPT_CORRECT_ZH = [
   // 否则攻击句被自家豁免组吃掉（实测：契约自由…不该有例外 → 被「有例外」
   // 误豁免）。Node 支持后行否定断言。
   /(?<![不该没未])有例外|(?<![不该没未])存在例外|(?<![不该没未])是有例外|当然有例外|不无例外|例外情况|例外情形|有例外情形|有例外情况|是有例外的/,
+  // [r400] 明文宣告豁免形：「所以救护车有紧急任务豁免，依规可逆行」——
+  // 规则引用后**显式承认**例外正是正确响应形状（与 r372 的「有例外」
+  // 守卫同族），收 有/设有/另有/订有 + 豁免/除外/但书/变通。
+  /(?<![不该没未])(?:有|设有|另有|订有|定有)[^。！？；\n]{0,14}(?:豁免|除外|但书|变通)/,
+  /另有(?:规定|安排|办法|流程|标准)/,
   /不适用|并不适用|不一定适用|未必适用|在此不适用|不适用于/,
   /边界条件|适用范围|适用前提|前提条件|前置条件|限定条件|限制条件|成立条件|约束条件|有效性依赖|取决于|要看具体情况|结合具体情况/,
   /不能一概|不可一概|不能一概而论|不能(?:简单|笼统|机械)地(?:套用|应用|推广|推论)|不能机械套用|不能(?:简单)?套用|不能笼统|不能(?:简单)类推|不能照搬|不能生搬硬套|不宜(?:简单)?套用/,
@@ -210,6 +260,8 @@ const EXEMPT_CORRECT_ZH = [
 ];
 const EXEMPT_CORRECT_EN = [
   /\b(?:exceptions?\s+(?:apply|applies|exist|always)|there\s+are\s+(?:always\s+)?exceptions?|with\s+(?:some\s+|the\s+)?(?:notable\s+)?exceptions?|on\s+a\s+case-?by-?case\s+basis|case-?by-?case|depending\s+on|subject\s+to|with\s+the\s+caveat|where\s+applicable|qualified\s+by|carve-?outs?\s+(?:apply|for)|depends\s+on\s+(?:the\s+)?(?:circumstances|context|case|situation))\b/i,
+  // [r400] 明文宣告豁免形（EN）：the rule has an explicit exemption for …
+  /\b(?:has|have|there\s+is|there\s+are|with)\s+(?:an?\s+)?(?:explicit\s+|specific\s+)?(?:exemption|exemptions|carve[- ]outs?)\b/i,
   /\b(?:does\s+not|doesn'?t|do\s+not|don'?t|cannot|can'?t|should\s+not|shouldn'?t|must\s+not|won'?t|isn'?t|aren'?t)\s+(?:apply|applies|generalize|transfer|hold|carry\s+over|work\s+in\s+every|extend)\b/i,
   /\b(?:not\s+necessarily|not\s+always|no\s+blanket|don'?t\s+overgeneralize|you\s+can'?t\s+just\s+generalize|context-?dependent|situational|contingent)\b/i,
   /\b(?:boundary|scope|domain|validity)\s+(?:conditions?|limits?|constraints?|of\s+(?:validity|applicability))\b/i,
@@ -262,7 +314,9 @@ function negatedBefore(text, idx, isZh) {
 
 // 腿①：取所有命中位置（通则标记可能多处出现）
 function findRuleLeg(text, isZh, R) {
-  const list = isZh ? (R.RULE_ZH || RULE_ZH) : (R.RULE_EN || RULE_EN);
+  const list = isZh
+    ? [...(R.RULE_ZH || RULE_ZH), ...(R.RULE_QUOTE_ZH || RULE_QUOTE_ZH)]
+    : [...(R.RULE_EN || RULE_EN), ...(R.RULE_QUOTE_EN || RULE_QUOTE_EN)];
   const idxs = [];
   for (const re of list) {
     const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
@@ -277,7 +331,9 @@ function findRuleLeg(text, isZh, R) {
 
 // 腿②：取腿①邻近窗内、未被否定的首个例外情形位置（双向配对）
 function findExcLeg(text, isZh, R, ruleIdxs) {
-  const list = isZh ? (R.EXC_ZH || EXC_ZH) : (R.EXC_EN || EXC_EN);
+  const list = isZh
+    ? [...(R.EXC_ZH || EXC_ZH), ...(R.EMERG_ZH || EMERG_ZH)]
+    : [...(R.EXC_EN || EXC_EN), ...(R.EMERG_EN || EMERG_EN)];
   const win = isZh ? WIN_RULE_EXC_ZH : WIN_RULE_EXC_EN;
   let best = -1, bestDist = Infinity;
   for (const ai of ruleIdxs) {
@@ -385,8 +441,10 @@ module.exports = {
   checkAccidentFallacy,
   __internals: () => ({
     RULE_ZH, EXC_ZH,
+    RULE_QUOTE_ZH, EMERG_ZH,
     EXEMPT_META_ZH, EXEMPT_CORRECT_ZH, EXEMPT_DISCIPLINE_ZH,
     RULE_EN, EXC_EN,
+    RULE_QUOTE_EN, EMERG_EN,
     EXEMPT_META_EN, EXEMPT_CORRECT_EN, EXEMPT_DISCIPLINE_EN,
   }),
 };
