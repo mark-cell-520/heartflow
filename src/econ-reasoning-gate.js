@@ -257,6 +257,22 @@ const FAMILIES = [
   //   （群体→个体平移）、significance_effect_size（显著性→重要性）、
   //   dose_response_linearity（剂量-反应线性化）射程不重叠。
   { key: 'effect_measure_misread',             mod: './effect-measure-misread.js',             fn: 'detectEffectMeasureMisread',            zh: '效应量口径误读',          en: 'effect-measure misread (OR-as-risk / HR-as-cumulative)', round: 'r386' },
+  // r387 新增：显著性裁定误读（statistical-significance verdict misread——把
+  //   一次统计检验的显著性结论直接兑换成确定性实质裁定）。立项探针
+  //   （scripts/round-387/probe-candidates.js + probe-familyb.js）两族同池定拨：
+  //   子族 1「边缘显著→效应存在」20 条攻击穿透 18/20（仅 2 条被
+  //   significance_effect_size / vagueness 代拦），子族 2「不显著→无效应」
+  //   18 条穿透 14/18（仅 4 条被 fallacy_of_relevance / mediator_confusion
+  //   零归因代拦）——为统计素养轴全场最高穿透且良性边界最净。海外扫描**有命中**
+  //   （GitHub 命中 Tessavana/Science_Scan 规则式检测器 + 其 Nonsignificant
+  //   incorrect2.xlsx 措辞表，解出 523 条误读措辞：前 12 条无效应族 + 后 511
+  //   条边缘显著族；本模块腿①/腿②以其为外部基准核对覆盖度，判据形状仍按双腿
+  //   共现范式自建）。双腿（显著性结论标记 × 实质裁定）+ 推断标记（并列实测
+  //   发现不判）+ CONCEPT/CORRECT 两组豁免 + 腿②紧前否定/对冲双守卫；与
+  //   significance_effect_size（显式 p 值→重要性，不收无 p 值的边缘显著措辞
+  //   包装）、absence_of_problems（工程检验阴性→无问题，不收统计显著性术语）、
+  //   appeal_to_ignorance（举证责任分配）射程不重叠。
+  { key: 'significance_verdict_misread',       mod: './significance-verdict-misread.js',       fn: 'detectSignificanceVerdictMisread',      zh: '显著性裁定误读',          en: 'significance-verdict misread (borderline-as-effect / nonsignificant-as-no-effect)', round: 'r387' },
 ];
 
 const _cache = new Map();
