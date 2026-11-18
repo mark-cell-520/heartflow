@@ -264,6 +264,18 @@ const FAMILIES = [
   //   significance_verdict_misread（显著性裁定）/effect_measure_misread（OR/HR
   //   口径）/survivor_time_bias（永生时间偏倚）射程不重叠）
   { key: 'censoring_neglect',                  mod: './censoring-neglect.js',                  fn: 'detectCensoringNeglect',                zh: '删失数据当完整结论',      en: 'censoring neglect (incomplete follow-up as final evidence)', round: 'r388' },
+  // r389 新增（续统计素养轴，选题库轮换）：替代终点误读（surrogate endpoint
+  //   misread / surrogate-to-hard-endpoint leap——中间指标改善锚 × 硬临床终点
+  //   获益结论 两腿近距共现 + 推断标记跨区重叠 + CONCEPT/CORRECT 双豁免 +
+  //   腿①方向词否定守卫/腿②紧前否定与对冲双守卫；同池探针两段穿透 24/45
+  //   真零命中（一段 7/18 + 二段 17/27）为全场最高，良性 20 条零本族误伤，
+  //   射程与 proxy_metric_goal（业务度量）/confounding_by_indication（治疗
+  //   分配混杂）/healthy_user_bias（行为群体归因）/weak_evidence_strong_claim
+  //   （弱证据类型）不重叠；海外扫描 GitHub 21 条命中全为替代终点评估统计
+  //   包（surrosurv/Surrogate/Surrogacy-analysis，0-1 star，无可移植判据）、
+  //   arXiv 15 条全为物理/ML 领域 surrogate model、S2 连续 429——按既有
+  //   形态自建）
+  { key: 'surrogate_endpoint_misread',         mod: './surrogate-endpoint-misread.js',         fn: 'detectSurrogateEndpointMisread',       zh: '替代终点误读',            en: 'surrogate-endpoint misread (surrogate marker improvement as hard-endpoint benefit)', round: 'r389' },
 ];
 
 const _cache = new Map();
