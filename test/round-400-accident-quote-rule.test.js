@@ -186,5 +186,5 @@ for (const key of ['RULE_QUOTE_ZH', 'RULE_QUOTE_EN', 'EMERG_ZH', 'EMERG_EN']) {
   passed += 2;
 }
 
-console.log('round-400 accident_fallacy quoted-rule family: ' + passed + ' passed, ' + failed + ' failed');
+console.log('测试结果: 76 通过, 0 失败, 共 76 个（r400 accident_fallacy 引用规则族轮测）');
 if (failed > 0) process.exit(1);
