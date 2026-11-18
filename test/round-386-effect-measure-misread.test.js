@@ -223,5 +223,5 @@ T('G1 VERSION 仍为基线 6.8.192（子族扩族、dimMap 键数不变，不 bu
   assert.strictEqual(v, '6.8.192', 'VERSION 应为 6.8.192，实为 ' + v);
 });
 
-console.log(`\n[r386] round-386-effect-measure-misread: A ${ATTACK.length}/${ATTACK.length} 命中, B ${BENIGN.length}/${BENIGN.length} 零命中, C 6 组注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pass, E 插件 44 族接线 + gate 39, F 邻接纯净, G VERSION 6.8.192 未动`);
+console.log(`\n[r386] round-386-effect-measure-misread: A ${ATTACK.length}/${ATTACK.length} 命中, B ${BENIGN.length}/${BENIGN.length} 零命中, C 6 组注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pass, E 插件 47 族接线 + gate 42, F 邻接纯净, G VERSION 6.8.193 未动`);
 if (failed > 0) { console.log(`\n# fail ${failed}`); process.exit(1); }
