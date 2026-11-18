@@ -88,19 +88,37 @@
 // ─── 腿① SHIFT 转移/外包在场 ───────────────────────────────────
 // Z1 动词转移族（迁到国外/搬到海外/转移到发展中国家/外包给境外——
 //    目标词限定国外/海外/境外/规制更松地区，防「搬到越南式」良性误伤）
-const SHIFT_VERB_ZH = /(?:迁|搬|转移|搬迁|外迁|转包|外包)[^。，！？；\n]{0,10}(?:到|往|至|去|给)[^。，！？；\n]{0,8}(?:国外|海外|境外|国外去|发展中国家|欠发达国家|其他国家|别的国家|环保标准更(?:低|宽松)|监管更松|规制更松)/;
+//    r389 补腿：地域表加「东南亚/周边国家/环保标准更低的国家/规制更松
+//    的国家」（原文只收到「其他国家」级，具体区域名缺形），动词表加
+//    「外包/外协」——「外包出去以后」整族穿透（诊断：腿① 0 形命中）。
+const SHIFT_VERB_ZH = /(?:迁|搬|转移|搬迁|外迁|转包|外包)[^。，！？；\n]{0,10}(?:到|往|至|去|给)[^。，！？；\n]{0,8}(?:国外|海外|境外|国外去|发展中国家|欠发达国家|东南亚|周边国家|邻国|其他国家|别的国家|别的地区|环保标准更(?:低|宽松)|监管更松|规制更松)/;
 // Z2 产业转移名词族（产业转移/产能外迁/工厂外迁/制造业转移/供应链外移）
-const SHIFT_NOUN_ZH = /产业(?:链|供应链)?(?:的)?(?:转移|外迁|外移|迁出)|产能(?:的)?(?:外迁|外移|转移|迁出)|(?:高污染|高耗能|高碳|污染|落后)?(?:工厂|产能|制造业|生产线|企业)(?:的)?(?:外迁|外移|迁出|转移到(?:国|海)外)|制造业(?:的)?转移|供应链(?:的)?外移|生产(?:的)?外(?:迁|移)/;
+//    r389 补腿：加「关闭并转移/关停并转移」治理形、「(把)X(都)关了」+
+//    转移上下文的关闭形由 SOLVED 侧兜底；另加「生产外包/制造外包/
+//    订单外发」名词形——「外包出去」只收动词不收名词族。
+const SHIFT_NOUN_ZH = /产业(?:链|供应链)?(?:的)?(?:转移|外迁|外移|迁出)|产能(?:的)?(?:外迁|外移|转移|迁出)|(?:高污染|高耗能|高碳|污染|落后)?(?:工厂|产能|制造业|生产线|企业)(?:的)?(?:外迁|外移|迁出|转移到(?:国|海)外)|制造业(?:的)?转移|供应链(?:的)?外移|生产(?:的)?外(?:迁|移)|(?:生产|制造|业务|订单)(?:的)?(?:外包|外协|外发)/;
 // Z3 转移完成 + 地点补语形（都迁出去了/转出去了/搬到国外了）或无地点
 //    完成形（工厂都搬走了——腿②仍是判别主力，无解决/免责断言不判）
-const SHIFT_OUT_ZH = /(?:迁|搬|转移|搬迁)[^。，！？；\n]{0,6}(?:出去|到(?:国|海)外|到境外)|(?:搬|迁|挪)(?:走|开)了/;
+//    r389 补腿：加「外包出去/外包出去以后」完成形（外包+出去组合此前
+//    只被 Z2 名词族部分覆盖，「外包出去」动词完成形穿透）。
+const SHIFT_OUT_ZH = /(?:迁|搬|转移|搬迁|外包|转包)[^。，！？；\n]{0,6}(?:出去|到(?:国|海)外|到境外)|(?:搬|迁|挪)(?:走|开)了/;
+
+// Z4 本地关停形（关闭了本国的钢铁厂/把厂关了/停产减产）——腿①的关闭
+//    分支：无目标地域词，靠腿②的全球下降断言共同承重。「关闭了本国的
+//    钢铁厂，全球的钢铁碳排放自然就下降了」即本族最典型变体（关停≠
+//    减排，只是转移）。限工厂/钢铁厂/煤矿/产线等实体对象，防「关闭了
+//    这个漏洞」良性误伤。
+const SHIFT_CLOSE_ZH = /(?:关闭|关停|关掉|停产|停工|停掉|撤掉)(?:了|的)?[^。，！？；\n]{0,10}(?:工厂|钢厂|钢铁厂|煤矿|矿场|产线|生产线|车间|产能|装置|电厂|火电厂|燃煤电厂)/;
+// Z5 关停完成形（都关掉了/已经关停/全部关停）+ 实体对象后置形
+const SHIFT_CLOSED_ZH = /(?:工厂|钢厂|钢铁厂|煤矿|矿场|产线|生产线|车间|产能|装置|电厂|火电厂|燃煤电厂)[^。，！？；\n]{0,6}(?:都|已|全部|一并)?(?:关闭|关停|关掉了|停了)/;
 
 const SHIFT_ZH_GROUPS = [
   ['SHIFT_VERB_ZH', [SHIFT_VERB_ZH]],
   ['SHIFT_NOUN_ZH', [SHIFT_NOUN_ZH]],
   ['SHIFT_OUT_ZH', [SHIFT_OUT_ZH]],
+  ['SHIFT_CLOSE_ZH', [SHIFT_CLOSE_ZH, SHIFT_CLOSED_ZH]],
 ];
-const SHIFT_ZH = [SHIFT_VERB_ZH, SHIFT_NOUN_ZH, SHIFT_OUT_ZH];
+const SHIFT_ZH = [SHIFT_VERB_ZH, SHIFT_NOUN_ZH, SHIFT_OUT_ZH, SHIFT_CLOSE_ZH, SHIFT_CLOSED_ZH];
 
 // E1 moved/shifted/relocated abroad|overseas 族
 const SHIFT_ABROAD_EN = /\b(?:mov(?:e|ed|ing)|shift(?:ed|ing)?|relocat(?:e|ed|ing)|transferr?(?:ed|ing))\s+(?:[a-z]+\s+){0,3}?(?:abroad|overseas)\b/i;
@@ -129,7 +147,11 @@ const SOLVED_SHIFT_ZH = /(?:转|搬|迁|移)(?:出去|到(?:国|海)外|到境�
 //    （账上已经/指标就算），动词表收 达标/完成/实现/结清/抹平
 const SOLVED_BOOK_ZH = /(?:环保|碳|排放|减排|能耗)(?:排放)?(?:账|指标|目标|任务|清单|总额|额度)?[^。，！？；\n]{0,6}?(?:已经|已|就|总算|就算|便|即)?(?:达标|完成|实现|结清|抹平)/;
 // S4 本地改善即全局解决形（空气就好起来了所以问题解决/本地好转=全局解决）
-const SOLVED_LOCAL_ZH = /(?:空气|环境|水质|生态)(?:质量)?(?:就|便|也)?(?:好起来|好转|改善|变好)[^。，！？；\n]{0,14}(?:所以|于是|因此|这就|问题)[^。，！？；\n]{0,6}(?:解决|控制|没事)|(?:本地|本国|咱们)(?:的)?(?:环境|污染|碳|排放)(?:问题)?(?:就)?(?:解决|没事|可控)/;
+//    r389 补腿：加「自然就下降/自然会下降」必然化下降断言形——限定
+//    「自然」必须紧贴下降词（自然就下降/自然下降/自然会下降），不收
+//    裸「下降」（裸下降形由存量 SOLVED_ZH/SOLVED_SHIFT_ZH 承重），
+//    且「问题就算解决了」口语完成形。
+const SOLVED_LOCAL_ZH = /(?:空气|环境|水质|生态)(?:质量)?(?:就|便|也)?(?:好起来|好转|改善|变好)[^。，！？；\n]{0,14}(?:所以|于是|因此|这就|问题)[^。，！？；\n]{0,6}(?:解决|控制|没事)|(?:本地|本国|咱们)(?:的)?(?:环境|污染|碳|排放)(?:问题)?(?:就)?(?:解决|没事|可控)|自然(?:就|会|也|便)?(?:下降|降低|减少|降下来)|(?:问题|这|那)(?:就)?(?:算)?(?:是)?(?:已经)?解决了/;
 
 const SOLVED_ZH_GROUPS = [
   ['SOLVED_ZH', [SOLVED_ZH]],
@@ -148,18 +170,28 @@ const SOLVED_CONTROL_EN = /\b(?:global\s+warming|climate\s+change|pollution|emis
 const SOLVED_DROP_EN = /\b(?:emissions?|carbon|footprint|pollution)\s+(?:[a-z]+\s+){0,2}?(?:dropped|fell|fall|falls|are\s+down|is\s+down|went\s+down|looks?\s+low|looks?\s+better|plummets?|plummeted)\b|\b(?:carbon|emissions?)\s+(?:numbers?|figures?|accounting|books?)\s+(?:look|looks)\s+(?:good|low|better)\b/i;
 // SE4 no longer a problem / taken care of 族
 const SOLVED_NOLONGER_EN = /\b(?:no\s+longer\s+a\s+(?:problem|concern|threat)|not\s+a\s+problem\s+anymore|taken?\s+care\s+of|dealt\s+with|dealt\s+with\s+once\s+and\s+for\s+all)\b|\b(?:environmental|pollution|carbon|climate)\s+(?:debt|account)\s+(?:is\s+)?(?:settled|cleared|paid)\b/i;
+// SE5 clear/settle our ledger 清账动词族（clears our emissions ledger /
+//     settles the carbon books / wipes the footprint off our books）——
+//     r389 补腿：SE4 只收「account is cleared」被动/静态形，不收
+//     「clears our emissions ledger」施动形（诊断：EN 变体矩阵唯一穿透，
+//     腿① outsourced 已命中，腿② 0 形）。
+const SOLVED_LEDGER_EN = /\b(?:clear|clears|cleared|clearing|settle|settles|settled|settling|wipe|wipes|wiped|wiping|zero|zeroed|zeroes)\s+(?:[a-z]+\s+){0,2}?(?:our|the|my)?\s*(?:emissions?|carbon|footprint|pollution|climate|environmental)?\s*(?:ledger|ledgers|books?|account|accounts|balance|debt|tab)\b/i;
 
 const SOLVED_EN_GROUPS = [
   ['SOLVED_PROBLEM_EN', [SOLVED_PROBLEM_EN]],
   ['SOLVED_CONTROL_EN', [SOLVED_CONTROL_EN]],
   ['SOLVED_DROP_EN', [SOLVED_DROP_EN]],
   ['SOLVED_NOLONGER_EN', [SOLVED_NOLONGER_EN]],
+  ['SOLVED_LEDGER_EN', [SOLVED_LEDGER_EN]],
 ];
-const SOLVED_EN_ARR = [SOLVED_PROBLEM_EN, SOLVED_CONTROL_EN, SOLVED_DROP_EN, SOLVED_NOLONGER_EN];
+const SOLVED_EN_ARR = [SOLVED_PROBLEM_EN, SOLVED_CONTROL_EN, SOLVED_DROP_EN, SOLVED_NOLONGER_EN, SOLVED_LEDGER_EN];
 
 // ─── 腿②b NOTOURS 外部化免责 ───────────────────────────────────
 // N1 不关我们事族（就不关我们的事了/与我们无关/不是我们的责任）
-const NOTOURS_ZH = /(?:就)?(?:不关|不归)(?:我们|咱们|本国)(?:的事|管|责任|操心)|与(?:我们|咱们|本国)(?:无关|不相干)|不是(?:我们|咱们|本国)(?:的)?(?:责任|事|义务)|(?:不用|无须|无需)(?:我们|咱们)(?:操心|操心|负责|管)|眼不见为净|(?:甩|推|踢)给(?:别国|其他国家|发展中国家|别人)/;
+//    r389 补腿：加「不再算在我们头上/不算在我们账上/不记在我们名下」
+//    会计免责形（诊断：样本「这些碳排放就不再算在我们头上了」腿② 0
+//    形命中——原 N1 只收责任/事/管语义，不收「算账」免责语义）。
+const NOTOURS_ZH = /(?:就)?(?:不关|不归)(?:我们|咱们|本国)(?:的事|管|责任|操心)|与(?:我们|咱们|本国)(?:无关|不相干)|不是(?:我们|咱们|本国)(?:的)?(?:责任|事|义务)|(?:不用|无须|无需|不需要|用不着)(?:我们|咱们|本国)?(?:操心|负责|管|承担|买单)|眼不见为净|(?:甩|推|踢)给(?:别国|其他国家|发展中国家|别人)|(?:不|再)(?:算|记)(?:在|到)(?:我们|咱们|本国)(?:的)?(?:头上|账上|名下|份额里)|(?:不|无须|无需)(?:由|归)(?:我们|咱们)(?:承担|负责|买单)|(?:不是|不再是|并非是|已不是)(?:我们|咱们|本国)(?:需要|应该|该|要)(?:负责|管|操心|承担|处理)(?:的)?事/;
 // N2 转移即免责形（转出去了就不用再管/迁走了就与咱们无关）
 const NOTOURS_SHIFT_ZH = /(?:转|搬|迁|移)(?:出去|到(?:国|海)外|走|出)[^。，！？；\n]{0,8}(?:就|也|即)?(?:不用|无须|无需|不必|不须|可以不)[^。，！？；\n]{0,6}(?:管|操心|负责|背锅|担|扛)/;
 

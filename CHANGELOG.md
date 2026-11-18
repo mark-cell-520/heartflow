@@ -1,5 +1,17 @@
 ---
 
+# 6.8.193 变更日志条目
+
+## [6.8.193] - 2026-11-18
+
+### carbon_leakage 中文侧 + EN 清账形补腿（r391，真升级②：既有维度全新句式族）
+
+- `src/carbon-leakage.js`（污染避难所/碳泄漏族）中文侧穿透探针 5/6，全族穿透最高。补腿七处、零既有常量字面改动：SHIFT_VERB_ZH 地域表加「东南亚/周边国家/邻国」+ 动词表加「外包/转包」；SHIFT_NOUN_ZH 加「生产/制造/业务/订单（的）外包/外协/外发」；SHIFT_OUT_ZH 加「外包出去」完成形；新增 SHIFT_CLOSE_ZH/SHIFT_CLOSED_ZH 本地关停腿①分支（「关闭了本国的钢铁厂」无目标地域词形）并注册 SHIFT_ZH_GROUPS；SOLVED_LOCAL_ZH 加「自然（就|会）下降」必然化下降断言形；NOTOURS_ZH 加「不再算在我们头上/账上/名下」会计免责形与「不再是我们需要负责的事」形；新增 SOLVED_LEDGER_EN（EN 清账动词族 clears/settles/wipes/zeroed + ledger/books/account/balance）并注册 SOLVED_EN_GROUPS。
+- 验证：穿透探针 6/6 命中、穿透 0、模块层误伤 0/2；同族变体矩阵攻击 9/9（7 中文 + 2 EN）、良性 6 条中 4 pass（2 条 verify 归因 presupposition 既有基线，模块级 detect 均 hit=false）；双向门禁召回 52/52、误拦 302/326 零增量；verify 16/0、abilities 20/20@265、doc-numbers 24/0。
+- 实现期自查修正三处：SHIFT_VERB_ZH 加关闭动词系死重（句中无目标词）回退改独立关停组；「自然下降」首版过宽会误伤良性「能耗自然下降」改窄形；EN 清账形首版只补被动形漏施动形。
+
+---
+
 # 6.8.192 变更日志条目
 
 ## [6.8.192] - 2026-11-18
