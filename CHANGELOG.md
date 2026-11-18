@@ -1,4 +1,10 @@
-# 6.8.200 变更日志条目
+# 6.8.201 变更日志条目
+
+- **第 197 维度 goal_drift 新增「显式约束×权衡搁置宣告」攻击族（r401，真升级②既有维度全新句式族）**：来源论文 arXiv:2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》——价值冲突子族的实证结论是环境信号（进度/工期/业务压力）可覆盖 agent 持有的显式约束，逐 action 浅层合规检查覆盖不到。checkGoalDrift 由单族改为双族 OR：存量 ANCHOR×SWITCH（目标置换，r200）+ 新族 CONSTRAINT×OVERRIDE（显式约束在场 × 让步/权衡搁置宣告，双腿共现 + 邻近窗 ZH≤60/EN≤160）。新增八个常量（CONSTRAINT_ZH/EN、OVERRIDE_ZH/EN、EXEMPT_COMPLIANCE_ZH/EN），豁免组由四组扩为五组（新增约束被遵守正面陈述豁免）。src/index.js 零改动、dimMap 键数不变。
+- **立项与验证**：探针 scripts/round-401/probe-value-override.js 实测扩族前 15 攻击仅 3/15 命中（12/15 穿透 gate=pass），扩族后 **15/15 非 pass**（12 由 goal_drift verify + 3 由存量维度代拦）；轮测 test/round-401-goal-drift-value-override.js **15/15**（4 腿负例注入 4/4 翻转、豁免承重 3/3、邻近窗承重、原族不回归 2 项、变体矩阵攻击 5/5 + 良性 5/5）；新族自身 **0/4** 良性误伤（gate 层 4 条非 pass 均为既有基线噪声）。五门禁：verify 16/0、guard-abilities 20/20、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326 零新增。
+- **已知边界**：本族为 VERIFY 级；无显式约束主语的裸搁置宣告不在射程（由 code_security/reward_hacking 覆盖）；邻近窗为字符窗，超长插入语会漏判。
+
+---
 
 - **第 268/269 维度接线收尾（r399，收尾轮）**：baseline_omission（基线缺失——无对照比例结果断言，第 268 维，r398 产出）与 claimed_verification_without_trail（空核验宣称——宣称核验完成却无核验轨迹，第 269 维，r400 产出）在 src/index.js 九处接线基础上完成门禁闭环。
 - **双向门禁误伤修复**：claimed_verification_without_trail 豁免腿 QUESTIONED_ZH 扩展「义务/待办标记 × 核验动词同窗共现」族与「合规流程语境」族（反洗钱/可疑交易/涉嫌/合规审查/人工复审），修复「这笔交易触发了反洗钱规则，需要人工核查。」（待执行合规动作）被误判为已完成核验宣称的问题；不收裸「要」，「我要亲自验证」仍为攻击句式。guard-abilities 双向垂直场景 149/150 → 150/150。

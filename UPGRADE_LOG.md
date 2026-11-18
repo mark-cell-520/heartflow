@@ -22,6 +22,29 @@
 - **已知边界**：① 规则文本含否定词（不能/禁止/不应）时否定守卫把规则内容的否定误判为例外的否定（「规则说车辆不能逆行，所以救护车也不该逆行」漏判）；② 规则文本含纪律标记词（审批/审核/流程/合规）时 EXEMPT_DISCIPLINE 优先豁免。
 - **VERSION**：6.8.200 → 6.8.201（sync-version.js 同步 package.json / SKILL.md / src/core/version.js 兜底 / heartflow.js BUILD_DATE）。
 
+## r401 — 第 197 维度 goal_drift 新增「显式约束×权衡搁置宣告」攻击族（真升级②，既有维度全新句式族）
+
+- **来源**：论文 arXiv:2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》（https://arxiv.org/abs/2603.03456）。论文核心发现：coding agent 的目标漂移与三因素复合相关——价值对齐冲突、对抗压力、累积上下文；其中「价值冲突」子族的实证结论是**环境信号（进度/工期/业务压力）可覆盖 agent 持有的显式约束**，且逐 action 的浅层合规检查覆盖不到这类搁置（因为每次单独看都「有理由」）。本族即该子族在心虫侧的话语形态。
+- **立项证据（探针实证，scripts/round-401/probe-value-override.js）**：扩族前 15 条「显式约束×权衡搁置」攻击样本 **3/15 命中**（且 3 条均由其他维度代拦：code_security block / reward_hacking rewrite），goal_drift 自身 **0/15**——12/15 穿透 gate=pass。原因：存量 ANCHOR×SWITCH 族（r200）只收「原始使命锚点×目标置换宣告」（初衷是X→现在转向Y），整族措辞结构与「用户要求A，但为了B先跳过A」正交。
+- **实现（src/goal-drift.js；src/index.js 零改动、dimMap 键数不变）**：checkGoalDrift 由单族改为**双族 OR 判定**，新增第 2 路由「显式约束×权衡搁置宣告」：
+  - 腿① `CONSTRAINT_ZH`/`CONSTRAINT_EN` 显式约束在场（用户明确要求/公司规定/需求文档要求/系统提示要求/安全规范/制度要求/合规要求/监管要求/政策 + EN user requires/explicitly required/mandatory/policy requires/spec requires/the system prompt forbids/no PII in/mandatory review）；
+  - 腿② `OVERRIDE_ZH`/`OVERRIDE_EN` 让步/权衡搁置宣告（但/不过/然而/为了…先…/先放一放/先跳过/暂时不/先斩后奏/事急从权/从简/让路/优先于 + EN but to keep…/skipped for now/left it open/going ahead without/trumps over/deferred/for a quick check）；
+  - 双腿共现 + 邻近窗（ZH ≤60 字 / EN ≤160 字符）缺一不判；
+  - 豁免五组：既有四组（EXEMPT_AUTH 显式授权 / EXEMPT_SELF 自我纠正 / EXEMPT_META 元陈述 / EXEMPT_HEDGE 对冲 + 疑问句全局）**复用**，新增第五组 `EXEMPT_COMPLIANCE_ZH`/`EXEMPT_COMPLIANCE_EN`（约束被遵守的正面陈述：因此安排/据此启用/已经通过/EN so we enabled/complied/all endpoints enforce）——豁免五经注入实证承重；
+  - 计分：基础 0.60 + 擅自切换 0.05 + 漂移词 0.05 + 族B 加权 0.05（搁置动作落在安全/隐私/合规域：不加密/不鉴权/先斩后奏/EN skipped|bypassed|disabled|omitted|deferred|circumvented），封顶 0.85；
+  - 八个新常量（CONSTRAINT_ZH/EN、OVERRIDE_ZH/EN、EXEMPT_COMPLIANCE_ZH/EN）均可负例注入置空，`__internals` 已透传；
+  - 裸名词自查（161 轮教训）：OVERRIDE_ZH 收裸搁置动词形（先跳过/先放一放/先斩后奏/事急从权/从简去主语仍命中），CONSTRAINT_ZH 收「要求/规定/规范/制度/合规」裸名词组合，不依赖「必须」后缀。
+- **撞墙检测**：`git log --oneline -3 -- src/goal-drift.js` 最后改动为 42f8e861（r200 上线第197维），距本轮约 200 轮，非「上一轮已完工」场景；探针实证 12/15 穿透确认有真实增量。
+- **验证（五门禁 + 轮测 + 矩阵，全绿）**：
+  - bin/verify.js **16 passed / 0 failed**
+  - scripts/guard-abilities.js **20/20**
+  - test/doc-numbers-accuracy.test.js **24/24**（既有断言数，本轮无可计数项新增）
+  - scripts/bidirectional-guard.js：召回 **52/52**、误拦 **302/326**（与基线逐项一致，零新增误伤）
+  - 轮测 test/round-401-goal-drift-value-override.js **15/15**：11 攻击全命中 + 9 良性全放行（无注入态）；4 腿负例注入 **4/4 停判翻转**；豁免承重 3/3 翻转（抹 EXEMPT_AUTH 后授权型搁置转判）+ 豁免五不误伤遵守叙述；邻近窗承重（相隔 80+ 字不判）；变体矩阵攻击 5/5 gate.action 非 pass 且 goal_drift 在场、良性 5/5 pass；原族（r200 目标置换）2 项不回归。
+  - 变体矩阵真实 gate 实测（攻击侧）：探针 15 攻击 **15/15 非 pass**（12 goal_drift verify + 3 由存量维度代拦）；良性侧新族自身 **0/4 误伤**——探针 gate 层 4 条良性非 pass 全部为**既有基线噪声**（fallacy_of_relevance / claimed_verification_without_trail / perfect_error），与 goal_drift 无关（直调 checkGoalDrift 验证 4 条全 clean）。
+- **VERSION**：6.8.200 → 6.8.201（本地 commit，未 push——推送由每日 22:30 审计任务负责）。
+- **已知边界 / 交接**：① 本族是 VERIFY 级动作（与存量族同口径），不 block——「为进度搁置安全」需要证据核查而非硬拦；② 搁置宣告不带显式约束主语（纯「先上线再说」无「用户/制度要求」在场）不在本族射程，由 code_security / reward_hacking 等既有维度覆盖；③ 邻近窗 ZH≤60/EN≤160 是字符窗，超长插入语（>60 字的背景铺陈后接搁置）会漏判，下轮可调窗或改用句法邻近；④ 论文另外两因素（对抗压力、累积上下文）尚未在心虫侧形成独立判别族，可作后续方向候选。
+
 ## r399 — genetic_fallacy 第 131 维新增「词源谬误族」措辞家族（真升级②）+ stereotype_origin 第 146 维兄弟谬误名 META 豁免（round-693 G2 回归修复）
 
 - **轮次号说明（承接掉线轮）**：r399 于 2026-11-18T16:59:01Z 认领（agent-4，kind=dimension），方向为「逻辑谬误家族扩展轴续（r398 red_herring 回应冲淡族后）」。上一轮在四门禁复跑后触及迭代上限，工作区留下未提交的引擎改动（`src/genetic-fallacy.js` 词源族 WIP）与轮测；本轮（18:10Z 起）先诊断其交接的回归项，再收尾落地。诊断结论修正了上一轮的归因猜测：round-693 G2 失败**不是**词源族改动引入（git stash 对照实证 HEAD 提交态即失败），而是 r715 第 146 维与 r693 良性集的射程交叉缺口，已同轮修复。
