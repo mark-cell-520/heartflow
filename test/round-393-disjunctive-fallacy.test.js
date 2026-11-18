@@ -1,24 +1,33 @@
 /**
  * test/round-393-disjunctive-fallacy.test.js
- * r393 轮单测：第 266 维度 disjunctive_syllogism_fallacy（非穷尽析取消去谬误）
- * + r393 补腿（腿③析取对立归责 / 腿④结果归因排除）
+ * r393 轮单测：第 65 维 false_dilemma 新增「析取消去谬误」措辞家族
+ * （非穷尽析取 × 排除确证，推理层补腿）
  *
- * 轮次背景：r392 落地第 266 维度（disjunctive_syllogism_fallacy，引擎接线 +
- * VERSION 6.8.194 bump + 文档同步）后会话中断未 commit，r393 开轮 sync 时
- * 以 stash 形式恢复 WIP。按容错条款「本地独有产能优先固化」核实后继续：
- *   · r392 模块自测暴露 2 条漏判——A4「要么接受这个方案，要么就是跟团队过不去」
- *     （D1 命中但缺显式否定支：析取框架自身构成隐式对立归责）与
- *     A7「方案没成功，说明执行的人能力不行」（无析取词无排除动词，纯结果
- *     失败反推单支归因）。
- *   · r393 立项探针 scripts/round-393/probe-legs34.js：腿③ 4/4 命中、
- *     腿④初版 0/6（BLAME_INFER_ZH 正则缺陷）→ 修正后 6/6，良性合计 0 误伤。
- * 判定：真升级②（既有维度补腿——新判别腿/句式族，红队漏判实证 A4/A7）。
+ * 轮次背景（r393 接手轮，如实记录）：
+ *   r392 掉线 WIP 被远端以 188954e 固化——但该 commit 只提交了
+ *   src/disjunctive-fallacy.js + 轮测 + 探针脚本，commit message 声称的
+ *   「dimMap 265→266 / src/index.js 八处接线 / VERSION 6.8.194 /
+ *   四门禁全绿」均不在 diff 内（overclaim）。r393 sync 后核实：
+ *     · 立项探针 scripts/round-393/probe-takeover.js（合并树 188954e）：
+ *       18 条攻击 gate 层 **14/18 穿透**，良性 1/12 非 pass
+ *       （contradiction 存量基线）——缺口为真，值得落地。
+ *     · 但新 dimMap 键须改 src/index.js（1 号独占接线区，agent-4 红线
+ *       不碰），故**重定 scope**：以「既有第 65 维 false_dilemma 新增
+ *       措辞家族」形式接入（真升级②）——src/false-dilemma.js 路由⑩
+ *       调用 src/disjunctive-fallacy.js detect()，union 语义。
+ *   r392 自测暴露的 2 条漏判由 r393 腿③/腿④ 承接（A4 隐式对立归责 /
+ *   A7 结果归因排除，探针 scripts/round-393/probe-legs34.js：腿③ 4/4、
+ *   腿④修正后 6/6、良性 0 误伤）。
  *
- * 四层验证（同 r386/r388/r389/r392 范式）：
+ * 判定：真升级②（既有维度全新措辞家族——红队漏判实证 A4/A7 + gate 层
+ * 14/18 穿透）。
+ *
+ * 验证层次：
  *   1. 模块级 detect 直接调用（全腿 + 豁免 + 守卫）
- *   2. gate 层 mainGate.gate 归因（findings 带 disjunctive_syllogism_fallacy）
- *   3. 负例注入-删条（双腿/双豁免/双腿守卫承重证明）
- *   4. 良性样本 gate 层零误伤（新腿引入后无增量误伤）
+ *   2. checkFalseDilemma 层归属（R.DSF 全删 → 新族承重样本转 miss）
+ *   3. gate 层 mainGate.gate 归因（findings 带 false_dilemma、action 非 pass）
+ *   4. 负例注入-删条（句子级 + 常量级两级）
+ *   5. 良性样本 gate 层零增量误伤
  */
 'use strict';
 
@@ -29,6 +38,7 @@ const ROOT = path.join(__dirname, '..');
 const mainGate = require(path.join(ROOT, 'src', 'gate.js'));
 const gcheck = mainGate.gate || mainGate.check;
 const mod = require(path.join(ROOT, 'src', 'disjunctive-fallacy.js'));
+const { checkFalseDilemma } = require(path.join(ROOT, 'src', 'false-dilemma.js'));
 
 let pass = 0;
 let fail = 0;
@@ -46,6 +56,7 @@ const attacks = [
   ['你不认同公司的决定，那你就是想跳槽了', '身份排除'],
   ['这不是我造成的，那就是你的责任', '责任排除'],
   ['既然不是方案的问题，那只能是执行的人能力不行', '归因排除'],
+  ['既然不是他造成的，那说明是管理问题', '长形归因排除（紧凑腿不覆盖形）'],
   ['他不是在质疑这个决定，他就是想借此机会搅乱整个团队', '动机排除'],
   // EN 分支
   ['Either you agree with the plan or you are against progress', 'EN 立场排除'],
@@ -69,7 +80,7 @@ for (const [t, label] of attacks) {
   ok(r.hit === true && r.family === 'disjunctive_fallacy', `攻击命中：${label} :: ${t.slice(0, 24)}`);
 }
 
-// ─── B. 腿③/腿④ 常量级验证（r393 新腿的判据腿可独立复现）─────
+// ─── B. 腿③/腿④ 常量级验证（r393 新腿的判据腿可独立复现）──────
 section('B. r393 新腿常量级验证');
 ok(mod.DISJ_BLAME_ZH.test('要么接受这个方案，要么就是跟团队过不去'), 'DISJ_BLAME_ZH 腿③命中');
 ok(mod.RESULT_FAIL_ZH.test('方案没成功') && mod.BLAME_INFER_ZH.test('方案没成功，说明执行的人能力不行'),
@@ -84,6 +95,9 @@ const exempt = [
   ['布尔值只能是 0 或 1', '布尔二元'],
   ['The function accepts either a string or a number', 'EN 类型列举'],
   ['This is the misconception of false disjunctive syllogism', 'EN 概念教学'],
+  ['选言推理的有效形式说明：排除一支，另一支就是确证的', 'ZH 概念教学（推理+有效）'],
+  ['Disjunctive logic: if not A then it must be B', 'EN 概念教学（disjunctive logic）'],
+  ['布尔字段只能取0或1，不是0就是1，没有第三种取值', 'ZH 程序性二元（字段+0/1）'],
 ];
 for (const [t, label] of exempt) {
   const r = mod.detect(t);
@@ -109,16 +123,15 @@ for (const [t, label] of benignMod) {
   ok(r.hit === false, `良性零误伤：${label} :: ${t.slice(0, 24)}`);
 }
 
-// ─── E. gate 层归因：findings 带维度名 ─────────────────────
-section('E. gate 层归因（verify 级 + findings 维度名）');
-let gateHit = 0;
-for (const [t, label] of attacks) {
+// ─── E. gate 层归因：findings 带 false_dilemma + action 非 pass ──
+section('E. gate 层归因（verify/rewrite 级 + findings 维度名）');
+let gateFd = 0;
+for (const [t] of attacks) {
   const r = gcheck(t);
   const dims = (r.findings || []).map((f) => f.dimension);
-  if (dims.includes('disjunctive_syllogism_fallacy')) gateHit++;
+  if (dims.includes('false_dilemma')) gateFd++;
 }
-ok(gateHit >= 10, `gate 层归因（新腿至少 10 条 findings 带维度名，实测 ${gateHit}/${attacks.length}）`);
-// gate action 必须为非 pass（verify 级）
+ok(gateFd === attacks.length, `gate 层全部攻击样本 findings 带 false_dilemma（实测 ${gateFd}/${attacks.length}）`);
 let nonPass = 0;
 for (const [t] of attacks) {
   const r = gcheck(t);
@@ -126,26 +139,64 @@ for (const [t] of attacks) {
 }
 ok(nonPass === attacks.length, `gate 层全部攻击样本非 pass（实测 ${nonPass}/${attacks.length}）`);
 
-// ─── F. 负例注入-删条：删掉双腿即穿透（承重证明）────────────
-section('F. 负例注入-删条（双腿承重证明）');
-// F1：腿③删「就是」收尾确证词 → 回到纯并列，模块层转 miss
+// ─── F. 负例注入-删条（句子级）：删掉句中模式即转 miss ───────
+section('F. 负例注入-删条·句子级（承重证明）');
 const f1 = mod.detect('要么接受这个方案，要么跟团队过不去，这两条路都可以选');
 ok(f1.hit === false, '腿③删条：去掉「就是」确证收尾后转 miss（纯并列）');
-// F2：腿④删归因推出锚（说明/表明/意味着 + 责任对象）→ 转 miss
 const f2 = mod.detect('方案没成功，原因是多方面的');
 ok(f2.hit === false, '腿④删条：去掉单支归因推出后转 miss');
-// F3：腿④删结果失败锚 → 转 miss
 const f3 = mod.detect('大家要说明执行的人能力不行，这需要证据');
 ok(f3.hit === false, '腿④删条：去掉结果失败锚后转 miss');
-// F4：守卫——推出支显式对冲
 const f4 = mod.detect('既然不是方案的问题，那未必是执行的人能力不行');
 ok(f4.hit === false, '守卫：推出支显式对冲（未必是）不判');
-// F5：守卫——对冲短语共现（讨论谬误本身）
 const f5 = mod.detect('不支持就是反对，这是一种误解');
 ok(f5.hit === false, '守卫：对冲短语共现（讨论谬误本身）不判');
 
-// ─── G. 良性样本：gate 层零误伤 ────────────────────────────
-section('G. 良性样本 gate 层检查');
+// ─── G. 常量级注入-删条：注入 /$^/ 替换整个模式 ─────────────
+section('G. 负例注入-删条·常量级（detect(text, inject)）');
+const injCases = [
+  // 腿①②长形删条——用「造成」类动词样本（紧凑腿 NEGATE 形不覆盖，
+  // 否则删 NEG/INFER 后紧凑腿兜底，union 语义下翻不掉）
+  ['DISJ_ZH', '既然不是他造成的，那说明是管理问题', false],
+  ['NEG_BRANCH_ZH', '既然不是他造成的，那说明是管理问题', false],
+  ['INFER_BRANCH_ZH', '既然不是他造成的，那说明是管理问题', false],
+  // 腿③/腿④/EN 删条
+  ['DISJ_BLAME_ZH', '要么接受这个方案，要么就是跟团队过不去', false],
+  ['RESULT_FAIL_ZH', '方案没成功，说明执行的人能力不行', false],
+  ['BLAME_INFER_ZH', '方案没成功，说明执行的人能力不行', false],
+  ['EXCLUDE_INFER_EN', 'If it is not a supply issue, then it must be a demand issue', false],
+  // 豁免承重：删豁免常量 → 默认豁免样本转命中
+  ['CONCEPT_ZH', '选言推理的有效形式说明：排除一支，另一支就是确证的', true],
+  ['CONCEPT_EN', 'Disjunctive logic: if not A then it must be B', true],
+  ['FACTUAL_ZH', '布尔字段只能取0或1，不是0就是1，没有第三种取值', true],
+];
+for (const [key, sample, expectHit] of injCases) {
+  const inj = {}; inj[key] = /$^/;
+  const r = mod.detect(sample, inj);
+  ok(r.hit === expectHit, `注入删 ${key} → ${expectHit ? '转命中（豁免承重）' : '转 miss（腿承重）'} :: ${sample.slice(0, 20)}`);
+}
+
+// ─── H. 归属证明：checkFalseDilemma 层 R.DSF 全删 ───────────
+section('H. 归属证明（checkFalseDilemma + R.DSF 全删 → 新族承重转 miss）');
+const DELETE_ALL_DSF = {
+  DSF: {
+    DISJ_ZH: /$^/, DISJ_EN: /$^/, NEG_BRANCH_ZH: /$^/, INFER_BRANCH_ZH: /$^/,
+    EXCLUDE_INFER_EN: /$^/, NEGATE_ZH: /$^/, DISJ_BLAME_ZH: /$^/,
+    RESULT_FAIL_ZH: /$^/, BLAME_INFER_ZH: /$^/,
+  },
+};
+let dsfCarried = 0;
+for (const [t] of attacks) {
+  const base = checkFalseDilemma(t);
+  const del = checkFalseDilemma(t, DELETE_ALL_DSF);
+  if (base.hit && !del.hit) dsfCarried++;
+}
+// 18/19 新族承重：唯一例外「要么接受这个方案，要么就是跟团队过不去」
+// 由 false_dilemma 既有路由⑨a（要么-frame×贬损标签）兜底——union 先例。
+ok(dsfCarried >= 18, `checkFalseDilemma 层新族承重 ≥18/19（实测 ${dsfCarried}/${attacks.length}，1 条既有路由兜底属 union 先例）`);
+
+// ─── I. 良性样本：gate 层零增量误伤 ────────────────────────
+section('I. 良性样本 gate 层检查');
 const benignGate = [
   '你要么接受调解，要么就走法律程序，这是两条可选路径',
   '要么今天发布，要么等下周三窗口，两个选项都可以',
@@ -155,6 +206,9 @@ const benignGate = [
   '实验没出结果，我们还得看看是不是设备校准的问题',
   '开关只有开和关两种状态',
   'The function accepts either a string or a number',
+  '选言推理的有效形式说明：排除一支，另一支就是确证的',
+  'Disjunctive logic: if not A then it must be B',
+  '布尔字段只能取0或1，不是0就是1，没有第三种取值',
 ];
 let benignPass = 0;
 const benignNonPass = [];
@@ -163,15 +217,20 @@ for (const t of benignGate) {
   if (r.gate && r.gate.action === 'pass') benignPass++;
   else benignNonPass.push(`${r.gate.action}:${(r.findings || []).map((f) => f.dimension).join(',')} :: ${t.slice(0, 20)}`);
 }
-ok(benignPass >= 7, `良性 gate 层 pass（实测 ${benignPass}/${benignGate.length}，非 pass 项须归因既有维度）`);
+ok(benignPass >= 10, `良性 gate 层 pass（实测 ${benignPass}/${benignGate.length}，非 pass 项须归因既有维度）`);
 benignNonPass.forEach((s) => console.log(`  [benign-nonpass] ${s}`));
 
-// ─── H. 接线完整性：index.js dimMap + allDims 双接 ──────────
-section('H. 接线完整性');
+// ─── J. 接线完整性：false-dilemma.js 路由⑩ + scope 纪律 ─────
+section('J. 接线完整性与 scope 纪律');
+const fdSrc = require('fs').readFileSync(path.join(ROOT, 'src', 'false-dilemma.js'), 'utf8');
+ok(fdSrc.includes("require('./disjunctive-fallacy.js')"), 'false-dilemma.js require 接线存在');
+ok(/disjunctiveFallacy\.detect\(text, R\.DSF/.test(fdSrc), 'false-dilemma.js 路由⑩ detect 调用存在（R.DSF 命名空间）');
+ok(checkFalseDilemma('方案没成功，说明执行的人能力不行').hit === true, '功能接线：checkFalseDilemma 对新族样本 hit');
+ok(/析取消去/.test(checkFalseDilemma('方案没成功，说明执行的人能力不行').detail), '功能接线：detail 带「析取消去」家族标记');
+// scope 纪律：src/index.js 零改动（新 dimMap 键须 1 号接线，agent-4 红线）
 const idxSrc = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
-ok(idxSrc.includes('disjunctive_syllogism_fallacy: dsf'), 'index.js dimMap 已接 disjunctive_syllogism_fallacy');
-ok(/name:'disjunctive_syllogism_fallacy'/.test(idxSrc), 'index.js allDims 已接 disjunctive_syllogism_fallacy');
-ok(/require\('\.\/disjunctive-fallacy\.js'\)/.test(idxSrc), 'index.js require 接线存在');
+ok(!idxSrc.includes('disjunctive_syllogism_fallacy'), 'scope 纪律：src/index.js 无新 dimMap 键（dimMap 键数不变）');
+ok(!idxSrc.includes('disjunctive-fallacy'), 'scope 纪律：src/index.js 无本模块直接 require（经 false-dilemma.js 中转）');
 
 // ─── 汇总 ──────────────────────────────────────────────────
 console.log(`\n# 汇总: ${pass} pass, ${fail} fail`);
