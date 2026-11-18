@@ -1,5 +1,20 @@
 ---
 
+# 6.8.197 变更日志条目
+
+## [6.8.197] - 2026-11-18
+
+### illusion_of_control 第 256 维新增「日常生活与人生机遇场景」措辞家族（r734，真升级②：既有维度全新措辞家族）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r395 诉诸无知免证族后）。**轮次号说明**：原认领 r396 与 1 号 10-30 已发布轮次撞号（`test/round-396-zh-softdb-bare-conn-qualifies.test.js` 由 bc6fc0f 引入），按 r333 撞号先例重编号为 r734（全局最大轮 +1）。海外扫描 arXiv（parse-fail）/ GitHub（0 repo）/ S2（15 条背景文献无可集成纯规则方案）空返，按既有形态自建。
+- 缺口解剖：第 256 维 `src/illusion-of-control.js` 存量四链（经典赌博 + r315 体育幸运仪式 + r323 现代游戏抽奖）对人生机遇（考试/面试/评审/评职称）与日常偶遇（红灯/排队/取号/打车/点名）场景射程外——同池探针 `scripts/round-734/probe-daily-chance.js`（17 攻击 + 16 良性）实证攻击穿透 **11/17**，良性 5/16 非 pass 全为存量维度（standard_shift ×2、monocausal ×2、存量链 FP ×1）与本族无关。
+- `src/illusion-of-control.js` 新增第 5 链「日常生活与人生机遇场景控制幻觉族」（union，与存量四链互补）：腿① A_ZH5/A_EN5 机遇/日常偶遇锚点（面试/考研/上岸/答辩/评审/评职称/offer；EN exam/interview/promotion/title evaluation/job offer/tenure review/red lights/queues/checkout/taxi/roll call）；腿② B_ZH5/B_EN5 主观控制行为扩展（幸运领带/锦鲤/红衬衫/幸运币/固定周三/同一条路/同一个座位/翻正硬币/拜一拜/上香；EN lucky tie/koi/same route/same seat/flip my coin upright/pray/ritual）；腿③ C_ZH5/C_EN5 机遇影响断言（概率明显更大/运气总会更好/被点到的几率仿佛都会小一些/通过率就是会提升；EN improves my chances of/are always higher/my luck gets better）。三腿共现 + 邻近窗 + 既有豁免/否定守卫天然排除技能域（准备/练习）、仪式无断言、否定纠偏、概念讨论。**src/index.js 零改动、dimMap 键数仍 265**（② scope 纪律）。
+- 落地修正（r734b，复跑实证）：①-j2 补「打到车/叫到车」变体（原表只有连续形「打车」）、A_ZH5 补抽奖/彩票锚点（翻正硬币族可挂经典随机锚点）、B_ZH5 补幸运币/拜一拜/上香/祈祷仪式动词（存量表在第一链，本链需自带，否则跨链不组合）、③-j3 补下降族反序形（「都会小一些」无 更/变 前缀）、C_EN5 补 improves-odds-of 与 luck-gets-better 形（含插入语容忍）、③-j5 补反序形（通过率就是会提升）、B_EN5 补 pray/ritual、A_EN5 补 title evaluation——修后 19/19 攻击全部由本维承重（「红衬衫」由 pseudo_causal 代拦转本维、「pray before the title evaluation」由 perfect_error 代拦转本维）。
+- 验证（本轮全部实测）：立项探针攻击穿透 11/17 → 落地后 gate 层 **19/19 非 pass 且 illusion_of_control finding 在场**；良性 **5/16 与基线逐项一致**（存量 standard_shift ×2 / monocausal ×2 / 存量链 FP ×1，零新增误伤，B2/B3 轮测实证杀新常量后状态不变）；轮测 `test/round-734-illusion-of-control-daily-chance.test.js` **17 断言全绿**（19 攻击全腿 + 11 良性干净 pass + 5 存量 FP 实证 + 8 存量回归 + 6 常量注入删条 16/16 翻转 + 加性证明 + gate 归因 + 接线零改动纪律）；注入删条矩阵（`scripts/round-734/matrix-module.js`）实证 16 条样本由新常量独占承重（1 条「Rubbing my lucky coin」与存量链①双承重，删任一单常量不 miss）。
+- 四门禁（HEAD 提交态实跑）：verify **16/0**、guard-abilities **20/20@265**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 # 6.8.196 变更日志条目
 
 ## [6.8.196] - 2026-11-18
