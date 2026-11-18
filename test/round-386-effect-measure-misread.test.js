@@ -168,25 +168,25 @@ for (let i = 0; i < ATTACK.length; i++) {
 
 // ─── E 插件层接线 ───
 console.log('=== E 插件层接线 ===');
-T('E1 插件族表含 effect_measure_misread 且计数 43', () => {
+T('E1 插件族表含 effect_measure_misread 且计数 44', () => {
   assert.ok(plugin.FAMILIES.some(f => f.key === 'effect_measure_misread' && f.round === 'r386'), '插件族表缺 effect_measure_misread');
-  assert.strictEqual(plugin.FAMILIES.length, 43);
+  assert.strictEqual(plugin.FAMILIES.length, 44);
 });
-T('E2 econ 组 36 族 + stats 组 7 族，key 唯一', () => {
+T('E2 econ 组 36 族 + stats 组 8 族，key 唯一', () => {
   const econ = plugin.FAMILIES.filter(f => f.group === 'econ');
   const stats = plugin.FAMILIES.filter(f => f.group === 'stats');
   assert.strictEqual(econ.length, 36);
-  assert.strictEqual(stats.length, 7);
+  assert.strictEqual(stats.length, 8);
   const keys = plugin.FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 43);
+  assert.strictEqual(new Set(keys).size, 44);
 });
 T('E3 插件 version 已 bump 至 1.19.0', () => {
-  assert.strictEqual(plugin.version, '1.19.0');
+  assert.strictEqual(plugin.version, '1.20.0');
 });
-T('E4 gate 桥族表含 effect_measure_misread 且计数 38', () => {
+T('E4 gate 桥族表含 effect_measure_misread 且计数 39', () => {
   const gFams = gate.FAMILIES;
   assert.ok(gFams.some(f => f.key === 'effect_measure_misread' && f.round === 'r386'), 'gate 桥族表缺 effect_measure_misread');
-  assert.strictEqual(gFams.length, 38, 'gate 桥族表应为 38 族');
+  assert.strictEqual(gFams.length, 39, 'gate 桥族表应为 39 族');
 });
 T('E5 插件 analyze 归因 effect_measure_misread', () => {
   const r = plugin.analyze(ATTACK[0]);
@@ -223,5 +223,5 @@ T('G1 VERSION 仍为基线 6.8.192（子族扩族、dimMap 键数不变，不 bu
   assert.strictEqual(v, '6.8.192', 'VERSION 应为 6.8.192，实为 ' + v);
 });
 
-console.log(`\n[r386] round-386-effect-measure-misread: A ${ATTACK.length}/${ATTACK.length} 命中, B ${BENIGN.length}/${BENIGN.length} 零命中, C 6 组注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pass, E 插件 43 族接线 + gate 38, F 邻接纯净, G VERSION 6.8.192 未动`);
+console.log(`\n[r386] round-386-effect-measure-misread: A ${ATTACK.length}/${ATTACK.length} 命中, B ${BENIGN.length}/${BENIGN.length} 零命中, C 6 组注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pass, E 插件 44 族接线 + gate 39, F 邻接纯净, G VERSION 6.8.192 未动`);
 if (failed > 0) { console.log(`\n# fail ${failed}`); process.exit(1); }

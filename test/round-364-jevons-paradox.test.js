@@ -160,8 +160,8 @@ check('E2 两张族表均含 jevons_paradox 且计数 +1', () => {
   assert(GATE_FAMS.some(f => f.key === 'decoy_effect' && f.round === 'r371'), 'gate 桥族表缺 decoy_effect（r371 扩族漏登记）');
   assert(plugin.FAMILIES.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), '插件族表缺 paradox_of_thrift（r369 扩族漏登记）');
   assert(plugin.FAMILIES.some(f => f.key === 'decoy_effect' && f.round === 'r371'), '插件族表缺 decoy_effect（r371 扩族漏登记）');
-  assert.strictEqual(GATE_FAMS.length, 38, 'gate 桥族表计数应为 37，实为 ' + GATE_FAMS.length);
-  assert.strictEqual(plugin.FAMILIES.length, 43, '插件族表计数应为 42，实为 ' + plugin.FAMILIES.length);
+  assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥族表计数应为 37，实为 ' + GATE_FAMS.length);
+  assert.strictEqual(plugin.FAMILIES.length, 44, '插件族表计数应为 42，实为 ' + plugin.FAMILIES.length);
   // r381 扩族义务：lump_of_labor 入表后 gate 桥 35→36、插件 40→41（econ 34→35）
   assert(GATE_FAMS.some(f => f.key === 'lump_of_labor' && f.round === 'r381'), 'gate 桥族表缺 lump_of_labor（r381 扩族漏登记）');
   assert(plugin.FAMILIES.some(f => f.key === 'lump_of_labor' && f.round === 'r381'), '插件族表缺 lump_of_labor（r381 扩族漏登记）');

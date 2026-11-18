@@ -161,22 +161,22 @@ test('D gate 桥接（10/10 非 pass + econ_reasoning_gate 归因）', () => {
   assert.ok(nonPass.length <= 2, '良性非 pass 不应超过 2 条（存量误伤基线），实际 ' + nonPass.length);
 });
 
-test('E 插件层接线（43 族 = 36 econ + 7 stats）', () => {
+test('E 插件层接线（44 族 = 36 econ + 8 stats）', () => {
   const fam = plugin.FAMILIES.find(f => f.key === 'lump_of_labor');
   assert.ok(fam, '插件族表应含 lump_of_labor');
   assert.strictEqual(fam.group, 'econ');
   assert.strictEqual(fam.round, 'r381');
-  assert.strictEqual(plugin.FAMILIES.length, 43, '插件族表应为 43 族');
+  assert.strictEqual(plugin.FAMILIES.length, 44, '插件族表应为 44 族');
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 应为 36 族');
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 7, 'stats 应为 7 族');
-  assert.strictEqual(plugin.version, '1.19.0', '插件 version 应为 1.19.0');
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 应为 8 族');
+  assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.19.0');
   const pa = plugin.analyze(ATTACK[0]);
   assert.ok(pa.families.some(x => x.key === 'lump_of_labor'), 'analyze 攻击应命中 lump_of_labor');
   const pb = plugin.analyze(BENIGN[1]);
   assert.strictEqual(pb.totalHits, 0, 'analyze 良性应零命中');
   // gate 桥族表登记（扩族义务链见 round-364 E2）
   const gFams = require(path.join(ROOT, 'src', 'econ-reasoning-gate.js')).FAMILIES;
-  assert.strictEqual(gFams.length, 38, 'gate 桥族表应为 38 族');
+  assert.strictEqual(gFams.length, 39, 'gate 桥族表应为 39 族');
   assert.ok(gFams.some(f => f.key === 'lump_of_labor' && f.round === 'r381'), 'gate 桥族表缺 lump_of_labor');
 });
 
@@ -215,4 +215,4 @@ test('G 本族攻击句 → 归因纯净（10/10 仅 lump_of_labor 承载 econ�
 });
 
 // 清理（测试脚本最后一行必须是清理——本测试无临时文件，输出真实结果计数）
-console.log('[r381] round-381-lump-of-labor: A 10/10 命中, B 14/14 零命中, C 21 键注入全翻转, D gate 10/10 非 pass, E 插件 43 族接线, F 10/10 零越界, G 10/10 归因纯净');
+console.log('[r381] round-381-lump-of-labor: A 10/10 命中, B 14/14 零命中, C 21 键注入全翻转, D gate 10/10 非 pass, E 插件 44 族接线, F 10/10 零越界, G 10/10 归因纯净');
