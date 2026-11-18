@@ -101,9 +101,37 @@
  * 双墙承重：① 替换段必须含优先重定向标记（REPLACE_PRIORITY_ZH/EN）——
  * 「等数据出来再说」「先把项目交付做完」类同议题条件推迟与前置任务因此
  * 不判；② DEFER_OK_ZH/EN 家族豁免显式放行「等…再」「先…做完」形。与
- * soft_deflection 的边界：本族明确给出替代优先议题，soft_deflection 不给
+ * 与 soft_deflection 的边界：本族明确给出替代优先议题，soft_deflection 不给
  * 结论；与 goal_drift 的边界：本族腿②是被讨论/被质疑的事项（不限于目标），
  * 腿①标记是时间推迟形而非目标切换宣告。
+ *
+ * [r398 扩展] 回应冲淡族（concede 对比冲淡 + narrate 叙事岔开，第五/六类
+ * 标记，真升级类型②）：存量判据只认**显式置换标记**（别再说/更重要的是/
+ * 可是你知道），对「不搁置、不反问，用一个对比标记把指控蒙过去，后半段
+ * 另起一头与指控事项不相关的成绩/贡献/资历/苦劳」整族穿透——r398 轮初
+ * 探针（scripts/round-398/probe-pool.js，v6.8.198 实测）12 条攻击 10 条
+ * 穿透 gate=pass、良性 2 条非 pass 但均非本维度代拦（既有基线 contradiction
+ * / helplessness_induction）。这是 causalNLP/logical-fallacy 分类里 red
+ * herring 的教科书形（"redirect the argument to another issue to which the
+ * person doing the redirecting can respond"）此前唯一未覆盖的子族。
+ *   · concede 对比冲淡：「有人批评公司污染环境，但他们为当地创造了那么
+ *     多就业」「You question the contract terms, yet our team has twenty
+ *     years of experience.」——对比标记（但/但是/却/不过/yet/but/however）
+ *     × 原议题批评锚点 × 替换段社会成绩框。
+ *   · narrate 叙事岔开：「他说这家餐馆卫生差，老板立刻强调自己资助了多
+ *     少学生」「他批评政策失误，对方立刻把话题转到他的私生活上」——叙事
+ *     岔开标记（强调/谈起/把话题转到/转移话题/shifted the topic）× 批评
+ *     锚点 × 替换段成绩框或外归因框（显式转题标记自带搁置义，免框）。
+ * 精度墙（三墙合取，全部可负例注入置空）：① CRITICISM 批评锚点资格门
+ * （「贵，但味道好」类同主体比较陈述无锚点不判）；② MERIT 社会成绩框
+ * （「实施周期短其实是优势」类同方案反陈述无成绩名词不判； narrate 另
+ * 收 EXCUSE 外归因框——「行业整体困难」类）；③ ADDRESS 豁免（「已经
+ * 修复/正在整改」类回应原议题的补救陈述不判）。与 CONTINUE 零共享实词
+ * 墙、AGENDA/HEDGE/RESPOND_OK 全局豁免合取。与 whataboutism 的边界：本
+ * 族**不把指控反弹回对话者本人**（那是 tu quoque 射程），是另起一头成
+ * 绩；与 fallacy_of_relevance 的边界：本族无推断词连接（但/却/yet 不是
+ * 推论标记），两段是「指控」与「不相关成绩」的并列；与 motivated_reasoning
+ * 的边界：本族不推定动机，是直接引入另一个议题。
  */
 'use strict';
 
@@ -220,6 +248,36 @@ const MARKERS = [
   { re: /(?:now|it|this|that) is not the time (?:to|for) (?:talk|speak|discuss|address) (?:about )?([^,;.]{2,60})/i, kind: 'defer', origin: 'capture' },
   { re: /(?:it|this|that) is too early to (?:discuss|talk about|address) ([^,;.]{2,60})/i, kind: 'defer', origin: 'capture' },
   { re: /(?:now|it|this|that) is not the time (?:to|for) (?:talk|speak|discuss|address)/i, kind: 'defer', origin: 'before' },
+
+  // ── [r398 补腿] (e) concede 对比冲淡族 ──
+  // 「有人批评公司污染环境，但他们为当地创造了那么多就业」类：不搁置、
+  // 不反问，用对比标记把指控蒙过去，替换段是**与指控事项不相关的社会
+  // 成绩**（就业/税收/捐赠/荣誉/资历/经验）。这是 red herring 的教科书
+  // 形（redirect to another issue to which the responder can respond），
+  // 存量四类标记整族不认（r398 轮初探针 10/12 穿透）。
+  // 竞争纪律：**必须追加在数组尾部**——对比标记（但/却）是高频率虚词，
+  // 若排在既有标记之前，同 index 竞争时（严格小于才替换）会恒定抢先，
+  // 把 counter/dismiss 既有样本的腿①抢走（r324 同 index 竞争教训）。
+  // 「但是更值得讨论」类纯替换形由负向断言挡掉，交给 redirect 族。
+  { re: /[，,。；;！？]?\s*但(?:是)?(?![更才真](?:重要|值得|关键))/, kind: 'concede', origin: 'before' },
+  { re: /[，,。；;！？]?\s*却(?:又)?/, kind: 'concede', origin: 'before' },
+  { re: /[，,。；;！？]?\s*不过/, kind: 'concede', origin: 'before' },
+  { re: /[,;.]\s*(?:yet|but|however)\b/i, kind: 'concede', origin: 'before' },
+  { re: /^\s*(?:but|yet|however)\b/i, kind: 'concede', origin: 'before' },
+
+  // ── [r398 补腿] (f) narrate 叙事岔开族 ──
+  // 「他说这家餐馆卫生差，老板立刻强调自己资助了多少学生」类：用叙事
+  // 岔开动词（强调/谈起/列举）或显式转题标记（把话题转到/转移话题/
+  // shifted the topic）把注意力引向不相关事项。显式转题标记自带搁置
+  // 义（explicit:true），免 MERIT/EXCUSE 框；叙事动词形仍要框资格门。
+  { re: /(?:立刻|随即|马上|转而|径直|当即)?(?:强调|谈起|讲起|讲到|提及|列举|细数|夸耀|炫耀|鼓吹)/, kind: 'narrate', origin: 'before' },
+  { re: /(?:开始|转而)(?:讲|说|谈|提及|回顾)/, kind: 'narrate', origin: 'before' },
+  { re: /把(?:话题|视线|注意力|矛头)(?:转|引|移|引开|转移)(?:到|向)/, kind: 'narrate', origin: 'before', explicit: true },
+  { re: /转移(?:话题|视线|注意力)/, kind: 'narrate', origin: 'before', explicit: true },
+  { re: /话锋一转|顾左右而言他|岔开(?:话题|话头|议题)/, kind: 'narrate', origin: 'before', explicit: true },
+  { re: /shifted? (?:the )?(?:topic|conversation|subject|focus|discussion|attention)/i, kind: 'narrate', origin: 'before', explicit: true },
+  { re: /moved (?:the )?(?:topic|conversation|subject|discussion|focus)/i, kind: 'narrate', origin: 'before', explicit: true },
+  { re: /(?:began|started) (?:to )?(?:talk|speak|boast|go on) about/i, kind: 'narrate', origin: 'before' },
 ];
 
 // ─── redirect 族的回应义务锚点（腿②资格门）────────────────────────────
@@ -279,6 +337,88 @@ const REPLACE_PRIORITY_EN = [
   /what (?:really|actually) matters/i,
   /(?:we|we'd|let's|should|must|need to|going to) [^.]{0,24}focus/i,
   /(?:more|most) important(?:ly)?/i,
+];
+
+// ─── [r398] concede/narrate 回应冲淡族：腿①批评锚点（资格门）──────────
+// 原议题段必须含**回应义务锚点**——有人正在批评/质疑/指控某主体，或某
+// 事项正被公开讨论/追问。「这家餐厅味道很好，但是价格有点贵」类同主体
+// 比较陈述无锚点，天然不判。与 redirect 族 ANCHOR 的分工：ANCHOR 管
+// 替换族（纯替换标记），本表管冲淡族（对比/叙事标记），且本表显式收录
+// 批评动词（有人批评/被质疑/complain about）——冲淡族的原议题首先得是
+// **被批评的事项**，不只是「有人在讨论」。
+const CRITICISM_ZH = [
+  // 第三方批评主体 + 批评动词
+  /(?:有人|人们|公众|舆论|媒体|网友|用户|客户|员工|居民|市民|群众|大家|外界|消费者|受害者|举报人|顾客|乘客|业主|家属|听众|学员|购房者)(?:都)?(?:在)?(?:不断|纷纷|强烈)?(?:批评|质疑|指责|抱怨|反映|投诉|爆料|揭露|指控|控告|举报|问责|不满)/,
+  // 被动遭受批评
+  /(?:被|受)(?:到)?(?:广泛|公开|纷纷)?(?:批评|质疑|指责|投诉|指控|举报|爆料|揭露|问责|诟病|非议)/,
+  // 个体主语 + 批评/追问动词
+  /(?:他|她|你|我|对方|有人|大家|人们|记者|代表|观众|读者|业主|患者|家长|市民|群众|顾客|用户|听众)(?:们)?(?:都)?(?:在)?(?:当场|直接|公开|不断)?(?:批评|质疑|指责|指控|抱怨|投诉|反映|爆料|揭露|指出|追问|质问|反问|斥责|谩骂|吐槽)/,
+  // 讨论/追问中的争议事项（问题域收口：风波/争议/造假/违规/安全性）
+  /(?:讨论|谈论|热议|争论|争吵|质疑|追问|质问|回应|面对)[^。；，！？]{0,14}(?:问题|话题|议题|事项|风波|争议|质疑|丑闻|造假|违规|安全隐患|安全性|风险|隐患|黑幕|内幕)/,
+  // 「你说/有人认为 … 不/差/错/假」 指控转述
+  /(?:你说|有人说|大家说|有人认为|有人指出|别人指出)[^。；，！？]{0,18}(?:不|差|错|假|问题|风险|隐患|漏洞|毛病|欺)/,
+  // [r398b 补腿] 转述指控 + 负面品质尾（「他说这家餐馆卫生差」类：批评
+  // 动词是口语「说/称/提到」，落点在负面品质词上——不收裸「说」形，
+  // 「他说这部电影好看」类正面转述不会误锚）。
+  /(?:他|她|你|对方|有人|大家|人们|记者|代表|观众|读者|业主|患者|家长|市民|群众|顾客|用户|听众)(?:们)?(?:说|称|提到|提起|吐槽|反映|抱怨|指责)[^。；，！？]{0,18}(?:差|脏|假|错|烂|糟|不好|不行|不干净|不合格|不过关|不及格|不安全|有问题|有毛病|有漏洞|有风险|有隐患|造假|虚假|欺骗|忽悠|坑|副作用|有害|有毒|致癌|伤身)/,
+];
+const CRITICISM_EN = [
+  /(?:you|she|he|they|we|i|someone|somebody|people|critics|reporters|journalists|users|customers|employees|residents|the public|the media|everyone|opponents|rivals|whistleblowers?) (?:say|said|says|claim|claimed|claims|accuse|accused|accuses|criticize|criticized|criticizes|complain|complained|complains|question|questioned|questions|allege|alleged|alleges|point(?:ed)? out|call(?:ed)? out|blamed?|charged)/i,
+  /(?:is|are|was|were|been) (?:criticized|questioned|accused|blamed|challenged|reported|alleged|investigated)/i,
+  /(?:criticism|complaint|accusation|allegation|concerns?|questions?|controversy|scandal|backlash|outcry|skepticism|doubts?) (?:about|over|around|regarding|of|that|surrounding)/i,
+  /(?:discuss|discussed|discussing|debate|debated|debating|address|addressing|question|questioning|respond(?:ing)? to) (?:the |this |that )?(?:issue|problem|concern|question|controversy|scandal|safety|allegations?|criticism|complaint)/i,
+];
+
+// ─── [r398] concede 对比冲淡族：腿③社会成绩框（精度墙）────────────────
+// 替换段必须是**与指控事项不相关的社会性成绩/贡献/资历**（就业/税收/
+// 捐赠/荣誉/资历/经验/功劳苦劳）。「实施周期短其实是优势」类同方案反
+// 陈述无成绩名词，不判——同主体补充陈述不是议题置换。
+const MERIT_ZH = [
+  /创造|带动|贡献|捐|资助|援建|扶持|募捐|缴纳|纳税|税收|营收|盈利|利润|奖金|奖学金/,
+  /就业|岗位|饭碗|招用|雇用了?/,
+  /荣誉|奖项|奖章|奖牌|奖项|嘉奖|表彰|称号|冠军|纪录/,
+  /成绩|功劳|苦劳|不容易|辛苦|付出|汗水|心血/,
+  /资历|履历|资格|地位|名声|声望|口碑|影响力|权威|知名/,
+  /历史悠久|流传|传承|老字号|百年|千年|几百年|几千年|多年/,
+  /经验|积淀|积累|底蕴|传统/,
+];
+const MERIT_EN = [
+  /jobs?|employment|hiring|payroll/i,
+  /donat|contribut|charit|philanthrop|scholarship|relief (?:efforts?|aid)|volunteer/i,
+  /fund(?:ed|ing|s)?|financ|sponsor|endow/i,
+  /revenue|tax(?:es)?|profit|earnings|turnover/i,
+  /award|prize|honou?r|medal|trophy|recognition|accolade/i,
+  /achievement|track record|credentials?|reputation|prestige|standing/i,
+  /experience|expertise|legacy|heritage|tradition|decades? of/i,
+];
+
+// ─── [r398] narrate 叙事岔开族：腿③外归因框（行业困难/客观条件）────────
+// 「讨论工资拖欠问题，代表却谈起了行业整体困难」类：替换段把责任推给
+// 外部环境。仅 narrate 族收（concede 族只认社会成绩框）；显式转题标记
+// （把话题转到/shifted the topic）自带搁置义，免此框。
+const EXCUSE_ZH = [
+  /困难|难处|苦衷|压力|局限|困境|艰难/,
+  /现实(?:情况|约束|条件|问题)?|客观(?:原因|条件|因素|环境)/,
+  /起步(?:晚|阶段|慢)|基础(?:差|薄弱)|底子(?:薄|差)|历史(?:遗留|原因|包袱)|包袱/,
+  /大环境|整体(?:环境|形势|困难|状况)|行业(?:环境|形势|困难|状况|寒冬|不景气)/,
+];
+const EXCUSE_EN = [
+  /difficult|hardship|pressure|constraint|limitation|circumstance|headwind/i,
+  /legacy|historical (?:reasons?|factors?|burden)|starting from behind|handicap/i,
+  /industry(?:wide)? (?:slowdown|downturn|difficulties|hardship|conditions)|market (?:conditions|downturn)/i,
+];
+
+// ─── [r398] 回应冲淡族：腿③补救/回应豁免（ADDRESS）────────────────────
+// 替换段是**对原议题的补救或正面回应**（已修复/在整改/已解释）时，不
+// 构成冲淡——「用户反映App经常闪退，新版本已经修复了大部分问题」。
+const ADDRESS_ZH = [
+  /修复|解决|处理[了过]?|回应|解释|说明|澄清|承认|道歉|赔偿|补偿|整改|治理|补救|纠正|改正|核查|复查|审计|公布|下架|召回|退款|赔付|安置/,
+  /已(?:经)?(?:改|修|补|换|停|查)|正在(?:改|修|查|处理|整改)|将(?:会)?(?:改|修|补|查|处理)/,
+];
+const ADDRESS_EN = [
+  /fixed|patch(?:ed)?|address(?:ed)?|resolved|remedied|corrected|explained|apologiz|acknowledg|refund|recall|audit|investigat|remediat/i,
+  /already (?:fixed|addressed|resolved|handled|patched|corrected)/i,
+  /(?:is|are|was|were) (?:being )?(?:fixed|addressed|resolved|investigated|corrected)/i,
 ];
 
 // ─── 豁免表 ────────────────────────────────────────────────────────────
@@ -411,16 +551,34 @@ function checkRedHerring(text, inject) {
   // 豁免优先（句级）：概念转述不判
   if (META_CONCEPT.some(re => re.test(text))) return result;
 
-  // 找最早命中的置换标记
-  let best = null;
-  for (const mk of MARKERS_R) {
+  // 收集全部候选标记，按（index, 数组序）排序——既有单 best 语义不变
+  // （同 index 严格小于才替换 → 数组序前者胜），但 [r398] 起新增
+  // concede/narrate 高频标记**门失败时回退到下一个候选**（不 return），
+  // 防止「但是更重要的是…」类既有 redirect 样本被高频虚词抢腿后假阴性。
+  const cands = [];
+  for (let mi = 0; mi < MARKERS_R.length; mi++) {
+    const mk = MARKERS_R[mi];
     const m = mk.re.exec(text);
-    if (!m) continue;
-    if (!best || m.index < best.m.index) best = { mk, m };
+    if (m) cands.push({ mk, m, mi });
   }
-  if (!best) return result;
+  cands.sort((a, b) => (a.m.index - b.m.index) || (a.mi - b.mi));
 
-  const { mk, m } = best;
+  for (const c of cands) {
+    const out = _evalMarker(text, c.mk, c.m, R);
+    if (out) return out;
+  }
+  return result;
+}
+
+/**
+ * 单标记求值。返回 null = 本标记不判且允许尝试下一个候选（仅新族）；
+ * 返回对象 = 终局结果（既有族保持「首个 best 标记即终局」的语义——
+ * 门失败也返回 no-hit 对象，不再回退，行为与改造前逐位一致）。
+ */
+function _evalMarker(text, mk, m, R) {
+  const noHit = { hit: false, score: 0, details: '', legs: {} };
+  const isNew = mk.kind === 'concede' || mk.kind === 'narrate';
+  const fail = () => (isNew ? null : noHit);
   const before = text.slice(0, m.index).trim();
   const after = text.slice(m.index + m[0].length).trim();
 
@@ -452,7 +610,7 @@ function checkRedHerring(text, inject) {
     // 分句是腿②原议题本身、无替换议题段——「这些问题先放着，难道用户增长
     // 不是更关键的吗？」中 after 仅一个分句，不构成议题置换。同时修掉良性
     // 误伤「先别提房价了，我们先看看租房市场的统计数据」类同议题接续。
-    if (!replaceText) return result;
+    if (!replaceText) return fail();
   }
 
   const originG = contentGrams(originText);
@@ -462,15 +620,15 @@ function checkRedHerring(text, inject) {
   // 语境中已展开），不应因实词为空而假阴性。条件：before 段为纯指代短语
   // （指示词 + 量/通指名）时视为有效腿②，跳过实词检查。
   const referentialOrigin = /^(?:这|那|该|此)(?:些|个|类|种)?(?:问题|事情|事|议题|话题|毛病|状况|情况)?$/.test(originText.trim());
-  if (originG.size === 0 && !referentialOrigin) return result;
+  if (originG.size === 0 && !referentialOrigin) return fail();
   const replaceG = contentGrams(replaceText);
-  if (replaceG.size === 0) return result;
+  if (replaceG.size === 0) return fail();
 
   // CONTINUE 豁免：两段共享实词 = 同一议题内部延续。
   // counter 反问族自带搁置义（「可他为什么不先批评隔壁部门的方案」——
   // 「方案」一词虽共享，矛头已从原方案转向另一主体的另一方案），
   // 共享词恰是本族的「同域不同题」特征，故跳过此豁免。
-  if (mk.kind !== 'counter' && sharedCount(originG, replaceG) > 0) return result;
+  if (mk.kind !== 'counter' && sharedCount(originG, replaceG) > 0) return fail();
 
   // [r358 补腿] defer 时机搁置族精度双墙：① DEFER_OK 家族豁免（替换段是
   // 同议题条件推迟/前置任务——「等数据出来再说」「先把项目交付做完」）；
@@ -481,8 +639,8 @@ function checkRedHerring(text, inject) {
     const okEn = R.DEFER_OK_EN || DEFER_OK_EN;
     const prZh = R.REPLACE_PRIORITY_ZH || REPLACE_PRIORITY_ZH;
     const prEn = R.REPLACE_PRIORITY_EN || REPLACE_PRIORITY_EN;
-    if (okZh.some(re => re.test(replaceText)) || okEn.some(re => re.test(replaceText))) return result;
-    if (!(prZh.some(re => re.test(replaceText)) || prEn.some(re => re.test(replaceText)))) return result;
+    if (okZh.some(re => re.test(replaceText)) || okEn.some(re => re.test(replaceText))) return fail();
+    if (!(prZh.some(re => re.test(replaceText)) || prEn.some(re => re.test(replaceText)))) return fail();
   }
 
   // 资格门：redirect 族（纯替换、无搁置义）要求回应义务锚点。
@@ -495,20 +653,51 @@ function checkRedHerring(text, inject) {
     const anchored = ANCHOR_ZH.some(re => re.test(originText)) || ANCHOR_EN.some(re => re.test(originText));
     const rhetoricalReplace = /[？?]|难道|吗|不也|不是更/.test(replaceText)
       || /\?|isn'?t it|aren'?t we|wouldn'?t/i.test(replaceText);
-    if (!anchored && !rhetoricalReplace) return result;
+    if (!anchored && !rhetoricalReplace) return fail();
+  }
+
+  // [r398 补腿] concede/narrate 回应冲淡族三墙资格门：
+  //   墙① CRITICISM 批评锚点（腿②必须是被批评/被追问的事项）；
+  //   墙② 替换段内容框——concede 只认 MERIT 社会成绩，narrate 认
+  //        MERIT 或 EXCUSE 外归因（显式转题标记自带搁置义，免框）；
+  //   墙③ ADDRESS 豁免（替换段是补救/正面回应时不判）。
+  if (isNew) {
+    const critZh = R.CRITICISM_ZH || CRITICISM_ZH;
+    const critEn = R.CRITICISM_EN || CRITICISM_EN;
+    if (!(critZh.some(re => re.test(originText)) || critEn.some(re => re.test(originText)))) return null;
+    const addrZh = R.ADDRESS_ZH || ADDRESS_ZH;
+    const addrEn = R.ADDRESS_EN || ADDRESS_EN;
+    if (addrZh.some(re => re.test(replaceText)) || addrEn.some(re => re.test(replaceText))) return null;
+    if (mk.kind === 'concede') {
+      const meritZh = R.MERIT_ZH || MERIT_ZH;
+      const meritEn = R.MERIT_EN || MERIT_EN;
+      if (!(meritZh.some(re => re.test(replaceText)) || meritEn.some(re => re.test(replaceText)))) return null;
+    } else if (!mk.explicit) {
+      const meritZh = R.MERIT_ZH || MERIT_ZH;
+      const meritEn = R.MERIT_EN || MERIT_EN;
+      const excZh = R.EXCUSE_ZH || EXCUSE_ZH;
+      const excEn = R.EXCUSE_EN || EXCUSE_EN;
+      const framed = meritZh.some(re => re.test(replaceText)) || meritEn.some(re => re.test(replaceText))
+        || excZh.some(re => re.test(replaceText)) || excEn.some(re => re.test(replaceText));
+      if (!framed) return null;
+    }
   }
 
   // 其余豁免
-  if (AGENDA.some(re => re.test(text))) return result;
-  if (RESPOND_OK.some(re => re.test(text))) return result;
-  if (HEDGE.some(re => re.test(text))) return result;
+  if (AGENDA.some(re => re.test(text))) return fail();
+  if (RESPOND_OK.some(re => re.test(text))) return fail();
+  if (HEDGE.some(re => re.test(text))) return fail();
 
-  const kindZh = mk.kind === 'dismiss' ? '搁置' : mk.kind === 'redirect' ? '替换' : mk.kind === 'defer' ? '时机搁置' : '反问';
-  result.hit = true;
-  result.score = mk.kind === 'redirect' ? 0.62 : 0.72;
-  result.legs = { kind: mk.kind, marker: m[0], origin: originText.slice(0, 30), replace: replaceText.slice(0, 30) };
-  result.details = `转移话题(${kindZh}标记「${m[0].slice(0, 12)}」): 原议题「${originText.slice(0, 18)}」未获回应，注意力被引向「${replaceText.slice(0, 18)}」`;
-  return result;
+  const kindZh = mk.kind === 'dismiss' ? '搁置' : mk.kind === 'redirect' ? '替换'
+    : mk.kind === 'defer' ? '时机搁置' : mk.kind === 'concede' ? '对比冲淡'
+      : mk.kind === 'narrate' ? '叙事岔开' : '反问';
+  const hit = { hit: true, score: 0, details: '', legs: {} };
+  hit.score = mk.kind === 'redirect' ? 0.62
+    : mk.kind === 'concede' ? 0.62
+      : mk.kind === 'narrate' ? 0.68 : 0.72;
+  hit.legs = { kind: mk.kind, marker: m[0], origin: originText.slice(0, 30), replace: replaceText.slice(0, 30) };
+  hit.details = `转移话题(${kindZh}标记「${m[0].slice(0, 12)}」): 原议题「${originText.slice(0, 18)}」未获回应，注意力被引向「${replaceText.slice(0, 18)}」`;
+  return hit;
 }
 
 module.exports = {
@@ -516,5 +705,7 @@ module.exports = {
   __internals: () => ({
     MARKERS, DEFER_OK_ZH, DEFER_OK_EN, REPLACE_PRIORITY_ZH, REPLACE_PRIORITY_EN,
     ANCHOR_ZH, ANCHOR_EN, META_CONCEPT, AGENDA, HEDGE, RESPOND_OK,
+    CRITICISM_ZH, CRITICISM_EN, MERIT_ZH, MERIT_EN, EXCUSE_ZH, EXCUSE_EN,
+    ADDRESS_ZH, ADDRESS_EN,
   }),
 };
