@@ -79,6 +79,17 @@
  *     名词的贬损反问（逻辑能力能强到哪去/能写出什么好东西），
  *     不泛收「能……吗」；
  *   · 评析这套话术本身（出身歧视是一种偏见/识别出身歧视话术）。
+ *
+ * [r399] 新增兄弟谬误名 META 豁免（round-693 G2 回归修复）：元讨论
+ * 引用**兄弟维度**的谬误学名时，句中引用的歧视性语句是反面例子而非
+ * 运用——「父母说『年轻人提出的观点不成熟』，这就是典型的起源谬误」
+ * 中，genetic_fallacy（第 131 维）自身的 META 豁免已放行该样本，但
+ * 本维度豁免名单只收自己的谬误名（出身歧视/学历歧视……），年轻人×
+ * 不成熟双腿仍中，gate 层由本维度判 verify（r399 接手 r398 交接的
+ * 回归项实测：该失败在 HEAD 提交态复现，非本轮词源族改动引入）。
+ * 兄弟谬误名（起源谬误/基因谬误/诉诸出身/刻板印象……）与自有名同样
+ * 标记元讨论，补齐名单；仍要求「点名称作谬误」的元讨论框（这就是
+ * 典型的X / X是一种谬误），不收裸提名字的描述句。
  */
 'use strict';
 
@@ -157,6 +168,16 @@ const BELITTLE_EN = new RegExp(
 const META_EXEMPT_ZH = /(?:这|那就是|这就是|这正是|那正是一种|属于|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型|明显)?(?:出身歧视|出身论|学历歧视|以出身论|按出身论|来源歧视|出身偏见)|(?:出身歧视|出身论|学历歧视|以出身论|按出身论|来源歧视|出身偏见)(?:是|属于|是一种|正是|属于|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型)?(?:偏见|歧视|谬误|谬说|逻辑错误|逻辑谬误|错误论证|非形式谬误|话术|手法|手段|策略|伎俩|套路|现象|问题|错误)/;
 const META_EXEMPT_EN = /\b(?:stereotype\s+by\s+origin|discrimination\s+by\s+origin|prejudice\s+based\s+on\s+origin|classism|elitism)\s+(?:is|are)\s+(?:a\s+)?(?:prejudice|discrimination|fallacy|manipulation|tactic|rhetorical|technique|form\s+of|symptom\s+of|common)\b/i;
 
+// ─── [r399] 兄弟谬误名 META 豁免（round-693 G2 回归修复）─────────────
+// 结构与 META_EXEMPT_ZH 同构：元讨论框（这就是典型的X / X是一种谬误）
+// × 兄弟维度谬误学名。兄弟名与自有名同样标记「句中引用是反面例子」。
+// 覆盖两族：① genetic_fallacy（第 131 维）族名——起源谬误/基因谬误/
+// 诉诸出身（回归样本点名「起源谬误」）；② stereotype 族名
+// ——刻板印象/地域歧视/年龄歧视（同家族元讨论）。独立常量、独立 inject
+// 锚点（负例脚本可单独摘除验证承重），不动 1 号 r715 的原有常量。
+const SIBLING_META_ZH = /(?:这|那就是|这就是|这正是|那正是一种|属于|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型|明显)?(?:起源谬误|基因谬误|诉诸出身|刻板印象|地域歧视|年龄歧视)|(?:起源谬误|基因谬误|诉诸出身|刻板印象|地域歧视|年龄歧视)(?:是|属于|是一种|正是|属于|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型)?(?:偏见|歧视|谬误|谬说|逻辑错误|逻辑谬误|错误论证|非形式谬误|话术|手法|手段|策略|伎俩|套路|现象|问题|错误)/;
+const SIBLING_META_EN = /\b(?:genetic\s+fallacy|fallacy\s+of\s+genesis|appeal\s+to\s+origin|argument\s+from\s+origin|stereotype|stereotyping|ageism|regional\s+discrimination)\s+(?:is|are)\s+(?:a\s+)?(?:prejudice|discrimination|fallacy|manipulation|tactic|rhetorical|technique|form\s+of|symptom\s+of|common|bias)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空白正则替换指定常量
@@ -171,9 +192,17 @@ function checkStereotypeOrigin(text, inject) {
   const BELITTLE_EN_ = R.BELITTLE_EN || BELITTLE_EN;
   const META_EXEMPT_ZH_ = R.META_EXEMPT_ZH || META_EXEMPT_ZH;
   const META_EXEMPT_EN_ = R.META_EXEMPT_EN || META_EXEMPT_EN;
+  const SIBLING_META_ZH_ = R.SIBLING_META_ZH || SIBLING_META_ZH;
+  const SIBLING_META_EN_ = R.SIBLING_META_EN || SIBLING_META_EN;
 
   // 在评析这套话术 → 不是运用它
   if (META_EXEMPT_ZH_.test(text) || META_EXEMPT_EN_.test(text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+
+  // [r399] 元讨论引用兄弟谬误学名（起源谬误/基因谬误/刻板印象……）→
+  // 句中引用是反面例子，同样不是运用它（round-693 G2 回归修复）。
+  if (SIBLING_META_ZH_.test(text) || SIBLING_META_EN_.test(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
@@ -199,5 +228,5 @@ function checkStereotypeOrigin(text, inject) {
 
 module.exports = {
   checkStereotypeOrigin,
-  __internals: () => ({ ORIGIN_ZH, ORIGIN_EN, BELITTLE_ZH, BELITTLE_EN, META_EXEMPT_ZH, META_EXEMPT_EN }),
+  __internals: () => ({ ORIGIN_ZH, ORIGIN_EN, BELITTLE_ZH, BELITTLE_EN, META_EXEMPT_ZH, META_EXEMPT_EN, SIBLING_META_ZH, SIBLING_META_EN }),
 };

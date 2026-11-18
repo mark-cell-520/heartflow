@@ -69,15 +69,17 @@ const REGRESSION = [
     mustContain: ['你抑郁了', '你有病'],
   },
   {
-    name: 'dream-loop:326 矛盾关键词',
-    file: 'src/dream/dream-loop.js', line: 326,
+    // 行锚随 v6.8.121（65ab489, 2026-11-02）审计修复在正则上方补注释块
+    // 下移：326→328、337→339（2026-11-18 r399 实测校准）
+    name: 'dream-loop:328 矛盾关键词',
+    file: 'src/dream/dream-loop.js', line: 328,
     cjk: ['但这不是', '但是没有', '错误发生了', '矛盾出现', '反对这个', '否定它'],
     ascii: ['this is not true', 'never stop', 'absolutely wrong', 'false claim'],
     mustContain: ['不是', '错误'],
   },
   {
-    name: 'dream-loop:337 显著关键词',
-    file: 'src/dream/dream-loop.js', line: 337,
+    name: 'dream-loop:339 显著关键词',
+    file: 'src/dream/dream-loop.js', line: 339,
     cjk: ['升级完成', '错误修复', '修复逻辑', '记忆升级', '逻辑错误'],
     ascii: ['version 2', 'an error', 'fix it', 'upgrade now', 'dream on'],
     mustContain: ['升级', '逻辑'],

@@ -63,6 +63,19 @@
  * 同口径）。verify 的含义是「这段推断结构需要复核」——用出身代替
  * 内容的文本，调用方应暂停采信其评价结论。
  *
+ * [r399] 新增「词源谬误族」（etymological fallacy，起源谬误的语义子种）：
+ * 引用一个词的**词源/本义**（源于/本义是/古汉语里/comes from/literally
+ * means），据此裁定该词**当下**的含义、正确用法或相关事物的资格——
+ * 「只有X才算Y / 现在的用法是误用 / 不配叫Y」。存量 SOURCE×QUALITY 族收
+ * 「谁说的/哪生产的/什么年代的」来源点名 × 质量贬损；本族收「词的起源」
+ * × 定义/规范结论，两类措辞结构正交、射程互补。判据同为双腿共现：
+ *   腿① ETYM 词源/本义标记（源于/本义/原意/古汉语里/comes from/
+ *        literally means/originally meant/derives from ...）；
+ *   腿② NORM 定义/规范结论（才算/不配叫/从一开始就是误用/违背本义/
+ *        counts as true/not a real/misuses the word ...）。
+ * 良性（词源的事实陈述、明确否认词源决定当下用法的反谬误陈述、语言学
+ * 教学/词典释义）只有腿①没有腿②，双腿共现天然豁免；行动级同为 VERIFY。
+ *
  * 明确不判的（豁免——这些是正当的来源采信、事实陈述与概念分析）：
  *   · 正当来源采信：以**验证过程**为据（经过审计/同行评审/临床验证/
  *     官方统计/检测认证）——与「按身份下结论」的区别正是本维度的判据
@@ -139,6 +152,29 @@ const QUALITY_EN = new RegExp(
 const META_EXEMPT_ZH = /(?:这|那就是|这就是|这正是|那正是一种|属于|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型|明显)?(?:起源谬误|基因谬误|诉诸出身|以出身论|来源歧视|出身论)|(?:起源谬误|基因谬误|genetic\s*fallacy|诉诸出身|以出身论|来源歧视|出身论)(?:是|属于|是一种|正是|属于|属于一种)(?:一种|典型的|常见的|经典的|隐性|常见|典型)?(?:谬误|谬说|逻辑错误|逻辑谬误|错误论证|非形式谬误|话术|手法|手段|策略|伎俩|套路|现象|问题|错误|歧视|偏见)/;
 const META_EXEMPT_EN = /\b(?:genetic\s+fallacy|fallacy\s+of\s+genesis|appeal\s+to\s+origin|argument\s+from\s+origin)\s+(?:is|are)\s+(?:a\s+)?(?:fallacy|manipulation|tactic|rhetorical|technique|form\s+of|symptom\s+of|common)\b/i;
 
+// ─── [r399] 词源谬误族（etymological fallacy）双腿常量 ─────────────────
+// 腿① ETYM：词的词源/本义被引用（来源是「词的起源」而非「谁说的」）。
+// 中文：源于/来源于/来自/本义是/原意是/古汉语里/从词源/本来是这个意思...
+// 英文：comes from / derives from / literally means / originally meant /
+// once meant / from the Latin(Greek) / etymologically / traces back to。
+const ETYM_ZH = /(?:源于|来源于|来自于|来自|本义(?:是|指|上的)?|原义|原意(?:是|指)|本意(?:是|指)|最初的意思|本来(?:是|指|的意思|是这个意思)|原指|原本(?:是|指)|古义|在古汉语|古汉语里|古汉语中|从词源|词源上|字面(?:上)?的意思|这个词?本来|拆开来看|追根溯源)/;
+const ETYM_EN = /\b(?:comes?\s+from|derives?\s+from|derived\s+from|originates?\s+from|literally\s+means?|originally\s+(?:meant|referred|signified|denoted|included|stood|was)|once\s+meant|from\s+the\s+(?:Latin|Greek|root|Old)|etymologically|traces?\s+back\s+to)\b/i;
+
+// 腿② NORM：由词源推出当下含义/用法/资格的定义或规范结论。
+// 中文：才算/才配叫/从一开始就是误用/违背本义/算不上真正的/就是对…背叛...
+// 英文：is not a real / counts as true / no true / misuses the word /
+// contradicts its real / distorts its proper。
+// 边界：只收「由来源裁定现在」的规范结论，不收「反映了…认知」这类描述句。
+const ETYM_NORM_ZH = /(?:才算|才称得?上|才配(?:叫|称|是)|根本不配|不配(?:叫|称|是)|从一开始就是(?:错|误用|用错|滥用|错的)|从一开始就背离|从一开始就偏|根本是误用|就是误用|纯属误用|是(?:一种)?误用|违背了?[^。！？；\n]{0,8}本义|背离了?[^。！？；\n]{0,8}本义|称不上[^。！？；\n]{0,6}本义|算不上真正的|根本算不上|就是对[^。！？；\n]{0,8}背叛)/;
+const ETYM_NORM_EN = /\b(?:(?:is|are)\s+not\s+(?:a\s+|an\s+)?(?:real|true|proper|genuine|actual)|not\s+a\s+(?:real|true|proper|genuine)|no\s+true|counts?\s+as\s+(?:a\s+)?(?:real|true|proper|genuine)|misuses?\s+the\s+word|distorts?\s+its\s+(?:real|true|proper|original)|contradicts?\s+its\s+(?:real|true|proper|original)|so\s+only\s+.{0,40}(?:is|counts|qualifies))\b/i;
+
+// 词源谬误族 META 豁免：评析「词源谬误」这套话术本身不判——句中点名词源
+// 谬误的学名（词源谬误/诉诸词源/etymological fallacy）即视为元讨论（含
+// 教科书引用该谬误作例子的情形）。双腿共现天然豁免绝大多数词源陈述，
+// 此豁免专兜「既引用词源又下规范结论、且点名称作反面例子」的元陈述。
+const ETYM_META_ZH = /(?:词源谬误|语源谬误|诉诸词源|以词源论|本义主义|词源主义|词源决定论)/;
+const ETYM_META_EN = /\b(?:etymological\s+fallacy|appeal\s+to\s+etymology|argument\s+from\s+etymology)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空白正则替换指定常量
@@ -176,10 +212,41 @@ function checkGeneticFallacy(text, inject) {
     };
   }
 
+  // ─── [r399] 新路由：词源谬误族（etymological fallacy）─────────────
+  // 双腿共现：腿① 词源/本义标记 × 腿② 定义/规范结论（缺一不判）。
+  // 与存量 SOURCE×QUALITY 族正交：存量收「谁说的/哪生产的/什么年代的」，
+  // 本族收「词的起源」，存量结论是质量贬损，本族结论是定义/用法/资格
+  // 裁定。良性词源陈述（事实陈述/反谬误陈述/语言学教学）只有腿①，
+  // 双腿共现天然豁免；union 语义，与存量路由互补不冲突。
+  const ETYM_ZH_ = R.ETYM_ZH || ETYM_ZH;
+  const ETYM_EN_ = R.ETYM_EN || ETYM_EN;
+  const ETYM_NORM_ZH_ = R.ETYM_NORM_ZH || ETYM_NORM_ZH;
+  const ETYM_NORM_EN_ = R.ETYM_NORM_EN || ETYM_NORM_EN;
+  const ETYM_META_ZH_ = R.ETYM_META_ZH || ETYM_META_ZH;
+  const ETYM_META_EN_ = R.ETYM_META_EN || ETYM_META_EN;
+
+  const etymZh = ETYM_ZH_.test(text);
+  const etymEn = ETYM_EN_.test(text);
+  const etymNormZh = ETYM_NORM_ZH_.test(text);
+  const etymNormEn = ETYM_NORM_EN_.test(text);
+
+  if ((etymZh || etymEn) && (etymNormZh || etymNormEn)) {
+    // 评析「词源谬误」这套话术本身 → 不是运用它
+    if (ETYM_META_ZH_.test(text) || ETYM_META_EN_.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+    return {
+      hit: true,
+      score: 0.6,
+      count: 1,
+      detail: isZh ? '词源谬误×本义规范推断(zh)' : '词源谬误×本义规范推断(en)',
+    };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
   checkGeneticFallacy,
-  __internals: () => ({ SOURCE_ZH, SOURCE_EN, QUALITY_ZH, QUALITY_EN, META_EXEMPT_ZH, META_EXEMPT_EN }),
+  __internals: () => ({ SOURCE_ZH, SOURCE_EN, QUALITY_ZH, QUALITY_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ETYM_ZH, ETYM_EN, ETYM_NORM_ZH, ETYM_NORM_EN, ETYM_META_ZH, ETYM_META_EN }),
 };
