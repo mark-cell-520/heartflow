@@ -138,23 +138,23 @@ BENIGNS.forEach((t, i) => {
 // ═══ 测试 6：插件层注册（含 FAMILIES 计数 + analyze 归因）═════
 console.log('\n[6] 插件层注册');
 {
-  ok(plugin.version === '1.22.0', `version=1.22.0（${plugin.version}）`);
+  ok(plugin.version === '1.23.0', `version=1.23.0（${plugin.version}）`);
   const desc = String(plugin.description || '');
   ok(desc.includes('censoring_neglect'), 'description 含 censoring_neglect');
   ok(desc.includes('r388'), 'description 含 r388');
-  ok(desc.includes('46 族'), 'description 标注 46 族');
+  ok(desc.includes('47 族'), 'description 标注 47 族');
   // FAMILIES 族表计数（r386 范式）
   ok(plugin.FAMILIES.some(f => f.key === 'censoring_neglect' && f.round === 'r388'), 'FAMILIES 含 censoring_neglect（round r388）');
-  ok(plugin.FAMILIES.length === 46, `FAMILIES 46 族（实际 ${plugin.FAMILIES.length}）`);
+  ok(plugin.FAMILIES.length === 47, `FAMILIES 47 族（实际 ${plugin.FAMILIES.length}）`);
   const econN = plugin.FAMILIES.filter(f => f.group === 'econ').length;
   const statsN = plugin.FAMILIES.filter(f => f.group === 'stats').length;
   ok(econN === 36, `econ 组 36 族（实际 ${econN}）`);
-  ok(statsN === 10, `stats 组 10 族（实际 ${statsN}）`);
-  ok(new Set(plugin.FAMILIES.map(f => f.key)).size === 46, 'FAMILIES key 唯一');
+  ok(statsN === 11, `stats 组 11 族（实际 ${statsN}）`);
+  ok(new Set(plugin.FAMILIES.map(f => f.key)).size === 47, 'FAMILIES key 唯一');
   // gate 桥族表计数
   const gFams = gate.FAMILIES;
   ok(gFams.some(f => f.key === 'censoring_neglect' && f.round === 'r388'), 'gate 桥族表含 censoring_neglect');
-  ok(gFams.length === 41, `gate 桥族表 41 族（实际 ${gFams.length}）`);
+  ok(gFams.length === 42, `gate 桥族表 42 族（实际 ${gFams.length}）`);
   // analyze 归因
   const an = plugin.analyze(ATTACKS[0]);
   ok(an.families.some(x => x.key === 'censoring_neglect'), `analyze 归因 censoring_neglect（${an.families.map(x => x.key).join(',')}）`);

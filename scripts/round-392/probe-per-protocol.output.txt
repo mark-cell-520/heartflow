@@ -1,0 +1,56 @@
+=== ATTACK ===
+caught(rewrite) | ["completion_evidence","econ_reasoning_gate"] | 只分析完成全部疗程的患者，疗效非常显著，说明药物确实有效。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate","pseudo_causal","pseudo_causal"] | 排除不依从的受试者后，治疗组结局明显更好，可见药效可靠。
+caught(verify) | ["econ_reasoning_gate"] | 按完成试验的人群分析，新疗法把风险降低了一半，这就是真实疗效。
+caught(rewrite) | ["confirmatory_evidence","econ_reasoning_gate"] | 退出试验的人不用管，只看坚持下来的，效果依然明确。
+caught(verify) | ["econ_reasoning_gate"] | 只统计按方案用药的人群，新药的效果非常确凿。
+caught(verify) | ["econ_reasoning_gate"] | 依从性好的那部分患者效果显著，这就是药物的真实效果。
+caught(verify) | ["econ_reasoning_gate"] | 只纳入按时服完药的受试者，这样测出来的疗效才是药物的真实水平。
+caught(verify) | ["econ_reasoning_gate"] | 把中途停药的人都剔掉之后，剩余患者的治愈率非常高，足见药效过硬。
+caught(verify) | ["econ_reasoning_gate"] | 只看完成了整个方案的那一组，新药的疗效确凿无疑。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate","relative_risk_individual_transfer"] | 按方案集分析显示风险下降明显，可见疗效是确切的。
+caught(verify) | ["econ_reasoning_gate","confidence"] | 坚持完成随访的患者结局最好，这就是治疗的真实效果。
+caught(verify) | ["econ_reasoning_gate"] | Among patients who completed the full course, the drug clearly worked, proving its efficacy.
+caught(verify) | ["econ_reasoning_gate"] | Excluding non-adherent participants, the treatment halved the risk, which is the real effect.
+caught(verify) | ["econ_reasoning_gate"] | Looking only at those who finished the program, the outcome improvement is substantial.
+caught(verify) | ["econ_reasoning_gate"] | In the adherent subgroup the drug worked well, which is its true effect.
+caught(verify) | ["econ_reasoning_gate"] | Counting only those who took the drug as prescribed, the treatment clearly works.
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | Among completers the therapy performed remarkably well, which demonstrates its true efficacy.
+caught(verify) | ["econ_reasoning_gate"] | Restricting the analysis to adherent patients, the drug genuinely works.
+=> ATTACK: 0/18
+=== BENIGN ===
+PENETRATED | [none] | 意向性治疗分析才是主分析，按方案分析只能作为辅助参考。
+PENETRATED | [none] | 按方案分析集破坏了随机化，两组不再可比，不能单独作为疗效证据。
+PENETRATED | [none] | 所谓按方案分析，是指只统计完成全程的受试者，它会高估治疗效果。
+PENETRATED | [none] | 试验中脱落的患者偏多，数据可靠性有限，结论要谨慎。
+PENETRATED | [none] | 按方案分析集的结果与意向性治疗分析一致，都显示风险下降。
+caught(verify) | ["perfect_error"] | 两组患者的依从性都在80%以上，脱落率很低。
+PENETRATED | [none] | 这项研究没有报告按方案分析集，只有意向性治疗分析的结果。
+PENETRATED | [none] | 虽然只看了完成治疗的受试者，样本量已经太小，说明不了任何问题。
+PENETRATED | [none] | 退出试验的患者特征与完成者不同，这会引入选择偏倚。
+PENETRATED | [none] | 完成全程治疗的患者肿瘤标志物下降更明显。
+PENETRATED | [none] | 只统计依从者会高估药效，这是按方案分析的已知缺陷。
+PENETRATED | [none] | 服药依从性高与更好的健康结局相关，但可能只是自选择混杂。
+PENETRATED | [none] | 完成了半年随访的受试者共320人，随访完成率91%。
+PENETRATED | [none] | 按方案服药的患者比例越高，说明临床试验的质量控制越好。
+PENETRATED | [none] | 脱落患者的后续结局未知，需要在意向性治疗框架下保守估计。
+PENETRATED | [none] | The intention-to-treat analysis is the primary; per-protocol results are supportive only.
+PENETRATED | [none] | Per-protocol analysis means counting only completers, and it can overstate the treatment effect.
+caught(rewrite) | ["fallacy_of_relevance"] | Many participants dropped out, so the reliability of the data is limited.
+PENETRATED | [none] | The per-protocol set and the ITT set agreed, both showing a risk reduction.
+PENETRATED | [none] | The study reported no per-protocol analysis, only the intention-to-treat result.
+PENETRATED | [none] | Completers and dropouts differed in baseline characteristics, which introduces selection bias.
+PENETRATED | [none] | Adherence was high in both arms, with few discontinuations.
+PENETRATED | [none] | Among those who completed the trial, side effects were similar between groups.
+caught(rewrite) | ["fallacy_of_relevance"] | The trial stopped early, so the follow-up data remain incomplete.
+caught(verify) | ["perfect_error"] | Adherence to the protocol was 85% in the treatment arm and 82% in the control arm.
+=> BENIGN: 21/25
+=== SCOPE ===
+caught(verify) | ["monocausal_attribution"] | 重症患者才用上了新药，所以他们的结局差不能全怪药效不好。
+caught(verify) | ["econ_reasoning_gate"] | 吃维生素的人明显更健康，所以维生素让人健康。
+PENETRATED | [none] | 只统计点击了广告的用户，转化率非常高，说明营销有效。
+caught(rewrite) | ["scrutiny_evasion","reverse_causation"] | 参加了筛查的人确诊数上升，说明筛查普及有问题。
+caught(rewrite) | ["fallacy_of_relevance"] | Sicker patients were given the new drug, so their worse outcomes reflect baseline risk.
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | Supplement users are healthier, which proves vitamins keep you healthy.
+caught(rewrite) | ["fallacy_of_relevance"] | Among users who clicked the ad, conversion was very high, so the marketing works.
+=> SCOPE: 1/7

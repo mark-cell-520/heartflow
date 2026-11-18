@@ -1,0 +1,164 @@
+
+[1] 模块级 detectPerProtocolMisread — 攻击样本
+  PASS A1 hit（score=0.66, count=1）
+  PASS A2 hit（score=0.66, count=1）
+  PASS A3 hit（score=0.66, count=1）
+  PASS A4 hit（score=0.66, count=1）
+  PASS A5 hit（score=0.66, count=1）
+  PASS A6 hit（score=0.66, count=1）
+  PASS A7 hit（score=0.72, count=2）
+  PASS A8 hit（score=0.66, count=1）
+  PASS A9 hit（score=0.66, count=1）
+  PASS A10 hit（score=0.72, count=2）
+  PASS A11 hit（score=0.66, count=1）
+  PASS A12 hit（score=0.72, count=2）
+  PASS A13 hit（score=0.66, count=1）
+  PASS A14 hit（score=0.66, count=1）
+  PASS A15 hit（score=0.66, count=1）
+  PASS A16 hit（score=0.66, count=1）
+  PASS A17 hit（score=0.72, count=2）
+  PASS A18 hit（score=0.66, count=1）
+  PASS A19 hit（score=0.66, count=1）
+  PASS A20 hit（score=0.66, count=1）
+  PASS A21 hit（score=0.72, count=2）
+  PASS A22 hit（score=0.66, count=1）
+  PASS A23 hit（score=0.66, count=1）
+  PASS A24 hit（score=0.66, count=1）
+  PASS A25 hit（score=0.66, count=1）
+  PASS A26 hit（score=0.72, count=2）
+
+[2] 模块级 detectPerProtocolMisread — 良性样本零误伤
+  PASS B1 不命中
+  PASS B2 不命中
+  PASS B3 不命中
+  PASS B4 不命中
+  PASS B5 不命中
+  PASS B6 不命中
+  PASS B7 不命中
+  PASS B8 不命中
+  PASS B9 不命中
+  PASS B10 不命中
+  PASS B11 不命中
+  PASS B12 不命中
+  PASS B13 不命中
+  PASS B14 不命中
+  PASS B15 不命中
+  PASS B16 不命中
+  PASS B17 不命中
+  PASS B18 不命中
+  PASS B19 不命中
+  PASS B20 不命中
+  PASS B21 不命中
+  PASS B22 不命中
+  PASS B23 不命中
+  PASS B24 不命中
+  PASS B25 不命中
+  PASS B26 不命中
+  PASS B27 不命中
+  PASS B28 不命中
+  PASS B29 不命中
+  PASS B30 不命中
+  PASS B31 不命中
+  PASS B32 不命中
+  PASS B33 不命中
+  PASS B34 不命中
+
+[3] 命中结果结构完整性
+  PASS dimension 字段正确
+  PASS severity 在 60-100（66）
+  PASS guidance 非空且充实
+  PASS evidence 数组非空
+  PASS tags 含 per-protocol-analysis
+
+[4] gate 层归因
+  PASS gate 层 action 非 pass 26/26
+  PASS gate 层 econ_reasoning_gate 归因 26/26
+
+[5] gate 层良性不被 block
+  PASS B1 action=pass（非 block）
+  PASS B2 action=pass（非 block）
+  PASS B3 action=pass（非 block）
+  PASS B4 action=pass（非 block）
+  PASS B5 action=pass（非 block）
+  PASS B6 action=pass（非 block）
+  PASS B7 action=pass（非 block）
+  PASS B8 action=pass（非 block）
+  PASS B9 action=pass（非 block）
+  PASS B10 action=pass（非 block）
+  PASS B11 action=pass（非 block）
+  PASS B12 action=verify（非 block）
+  PASS B13 action=pass（非 block）
+  PASS B14 action=pass（非 block）
+  PASS B15 action=pass（非 block）
+  PASS B16 action=pass（非 block）
+  PASS B17 action=pass（非 block）
+  PASS B18 action=pass（非 block）
+  PASS B19 action=pass（非 block）
+  PASS B20 action=rewrite（非 block）
+  PASS B21 action=pass（非 block）
+  PASS B22 action=pass（非 block）
+  PASS B23 action=pass（非 block）
+  PASS B24 action=rewrite（非 block）
+  PASS B25 action=verify（非 block）
+  PASS B26 action=pass（非 block）
+  PASS B27 action=rewrite（非 block）
+  PASS B28 action=pass（非 block）
+  PASS B29 action=verify（非 block）
+  PASS B30 action=verify（非 block）
+  PASS B31 action=pass（非 block）
+  PASS B32 action=rewrite（非 block）
+  PASS B33 action=rewrite（非 block）
+  PASS B34 action=rewrite（非 block）
+
+[6] 插件层注册
+  PASS version=1.23.0（1.23.0）
+  PASS description 含 per_protocol_misread
+  PASS description 含 r392
+  PASS description 标注 47 族
+  PASS FAMILIES 含 per_protocol_misread（round r392）
+  PASS FAMILIES 47 族（实际 47）
+  PASS econ 组 36 族（实际 36）
+  PASS stats 组 11 族（实际 11）
+  PASS FAMILIES key 唯一
+  PASS gate 桥族表含 per_protocol_misread
+  PASS gate 桥族表 42 族（实际 42）
+  PASS analyze 归因 per_protocol_misread（per_protocol_misread）
+  PASS analyze score 0.66
+
+[7] 射程不重叠对照
+  PASS proxy_metric_goal 领地不判
+  PASS proxy_metric_goal 领地不判
+  PASS proxy_metric_goal 领地不判
+  PASS confounding_by_indication 领地不判
+  PASS confounding_by_indication 领地不判
+  PASS healthy_user_bias 领地不判
+  PASS healthy_user_bias 领地不判
+  PASS weak_evidence_strong_claim 领地不判
+  PASS effect_measure_misread 领地不判
+  PASS significance_verdict_misread 领地不判
+  PASS censoring_neglect 领地不判
+  PASS surrogate_endpoint_misread 领地不判
+  PASS relative_risk_individual_transfer 领地不判
+
+[8] 负例注入-删条（承重）
+  PASS 注入前应命中（前提）
+  PASS C1 全键注入 → 家族从命中消失
+  PASS C2 腿① POP 全注入 → 家族消失（腿①承重）
+  PASS C3 腿② EFF 全注入 → 家族消失（腿②承重）
+  PASS C4 CONCEPT_ZH 默认应豁免
+  PASS C4 CONCEPT_ZH 注入后应转命中
+  PASS C4 CONCEPT_EN 默认应豁免
+  PASS C4 CONCEPT_EN 注入后应转命中
+  PASS C4 CORRECT_ZH 默认应豁免
+  PASS C4 CORRECT_ZH 注入后应转命中
+  PASS C4 CORRECT_EN 默认应豁免
+  PASS C4 CORRECT_EN 注入后应转命中
+  PASS C5 NEG1 默认应豁免（腿①否定守卫）
+  PASS C5 NEG1 注入后应转命中
+  PASS C6 NEG/HEDGE 默认应豁免（腿②双守卫）
+  PASS C6 NEG/HEDGE 注入后应转命中
+
+==================================================
+r392 单测结果: 143 PASS / 0 FAIL
+==================================================
+全绿

@@ -5,7 +5,7 @@
  *   B 模块级良性零误伤（含射程邻接族不误判）
  *   C 注入-删条负例（逐条删掉本轮新模式，断言守卫必须变红——断言失败而非加载崩溃）
  *   D gate 层归因（action 非 pass 且 findings 含 econ_reasoning_gate）
- *   E 存量计数链同步（econ 族数 38→39 / 插件 43→44；r389 再同步 39→41 / 44→46）
+ *   E 存量计数链同步（econ 族数 38→39 / 插件 43→44；r389 再同步 39→41 / 44→46；r392 再同步 41→42 / 46→47）
  */
 'use strict';
 const assert = require('assert');
@@ -198,18 +198,18 @@ test('r387 D2 gate 层良性对照零归因', () => {
 });
 
 // ─── E 存量计数链同步 ───
-test('r387 E econ gate 族数 41 / 插件族数 46（36 econ + 10 stats）', () => {
+test('r387 E econ gate 族数 42 / 插件族数 47（36 econ + 11 stats）', () => {
   const g = require('../src/econ-reasoning-gate.js');
   const fams = g.FAMILIES;
-  assert.ok(Array.isArray(fams) && fams.length === 41, 'econ gate FAMILIES 应为 41，实测 ' + (fams && fams.length));
+  assert.ok(Array.isArray(fams) && fams.length === 42, 'econ gate FAMILIES 应为 42，实测 ' + (fams && fams.length));
   assert.ok(fams.some(f => f.key === 'significance_verdict_misread'), '应含 significance_verdict_misread');
 
   const plugin = require('../src/plugins/econ-reasoning-check/index.js');
   const pfams = plugin.FAMILIES;
-  assert.ok(Array.isArray(pfams) && pfams.length === 46, '插件 FAMILIES 应为 46，实测 ' + (pfams && pfams.length));
+  assert.ok(Array.isArray(pfams) && pfams.length === 47, '插件 FAMILIES 应为 47，实测 ' + (pfams && pfams.length));
   const stats = pfams.filter(f => f.group === 'stats');
   const econ = pfams.filter(f => f.group === 'econ');
-  assert.strictEqual(stats.length, 10, 'stats 组应为 10，实测 ' + stats.length);
+  assert.strictEqual(stats.length, 11, 'stats 组应为 11，实测 ' + stats.length);
   assert.strictEqual(econ.length, 36, 'econ 组应为 36，实测 ' + econ.length);
-  assert.strictEqual(plugin.version, '1.22.0', '插件 version 应为 1.22.0，实测 ' + plugin.version);
+  assert.strictEqual(plugin.version, '1.23.0', '插件 version 应为 1.23.0，实测 ' + plugin.version);
 });

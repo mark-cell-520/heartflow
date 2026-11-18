@@ -3,8 +3,8 @@
  * r336 机会成本忽视扩族至 22 族后随族表更新）
  *
  * 覆盖：
- *   A 插件元数据与族表（46 族 = 36 econ + 10 stats，族键/模块路径/组归属）
- *   B 每族攻击命中（46 族全中，模块级判据经插件聚合后仍可达）
+ *   A 插件元数据与族表（47 族 = 36 econ + 11 stats，族键/模块路径/组归属）
+ *   B 每族攻击命中（47 族全中，模块级判据经插件聚合后仍可达）
  *   C 良性零误伤（12 条官方良性形状语料）
  *   D action=<family key> 单族过滤（MCP action 入参）
  *   E 负例注入-删条（40 个：blind inject 各模块 __internals 探针键后，
@@ -109,6 +109,8 @@ const ATTACK = {
   censoring_neglect: '新药组观察满一年时无一人死亡，可见这种新药的一年生存率是100%，疗效完胜对照组。',
   // r389 替代终点误读（src/surrogate-endpoint-misread.js，双腿：腿① SURROGATE_* × 腿② HARD_* + INFER_* + CONCEPT/CORRECT 双豁免 + 腿①方向词否定/腿②双守卫）
   surrogate_endpoint_misread: '新药让患者的低密度脂蛋白和血压都降下来了，所以说这种药能预防心梗、延长患者寿命。',
+  // r392 按方案分析集误读（src/per-protocol-misread.js，双腿：腿① POP_* 分析集限定锚 × 腿② EFF_* 疗效兑现结论 + CONCEPT/CORRECT 双豁免 + 腿①紧前否定/腿②双守卫，不强制推断标记——腿②自身即兑现结构）
+  per_protocol_misread: '只统计按方案用药的人群，新药的效果非常确凿。',
 };
 
 // ─── 良性样本（官方良性语料形状 + 典型 think 结论）──
@@ -207,6 +209,8 @@ const INJECT_KEY = {
   censoring_neglect: ['WINDOW_ZH', 'WINDOW_EN', 'CENSOR_ZH', 'CENSOR_EN', 'COMPLETE_ZH', 'COMPLETE_EN', 'INFER_ZH', 'INFER_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'COMPLETED_ZH', 'COMPLETED_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN'],
   // r389 surrogate_endpoint_misread（腿① SURROGATE_* × 腿② HARD_* + INFER_* + CONCEPT/CORRECT 豁免 + NEG1 腿①守卫/腿②双守卫）
   surrogate_endpoint_misread: ['SURROGATE_ZH', 'SURROGATE_EN', 'HARD_ZH', 'HARD_EN', 'INFER_ZH', 'INFER_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN', 'NEG1_ZH', 'NEG1_EN'],
+  // r392 per_protocol_misread（腿① POP_ZH_P1..P5B / POP_EN_G1..G6 × 腿② EFF_ZH_E1..E5 / EFF_EN + CONCEPT/CORRECT 双豁免 + 腿①紧前否定守卫（含 interior）/腿②双守卫）
+  per_protocol_misread: ['POP_ZH_P1', 'POP_ZH_P2', 'POP_ZH_P3', 'POP_ZH_P3B', 'POP_ZH_P4', 'POP_ZH_P5', 'POP_ZH_P5B', 'POP_ZH_P6', 'POP_ZH_P7', 'POP_ZH_P8', 'POP_ZH_P9', 'POP_EN_G1', 'POP_EN_G2', 'POP_EN_G3', 'POP_EN_G4', 'POP_EN_G5', 'POP_EN_G6', 'EFF_ZH_E1', 'EFF_ZH_E2', 'EFF_ZH_E3', 'EFF_ZH_E4', 'EFF_ZH_E5', 'EFF_EN', 'CONCEPT_ZH', 'CONCEPT_EN', 'CORRECT_ZH', 'CORRECT_EN', 'NEG_ZH', 'NEG_EN', 'HEDGE_ZH', 'HEDGE_EN', 'NEG1_ZH', 'NEG1_EN'],
   // r339 适应证混杂（腿①选择分配四组 + 腿②治疗因果四组，ZH 侧对 ATTACK 样本承重）
   confounding_by_indication: ['SELECT_VERB_ZH', 'SELECT_TREAT_SEV_ZH', 'SELECT_SEV_TREAT_ZH', 'SELECT_IMBALANCE_ZH', 'CAUSAL_MARK_ZH_A', 'CAUSAL_PROVE_ZH_B', 'CAUSAL_TREAT_ZH_C', 'CAUSAL_OUTCOME_ZH_D'],
   // r343 incentive_conflation（镜像双腿：腿① ZH 连接词 E 组 + 腿② ZH 否认 A 组对
@@ -222,14 +226,14 @@ T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
   assert.strictEqual(PLUGIN.hooks[0].event, 'postprocess.think');
   assert.strictEqual(typeof PLUGIN.init, 'function');
 });
-T('A2 族表 46 族：36 econ + 10 stats，key 唯一', () => {
-  assert.strictEqual(FAMILIES.length, 46); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1 + r376 存款创造贷款误解 1 + r377 税率-税收线性误读 1 + r378 未理赔即亏误读 1 + r379 固定费率偏误 1 + r381 劳动总量谬误 1 + r385 绝对优势≠比较优势 1 + r386 效应量口径误读 1
+T('A2 族表 47 族：36 econ + 11 stats，key 唯一', () => {
+  assert.strictEqual(FAMILIES.length, 47); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r360 注册松散：原断言停在 r360 前的 24）+ r364 Jevons 悖论 1 + r366 碳泄漏 1 + r367 价格管制 1 + r368 重商主义 1 + r369 节约悖误 1 + r371 诱饵效应 1 + r372 健康使用者偏倚 1 + r373 非凡主张证据比例错配 1 + r373 税负转嫁谬误 1 + r374 存量-流量混淆 1 + r375 政府-家庭收支类比 1 + r376 存款创造贷款误解 1 + r377 税率-税收线性误读 1 + r378 未理赔即亏误读 1 + r379 固定费率偏误 1 + r381 劳动总量谬误 1 + r385 绝对优势≠比较优势 1 + r386 效应量口径误读 1 + r387 显著性裁定误读 1 + r388 删失数据当完整结论 1 + r389 替代终点误读 1 + r392 按方案分析集误读 1
   const econ = FAMILIES.filter(f => f.group === 'econ');
   const stats = FAMILIES.filter(f => f.group === 'stats');
   assert.strictEqual(econ.length, 36);
-  assert.strictEqual(stats.length, 10);
+  assert.strictEqual(stats.length, 11);
   const keys = FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 46);
+  assert.strictEqual(new Set(keys).size, 47);
 });
 T('A3 每族都有模块路径 + 导出函数名 + 中英标签', () => {
   for (const f of FAMILIES) {

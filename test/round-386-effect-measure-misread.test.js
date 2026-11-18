@@ -170,23 +170,23 @@ for (let i = 0; i < ATTACK.length; i++) {
 console.log('=== E 插件层接线 ===');
 T('E1 插件族表含 effect_measure_misread 且计数 44', () => {
   assert.ok(plugin.FAMILIES.some(f => f.key === 'effect_measure_misread' && f.round === 'r386'), '插件族表缺 effect_measure_misread');
-  assert.strictEqual(plugin.FAMILIES.length, 46);
+  assert.strictEqual(plugin.FAMILIES.length, 47);
 });
-T('E2 econ 组 36 族 + stats 组 10 族，key 唯一', () => {
+T('E2 econ 组 36 族 + stats 组 11 族，key 唯一', () => {
   const econ = plugin.FAMILIES.filter(f => f.group === 'econ');
   const stats = plugin.FAMILIES.filter(f => f.group === 'stats');
   assert.strictEqual(econ.length, 36);
-  assert.strictEqual(stats.length, 10);
+  assert.strictEqual(stats.length, 11);
   const keys = plugin.FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 46);
+  assert.strictEqual(new Set(keys).size, 47);
 });
 T('E3 插件 version 已 bump 至 1.19.0', () => {
-  assert.strictEqual(plugin.version, '1.22.0');
+  assert.strictEqual(plugin.version, '1.23.0');
 });
 T('E4 gate 桥族表含 effect_measure_misread 且计数 39', () => {
   const gFams = gate.FAMILIES;
   assert.ok(gFams.some(f => f.key === 'effect_measure_misread' && f.round === 'r386'), 'gate 桥族表缺 effect_measure_misread');
-  assert.strictEqual(gFams.length, 41, 'gate 桥族表应为 41 族');
+  assert.strictEqual(gFams.length, 42, 'gate 桥族表应为 42 族');
 });
 T('E5 插件 analyze 归因 effect_measure_misread', () => {
   const r = plugin.analyze(ATTACK[0]);
