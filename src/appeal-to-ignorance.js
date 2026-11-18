@@ -16,7 +16,7 @@
  * 即含「举证责任倒置」），缺口是 I1 模式覆盖不到需求句式，故按真升级②
  * （给已有维度补此前零覆盖的新句式族）扩展，不新增维度编号。
  *
- * 判据（三类路由，任一命中即 verify 级）：
+ * 判据（四类路由，任一命中即 verify 级）：
  *   R1 推定形（v6.8.4 原有）：I1 举证责任在场 × I2 推定成立
  *   R2 需求形（v6.8.54 新增）：D 举证倒置要求 × S 取消资格/要求服从
  *      ——不推定成立，把"拿出证据/反证"设为质疑的前提，达不到就禁声
@@ -24,6 +24,18 @@
  *      to question——门槛结构自含攻击性，无需第二腿
  *   R3 回应质疑形（v6.8.54 新增）：O 对话方质疑在场 × (D4 反将一军 |
  *      DF 带驱离后缀的举证要求)
+ *   R4 免证形（[r395] 新增）：诉诸明显性/常识免证——宣称主张因「显而易
+ *      见/不言而喻/明摆着/self-evident/common sense」而免于举证。强标记
+ *      单腿即判（不言而喻/明摆着/不争的事实/稍微有点常识的人都不会；
+ *      EN self-evident / plain to see / obvious to all / anyone with
+ *      common sense），弱标记（常识/稍微想想/common sense）须与免证动作
+ *      同语言配对（不需要数据/用不着分析/心里都清楚；EN no analysis is
+ *      needed / without any evidence）。与 R1（以无知推定）、R2（倒置
+ *      索证）同属「断言绕过证据纪律兑现」：R1 说「你驳不倒所以成立」，
+ *      R4 说「明摆着所以不用证」。FALLACY_PATTERNS 有同族启发式标签
+ *      （权重 0.2）但 gate 层零覆盖（r395 探针 10/12 穿透），本路由补
+ *      gate 级判别。边界：appeal_to_ridicule（第 129 维）管蔑视表达，本族
+ *      管免证宣言；带「需要/必须+数据/证据」的索取形归正当核验请求。
  *
  * 为什么现有维度拦不住（r707 实测复量）：
  *   · appeal_to_ignorance 自身 I1 模式只认"你证明不了/拿不出反证"窄形，
@@ -155,12 +167,47 @@ const QUALIFY_EN = /\bfallacy\b|\binvalid\b|\bdoesn'?t\s+(?:hold|follow|work)\b|
 // 正当原则：主张者承担举证责任
 const RULE_EN = /\b(?:the\s+)?(?:burden\s+of\s+proof)\s+(?:lies|falls|rests)\s+(?:with|on)\s+(?:the\s+)?(?:one|person|claimant|proponent|party)/i;
 
+// ─── [r395] R4 免证形腿组（诉诸明显性 / appeal to obviousness） ─────────
+// 不断言对方无法反驳（R1 推定形），也不把索证设为质疑门槛（R2 需求形），
+// 而是宣称主张因「显而易见/常识/不言而喻」而**免于举证**——举证义务被
+// 「明显性」直接抹掉，句子以「不需要数据/用不着分析/大家心里都清楚」收束。
+// 与 R1（以无知推定成立）、R2（倒置举证要求）同属本维度已声明射程
+// 「断言绕过证据纪律兑现」：R1 说「你驳不倒所以成立」，R4 说「明摆着所以
+// 不用证」。FALLACY_PATTERNS 有 appeal_to_obviousness / appeal_to_common_sense
+// 两个启发式标签（权重 0.2，src/index.js FALLACY_PATTERNS.en），但 gate 层
+// 零维度覆盖本族（r395 探针 10/12 穿透，coordination/agent4 留档），本路由
+// 补上 gate 级判别。边界：appeal_to_ridicule（第 129 维）管「脑子正常的人都
+// 不会」式蔑视表达，本族管「不言而喻/明摆着」式免证宣言，蔑视词不在本族
+// 词表；obviousness 只兑现不断言——句中带「需要/必须+数据/证据」的索取形
+// 归正当核验请求，由豁免承接。
+const OBV_STRONG_ZH = /不言而喻|明摆着|不争的事实|稍微有点(?:常识|脑子|经验|智商|脑子正常)的人(?:都)?(?:不会|不可能|绝不|看得|明白|认同|知道|清楚)|(?:长|有)(?:眼睛|脑子)的(?:人)?都|秃子头上的虱子|三岁小孩(?:都)?明白|最基本的道理/;
+const OBV_STRONG_EN = /self[- ]evident|plain to see|obvious to (?:all|anyone|everyone|any\b)|it'?s obvious that|it is obvious that|anyone with (?:common sense|half a brain)|with (?:half a brain|common sense) (?:you )?(?:can|could) (?:see|tell)/i;
+// 弱标记须与免证动作同语言配对，避免「从常识来说，下雨天路上会堵」类良性用法误伤
+const OBV_WEAK_ZH = /常识|稍微想想|用脚趾头(?:想|头想)|动动脑子/;
+const WAIVE_ZH = /不需要(?:数据|证据|论证|分析|讨论|证明|解释|实验|验证|调研)|用不着(?:分析|讨论|证据|想|争)|无需(?:论证|证明|数据|证据|讨论)|根本不用(?:想|说|讨论|争|分析)|稍微想想就能|稍加思索就能|心里都清楚/;
+const OBV_WEAK_EN = /common sense/i;
+const WAIVE_EN = /no (?:analysis|evidence|proof|argument|discussion|data|statistics) (?:is|'s)? ?needed|without (?:any )?(?:evidence|analysis|proof|argument|data)|needs? no (?:proof|evidence|analysis|justification)|no need for (?:evidence|analysis|proof|data|discussion)/i;
+// R4 豁免：概念/教学转述（公理/教材/谬误名）、纠正形（不是替代/not always/
+// 否定标记形）、已核验或索取证据形（需要/必须+数据、做了检验、need more data）
+const OBV_EXEMPT_ZH = /公理|axiom|不证自明|教材|教科书|课堂|讲义|称为|定义为|逻辑谬误|常见谬误|诉诸(?:明显性|常识|显而易见)|不是(?:明显性|常识|直觉)?(?:的)?(?:替代|代替|取代)|不等于(?:明显|证据)|(?:不是|并非|并不|未必|不一定)(?:是)?(?:不言而喻|明摆着|显而易见)|(?<![不无])(?:仍|还|仍要|还要|需要|必须|应当|应该|需)(?:先|再|另行|进一步|补充|提供|拿出|给出)?(?:更多|大量|充分)?(?:数据|证据|验证|检验|实验|实测|复核|论证)|做了(?:稳健性)?(?:检验|验证|测试|复核)|(?:经过|完成)(?:了)?(?:验证|检验|实测)/;
+const OBV_EXEMPT_EN = /axiom|textbook|lecture|fallacy|appeal to (?:obviousness|common sense)|not a (?:substitute|replacement)|not always (?:correct|right|true)|not necessarily (?:correct|right|true)|starting point|we still need|still requires?|requires? (?:evidence|data|proof|verification|testing)|(?:evidence|data|proof|verification|testing) (?:is|are) (?:still )?required|verified|checked the data|more (?:evidence|data|research) is (?:still )?needed|need(?:s)? more (?:evidence|data|research)/i;
+
 /**
  * @param {string} text 归一化后的文本
+ * @param {object} [inject] 负例脚本注入用：以永不匹配串替换指定常量
  * @returns {{hit:boolean, score:number, detail:string}}
  */
-function checkAppealToIgnorance(text) {
+function checkAppealToIgnorance(text, inject) {
   if (!text || typeof text !== 'string' || text.length < 6) return { hit: false, score: 0, detail: '' };
+  const R = inject || {};
+  const OBV_STRONG_ZH_ = R.OBV_STRONG_ZH || OBV_STRONG_ZH;
+  const OBV_STRONG_EN_ = R.OBV_STRONG_EN || OBV_STRONG_EN;
+  const OBV_WEAK_ZH_ = R.OBV_WEAK_ZH || OBV_WEAK_ZH;
+  const WAIVE_ZH_ = R.WAIVE_ZH || WAIVE_ZH;
+  const OBV_WEAK_EN_ = R.OBV_WEAK_EN || OBV_WEAK_EN;
+  const WAIVE_EN_ = R.WAIVE_EN || WAIVE_EN;
+  const OBV_EXEMPT_ZH_ = R.OBV_EXEMPT_ZH || OBV_EXEMPT_ZH;
+  const OBV_EXEMPT_EN_ = R.OBV_EXEMPT_EN || OBV_EXEMPT_EN;
 
   // 在评析「诉诸无知」这套论证 → 不是运用它
   if ((META_EXEMPT_ZH.test(text) && QUALIFY_ZH.test(text)) ||
@@ -228,7 +275,30 @@ function checkAppealToIgnorance(text) {
     return { hit: true, score: 0.4, detail: '举证倒置-回应质疑形(en)' };
   }
 
+  // R4 免证形（[r395] 新增）：诉诸明显性——宣称主张因「显而易见/常识/
+  // 不言而喻」而免于举证。强标记（不言而喻/明摆着/不争的事实/self-evident/
+  // obvious to all/anyone with common sense…）自含攻击性，单腿即判；弱标记
+  // （常识/稍微想想/common sense）须与免证动作（不需要数据/用不着分析/
+  // no analysis is needed…）同语言配对。中英分语言配对，避免英文免证词
+  // 配中文明显标记的偶然共现。
+  if (!OBV_EXEMPT_ZH_.test(text) && !OBV_EXEMPT_EN_.test(text)) {
+    const strongZh = OBV_STRONG_ZH_.test(text);
+    const strongEn = OBV_STRONG_EN_.test(text);
+    if (strongZh || strongEn) {
+      return { hit: true, score: 0.4, detail: strongZh ? '诉诸明显性-免证形(zh)' : 'appeal-to-obviousness(en)' };
+    }
+    if (OBV_WEAK_ZH_.test(text) && WAIVE_ZH_.test(text)) {
+      return { hit: true, score: 0.4, detail: '诉诸明显性-免证形(常识×免证,zh)' };
+    }
+    if (OBV_WEAK_EN_.test(text) && WAIVE_EN_.test(text)) {
+      return { hit: true, score: 0.4, detail: 'appeal-to-obviousness(common sense×waiver,en)' };
+    }
+  }
+
   return { hit: false, score: 0, detail: '' };
 }
 
-module.exports = { checkAppealToIgnorance };
+module.exports = {
+  checkAppealToIgnorance,
+  __internals: () => ({ OBV_STRONG_ZH, OBV_STRONG_EN, OBV_WEAK_ZH, WAIVE_ZH, OBV_WEAK_EN, WAIVE_EN, OBV_EXEMPT_ZH, OBV_EXEMPT_EN }),
+};
