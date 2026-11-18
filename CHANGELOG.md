@@ -1,5 +1,23 @@
 ---
 
+# 6.8.200 变更日志条目
+
+## [6.8.200] - 2026-11-18
+
+### genetic_fallacy 第 131 维新增「词源谬误族」措辞家族（r399，真升级②）+ stereotype_origin 第 146 维兄弟谬误名 META 豁免（round-693 G2 回归修复）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r398 red_herring 回应冲淡族后）。海外扫描 arXiv/GitHub/S2 空返（同 r392-r398 先例，按既有形态自建），产物落盘 `coordination/agent4/scout/`。定拨来源为 r735/r398 两轮交接的 persuasive-definition 候选族复探：专项探针 `scripts/round-399/probe-etymology.js` 中「引用词源裁定当下含义/用法/资格」子族 14 攻击 **9 条穿透 gate=pass**、10 良性 0 误伤——高于同池其他候选，定为本轮落地族（persuasive-definition 争议释义本身按 r735 纪律不收，见边界）。
+- 缺口解剖：第 131 维 `src/genetic-fallacy.js` 存量判据（r693 SOURCE×QUALITY 双腿）只收「谁说的/哪生产的/什么年代的」来源点名 × 质量贬损；「引用一个词的词源/本义（源于/本义是/古汉语里/comes from/literally means），据此裁定该词当下的含义、正确用法或相关事物的资格（只有X才算Y/现在的用法是误用/不配叫Y）」整族穿透——「『民主』这个词源于希腊语的『人民统治』，所以只有人民直接统治的制度才算真正的民主」「"Decide" comes from the Latin for "to cut off", so a decision that can be revisited is not a real decision」正是词源谬误（etymological fallacy）的教科书形，此前唯一未覆盖的起源谬误子种。
+- 实现（`src/genetic-fallacy.js`，第 131 维 genetic_fallacy；src/index.js 零改动、dimMap 键数仍 266）：新增第 2 路由「词源谬误族」（union，与存量 SOURCE×QUALITY 族正交——存量收「词的来源」之外的来源角色×质量贬损，本族收「词的起源」×定义/规范结论）：
+  - 判据双腿共现（缺一不判）：腿① ETYM_ZH/EN 词源/本义标记（源于/来源于/来自于/本义是/原意/古汉语里/从词源/追根溯源；EN comes from/derives from/literally means/originally meant/once meant/from the Latin(Greek)/etymologically/traces back to）；腿② ETYM_NORM_ZH/EN 定义/规范结论（才算/才配叫/不配叫/从一开始就是误用/违背本义/算不上真正的/就是对…背叛；EN is not a real/counts as true/no true/misuses the word/distorts its proper/contradicts its real）。
+  - 豁免 ETYM_META_ZH/EN：点名词源谬误学名（词源谬误/诉诸词源/etymological fallacy）的元陈述不判（含教科书引用该谬误作例子的情形）。
+  - 良性（词源事实陈述/反谬误陈述/语言学教学/词典释义）只有腿①没有腿②，双腿共现天然豁免；行动级同为 VERIFY（与存量族同口径）。六个新常量均可负例注入置空、`__internals` 已透传。
+- 同轮回归修复（round-693 G2，r398 交接项）：`test/round-693-genetic-fallacy.js` G2 断言 8 条良性 gate 层必须 pass，其中「父母说『年轻人提出的观点不成熟』，这就是典型的起源谬误」（评析 genetic_fallacy 话术本身的元讨论样本）实得 verify。归因实测（`scripts/round-399/debug-regression.js`）：承重维度是 **stereotype_origin**（第 146 维，年轻人×不成熟双腿中），genetic_fallacy 自有 META 豁免已放行该样本；git stash 对照实证该失败在 HEAD 提交态（b25c509）复现、**非本轮词源族改动引入**——系 r715 上线第 146 维后与 r693 良性集形成的射程交叉缺口：两个维度的豁免名单各只收自己的谬误学名，元讨论引用兄弟谬误名时漏豁免。修复（`src/stereotype-origin.js`，第 146 维；src/index.js 零改动、dimMap 仍 266）：新增 SIBLING_META_ZH/SIBLING_META_EN 两个常量（独立 inject 锚点，不动 r715 原有常量）——元讨论框（这就是典型的X / 属于X的… / X是一种谬误；EN X is a common…）× 兄弟维度谬误学名（起源谬误/基因谬误/诉诸出身/刻板印象/地域歧视/年龄歧视；EN genetic fallacy/fallacy of genesis/appeal to origin/stereotype/ageism）。仍要求元讨论框，不收裸提名字的描述句（边界锁实证：「年轻人就是不成熟，别拿刻板印象当借口」仍命中）。
+- 验证（本轮全部实测）：词源族立项探针 14 攻击 9 穿透、10 良性 0 误伤 → 落地后攻击 **14/14 非 pass**、良性 **10/10 pass**；轮测 `test/round-399-genetic-fallacy-etymology.test.js` **24 断言全绿**（A1/A2 攻击 16 全命中 + B1-B4 分支锁 + C1 gate 层 6 条非 pass 且 genetic_fallacy 承重 + D1 良性 14 条 gate 层 pass 且单维零命中 + E1/E2 单腿边界 + F1 META 豁免 4 + G1-G6 inject 摘除 **6/6 翻转** + H1/H2 加性证明 + I1/I2 存量回归 + J1-J3 接线）；回归修复轮测 `test/round-399-stereotype-origin-meta.test.js` **13 断言全绿**（A1/A2 回归样本中英修复 + B1/B2 元讨论框 4+2 + C1-C3 inject 摘除 **3/3 翻转** + D1 存量攻击 7 条召回不退化 + E1 边界锁 2 + F1/F2 gate 归因 + G1/G2 接线）；存量轮测不回归：round-693 **28/28**（修复前 27/28）、round-715 **56/56**。
+- 四门禁（提交态实跑）：verify **16/0**、guard-abilities **20/20@266**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 # 6.8.199 变更日志条目
 
 ## [6.8.199] - 2026-11-18
