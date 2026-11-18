@@ -234,13 +234,13 @@ check('F6 存量 benign 语料零误命中（官方良性集形状）', () => {
 console.log('### G 登记');
 check('G1 gate 桥族表含 paradox_of_thrift(r369) 且计数 35（r379 flat_rate_bias 入表后 34→35）', () => {
   assert(GATE_FAMS.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), 'gate 桥缺 paradox_of_thrift');
-  assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length);
+  assert.strictEqual(GATE_FAMS.length, 41, 'gate 桥计数 ' + GATE_FAMS.length);
 });
 check('G2 插件族表含 paradox_of_thrift(r369) 且计数 44（r371/r372/r373/r374 扩族义务：30→31→32→33→34→…，36 econ + 8 stats）', () => {
   assert(plugin.FAMILIES.some(f => f.key === 'paradox_of_thrift' && f.round === 'r369'), '插件缺 paradox_of_thrift');
-  assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length);
+  assert.strictEqual(plugin.FAMILIES.length, 46, '插件计数 ' + plugin.FAMILIES.length);
   assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
-  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+  assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 10, 'stats 计数异常');
 });
 check('G3 插件 analyze(only=paradox_of_thrift) 路由可用', () => {
   const r = plugin.analyze(ATTACK_ZH[0], { only: 'paradox_of_thrift' });

@@ -143,23 +143,23 @@ for (let i = 0; i < ATTACK.length; i++) {
 console.log('=== E 插件层接线 ===');
 T('E1 插件族表含 comparative_advantage 且计数 44', () => {
   assert.ok(plugin.FAMILIES.some(f => f.key === 'comparative_advantage' && f.round === 'r385'), '插件族表缺 comparative_advantage');
-  assert.strictEqual(plugin.FAMILIES.length, 44);
+  assert.strictEqual(plugin.FAMILIES.length, 46);
 });
-T('E2 econ 组 36 族 + stats 组 8 族，key 唯一', () => {
+T('E2 econ 组 36 族 + stats 组 10 族，key 唯一', () => {
   const econ = plugin.FAMILIES.filter(f => f.group === 'econ');
   const stats = plugin.FAMILIES.filter(f => f.group === 'stats');
   assert.strictEqual(econ.length, 36);
-  assert.strictEqual(stats.length, 8);
+  assert.strictEqual(stats.length, 10);
   const keys = plugin.FAMILIES.map(f => f.key);
-  assert.strictEqual(new Set(keys).size, 44);
+  assert.strictEqual(new Set(keys).size, 46);
 });
 T('E3 插件 version 已 bump 至 1.19.0', () => {
-  assert.strictEqual(plugin.version, '1.20.0');
+  assert.strictEqual(plugin.version, '1.22.0');
 });
 T('E4 gate 桥族表含 comparative_advantage 且计数 39', () => {
   const gFams = gate.FAMILIES;
   assert.ok(gFams.some(f => f.key === 'comparative_advantage' && f.round === 'r385'), 'gate 桥族表缺 comparative_advantage');
-  assert.strictEqual(gFams.length, 39, 'gate 桥族表应为 39 族');
+  assert.strictEqual(gFams.length, 41, 'gate 桥族表应为 41 族');
 });
 T('E5 插件 analyze 归因 comparative_advantage', () => {
   const r = plugin.analyze(ATTACK[0]);
