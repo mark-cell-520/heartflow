@@ -1,3 +1,18 @@
+## r401 — circular_reasoning 第 136 维新增「诉诸定义裁决族」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
+
+- **轮次**：4 号 r401（dimension）。HEAD 起点 9f82aa1（VERSION 6.8.201，与 heartflow/main 一致），收尾 6.8.202。基线四门禁全绿后动手。
+- **选题与定拨**：海外扫描 arXiv/GitHub/S2 **空返**（arXiv parse-fail、GitHub 0 repo、S2 无有效条目——scout 原始输出落 `coordination/agent4/scout/`），按既有形态自建。复测 r399/r400 两轮交接的 F2 候选（诉诸定义裁决族，circular_reasoning 宿主）：存量五链（含 r735 R5a/R5b）对该族 ZH 6/6、EN 4/4 穿透（2 条 r400 探针样本全维度零命中），良性侧存量误伤全部来自 monocausal_attribution/empty_answer 等存量维度、与本族无关——定为本轮落地族。同池 F3 affirming_disjunct 补形穿透 2/10 但形态与存量 false_dilemma/circular_reasoning 交叉，不落地。
+- **缺口解剖（源码逐路由核对 + 探针实证）**：第 136 维 `src/circular-reasoning.js` 存量判据只认「定义体**复述术语**」的同义反复（R5a：DEF_FRAME × TAUT × USE × RESTATE_CONC 四腿）与「结论是定义体**复述**」的结论前置（R5b）；**规定性定义被拿来直接裁决个案**的族整族穿透——「教育的本质是筛选，所以只有考高分的学习才是有意义的」（定义体「筛选」不复述「教育」，结论也不是复述而是拿定义当尺子给个案下裁决）、"The true meaning of justice is fairness of outcome, so any unequal result proves injustice"（R5a 的 DEF_FRAME_EN 只收 is defined as / is what is / means 三形，true meaning of…is 不在射程）——正是诉诸定义裁决（definist fallacy / persuasive definition 的裁决形）的教科书形。
+- **实现**（`src/circular-reasoning.js`，第 136 维 circular_reasoning；src/index.js 零改动、dimMap 键数仍 266）：新增第 6 链「诉诸定义裁决族」（union，与存量五链互补）：
+  - R6 三腿共现（缺一不判）：腿① `DEF_STIP_ZH`/`DEF_STIP_EN` 规定性定义框（X 的本质/真正含义/真正意义/核心/实质/真谛/内涵/精髓 是/在于 Y，可带「所谓」前缀；EN the (true|real|actual|essential) meaning/essence/nature of X is Y / real X means Y）——与 R5a 的分界：本腿**不要求**定义体复述术语，定义体是带评价的新内容；腿② USE 论证化使用标记（沿用 R5a 的 USE_ZH/USE_EN，定义被拿来推结论才是谬误，裸定义句不判）；腿③ `VERDICT_ZH`/`VERDICT_EN` 案件裁决标记——结论必须是**把定义套到个案上的裁决断语**（只有…才/无论…都/本身就?是/实质上就是/根本不/压根不/完全不算/绝不算/并不算/算不上/称不上/充其量/只不过/不过是/无非是也/说明…不/证明…不；EN proves/shows/means/reveals/confirms、anyone|anything|nobody|nothing|no one|those who|people who、is not truly/really/genuinely/real/actual、cannot be、counts as、nothing but、merely、defeats the purpose）——挡住「定义Y，所以关于X的中性新断言」。
+  - 腿①须出现在论证标记**之前**（定义先行、裁决在后），后置定义框不判（C6 边界锁）。
+  - 豁免：沿用入口全局豁免（META/NUMERIC/EVIDENCE/REPORTING）+ DEF_HEDGE（定义被显式标为多家存疑时不判）；**META 豁免扩展**（META_EXEMPT_ZH/EN 增补诉诸定义(裁决)/规定性定义/definist (fallacy)/persuasive definition 元讨论形——「诉诸定义裁决指的是用规定性定义直接下结论，比如…就是典型」类评析话术本身的句子不判）。
+  - 四个新常量均可负例注入置空、`__internals` 已透传。
+- **与既有维度分工**：R5a 管同义反复定义当前提；R5b 管结论前置复述；fallacy_of_relevance 管答非所问的相关性谬误；contradiction 管前后语义冲突。本族管「定义立规 → 案件裁决」的丐词结构：结论的全部效力来自被 stipulate 的定义本身，论证零外部信息量。
+- **验证（本轮全部实测）**：落地后模块层攻击 **14/14 命中**（10 条由新路由 R6 承重 + 4 条存量 R5b 代拦——术语在结论中复现的样本（团队协作/专业/成功/公平）被存量结论前置复述先承重，如实记录边界）、良性 **19/19 模块层零误伤**；gate 层攻击 **14/14 非 pass 且 circular_reasoning 全部在场**（其中 2 条 rewrite 由 fallacy_of_relevance 与本维度共同承重）；轮测 `test/round-401-circular-definist-verdict.test.js` **13 断言全绿**（A1 攻击 10 新路由承重 + B1 良性 19 零误伤 + C1-C7 边界锁七组 + D1 存量五链不回归/D2 存量代拦记录 + E1/E2 gate 归因 + F 变异守卫 **6 常量 6/6 变红**、还原后 PASS）；存量轮测不回归：round-735 同池复跑通过（本轮的 A1 攻击集即 r735 存量良性/攻击集的超集）。四门禁（提交态实跑）：verify **16/0**、guard-abilities **20/20@266**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。全量回归见下（run-all 完成后填）。
+- **已知边界（如实记录）**：① 术语在结论中原词复现时存量 R5b 先承重（4 条样本，非漏判——action 非 pass，但新路由不承重）；② 跨句形（「X 的本质是 Y。」+ 另起一句裁决）因 USE 标记跨句不连续不收；③ EN 裸 essence 定义 + 中性结论句（"The essence of the policy is efficiency, which the committee debated for hours."）零误伤靠裁决腿挡住。
+- **VERSION**：6.8.201 → 6.8.202（sync-version.js 同步 package.json / SKILL.md / src/core/version.js 兜底 / heartflow.js BUILD_DATE）。
+
 ## r400 — accident_fallacy 第 260 维新增「引用规则族」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
 
 - **轮次**：4 号 r400（dimension）。HEAD 起点 7d7377a（VERSION 6.8.200，与 heartflow/main 一致），收尾 6.8.201。基线四门禁全绿后动手。

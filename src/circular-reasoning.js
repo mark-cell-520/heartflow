@@ -622,7 +622,7 @@ function restateSo(text, isZh, R) {
 
 /** R6：诉诸定义裁决框（三腿共现：规定性定义 × 论证化使用 × 案件裁决） */
 function definistVerdict(text, isZh, R) {
-  const USE = isZh ? (R.USE_ZH || USE_ZH) : (R.USE_EN || USE_EN);
+  const USE = isZh ? R.USE_ZH || USE_ZH : R.USE_EN || USE_EN;
   // 腿②：论证化使用标记的位置即结论起点
   let uIdx = -1;
   for (const re of USE) {

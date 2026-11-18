@@ -1,5 +1,19 @@
 ---
 
+# 6.8.202 变更日志条目
+
+## [6.8.202] - 2026-11-19
+
+### circular_reasoning 第 136 维新增「诉诸定义裁决族」措辞家族（r401，真升级②）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r400 accident_fallacy 引用规则族后）。海外扫描 arXiv/GitHub/S2 **空返**（arXiv parse-fail、GitHub 0 repo、S2 无有效条目——scout 原始输出落 `coordination/agent4/scout/`），按既有形态自建。定拨来源为 r399/r400 两轮交接的 F2 候选复探（`scripts/round-401/probe-pool.js`）：存量五链（含 r735 R5a/R5b）对诉诸定义裁决族 ZH 6/6、EN 4/4 穿透（2 条 r400 探针样本全维度零命中），良性侧存量误伤全部来自 monocausal_attribution/empty_answer 等存量维度、与本族无关。
+- 缺口解剖：第 136 维 `src/circular-reasoning.js` 存量判据只认「定义体复述术语」的同义反复（R5a）与「结论是定义体复述」的结论前置（R5b）；「规定性定义被拿来直接裁决个案」整族穿透——「教育的本质是筛选，所以只有考高分的学习才是有意义的」（定义体不复述术语、结论是案件裁决而非复述）、"The true meaning of justice is fairness of outcome, so any unequal result proves injustice"（R5a 的 DEF_FRAME_EN 只收 is defined as / is what is / means，true meaning of…is 不在射程）。
+- 实现（`src/circular-reasoning.js`，第 136 维 circular_reasoning；src/index.js 零改动、dimMap 键数仍 266）：新增第 6 链「诉诸定义裁决族」（union）——R6 三腿共现缺一不判：腿① DEF_STIP_ZH/EN 规定性定义框（X 的本质/真正含义/真正意义/核心/实质/真谛/内涵/精髓 是/在于 Y；EN the (true|real|actual|essential) meaning/essence/nature of X is Y / real X means Y）× 腿② USE 论证化使用（沿用 R5a）× 腿③ VERDICT_ZH/EN 案件裁决标记（只有…才/无论…都/称不上/根本不/说明…不/证明…不；EN proves/shows/means、anyone who…is not、counts as、nothing but、defeats the purpose）。腿①须在论证标记之前（定义先行、裁决在后）。豁免沿用全局豁免 + DEF_HEDGE，META_EXEMPT_ZH/EN 扩展诉诸定义(裁决)/definist/persuasive definition 元讨论形。四个新常量可负例注入置空、`__internals` 已透传。
+- 验证（本轮全部实测）：落地后模块层攻击 **14/14 命中**（10 条新路由 R6 承重 + 4 条存量 R5b 代拦，边界如实记录）、良性 **19/19 模块层零误伤**；gate 层攻击 **14/14 非 pass 且 circular_reasoning 全部在场**；轮测 `test/round-401-circular-definist-verdict.test.js` **13 断言全绿**（10 攻击 + 19 良性 + C1-C7 边界锁七组 + D1/D2 存量回归与代拦记录 + E1/E2 gate 归因 + F 变异守卫 **6/6 变红**、还原后 PASS）。四门禁（提交态实跑）：verify **16/0**、guard-abilities **20/20@266**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326** 零新增。
+- 已知边界：① 术语在结论中原词复现时存量 R5b 先承重（4 条样本，非漏判）；② 跨句形（定义句 + 另起裁决句）因 USE 标记跨句不连续不收；③ EN 裸 essence 定义 + 中性结论句零误伤靠裁决腿挡住。
+
+---
+
 # 6.8.201 变更日志条目
 
 ## [6.8.201] - 2026-11-19
