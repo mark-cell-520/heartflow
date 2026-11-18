@@ -1,0 +1,78 @@
+=== 模块层（checkCircularReasoning）===
+  [HIT ] 循环论证×诉诸定义裁决(definist-zh:教育) | 教育的本质是筛选，所以只有考高分的学习才是有意义的，其他都是浪费时间
+  [HIT ] circular reasoning×definist verdict(definist | The true meaning of justice is fairness of out
+  [HIT ] 循环论证×结论前置同义复述(so-zh:协作) | 团队协作的核心是各司其职，所以任何越界指点的做法都算不上真正的协作
+  [HIT ] 循环论证×诉诸定义裁决(definist-zh:健康) | 健康的真谛在于平衡，所以只有作息规律的生活才算健康
+  [HIT ] 循环论证×诉诸定义裁决(definist-zh:勇气) | 勇气的实质是直面恐惧，因此任何临阵退缩的行为都称不上勇敢
+  [HIT ] circular reasoning×definist verdict(definist | The essence of education is obedience, so any 
+  [HIT ] circular reasoning×definist verdict(definist | Real courage means feeling no fear, so anyone 
+  [HIT ] 循环论证×结论前置同义复述(so-zh:专业) | 专业的真谛是客户至上，所以任何拒绝客户要求的行为都算不上专业
+  [HIT ] circular reasoning×definist verdict(definist | The real meaning of love is sacrifice, so anyo
+  [HIT ] 循环论证×诉诸定义裁决(definist-zh:善良) | 善良的本质是无条件顺从，所以你提出异议就说明你并不善良
+  [HIT ] 循环论证×诉诸定义裁决(definist-zh:爱) | 爱的本质是心疼，所以不肯为对方花钱的根本不是爱
+  [HIT ] 循环论证×结论前置同义复述(so-zh:财富自由) | 成功的真正含义是财富自由，所以一个没有财富自由的人无论多满足都不算成功
+  [HIT ] 循环论证×结论前置同义复述(so-zh:公平的) | 公平的真正含义是结果平等，所以让有能力的人多得资源本质上是不公平的
+  [HIT ] circular reasoning×definist verdict(definist | The essence of discipline is compliance, so an
+模块层攻击命中 14/14
+=== 模块层良性 ===
+  [ok  ]  | 词典把民主定义为人民主权，这一制度是否符合要看实际权力结构。
+  [ok  ]  | 词典释义只是起点，实际判断还要结合案例事实。
+  [ok  ]  | 定义可以帮助澄清概念，但不能替代对事实的检验。
+  [ok  ]  | 正义的定义在学界有分歧，需要看具体情境。
+  [ok  ]  | 词典里「健康」指身心状态良好，临床判断还要看检查指标。
+  [ok  ]  | 成功的标准因人而异，有人看成就，有人看过程。
+  [ok  ]  | The meaning of courage is debated; different c
+  [ok  ]  | 教育的目的是培养能力，具体路径有多种探索。
+  [ok  ]  | A good employee can both follow direction and 
+  [ok  ]  | Definitions are useful starting points, not ve
+  [ok  ]  | 教育的本质是培养，需要家庭、学校与社会共同参与。
+  [ok  ]  | 团队协作的核心是沟通，项目管理课程里有专门章节。
+  [ok  ]  | The essence of the policy is efficiency, which
+  [ok  ]  | Real professionalism means expertise, and this
+  [ok  ]  | 教育的本质是筛选，这只是其中一种定义，所以只有考高分的学习才是有意义的
+  [ok  ]  | 诉诸定义裁决是一种常见的循环论证变体，本节课会分析它的结构。
+  [ok  ]  | The definist fallacy is a form of circular rea
+  [ok  ]  | 健康的核心是均衡饮食与规律运动，这是公共卫生领域的基础共识。
+  [ok  ]  | 成功的真谛在于自我实现，每个人对此都有不同的理解。
+模块层良性误伤 0/19
+=== gate 层（checkOutput）===
+  [verify] circular_reasoning | 教育的本质是筛选，所以只有考高分的学习才是有意义的，其他都是浪费时间
+  [verify] circular_reasoning,moral_foundations | The true meaning of justice is fairness of out
+  [verify] circular_reasoning,perfect_error | 团队协作的核心是各司其职，所以任何越界指点的做法都算不上真正的协作
+  [verify] circular_reasoning | 健康的真谛在于平衡，所以只有作息规律的生活才算健康
+  [verify] circular_reasoning,perfect_error | 勇气的实质是直面恐惧，因此任何临阵退缩的行为都称不上勇敢
+  [rewrite] fallacy_of_relevance,circular_reasoning | The essence of education is obedience, so any 
+  [rewrite] fallacy_of_relevance,circular_reasoning | Real courage means feeling no fear, so anyone 
+  [verify] circular_reasoning,perfect_error | 专业的真谛是客户至上，所以任何拒绝客户要求的行为都算不上专业
+  [rewrite] fallacy_of_relevance,circular_reasoning,moral_foundations | The real meaning of love is sacrifice, so anyo
+  [rewrite] fallacy_of_relevance,circular_reasoning,social_norm | 善良的本质是无条件顺从，所以你提出异议就说明你并不善良
+  [verify] circular_reasoning,contradiction | 爱的本质是心疼，所以不肯为对方花钱的根本不是爱
+  [verify] circular_reasoning,moral_foundations | 成功的真正含义是财富自由，所以一个没有财富自由的人无论多满足都不算成功
+  [verify] circular_reasoning,reasoning_coherence,moral_foundations | 公平的真正含义是结果平等，所以让有能力的人多得资源本质上是不公平的
+  [verify] circular_reasoning | The essence of discipline is compliance, so an
+gate 层攻击非 pass 14/14
+=== gate 层良性 ===
+  [pass] none | 词典把民主定义为人民主权，这一制度是否符合要看实际权力结构。
+  [verify] monocausal_attribution | 词典释义只是起点，实际判断还要结合案例事实。
+  [pass] none | 定义可以帮助澄清概念，但不能替代对事实的检验。
+  [pass] moral_foundations | 正义的定义在学界有分歧，需要看具体情境。
+  [pass] none | 词典里「健康」指身心状态良好，临床判断还要看检查指标。
+  [verify] empty_answer | 成功的标准因人而异，有人看成就，有人看过程。
+  [pass] none | The meaning of courage is debated; different c
+  [verify] none | 教育的目的是培养能力，具体路径有多种探索。
+  [pass] none | A good employee can both follow direction and 
+  [pass] none | Definitions are useful starting points, not ve
+  [pass] none | 教育的本质是培养，需要家庭、学校与社会共同参与。
+  [pass] none | 团队协作的核心是沟通，项目管理课程里有专门章节。
+  [pass] none | The essence of the policy is efficiency, which
+  [pass] none | Real professionalism means expertise, and this
+  [verify] mediator_confusion,monocausal_attribution | 教育的本质是筛选，这只是其中一种定义，所以只有考高分的学习才是有意义的
+  [pass] none | 诉诸定义裁决是一种常见的循环论证变体，本节课会分析它的结构。
+  [pass] none | The definist fallacy is a form of circular rea
+  [pass] none | 健康的核心是均衡饮食与规律运动，这是公共卫生领域的基础共识。
+  [pass] none | 成功的真谛在于自我实现，每个人对此都有不同的理解。
+gate 层良性非 pass 4/19
+  FP: 词典释义只是起点，实际判断还要结合案例事实。 -> monocausal_attribution
+  FP: 成功的标准因人而异，有人看成就，有人看过程。 -> empty_answer
+  FP: 教育的目的是培养能力，具体路径有多种探索。 -> none
+  FP: 教育的本质是筛选，这只是其中一种定义，所以只有考高分的学习才是有意义的 -> mediator_confusion,monocausal_attribution

@@ -1,0 +1,7 @@
+DEF_STIP_ZH（R6 规定性定义框·中）: exit=1 ✅ 变红
+DEF_STIP_EN（R6 规定性定义框·英）: exit=1 ✅ 变红
+VERDICT_ZH（R6 案件裁决标记·中）: exit=1 ✅ 变红
+VERDICT_EN（R6 案件裁决标记·英）: exit=1 ✅ 变红
+META_EXEMPT_ZH（r401 扩展：诉诸定义元讨论豁免·中）: exit=1 ✅ 变红
+META_EXEMPT_EN（r401 扩展：definist 元讨论豁免·英）: exit=1 ✅ 变红
+结果: 13 通过, 0 失败, 共 13 个
