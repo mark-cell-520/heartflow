@@ -1,5 +1,24 @@
 ---
 
+# 6.8.199 变更日志条目
+
+## [6.8.199] - 2026-11-18
+
+### red_herring 第 255 维新增「回应冲淡族」措辞家族（r398，真升级②：既有维度全新措辞家族）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r735 循环论证同义反复族后）。海外扫描 arXiv（parse-fail 空返）/ GitHub（0 repo）/ S2（rate-limited 空返）**空返，按既有形态自建**，产物落盘 `coordination/agent4/scout/`。定拨来源为 r735 交接的探针缺口：同池探针 `scripts/round-735/probe-pool.js` F8 red_herring 家族攻击穿透 1/8，其中「回应批评→用对比标记蒙过去」子族 12 条攻击 **10 条穿透 gate=pass**（穿透样本全维度零命中）。
+- 缺口解剖：第 255 维 `src/red-herring.js` 存量判据（r323 三段结构 SHIFT×ORIGIN×REPLACE + r324 指代型腿②/反问豁免 + r358 defer 时机搁置族）只认**显式置换标记**（别再说/这些问题先放着/可是你知道/现在不是时候/更重要的是）；对「不搁置、不反问，用一个对比标记把指控蒙过去、后半段另起一头与指控事项不相关的成绩/贡献/资历/苦劳」整族穿透——「有人批评公司污染环境，但他们为当地创造了那么多就业」「You question the contract terms, yet our team has twenty years of experience.」正是 causalNLP（EMNLP 2022, arXiv:2202.13758）13 类谬误里 red herring 的教科书形（redirect the argument to another issue），此前唯一未覆盖的子族。
+- 实现（`src/red-herring.js`，第 255 维 red_herring；src/index.js 零改动、dimMap 键数仍 266）：新增两个标记族（append 于 MARKERS 数组尾部——对比标记（但/却）是高频虚词，若插在既有标记之前会在同 index 竞争中恒定抢先、抢走 counter/dismiss 既有样本的腿①，r324 同 index 竞争教训）：
+  - concede 对比冲淡族：但/但是/却/不过（负向断言排除「但是更值得讨论」类纯替换形——那是 redirect 存量族射程）；EN 词首/词中 yet/but/however。
+  - narrate 叙事岔开族：强调/谈起/列举/细数/把话题转到/转移话题/话锋一转/shifted the topic/moved the conversation；显式转题标记自带搁置义免内容框。
+  - 新族三墙资格门（合取、全部可负例注入置空）：墙① CRITICISM_ZH/EN 批评锚点（腿②必须是被批评/被追问的事项——第三方批评主体+批评动词、被动遭受批评、个体主语批评动词、讨论中的争议事项、「有人说…差/假」指控转述六类；EN 主体+批评动词、被动、criticism about、discuss…problem）；墙② 替换段内容框——concede 只认 MERIT_ZH/EN 社会成绩框（就业/税收/捐款/荣誉/奖项/资历/权威/历史悠久/口碑；EN jobs/tax/charity/awards/experience），narrate 叙事动词形认 MERIT 或 EXCUSE_ZH/EN 外归因框（行业整体困难/大环境），显式转题标记免框；墙③ ADDRESS_ZH/EN 豁免（替换段是补救/正面回应——已修复/正在排查/已整改/已解释时不判）。另复用存量 CONTINUE 零共享实词墙。
+  - 主判据改为**候选回退循环**：既有「首个 best 标记即终局」语义不变（同 index 严格小于才替换），但新族门失败时回退到下一个候选标记而非直接返回——防止「但是更重要的是…」类存量 redirect 样本被高频虚词抢腿后假阴性（C8 边界锁）。
+- 与既有维度分工：whataboutism（Tu quoque）管把指控反弹回对话者本人的反问形，本族另起一头成绩、不反弹；fallacy_of_relevance 管用推断词连接的不相干前提-结论，本族无推断词；soft_deflection 管不给结论的滑脱，本族明确给出替代事项；anecdote 管个人经历当证据——「开始讲小时候打疫苗的经历」类同议题延续（CONTINUE 墙拦截）刻意不收。
+- 验证（本轮全部实测）：立项探针 `scripts/round-398/probe-pool.js` 12 攻击穿透 10/12 → 落地后 **1/12**（唯一剩余为 anecdote 同议题延续形，刻意边界）；轮测 `test/round-398-red-herring-concession.test.js` **15 断言全绿**（A1 攻击 22 条全命中且全部由本轮新路由承重 + B1 良性 27 条零误伤 + C1-C8 边界锁八组 + D1-D3 存量四族回归/MARKERS 注入删条/explicit 免框证明 + E1/E2 gate 层 49 条归因 + F 8 常量写盘变异 **8/8 翻转**、还原后 PASS）；存量轮测不回归：round-323 **53/53**、round-358 **39/39**；边界预验 20/20。
+- 四门禁（提交态实跑）：verify **16/0**、guard-abilities **20/20@266**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 # 6.8.198 变更日志条目
 
 ## [6.8.198] - 2026-11-18
