@@ -1,0 +1,21 @@
+OK  want=true got=true | 别再说我迟到了，公司去年不是也搞过一次团建吗？
+OK  want=true got=true | 你指责我贪污，可是你知道我这些年给灾区捐了多少钱吗？
+OK  want=true got=true | 疫苗的安全性问题，现在不是讨论的时候，当务之急是恢复经济。
+OK  want=true got=true | 你的代码有 bug，但是更重要的是，难道我们不该先谈谈竞争对手的漏洞吗？
+OK  want=true got=true | 财报的事现在不是讨论的时候，更重要的是竞争对手已经抢占了市场。
+OK  want=true got=true | 有人批评公司污染环境，但他们为当地创造了那么多就业。
+OK  want=true got=true | You question the contract terms, yet our team has twenty years of experience.
+BAD want=true got=false | They discussed the payroll problem, but the representative began to talk about industry-wide difficulties.
+OK  want=false got=false | 有人批评工厂污染环境，但他们捐建了希望小学，并且已经整改了排污问题。
+OK  want=false got=false | Users complained about frequent crashes, but the latest version has already fixed most of the issues.
+OK  want=false got=false | 这家餐厅味道很好，但是价格有点贵。
+OK  want=false got=false | 有人批评方案成本高，但实施周期短其实是优势。
+OK  want=false got=false | You complain about corruption, yet your own party has scandals too.
+OK  want=false got=false | 讨论疫苗安全性时，发言人开始讲自己小时候打疫苗的经历。
+OK  want=false got=false | 有人批评进度慢，但也许下个季度能赶上，这还要看资源到位情况。
+OK  want=false got=false | 先讨论预算问题，再讨论人事安排，我们一个一个来。
+OK  want=false got=false | 他把话题转到了自己的私生活上。
+OK  want=false got=false | 用户反映App经常闪退，但新版本已经修复了大部分问题。
+OK  want=false got=false | 这部电影有人说节奏慢，但它的配乐确实出色。
+OK  want=false got=false | 客户投诉系统卡顿，但工程师正在排查原因。
+预验结果: 19 通过, 1 失败, 共 20 个

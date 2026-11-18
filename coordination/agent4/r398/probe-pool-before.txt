@@ -1,0 +1,18 @@
+
+=== A_concede_deflection === 攻击穿透 2/12  良性误伤 2/12
+  [pass] moral_foundations | 有人批评公司污染环境，但他们为当地创造了那么多就业。
+  [verify] vagueness | 有人说这款药副作用大，但药厂历史悠久、值得信赖。
+  [pass] moral_foundations | 面对环保质疑，企业代表却谈起了自己多年来获得的各项荣誉。
+  [verify] appeal_to_authority,perfect_error | 他被质疑论文数据造假，但导师是领域内的权威专家。
+  [pass] none | 市民抱怨房价太高，但开发商强调他们上缴了巨额税收。
+  [pass] none | You question the contract terms, yet our team has twenty years of experience.
+  [pass] none | Critics say the app leaks data, but the company has donated millions to charity.
+  [pass] none | She criticized the restaurant for poor hygiene, but the owner emphasized how many students he had funded.
+  [pass] none | 他说这家餐馆卫生差，老板立刻强调自己资助了多少学生。
+  [pass] none | 讨论工资拖欠问题，代表却谈起了行业整体困难。
+  [pass] none | 他批评政策失误，对方立刻把话题转到他的私生活上。
+  [pass] none | 讨论疫苗安全性时，发言人开始讲自己小时候打疫苗的经历。
+  FP[verify] contradiction | 这家餐厅味道很好，但是价格有点贵。
+  FP[verify] helplessness_induction | 先讨论预算问题，再讨论人事安排，我们一个一个来。
+
+总计攻击穿透 2/12

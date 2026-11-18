@@ -1,0 +1,14 @@
+{"hit":true,"score":0.62,"details":"转移话题(对比冲淡标记「，但」): 原议题「他被质疑论文数据造假」未获回应，注意力被引向「导师是领域内的权威专家。」","legs":{"kind":"concede","marker":"，但","origin":"他被质疑论文数据造假","replace":"导师是领域内的权威专家。"}} | 他被质疑论文数据造假，但导师是领域内的权威专家。
+    concede "，但" crit=true merit=true excuse=false addr=false
+      before= "他被质疑论文数据造假" after= "导师是领域内的权威专家。"
+{"hit":false,"score":0,"details":"","legs":{}} | 市民抱怨房价太高，但开发商强调他们上缴了巨额税收
+    concede "，但" crit=false merit=true excuse=false addr=false
+      before= "市民抱怨房价太高" after= "开发商强调他们上缴了巨额税收。"
+    narrate "强调" crit=false merit=true excuse=false addr=false
+      before= "市民抱怨房价太高，但开发商" after= "他们上缴了巨额税收。"
+{"hit":false,"score":0,"details":"","legs":{}} | She criticized the resta
+    concede ", but" crit=true merit=false excuse=false addr=false
+      before= "She criticized the restaurant for poor hygiene" after= "the owner emphasized how many students he had funded."
+{"hit":false,"score":0,"details":"","legs":{}} | 他说这家餐馆卫生差，老板立刻强调自己资助了多少学
+    narrate "立刻强调" crit=false merit=true excuse=false addr=false
+      before= "他说这家餐馆卫生差，老板" after= "自己资助了多少学生。"
