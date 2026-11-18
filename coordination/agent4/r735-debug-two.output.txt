@@ -1,0 +1,8 @@
+ZH base: {"hit":true,"score":0.5,"count":1,"detail":"循环论证×结论前置同义复述(so-zh-copular:安全的)"}
+ZH no-ANTONYM: {"hit":true,"score":0.5,"count":1,"detail":"循环论证×结论前置同义复述(so-zh-copular:安全的)"}
+EN base: {"hit":true,"score":0.5,"count":1,"detail":"circular reasoning×tautological definition as premise(def-en:Wisdom)"}
+EN no-SYN: {"hit":true,"score":0.5,"count":1,"detail":"circular reasoning×tautological definition as premise(def-en:Wisdom)"}
+ZH defCircular base: false
+ZH restateSo base: {"rep":"安全的","route":"so-zh-copular"}
+EN defCircular base: {"term":"Wisdom","route":"def-en"}
+EN restateSo base: false

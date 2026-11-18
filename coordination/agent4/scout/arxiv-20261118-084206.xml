@@ -1,0 +1,367 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/zBFrq/aRFJUl4jkg4hWmx5R3XjE</id>
+  <title>arXiv Query: search_query=all:causal OR all:reasoning OR all:bias OR all:benchmark&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T08:42:25Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:causal+OR+(all:reasoning+OR+(all:bias+OR+all:benchmark))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>334048</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23229v1</id>
+    <title>Ambient LLMs: Data-Efficient Supervised Fine-tuning via Temperature Matching</title>
+    <updated>2026-11-17T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.23229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Collecting large-scale, diverse, and high-quality post-training datasets for autoregressive language models is challenging. Consequently, Supervised Fine-Tuning (SFT) is typically applied to datasets significantly smaller than those used for pre-training, which leads to overfitting and the catastrophic forgetting of the tails of the data distribution. To prevent this collapse, we introduce Ambient SFT, a principled framework for leveraging imperfect predictions to augment the fine-tuning set. In our method, a "frozen" version of the pre-trained model serves as a noisy teacher that the fine-tuned model must match at a coarse level. In particular, we require that the high-temperature versions of the conditional distributions produced by the post-training model should match the high-temperature versions of the pre-training ones. The temperature hyperparameter controls the level of trust in the pre-trained model, with the limit $T\to \infty$ reverting back to regular SFT and $T=1$ to knowledge distillation. We demonstrate that our approach outperforms standard SFT across domain adaptation, instruction-tuning, and reasoning, leading for up to $21\%$ average relative improvement to standard SFT.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:37Z</published>
+    <arxiv:comment>Work in progress</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Giannis Daras</name>
+    </author>
+    <author>
+      <name>Marios Papachristou</name>
+    </author>
+    <author>
+      <name>Adam Klivans</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Constantinos Daskalakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23228v1</id>
+    <title>Spool: Low-Latency Streaming Inference for Hybrid Vision-Language Models</title>
+    <updated>2026-11-17T18:59:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applications such as visual accessibility agents and robotics require answering questions about recent video content promptly, over a bounded window of past frames (e.g., the last two minutes). Hybrid vision-language models (VLMs), which interleave attention with linear recurrent layers such as Gated DeltaNet (GDN), are attractive for this setting, but maintaining a sliding window is expensive. The reason is that recurrent layers combine all past frames into a shared state, so expiring old frames normally requires re-running the entire window through the model. We observe that the recurrent update is affine in the state with input-dependent coefficients, so the effect of each frame can be captured as a transformation that composes associatively. We present Spool, a training-free framework that caches per-frame state transformations and composes them efficiently as the window advances, removing expired frames from each recurrent layer's state without replaying frames through the backbone. Removal is exact within each layer; as with key-value eviction in attention, expired frames can retain residual influence through the cached inputs computed by earlier layers. We design a dedicated data structure and GPU kernels to achieve low caching and composition overhead. Across five open-source hybrid VLMs and four video reasoning benchmarks, Spool achieves the lowest p95 time-to-first-token in all 20 model-benchmark tests, reducing it by a geometric mean of $6.6\times$ over the faster of two recent vLLM baselines, while improving accuracy by 2.3 percentage points on average.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:27Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rui Ning</name>
+    </author>
+    <author>
+      <name>Om Chabra</name>
+    </author>
+    <author>
+      <name>Hari Balakrishnan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23225v1</id>
+    <title>StringQFT: A Multiuse Textbook Resource for AI-Assisted Theoretical Physics</title>
+    <updated>2026-11-17T18:58:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.23225v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23225v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present StringQFT as a textbook collection for string constructions of quantum field theory and as infrastructure for AI-assisted theoretical physics. The collection comprises 18 volumes, 190 chapters and 3,795 pages, covering brane probes, brane webs, geometric engineering, F-theory constructions, wrapped M5-branes and exact worldsheet constructions. Its open-book benchmark inventory contains 1,073 items, including 499 with automatic finite-answer checking. For retrieval-augmented generation, it provides 1,371 section records linked to textbook sources and PDF locations, together with a local lexical retriever. Training-data preparation is illustrated by 21 private, source-linked examples. For agents, it exposes 19 calculation tools with specified inputs and finite domains, connecting tool use to textbook derivations. We illustrate these uses through specific questions, retrieved passages and finite calculations. The textbook collection and accompanying resources are available at https://github.com/xingyang-yu/StringQFT.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:58:40Z</published>
+    <arxiv:comment>23 pages, 6 figures. Companion paper to an 18-volume textbook collection. Textbook PDFs: https://xingyangyu.com/textbook/</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Xingyang Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23219v1</id>
+    <title>Do LLM Agents Still Need to Be Told How to Self-Improve?</title>
+    <updated>2026-11-17T18:57:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.23219v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23219v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM agents increasingly drive their own learning. Self-improvement methods delegate various components of model optimization to the models themselves. As models become more capable, this motivates a basic question: do these increasingly capable models still need us to specify how they should self-improve? In this paper we study an autonomous paradigm in which, given basic primitives, resources, and a general goal for self-improvement, agents construct their own self-learning algorithm for context-based optimization. Using the setting of gameplay as a testbed, a frozen LLM agent is given a compute budget and tools for collecting experience and updating text documents, and allowed to freely experiment without an externally imposed loop or access to real-world data. We find that sufficiently capable models do self-improve under these conditions, demonstrating strategies that align with classic cognitive frameworks for self-regulated learning and constructs from machine learning literature on self-generated curricula. Furthermore, we study the extent to which the learned text artifacts transfer to external benchmarks, observing improvement across different game horizons, mechanics, and 3D navigation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:10Z</published>
+    <arxiv:comment>Project page: https://ssundaram21.github.io/self-org/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Shobhita Sundaram</name>
+    </author>
+    <author>
+      <name>Cansu Sancaktar</name>
+    </author>
+    <author>
+      <name>Phillip Isola</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23218v1</id>
+    <title>What Does a Bias Head Measure? Non-Identifiability in Head-Level Bias Attribution</title>
+    <updated>2026-11-17T18:57:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.23218v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23218v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Methods that localise social bias in large language models to individual attention heads and remove it by ablation are validated by their effect on a fairness metric, never by evidence that the statistic selecting the heads measures bias. We audit this on Qwen-2.5-7B-Instruct and Llama-3.1-8B-Instruct. The head map correlates at $ρ= -0.950$ and $-0.768$ with a label-blind response-length map, apparently identifying a surface confound. An intervention that breaks the length-label coupling rejects this reading: with the prompt held fixed, response length explains 1% of the statistic's variance. What does explain it is prompt identity, at 64% of variance, in an ordering that is not monotonic in length. Within any fixed prompt the fairness label, response length and the presence of a protected-group token are collinear at $φ= 0.95$, partly by definition of the labelling rule, so no observational analysis can attribute the map to any of them, and no method in this family performs an experiment that could. The substantive claims fail independently: bias selectivity is not late-layer-concentrated on either model under either reference reading, and no head set we tested reduces the unfairness rate when ablated. Its complement, scored on the opposite label, reliably destroys refusal behaviour ($p = 2.7\times10^{-5}$), demonstrating that the pipeline detects effects at this scale.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:08Z</published>
+    <arxiv:comment>18 pages, 13 tables. Under review at ACL Rolling Review (October 2026 cycle)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>S. M Seefat Alam</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23216v1</id>
+    <title>Higher-Scoring Coding Models Did Not Get More Work Done</title>
+    <updated>2026-11-17T18:56:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23216v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23216v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>New coding models advertise themselves on score improvements of coding benchmarks. Yet no study has tested if a model that scores higher on these benchmarks gets more real work done. On June 12, 2026, a U.S. export control directive banned access to Claude Fable 5 for 19 days, which forced users to switch to other models. During this time, most former Fable 5 users switched to Opus 4.8 (11 points lower on SWE-Bench Pro compared to Fable 5). We treat this suspension as a natural experiment, where the people and projects stayed the same and only the model changed, so we could isolate the effect of Fable 5 on user productivity. We tracked GitHub pull requests of 297 Fable 5 users before, during, and after the suspension. We used 8,908 developers who stayed on Opus 4.8 all the time as the control group. We also repeated the comparison across five model upgrades before and after the suspension in 2026 (1,208 developers, 15,442 pull requests). Fitting a difference-in-differences model with developer and date fixed effects, we found that having access to Fable 5 increased the 7-day merge rate of pull requests by only 1.4 percentage points [-1.4; +4.3], which was not statistically significant. Similarly, no significant increases of merge rates were found with the upgrades (weighted mean: -0.9 percentage points [-1.9; +0.2]); all five estimates were negative (95% intervals included 0, did not differ from each other). We also did not observe a significant increase in the number of pull requests merged per week (+2.4% [-4.9%; +10.2%]).</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:56:42Z</published>
+    <arxiv:comment>20 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Yining Hua</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23209v1</id>
+    <title>Learning Grounded Reasoning from Human Gaze</title>
+    <updated>2026-11-17T18:49:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.23209v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23209v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Human visual reasoning is driven by systematic exploration and extraction of task-relevant visual evidence. Human gaze provides a window into this process, making gaze a useful source of guidance for visually-grounded reasoning in vision-language models (VLMs). However, human gaze also includes noise and redundancies that may transfer poorly to VLMs. In this work, we investigate how human gaze data can be effectively leveraged to improve visual reasoning in VLMs, while maintaining alignment with human behavior. We collect 7,109 human gaze trials from a diverse and challenging set of visual reasoning tasks, and train grounded reasoning models with different forms of gaze guidance. Across evaluations in chart understanding, visual search, and counting, we find that using human gaze as a prior for grounded reasoning consistently outperforms supervision using the full gaze sequence. Based on these findings, we introduce GGR (Gaze-Guided Reasoner), which achieves greater human alignment and more reliable visual grounding while matching or outperforming leading grounded-reasoning baselines in accuracy. Reinforcement learning further improves task accuracy, gaze alignment, and grounding quality despite using no gaze supervision. Behavioral analyses show that gaze supervised models exhibit more visual exploration before arriving at an answer. Our results suggest that the value of human gaze lies in guiding spatial exploration and shaping reasoning behavior without requiring complete imitation of human behavior.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Gabriel Sarch</name>
+    </author>
+    <author>
+      <name>Declan Campbell</name>
+    </author>
+    <author>
+      <name>Nicholas Budny</name>
+    </author>
+    <author>
+      <name>Kia Ghods</name>
+    </author>
+    <author>
+      <name>Katerina Fragkiadaki</name>
+    </author>
+    <author>
+      <name>Jonathan D. Cohen</name>
+    </author>
+    <author>
+      <name>Brenden M. Lake</name>
+    </author>
+    <author>
+      <name>Taylor W. Webb</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23206v1</id>
+    <title>Reading Scene States: Uncovering Safety Failures in Vision-Language Models</title>
+    <updated>2026-11-17T18:48:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.23206v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23206v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language models (VLMs) can provide harmful assistance by interpreting visual events, even without an explicit request for the underlying harmful objective. We identify this \textbf{scene-state safety vulnerability} and introduce \textbf{SceneSafetyBench}, comprising 375 image--question pairs spanning Initial, Medium, and Ultimate scene states and five visual presentations. Across eight VLMs, scene-state inputs elicit harmful assistance with attack success rates (ASRs) of 45.6--72.3\%. Comparative analysis across three VLMs shows that scene-state inputs most closely resemble QR-related images in their layer-wise safety-related signal profiles, while exhibiting lower average late-layer readouts and distinct signal dynamics during generation. To turn this vulnerability into a systematic attack, we propose \textbf{S3TA}, which translates harmful objectives into scene states, queries image--question pairs independently, and assembles the responses. On seven MM-SafetyBench categories across eight open-weight and commercial VLMs, S3TA achieves a model-average ASR of \textbf{71.2\%, exceeding the strongest baseline by 6.1 percentage points}. Text-side filters and visual moderation provide limited protection. These findings highlight the need to safeguard the assistance models infer through scene-grounded reasoning, beyond screening input content.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:48:02Z</published>
+    <arxiv:comment>VLM safety, multimodal jailbreaks, and scene-state reasoning</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tongxi Wu</name>
+    </author>
+    <author>
+      <name>Yuyang Cheng</name>
+    </author>
+    <author>
+      <name>Jiacheng Xian</name>
+    </author>
+    <author>
+      <name>Menglin Yang</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Jian Zhang</name>
+    </author>
+    <author>
+      <name>Yang Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23197v1</id>
+    <title>Structure--Residual Inductive Biases for Language Model Pretraining</title>
+    <updated>2026-11-17T18:38:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23197v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23197v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Next-token prediction is relied upon to learn both predictive behavior and internal representations. We ask whether representation structure itself should be an explicit inductive bias. Motivated by the two-part coding view of Kolmogorov complexity, we study a structure--residual principle in which a representation separates structure from realization detail. We instantiate this principle in two complementary ways. Boundary Bottleneck Concept (BBC) routes information from token segments through boundary carriers while preserving local autoregressive computation. Continuous Concept (CC) regularizes representation geometry and induces a spectral decomposition into low-frequency structure and high-frequency residual. We derive coding bounds for both views and show that multiplicity-corrected boundary attention becomes exact as the within-segment path energy vanishes. Empirically, BBC and CC exhibit strikingly different depth preferences: BBC works best in early layers, whereas CC is most effective in later layers. At 300M training tokens, combining BBC and CC improves NLL by 1.44\% on GPT-2 Medium. These gains persist with training runs up to 20B tokens. Representation diagnostics show that BBC increases the relative predictive importance of boundary states, while CC reduces spectral residual energy. Together, these results suggest that structure--residual biases can improve language-model pretraining beyond next-token prediction. Code: https://github.com/haihuang-ml/structure-residual</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:38:27Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Hai Huang</name>
+    </author>
+    <author>
+      <name>Bartosz Żuk</name>
+    </author>
+    <author>
+      <name>Rassul Magauin</name>
+    </author>
+    <author>
+      <name>Jiaxin Huang</name>
+    </author>
+    <author>
+      <name>Xue Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23194v1</id>
+    <title>Global genetic inference at the scale of mass disasters</title>
+    <updated>2026-11-17T18:37:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.23194v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23194v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DNA-based disaster victim identification is commonly performed sequentially, with matches accepted before all genetic evidence is considered jointly. However, early matches may be incorrect or inconsistent with the globally most likely assignment, and treating them as final can affect subsequent identifications. Joint analysis avoids this dependence on decision order, but combinatorial growth has historically made it prohibitive in large cases. In this paper, we show that the general joint identification problem is NP-hard and develop a local-to-global framework for joint genetic inference at scale. We reduce the search using genetic compatibility tests, likelihood-based pruning of unlikely assignments, and symmetry reductions. We represent pedigree likelihoods as polynomials and reformulate the Elston-Stewart algorithm for efficient parallel likelihood evaluation on GPUs. Together, these advances yield a manageable set of candidate assignments and their likelihoods, from which we construct an integer linear program that resolves competing identifications and determines the global maximum-likelihood assignment. In small benchmarks, the method recovers the exhaustive-search optimum with up to 99.96% fewer likelihood evaluations. We also apply it to simulated disasters involving up to 10 thousand victims and missing persons. The framework is not limited to a single global optimum but yields a list of probable alternative assignments, thus providing a flexible tool to be used alongside other forensic evidence.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:37:15Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Yourie Weesie</name>
+    </author>
+    <author>
+      <name>Ritsaart Bergsma</name>
+    </author>
+    <author>
+      <name>Aafko Boonstra</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23192v1</id>
+    <title>WoRD: Diffusion-Based Posterior Inference for Online Goal Recognition</title>
+    <updated>2026-11-17T18:35:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.23192v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23192v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Goal recognition is the task of inferring an agent's intended goal from its observed behavior. Most existing work focuses on high-level symbolic recognition, abstracting away the continuous motion through which agents reach their goal. Methods that do reason over continuous trajectories rely on an explicit dynamics model that is hard to acquire and rarely transfers across settings. Neither approach explicitly learns how agents move toward each candidate goal, limiting accuracy on ambiguous trajectory prefixes where such knowledge is most needed.
+  We present WoRD (Waypoint Recognition with Diffusion), which uses a learned trajectory prior to infer the agent's goal from partial observations. At each step, WoRD runs one warm-started denoising chain per candidate goal, steers each chain toward the observed trajectory through a closed-form log-likelihood gradient, and reweights the resulting samples by Bayes' rule into a calibrated posterior over goals. We evaluate WoRD on simulated robot settings, pedestrian trajectories, and vehicle trajectories using four metrics targeting distinct failure modes. Across all three settings, the same inference procedure preserves calibrated multimodal beliefs through ambiguous prefixes where filter- and classifier-based observers collapse to a single mode or grow overconfident.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:35:53Z</published>
+    <arxiv:comment>Accepted at the 40th Annual Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Almog Anschel</name>
+    </author>
+    <author>
+      <name>Sarah Keren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23187v1</id>
+    <title>Any2Building: Unifying Point Clouds and Images for Building Reconstruction via Shared Spatial Queries</title>
+    <updated>2026-11-17T18:32:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.23187v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23187v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Abstracting structured buildings from limited observations is essential for 3D urban modeling and digital twins. Partial point clouds and overhead images of the same building provide incomplete 3D surface measurements and visual cues to its footprint, roof geometry, and rooftop structures, respectively. This motivates a unified framework that aligns geometric and visual cues in 3D and reconstructs buildings from either or both modalities. Building on this connection, we present Any2Building, a unified model for Level of Detail 2 (LoD2) building reconstruction from partial point clouds, overhead images, or both, with optional coarse geometric priors. At its core is an occupancy-grounded shared spatial queries representation that organizes available observations within a common 3D grid. Supervised by complete building surface voxels, these queries connect observational evidence to target geometry, enabling a shared generator to learn structural priors across tasks and providing spatial guidance for recovering missing structure. A trained voxel conditional surface-generation and low-poly remeshing pipeline then converts the predicted structure into compact LoD2 building models. To support this framework, we introduce BuildingWorld-Image, comprising approximately one million paired samples of partial point clouds, overhead images, and LoD2 building models across 18 cities. Experiments on multiple benchmarks demonstrate that Any2Building outperforms existing methods in geometric reconstruction accuracy across unimodal and multimodal point-cloud completion, single-image building generation, and prior-assisted generation, while maintaining detailed and robust recovery when point cloud input modality is degraded.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:32:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongye Hou</name>
+    </author>
+    <author>
+      <name>Zhuoxiao Li</name>
+    </author>
+    <author>
+      <name>Liu Xiangyu</name>
+    </author>
+    <author>
+      <name>Tengxi Wang</name>
+    </author>
+    <author>
+      <name>Jing Ou</name>
+    </author>
+    <author>
+      <name>Dongli Wu</name>
+    </author>
+    <author>
+      <name>Shuai Zhang</name>
+    </author>
+    <author>
+      <name>Tongyan Hua</name>
+    </author>
+    <author>
+      <name>Wufan Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23185v1</id>
+    <title>Polarity Composition Hypothesis: Causal Evidence from Negation in NLI</title>
+    <updated>2026-11-17T18:30:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.23185v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23185v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate how language models process negation in natural language inference (NLI). We propose the \textit{Polarity Composition Hypothesis}, a high-level causal model of this computation. Behavioral evaluations show that language-model predictions largely conform to the proposed hypothesis. Using Distributed Alignment Search, we identify causally effective subspaces aligned with the variables in the polarity-composition hypothesis. These representations transfer across negation forms and partially to a subset of MNLI. We release the dataset and code.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:30:35Z</published>
+    <arxiv:comment>Accepted to EACL 2027 (main conference)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Nhi Hoai Doan</name>
+    </author>
+    <author>
+      <name>Tatsuya Hiraoka</name>
+    </author>
+    <author>
+      <name>Munachiso Samuel Nwadike</name>
+    </author>
+    <author>
+      <name>Kentaro Inui</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23182v1</id>
+    <title>Fully Spiking Neural Implementation of Lambda-Calculus Beta-Reduction via Biologically Documented Mechanisms</title>
+    <updated>2026-11-17T18:27:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.23182v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23182v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present the first complete implementation of $β$-reduction in the untyped $λ$-calculus using exclusively spiking neural dynamics. Every step of the reduction---redex detection, subterm segmentation, variable-binding detection, De~Bruijn index arithmetic, token copying, and inter-step role maintenance---is performed by leaky integrate-and-fire (LIF) neurons with explicit membrane dynamics, exponential synaptic currents, axonal delays, and pair-based spike-timing-dependent plasticity (STDP). Each neural component maps onto a specific, experimentally documented mechanism: Jeffress-type delay-line coincidence for redex detection; a line-attractor balance counter for subterm segmentation; $θ$--$γ$ cross-frequency coupling for De~Bruijn variable binding; a phase-ring traveling wave for depth-index arithmetic; theta-cycle STDP for token copying; and recurrent persistent firing for role maintenance between reduction steps. All synaptic weights are derived analytically from measured EPSP amplitudes; no hand tuning is performed. The closed-loop system achieves 100\,\% agreement with a symbolic oracle across ten validation classes, including Church numeral arithmetic (\textsc{plus}, \textsc{mult}, \textsc{pred}), Boolean logic with divergent branches, Y-combinator steps, terms with up to six bound-variable occurrences, De~Bruijn indices up to~12, noise robustness, and determinism. To our knowledge this is the first Turing-complete symbolic computation performed entirely within spike dynamics using biologically grounded circuit primitives. We discuss implications for neuromorphic proof assistants and the neural basis of symbolic reasoning.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:27:55Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Vladimir A. Lazovskiy</name>
+    </author>
+    <author>
+      <name>Victor B. Kazantsev</name>
+    </author>
+    <author>
+      <name>Sergey V. Stasenko</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23179v1</id>
+    <title>Say Less, Hallucinate Less? Diagnosing and Restoring Object Coverage in Preference-Optimized Vision-Language Models</title>
+    <updated>2026-11-17T18:24:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.23179v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23179v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Preference optimization (PO) is the standard way to reduce object hallucination in large vision-language models. We find that four public PO checkpoints of LLaVA-1.5-7B also lower object coverage. They name fewer object categories, and their lower hallucination rates bring no significant gain in set-level object F1 on CHAIR. We therefore ask how much of the PO gain the base model can reproduce by stopping earlier. A positive end-of-sequence (EOS) logit bias lets the base model reach the recall of each PO model, and this early stopping alone reproduces 58 to 86 percent of the CHAIRi gain of three checkpoints on two disjoint COCO sets. Writing longer does not bring the lost categories back. Under greedy decoding, a negative EOS bias recovers only 2 to 9 percent of the lost CHAIR recall of these checkpoints, and 94 to 96 percent of the added object mentions repeat categories already named. On CHAIR, the base caption of the same image still names about half of the missed object categories. We therefore propose base-guided object-category restoration, which appends high-confidence base-only categories to the PO caption without training. With thresholds fixed on a development set, it brings three checkpoints within one point of the base recall on a held-out COCO set with a lower distinct-object hallucination rate than the base model. Against the recall-matched base stopping curve, its gain holds for RLAIF-V near the base recall and for RLAIF-V and CHAIR-DPO at an intermediate recall. We will release the code of the recall-controlled evaluation.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:24:58Z</published>
+    <arxiv:comment>18 pages, 6 figures, 19 tables. Main text and appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hansang Lee</name>
+    </author>
+  </entry>
+</feed>

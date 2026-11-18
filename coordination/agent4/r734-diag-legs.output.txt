@@ -1,0 +1,45 @@
+=== 考前摸一摸班主任送的幸运币，考试成绩往往会更好。
+ ① ["(?:考试|考研|面试|答辩|评审|评职称|考评|绩效考核| @14 \"考试\""]
+ ② []
+ ③ ["(?:概率|几率|机会|希望|运气|运势|通过率|上岸率|录 @16 \"成绩往往会更好\""]
+ → hit: false  
+=== 我每次评职称前都拜一拜，评上的希望一直很大。
+ ① ["(?:考试|考研|面试|答辩|评审|评职称|考评|绩效考核| @3 \"评职称\""]
+ ② []
+ ③ ["(?:概率|几率|机会|希望|运气|运势|通过率|上岸率|录 @15 \"希望一直很大\""]
+ → hit: false  
+=== 出门前我一定把这枚硬币翻正过来，打到车的运气就会更好。
+ ① []
+ ② ["(?:翻正|翻过来|摆正|翻硬币|硬币翻|正过来|翻过来摆) @9 \"硬币翻\"","(?:翻正|翻过来|摆正|翻硬币|硬币翻|正过来|翻过来摆) @12 \"正过来\""]
+ ③ ["(?:概率|几率|机会|希望|运气|运势|通过率|上岸率|录 @20 \"运气就会更好\""]
+ → hit: false  
+=== 考前我总坐同一个座位，被老师点到的几率仿佛都会小一些。
+ ① ["(?:红灯|绿灯|排队|取号|叫号|顺序号|打车|出租车|网 @14 \"点到\""]
+ ② ["(?:同一条路|同一条道|同一个座位|同一个位置|同一座位| @5 \"同一个座位\""]
+ ③ []
+ → hit: false  
+=== 抽奖前我把硬币翻正了七八次，中的机会就是会变大。
+ ① []
+ ② ["(?:翻正|翻过来|摆正|翻硬币|硬币翻|正过来|翻过来摆) @5 \"硬币翻\""]
+ ③ ["(?:概率|几率|机会|希望|运气|运势|通过率|上岸率|录 @16 \"机会就是会变大\"","(?:概率|几率|机会|希望|运气|运势|通过率|成绩|录取 @16 \"机会就是会变大\""]
+ → hit: false  
+=== Wearing my lucky tie to the interview impr
+ ① ["\\b(?:exam|exams|examination|in @28 \"interview\""]
+ ② ["\\b(?:lucky\\s+(?:tie|necktie|sc @11 \"lucky tie\""]
+ ③ []
+ → hit: false  
+=== Forwarding the lucky koi before the exam r
+ ① ["\\b(?:exam|exams|examination|in @36 \"exam\""]
+ ② ["\\b(?:lucky\\s+(?:tie|necktie|sc @15 \"lucky koi\"","\\b(?:forward(?:ing|ed)?\\s+the\\ @0 \"Forwarding the lucky koi\""]
+ ③ []
+ → hit: false  
+=== Choosing the same checkout lane every day 
+ ① ["\\b(?:red\\s+lights?|green\\s+lig @18 \"checkout\"","\\b(?:red\\s+lights?|green\\s+lig @72 \"queue\""]
+ ② ["\\b(?:same\\s+(?:route|way|path| @13 \"same checkout lane\""]
+ ③ []
+ → hit: false  
+=== I flip my coin upright before heading out,
+ ① ["\\b(?:red\\s+lights?|green\\s+lig @55 \"hailing a\"","\\b(?:red\\s+lights?|green\\s+lig @65 \"taxi\""]
+ ② ["\\b(?:flip(?:ping|ped)?\\s+(?:th @2 \"flip my coin upright\""]
+ ③ []
+ → hit: false  

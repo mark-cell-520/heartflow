@@ -1,0 +1,14 @@
+DEF_FRAME_ZH（R5a 定义式等同框·中）: exit=1 ✅ 变红
+DEF_FRAME_EN（R5a 定义式等同框·英）: exit=1 ✅ 变红
+USE_ZH（R5a 论证化使用·中）: exit=1 ✅ 变红
+USE_EN（R5a 论证化使用·英）: exit=1 ✅ 变红
+CONN_ZH（R5b 结论前置连接词·中）: exit=1 ✅ 变红
+CONN_EN（R5b 结论前置连接词·英）: exit=1 ✅ 变红
+TAUT_SYN_ZH（R5a 同义表·中）: exit=1 ✅ 变红
+TAUT_SYN_EN（R5a 同义表·英）: exit=1 ✅ 变红
+ANTONYM_ZH（R5a 反义否定表·中）: exit=1 ✅ 变红
+ZH_COPULAR（R5b 纯系词应用框 f9）: exit=1 ✅ 变红
+EN_COPULAR（R5b 纯系词应用框 e10）: exit=1 ✅ 变红
+DEF_HEDGE_ZH（定义存疑豁免·中）: exit=1 ✅ 变红
+DEF_HEDGE_EN（定义存疑豁免·英）: exit=1 ✅ 变红
+结果: 11 通过, 0 失败, 共 11 个

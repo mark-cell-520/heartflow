@@ -1,0 +1,63 @@
+
+=== 删 A_ZH5 后转 miss 的样本（11 条）
+   - 每次面试我都戴那条幸运领带，拿到 offer 的概率明显更大。
+   - 考前摸一摸班主任送的幸运币，考试成绩往往会更好。
+   - 我每次评职称前都拜一拜，评上的希望一直很大。
+   - 考前转发锦鲤，上岸的概率真的会变高。
+   - 答辩那天穿了那件红衬衫，通过率就是会提升。
+   - 坚持固定周三去加油，那天排队最短的概率会高一些。
+   - 出门前我一定把这枚硬币翻正过来，打到车的运气就会更好。
+   - 考前我总坐同一个座位，被老师点到的几率仿佛都会小一些。
+   - 抽奖前我把硬币翻正了七八次，中的机会就是会变大。
+   - 每天走同一条路，碰到绿灯的运气总会更好一些。
+   - 固定在这个窗口取号，排到前面号码的机会明显更大。
+
+=== 删 B_ZH5 后转 miss 的样本（11 条）
+   - 每次面试我都戴那条幸运领带，拿到 offer 的概率明显更大。
+   - 考前摸一摸班主任送的幸运币，考试成绩往往会更好。
+   - 我每次评职称前都拜一拜，评上的希望一直很大。
+   - 考前转发锦鲤，上岸的概率真的会变高。
+   - 答辩那天穿了那件红衬衫，通过率就是会提升。
+   - 坚持固定周三去加油，那天排队最短的概率会高一些。
+   - 出门前我一定把这枚硬币翻正过来，打到车的运气就会更好。
+   - 考前我总坐同一个座位，被老师点到的几率仿佛都会小一些。
+   - 抽奖前我把硬币翻正了七八次，中的机会就是会变大。
+   - 每天走同一条路，碰到绿灯的运气总会更好一些。
+   - 固定在这个窗口取号，排到前面号码的机会明显更大。
+
+=== 删 C_ZH5 后转 miss 的样本（11 条）
+   - 每次面试我都戴那条幸运领带，拿到 offer 的概率明显更大。
+   - 考前摸一摸班主任送的幸运币，考试成绩往往会更好。
+   - 我每次评职称前都拜一拜，评上的希望一直很大。
+   - 考前转发锦鲤，上岸的概率真的会变高。
+   - 答辩那天穿了那件红衬衫，通过率就是会提升。
+   - 坚持固定周三去加油，那天排队最短的概率会高一些。
+   - 出门前我一定把这枚硬币翻正过来，打到车的运气就会更好。
+   - 考前我总坐同一个座位，被老师点到的几率仿佛都会小一些。
+   - 抽奖前我把硬币翻正了七八次，中的机会就是会变大。
+   - 每天走同一条路，碰到绿灯的运气总会更好一些。
+   - 固定在这个窗口取号，排到前面号码的机会明显更大。
+
+=== 删 A_EN5 后转 miss 的样本（5 条）
+   - Wearing my lucky tie to the interview improves
+   - I always pray before the title evaluation; my 
+   - Forwarding the lucky koi before the exam reall
+   - Choosing the same checkout lane every day impr
+   - I flip my coin upright before heading out, and
+
+=== 删 B_EN5 后转 miss 的样本（5 条）
+   - Wearing my lucky tie to the interview improves
+   - I always pray before the title evaluation; my 
+   - Forwarding the lucky koi before the exam reall
+   - Choosing the same checkout lane every day impr
+   - I flip my coin upright before heading out, and
+
+=== 删 C_EN5 后转 miss 的样本（5 条）
+   - Wearing my lucky tie to the interview improves
+   - I always pray before the title evaluation; my 
+   - Forwarding the lucky koi before the exam reall
+   - Choosing the same checkout lane every day impr
+   - I flip my coin upright before heading out, and
+
+删任一单常量都不 miss 的样本（由存量链兜住或需删多常量）: 1
+   * Rubbing my lucky coin before the exam raises m

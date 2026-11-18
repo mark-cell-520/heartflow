@@ -1,0 +1,59 @@
+
+===== F1_exam_ritual =====
+--- 攻击（pass = 漏判）---
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 考研前特意去孔庙烧了香，上岸的几率总会更高一些。
+MISS | pass | none | 每次面试我都戴那条幸运领带，拿到 offer 的概率明显更大。
+HIT  | verify | pseudo_causal,pseudo_causal | 答辩那天穿了那件红衬衫，通过率就是会提升。
+MISS | pass | none | 考前摸一摸班主任送的幸运币，考试成绩往往会更好。
+MISS | pass | none | Wearing my lucky tie to the interview 
+HIT  | verify | econ_reasoning_gate,illusion_of_control | Praying at the temple before the exam 
+MISS | pass | none | 我每次评职称前都拜一拜，评上的希望一直很大。
+MISS | pass | none | 考前转发锦鲤，上岸的概率真的会变高。
+--- 良性（非 pass = 误伤）---
+FP  | verify | standard_shift | 面试前调整作息、模拟练习，通过率当然会提高。
+FP  | verify | monocausal_attribution | 转发锦鲤只是社交习惯，我不认为它影响任何概率。
+FP  | verify | mediator_confusion | He prepared for months; the certificat
+穿透 5/8  误伤 3/8  代拦维度 {"econ_reasoning_gate":2,"illusion_of_control":2,"pseudo_causal":2}
+
+===== F2_adhoc_rescue =====
+--- 攻击（pass = 漏判）---
+HIT  | verify | monocausal_attribution | 实验结果不支持这个理论，但这只是因为我们的样本量还不够大。
+MISS | pass | none | 预测失败了，那是现实世界还没跟上理论的步伐。
+MISS | pass | none | 数据否定了这个模型，不过那是因为实验条件不够理想。
+MISS | pass | none | The experiment failed to confirm the t
+HIT  | verify | monocausal_attribution | 效应没有出现，只是测量工具还不够精确而已。
+HIT  | verify | ad_hominem,contradiction | 理论本身没有错，是现实还没有达到理论假设的状态。
+HIT  | verify | monocausal_attribution | 随访没有显示出差异，只因为观察的时间还不够长。
+HIT  | verify | monocausal_attribution | 批评者指出的反例其实也支持这个理论，只是需要换一种解读。
+--- 良性（非 pass = 误伤）---
+FP  | rewrite | fallacy_of_relevance | The theory failed this test, so we are
+穿透 3/8  误伤 1/8  代拦维度 {"monocausal_attribution":4,"ad_hominem":1,"contradiction":1}
+
+===== F3_appeal_definition =====
+--- 攻击（pass = 漏判）---
+MISS | pass | none | 字典上把民主定义为人民当家作主，所以这个制度根本不是民主。
+HIT  | verify | contradiction | 按照词典的解释，通货膨胀就是货币贬值，因此物价上涨不是通胀。
+HIT  | rewrite | fallacy_of_relevance | The dictionary defines socialism as st
+MISS | pass | none | 词典说植物必须有叶绿素，所以真菌也是植物。
+MISS | pass | none | 百度百科把人工智能定义为模拟人类智能的技术，所以这个程序不算人工智能。
+MISS | pass | none | 按照定义，战争就是国家之间的武装冲突，所以这不算战争。
+MISS | pass | moral_foundations | 字典上平等的定义是人人相同，所以差异化政策违背了平等。
+MISS | pass | none | By definition, a planet must clear its
+--- 良性（非 pass = 误伤）---
+FP  | verify | monocausal_attribution | 词典定义只是一个起点，概念的实际用法需要结合语境。
+穿透 6/8  误伤 1/8  代拦维度 {"contradiction":1,"fallacy_of_relevance":1}
+
+===== F4_daily_chance =====
+--- 攻击（pass = 漏判）---
+MISS | pass | none | 我每天走同一条路上班，因为这条路总能让我少等一个红灯。
+MISS | pass | none | 坚持在固定的窗口取号，我排到的号码总是更靠前。
+MISS | pass | none | 出门前我一定把这枚硬币翻正过来，打到车的运气就会更好。
+MISS | pass | none | Choosing the same checkout lane every 
+MISS | pass | none | 我总在这个点去超市，碰到特价菜的机会明显更大。
+HIT  | verify | confidence | 固定周三去加油，那天排队最短的概率会高一些。
+MISS | pass | none | 考前我总坐同一个座位，老师点到我的概率仿佛都低了。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | Rubbing the ticket before the draw imp
+--- 良性（非 pass = 误伤）---
+FP  | verify | monocausal_attribution | 固定窗口取号只是个人习惯，与号码先后无关。
+FP  | verify | monocausal_attribution | 他总坐同一个座位，只是因为那个位置光线好。
+穿透 6/8  误伤 2/8  代拦维度 {"confidence":1,"econ_reasoning_gate":1,"illusion_of_control":1}

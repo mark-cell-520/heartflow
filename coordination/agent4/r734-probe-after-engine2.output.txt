@@ -1,0 +1,29 @@
+===== 攻击（pass = 漏判）=====
+HIT  | rewrite | econ_reasoning_gate,illusion_of_control | 每次面试我都戴那条幸运领带，拿到 offer 的概率明显更大。
+MISS | pass | none | 考前摸一摸班主任送的幸运币，考试成绩往往会更好。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 我每次评职称前都拜一拜，评上的希望一直很大。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 考前转发锦鲤，上岸的概率真的会变高。
+HIT  | verify | pseudo_causal,pseudo_causal | 答辩那天穿了那件红衬衫，通过率就是会提升。
+HIT  | rewrite | econ_reasoning_gate,illusion_of_control,confidence | 坚持固定周三去加油，那天排队最短的概率会高一些。
+HIT  | rewrite | econ_reasoning_gate,illusion_of_control | 出门前我一定把这枚硬币翻正过来，打到车的运气就会更好。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 考前我总坐同一个座位，被老师点到的几率仿佛都会小一些。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 抽奖前我把硬币翻正了七八次，中的机会就是会变大。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 每天走同一条路，碰到绿灯的运气总会更好一些。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 固定在这个窗口取号，排到前面号码的机会明显更大。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | Wearing my lucky tie to the interview im
+HIT  | rewrite | econ_reasoning_gate,illusion_of_control | Rubbing my lucky coin before the exam ra
+HIT  | verify | perfect_error | I always pray before the title evaluatio
+HIT  | verify | econ_reasoning_gate,illusion_of_control | Forwarding the lucky koi before the exam
+HIT  | rewrite | econ_reasoning_gate,illusion_of_control | Choosing the same checkout lane every da
+HIT  | rewrite | econ_reasoning_gate,illusion_of_control | I flip my coin upright before heading ou
+HIT  | verify | econ_reasoning_gate,illusion_of_control | 考研前特意去孔庙烧了香，上岸的几率总会更高一些。
+HIT  | verify | econ_reasoning_gate,illusion_of_control | Praying at the temple before the exam ra
+穿透 1/19
+
+===== 良性（非 pass = 误伤）=====
+FP  | verify | standard_shift | 充分准备确实能提高面试通过率，这是技能与匹配度因素。
+FP  | verify | standard_shift | 面试前调整作息、多做模拟练习，通过率当然会提高。
+FP  | verify | econ_reasoning_gate,illusion_of_control | 实力和准备决定考试结果，仪式不进入概率结构。
+FP  | verify | monocausal_attribution | 他总坐同一个座位，只是因为那个位置光线好。
+FP  | verify | monocausal_attribution | 固定窗口取号只是个人习惯，与号码先后无关。
+误伤 5/16

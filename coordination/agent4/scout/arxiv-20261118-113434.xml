@@ -1,0 +1,389 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/2GmViUDop7bvk71b7F+olf+NOXg</id>
+  <title>arXiv Query: search_query=all:persuasive OR all:definition OR all:slippery OR all:slope OR all:circular OR all:reasoning OR all:fallacy OR all:detection OR all:rule OR all:patterns&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T11:34:35Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:persuasive+OR+(all:definition+OR+(all:slippery+OR+(all:slope+OR+(all:circular+OR+(all:reasoning+OR+(all:fallacy+OR+(all:detection+OR+(all:rule+OR+all:patterns))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>635462</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23229v1</id>
+    <title>Ambient LLMs: Data-Efficient Supervised Fine-tuning via Temperature Matching</title>
+    <updated>2026-11-17T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.23229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Collecting large-scale, diverse, and high-quality post-training datasets for autoregressive language models is challenging. Consequently, Supervised Fine-Tuning (SFT) is typically applied to datasets significantly smaller than those used for pre-training, which leads to overfitting and the catastrophic forgetting of the tails of the data distribution. To prevent this collapse, we introduce Ambient SFT, a principled framework for leveraging imperfect predictions to augment the fine-tuning set. In our method, a "frozen" version of the pre-trained model serves as a noisy teacher that the fine-tuned model must match at a coarse level. In particular, we require that the high-temperature versions of the conditional distributions produced by the post-training model should match the high-temperature versions of the pre-training ones. The temperature hyperparameter controls the level of trust in the pre-trained model, with the limit $T\to \infty$ reverting back to regular SFT and $T=1$ to knowledge distillation. We demonstrate that our approach outperforms standard SFT across domain adaptation, instruction-tuning, and reasoning, leading for up to $21\%$ average relative improvement to standard SFT.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:37Z</published>
+    <arxiv:comment>Work in progress</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Giannis Daras</name>
+    </author>
+    <author>
+      <name>Marios Papachristou</name>
+    </author>
+    <author>
+      <name>Adam Klivans</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Constantinos Daskalakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23228v1</id>
+    <title>Spool: Low-Latency Streaming Inference for Hybrid Vision-Language Models</title>
+    <updated>2026-11-17T18:59:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applications such as visual accessibility agents and robotics require answering questions about recent video content promptly, over a bounded window of past frames (e.g., the last two minutes). Hybrid vision-language models (VLMs), which interleave attention with linear recurrent layers such as Gated DeltaNet (GDN), are attractive for this setting, but maintaining a sliding window is expensive. The reason is that recurrent layers combine all past frames into a shared state, so expiring old frames normally requires re-running the entire window through the model. We observe that the recurrent update is affine in the state with input-dependent coefficients, so the effect of each frame can be captured as a transformation that composes associatively. We present Spool, a training-free framework that caches per-frame state transformations and composes them efficiently as the window advances, removing expired frames from each recurrent layer's state without replaying frames through the backbone. Removal is exact within each layer; as with key-value eviction in attention, expired frames can retain residual influence through the cached inputs computed by earlier layers. We design a dedicated data structure and GPU kernels to achieve low caching and composition overhead. Across five open-source hybrid VLMs and four video reasoning benchmarks, Spool achieves the lowest p95 time-to-first-token in all 20 model-benchmark tests, reducing it by a geometric mean of $6.6\times$ over the faster of two recent vLLM baselines, while improving accuracy by 2.3 percentage points on average.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:27Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rui Ning</name>
+    </author>
+    <author>
+      <name>Om Chabra</name>
+    </author>
+    <author>
+      <name>Hari Balakrishnan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23222v1</id>
+    <title>Sidorenko Inequalities in Oriented Graphs</title>
+    <updated>2026-11-17T18:57:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.23222v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23222v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce relative Sidorenko and relative anti-Sidorenko inequalities for oriented graphs, strengthening the corresponding well-studied notions for tournaments by allowing arbitrary host graphs. An orientation $\vec H$ of a graph $H$ is relatively Sidorenko if $\hom(\vec H,\vec G) \ge 2^{-e(H)}\hom(H,G)$ for every oriented graph $\vec G$ with underlying graph $G$, and relatively anti-Sidorenko if the reverse inequality holds. We provide a complete characterisation of the class of connected relatively Sidorenko graphs in terms of weakly norming graphs, and exhibit several families of relatively Sidorenko and relatively anti-Sidorenko oriented graphs. Despite the substantially stronger definitions, many known tournament Sidorenko and anti-Sidorenko examples satisfy the relative inequalities, suggesting a broader theory of these phenomena in arbitrary host graphs and motivating several new structural and classification problems.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:20Z</published>
+    <arxiv:comment>27 pages, 3 figures. Comments welcome</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Veronica Bitonti</name>
+    </author>
+    <author>
+      <name>Emma Hogan</name>
+    </author>
+    <author>
+      <name>Jonathan A. Noel</name>
+    </author>
+    <author>
+      <name>Dmitry Tsarev</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23218v1</id>
+    <title>What Does a Bias Head Measure? Non-Identifiability in Head-Level Bias Attribution</title>
+    <updated>2026-11-17T18:57:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.23218v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23218v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Methods that localise social bias in large language models to individual attention heads and remove it by ablation are validated by their effect on a fairness metric, never by evidence that the statistic selecting the heads measures bias. We audit this on Qwen-2.5-7B-Instruct and Llama-3.1-8B-Instruct. The head map correlates at $ρ= -0.950$ and $-0.768$ with a label-blind response-length map, apparently identifying a surface confound. An intervention that breaks the length-label coupling rejects this reading: with the prompt held fixed, response length explains 1% of the statistic's variance. What does explain it is prompt identity, at 64% of variance, in an ordering that is not monotonic in length. Within any fixed prompt the fairness label, response length and the presence of a protected-group token are collinear at $φ= 0.95$, partly by definition of the labelling rule, so no observational analysis can attribute the map to any of them, and no method in this family performs an experiment that could. The substantive claims fail independently: bias selectivity is not late-layer-concentrated on either model under either reference reading, and no head set we tested reduces the unfairness rate when ablated. Its complement, scored on the opposite label, reliably destroys refusal behaviour ($p = 2.7\times10^{-5}$), demonstrating that the pipeline detects effects at this scale.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:08Z</published>
+    <arxiv:comment>18 pages, 13 tables. Under review at ACL Rolling Review (October 2026 cycle)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>S. M Seefat Alam</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23217v1</id>
+    <title>Near Resonance, Less Ordered: Radius and Mass Ordering in Compact Multi-planet Systems</title>
+    <updated>2026-11-17T18:56:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.23217v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23217v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Compact multi-planet systems exhibit a tendency for planetary radii to follow ordered sequences with orbital position, suggesting that these non-random patterns preserve a fossil record of their formation. Here, we investigate whether ordering of planet radii and masses with orbital period is related to proximity to mean-motion resonances. We compare near-resonant and non-resonant systems using complementary rank- and inversion-based measures of ordering, while accounting for differences in planet multiplicity and uncertainties in the measured planetary properties. We find that radii and masses are less monotonically ordered in near-resonant systems than in non-resonant systems, with the primary radius analysis providing stronger evidence than the mass analysis. This result is opposite to the naive expectation that dynamical instabilities should erase the primordial ordering of initially resonant systems and leave non-resonant systems in a more disordered state.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:56:45Z</published>
+    <arxiv:comment>12 pages, 5 figures, submitted to ApJ Letters</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Agustin Heron</name>
+    </author>
+    <author>
+      <name>Songhu Wang</name>
+    </author>
+    <author>
+      <name>Cristobal Petrovich</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23212v1</id>
+    <title>EviSlide-MIL: Multi-Query Pooling and Shared Prediction for Class-Incremental Whole-Slide Image Classification</title>
+    <updated>2026-11-17T18:50:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23212v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23212v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Histopathological analysis of whole-slide images (WSIs) plays a critical role in cancer diagnosis, and multiple instance learning (MIL) is widely adopted for WSI analysis under weak supervision. As new tumor subtypes are introduced, extending existing MIL models requires learning new classes while retaining knowledge of previously learned ones. This presents a class-incremental learning challenge, where models must acquire new classes with limited access to historical training data and recognize all learned classes without task identifiers at inference. A major obstacle is forgetting, as updates to feature aggregation and prediction modules can degrade performance on previously learned classes. To address this challenge, we propose \textbf{EviSlide-MIL}, a class-incremental WSI framework that integrates multiple learnable queries per class with a shared prediction module. The queries aggregate frozen patch features into class-specific representations, while the shared prediction module limits parameter growth across incremental stages. By freezing queries associated with previously learned classes, EviSlide-MIL preserves their attention patterns for identical inputs, while experience replay and knowledge distillation further mitigate forgetting as shared parameters are updated. Experiments on eight tumor subtypes from The Cancer Genome Atlas demonstrate that EviSlide-MIL achieves improved performance and reduced forgetting compared with competing methods across most learning settings, demonstrating its potential for scalable and knowledge-preserving WSI classification. Code and pretrained models will be released.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:50:42Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zhouhan Qian</name>
+    </author>
+    <author>
+      <name>Sicheng Chen</name>
+    </author>
+    <author>
+      <name>Chad Wong</name>
+    </author>
+    <author>
+      <name>Tianyi Zhang</name>
+    </author>
+    <author>
+      <name>Enhui Chai</name>
+    </author>
+    <author>
+      <name>Zeyu Liu</name>
+    </author>
+    <author>
+      <name>Fei Xia</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23211v1</id>
+    <title>Multimodal Masked Diffusion Autoencoder for Modeling Impaired Driving</title>
+    <updated>2026-11-17T18:50:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.23211v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23211v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Human cognitive state (e.g., distraction, stress), gaze, and behavior interact with the driving environment in subtle ways that AI could use to assist drivers, but ground-truth labels for human cognitive state levels are costly to obtain at scale. We propose a multimodal masked-diffusion autoencoder, ID-MAE, that adds a self-supervised objective to impairment prediction: alongside predicting the impairment label as a masked token, it reconstructs masked gaze and trajectory. To probe the effects of different modalities and types of impairments on model inference, we introduce DIVERT, a driving-simulator dataset containing 103 hours of driving data (n = 109) with ten impairment inductions spanning cognitive, visual, and emotional states, recorded with gaze, vehicle state, and scene video. We demonstrate how ID-MAE affords significant improvements in impairment inference results on both the DIVERT dataset and existing datasets, and enables strong results in additional tasks, such as trajectory and gaze prediction. For location-matched pairs, our model achieves a paired AUC of 0.706 for impairment detection on DIVERT, compared to 0.590 without reconstruction loss, improving over existing baselines. We probe the design space in terms of input modalities, masking scheme, positional encoding, attention mechanism, and decoding. We also investigate the interaction between various impairments in training and inference, demonstrating that visually demanding distractions are separable from cognitive distractions. Code and data will be available upon acceptance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:50:22Z</published>
+    <arxiv:comment>Equal contribution: John Gideon and Anshul Gupta. 8 pages, 6 figures. Submitted to CVPR 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>John Gideon</name>
+    </author>
+    <author>
+      <name>Anshul Gupta</name>
+    </author>
+    <author>
+      <name>Megan Applegate-Kenton</name>
+    </author>
+    <author>
+      <name>Kayli Battel</name>
+    </author>
+    <author>
+      <name>Todd J Rowell</name>
+    </author>
+    <author>
+      <name>Patricio Reyes Gomez</name>
+    </author>
+    <author>
+      <name>Laporsha Dees</name>
+    </author>
+    <author>
+      <name>Emily Sumner</name>
+    </author>
+    <author>
+      <name>Avinash Balachandran</name>
+    </author>
+    <author>
+      <name>Guy Rosman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23209v1</id>
+    <title>Learning Grounded Reasoning from Human Gaze</title>
+    <updated>2026-11-17T18:49:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.23209v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23209v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Human visual reasoning is driven by systematic exploration and extraction of task-relevant visual evidence. Human gaze provides a window into this process, making gaze a useful source of guidance for visually-grounded reasoning in vision-language models (VLMs). However, human gaze also includes noise and redundancies that may transfer poorly to VLMs. In this work, we investigate how human gaze data can be effectively leveraged to improve visual reasoning in VLMs, while maintaining alignment with human behavior. We collect 7,109 human gaze trials from a diverse and challenging set of visual reasoning tasks, and train grounded reasoning models with different forms of gaze guidance. Across evaluations in chart understanding, visual search, and counting, we find that using human gaze as a prior for grounded reasoning consistently outperforms supervision using the full gaze sequence. Based on these findings, we introduce GGR (Gaze-Guided Reasoner), which achieves greater human alignment and more reliable visual grounding while matching or outperforming leading grounded-reasoning baselines in accuracy. Reinforcement learning further improves task accuracy, gaze alignment, and grounding quality despite using no gaze supervision. Behavioral analyses show that gaze supervised models exhibit more visual exploration before arriving at an answer. Our results suggest that the value of human gaze lies in guiding spatial exploration and shaping reasoning behavior without requiring complete imitation of human behavior.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Gabriel Sarch</name>
+    </author>
+    <author>
+      <name>Declan Campbell</name>
+    </author>
+    <author>
+      <name>Nicholas Budny</name>
+    </author>
+    <author>
+      <name>Kia Ghods</name>
+    </author>
+    <author>
+      <name>Katerina Fragkiadaki</name>
+    </author>
+    <author>
+      <name>Jonathan D. Cohen</name>
+    </author>
+    <author>
+      <name>Brenden M. Lake</name>
+    </author>
+    <author>
+      <name>Taylor W. Webb</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23208v1</id>
+    <title>Distortion-Free Semantic Watermarks for Black-Box Generative Models</title>
+    <updated>2026-11-17T18:49:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.23208v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23208v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a provably distortion-free semantic watermarking algorithm that requires only black-box sampling access to a generative model and black-box access to a semantic embedding. A watermark is called distortion-free if, averaged over its secret detection key, it leaves the generator's output distribution unchanged; this provides a formal guarantee that watermarking does not reduce output quality. Conventional such watermarks are often brittle to transformations. This is especially problematic for images, where benign operations such as compression, cropping, or resizing change the entire pixel representation. Semantic watermarks therefore require detection to be robust to content-preserving transformations. Previous methods combining these properties rely heavily on specific white-box properties of the underlying model: either to autoregressive text generation or to diffusion-specific access, such as control of the initial noise or diffusion inversion. In contrast, our construction is fully generic: It only interacts with the generative model and the semantic embedding, a function that determines the notion of "preserving content" under which detection should be robust, via sample and query access. We then instantiate this framework for image generation. We characterize the two competing properties required of the semantic embedding: it should remain stable under transformations that preserve an image's content, but should distinguish independent generations from the same prompt. We train an image encoder directly for this tradeoff. The resulting encoder improves separation while maintaining stability over off-the-shelf alternatives and enables strong aggregate detection while remaining robust to various transformations. We demonstrate the effectiveness of our watermark scheme on both open-source and closed models, which is possible only due to restriction to black-box access.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:17Z</published>
+    <arxiv:comment>Project page: https://avivyossef.github.io/distortion-free-semantic-watermark/ Code: https://github.com/avivyossef/distortion-free-semantic-watermark</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aviv Yossef</name>
+    </author>
+    <author>
+      <name>Or Patashnik</name>
+    </author>
+    <author>
+      <name>Or Zamir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23206v1</id>
+    <title>Reading Scene States: Uncovering Safety Failures in Vision-Language Models</title>
+    <updated>2026-11-17T18:48:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.23206v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23206v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language models (VLMs) can provide harmful assistance by interpreting visual events, even without an explicit request for the underlying harmful objective. We identify this \textbf{scene-state safety vulnerability} and introduce \textbf{SceneSafetyBench}, comprising 375 image--question pairs spanning Initial, Medium, and Ultimate scene states and five visual presentations. Across eight VLMs, scene-state inputs elicit harmful assistance with attack success rates (ASRs) of 45.6--72.3\%. Comparative analysis across three VLMs shows that scene-state inputs most closely resemble QR-related images in their layer-wise safety-related signal profiles, while exhibiting lower average late-layer readouts and distinct signal dynamics during generation. To turn this vulnerability into a systematic attack, we propose \textbf{S3TA}, which translates harmful objectives into scene states, queries image--question pairs independently, and assembles the responses. On seven MM-SafetyBench categories across eight open-weight and commercial VLMs, S3TA achieves a model-average ASR of \textbf{71.2\%, exceeding the strongest baseline by 6.1 percentage points}. Text-side filters and visual moderation provide limited protection. These findings highlight the need to safeguard the assistance models infer through scene-grounded reasoning, beyond screening input content.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:48:02Z</published>
+    <arxiv:comment>VLM safety, multimodal jailbreaks, and scene-state reasoning</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tongxi Wu</name>
+    </author>
+    <author>
+      <name>Yuyang Cheng</name>
+    </author>
+    <author>
+      <name>Jiacheng Xian</name>
+    </author>
+    <author>
+      <name>Menglin Yang</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Jian Zhang</name>
+    </author>
+    <author>
+      <name>Yang Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23203v1</id>
+    <title>Identifying and Repairing Energy Smells with Agent Skills</title>
+    <updated>2026-11-17T18:45:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23203v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23203v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Energy smells are inefficient implementations that waste energy. Once code reaches production, these smells become costlier and riskier to fix, so energy efficiency checks should shift left, i.e., move earlier in the development lifecycle, to where code is written. Existing energy smell tools rely on fixed static rules and do not measure energy savings, whereas LLM-based optimizers mostly target execution time and rarely ground their changes in concrete smell definitions. To address both limitations, we present DR. GREENS, an agent skill that detects and repairs energy smells in Python code within the developer's coding environment. The skill grounds the coding agent in our taxonomy of 12 energy smells and 65 root causes, augmented with repair guidance drawn from 230 measured cases. The skill also encapsulates a static analyzer and an independent verifier to confirm behavior preservation and energy saving for each attempted repair. We evaluated DR. GREENS in 18 sessions on three open-source repositories, with two models and three skill configurations. Of the 258 measured repairs, 68.6% saved energy, with a median saving of 24.9%. Compared with a baseline skill that lacks the taxonomy, the full skill found more energy smells with verified savings in all three repositories with both models. DR. GREENS helps developers detect energy hotspots and fix them reliably without altering program behavior, which makes energy-efficient development more feasible.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:45:42Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Mohammadjavad Mehditabar</name>
+    </author>
+    <author>
+      <name>Saurabhsingh Rajput</name>
+    </author>
+    <author>
+      <name>Tushar Sharma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23201v1</id>
+    <title>Governance Risks in Decentralized Autonomous Organizations (DAOs): Implications for Traditional Financial Institutions</title>
+    <updated>2026-11-17T18:42:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.23201v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23201v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As financial institutions increasingly interact with blockchain ecosystems through decentralized finance, stablecoins, tokenized assets, and distributed ledger infrastructure, they come to depend on systems governed wholly or partly by decentralized autonomous organizations (DAOs). This paper examines how DAO governance differs from traditional corporate governance and what this implies for risk management in regulated financial institutions. Using a qualitative comparative framework grounded in OECD governance principles, Basel Committee guidance, and FINMA circulars, the study maps DAO deliberation, voting, and accountability mechanisms against established governance and risk-management principles and illustrates associated risks through selected real-world cases. The analysis shows that DAOs preserve core governance functions but redistribute them across token holders, delegates, community forums, smart contracts, and legal wrapper entities. This creates distinct risks, including voting-power concentration, weak proposal controls, legal uncertainty, and unclear accountability, which established frameworks do not fully capture, while also offering two transferable strengths: a transparent, traceable decision record and a direct link between approval and execution. The paper contributes a structured assessment framework linking DAO governance characteristics to existing governance, outsourcing, technology-risk, and operational-resilience processes, enabling institutions to address DAO-governed dependencies through targeted extensions of current practices rather than a separate risk framework.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:42:34Z</published>
+    <arxiv:comment>16 pages, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Christian Plöschberger</name>
+    </author>
+    <author>
+      <name>Irene Buller</name>
+    </author>
+    <author>
+      <name>Mark Christopher Ballandies</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23199v1</id>
+    <title>Circular Vector Tomography with Partial Radial Data</title>
+    <updated>2026-11-17T18:40:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.23199v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23199v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this article, we introduce and study several generalized circular Radon transforms acting on smooth vector fields compactly supported in a planar annulus, with centers restricted to the outer acquisition circle and truncated measurement radii. The operators of interest are the longitudinal and transverse circular Radon transforms and their weighted analogues. We characterize the kernels of the individual unweighted transforms. Then we establish the reconstruction of a vector field from the combined longitudinal and transverse circular Radon transform data. We further show that the pairs formed by each transform and its weighted analogue is not sufficient for the complete recovery of a vector field. However, we demonstrate that full reconstruction is possible with suitable additional data. Finally, we numerically implement and validate the derived inversion formulas.</summary>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:40:44Z</published>
+    <arxiv:primary_category term="math.CA"/>
+    <author>
+      <name>Rahul Bhardwaj</name>
+    </author>
+    <author>
+      <name>Indrani Zamindar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23192v1</id>
+    <title>WoRD: Diffusion-Based Posterior Inference for Online Goal Recognition</title>
+    <updated>2026-11-17T18:35:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.23192v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23192v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Goal recognition is the task of inferring an agent's intended goal from its observed behavior. Most existing work focuses on high-level symbolic recognition, abstracting away the continuous motion through which agents reach their goal. Methods that do reason over continuous trajectories rely on an explicit dynamics model that is hard to acquire and rarely transfers across settings. Neither approach explicitly learns how agents move toward each candidate goal, limiting accuracy on ambiguous trajectory prefixes where such knowledge is most needed.
+  We present WoRD (Waypoint Recognition with Diffusion), which uses a learned trajectory prior to infer the agent's goal from partial observations. At each step, WoRD runs one warm-started denoising chain per candidate goal, steers each chain toward the observed trajectory through a closed-form log-likelihood gradient, and reweights the resulting samples by Bayes' rule into a calibrated posterior over goals. We evaluate WoRD on simulated robot settings, pedestrian trajectories, and vehicle trajectories using four metrics targeting distinct failure modes. Across all three settings, the same inference procedure preserves calibrated multimodal beliefs through ambiguous prefixes where filter- and classifier-based observers collapse to a single mode or grow overconfident.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:35:53Z</published>
+    <arxiv:comment>Accepted at the 40th Annual Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Almog Anschel</name>
+    </author>
+    <author>
+      <name>Sarah Keren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23182v1</id>
+    <title>Fully Spiking Neural Implementation of Lambda-Calculus Beta-Reduction via Biologically Documented Mechanisms</title>
+    <updated>2026-11-17T18:27:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.23182v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23182v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present the first complete implementation of $β$-reduction in the untyped $λ$-calculus using exclusively spiking neural dynamics. Every step of the reduction---redex detection, subterm segmentation, variable-binding detection, De~Bruijn index arithmetic, token copying, and inter-step role maintenance---is performed by leaky integrate-and-fire (LIF) neurons with explicit membrane dynamics, exponential synaptic currents, axonal delays, and pair-based spike-timing-dependent plasticity (STDP). Each neural component maps onto a specific, experimentally documented mechanism: Jeffress-type delay-line coincidence for redex detection; a line-attractor balance counter for subterm segmentation; $θ$--$γ$ cross-frequency coupling for De~Bruijn variable binding; a phase-ring traveling wave for depth-index arithmetic; theta-cycle STDP for token copying; and recurrent persistent firing for role maintenance between reduction steps. All synaptic weights are derived analytically from measured EPSP amplitudes; no hand tuning is performed. The closed-loop system achieves 100\,\% agreement with a symbolic oracle across ten validation classes, including Church numeral arithmetic (\textsc{plus}, \textsc{mult}, \textsc{pred}), Boolean logic with divergent branches, Y-combinator steps, terms with up to six bound-variable occurrences, De~Bruijn indices up to~12, noise robustness, and determinism. To our knowledge this is the first Turing-complete symbolic computation performed entirely within spike dynamics using biologically grounded circuit primitives. We discuss implications for neuromorphic proof assistants and the neural basis of symbolic reasoning.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:27:55Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Vladimir A. Lazovskiy</name>
+    </author>
+    <author>
+      <name>Victor B. Kazantsev</name>
+    </author>
+    <author>
+      <name>Sergey V. Stasenko</name>
+    </author>
+  </entry>
+</feed>

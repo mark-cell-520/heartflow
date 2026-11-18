@@ -1,0 +1,19 @@
+PASS  A1 中文人生机遇场景全腿命中（幸运仪物/固定习惯/翻正/仪式动词 × 机遇断言）
+PASS  A2 英文人生机遇与日常偶遇场景全腿命中
+PASS  B1 gate 层良性干净放行（技能域/否定形/机制形/习惯无断言/概念形）
+PASS  B2 存量 FP 与本族无关——杀全部新常量后模块层命中状态不变
+PASS  B3 存量 FP 实证：5 条基线非 pass 全部由存量维度承重（非本族增量）
+PASS  C1 存量四链精度保持（经典赌博/r315 体育/r323 游戏/r331 既有全仍命中）
+PASS  D1 删 A_ZH5——11 条中文攻击转 miss
+PASS  D2 删 B_ZH5——11 条中文攻击转 miss
+PASS  D3 删 C_ZH5——11 条中文攻击转 miss
+PASS  D4 删 A_EN5——5 条独占英文攻击转 miss
+PASS  D5 删 B_EN5——5 条独占英文攻击转 miss
+PASS  D6 删 C_EN5——5 条独占英文攻击转 miss
+PASS  E1 加性——杀全部新常量，存量四链回归样本仍命中
+PASS  E2 双承重实证——Rubbing my lucky coin 样本由存量链①同样承重（删任一单常量不 miss）
+PASS  F1 gate 层 19 条攻击非 pass 且 illusion_of_control finding 在场
+PASS  F2 gate 层干净良性 pass（锁死精度）
+PASS  G1 src/index.js 接线零改动 + discriminate 命中 illusion_of_control
+
+全部 17 项断言通过

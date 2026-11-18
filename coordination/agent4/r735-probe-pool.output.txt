@@ -1,0 +1,90 @@
+
+=== F1_appeal_definition === 攻击穿透 3/8  良性误伤 1/8
+  [pass] none | 字典上把民主定义为人民当家作主，所以这个制度根本不是民主。
+  [verify] contradiction | 按照词典的解释，通货膨胀就是货币贬值，因此物价上涨不是通胀。
+  [rewrite] fallacy_of_relevance | The dictionary defines socialism as state ownership, so this policy is not socialist.
+  [pass] moral_foundations | 词典里正义的定义是给予每个人应得的，所以这种判决并不正义。
+  [verify] contradiction | 爱的定义就是心疼，所以不肯为对方花钱的根本不是爱。
+  [pass] none | 自由在词典里的意思是按自己意志行动，因此遵守规则的人没有自由。
+  [pass] none | By definition, a recession is two quarters of decline, so this is not a recession.
+  [pass] none | 健康的定义是没有疾病，所以只要没生病他就是健康的。
+  FP[verify] monocausal_attribution | 词典释义只是起点，实际判断还要结合案例事实。
+
+=== F2_circular_definition === 攻击穿透 4/8  良性误伤 1/8
+  [verify] reasoning_coherence | 幸福的定义就是感到幸福，所以感到幸福的人一定幸福。
+  [pass] none | 成功的定义是取得成功，没取得成功就是没成功。
+  [rewrite] absolute_claim,hasty_generalization,moral_foundations,perfect_error | 公平就是对所有人都公平，所以这种分配很公平。
+  [pass] none | 效率的定义就是有效率地做事，所以我们这样做很有效率。
+  [verify] empty_answer | Health is defined as being healthy, so he is healthy by definition.
+  [pass] none | Truth is what is true, therefore this statement is true.
+  [verify] reasoning_coherence | 好的设计就是设计得好的东西，这件作品显然是好设计。
+  [pass] none | 安全的状态就是没有危险，没出事故说明我们是安全的。
+  FP[verify] mediator_confusion,monocausal_attribution,moral_foundations | 词典对公平的解释是处理事情合情合理，这只是参考。
+
+=== F3_slippery_opening === 攻击穿透 4/8  良性误伤 1/8
+  [pass] none | 今天允许学生在校园里玩手机，明天他们就会要求上课也随便玩。
+  [rewrite] absolute_claim,hasty_generalization,stereotype,perfect_error | 一旦给这个群体开了优待的口子，接下来所有人都会要求同等待遇。
+  [verify] slippery_slope | 这次让步一步，后面就会被步步紧逼，直到完全失控。
+  [pass] none | If we allow this exception now, every rule will be broken tomorrow.
+  [verify] scrutiny_evasion | 现在放松一次审核，以后就再也审不住任何东西了。
+  [pass] none | 开了这个先例，后面就会有无数人效仿。
+  [verify] sorites_fallacy | 只要这一次妥协，很快连原则都守不住了。
+  [pass] none | 今天可以破例一次，明天破例就会变成常态。
+  FP[verify] empty_answer | 先例的影响要具体分析，不能一概而论。
+
+=== F4_mean_as_typical === 攻击穿透 2/8  良性误伤 0/8
+  [pass] none | 人均收入达到了八万元，所以大多数人的年收入都在八万左右。
+  [pass] none | 班级平均分是 85 分，可见班上大部分同学都考到了 85 分以上。
+  [pass] none | 平均每户拥有 1.5 套住房，意味着多数家庭都有多余的房子。
+  [rewrite] fallacy_of_relevance | The average income is 80,000, so most people earn around 80,000.
+  [pass] none | 平均房价是一万二，这说明随便一套房就是一万一二的价格。
+  [pass] none | 人均 GDP 超过一万美元，说明大多数人都过上了一万美元的生活。
+  [rewrite] fallacy_of_relevance | The class average was 85, so most students scored above 85.
+  [pass] none | 平均睡眠时长为七小时，可见多数人每晚都睡够了七小时。
+
+=== F5_reverse_causation === 攻击穿透 1/8  良性误伤 3/8
+  [pass] none | 成绩好的学生都爱运动，所以想提高成绩就应该去运动。
+  [verify] reverse_causation | 生病的人都在吃药，所以少吃药的人更健康。
+  [pass] none | 富裕家庭孩子识字早，所以让孩子早点识字就能变富裕。
+  [pass] none | Healthy people exercise more, so exercising will make anyone healthy.
+  [pass] none | 睡得好的员工绩效高，所以只要改善睡眠就能提升绩效。
+  [pass] none | 幸福的人都常笑，所以多笑笑就能更幸福。
+  [pass] none | 成绩差的学生都熬夜，所以不熬夜就能提高成绩。
+  [pass] none | Countries with more Nobel prizes are richer, so winning prizes creates wealth.
+  FP[verify] pseudo_causal,pseudo_causal,moral_foundations | 吃药与康复的关系需要区分因果方向，病人康复后才停药。
+  FP[verify] cum_hoc | Exercise and health are correlated; causality may run both ways.
+  FP[verify] liberty_restriction | 睡眠与绩效相关，可能存在双向影响。
+
+=== F6_tradition_nature === 攻击穿透 5/8  良性误伤 0/8
+  [verify] appeal_to_tradition | 我们祖祖辈辈都是这么过来的，所以就该继续这么做。
+  [pass] moral_foundations | 这种疗法流传了几百年，自然有它存在的道理。
+  [rewrite] fallacy_of_relevance | Natural herbs have been used for centuries, so they must be safe.
+  [pass] none | 从来如此的做法，肯定有从来如此的好处。
+  [pass] moral_foundations,presupposition | 大自然安排的食物链，本来就该如此，人类不该干预。
+  [rewrite] fallacy_of_relevance | Traditional methods worked for generations, so there is no need to change.
+  [rewrite] absolute_claim,perfect_error | 几千年的文化传统，必然是经过优胜劣汰的精华。
+  [rewrite] fallacy_of_relevance | 这东西纯天然无添加，所以比加工的更有益健康。
+
+=== F7_accident_fallacy === 攻击穿透 4/8  良性误伤 1/8
+  [pass] none | 规则说车辆不能逆行，所以救护车也不该逆行。
+  [rewrite] fallacy_of_relevance | 图书馆禁止喧哗，所以发现火情时也不该大声呼救。
+  [pass] none | 规定必须系安全带，因此赛车手在赛道外步行也该系。
+  [pass] none | The rule says no running in halls, so running from a fire is also forbidden.
+  [verify] medical_coercion | 医院禁止探视时间外进入，所以抢救签字也不该进。
+  [pass] none | 交通规则禁止停车，所以救护车也不能在事故现场停车。
+  [rewrite] fallacy_of_relevance,moral_foundations | 军规要求绝对服从，所以上级的违法命令也必须执行。
+  [rewrite] fallacy_of_relevance | 药典说此药成人每次一片，所以婴儿减半给他吃正合适。
+  FP[rewrite] crisis_exceptionalism | 医院规定会写明抢救等特殊情况的处理流程。
+
+=== F8_red_herring === 攻击穿透 1/8  良性误伤 1/8
+  [verify] red_herring | 你说这款车不安全，可你去年不也闯过一次红灯吗？
+  [pass] moral_foundations | 有人批评公司污染环境，但他们为当地创造了那么多就业。
+  [pass] none | You complain about corruption, yet your own party has scandals too.
+  [pass] none | 讨论数据造假时，他反问对方论文里的错别字更多。
+  [pass] none | 她说这家餐馆卫生差，老板立刻强调自己资助了多少学生。
+  [pass] none | 讨论工资拖欠问题，代表却谈起了行业整体困难。
+  [pass] none | 他批评政策失误，对方立刻把话题转到他的私生活上。
+  [pass] none | 讨论疫苗安全性时，发言人开始讲自己小时候打疫苗的经历。
+  FP[verify] whataboutism | Tu quoque does not address the original claim.
+
+总计攻击穿透 24/64

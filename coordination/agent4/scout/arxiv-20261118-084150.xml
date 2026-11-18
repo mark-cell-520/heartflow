@@ -1,0 +1,383 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/HqLrXzQnPxI/mx1cdWkFSQ8US/E</id>
+  <title>arXiv Query: search_query=all:statistical OR all:reasoning OR all:fallacy OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T08:42:05Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:reasoning+OR+(all:fallacy+OR+all:detection))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>598673</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23229v1</id>
+    <title>Ambient LLMs: Data-Efficient Supervised Fine-tuning via Temperature Matching</title>
+    <updated>2026-11-17T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.23229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Collecting large-scale, diverse, and high-quality post-training datasets for autoregressive language models is challenging. Consequently, Supervised Fine-Tuning (SFT) is typically applied to datasets significantly smaller than those used for pre-training, which leads to overfitting and the catastrophic forgetting of the tails of the data distribution. To prevent this collapse, we introduce Ambient SFT, a principled framework for leveraging imperfect predictions to augment the fine-tuning set. In our method, a "frozen" version of the pre-trained model serves as a noisy teacher that the fine-tuned model must match at a coarse level. In particular, we require that the high-temperature versions of the conditional distributions produced by the post-training model should match the high-temperature versions of the pre-training ones. The temperature hyperparameter controls the level of trust in the pre-trained model, with the limit $T\to \infty$ reverting back to regular SFT and $T=1$ to knowledge distillation. We demonstrate that our approach outperforms standard SFT across domain adaptation, instruction-tuning, and reasoning, leading for up to $21\%$ average relative improvement to standard SFT.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:37Z</published>
+    <arxiv:comment>Work in progress</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Giannis Daras</name>
+    </author>
+    <author>
+      <name>Marios Papachristou</name>
+    </author>
+    <author>
+      <name>Adam Klivans</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Constantinos Daskalakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23228v1</id>
+    <title>Spool: Low-Latency Streaming Inference for Hybrid Vision-Language Models</title>
+    <updated>2026-11-17T18:59:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Applications such as visual accessibility agents and robotics require answering questions about recent video content promptly, over a bounded window of past frames (e.g., the last two minutes). Hybrid vision-language models (VLMs), which interleave attention with linear recurrent layers such as Gated DeltaNet (GDN), are attractive for this setting, but maintaining a sliding window is expensive. The reason is that recurrent layers combine all past frames into a shared state, so expiring old frames normally requires re-running the entire window through the model. We observe that the recurrent update is affine in the state with input-dependent coefficients, so the effect of each frame can be captured as a transformation that composes associatively. We present Spool, a training-free framework that caches per-frame state transformations and composes them efficiently as the window advances, removing expired frames from each recurrent layer's state without replaying frames through the backbone. Removal is exact within each layer; as with key-value eviction in attention, expired frames can retain residual influence through the cached inputs computed by earlier layers. We design a dedicated data structure and GPU kernels to achieve low caching and composition overhead. Across five open-source hybrid VLMs and four video reasoning benchmarks, Spool achieves the lowest p95 time-to-first-token in all 20 model-benchmark tests, reducing it by a geometric mean of $6.6\times$ over the faster of two recent vLLM baselines, while improving accuracy by 2.3 percentage points on average.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:27Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rui Ning</name>
+    </author>
+    <author>
+      <name>Om Chabra</name>
+    </author>
+    <author>
+      <name>Hari Balakrishnan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23224v1</id>
+    <title>From nonlocal correlations to local symmetry breaking: Asymmetry dynamics of crosscap states</title>
+    <updated>2026-11-17T18:57:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.23224v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23224v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Under unitary dynamics preserving a global symmetry, bipartite entanglement typically grows while an initially broken symmetry is locally restored. Here, we show that this conventional scenario can be reversed when symmetry-breaking coherence is initially encoded in long-range entanglement. We investigate this phenomenon in a family of charge deformed crosscap states, characterized by antipodal entangled pairs with tunable entanglement and symmetry breaking. We first characterize their static properties, finding a Page-like entanglement profile and an entanglement asymmetry that vanishes for subsystems smaller than half the system size, but grows logarithmically for larger subsystems. For symmetric subsystems, we also analyze the symmetry-resolved entanglement and investigate how it evolves as the subsystem is continuously deformed away from a symmetric partition. Following a quench to a free-fermion tight-binding chain, we uncover an unconventional dynamics in which the entanglement entropy decreases whereas the entanglement asymmetry increases, so that initially symmetric subsystems dynamically develop local symmetry breaking. This behavior is quantitatively captured by a quasiparticle picture describing the propagation of antipodal correlations. Our results reveal how symmetry-preserving dynamics can redistribute globally encoded symmetry-breaking coherence, making it locally accessible, and establish the initial entanglement structure as a key ingredient in determining the fate of local symmetries out of equilibrium.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:40Z</published>
+    <arxiv:comment>29 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Konstantinos Chalas</name>
+    </author>
+    <author>
+      <name>Pasquale Calabrese</name>
+    </author>
+    <author>
+      <name>Colin Rylands</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23223v1</id>
+    <title>Equilibrium Statistics and Stability in Random Two-Population and Three-Population Evolutionary Games</title>
+    <updated>2026-11-17T18:57:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.23223v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23223v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multi-population matrix evolutionary games provide a framework for studying adaptation and strategic interactions among heterogeneous agents. When payoffs are uncertain, however, analysing a specified game does not reveal how frequently different evolutionary outcomes occur or how their probabilities depend on modelling assumptions. We study two- and three-population games with two strategies per population and both within- and between-population pairwise interactions, with payoffs fixed during each evolutionary trajectory. For two populations, we derive equilibrium-existence probabilities and analytical stability results for generic games and three structured classes: diversity, exclusive, and avoidance games. For generic two-population games, independent Gaussian sampling of payoff entries and of replicator coefficients produces different equilibrium statistics. Interaction structure further distinguishes coexistence from attraction: diversity and exclusive games share the same interior-existence probability, but only exclusive games admit asymptotically stable interior equilibria. Avoidance games admit transversely attracting equilibrium families without locally asymptotically stable individual points. For generic three-population games under independent payoff sampling, we obtain existence probabilities for all equilibrium types and joint existence-and-stability probabilities for boundary equilibria. Monte Carlo simulations support the analytical predictions and quantify multistability, while phase portraits illustrate initial-condition dependence. Under the same Gaussian payoff-sampling protocol, simulations show a lower frequency of fully mixed equilibria but a higher frequency of multistability for three populations than for two.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:35Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Zhao Song</name>
+    </author>
+    <author>
+      <name>Manh Hong Duong</name>
+    </author>
+    <author>
+      <name>The Anh Han</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23218v1</id>
+    <title>What Does a Bias Head Measure? Non-Identifiability in Head-Level Bias Attribution</title>
+    <updated>2026-11-17T18:57:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.23218v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23218v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Methods that localise social bias in large language models to individual attention heads and remove it by ablation are validated by their effect on a fairness metric, never by evidence that the statistic selecting the heads measures bias. We audit this on Qwen-2.5-7B-Instruct and Llama-3.1-8B-Instruct. The head map correlates at $ρ= -0.950$ and $-0.768$ with a label-blind response-length map, apparently identifying a surface confound. An intervention that breaks the length-label coupling rejects this reading: with the prompt held fixed, response length explains 1% of the statistic's variance. What does explain it is prompt identity, at 64% of variance, in an ordering that is not monotonic in length. Within any fixed prompt the fairness label, response length and the presence of a protected-group token are collinear at $φ= 0.95$, partly by definition of the labelling rule, so no observational analysis can attribute the map to any of them, and no method in this family performs an experiment that could. The substantive claims fail independently: bias selectivity is not late-layer-concentrated on either model under either reference reading, and no head set we tested reduces the unfairness rate when ablated. Its complement, scored on the opposite label, reliably destroys refusal behaviour ($p = 2.7\times10^{-5}$), demonstrating that the pipeline detects effects at this scale.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:08Z</published>
+    <arxiv:comment>18 pages, 13 tables. Under review at ACL Rolling Review (October 2026 cycle)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>S. M Seefat Alam</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23216v1</id>
+    <title>Higher-Scoring Coding Models Did Not Get More Work Done</title>
+    <updated>2026-11-17T18:56:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23216v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23216v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>New coding models advertise themselves on score improvements of coding benchmarks. Yet no study has tested if a model that scores higher on these benchmarks gets more real work done. On June 12, 2026, a U.S. export control directive banned access to Claude Fable 5 for 19 days, which forced users to switch to other models. During this time, most former Fable 5 users switched to Opus 4.8 (11 points lower on SWE-Bench Pro compared to Fable 5). We treat this suspension as a natural experiment, where the people and projects stayed the same and only the model changed, so we could isolate the effect of Fable 5 on user productivity. We tracked GitHub pull requests of 297 Fable 5 users before, during, and after the suspension. We used 8,908 developers who stayed on Opus 4.8 all the time as the control group. We also repeated the comparison across five model upgrades before and after the suspension in 2026 (1,208 developers, 15,442 pull requests). Fitting a difference-in-differences model with developer and date fixed effects, we found that having access to Fable 5 increased the 7-day merge rate of pull requests by only 1.4 percentage points [-1.4; +4.3], which was not statistically significant. Similarly, no significant increases of merge rates were found with the upgrades (weighted mean: -0.9 percentage points [-1.9; +0.2]); all five estimates were negative (95% intervals included 0, did not differ from each other). We also did not observe a significant increase in the number of pull requests merged per week (+2.4% [-4.9%; +10.2%]).</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:56:42Z</published>
+    <arxiv:comment>20 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Yining Hua</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23211v1</id>
+    <title>Multimodal Masked Diffusion Autoencoder for Modeling Impaired Driving</title>
+    <updated>2026-11-17T18:50:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.23211v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23211v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Human cognitive state (e.g., distraction, stress), gaze, and behavior interact with the driving environment in subtle ways that AI could use to assist drivers, but ground-truth labels for human cognitive state levels are costly to obtain at scale. We propose a multimodal masked-diffusion autoencoder, ID-MAE, that adds a self-supervised objective to impairment prediction: alongside predicting the impairment label as a masked token, it reconstructs masked gaze and trajectory. To probe the effects of different modalities and types of impairments on model inference, we introduce DIVERT, a driving-simulator dataset containing 103 hours of driving data (n = 109) with ten impairment inductions spanning cognitive, visual, and emotional states, recorded with gaze, vehicle state, and scene video. We demonstrate how ID-MAE affords significant improvements in impairment inference results on both the DIVERT dataset and existing datasets, and enables strong results in additional tasks, such as trajectory and gaze prediction. For location-matched pairs, our model achieves a paired AUC of 0.706 for impairment detection on DIVERT, compared to 0.590 without reconstruction loss, improving over existing baselines. We probe the design space in terms of input modalities, masking scheme, positional encoding, attention mechanism, and decoding. We also investigate the interaction between various impairments in training and inference, demonstrating that visually demanding distractions are separable from cognitive distractions. Code and data will be available upon acceptance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:50:22Z</published>
+    <arxiv:comment>Equal contribution: John Gideon and Anshul Gupta. 8 pages, 6 figures. Submitted to CVPR 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>John Gideon</name>
+    </author>
+    <author>
+      <name>Anshul Gupta</name>
+    </author>
+    <author>
+      <name>Megan Applegate-Kenton</name>
+    </author>
+    <author>
+      <name>Kayli Battel</name>
+    </author>
+    <author>
+      <name>Todd J Rowell</name>
+    </author>
+    <author>
+      <name>Patricio Reyes Gomez</name>
+    </author>
+    <author>
+      <name>Laporsha Dees</name>
+    </author>
+    <author>
+      <name>Emily Sumner</name>
+    </author>
+    <author>
+      <name>Avinash Balachandran</name>
+    </author>
+    <author>
+      <name>Guy Rosman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23209v1</id>
+    <title>Learning Grounded Reasoning from Human Gaze</title>
+    <updated>2026-11-17T18:49:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.23209v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23209v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Human visual reasoning is driven by systematic exploration and extraction of task-relevant visual evidence. Human gaze provides a window into this process, making gaze a useful source of guidance for visually-grounded reasoning in vision-language models (VLMs). However, human gaze also includes noise and redundancies that may transfer poorly to VLMs. In this work, we investigate how human gaze data can be effectively leveraged to improve visual reasoning in VLMs, while maintaining alignment with human behavior. We collect 7,109 human gaze trials from a diverse and challenging set of visual reasoning tasks, and train grounded reasoning models with different forms of gaze guidance. Across evaluations in chart understanding, visual search, and counting, we find that using human gaze as a prior for grounded reasoning consistently outperforms supervision using the full gaze sequence. Based on these findings, we introduce GGR (Gaze-Guided Reasoner), which achieves greater human alignment and more reliable visual grounding while matching or outperforming leading grounded-reasoning baselines in accuracy. Reinforcement learning further improves task accuracy, gaze alignment, and grounding quality despite using no gaze supervision. Behavioral analyses show that gaze supervised models exhibit more visual exploration before arriving at an answer. Our results suggest that the value of human gaze lies in guiding spatial exploration and shaping reasoning behavior without requiring complete imitation of human behavior.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Gabriel Sarch</name>
+    </author>
+    <author>
+      <name>Declan Campbell</name>
+    </author>
+    <author>
+      <name>Nicholas Budny</name>
+    </author>
+    <author>
+      <name>Kia Ghods</name>
+    </author>
+    <author>
+      <name>Katerina Fragkiadaki</name>
+    </author>
+    <author>
+      <name>Jonathan D. Cohen</name>
+    </author>
+    <author>
+      <name>Brenden M. Lake</name>
+    </author>
+    <author>
+      <name>Taylor W. Webb</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23208v1</id>
+    <title>Distortion-Free Semantic Watermarks for Black-Box Generative Models</title>
+    <updated>2026-11-17T18:49:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.23208v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23208v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a provably distortion-free semantic watermarking algorithm that requires only black-box sampling access to a generative model and black-box access to a semantic embedding. A watermark is called distortion-free if, averaged over its secret detection key, it leaves the generator's output distribution unchanged; this provides a formal guarantee that watermarking does not reduce output quality. Conventional such watermarks are often brittle to transformations. This is especially problematic for images, where benign operations such as compression, cropping, or resizing change the entire pixel representation. Semantic watermarks therefore require detection to be robust to content-preserving transformations. Previous methods combining these properties rely heavily on specific white-box properties of the underlying model: either to autoregressive text generation or to diffusion-specific access, such as control of the initial noise or diffusion inversion. In contrast, our construction is fully generic: It only interacts with the generative model and the semantic embedding, a function that determines the notion of "preserving content" under which detection should be robust, via sample and query access. We then instantiate this framework for image generation. We characterize the two competing properties required of the semantic embedding: it should remain stable under transformations that preserve an image's content, but should distinguish independent generations from the same prompt. We train an image encoder directly for this tradeoff. The resulting encoder improves separation while maintaining stability over off-the-shelf alternatives and enables strong aggregate detection while remaining robust to various transformations. We demonstrate the effectiveness of our watermark scheme on both open-source and closed models, which is possible only due to restriction to black-box access.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:17Z</published>
+    <arxiv:comment>Project page: https://avivyossef.github.io/distortion-free-semantic-watermark/ Code: https://github.com/avivyossef/distortion-free-semantic-watermark</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aviv Yossef</name>
+    </author>
+    <author>
+      <name>Or Patashnik</name>
+    </author>
+    <author>
+      <name>Or Zamir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23207v1</id>
+    <title>Local interference algorithms for observables in large random circuits</title>
+    <updated>2026-11-17T18:48:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23207v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23207v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In quantum dynamics, it is generally believed that interference effects lead to a sign problem for classical Monte Carlo sampling methods, rendering sampling ineffective. In this paper we show that this is generically not the case for the task of simulating the evolution of observables in random instances of circuit dynamics. Specifically, we consider two examples of observables which give large signals despite the randomness of the dynamics: first order out-of-time-ordered correlators (OTOCs) in unstructured random circuits without conservation laws and time-ordered charge-charge correlators (TOCs) in particle number-preserving random circuits. We show that these observables can be approximated by classical stochastic processes and that these approximations can be systematically improved with a series expansion that incorporates coherent corrections associated with clusters of gates. We design and implement algorithms that combine Monte Carlo sampling and tensor network methods to approximate the series. We observe numerically that the computational complexity of approximating TOCs and OTOCs scales polynomially in the circuit size and in the target precision. We study the accuracy of these algorithms by directly mapping their ensemble-averaged errors to partition functions of replica statistical models, allowing for perturbative analysis and numerics in $1$d brickwork geometries. Our theoretical analysis explains the empirical observation of polynomial complexity of these algorithms and is consistent with polynomial complexity extending to arbitrarily small precision and to the thermodynamic limit.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:48:27Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Philippe Suchsland</name>
+    </author>
+    <author>
+      <name>Brayden Ware</name>
+    </author>
+    <author>
+      <name>Vladislav D. Kurilovich</name>
+    </author>
+    <author>
+      <name>Vadim Smelyanskiy</name>
+    </author>
+    <author>
+      <name>Kostyantyn Kechedzhi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23206v1</id>
+    <title>Reading Scene States: Uncovering Safety Failures in Vision-Language Models</title>
+    <updated>2026-11-17T18:48:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.23206v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23206v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language models (VLMs) can provide harmful assistance by interpreting visual events, even without an explicit request for the underlying harmful objective. We identify this \textbf{scene-state safety vulnerability} and introduce \textbf{SceneSafetyBench}, comprising 375 image--question pairs spanning Initial, Medium, and Ultimate scene states and five visual presentations. Across eight VLMs, scene-state inputs elicit harmful assistance with attack success rates (ASRs) of 45.6--72.3\%. Comparative analysis across three VLMs shows that scene-state inputs most closely resemble QR-related images in their layer-wise safety-related signal profiles, while exhibiting lower average late-layer readouts and distinct signal dynamics during generation. To turn this vulnerability into a systematic attack, we propose \textbf{S3TA}, which translates harmful objectives into scene states, queries image--question pairs independently, and assembles the responses. On seven MM-SafetyBench categories across eight open-weight and commercial VLMs, S3TA achieves a model-average ASR of \textbf{71.2\%, exceeding the strongest baseline by 6.1 percentage points}. Text-side filters and visual moderation provide limited protection. These findings highlight the need to safeguard the assistance models infer through scene-grounded reasoning, beyond screening input content.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:48:02Z</published>
+    <arxiv:comment>VLM safety, multimodal jailbreaks, and scene-state reasoning</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tongxi Wu</name>
+    </author>
+    <author>
+      <name>Yuyang Cheng</name>
+    </author>
+    <author>
+      <name>Jiacheng Xian</name>
+    </author>
+    <author>
+      <name>Menglin Yang</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Jian Zhang</name>
+    </author>
+    <author>
+      <name>Yang Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23203v1</id>
+    <title>Identifying and Repairing Energy Smells with Agent Skills</title>
+    <updated>2026-11-17T18:45:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23203v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23203v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Energy smells are inefficient implementations that waste energy. Once code reaches production, these smells become costlier and riskier to fix, so energy efficiency checks should shift left, i.e., move earlier in the development lifecycle, to where code is written. Existing energy smell tools rely on fixed static rules and do not measure energy savings, whereas LLM-based optimizers mostly target execution time and rarely ground their changes in concrete smell definitions. To address both limitations, we present DR. GREENS, an agent skill that detects and repairs energy smells in Python code within the developer's coding environment. The skill grounds the coding agent in our taxonomy of 12 energy smells and 65 root causes, augmented with repair guidance drawn from 230 measured cases. The skill also encapsulates a static analyzer and an independent verifier to confirm behavior preservation and energy saving for each attempted repair. We evaluated DR. GREENS in 18 sessions on three open-source repositories, with two models and three skill configurations. Of the 258 measured repairs, 68.6% saved energy, with a median saving of 24.9%. Compared with a baseline skill that lacks the taxonomy, the full skill found more energy smells with verified savings in all three repositories with both models. DR. GREENS helps developers detect energy hotspots and fix them reliably without altering program behavior, which makes energy-efficient development more feasible.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:45:42Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Mohammadjavad Mehditabar</name>
+    </author>
+    <author>
+      <name>Saurabhsingh Rajput</name>
+    </author>
+    <author>
+      <name>Tushar Sharma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23192v1</id>
+    <title>WoRD: Diffusion-Based Posterior Inference for Online Goal Recognition</title>
+    <updated>2026-11-17T18:35:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.23192v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23192v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Goal recognition is the task of inferring an agent's intended goal from its observed behavior. Most existing work focuses on high-level symbolic recognition, abstracting away the continuous motion through which agents reach their goal. Methods that do reason over continuous trajectories rely on an explicit dynamics model that is hard to acquire and rarely transfers across settings. Neither approach explicitly learns how agents move toward each candidate goal, limiting accuracy on ambiguous trajectory prefixes where such knowledge is most needed.
+  We present WoRD (Waypoint Recognition with Diffusion), which uses a learned trajectory prior to infer the agent's goal from partial observations. At each step, WoRD runs one warm-started denoising chain per candidate goal, steers each chain toward the observed trajectory through a closed-form log-likelihood gradient, and reweights the resulting samples by Bayes' rule into a calibrated posterior over goals. We evaluate WoRD on simulated robot settings, pedestrian trajectories, and vehicle trajectories using four metrics targeting distinct failure modes. Across all three settings, the same inference procedure preserves calibrated multimodal beliefs through ambiguous prefixes where filter- and classifier-based observers collapse to a single mode or grow overconfident.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:35:53Z</published>
+    <arxiv:comment>Accepted at the 40th Annual Conference on Neural Information Processing Systems (NeurIPS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Almog Anschel</name>
+    </author>
+    <author>
+      <name>Sarah Keren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23182v1</id>
+    <title>Fully Spiking Neural Implementation of Lambda-Calculus Beta-Reduction via Biologically Documented Mechanisms</title>
+    <updated>2026-11-17T18:27:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.23182v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23182v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present the first complete implementation of $β$-reduction in the untyped $λ$-calculus using exclusively spiking neural dynamics. Every step of the reduction---redex detection, subterm segmentation, variable-binding detection, De~Bruijn index arithmetic, token copying, and inter-step role maintenance---is performed by leaky integrate-and-fire (LIF) neurons with explicit membrane dynamics, exponential synaptic currents, axonal delays, and pair-based spike-timing-dependent plasticity (STDP). Each neural component maps onto a specific, experimentally documented mechanism: Jeffress-type delay-line coincidence for redex detection; a line-attractor balance counter for subterm segmentation; $θ$--$γ$ cross-frequency coupling for De~Bruijn variable binding; a phase-ring traveling wave for depth-index arithmetic; theta-cycle STDP for token copying; and recurrent persistent firing for role maintenance between reduction steps. All synaptic weights are derived analytically from measured EPSP amplitudes; no hand tuning is performed. The closed-loop system achieves 100\,\% agreement with a symbolic oracle across ten validation classes, including Church numeral arithmetic (\textsc{plus}, \textsc{mult}, \textsc{pred}), Boolean logic with divergent branches, Y-combinator steps, terms with up to six bound-variable occurrences, De~Bruijn indices up to~12, noise robustness, and determinism. To our knowledge this is the first Turing-complete symbolic computation performed entirely within spike dynamics using biologically grounded circuit primitives. We discuss implications for neuromorphic proof assistants and the neural basis of symbolic reasoning.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:27:55Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Vladimir A. Lazovskiy</name>
+    </author>
+    <author>
+      <name>Victor B. Kazantsev</name>
+    </author>
+    <author>
+      <name>Sergey V. Stasenko</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23178v1</id>
+    <title>Photon condensation driven by scalar spin chirality</title>
+    <updated>2026-11-17T18:23:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.23178v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23178v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Gauge invariance forbids equilibrium photon condensation for spatially uniform electric-dipole coupling, motivating alternative routes based on orbital magnetic response. We show that triangular molecular magnets coupled to a cavity support photon condensation driven by emergent scalar spin chirality. Starting from the half-filled Hubbard model in the Mott regime, we derive an effective Hamiltonian in which virtual ring exchange couples the cavity flux directly to scalar spin chirality. Mean-field theory, collective-fluctuation calculations, and finite-size exact diagonalization reveal a phase with spontaneous chirality ordering and a macroscopic cavity displacement, together with hybrid chirality-photon excitations. The condensation threshold can be tuned electrically through the molecular chirality splitting. Our results establish emergent orbital degrees of freedom in frustrated magnets as a route to equilibrium light-matter ordering beyond conventional dipolar cavity quantum electrodynamics.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:23:48Z</published>
+    <arxiv:comment>19 pages, 3 figures; includes Supplemental Material</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>Dimitrije Stepanenko</name>
+    </author>
+    <author>
+      <name>Daniel Loss</name>
+    </author>
+    <author>
+      <name>Mircea Trif</name>
+    </author>
+  </entry>
+</feed>

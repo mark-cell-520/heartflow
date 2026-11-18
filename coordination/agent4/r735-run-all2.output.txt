@@ -1,0 +1,223 @@
+
+=== HeartFlow module tests ===
+
+CodeWriter / CodeGenerator / HeartLogic / DesireCognition — 模块已清理
+
+=== 动态接入其余测试文件 ===
+共 827 个测试文件：并发池 737 + 串行车道 90（JOBS=4，可调 1-16）
+串行车道 = 变更测试（写 src/）+ MCP 服务类，防并发互踩
+
+[1/827]   KnowledgeOntology
+
+[2/827]   KnowledgeQuery
+
+[3/827]   ClassicsValueMapper
+
+[4/827]   ClassicsRules
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[5/827]   DualPerspectiveAuditor
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[6/827]   SignalAbsorber
+classics-rules: 20 通过, 0 失败, 共 20 个
+
+[7/827]   AgentBoundaryGuard
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[8/827]   MetacognitiveExecutive
+dual-perspective: 11 通过, 0 失败
+
+[9/827]   RecoveredModules
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[10/827]   RecoveredModules2
+  (无输出)
+
+[11/827]   KnowledgeGraphAdapter
+signal-absorber: 22 通过, 0 失败
+
+[12/827]   SourceAnnotator
+  [重试] RecoveredModules: 子进程零输出被中断（环境噪声），重跑一次
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[13/827]   SecurityAudit
+  [异常] RecoveredModules: Command failed: node /data/workspace/heartflow/test/recovered-modules.test.js
+
+[14/827]   IdentityCore
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[15/827]   BigFivePersonality
+  (无输出)
+
+[16/827]   SelfModel
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[17/827]   LogicReasoning
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[18/827]   ReflectionLoop
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[19/827]   ModuleRegistry (P4)
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[20/827]   RouteWhitelist (P4)
+安全审计回归: 15 通过, 1 失败, 共 16 个
+
+[21/827]   SafeFS (P4)
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[22/827]   · 35dim-integration.test.js
+测试结果: 13 通过, 0 失败, 共 13 个
+
+[23/827]   · a2m-notify-http.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[24/827]   · a2m-notify.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[25/827]   · absolute-claim-en.test.js
+  (无输出)
+
+[26/827]   · action-tracker.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[27/827]   · active-inference-efe.test.js
+  ✅ 验签：合法 RSA2 签名通过
+  ✅ handleNotify：验签通过后正确入账
+  ✅ handleNotify：验签失败返回 failure 且不改状态
+
+[28/827]   · adaptive-controller.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[29/827]   · adversarial-synthesis.test.js
+  (无输出)
+
+[30/827]   · adversarial-upgrade.test.js
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[31/827]   · adversarial-variant-language-coverage.test.js
+  [异常] · absolute-claim-en.test.js: Command failed: node /data/workspace/heartflow/test/absolute-claim-en.test.js
+
+[32/827]   · adversarial-variant.test.js
+测试结果: 30 通过, 0 失败, 共 30 个
+
+[33/827]   · affective-forecast.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[34/827]   · ai-writing-tell-co-occurrence.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[41/827]   · ai-writing-tell-zh-en-mixing-round50.test.js
+  (无输出)
+
+[42/827]   · ai-writing-tell.test.js
+测试结果: 16 通过, 0 失败, 共 16 个
+
+[43/827]   · anchoring-effect.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[44/827]   · anonymous-source-claim.test.js
+  (无输出)
+
+[45/827]   · anonymous-source.test.js
+结果: 89 通过, 1 失败, 共 90 个
+  ✗ C gate pass: 总有一天你会明白这个道理: action=rewrite 良性应为 pass
+
+[46/827]   · api-surface-consistency.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[47/827]   · appeal-authority-first-person-r227.test.js
+结果: 3 通过, 0 失败, 共 3 个
+
+[48/827]   · appeal-to-future.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[49/827]   · appeal-to-rumor.test.js
+appeal_to_rumor: 10 通过, 0 失败
+
+[50/827]   · assertion-quality-guard.test.js
+结果: 3 通过, 0 失败, 共 3 个
+
+[51/827]   · assertions.test.js
+  ✓ isEqual 不等返回失败
+  ✓ throws 无异常则失败
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[52/827]   · atomic-write.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[53/827]   · audit-regression.test.js
+结果: 15 通过, 0 失败, 共 15 个
+
+[54/827]   · audit-wiring.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[55/827]   · auto-rules.test.js
+53 通过, 0 失败
+
+[56/827]   · automation-bias.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[57/827]   · bad-faith-en-r226.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[58/827]   · bad-faith-feigned-discussion-round52.test.js
+  [异常] · audit-regression.test.js: Command failed: node /data/workspace/heartflow/test/audit-regression.test.js
+
+[59/827]   · bad-faith-gaps-round88.test.js
+45 通过, 0 失败
+
+[60/827]   · bad-faith-narrative-round86.test.js
+测试结果: 17 通过, 0 失败, 共 17 个
+
+[61/827]   · behavior-tracker.test.js
+behavior-tracker: 1 通过, 0 失败, 共 1 个
+
+[62/827]   · being-logic.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[63/827]   · benign-mixed-benchmark.test.js
+  (无输出)
+
+[64/827]   · benign-nonpass-calibration.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[65/827]   · bidirectional-guard.test.js
+  ✅ 基线维度全部丢失 → lostDims 非空 → 应判失败
+  ✅ 部分退化（丢 1 维）→ lostDims 长度 1 → 仍判失败
+  ✅ 新增维度不导致失败（只查丢失，不查新增）
+结果: 12 通过, 0 失败, 共 12 个
+
+[66/827]   · blindspot-upgrade.test.js
+结果: 5 通过, 0 失败, 共 5 个
+
+[67/827]   · boot-check.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[68/827]   · broken-window-fallacy.test.js
+结果: 28 通过, 0 失败, 共 28 个
+
+[69/827]   · budget.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[70/827]   · bulk-export-en-couple-r381.test.js
+  (无输出)
+
+[71/827]   · bullshit-engineering-context.test.js
+结果: 10 通过, 1 失败, 共 11 个
+
+[72/827]   · capability-abstraction.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[73/827]   · capability-guard.test.js
+测试结果: 22 通过, 0 失败, 共 22 个
+
+[74/827]   · check-confidence-calibration.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[76/827]   · code-security-command-injection.test.js
+  [异常] · bulk-export-en-couple-r381.test.js: Command failed: node /data/workspace/heartflow/test/bulk-export-en-couple-r381.test.js
+
+[77/827]   · code-security-dev-context-round28.test.js
