@@ -277,7 +277,7 @@ const MARKERS = [
   { re: /话锋一转|顾左右而言他|岔开(?:话题|话头|议题)/, kind: 'narrate', origin: 'before', explicit: true },
   { re: /shifted? (?:the )?(?:topic|conversation|subject|focus|discussion|attention)/i, kind: 'narrate', origin: 'before', explicit: true },
   { re: /moved (?:the )?(?:topic|conversation|subject|discussion|focus)/i, kind: 'narrate', origin: 'before', explicit: true },
-  { re: /(?:began|started) (?:to )?(?:talk|speak|boast|go on) about/i, kind: 'narrate', origin: 'before' },
+  { re: /(?:began|started) (?:to )?(?:talk(?:ing)?|speak(?:ing)?|boast(?:ing)?|go(?:ing)? on) about/i, kind: 'narrate', origin: 'before' },
 ];
 
 // ─── redirect 族的回应义务锚点（腿②资格门）────────────────────────────
@@ -348,7 +348,7 @@ const REPLACE_PRIORITY_EN = [
 // **被批评的事项**，不只是「有人在讨论」。
 const CRITICISM_ZH = [
   // 第三方批评主体 + 批评动词
-  /(?:有人|人们|公众|舆论|媒体|网友|用户|客户|员工|居民|市民|群众|大家|外界|消费者|受害者|举报人|顾客|乘客|业主|家属|听众|学员|购房者)(?:都)?(?:在)?(?:不断|纷纷|强烈)?(?:批评|质疑|指责|抱怨|反映|投诉|爆料|揭露|指控|控告|举报|问责|不满)/,
+  /(?:有人|人们|公众|舆论|媒体|网友|用户|客户|员工|居民|市民|群众|大家|外界|消费者|受害者|举报人|顾客|乘客|业主|家属|听众|学员|购房者)(?:都)?(?:在)?(?:不断|纷纷|强烈)?(?:批评|质疑|指责|抱怨|反映|投诉|爆料|揭露|指控|控告|举报|问责|追问|质问|发问|不满)/,
   // 被动遭受批评
   /(?:被|受)(?:到)?(?:广泛|公开|纷纷)?(?:批评|质疑|指责|投诉|指控|举报|爆料|揭露|问责|诟病|非议)/,
   // 个体主语 + 批评/追问动词
@@ -363,10 +363,10 @@ const CRITICISM_ZH = [
   /(?:他|她|你|对方|有人|大家|人们|记者|代表|观众|读者|业主|患者|家长|市民|群众|顾客|用户|听众)(?:们)?(?:说|称|提到|提起|吐槽|反映|抱怨|指责)[^。；，！？]{0,18}(?:差|脏|假|错|烂|糟|不好|不行|不干净|不合格|不过关|不及格|不安全|有问题|有毛病|有漏洞|有风险|有隐患|造假|虚假|欺骗|忽悠|坑|副作用|有害|有毒|致癌|伤身)/,
 ];
 const CRITICISM_EN = [
-  /(?:you|she|he|they|we|i|someone|somebody|people|critics|reporters|journalists|users|customers|employees|residents|the public|the media|everyone|opponents|rivals|whistleblowers?) (?:say|said|says|claim|claimed|claims|accuse|accused|accuses|criticize|criticized|criticizes|complain|complained|complains|question|questioned|questions|allege|alleged|alleges|point(?:ed)? out|call(?:ed)? out|blamed?|charged)/i,
+  /(?:you|she|he|they|we|i|someone|somebody|people|critics?|reporters?|journalists?|users?|customers?|employees?|residents?|activists?|advocates?|investigators?|regulators?|inspectors?|auditors?|prosecutors?|attorneys?|lawyers?|watchdogs?|committees?|the public|the media|everyone|opponents?|rivals?|whistleblowers?|victims?) (?:say|said|says|claim|claimed|claims|accuse|accused|accuses|criticize|criticized|criticizes|complain|complained|complains|question|questioned|questions|challenge|challenged|challenges|press|pressed|confront|confronted|probe|probed|allege|alleged|alleges|point(?:ed)? out|call(?:ed)? out|blamed?|charged)/i,
   /(?:is|are|was|were|been) (?:criticized|questioned|accused|blamed|challenged|reported|alleged|investigated)/i,
   /(?:criticism|complaint|accusation|allegation|concerns?|questions?|controversy|scandal|backlash|outcry|skepticism|doubts?) (?:about|over|around|regarding|of|that|surrounding)/i,
-  /(?:discuss|discussed|discussing|debate|debated|debating|address|addressing|question|questioning|respond(?:ing)? to) (?:the |this |that )?(?:issue|problem|concern|question|controversy|scandal|safety|allegations?|criticism|complaint)/i,
+  /(?:discuss|discussed|discussing|debate|debated|debating|address|addressing|question|questioning|respond(?:ing)? to) [a-z][a-z\s']{0,24}?(?:issue|problem|concern|question|controversy|scandal|safety|allegations?|criticism|complaint)/i,
 ];
 
 // ─── [r398] concede 对比冲淡族：腿③社会成绩框（精度墙）────────────────
@@ -376,7 +376,7 @@ const CRITICISM_EN = [
 const MERIT_ZH = [
   /创造|带动|贡献|捐|资助|援建|扶持|募捐|缴纳|纳税|税收|营收|盈利|利润|奖金|奖学金/,
   /就业|岗位|饭碗|招用|雇用了?/,
-  /荣誉|奖项|奖章|奖牌|奖项|嘉奖|表彰|称号|冠军|纪录/,
+  /荣誉|奖项|奖章|奖牌|嘉奖|表彰|称号|冠军|纪录|大奖|获奖|夺奖|金牌/,
   /成绩|功劳|苦劳|不容易|辛苦|付出|汗水|心血/,
   /资历|履历|资格|地位|名声|声望|口碑|影响力|权威|知名/,
   /历史悠久|流传|传承|老字号|百年|千年|几百年|几千年|多年/,
@@ -668,15 +668,17 @@ function _evalMarker(text, mk, m, R) {
     const addrZh = R.ADDRESS_ZH || ADDRESS_ZH;
     const addrEn = R.ADDRESS_EN || ADDRESS_EN;
     if (addrZh.some(re => re.test(replaceText)) || addrEn.some(re => re.test(replaceText))) return null;
+    const meritZh = R.MERIT_ZH || MERIT_ZH;
+    const meritEn = R.MERIT_EN || MERIT_EN;
+    const excZh = R.EXCUSE_ZH || EXCUSE_ZH;
+    const excEn = R.EXCUSE_EN || EXCUSE_EN;
     if (mk.kind === 'concede') {
-      const meritZh = R.MERIT_ZH || MERIT_ZH;
-      const meritEn = R.MERIT_EN || MERIT_EN;
+      // concede 只认社会成绩框——同方案反陈述（「实施周期短其实是优势」）
+      // 无成绩名词，不判。
       if (!(meritZh.some(re => re.test(replaceText)) || meritEn.some(re => re.test(replaceText)))) return null;
     } else if (!mk.explicit) {
-      const meritZh = R.MERIT_ZH || MERIT_ZH;
-      const meritEn = R.MERIT_EN || MERIT_EN;
-      const excZh = R.EXCUSE_ZH || EXCUSE_ZH;
-      const excEn = R.EXCUSE_EN || EXCUSE_EN;
+      // narrate 叙事动词形认成绩框或外归因框；显式转题标记（把话题转到/
+      // shifted the topic）自带搁置义，免框（见 C7 边界锁）。
       const framed = meritZh.some(re => re.test(replaceText)) || meritEn.some(re => re.test(replaceText))
         || excZh.some(re => re.test(replaceText)) || excEn.some(re => re.test(replaceText));
       if (!framed) return null;
