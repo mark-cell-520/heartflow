@@ -1,0 +1,142 @@
+test/round-295-econ-reasoning-wiring.test.js:2: * r295 经济与资源推理 + 统计素养插件层+MCP 接线轮测（r296 扩族至 21 族、
+test/round-295-econ-reasoning-wiring.test.js:3: * r336 机会成本忽视扩族至 22 族后随族表更新）
+test/round-295-econ-reasoning-wiring.test.js:6: *   A 插件元数据与族表（44 族 = 36 econ + 8 stats，族键/模块路径/组归属）
+test/round-295-econ-reasoning-wiring.test.js:7: *   B 每族攻击命中（44 族全中，模块级判据经插件聚合后仍可达）
+test/round-295-econ-reasoning-wiring.test.js:206: T('A1 插件导出完整（name/version/hooks/init/analyze/FAMILIES）', () => {
+test/round-295-econ-reasoning-wiring.test.js:213: T('A2 族表 44 族：36 econ + 8 stats，key 唯一', () => {
+test/round-295-econ-reasoning-wiring.test.js:214: assert.strictEqual(FAMILIES.length, 44); // r295 18 + r296 信息与激励盲区 3 + r336 机会成本忽视 1 + r339 适应证混杂 1 + r343 incentive_conflation 1 + r360 Will Rogers 1（r361 收尾 r
+test/round-295-econ-reasoning-wiring.test.js:217: assert.strictEqual(econ.length, 36);
+test/round-295-econ-reasoning-wiring.test.js:218: assert.strictEqual(stats.length, 8);
+test/round-295-econ-reasoning-wiring.test.js:220: assert.strictEqual(new Set(keys).size, 44);
+test/round-295-econ-reasoning-wiring.test.js:256: assert.strictEqual(hits.length, 0, '误伤:\n' + hits.join('\n'));
+test/round-295-econ-reasoning-wiring.test.js:259: assert.strictEqual(analyze('').totalHits, 0);
+test/round-295-econ-reasoning-wiring.test.js:260: assert.strictEqual(analyze('短').totalHits, 0);
+test/round-295-econ-reasoning-wiring.test.js:261: assert.strictEqual(analyze(null).totalHits, 0);
+test/round-295-econ-reasoning-wiring.test.js:262: assert.strictEqual(analyze(undefined).score, 0);
+test/round-295-econ-reasoning-wiring.test.js:268: assert.strictEqual(r.familyCount, 1);
+test/round-295-econ-reasoning-wiring.test.js:273: assert.strictEqual(r.familyCount, 0);
+test/round-295-econ-reasoning-wiring.test.js:373: const r = await rpc('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 't', version: '1' } }, {});
+test/round-295-econ-reasoning-wiring.test.js:389: assert.strictEqual(call1.status, 200, `HTTP ${call1.status}`);
+test/round-295-econ-reasoning-wiring.test.js:396: assert.strictEqual(call2.status, 200, `HTTP ${call2.status}`);
+test/round-295-econ-reasoning-wiring.test.js:417: // [2026-11-12 审计修复] 原断言 strictEqual(n, 246) 写死 r295 锚点，r297 起
+test/round-295-econ-reasoning-wiring.test.js:421: // 本轮 18 族键不得出现在 gate 维度表（gate 层零接线，交接项给 1 号）
+test/round-295-econ-reasoning-wiring.test.js:424: // 「意外接入」。其余 17 族仍须保持零接线。
+test/round-295-econ-reasoning-wiring.test.js:432: assert.strictEqual(unexpected.length, 0, `gate 维度表出现本轮族键: ${unexpected.join(',')}`);
+test/round-364-jevons-paradox.test.js:3: // 插件层第 26 族）。r364 立项探针 coordination/agent4/probes/r364-probe-jevens.js：
+test/round-364-jevons-paradox.test.js:163: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥族表计数应为 37，实为 ' + GATE_FAMS.length);
+test/round-364-jevons-paradox.test.js:164: assert.strictEqual(plugin.FAMILIES.length, 44, '插件族表计数应为 42，实为 ' + plugin.FAMILIES.length);
+test/round-367-price-control.test.js:3: // 插件层第 28 族）。r367 立项探针 scripts/round-367/probe-pool-r367.js：
+test/round-367-price-control.test.js:210: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length);
+test/round-367-price-control.test.js:214: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length);
+test/round-368-mercantilism.test.js:3: // 插件层第 29 族）。r368 立项探针 scripts/round-368/probe-mercantilism-r368.js
+test/round-368-mercantilism.test.js:232: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length);
+test/round-368-mercantilism.test.js:236: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length);
+test/round-369-paradox-of-thrift.test.js:3: // 子族 / 插件层第 30 族）。r369 立项探针（v6.8.189 pristine 基线）：
+test/round-369-paradox-of-thrift.test.js:237: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length);
+test/round-369-paradox-of-thrift.test.js:241: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length);
+test/round-369-paradox-of-thrift.test.js:242: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
+test/round-369-paradox-of-thrift.test.js:243: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+test/round-371-decoy-effect.test.js:3: // 插件层第 31 族）。r371 立项探针（scripts/round-371/probe-r371-pool.js，
+test/round-371-decoy-effect.test.js:272: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length);
+test/round-371-decoy-effect.test.js:276: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length);
+test/round-371-decoy-effect.test.js:277: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
+test/round-371-decoy-effect.test.js:278: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+test/round-372-healthy-user-bias.test.js:3: // 子族 / 插件层第 32 族）。r372 立项探针（scripts/round-372/probe-r372-pool.js，
+test/round-372-healthy-user-bias.test.js:302: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length);
+test/round-372-healthy-user-bias.test.js:306: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length);
+test/round-372-healthy-user-bias.test.js:307: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
+test/round-372-healthy-user-bias.test.js:308: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+test/round-373-extraordinary-claims.test.js:3: // 插件层第 33 族）。r373 立项探针（scripts/round-373/probe-r373-pool.js +
+test/round-373-extraordinary-claims.test.js:6: // 低、C ambiguity_aversion 2/4 良性脏、D extraordinary_claims 攻击穿透 4/5
+test/round-373-extraordinary-claims.test.js:258: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length); // 36(r385 后) + r386 effect_measure_misread 1
+test/round-373-extraordinary-claims.test.js:262: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length); // 42 + r386 effect_measure_misread 1
+test/round-373-extraordinary-claims.test.js:263: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
+test/round-373-extraordinary-claims.test.js:264: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+test/round-373-extraordinary-claims.test.js:266: check('G3 插件 version 已 bump 至 1.19.0（r386 再 bump）', () => {
+test/round-373-extraordinary-claims.test.js:267: assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.19.0，实为 ' + plugin.version);
+test/round-374-stock-flow-conflation.test.js:3: // 34 族）。r374 立项探针（scripts/round-374/probe-r374-pool.js +
+test/round-374-stock-flow-conflation.test.js:270: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length); // 36(r385 后) + r386 effect_measure_misread 1
+test/round-374-stock-flow-conflation.test.js:274: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length); // 42 + r386 effect_measure_misread 1
+test/round-374-stock-flow-conflation.test.js:275: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
+test/round-374-stock-flow-conflation.test.js:276: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+test/round-374-stock-flow-conflation.test.js:278: check('G3 插件 version 已 bump 至 1.19.0（r386 再 bump）', () => {
+test/round-374-stock-flow-conflation.test.js:279: assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.19.0，实为 ' + plugin.version);
+test/round-375-government-household-analogy.test.js:3: // 第 36 族，econ 组第 30 子族）。r375 立项探针（scripts/round-375/
+test/round-375-government-household-analogy.test.js:278: assert.strictEqual(GATE_FAMS.length, 39, 'gate 桥计数 ' + GATE_FAMS.length); // 36(r385 后) + r386 effect_measure_misread 1
+test/round-375-government-household-analogy.test.js:282: assert.strictEqual(plugin.FAMILIES.length, 44, '插件计数 ' + plugin.FAMILIES.length); // 42 + r386 effect_measure_misread 1
+test/round-375-government-household-analogy.test.js:283: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 计数异常');
+test/round-375-government-household-analogy.test.js:284: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 计数异常');
+test/round-375-government-household-analogy.test.js:286: check('G3 插件 version 已 bump 至 1.19.0（r386 再 bump）', () => {
+test/round-375-government-household-analogy.test.js:287: assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.19.0，实为 ' + plugin.version);
+test/round-376-money-creation.test.js:150: assert.strictEqual(gate.FAMILIES.length, 39);
+test/round-376-money-creation.test.js:156: assert.strictEqual(plugin.FAMILIES.length, 44);
+test/round-376-money-creation.test.js:158: T('D2 插件 version 1.19.0（r386 再 bump）', () => {
+test/round-376-money-creation.test.js:159: assert.strictEqual(plugin.version, '1.20.0');
+test/round-376-money-creation.test.js:163: assert.strictEqual(r.familyCount, 1);
+test/round-377-linear-tax-revenue.test.js:187: T('D1 插件族表 44 族：36 econ + 8 stats，key 唯一', () => {
+test/round-377-linear-tax-revenue.test.js:188: assert.strictEqual(plugin.FAMILIES.length, 44);
+test/round-377-linear-tax-revenue.test.js:189: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36);
+test/round-377-linear-tax-revenue.test.js:190: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8);
+test/round-377-linear-tax-revenue.test.js:192: assert.strictEqual(new Set(keys).size, 44);
+test/round-377-linear-tax-revenue.test.js:195: T('D2 插件 version 1.19.0（r386 再 bump）', () => {
+test/round-377-linear-tax-revenue.test.js:196: assert.strictEqual(plugin.version, '1.20.0');
+test/round-377-linear-tax-revenue.test.js:198: T('D3 gate 桥族表 39 族', () => {
+test/round-377-linear-tax-revenue.test.js:199: assert.strictEqual(gate.FAMILIES.length, 39);
+test/round-378-insurance-claim-loss.test.js:15: * → C 引擎 gate 兑现 → D 插件层接线（44 族 36 econ + 8 stats / v1.19.0 /
+test/round-378-insurance-claim-loss.test.js:16: * gate 桥 38 族）→ E 射程邻接核查（sunk_cost_coercion / present_bias /
+test/round-378-insurance-claim-loss.test.js:189: T('D1 插件族表 44 族：36 econ + 8 stats，key 唯一', () => {
+test/round-378-insurance-claim-loss.test.js:190: assert.strictEqual(plugin.FAMILIES.length, 44);
+test/round-378-insurance-claim-loss.test.js:191: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36);
+test/round-378-insurance-claim-loss.test.js:192: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8);
+test/round-378-insurance-claim-loss.test.js:194: assert.strictEqual(new Set(keys).size, 44);
+test/round-378-insurance-claim-loss.test.js:197: T('D2 插件 version 1.19.0（r386 再 bump）', () => {
+test/round-378-insurance-claim-loss.test.js:198: assert.strictEqual(plugin.version, '1.20.0');
+test/round-378-insurance-claim-loss.test.js:200: T('D3 gate 桥族表 39 族', () => {
+test/round-378-insurance-claim-loss.test.js:201: assert.strictEqual(gate.FAMILIES.length, 39);
+test/round-379-flat-rate-bias.test.js:141: test('E 插件层接线（44 族 = 36 econ + 8 stats）', () => {
+test/round-379-flat-rate-bias.test.js:146: assert.strictEqual(plugin.FAMILIES.length, 44, '插件族表应为 44 族');
+test/round-379-flat-rate-bias.test.js:147: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 应为 36 族');
+test/round-379-flat-rate-bias.test.js:148: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 应为 8 族');
+test/round-379-flat-rate-bias.test.js:149: assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.19.0');
+test/round-379-flat-rate-bias.test.js:153: assert.strictEqual(pb.totalHits, 0, 'analyze 良性应零命中');
+test/round-379-flat-rate-bias.test.js:192: console.log('[r379] round-379-flat-rate-bias: A 10/10 命中, B 6/6 零命中, C 18 键注入全翻转, D gate 10/10 非 pass, E 插件 44 族接线, F 12/12 零越界, G 10/10 归因纯净');
+test/round-381-lump-of-labor.test.js:164: test('E 插件层接线（44 族 = 36 econ + 8 stats）', () => {
+test/round-381-lump-of-labor.test.js:169: assert.strictEqual(plugin.FAMILIES.length, 44, '插件族表应为 44 族');
+test/round-381-lump-of-labor.test.js:170: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'econ').length, 36, 'econ 应为 36 族');
+test/round-381-lump-of-labor.test.js:171: assert.strictEqual(plugin.FAMILIES.filter(f => f.group === 'stats').length, 8, 'stats 应为 8 族');
+test/round-381-lump-of-labor.test.js:172: assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.19.0');
+test/round-381-lump-of-labor.test.js:176: assert.strictEqual(pb.totalHits, 0, 'analyze 良性应零命中');
+test/round-381-lump-of-labor.test.js:179: assert.strictEqual(gFams.length, 39, 'gate 桥族表应为 39 族');
+test/round-381-lump-of-labor.test.js:218: console.log('[r381] round-381-lump-of-labor: A 10/10 命中, B 14/14 零命中, C 21 键注入全翻转, D gate 10/10 非 pass, E 插件 44 族接线, F 10/10 零越界, G 10/10 归因纯净');
+test/round-385-comparative-advantage.test.js:105: assert.strictEqual(hits.length, 0, '误伤:\n' + hits.join('\n'));
+test/round-385-comparative-advantage.test.js:146: assert.strictEqual(plugin.FAMILIES.length, 44);
+test/round-385-comparative-advantage.test.js:148: T('E2 econ 组 36 族 + stats 组 8 族，key 唯一', () => {
+test/round-385-comparative-advantage.test.js:151: assert.strictEqual(econ.length, 36);
+test/round-385-comparative-advantage.test.js:152: assert.strictEqual(stats.length, 8);
+test/round-385-comparative-advantage.test.js:154: assert.strictEqual(new Set(keys).size, 44);
+test/round-385-comparative-advantage.test.js:156: T('E3 插件 version 已 bump 至 1.19.0', () => {
+test/round-385-comparative-advantage.test.js:157: assert.strictEqual(plugin.version, '1.20.0');
+test/round-385-comparative-advantage.test.js:162: assert.strictEqual(gFams.length, 39, 'gate 桥族表应为 39 族');
+test/round-385-comparative-advantage.test.js:200: console.log(`\n[r385] round-385-comparative-advantage: A ${ATTACK.length}/${ATTACK.length} 命中, B 11/11 零命中, C 3 键注入全翻转, D ${ATTACK.length}/${ATTACK.length} 非 pa
+test/round-386-effect-measure-misread.test.js:107: assert.strictEqual(hits.length, 0, '误伤:\n' + hits.join('\n'));
+test/round-386-effect-measure-misread.test.js:173: assert.strictEqual(plugin.FAMILIES.length, 44);
+test/round-386-effect-measure-misread.test.js:175: T('E2 econ 组 36 族 + stats 组 8 族，key 唯一', () => {
+test/round-386-effect-measure-misread.test.js:178: assert.strictEqual(econ.length, 36);
+test/round-386-effect-measure-misread.test.js:179: assert.strictEqual(stats.length, 8);
+test/round-386-effect-measure-misread.test.js:181: assert.strictEqual(new Set(keys).size, 44);
+test/round-386-effect-measure-misread.test.js:183: T('E3 插件 version 已 bump 至 1.19.0', () => {
+test/round-386-effect-measure-misread.test.js:184: assert.strictEqual(plugin.version, '1.20.0');
+test/round-386-effect-measure-misread.test.js:189: assert.strictEqual(gFams.length, 39, 'gate 桥族表应为 39 族');
+test/round-386-effect-measure-misread.test.js:226: console.log(`\n[r386] round-386-effect-measure-misread: A ${ATTACK.length}/${ATTACK.length} 命中, B ${BENIGN.length}/${BENIGN.length} 零命中, C 6 组注入全翻转, D ${ATTACK.
+test/round-387-significance-verdict-misread.test.js:8: *   E 存量计数链同步（econ 族数 38→39 / 插件 43→44）
+test/round-387-significance-verdict-misread.test.js:201: test('r387 E econ gate 族数 39 / 插件族数 44（36 econ + 8 stats）', () => {
+test/round-387-significance-verdict-misread.test.js:212: assert.strictEqual(stats.length, 8, 'stats 组应为 8，实测 ' + stats.length);
+test/round-387-significance-verdict-misread.test.js:213: assert.strictEqual(econ.length, 36, 'econ 组应为 36，实测 ' + econ.length);
+test/round-387-significance-verdict-misread.test.js:214: assert.strictEqual(plugin.version, '1.20.0', '插件 version 应为 1.20.0，实测 ' + plugin.version);
+test/round-388-censoring-neglect.test.js:18: *   3. 插件层注册（version / family 列表）
+test/round-388-censoring-neglect.test.js:141: ok(plugin.version === '1.21.0', `version=1.21.0（${plugin.version}）`);
+test/round-388-censoring-neglect.test.js:145: ok(desc.includes('45 族'), 'description 标注 45 族');
+test/round-388-censoring-neglect.test.js:148: ok(plugin.FAMILIES.length === 45, `FAMILIES 45 族（实际 ${plugin.FAMILIES.length}）`);
+test/round-388-censoring-neglect.test.js:151: ok(econN === 36, `econ 组 36 族（实际 ${econN}）`);
+test/round-388-censoring-neglect.test.js:152: ok(statsN === 9, `stats 组 9 族（实际 ${statsN}）`);
+test/round-388-censoring-neglect.test.js:157: ok(gFams.length === 40, `gate 桥族表 40 族（实际 ${gFams.length}）`);

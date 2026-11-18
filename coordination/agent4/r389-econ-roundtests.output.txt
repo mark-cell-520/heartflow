@@ -1,0 +1,39 @@
+########## test/round-295-econ-reasoning-wiring.test.js
+结果: 113 通过, 0 失败
+########## test/round-360-will-rogers-phenomenon.test.js
+结果: 40 通过, 0 失败, 共 40 个
+########## test/round-361-will-rogers-gaps.test.js
+结果: 20 通过, 0 失败, 共 20 个
+########## test/round-362-will-rogers-gaps2.test.js
+结果: 20 通过, 0 失败, 共 20 个
+########## test/round-364-jevons-paradox.test.js
+测试结果: 70 通过, 0 失败, 共 70 个
+########## test/round-367-price-control.test.js
+测试结果: 30 通过, 0 失败, 共 30 个
+########## test/round-368-mercantilism.test.js
+测试结果: 38 通过, 0 失败, 共 38 个
+########## test/round-369-paradox-of-thrift.test.js
+测试结果: 37 通过, 0 失败, 共 37 个
+########## test/round-371-decoy-effect.test.js
+测试结果: 43 通过, 0 失败, 共 43 个
+########## test/round-372-healthy-user-bias.test.js
+测试结果: 42 通过, 0 失败, 共 42 个
+########## test/round-373-extraordinary-claims.test.js
+测试结果: 44 通过, 0 失败, 共 44 个
+########## test/round-374-stock-flow-conflation.test.js
+测试结果: 46 通过, 0 失败, 共 46 个
+########## test/round-375-government-household-analogy.test.js
+测试结果: 45 通过, 0 失败, 共 45 个
+########## test/round-376-money-creation.test.js
+r376-money-creation: 43 通过 / 0 失败
+########## test/round-377-linear-tax-revenue.test.js
+结果: 34 通过, 0 失败
+########## test/round-378-insurance-claim-loss.test.js
+结果: 37 通过, 0 失败
+########## test/round-379-flat-rate-bias.test.js
+########## test/round-381-lump-of-labor.test.js
+########## test/round-385-comparative-advantage.test.js
+########## test/round-386-effect-measure-misread.test.js
+########## test/round-387-significance-verdict-misread.test.js
+########## test/round-388-censoring-neglect.test.js
+r388 单测结果: 52 PASS / 0 FAIL

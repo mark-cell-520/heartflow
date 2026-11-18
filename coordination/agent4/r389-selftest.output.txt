@@ -1,0 +1,4 @@
+ATTACK hit: 27/27
+BENIGN non-pass(module): 0/20
+RANGE cross-hit: 0/9
+total: PASS

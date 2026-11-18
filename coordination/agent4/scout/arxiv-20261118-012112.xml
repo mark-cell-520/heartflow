@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/mPCFZic87zxvdIZ9Qok7nscRFUY</id>
+  <title>arXiv Query: search_query=all:surrogate OR all:endpoint&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T01:21:13Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:surrogate+OR+all:endpoint&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>21717</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21603v1</id>
+    <title>A separation criterion for chiral systems and its application to Plebański--Demiański perturbations</title>
+    <updated>2026-11-16T18:59:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.21603v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21603v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We give a constructive criterion for local separation of first-order chiral systems coupling two complex doublets. It combines a Gram decomposition of the coupling sources with separate coordinate dependence and a differential transport test. For recoverable, nondegenerate source families, the criterion is necessary and sufficient within the specified class of mode-independent complex matrix transformations with unit determinant. For a fixed differential operator and admissible Gram decomposition, we identify conditions under which the sources uniquely determine the Hermitian coefficient matrix required for separation. As an application, we construct an explicit algebraic transformation and derive separated radial and angular equations for coupled radiative Einstein--Maxwell perturbations of rotating, charged Plebański--Demiański backgrounds with acceleration, NUT charge, and a cosmological constant, on specified local patches. Its Gram decomposition is unique under additional generic assumptions. We also derive angular endpoint indices for Bonnor and Misner identifications with conical deficits or excesses. Under the stated regularity assumptions, each specified self-adjoint angular realization at fixed real mode parameters has a discrete spectrum and a complete orthonormal eigenbasis.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:03Z</published>
+    <arxiv:comment>37 pages</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Hideo Furugori</name>
+    </author>
+    <author>
+      <name>Daisuke Yoshida</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21594v1</id>
+    <title>Surrogate-Assisted Compact-Model Extraction for SKY130 CMOS at 77 K</title>
+    <updated>2026-11-16T18:57:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.21594v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21594v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cryogenic circuit design requires compact transistor models that reproduce measured low-temperature behavior and run in standard circuit simulators. We fit BSIM4 parameters to measured I-V curves of SkyWater 130 nm (SKY130) transistors at 77 K using a neural surrogate of NGSpice. The surrogate maps compact-model parameters and device geometry to the complete set of output and transfer characteristics. Extraction is a bounded least-squares search: a bank of NGSpice simulations supplies initial candidates, finite differences of the surrogate supply the local Jacobian, and NGSpice re-simulates the resulting cards before selection. On 18 measured geometries, we compare a search over seven card parameters with a search over 43 parameters selected by NGSpice sensitivity. Relative to NGSpice re-simulations of the previously released cards, the two searches reduce the in-sample mean relative root-mean-square error (RRMS) by 17% and 26%, respectively. The 43-parameter search has the lower overall error, but the seven-parameter search has the lower mean on high-bias curves, and some individual curves have higher error than with the released cards under both searches.</summary>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.app-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:57:06Z</published>
+    <arxiv:primary_category term="physics.ins-det"/>
+    <author>
+      <name>Aaron Wang</name>
+    </author>
+    <author>
+      <name>Olivia Gzamouranis</name>
+    </author>
+    <author>
+      <name>Vaibhav Lohia</name>
+    </author>
+    <author>
+      <name>Hershel Fei Xun Weiner</name>
+    </author>
+    <author>
+      <name>Olivia Seidel</name>
+    </author>
+    <author>
+      <name>Richard Cavanaugh</name>
+    </author>
+    <author>
+      <name>Giuseppe Di Guglielmo</name>
+    </author>
+    <author>
+      <name>Nhan Tran</name>
+    </author>
+    <author>
+      <name>Davide Braga</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21528v1</id>
+    <title>Post-Quantum Migration of Wi-Fi Key Establishment: A Hybrid ML-KEM Design for OWE and FILS, Validated on OWE with hostapd</title>
+    <updated>2026-11-16T18:18:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.21528v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21528v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The key agreements that protect a Wi-Fi connection rely on Diffie-Hellman, which a sufficiently capable quantum computer would break; an adversary can therefore record an association today and decrypt its traffic years later. Key establishment is thus the part of IEEE 802.11 that has to be migrated first. This work targets the two protocols that perform that agreement inside the frames used to set up the link: Opportunistic Wireless Encryption (OWE), which encrypts otherwise open networks, and Fast Initial Link Setup (FILS), designed for fast connection in dense and mobile deployments. We propose replacing their Diffie-Hellman exchange with a hybrid one that runs the classical elliptic-curve agreement alongside ML-KEM (FIPS 203) and derives the master key from both secrets, so the connection stays protected as long as either component remains unbroken. The exchange reuses the frames each protocol already sends and adds no extra round trip; an access point can advertise the hybrid mode alongside classical OWE, and a station configured to require it refuses to associate without a completed post-quantum exchange. Binding the advertised capabilities to the derived key is specified as a design extension and is not part of the prototype. We validate the design with a working implementation on hostapd and wpa_supplicant: both endpoints derive the same key in every measured connection, with the two smaller parameter sets each enlarged association frame fits in a single frame even under a conservative 1500-byte fragmentation threshold, and the added connection time and computation stay below half a millisecond. The measurements are obtained on OWE; the design carries over to FILS, whose frame budget is left for specific measurement. Of the three ML-KEM parameter sets, the intermediate one offers the best balance between security level and size.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:18:31Z</published>
+    <arxiv:comment>8 pages, 4 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Jesús R. Abascal</name>
+    </author>
+    <author>
+      <name>Ana I. Gómez</name>
+    </author>
+    <author>
+      <name>Domingo Gómez-Pérez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21443v1</id>
+    <title>Quantum Optimization Algorithm for Pinching-Antenna Activation with Max-Min Fairness</title>
+    <updated>2026-11-16T17:31:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.21443v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21443v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this letter, we propose a training-free quantum approximate optimization algorithm with a linear-ramp schedule (LR-QAOA) for antenna activation in pinching-antenna systems (PASS). Since all active pinching antennas (PAs) share one feed and split its power, maximizing the signal-to-noise ratio (SNR) of the weakest user becomes a combinatorial max-min problem that must be re-solved whenever the users move. We formulate the problem as a two-local Ising Hamiltonian with one qubit per PA and no penalty terms, employing a weightedsum surrogate to prioritize weaker users. Instead of training the circuit with a classical optimizer, the proposed LR-QAOA method tunes its parameters via a linear ramp; the measured patterns are ranked by the exact max-min objective, and the best ones are refined with a short local search using the same number of evaluated patterns. Monte Carlo simulations show that the proposed LR-QAOA method outperforms greedy activation, projection-guided activation, and semidefinite relaxation-based classical baseline methods when all methods test the same number of PA on/off patterns. Experiments on real IBM Quantum hardware further show that the execution time remains nearly constant as the number of PAs grows, whereas exhaustive search grows exponentially. However, gate noise in the NISQ era restricts near-optimal hardware solutions to small numbers of antennas only.</summary>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:31:32Z</published>
+    <arxiv:primary_category term="eess.SP"/>
+    <author>
+      <name>Soumyadip Paul</name>
+    </author>
+    <author>
+      <name>Neel Kanth Kundu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21423v1</id>
+    <title>Emergent Steering Beyond Endpoint Alignment in Chemical Reaction Models</title>
+    <updated>2026-11-16T17:13:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.21423v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21423v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning models for chemical reaction prediction are usually evaluated by endpoint accuracy, but endpoint correctness alone does not reveal how a model represents chemical transformation or why it fails. We introduce UniRxnAxis, a unified forward-retrosynthesis framework that models both tasks as direction-conditioned endpoint redistribution in a shared latent space. By aligning source states, transformed states, and encoded target endpoints, UniRxnAxis enables directional auditing of learned latent updates. This shared latent geometry allows the learned displacement (from the encoder source state $S_0$ to the decoder-facing transformed state $S_1$) to be decomposed into an endpoint-parallel component and an endpoint-orthogonal residual, which we call emergent steering. Our evaluation shows that emergent steering is functionally important: in retrosynthesis, it recovers most of the model's utility, remains effective under random, shuffled, and prototype controls, and directly affects which bond edits are promoted or suppressed. The residual-over-parallel ordering persists across alignment strengths, after decoder-interface calibration, against angle-matched random axes, and in a second graph-edit architecture, although its magnitude depends on the reference axis and optimization. The decomposition also supports a proxy taxonomy of model-side failures, showing how reaction models can be audited beyond endpoint accuracy.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:13:17Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yili Shen</name>
+    </author>
+    <author>
+      <name>Kehan Guo</name>
+    </author>
+    <author>
+      <name>Haomin Zhuang</name>
+    </author>
+    <author>
+      <name>Xiangliang Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21411v1</id>
+    <title>Sharp $L_p$-Regularity for Quantum Markov Semigroups</title>
+    <updated>2026-11-16T17:01:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.21411v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21411v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We determine the sharp universal constants in positive-input $L_p$-regularity for finite-dimensional quantum Markov semigroups with a faithful invariant state. For $1&lt;p&lt;\infty$, they are $p\sin(π/p)/(2(p-1))$ under KMS symmetry and $\frac{p}{2(p-1)}\tan(\fracπ{2}\min\{1/p,1-1/p\})$ without a symmetry assumption, with the endpoint values at $p=1$ given by $π/2$ and $π/4$, respectively.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.FA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:01:44Z</published>
+    <arxiv:comment>19 pages; comments are welcome</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Lijun Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21339v1</id>
+    <title>MovieRoll: A Systematic Framework for Rolling Out Long-Form Videos</title>
+    <updated>2026-11-16T16:21:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.21339v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21339v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Streaming video generation must sustain quality beyond the training horizon while handling self-generated history and growing cache costs. To address these challenges, we present MovieRoll, a base-to-distilled framework that connects streaming fine-tuning, long-rollout distillation, and long-horizon inference. We first establish a robust multi-step base through Window-wise Teacher Forcing (WinTF), which jointly denoises chunks at progressive noise levels with bidirectional attention within each window and causal access to preceding history. To retain historical context efficiently, hierarchical KV-cache compression (HieraKV) exploits layer-wise attention patterns, retaining full history in shallow layers and sink--recent history in deeper layers. This reduces cache memory by up to 78% while improving generation quality. Building on this base, cumulative long tuning with distribution matching distillation (CuLT-DMD) holds parameters fixed throughout each long self-rollout and averages local gradients before updating. Each update therefore combines supervision across temporal positions while retaining only one local computation graph, enabling efficient long-rollout training of a few-step generator. To extend generation beyond the training horizon, KV recomputation bounds context for both models, while guidance annealing (AnnealCFG) reduces guidance toward the clean endpoint to stabilize MovieRoll-Base. Complementing these modeling advances, FBCA attention and PS-VAE decoding support efficient training and streaming output. On HeliosBench, MovieRoll-Base remains competitive at 30s after training on videos of up to 15s, and MovieRoll-Distilled achieves the highest total scores among the compared methods across single- and multi-event evaluations up to 60s, combining sustained naturalness with active motion.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T16:21:07Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yunyang Ge</name>
+    </author>
+    <author>
+      <name>Weijie Kong</name>
+    </author>
+    <author>
+      <name>Ryan Xu</name>
+    </author>
+    <author>
+      <name>Yue Wu</name>
+    </author>
+    <author>
+      <name>Qi Tian</name>
+    </author>
+    <author>
+      <name>Jiangfeng Xiong</name>
+    </author>
+    <author>
+      <name>Bin Lin</name>
+    </author>
+    <author>
+      <name>Mingzhe Zheng</name>
+    </author>
+    <author>
+      <name>Shenghai Yuan</name>
+    </author>
+    <author>
+      <name>Zheyuan Liu</name>
+    </author>
+    <author>
+      <name>Jianwei Zhang</name>
+    </author>
+    <author>
+      <name>Li Yuan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21270v1</id>
+    <title>SCOPE: A Physical Execution Latency-Guided Quantum Circuit Compilation Framework</title>
+    <updated>2026-11-16T15:39:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.21270v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21270v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum computing requires compilers to translate algorithms represented in the quantum circuit model into unitary operations supported by physical devices. Limited coherence time makes physical execution latency an important compilation objective. Gate fusion can shorten pulses, but gate count and depth do not capture fused targets' control demands. Evaluating every candidate with quantum optimal control (QOC) would embed pulse optimization in structural search. We present Schmidt-guided Compilation for Optimized Pulse Execution (SCOPE), driven by an operator Schmidt time surrogate. The target's angular distance from product operators measures the required nonlocal change; dividing it by a coupling-limited evolution-rate bound gives a lower bound on exact implementation time. Trace-angle and waveform constraints complete block scores for critical-path evaluation during genetic search. Local QOC determines final pulse durations. Under a numerical nearest-neighbor control model, all 104 results across 13 instances from four application families have shorter QOC critical-path durations than an adapted efficient pulse generation framework with advanced synthesis for quantum circuits (EPOC). Using eight-run instance means, the equally weighted reduction is 42.50\%, with a geometric mean speedup of 2.00. In a shared six-qubit quantum Fourier transform (QFT) ablation, time-surrogate guidance reduces mean QOC duration by 22.21\% relative to gate-count guidance and 21.01\% relative to depth guidance, validating the surrogate's joint use in fitness evaluation and mutation-region selection.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T15:39:01Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Bolin Zhang</name>
+    </author>
+    <author>
+      <name>Zhiyuan Zhang</name>
+    </author>
+    <author>
+      <name>Yongguang Lv</name>
+    </author>
+    <author>
+      <name>Ruiqing He</name>
+    </author>
+    <author>
+      <name>Hengliang Guo</name>
+    </author>
+    <author>
+      <name>Jiandong Shang</name>
+    </author>
+    <author>
+      <name>Qiang Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21247v1</id>
+    <title>Neurosymbolic Synthesis of Contraction Metrics with Certified Verification</title>
+    <updated>2026-11-16T15:26:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.21247v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21247v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study counterexample-guided synthesis of contraction metrics for continuous-time autonomous systems on compact domains. A learner proposes a metric; a sound verifier certifies its matrix inequality or returns diagnostic points for retraining. The neural extension pairs a learned metric factor with symbolic contraction conditions and rigorous numerical verification; main ablations use polynomial features. We give computable polynomial bounds in arbitrary dimension and outward-rounded verification for polynomial, trigonometric, and neural representations. Loop soundness is separated from conditional finite-grid termination under idealized feasibility assumptions. We analyze why scaling and fixed-margin training can leave valid metrics uncertified. The scaling construction requires a scale-closed family, which the experimental fixed-floor class generally lacks. Verified slack improves the contraction rate and quantifies model-error tolerances using certified residual and Jacobian bounds. Finite-distance conclusions require connecting paths whose flows stay in the verified region. Experiments include controlled ablations, three-dimensional verification, and transfer from a fitted surrogate with known-truth residual certification. A physical swing-model study compares neural learning objectives with shared verification and invariant energy regions. Verified constant metrics certify the polynomial benchmark and smallest swing-model domain; neither result requires neural state dependence. Exploratory refinement certifies additional frozen candidates at a larger verification budget. In matched polynomial operating-grid experiments, trace normalization and margin coupling did not demonstrate a certification-count advantage within the tested budgets. These choices address specific failure mechanisms without guaranteeing optimizer convergence or general empirical superiority.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T15:26:01Z</published>
+    <arxiv:comment>30 pages, 10 figures. Code and verified reproduction: https://github.com/vmpreciado/NeuroSymbolic/releases/tag/v1.2.2</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Victor M. Preciado</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21214v1</id>
+    <title>Taking Time Out of TOCTOU: From Race Reproduction to Security Discovery</title>
+    <updated>2026-11-16T15:06:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.21214v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21214v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Time-of-check-to-time-of-use (TOCTOU) races are hard to reproduce and lost races can make vulnerable programs look fixed. We present Chronos, a framework that separates intervention timing from verdict evidence and builds reusable one-trial security regression oracles from declared races for deterministic reproduction, commit bisection and CI. Race Specifications compose reusable hold engines, actions, observers and outcome rules. When the declared hold is reached and the attack completes while held, Chronos orders it before the use under blocking and interference assumptions. Chronos uses seccomp notifications to enforce declared hold-attack-release ordering at syscall boundaries on stock Linux; ptrace and a KVM guest gate provide holds at userspace and kernel instruction sites. One decision procedure labels every mechanism's runs: fixed requires positive, case-specific evidence of preservation, justified refusal, omission under checked coverage, or a declared rule; missing or contradictory required evidence remains indeterminate. On known-vulnerable builds, effect-only checkers made over 800 false-fixed classifications in failed-intervention trials; Chronos made none. All 17 syscall-held cases and four of six instruction-held cases had vulnerable and fixed labels. Two kernel cases remain one-sided. All 27 historical bisections recovered the expected boundaries. For runc's masked-path bisection with one victim per launch, fixed retry and Git Bayesect took medians of 475 and 398 natural launches; Chronos used seven held trials including endpoint checks. Since a label means the same however a fix is written, we also ran the specifications and attack variants on releases, distribution packages and other runtimes. There, Chronos helped us uncover three issues: incomplete fixes in chrony and rpm, and a Debian rpm package its tracker listed as fixed.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.OS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T15:06:56Z</published>
+    <arxiv:comment>22 pages, 9 figures, 15 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Hasnain Naeem</name>
+    </author>
+    <author>
+      <name>Ryan Henry</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21185v1</id>
+    <title>Surrogate-Based Optimization of Tandem Twin-Rotor Wind Turbines Accounting for Wake Interactions</title>
+    <updated>2026-11-16T14:40:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.21185v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21185v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Wake interaction in a tandem twin-rotor turbine couples power capture with thrust on the shared support. This study develops a time-resolved surrogate for upstream IEA Wind 22 MW and downstream NREL 5 MW rotors. It covers spacing ratios $0.01\leq L/D\leq0.20$ and tip-speed ratios $4\leqλ\leq11$. Vortex-method simulations of 160 configurations under turbulent inflow train per-time-node XGBoost models to predict 600 s power, thrust, and torque histories. A CNN-Attention-LSTM network extends these histories, and a genetic algorithm balances the system power and thrust coefficients. Ten-fold cross-validation gives median power-history $R^2$ values of 0.995 upstream and 0.958 downstream for unseen configurations, but the first stage cannot extrapolate in tip-speed ratio. With fixed pitch and prescribed rotor speed, the coefficients apply where both rotors reach the simulated tip-speed ratio below rated wind speed. Increasing spacing raises upstream power by up to 6% and lowers downstream power by up to 62%. System power changes by less than 4% at fixed $λ$. The high-power end of the Pareto front lies near $λ=10$. At $L/D=0.20$, the system power coefficient is highest. This configuration has the lowest peak thrust among the high-power candidates.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T14:40:48Z</published>
+    <arxiv:comment>24 pages, 17 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Yinong Tian</name>
+    </author>
+    <author>
+      <name>Shan Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21119v1</id>
+    <title>The Limits of Closed-Form Couplings for Few-Step Generation</title>
+    <updated>2026-11-16T14:03:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.21119v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21119v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Few-step generators via flow models require complicated technical solutions such as a pretrained flow model or a consistency loss. While rectified flows have gained popularity for their success in few-step sampling, they pay a cost of needing a pre-trained model and sampling a large number of couplings per dataset. Yet for a finite dataset and a Gaussian probability path, the probability-flow vector field of the empirical distribution is available in closed form, so one could use this field as the teacher and skip pretraining altogether. We demonstrate that, surprisingly, this approach is impossible for problems of practical relevance. In particular, the analytic solution of the diffusion process in high dimensions becomes almost a linear transformation. The integration returns the noise vector drawn at initialisation, plus a drift that is empirically a faint copy of the data point, almost independent of the noise. The coupling therefore differs from an independent pairing only through this drift. As a result, training a model on these couplings is almost equivalent to training the model on the independent draws of the noise and the data, which does not provide a useful teacher. We highlight that this is the direct consequence of the high-dimensionality of the data, and that for low enough dimensions or large enough datasets, analytic couplings become more efficient teachers. We quantify this effect by the fraction of endpoint energy carried by the drift, which scales as $\frac{\log N}{d}$ for a dataset of size $N$ in a $d$-dimensional space. Finally, we provide an empirical study confirming all the theoretical results presented in the paper.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T14:03:10Z</published>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Tobias Höppe</name>
+    </author>
+    <author>
+      <name>Stefan Bauer</name>
+    </author>
+    <author>
+      <name>Qiang Liu</name>
+    </author>
+    <author>
+      <name>Andrea Dittadi</name>
+    </author>
+    <author>
+      <name>Kirill Neklyudov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21096v1</id>
+    <title>Inference Equivalence and Quotient Coding</title>
+    <updated>2026-11-16T13:42:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.21096v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21096v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Incomplete observations can admit multiple physical interpretations without making every task conclusion ambiguous. Recovering all compatible scenes is often unnecessary, whereas indiscriminate compression may change which claims are justified. We ask which distinctions among observation-compatible interpretation sets must be retained to preserve every valid conclusion of a specified task. We first define inference validity as truth across all physically compatible states and characterize it, under a closedness condition, by distances to physically realizable falsifying measurements. For a finite semantic claim family ordered by specificity, the Exact Inference Frontier forms the unique minimal antichain generating all valid claims. We then define inference equivalence between compatibility sets and construct a canonical quotient code from their frontiers. Among deterministic codes admitting exact inference decoding, it induces the coarsest partition, minimizing the number of distinguishable code values rather than storage or computation. Finally, we characterize inference errors from learned compatibility sets, derive conditions for exact inference preservation despite set errors, and evaluate an asymmetric learning surrogate under distribution shifts. On a registered finite bank, 145 compatibility sets yield 31 quotient codes with unchanged valid-claim sets. Across geometry, mechanism, and joint shifts, learned estimates exhibit different accuracy-specificity trade-offs. On 1,962 official HRSID test images, 1,913 distinct candidate sets induce only 36 seven-claim inference signatures, while a visual 3-NN baseline achieves 87.31% precision on issued claims.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T13:42:29Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Zibo Meng</name>
+    </author>
+    <author>
+      <name>Andrew C. M. Austin</name>
+    </author>
+    <author>
+      <name>Alin Achim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21093v1</id>
+    <title>On Chen's Extended Action for $κ(R,T)$ Gravity: Gravity in a Polarizable Medium, Material Folds and a No-Bounce Theorem</title>
+    <updated>2026-11-16T13:38:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.21093v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21093v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chen's local adjoint action reproduces the field equations of $κ(R,T)$ from a local variational principle, and we show that it does physical work. In flat FLRW, Dirac reduction gives a Hamiltonian independent of $κ(T)$ on regular branches, where the coupling enters through a second-class matter constraint. The physical stress tensor is not generally conserved, but a dressed particle number is. An exact decomposition of the effective source motivates a polarizable-medium interpretation: $κ=0$ corresponds to total screening, the repulsive phase to overscreening, and a fold of the matter map to saturation. For linear coupling and dust, the expanding low-density branch has a past endpoint at the fold, where the volume is minimal and the density reaches $ρ_c/2$ at finite curvature. Dirac consistency rules out smooth Hamiltonian continuation through the fold. More generally, a flat-FLRW bounce is excluded for $κ&gt;0$, positive density and $w&gt;-1$. The linear dust model reproduces the effective Friedmann equation of loop quantum cosmology (LQC), but the two models obey different conservation laws. An effective pressure $-ρ^2/ρ_c$ restores the homogeneous LQC dynamics, and the fold density coincides with the signature-change threshold in the deformed-algebra approach to LQC. The reduced dust constraint admits an exactly solvable Koopman--von Neumann transport quantization and the adjoint field acts as a response variable, motivating an open-system interpretation.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T13:38:03Z</published>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Ginés R. Pérez Teruel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21064v1</id>
+    <title>Boundedness properties of bilinear Fourier integral operators with complex phases</title>
+    <updated>2026-11-16T13:14:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.21064v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21064v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we investigate mapping properties on Lebesgue spaces of bilinear Fourier integral operators (FIOs) with complex phases. Indeed, we provide for bilinear Fourier integral operators with complex phases boundedness theorems for the corresponding Seeger-Sogge-Stein orders, including the endpoint estimates. Our results extend the same boundedness property in the case of real-valued phases proved by Rodriguez-López, Rule, and Staubach, and provide the bilinear version for the linear one proved earlier by Ruzhansky for phases of positive type. Also, our Seeger-Sogge-Stein theorem for bilinear operators with complex phases cannot be directly deduced from its real counterpart. A new approach used in this article consists of providing directly the boundedness theorems on Lebesgue spaces without the use of the multilinear Fefferman-Stein interpolation theorem. For this, a maximal function theorem due to Bourgain is applied. As a byproduct, we also consider transference boundedness theorems of FIOs with complex phases from $\mathbb{R}^n$ to the torus $\mathbb{T}^n\equiv \mathbb{R}^n/\mathbb{Z}^n$ and then, we provide new criteria for the boundedness of Fourier integral operators on the torus with complex phases (Fourier series operators in the sense of Ruzhansky and Turunen).</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.FA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T13:14:33Z</published>
+    <arxiv:comment>50 Pages</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Duván Cardona Sánchez</name>
+    </author>
+    <author>
+      <name>Manuel Martínez-Flores</name>
+    </author>
+    <author>
+      <name>Frederick Opoku</name>
+    </author>
+  </entry>
+</feed>

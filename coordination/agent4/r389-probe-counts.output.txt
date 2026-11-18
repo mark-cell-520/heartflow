@@ -1,0 +1,7 @@
+gate FAMILIES: 41
+plugin FAMILIES: 46 version: 1.22.0
+stats: 10 econ: 36 other: 0
+gate has surrogate_endpoint_misread: true
+plugin has surrogate_endpoint_misread: true
+gate last 3 keys: significance_verdict_misread, censoring_neglect, surrogate_endpoint_misread
+plugin last 3 keys: significance_verdict_misread, censoring_neglect, surrogate_endpoint_misread

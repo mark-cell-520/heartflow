@@ -1,0 +1,7 @@
+C6 default hit: false
+S3 default: false | inject NEG: true
+C5-ZH default: false | inject CONCEPT_ZH: true
+C5-EN default: false | inject CONCEPT_EN: true
+CORRECT-ZH default: false | inject CORRECT_ZH: true
+CORRECT-EN default: false | inject CORRECT_EN: true
+C7 default: false | inject NEG+HEDGE+CONCEPT: true
