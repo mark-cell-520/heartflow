@@ -82,6 +82,43 @@
  *   · 数字与百分比在场（量化陈述自带外部锚点）；
  *   · 条件后置（「错了就要认」类——就/如果/要是 开头的后续分句是
  *     条件句不是定义复述）。
+ *
+ * [r735 扩展·真升级②] 新增**同义反复论证族**（第 5 链，union，与存量四链
+ * 互补；src/index.js 零改动、dimMap 键数仍 266——1 号 r397 已接线第 267
+ * 维，本族不新增键）——存量判据只认两种语序
+ * （「因为A，所以A'」的 because-split 与「A，A'」的逗号 chain），
+ * 「A，所以A'」的**结论前置复述**与**同义反复定义当论证前提**整族穿透
+ * （r735 二段深探实测：ZH 6/12、EN 10/12 穿透，穿透样本全维度零命中）：
+ *   · R5a 定义循环框（四腿共现）：腿① DEF_FRAME 定义式等同框（ZH 的
+ *     定义/本质是、所谓…是、句首 X 就是；EN is defined as / is what is /
+ *     means）；腿② TAUT 同义反复体——定义体复述术语本身，三形任一：
+ *     子串包含（Y 含 X 或 X 含 Y）、反义否定（Y = 没/无/不 + X 的反义
+ *     词，ANTONYM_ZH）、同义表（TAUT_SYN_ZH/EN 显式小表，防任意近义词
+ *     泛化）；腿③ USE 论证化使用（所以/因此/因而/故而/于是/从而；EN
+ *     therefore/thus/hence/so/consequently）——裸定义句不判；腿④
+ *     RESTATE_CONC 结论必须是定义体的复述（结论含术语 ∧ 结论与定义体
+ *     有共享片段；反义否定形豁免共享要求）。腿④挡掉「教育的本质是培养
+ *     人，所以教育要面向全体学生」这类**引入新内容**的假阳性，也把
+ *     「爱=心疼」「友谊=互相帮助」这类**可争议词典释义**（persuasive
+ *     definition）挡在本维射程外——它们不是同义反复。
+ *   · R5b 结论前置复述框（两腿共现）：CONN_ZH/CONN_EN 切出 A|B，复用
+ *     存量 REPEAT×FRAME 双腿，并补两个**纯系词应用框**：f9 ZH_COPULAR
+ *     （「主语(+副词)+是+谓词」且谓词含重复词——存量 f8 只收「(代词)
+ *     是X」形，收不住「这件作品显然是好设计」）；e10（「(主语)+is/are
+ *     (+of)+谓词」，右句谓词组**不经 enWords 停词过滤**——just/safe 这
+ *     类谓词核心词恰在 EN_STOP 里，过滤后无 pair 可配整族恒死；窗宽 6
+ *     词覆盖 "we have had no accidents and are safe" 形）。
+ *   · 新增豁免 DEF_HEDGE_ZH/EN：定义被显式标为多家存疑（「这只是其中
+ *     一种定义」「one of several definitions」「学界有分歧」）时不判。
+ * 验证（r735 实测，含腿④收紧后的复测）：模块层轮测 60/60（34 攻击 + 26 良
+ * 性含定义句/教学句/存疑定义形/新内容结论形，scripts/round-735/
+ * selftest-module.js 另 63/63）；gate 层攻击 34/34 非 pass
+ * 且 circular_reasoning finding 在场；良性误伤与探针基线逐项一致（G1 3/12、
+ * G3 1/12 改动前后同批、零新增；承维全为存量：empty_answer ×2 /
+ * prompt_injection+moral_foundations ×1 / 无 finding ×1）；存量轮
+ * 测不回归：round-701 18/18、round-463 全通过、round-417 全通过、
+ * round-431 全通过。变异守卫 13 个新常量逐一作废全变红（见
+ * test/round-735-circular-tautology-restate.test.js）。
  */
 'use strict';
 
@@ -301,6 +338,266 @@ function checkEn(text) {
   return null;
 }
 
+// ─── [r735 新增族] 同义反复论证族：定义循环 R5a + 结论前置复述 R5b ────────
+// 辨别的族：**同义反复的定义被当作论证前提**（「幸福的定义就是感到幸福，
+// 所以感到幸福的人一定幸福」——定义体只是把术语换了个说法，再由它推出
+// 结论，论证零信息量），以及**结论前置语序的复述论证**（「A，所以A'」）。
+// 存量判据只认两种语序：「因为A，所以A'」（连接词在中的 because-split）
+// 与「A，A'」（逗号后紧跟重复词的 chain），「A，所以A'」整族穿透——
+// r735 探针实测 6/12（ZH）/ 10/12（EN）穿透，穿透样本全维度零命中。
+//
+// R5a 四腿共现，缺一不判：
+//   腿① DEF_FRAME 定义式等同框（ZH 的定义/的本质是/所谓…是/句首 X 就是；
+//        EN is defined as / is what is / means）；
+//   腿② TAUT 同义反复体——定义体复述术语本身，三形任一：子串包含
+//        （Y 含 X 或 X 含 Y）、反义否定（Y = 没/无/不 + X 的反义词）、
+//        同义表 TAUT_SYN（显式小表，防任意近义词泛化）；
+//   腿③ USE 论证化使用（所以/因此/因而/故而/于是；EN therefore/thus/
+//        hence/so/consequently）——定义被拿来推结论才是谬误，裸定义句
+//        （「幸福的定义因人而异」）不判；
+//   腿④ RESTATE_CONC 结论是定义体的复述（结论含术语 ∧ 与定义体有共享；
+//        反义否定形豁免共享）——挡住「定义Y，所以关于X的新断言」。
+// R5b 两腿共现：CONN 结论前置连接词切出 A|B，复用存量 REPEAT×FRAME
+//    双腿（commonZhNgrams/enMatch × zhDefinitionalFrame/
+//    enDefinitionalFrame），并补两个**纯系词应用框** f9/e10（「这件
+//    作品显然是好设计」「this verdict is just」——存量 f8/e6 只收
+//    「(代词)是X」形，收不住「主语+副词+是+谓词」的应用句）。
+// 豁免沿用入口五条全局豁免（META 概念教学/NUMERIC/EVIDENCE/REPORTING），
+// 另加 DEF_HEDGE：定义被显式标为多家存疑时不判（「这只是其中一种
+//    定义」「one of several definitions」）。
+
+// 腿① R5a 定义式等同框（中文，捕获组 = 被定义术语 X）
+const DEF_FRAME_ZH = [
+  /^(.{1,12}?)的(?:定义|本质)(?:就)?是/,
+  /所谓(.{1,12}?)(?:就)?是/,
+  /^(.{1,10}?)就是/,
+];
+// 腿① R5a 定义式等同框（英文）
+const DEF_FRAME_EN = [
+  /\b([a-z][a-z\s-]{2,28}?)\s+is\s+(?:defined\s+as|what\s+is)\s+/i,
+  /\b([a-z][a-z\s-]{2,28}?)\s+means\s+/i,
+];
+// 腿③ R5a 论证化使用标记（中文）
+const USE_ZH = [/所以/, /因此/, /因而/, /故而/, /于是/, /从而/];
+// 腿③ R5a 论证化使用标记（英文）
+const USE_EN = [/\b(?:therefore|thus|hence|consequently)\b/i, /\bso\b/i];
+// 腿① R5b 结论前置连接词（中文）
+const CONN_ZH = [/所以/, /因此/, /因而/, /故而/];
+// 腿① R5b 结论前置连接词（英文）
+const CONN_EN = [/\b(?:therefore|thus|hence)\b/i, /,\s*so\s+/i];
+// 腿② R5a 同义表（显式小表：术语 → 定义体中的同义/复述形）
+const TAUT_SYN_ZH = [
+  ['真理', /真实|正确的认识/],
+  ['健康', /无病/],
+  ['成功', /成就|达成目标/],
+  ['爱', /心疼|关心|喜爱/],
+  ['友谊', /互助|互相帮助/],
+  ['教育', /培养|教导/],
+  ['正义', /公正|应得/],
+  ['勇气', /勇敢|面对恐惧/],
+  ['智慧', /明智/],
+  ['幸福', /快乐|愉悦/],
+  ['公平', /平等|一视同仁/],
+  ['安全', /平安/],
+];
+const TAUT_SYN_EN = [
+  ['truth', /\btrue\b|\btruth/],
+  ['health', /\bhealth/],
+  ['success', /\bsuccess/],
+  ['love', /car(?:e|ing|ed)\b|affection|lov(?:e|ing|ed)\b/],
+  ['friendship', /\bfriend/],
+  ['education', /\beducat/],
+  ['justice', /\bjust/],
+  ['wisdom', /\bwis/],
+  ['courage', /\bcourag/],
+  ['happiness', /\bhapp/],
+  ['safety', /\bsafe/],
+  ['fairness', /\bfair/],
+  ['efficiency', /\befficien/],
+];
+// 腿② R5a 反义否定表（术语 → 反义词；Y = 没/无/不 + 反义词 即复述）
+const ANTONYM_ZH = [
+  ['安全', /危险/], ['健康', /疾病|病/], ['成功', /失败/],
+  ['公平', /偏颇|不公/], ['幸福', /痛苦|不幸/],
+];
+// 豁免：定义被显式标为多家存疑（呈现定义争议，不是以定义立论）
+const DEF_HEDGE_ZH = /定义之一|其中一种|的一种理解|一种界定|各有分歧|存在分歧|学界|尚无定论|众说纷纭/;
+const DEF_HEDGE_EN = /\b(?:one\s+of\s+(?:several|many|the)\s+definitions?|one\s+definition|contested|debated|there\s+is\s+no\s+single\s+definition|definitions\s+vary)\b/i;
+// 腿② R5b 纯系词应用框（中文 f9）：「主语(+副词)+是+谓词」且谓词含重复词
+const ZH_COPULAR = /^(?:这|那|它|其)?[^。]{0,10}?(?:显然|明显|当然|自然|一定|确实|果然|分明)?是([^。]{0,14})$/;
+
+// 腿② R5b 纯系词应用框（英文 e10）：「(主语)+is/are (+of)+谓词」，窗宽 6
+// 词覆盖 "we have had no accidents and are safe" 形；右句谓词组不经 enWords
+// 停词过滤（just/safe 这类谓词核心词恰在 EN_STOP 里，过滤后无 pair 可配）。
+const EN_COPULAR = /^(?:(?:it|this|that|he|she|they|we|our|your|the|a|an)\s+)?(?:[a-z]+\s+){0,6}(?:is|are)\s+(?:of\s+|full\s+of\s+)?([^.]{0,30})$/i;
+
+/** R5a 腿②（中文）：定义体是否复述术语本身。返回复述形（substring/antonym/syn）或 null */
+function tautZh(term, body, R) {
+  if (!term || !body) return null;
+  if (term.length >= 2 && (body.includes(term) || term.includes(body) && body.length >= 2)) return 'substring';
+  for (const [t, anti] of (R.ANTONYM_ZH || ANTONYM_ZH)) {
+    // 没/无/不 + (有|是)? + 反义词 —— 「没有危险」「无危险」「不是失败」
+    if (term.includes(t) && new RegExp('[没无不](?:有|是)?' + anti.source).test(body)) return 'antonym';
+  }
+  for (const [t, syn] of (R.TAUT_SYN_ZH || TAUT_SYN_ZH)) {
+    if (term.includes(t) && syn.test(body)) return 'syn';
+  }
+  return null;
+}
+
+/** R5a 腿②（英文）：定义体是否复述术语本身。返回复述形或 null */
+function tautEn(term, body, R) {
+  if (!term || !body) return null;
+  const t = term.toLowerCase();
+  const b = body.toLowerCase();
+  const stem = enStem(t);
+  if (stem.length >= 4 && new RegExp('\\b' + esc(stem)).test(b)) return 'substring';
+  for (const [w, syn] of (R.TAUT_SYN_EN || TAUT_SYN_EN)) {
+    if (t.includes(w) && syn.test(b)) return 'syn';
+  }
+  return null;
+}
+
+/** R5a 腿④（中文）：结论是否是对定义体的复述（而非引入新内容） */
+function restateConcZh(term, body, conc, tautRoute) {
+  if (!conc || !term || !body) return false;
+  // (a) 结论含术语本身（或其 ≥2 字子串）——结论必须是「关于被定义项」的
+  let hasTerm = false;
+  for (let n = Math.min(4, term.length); n >= 2 && !hasTerm; n--) {
+    for (let i = 0; i + n <= term.length; i++) {
+      if (conc.includes(term.substr(i, n))) { hasTerm = true; break; }
+    }
+  }
+  if (!hasTerm) return false;
+  // 反义否定形（Y = 没/无/不 + 反义词）豁免：定义体是术语的否定面，它的
+  // 自然应用句只说术语（「零事故的系统显然足够安全」），与定义体零共享。
+  if (tautRoute === 'antonym') return true;
+  // (b1) 结论与定义体共享**非术语自身**的片段（「有效」/「成就」/「认识」
+  //      这类定义体内容）——复述了定义体的信息。
+  for (const g of commonZhNgrams(body, conc)) {
+    if (!term.includes(g)) return true;
+  }
+  // (b2) 术语处于结论**谓词位**（尾 2 字内，且前面 6 字内有修饰/系词）：
+  //      「这种分配很公平」是把定义直接套到主词上；而「效率值得重视」
+  //      术语在句首当主语、后面跟新谓词，是引入新内容，不判。
+  const p = conc.lastIndexOf(term);
+  if (p >= 0 && conc.length - (p + term.length) <= 2) {
+    if (/(?:是|很|显然|自然|当然|确实|完全|都|也|才|就|相当|非常|极其|特别|明显)/.test(conc.slice(Math.max(0, p - 6), p))) return true;
+  }
+  return false;
+}
+
+/** R5a 腿④（英文）：结论是否是对定义体的复述 */
+function restateConcEn(term, body, conc, tautRoute) {
+  if (!conc || !term || !body) return false;
+  const cw = enWords(conc);
+  const bw = enWords(body);
+  // (a) 结论含术语词干
+  const hasTerm = cw.some((w) => enMatch(w, term.toLowerCase()))
+    || (enStem(term.toLowerCase()).length >= 4 && new RegExp(esc(enStem(term.toLowerCase()))).test(conc.toLowerCase()));
+  if (!hasTerm) return false;
+  if (tautRoute === 'antonym') return true;
+  // (b1) 结论与定义体共享**非术语自身**的实词
+  for (const a of bw) {
+    for (const b of cw) {
+      if (enMatch(a, b) && !enMatch(b, term.toLowerCase())) return true;
+    }
+  }
+  // (b2) 术语（或其同根词）是结论的**最后一个实词**——谓词位
+  for (let i = cw.length - 1; i >= 0; i--) {
+    if (enMatch(cw[i], term.toLowerCase())) return true;
+    break;
+  }
+  return false;
+}
+
+/** R5a：定义循环框（四腿共现） */
+function defCircular(text, isZh, R) {
+  const USE = isZh ? (R.USE_ZH || USE_ZH) : (R.USE_EN || USE_EN);
+  // 论证化使用标记的位置即结论起点（腿④要拿结论比对）
+  let uIdx = -1;
+  for (const re of USE) {
+    const m = text.match(re);
+    if (m && (uIdx < 0 || m.index < uIdx)) uIdx = m.index;
+  }
+  if (uIdx < 0) return false;
+  const conc = text.slice(uIdx).replace(isZh
+    ? /^(?:所以|因此|因而|故而|于是|从而)/
+    : /^(?:\b(?:therefore|thus|hence|consequently)\b|so\b)/i, '');
+  const FRAMES = isZh ? (R.DEF_FRAME_ZH || DEF_FRAME_ZH) : (R.DEF_FRAME_EN || DEF_FRAME_EN);
+  for (const re of FRAMES) {
+    const m = text.match(re);
+    if (!m) continue;
+    const term = (m[1] || '').trim();
+    // 定义体只取到第一个分句边界/论证标记为止——否则**结论里的术语会被
+    // 当成定义体的复述**（「安全就是不出事故，所以安全很重要」会假阳性：
+    // 不出事故 压根没复述 安全，复述它的是结论）。
+    let body = text.slice(m.index + m[0].length);
+    const cut = body.search(isZh
+      ? /[，,。；;、！!？?]|所以|因此|因而|故而|于是|从而/
+      : /[,.;:!?]|\b(?:therefore|thus|hence|consequently|so)\b/i);
+    if (cut >= 0) body = body.slice(0, cut);
+    const taut = isZh ? tautZh(term, body, R) : tautEn(term, body, R);
+    if (!taut) continue;
+    // 腿④：结论必须是对定义体的复述（含术语 + 与定义体有共享），挡住
+    // 「定义Y，所以关于X的新断言」这类假阳性。
+    const restate = isZh ? restateConcZh(term, body, conc, taut) : restateConcEn(term, body, conc, taut);
+    if (restate) return { term, route: isZh ? 'def-zh' : 'def-en' };
+  }
+  return false;
+}
+
+/** R5b：结论前置复述框（CONN 切分 + REPEAT×FRAME） */
+function restateSo(text, isZh, R) {
+  const CONN = isZh ? (R.CONN_ZH || CONN_ZH) : (R.CONN_EN || CONN_EN);
+  let idx = -1;
+  for (const re of CONN) {
+    const m = text.match(re);
+    if (m && (idx < 0 || m.index < idx)) idx = m.index;
+  }
+  if (idx < 1) return false;
+  const left = text.slice(0, idx).trim();
+  const right = text.slice(idx).replace(isZh ? /^(?:所以|因此|因而|故而)/ : /^(?:\b(?:therefore|thus|hence)\b|,\s*so\s+)/i, '').trim().replace(/[。，,．.！!？?；;]+$/, '');
+  if (left.length < 3 || right.length < 3) return false;
+  if (isZh) {
+    for (const rep of commonZhNgrams(left, right)) {
+      if (zhDefinitionalFrame(right, rep)) return { rep, route: 'so-zh' };
+      // [r735] f9 纯系词应用框：「主语(+副词)+是+谓词」且谓词含重复词
+      const cm = right.match(R.ZH_COPULAR || ZH_COPULAR);
+      if (cm && cm[1].includes(rep)) return { rep, route: 'so-zh-copular' };
+    }
+    return false;
+  }
+  const lw = enWords(left);
+  const rw = enWords(right);
+  // [r735] e10 纯系词应用框（先于 pair 路由）：「(主语)+is/are (+of)+谓词」
+  // 且谓词含左腿实词。右句谓词组**不经过 enWords 停词过滤**——just/safe
+  // 这类谓词核心词恰在 EN_STOP 里，过滤后无 pair 可配、整族恒死。
+  // 窗宽 6 词覆盖 "we have had no accidents and are safe" 形。
+  const em = right.match(R.EN_COPULAR || EN_COPULAR);
+  if (em) {
+    const predWords = em[1].toLowerCase().match(/[a-z]{3,}/g) || [];
+    for (const a of lw) {
+      for (const w of predWords) {
+        if (enMatch(a, w)) return { rep: a + '~' + w, route: 'so-en-copular' };
+      }
+    }
+  }
+  for (const a of lw) {
+    for (const b of rw) {
+      if (!enMatch(a, b)) continue;
+      if (enDefinitionalFrame(right, a)) return { rep: a + '~' + b, route: 'so-en' };
+    }
+  }
+  return false;
+}
+
+/** 数组版 anyHit（正则列表任一命中） */
+function anyHitArr(list, text) {
+  for (const re of list) { if (re.test(text)) return true; }
+  return false;
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空白正则替换指定常量
@@ -346,6 +643,32 @@ function checkCircularReasoning(text, inject) {
         : `circular reasoning×repeated term×definitional restatement(${r.route}:${r.rep})`,
     };
   }
+  // [r735] 新族路由 R5：同义反复论证（定义循环 R5a + 结论前置复述 R5b）。
+  // DEF_HEDGE 先行：定义被显式标为多家存疑时不判。
+  if (!(R.DEF_HEDGE_ZH || DEF_HEDGE_ZH).test(text) && !(R.DEF_HEDGE_EN || DEF_HEDGE_EN).test(text)) {
+    const d5 = defCircular(text, isZh, R);
+    if (d5) {
+      return {
+        hit: true,
+        score: 0.5,
+        count: 1,
+        detail: isZh
+          ? `循环论证×同义反复定义当论证前提(${d5.route}:${d5.term})`
+          : `circular reasoning×tautological definition as premise(${d5.route}:${d5.term})`,
+      };
+    }
+    const s5 = restateSo(text, isZh, R);
+    if (s5) {
+      return {
+        hit: true,
+        score: 0.5,
+        count: 1,
+        detail: isZh
+          ? `循环论证×结论前置同义复述(${s5.route}:${s5.rep})`
+          : `circular reasoning×conclusion-first restatement(${s5.route}:${s5.rep})`,
+      };
+    }
+  }
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
@@ -355,5 +678,9 @@ module.exports = {
     FUNCTION_NGRAM, EVIDENCE_EXEMPT, REPORTING_EXEMPT, META_EXEMPT_ZH, META_EXEMPT_EN, NUMERIC,
     DEFINITIONAL_MARKERS, RESTART_TAIL, commonZhNgrams, zhDefinitionalFrame, checkZh, checkEn,
     enStem, enWords, enMatch, enDefinitionalFrame,
+    // [r735] 同义反复论证族（R5a 定义循环 + R5b 结论前置复述）
+    DEF_FRAME_ZH, DEF_FRAME_EN, USE_ZH, USE_EN, CONN_ZH, CONN_EN,
+    TAUT_SYN_ZH, TAUT_SYN_EN, ANTONYM_ZH, DEF_HEDGE_ZH, DEF_HEDGE_EN, ZH_COPULAR, EN_COPULAR,
+    tautZh, tautEn, defCircular, restateSo, restateConcZh, restateConcEn,
   }),
 };
