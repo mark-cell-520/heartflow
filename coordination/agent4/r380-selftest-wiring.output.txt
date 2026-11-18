@@ -1,6 +1,0 @@
-gate FAMILIES: 36 （含 lump_of_labor: true ）
-gate hit: true | families: lump_of_labor | score: 0.7
-plugin version: 1.17.0 | families: 41 | econ: 35 | stats: 6
-plugin analyze: 3 | families: lump_of_labor
-plugin analyze benign: 0
-gate benign hit: false
