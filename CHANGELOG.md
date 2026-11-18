@@ -1,3 +1,10 @@
+# 6.8.200 变更日志条目
+
+- **第 268/269 维度接线收尾（r399，收尾轮）**：baseline_omission（基线缺失——无对照比例结果断言，第 268 维，r398 产出）与 claimed_verification_without_trail（空核验宣称——宣称核验完成却无核验轨迹，第 269 维，r400 产出）在 src/index.js 九处接线基础上完成门禁闭环。
+- **双向门禁误伤修复**：claimed_verification_without_trail 豁免腿 QUESTIONED_ZH 扩展「义务/待办标记 × 核验动词同窗共现」族与「合规流程语境」族（反洗钱/可疑交易/涉嫌/合规审查/人工复审），修复「这笔交易触发了反洗钱规则，需要人工核查。」（待执行合规动作）被误判为已完成核验宣称的问题；不收裸「要」，「我要亲自验证」仍为攻击句式。guard-abilities 双向垂直场景 149/150 → 150/150。
+- **文档数字同步**：README.md 8 处 / SKILL.md 5 处 / AGENTS.md 5 处（dimensions 266/267→268、verify 233/234→235、Verify 列举补新维度、三 tier 相加说明 255→265）；doc-numbers-accuracy 14/24 → 24/24。
+- 五门禁全绿：verify 16/0、guard-abilities 20/20、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326 零新增、变体矩阵 24/24（攻击 12/12、良性 12/12）。
+
 ---
 
 # 6.8.202 变更日志条目

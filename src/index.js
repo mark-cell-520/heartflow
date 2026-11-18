@@ -773,6 +773,20 @@ const { checkQuantifierScopeShift } = require('./quantifier-scope-shift.js');
 // 良性 15/15），但 src/index.js 从未 require/dispatch——探针实测 gate 层
 // ZH 侧 4/4 穿透、EN 侧 1/2 穿透。变量名 mat——mean as typical 缩写。
 const { checkMeanAsTypical } = require('./mean-as-typical.js');
+// [r398 接线] 第 268 维度 baseline_omission（基线缺失——报告比例结果却不
+// 交代对照组/基线/分母口径，把无参照系的百分比当疗效证明）require。模块
+// r398 本轮起草，探针实证（/tmp/hf-r398-probe-pool.js，v6.8.197 gate 层）
+// 本族攻击 7/7 完全穿透、零维度承重。变量名 bo——baseline omission 缩写。
+const { checkBaselineOmission } = require('./baseline-omission.js');
+// [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验宣称：
+// 宣称核验已完成却不给核验轨迹——无来源/无数据/无复现路径）require。模块
+// r736 起草并备齐双腿与三组豁免（注释内实测记录：漏判主因零主语广告语、
+// 光杆核验动词完成体、EN 简单过去时，均已修正），但 src/index.js 从未
+// require/dispatch——属「已加载未 dispatch」能力。缺口来源：reverify
+// （2akouwu/reverify，1347★）核心纪律「模型只提议；确定性工具逐条核验，
+// 只有通过核验的才成为事实」。变量名 cvw——claimed verification
+// without trail 缩写，grep 0 命中。
+const { checkClaimedVerificationWithoutTrail } = require('./claimed-verification-without-trail.js');
 // [r367 接线] 第 260 维度 package_deal（一揽子谬误：把多个独立命题打包成
 // 不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制单条独立判断）require。
 // 缺口实证见 scripts/round-367/probe-package-deal.js（11 条攻击样本 8 条穿透
@@ -2441,6 +2455,17 @@ function discriminate(text, evidence = [], contentMode) {
   // 85分以上」等）、EN 侧 1/2 穿透。本行让分布误读以独立维度名进入
   // findings/scores/dimMap。
   const mat = _applyPedagogyRelaxation(checkMeanAsTypical(_normText), "mean_as_typical", pedagogyRelaxation);
+  // [r398 接线] 第 268 维度 baseline_omission（基线缺失：比例结果断言×疗效/
+  // 效果断言双腿 + 三组豁免）独立 dispatch。模块层本轮实测攻击 12/12、良性
+  // 10/10，src/index.js 从未 require/dispatch——探针实测 gate 层本族 7/7
+  // 穿透。本行让「无对照比例结果断言」以独立维度名进入 findings/scores/dimMap。
+  const bo = _applyPedagogyRelaxation(checkBaselineOmission(_normText), "baseline_omission", pedagogyRelaxation);
+  // [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验宣称）
+  // 独立 dispatch。模块 r736 前已存在但从未 dispatch——探针实测 gate 层
+  // 本族穿透（「我们团队核实过这个数据」「经过实测，这款产品确实更好用」
+  // 「I verified it myself and it works.」等），零维度承重。本行让「空核验
+  // 宣称」以独立维度名进入 findings/scores/dimMap。
+  const cvw = _applyPedagogyRelaxation(checkClaimedVerificationWithoutTrail(_normText), "claimed_verification_without_trail", pedagogyRelaxation);
   // [r367 接线] 第 260 维度 package_deal（一揽子谬误）独立 dispatch。探针
   // 实证 gate 层穿透（8/11 漏判），本行让「打包绑定 × 全有或全无」以独立
   // 维度名进入 findings/scores/dimMap。
@@ -3205,6 +3230,13 @@ function discriminate(text, evidence = [], contentMode) {
     // [r397 接线] 第 267 维度 mean_as_typical 参与判定（均值当典型值
     // / 分布误读）。
     {score: mat.score, name:'mean_as_typical'},
+    // [r398 接线] 第 268 维度 baseline_omission 参与判定（基线缺失：比例
+    // 结果无对照断言）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: bo.score, name:'baseline_omission'},
+    // [r400 接线] 第 269 维度 claimed_verification_without_trail 参与判定
+    // （空核验宣称：核验动作在场但轨迹缺失）。同 r331 先例：dimMap 与
+    // allDims 两处都接。
+    {score: cvw.score, name:'claimed_verification_without_trail'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -3867,8 +3899,15 @@ function discriminate(text, evidence = [], contentMode) {
     // dimMap 登记。mat——mean as typical 缩写。r394/r395 起草模块层、
     // 本轮补齐九处接线，探针实证 gate 层 ZH 4/4、EN 1/2 穿透。
     mean_as_typical: mat,
-    // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定腿 × 全有或
-    // 全无腿 × 邻近窗 × 六组豁免）dimMap 登记。pkg。
+    // [r398 接线] 第 268 维度 baseline_omission（基线缺失 / 无对照比例结果
+    // 断言）dimMap 登记。bo——baseline omission 缩写。探针实证 gate 层本族
+    // 攻击 7/7 穿透、零维度承重。
+    baseline_omission: bo,
+    // [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验
+    // 宣称）dimMap 登记。cvw——claimed verification without trail 缩写。
+    claimed_verification_without_trail: cvw,
+    // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
+    // 全无）dimMap 登记。pkg。
     package_deal: pkg,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性偏差×
     // 生动个案腿×偏斜断言腿）。
@@ -4418,11 +4457,16 @@ function discriminate(text, evidence = [], contentMode) {
     // guidance。mat——mean as typical 缩写。模块层 r394 立项（穿透探针
     // 攻击 5/6、良性 3/3）、r395 起草双腿与豁免，src/index.js 从未接线，
     // 本轮补齐。
+    // [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验
+    // 宣称）guidance。cvw——claimed verification without trail 缩写。
+    'claimed_verification_without_trail': "不得**宣称一次核验已经完成却不给出任何核验轨迹**——空核验宣称（claimed verification without trail）是文本说「我验证过了/团队核实了/已实测」，却不提供来源、数据、复现路径或方法学标记，把「核验动作在场」本身当成结论可靠的依据。样本形状：「我们团队核实过这个数据。」「经过实测，这款产品确实更好用。」「实测有效，效果看得见。」「我已亲自验证，这个方案没问题。」「I verified it myself and it works.」「We tested it thoroughly and it passed.」「Tested and it works.」（样本形状与负例见 test/round-400-claimed-verification-without-trail.test.js）。为什么这本身就是问题：在「模型只提议；确定性工具逐条核验，只有通过核验的才成为事实」（reverify 纪律）的标准下，一次没有轨迹的核验宣称不可复核、不可复现、不可追责——它把本应可审计的过程压缩成一句无法检验的断言，让读者无从区分「真的验过」与「口头说验过」。正当做法是**补上核验轨迹**（附上复现脚本/原始数据/来源编号/方法说明），或**把空核验降级为待验证假设**（声称有效但尚未提供可复核证据，需要独立测试）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① VERIFY_CLAIM 核验完成宣称——第一人称/机构主语（我/本人/我们/团队/小组/实验室；EN I/we/the team/our lab）× 核验动词（验证/核实/核查/实测/亲测/测试过/确认过/检验/复测/复现过/调研过；EN verified/checked/confirmed/tested/validated/cross-checked/reproduced）× 完成体（了/过/已经/亲自/反复/实测/亲测等光杆完成形；EN 核验动词过去式自身即完成体）；主语允许缺失（汉语广告语「实测有效」省略主语，r736 实测整族穿透的第三主因），但第三方主语（他说/据称/据报道/专家声称）在场时核验归属他人、本族不判。腿② TRAIL_ABSENT 无核验轨迹——反向判定而非词表：腿①命中后全句无来源/出处/编号/链接/DOI/数据集/样本量/方法论/实验设计/对照组/复现/可复现/日志/存档/同行评审/第三方检测/公示等可供第三方复核的载体即判。缺腿不判——「已验证（复现脚本与原始数据见附录 A）」有轨迹、是正当披露；「我们反复核验」中的「核验」是腿①核验动词而非轨迹动作。边界：confidence 只管确定性措辞（无疑/必然/百分之百），不关心「谁验过」；unsupported_claim 管没有依据的断言，本族断言**自称有核验**、错在轨迹缺失而非依据整体缺失；evidence_claim_mismatch 管断言超出所引证据的覆盖范围，本族根本没有可引用的证据、只有一句「已经验过了」；weak_evidence_strong_claim 管证据强度与结论强度不匹配，本族不涉及任何证据；anonymous_source_claim 管来源不可指认，本族的来源在场（我/团队/实验室）、缺的是核验轨迹而非来源身份；completion_evidence 管「已完成」的宣称缺完成证据，本族特指**核验/验证类完成宣称**（verify/checked/tested），射程更窄更深。verify 级——单句可能是合规披露转述、他人宣传话术引述、或作者正要批判该空核验宣称；verify 的含义是「这个核验宣称没有轨迹，需要补上来源/数据/复现路径才能采信」，调用方应要求补核验轨迹，而不是把『说验过了』当『验过了』。明确不判（豁免）：①轨迹纪律语言在场（句中带来源/数据/方法/复现路径——见腿②载体清单；EN source/raw data/dataset/methodology/control group/reproducible/logs/peer review/third party/disclosure）；②核验动作被质疑/待补的元陈述（尚未核验/无法验证/没法证实/需要验证/数据存疑/待确认/没有数据支撑；EN not yet verified/lacks verification/awaiting confirmation/still pending/remains unproven——作者正在指出缺口）；③核验/验证概念的教学转述（可证伪/可复现性/科学方法/方法论/核验流程/验证实验设计/同行评审/双盲/假设检验；EN falsifiability/scientific method/methodology/controlled experiment/peer review/textbook/lecture——概念讨论本身不是运用它）。",
     'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）guidance。
     'quantifier_scope_shift': "不得**把「对每个 x 各有一个 y」偷换成「有一个 y 对所有 x 成立」**——量词辖域移位（quantifier scope shift / scope fallacy，∀x∃y 推不出 ∃y∀x）是把逐点成立的断言整体化为同一对象的普遍断言：「对每个员工都有一个工位，所以存在一个工位是所有员工共用的」「每个人都有一位守护天使，所以有一位守护天使守护所有人」「有人迟到了，所以所有人都必须提前到」（Every student has a mentor, so there is a mentor for every student. / Each child has a parent, so there is a parent for all children.）。∀x∃y（每个人有自己的）与 ∃y∀x（有一个共用的）是逻辑强度完全不同的两个命题，前者弱、后者强，用推断连接词把前者接到后者上等于把弱命题伪装成强命题。判据**四腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① SCOPE-PREMISE 辖域前提（对每个/每一个/每个/每人/人人/每个人/各有一位/各自有/每人都有一个/任何人都有一个；EN every / each / every person / everyone has / each child / anyone has，含裸名词形：单独出现「每个」「人人」即命中腿①）；腿② EXISTENCE 存在量词结论（存在一个/有一个/某一个/某个/同一个/共用/共享/只用同一个/统统归；EN there is one / there exists / one single / the same / shared by all / a common，含裸名词形：单独出现「同一个」「共用」即命中腿②）；腿③ INFERENCE 推断连接词（所以/因此/这说明/就意味着/那就是/可见/故而；EN so / therefore / which means / hence / thus / that means，含倒装形：结论在前、前提在后作理由）；腿④ PREDICATE-SHARED 谓域共享——结论中的谓词与前提中的谓词同族（工位-工位/导师-导师/天使-天使/工位-座位；mentor-mentor/angel-angel），确保偷换的是同一个关系而非两个无关陈述。四腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「辖域移位」叙述。边界：undistributed_middle（中项不周延）管三段论中项未周延，本族管量词辖域顺序；affirming_the_consequent/denying_the_antecedent 管条件句逆/否误用，本族不依赖条件句；fallacy_of_relevance 管相关性缺失，本族的推理形式本身无效；hasty_generalization 管样本不足的归纳，本族是演绎形式的误用而非样本问题；whole_part_transfer 管整体部分性质互推，本族管的是量词嵌套顺序而非整体-部分。明确不判：正确辖域表述（每个人有各自的工位，不是同一个/每人都配了一把钥匙，钥匙不通用——**把 ∀x∃y 与 ∃y∀x 区分开是正确判别**）、同一性本来成立的陈述（全校共用一个食堂/大家共用一条网线——**对象真的是同一个时不是移位**）、提问句式（含 ?/？）、否定与对冲（不意味着/不代表/未必/不一定/取决于；EN does not mean / not necessarily / depends on）、概念教学（量词辖域/辖域移位/quantifier scope / scope fallacy / ∀x∃y）。",
+    // [r398 接线] 第 268 维度 baseline_omission（基线缺失：无对照比例结果断言）guidance。
+    'baseline_omission': "不得**把一个没有对照组、基线或分母口径的比例结果当成疗效/效果的证明**——基线缺失（baseline omission / uncontrolled rate claim）：报告治愈率、满意度、成功率却不交代自愈率是多少、安慰剂组表现如何、样本分母是谁，等于把「无人对照的百分比」伪装成「效果证据」。样本形状：「这种新疗法治愈率高达九成，效果惊人。」「用了我们的产品，百分之八十的客户都满意。」「本课程学员九成实现了收入翻倍。」「这种药的缓解率达到百分之八十五。」「The new treatment cures ninety percent of patients.」「Our product achieves an eighty percent success rate.」「After the training, ninety percent of students doubled their income.」（模块层矩阵攻击 12/12、良性 10/10，见 src/baseline-omission.js）。判据**双腿共现 + 三组豁免，缺一不判**：腿① RATE_RESULT 比例结果——治愈率/缓解率/成功率/满意率/满意度/达标率/留存率/复购率/完成率/合格率/通过率/有效率/好评率/完课率/及格率/转化率/退货率/退订率/增幅/降幅/中奖率/命中率/占有率（EN cure/recovery/success/satisfaction/retention/pass/completion/response/conversion rate）或腿①b RATE_RESULT_VERB 结果动词×比例（治愈/治好了/缓解/改善/满意/认可/达标/完成/通过/留存/复购/翻倍/提升 × 九成/八成/百分之N/N% / ninety percent / N out of N）；腿② CLAIM_EFFECT 疗效/效果断言（高达/达到/惊人/显著/明显/完胜/效果看得见/证明有效/疗效确切/遥遥领先/都很满意/大获成功/好评如潮/很成功/成效显著；EN achieves/delivers/proves/remarkable/impressive/dramatic/industry-leading/overwhelmingly positive/cures…percent）。缺腿不判——只报数字无效果断言（「治愈率90%，待验证」）是中性披露，归 verify 前的 unsupported_claim。边界：statistical_misleading（第58维）管**基数小到没意义**（样本 2→8 人），要求句中给出绝对量；本族可完全无数字细节、只给大比例，错在无参照系——它给了大基数（样本量 12000）会早退放过，而「样本量 12000 的治愈率九成」若无对照组仍是本族；percentage_overflow 管**百分比超 100** 的算术错误，本族百分比完全合法；base_rate_neglect（第169维）管**阳性信号→高置信后验**（检测阳性所以几乎肯定得病），错在忽略先验，本族错在缺对照组、腿②是疗效断言而非置信模态；weak_evidence_strong_claim（第245维）管**证据强度与结论强度不匹配**的泛化结构，不特指比例结果缺对照；unsupported_claim 管泛化无依据断言，本族有依据（百分比结果）、错在依据不完整。verify 级——单句可能是合规披露中的一句、转述他人宣传话术、或作者正要批判该数据缺对照；verify 的含义是「这个比例结果没有对照参照系，需要补上对照组、基线或分母口径才能判断它是否构成疗效证据」，调用方应要求补对照数据，而不是接受孤立百分比当效果证明。明确不判（豁免）：①对照/基线纪律语言在场（对照组/控制组/基线组/基线值/安慰剂/双盲/随机对照/RCT/历史对照/行业均值/基准值/分母/样本量/参与人数/统计口径/与…相比/环比/同比；EN control group/placebo/randomized/baseline/benchmark/compared with/versus/sample size/out of N）；②数字被质疑或待核验的元陈述（需要验证/数据存疑/样本太小/缺乏对照/孤证/尚未核验/未公布；EN unverified/needs verification/sample too small/lacks control/insufficient evidence）；③统计教学/谬误分析转述（谬误/案例教学/反例/典型错误/教学/教材/举例/示例/剖析；EN fallacy/case study/for example/illustrates/textbook）。",
     // [r366] 第 259 维度 existential_fallacy（存在谬误）guidance。
     'existential_fallacy': "不得**从无存在承诺的前提推出存在性结论**——存在谬误（existential fallacy / illicit subalternation）是从一个不含存在承诺的前提集推出「存在……」结论，却没为该结论断言对象的存在提供任何独立证据。亚里士多德-布尔传统：全称命题（「所有 S 都是 P」）不断言任何 S 存在（vacuously true），条件命题（「若 P 则 Q」）不断言 P 有实例，规范命题（「X 应当 Y」）不断言有 X 在 Y，定义命题（「X 被定义为 Y」）只是元语言约定不断言实例——四类前提都推不出「存在……」。样本形状：「所有喝过这款茶的人都改善了睡眠，所以存在喝茶助眠的人。」「如果按下这个按钮就能获得奖励，那么一定存在获得过奖励的人。」「凤凰被定义为百鸟之王，因此存在百鸟之王。」「每个人都应该遵守交通规则，所以存在遵守交通规则的人。」（All unicorns have horns, so there exists a unicorn with a horn. / There must be a perfect solution, because every problem we face can be solved in principle.）。判据**双腿共现 + 邻近窗 + 六组豁免，缺一不判**：腿① NON-EXISTENTIAL PREMISE 无存在承诺前提（全称：所有/凡是/一切/任何/每个；EN all/every/each/any/no/none；条件：如果/若/倘若/只要/一旦；EN if/whenever/provided/assuming；规范：应该/应当/必须/理应；EN should/ought to/must；定义：被定义为/所谓/指的是；EN is defined as/by definition/refers to）——前提标记之前不得出现存在承诺词（有些/有的/例如/存在；EN some/there is/for example），带承诺的前提是非空域、推出存在结论合法；腿② EXISTENTIAL CONCLUSION 存在性结论（所以存在/一定存在/必有/可见不乏其人；EN so there is/there must be/exists），含倒装形（结论在前、前提在后作理由）。两腿落在 3 个子句邻近窗内且六组豁免（数学构造/直接观察/谬误概念转述/教学语境/对冲结论/否定转移——「不能推出存在……」是元层面正确陈述）全不中即判。边界：quantifier_scope_shift 管量词辖域顺序移位（∀x∃y↔∃y∀x，要求谓域共享），本族管推论方向本身、不要求谓域共享；undistributed_middle 管三段论中项不周延（双前提），本族单前提即可成立且结论是存在断言；affirming_the_consequent/denying_the_antecedent 管条件句方向错误，本族条件前提本身合法、错在推出存在实例；hasty_generalization 管证据不足的归纳，本族是演绎形式无效。verify 级——存在结论偶然可能为真，错的是推理形式未给存在性提供支撑，需补实例证据或独立存在性论证。明确不判：带存在承诺前提的合法推理（有些 S 是 P，所以存在 S）、数学合法存在构造（对每个实数 x 存在 y 使 x+y=0）、直接观察/经验报告（调研显示存在……）、正当的多因或并列陈述。来源：arXiv 2405.02318（NL2FOL，NL→FOL→SMT 有效性判定）的形式结构思路，纯规则实现零 LLM 依赖；探针实证见 scripts/round-366/probe-existential-fallacy.js。",
     'negative_existential_import': "不得**从否定或未发现的前提推出肯定存在/全称接受结论**——否定前提推存在（negative existential import / argument from failed observation）是从否定性前提（没人见过 X、没有证据显示、尚未发现、无人反驳、你说不出理由）推出肯定性结论（X 必定存在于……、它已经被所有人接受、所以它是对的、必定出自某种神秘机制）。逻辑上否定命题 ¬Observe / ¬Evidence / ¬Refute 不断言其补域的正面内容：没观测到不等于不存在，观测失败也不等于存在移位，「你说不出反对理由」更不等于论题成立——在布尔解释下否定前提与存在断言之间没有任何逻辑通道。样本形状：「没有人见过龙，所以龙一定存在于我们尚未探索的地方。」「从来没有人证明这个理论是错的，因此这个理论就是对的。」「你说不出反对的理由，说明这个方案是对的。」「没有科学家能解释这个现象，所以这一定是超自然力量造成的。」「没人反驳过这个观点，说明它已经被所有人接受了。」（No one has ever seen a dragon, so dragons must exist beyond what we have explored. / Nobody has refuted this theory, so it must be true.）。判据**双腿共现 + 邻近窗 + 六组豁免，缺一不判**：腿① NEGATIVE PREMISE 否定/未发现前提（观测否定：没人见过/看不见/无人看见，EN nobody has seen/observed；证据否定：没有证据/无证据显示/无法证实，EN no evidence shows/cannot be verified；发现否定：尚未发现/至今没有发现/未被发现，EN has not been found；反驳否定：没人反驳/无人质疑/你说不出理由，EN no one has refuted/you cannot refute；解释否定：没有科学家能解释/无人理解，EN cannot be explained）——前提标记之前不得出现存在承诺词（有些/有的/例如/存在；EN some/there is/for example），带承诺的前提是非空域、推出存在结论合法；腿② AFFIRMATIVE CONCLUSION 肯定存在/全称结论（存在断言：必定存在/一定存在于/必然存在于/必有，EN must exist/must be out there；全称接受：被所有人接受/人人都相信/就是对的，EN accepted by everyone/must be true），含倒装形（结论在前、前提在后作理由）。两腿落在 3 个子句邻近窗内且六组豁免（存在承诺前提/直接观察经验报告/谬误概念转述/教学语境/对冲结论/合规限定结论——「不等于存在」「未被证实」是本维度保护的正当结论，另加科学共同体程序陈述同行评审/可复现性）全不中即判。边界：appeal_to_ignorance（第62维）管举证责任分配（你证明不了→推定成立/照办/推广），本族管推论方向（否定/未发现前提→存在或全称结论），且结论段必须是存在/全称断言形状、不含「对方须先自证」的倒置结构；existential_fallacy（第259维）管肯定无存在承诺前提（全称/条件/规范/定义，vacuously true）→存在结论，本族管否定性前提（¬Observe/¬Evidence/¬Refute），两类前提在逻辑上互补、射程互斥；illicit_conversion/affirming_the_consequent/denying_the_antecedent 管条件句方向错误或换位，本族否定前提本身合法（真的没人见过），错的是从否定前提兑换存在/全称结论；hasty_generalization 管证据不足的归纳，本族是演绎形式无效（否定前提为真而结论无据）。verify 级——结论偶然可能为真（龙可能真有、理论可能真对），错的是推理形式没给结论提供支撑，需补正面证据或独立论证。明确不判：带存在承诺前提的合法推理（有些病人报告了这种症状，所以存在这种症状）、有正面观测支撑的结论（调研显示存在……）、科学共同体正当程序陈述（尚未复现说明该结果可信度存疑）、正当的多因或并列陈述。来源：arXiv 2405.02318（NL2FOL 形式化思路，LOGIC 数据集高频失效族之一），纯规则实现零 LLM 依赖；探针实证见 scripts/round-367/probe-neg-existential.js。",
@@ -6114,6 +6158,21 @@ function discriminate(text, evidence = [], contentMode) {
     // count_rate_conflation 均不覆盖「均值当众数/典型值用」这一结构，
     // rewrite/block 会误伤正常统计描述。
     'mean_as_typical',
+    // [r398 接线] 第 268 维度 baseline_omission（基线缺失：无对照比例结果
+    // 断言）。verify 级——单句可能是合规披露转述、他人宣传话术引述或作者
+    // 正要批判该数据缺对照；statistical_misleading（基数小）/percentage_
+    // overflow（>100%）/base_rate_neglect（阳性→高置信）/weak_evidence_
+    // strong_claim（泛化不匹配）均不覆盖「结果比例缺对照组」这一结构，
+    // rewrite/block 会误伤正常统计披露。
+    'baseline_omission',
+    // [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验
+    // 宣称：宣称核验完成却无来源/数据/复现路径）。verify 级——单句可能是
+    // 合规披露转述、他人宣传话术引述或作者正要批判该空核验宣称；
+    // confidence（只管确定性措辞）/unsupported_claim（依据整体缺失）/
+    // evidence_claim_mismatch（断言超证据范围）/anonymous_source_claim
+    // （来源不可指认）/completion_evidence（完成宣称缺完成证据）均不覆盖
+    // 「核验动作在场但轨迹缺失」这一结构，rewrite/block 会误伤正常披露。
+    'claimed_verification_without_trail',
   ]);
   // pass：无问题通过
 
@@ -6585,6 +6644,12 @@ function discriminate(text, evidence = [], contentMode) {
       // mat——mean as typical 缩写。r394/r395 起草模块层、本轮补齐接线，
       // 探针实证 gate 层 ZH 4/4、EN 1/2 穿透。
       mean_as_typical: mat,
+      // [r398 接线] 第 268 维度 baseline_omission 补登记（基线缺失 / 无对照
+      // 比例结果断言）。bo——baseline omission 缩写。
+      baseline_omission: bo,
+      // [r400 接线] 第 269 维度 claimed_verification_without_trail 补登记
+      // （空核验宣称）。cvw——claimed verification without trail 缩写。
+      claimed_verification_without_trail: cvw,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6772,6 +6837,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r397 接线] 第 267 维度 mean_as_typical 补登记（均值当典型值 /
     // 分布误读）。mat——mean as typical 缩写。同上：九处一次接齐。
     mean_as_typical: mat,
+    // [r398 接线] 第 268 维度 baseline_omission 补登记（基线缺失：比例结果
+    // ×疗效断言双腿、三组豁免）。bo——baseline omission 缩写。
+    baseline_omission: bo,
+    // [r400 接线] 第 269 维度 claimed_verification_without_trail 补登记
+    // （空核验宣称）。cvw——claimed verification without trail 缩写。
+    claimed_verification_without_trail: cvw,
     // [r323] 第 255 维度 red_herring 补登记（转移话题/偷换论题：用
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。

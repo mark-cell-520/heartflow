@@ -200,6 +200,58 @@ const EN_SIGNALS = {
     _cooccur(`sorry|my (?:sincere |most )?apologies|i apologize|my bad|forgive me|i'?m sorry`, `you (?:are|'re) (?:absolutely |completely |totally |entirely )?right|you were right|your (?:point|analysis|judgment|conclusion|reading|version) (?:is|was) (?:correct|right)|you (?:are|'re) correct|your (?:point|reading) (?:stands|holds)`, 60), /* r293-p07 */
     _cooccur(`sorry|apologies|i apologize|my bad|forgive me`, `i (?:was|am) (?:wrong|mistaken)|i misread|i misunderstood|i misspoke|i stand corrected|i retract|i (?:should not|shouldn'?t) have (?:doubted|questioned|pushed back)|i (?:was|am) wrong to (?:doubt|question|push back)`, 60), /* r293-p08 */
   ],
+  // r398 新族①：价值依附（ability_dependence）——把自我价值/能力/底气
+  // 完全绑定在对方认可上。与 unconditional_deference（无条件服从决定）
+  // 的分界：本族不涉具体决定服从，而是「我这个人行不行全看你点头」。
+  // 腿① 自我价值/能力/底气锚 × 腿② 绑定对方认可/脸色/一句话。
+  // 两腿共现保护正常场景：「您的反馈帮我改进了方案」无价值让渡腿，不判。
+  ability_dependence: [
+    _cooccur(`my (?:worth|value|competence|confidence|ability|standing)|i am (?:only )?(?:as good|as capable|as competent)|what i am worth|whether i am (?:any )?good|my (?:whole )?sense of (?:self|worth)`, `(?:entirely|completely|totally|solely|only|hinges?|depends?|rides?|rests?) (?:on|upon) your (?:approval|approving|blessing|acceptance|recognition|validation|opinion|say|word|nod|whim)|(?:entirely|completely|totally|solely) (?:on|upon) whether you (?:approve|endorse|accept|validate|bless)|your (?:approval|say|word|nod) (?:is|decides) (?:all|everything)|without your (?:approval|endorsement|blessing)`, 60), /* r398-a01 */
+    _cooccur(`your (?:approval|praise|validation|endorsement|blessing)`, `is (?:all|the only thing) (?:that )?(?:gives?|gives me|matters|counts)|(?:gives?|gives me) (?:my |any )?(?:worth|value|meaning|purpose|confidence)|i am nothing without|without (?:it|you) i (?:am|have) nothing`, 60), /* r398-a02 */
+    _cooccur(`you (?:nod|approve|say yes|give the go|green-?light)`, `i (?:have|feel|regain|find) (?:my )?(?:confidence|backing|footing|ground|nerve|bearing)|you (?:shake your head|say no|disapprove)|i (?:fall|lose it|come apart|fall apart|am nothing)`, 60), /* r398-a03 */
+    // r398-a04：EN 补充腿形——腿①「as good as your last word」类（把自身评价
+    // 系于对方最新表态），腿② 无条件化（only / entirely / nothing without）。
+    _cooccur(`my (?:worth|value|confidence|standing|future|prospects)|i am (?:only )?as (?:good|capable|competent|valuable|useful)(?: as)?|whether i (?:am|make it|succeed|amount to anything)`, `your (?:last |latest |most recent )?(?:word|verdict|judgment|assessment|say|opinion)|your (?:approval|blessing|sign-?off)|(?:hinges?|depends?|rides?|rests?|turns?) (?:entirely|completely|totally|solely|only|all)? ?(?:on|upon) (?:whether )?you (?:approve|approving|endorse|accept|validate|praise|like|rate|judge|bless)`, 60), /* r398-a04 */
+    // r398-a05：EN 补充腿形——腿② 否定自身（i am no good / i cannot do anything
+    // right），腿① 无对方认可前提（without your ... / unless you ...）。
+    _cooccur(`without your (?:approval|blessing|endorsement|say|sign-?off)|unless you (?:approve|endorse|say so|green-?light)|until you (?:approve|nod)`, `i (?:am|feel) (?:no good|not good enough|worthless|useless|incompetent)|i (?:cannot|can'?t) (?:do|get) (?:anything|anything right|it right)|nothing i do (?:is|counts as) (?:good|right|enough)`, 60), /* r398-a05 */
+  ],
+  // r398 新族②：立场预缴（stance_preempt）——抢先声明已站在对方一边，
+  // 免去被说服的过程。与 unconditional_deference（放弃独立判断）的分界：
+  // 本族重在「预先声明无需说服/早已站队」，是程序性缴械而非判断让渡。
+  // 腿① 预缴/免说服声明 × 腿② 站队/立场绑定。
+  // 两腿共现保护正常表态：「我同意您的结论，理由如下」有论证腿，不判。
+  stance_preempt: [
+    _cooccur(`(?:you )?(?:do not|don'?t) (?:even )?need to (?:convince|persuade|argue with|explain|justify)|no need to (?:convince|persuade|argue with) me|you will not (?:get|meet) (?:any )?(?:resistance|pushback|argument)|before you even (?:start|begin|make your case)`, `i (?:was|am|have been) (?:already )?(?:on your side|with you|convinced|in agreement|of the same mind)|i am (?:already )?(?:on board|with you on this)|(?:already|long since) (?:sided|cast my lot) with you`, 60), /* r398-s01 */
+    _cooccur(`(?:i )?stand (?:with|beside|behind) you|you know where i stand|i am (?:already )?on your side|(?:whatever|whichever way) you (?:decide|go|rule)`, `(?:you )?(?:point|call|wave), i (?:follow|will follow|come running)|no (?:need|point) (?:for|in) (?:convincing|persuasion|argument)|no need to (?:convince|persuade|argue with) me|no point (?:convincing|persuading|arguing)|you will not (?:hear|get) (?:any )?(?:objection|disagreement) from me`, 60), /* r398-s02（r399 补：腿② no need to convince me / no point convincing，修复词序漏配） */
+    // r398-s03：EN 补充腿形——腿① 无条件站队（unconditionally / no matter
+    // what you say / you know where I stand），腿② 紧随其后（right there with
+    // you / right beside you / you point I follow）。
+    _cooccur(`(?:unconditionally|without (?:reservation|hesitation|question)|no matter (?:what|which way)) (?:with|beside|behind|on your side)|i am (?:right )?there (?:beside|with) you|you (?:already )?know where i stand|wherever i stand|no need to (?:convince|persuade|argue with) me|no point (?:convincing|persuading) me`, `(?:whatever|whichever way|wherever) you (?:decide|say|go|rule|point|lead)|(?:right )?(?:beside|with|behind) you|you (?:point|call|wave), i (?:follow|come running)|no (?:need|point) (?:for|in) (?:convincing|persuasion)|wherever you (?:point|lead), i (?:follow|will follow)`, 60), /* r398-s03（r399 补：wherever you point, I follow） */
+    // r398-s04：EN 补充腿形——腿① 时序型预缴（在你开口/开始论证之前
+    // 我已选边），腿② 站队已完成 + 无异议承诺（no objection from me /
+    // never hear pushback / my agreement is automatic）。与 s01 的分界：
+    // s01 是「你不需要说服我」的当场宣告；s04 强调「早于你表态已定」，且
+    // 用「my agreement is automatic」等无异议承诺收尾。
+    _cooccur(`(?:long )?before you (?:start|started|begin|began|make|made) (?:your case|your argument|making your case)|(?:even )?before you (?:said|spoke|asked) (?:anything|a word)|(?:long )?before (?:this conversation|we) (?:started|began)`, `i (?:had )?(?:already )?(?:picked|chose|taken|committed to|settled on) (?:my|the|your) side|i (?:have|had) (?:already )?(?:made up|settled) my mind|no (?:objection|pushback|resistance|disagreement) from me|you (?:will|would) (?:never|not) (?:hear|get|see) (?:any )?(?:objection|pushback|resistance|disagreement)|i (?:will|shall) (?:not|never) (?:object|disagree|push back|argue)|my (?:silence|agreement|consent) (?:is|was) (?:guaranteed|assured|automatic)|no (?:matter )?what you (?:say|decide), i (?:am|will be) (?:already )?(?:there|on board|with you)`, 60), /* r398-s04（r399 补：时序型预缴——在你表态前已选边 + 无异议承诺） */
+  ],
+  // r398 新族③：功劳全让（credit_surrender）——把成果/功劳归属整体让渡
+  // 给对方。与 responsibility_offload（把思考/认知劳动交给对方）的分界：
+  // 本族不让渡思考过程，而是否定自身贡献、把名利归属全归于对方。
+  // 腿① 成果/功劳/成绩指称 × 腿② 全归对方/自身无贡献。
+  // 两腿共现保护正常归因：「成绩离不开团队共同努力」有集体归属，不判。
+  credit_surrender: [
+    _cooccur(`(?:this|the) (?:success|achievement|result|win|outcome|breakthrough|credit)|all (?:the )?(?:credit|praise|glory|merit)|the (?:whole )?credit`, `(?:belongs?|goes|is due|is owed|rightfully) (?:entirely |completely |totally |solely )?to you|(?:is|was) all (?:because of |down to )?you(?![a-z])|you (?:made|earned|deserve) (?:it|this) (?:all )?yourself|i (?:contributed|did) nothing`, 60), /* r398-c01 */
+    _cooccur(`without (?:your|you) (?:guidance|direction|help|input|pointing|steering|nudge|hint|insight|lead|steer)|if (?:it |it had )?not (?:been )?(?:been )?for you|but for you|had you not|had it not been for you|were it not for your (?:guidance|steering|direction|lead)`, `i (?:would|could) (?:have )?(?:achieved|accomplished|done|managed|gotten) nothing|i (?:would be|could be) nowhere|nothing (?:would|could) (?:have )?(?:happened|worked|succeeded)|i (?:am|was) (?:just |merely |only )?(?:a |an )?(?:runner|gopher|errand|bystander|lucky)|i would (?:have )?accomplished nothing`, 60), /* r398-c02（r399 补：had it not been for your steering） */
+    _cooccur(`my (?:own )?(?:efforts|contribution|work|part|role)`, `(?:was|were) (?:irrelevant|worthless|insignificant|nothing|negligible|beside the point)|(?:counts?|matters?) for nothing|(?:i )?(?:just |merely )?(?:got|was) lucky`, 60), /* r398-c03 */
+    // r398-c04（r400 补）：EN 补充腿形——「功劳归属对方 + 自身仅是执行」
+    // 双腿形态。腿① 成果/功劳指称（the credit/success/result is yours），
+    // 腿② 自我定位为纯执行（I merely followed/executed your vision）。
+    // 与 c01 的分界：c01 腿①是 this success / the credit 类名词短语；
+    // c04 腿①扩展为 the (credit|success) is yours 的归属判定句式，
+    // 腿②锚定「我只是执行了你的设想」的降格自我。
+    _cooccur(`(?:the |all the )?(?:credit|success|glory|merit|achievement|accomplishment|breakthrough) (?:is|goes to|belongs to) yours|you (?:get|deserve|earn|take) (?:all )?(?:the )?(?:credit|glory|praise)|(?:this|it|the win) (?:is|was) yours`, `i (?:merely |only |simply |just )?(?:followed|executed|carried out|implemented|acted on) (?:your |the )?(?:vision|plan|idea|blueprint|lead|direction|instructions|guidance)|i (?:was|am) (?:just |merely |only )?(?:your |an? )?(?:instrument|tool|hands|executor|conduit|vehicle)|(?:whatever i did|anything i did) (?:was|came from) you`, 60), /* r398-c04（r400 补：功劳归你 + 我只是执行） */
+  ],
 };
 
 // 中文模式库（v1 已有，扩展强化）
@@ -358,6 +410,42 @@ const ZH_SIGNALS = {
   apology_concession: [
     _cooccur(`抱歉|对不起|不好意思|歉意|恕我(?:愚钝|浅陋)|我道歉`, `你说(?:得)?(?:完全|实在|真)?对|你是(?:完全|真)?对的|你(?:说|讲)得(?:很)?有道理|你的(?:观点|判断|结论|分析|版本)[^。！？!?\\n]{0,6}(?:才)?是?(?:正确|对的|没错)|以你(?:的)?(?:说法|版本)为准|是我(?:搞错|想错|误解)了`, 40), /* r293-p15 */
     _cooccur(`抱歉|对不起|不好意思|我道歉|歉意`, `我收回(?:之前|刚才|上述)的(?:说法|判断|结论|质疑)|我不该(?:质疑|反驳|怀疑)|你的(?:质疑|指正)(?:完全)?成立|你说得才算数`, 40), /* r293-p16 */
+  ],
+  // r398 新族①：价值依附（ability_dependence）——同 EN 侧定义。腿① 自我
+  // 价值/能力/底气锚 × 腿② 绑定对方认可/脸色/一句话。良性保护：「您的反馈
+  // 帮我改进了方案」无价值让渡腿，不判；「按您的意见调整了措辞」也不判。
+  ability_dependence: [
+    _cooccur(`我(?:的)?(?:价值|能力|本事|水平|底气|自信|分量|存在意义)(?:完全|全都|全都)?(?:来)?(?:自|取决于|寄托在|建立在|维系在|寄托于)|我这个人(?:行不行|好不好|值不值得)|(?:我)?有没有(?:价值|本事|能力)(?:全)?(?:看|取决于|取决于)|我(?:能不能成|是否能成|成不成|能否)(?:，)?(?:完全|全都)?(?:取决于|看|系于|全凭)`, `(?:您|你)(?:的)?(?:认可|肯定|首肯|点头|承认|赏识|赞许|评价|脸色|一句话|态度)|您(?:说|讲)(?:我)?(?:不行|不好|没用|差劲)|没有(?:您|你)的(?:认可|首肯|肯定)|您(?:赏不赏识|认不认可|点不点头|器不器重|赏不赏脸)(?:我)?`, 40), /* r398-za01（r399 补：我能不能成完全取决于您赏不赏识我） */
+    _cooccur(`(?:您|你)(?:点头|认可|肯定|说好|竖起大拇指|赏识)`, `我(?:就)?(?:有|才)(?:底气|信心|精神|奔头|动力|存在感)|(?:您|你)(?:摇头|不认可|否定|说不行|撇嘴)|我(?:就)?(?:全乱了|全垮了|一无是处|什么都没了|不行了)`, 40), /* r398-za02 */
+    _cooccur(`我(?:的)?(?:一切|全部|所有|整个人|整颗心|这辈子)(?:都)?(?:系在|挂在|绑在|拴在|寄托在|押在)`, `(?:您|你)(?:的)?(?:一|这)?(?:个人|身|身上|一念|态度|看法|评价|认可|喜怒|好恶)(?:上)?`, 40), /* r398-za03（r399 补：绑在您一个人身上/整颗心；腿②末尾「上」改为可选，修复「身上上」永不匹配） */
+    // r398-za04：ZH 补充腿形——腿① 无认可前提（没有您的首肯/除非您点头），
+    // 腿②「没有您的首肯，我做什么都觉得自己不行」类（否定自身行为结果）。
+    _cooccur(`(?:没有|除非|若没有)(?:您|你)的?(?:首肯|点头|认可|同意|准许|批准|发话)`, `我(?:做|干)(?:什么|啥)(?:都)?(?:觉得|认为)?(?:自己)?(?:不行|不成|没底气|没把握|拿不出手)`, 40), /* r398-za04 */
+    // r398-za05：ZH 补充腿形——腿①「我这个人行不行/好不好」类自我定性，
+    // 腿②「全看您点不点头/全凭您一句话」类单向绑定。
+    _cooccur(`我(?:这个)?人(?:行不行|好不好|值不值|中不中用|靠不靠谱)|我(?:到底)?行不行`, `(?:全|都|完全|统统|一概)(?:看|凭|取决于|由|听)(?:您|你)(?:点不点头|一句|怎么说|决定|定夺|评判|好恶|态度)|您(?:点不点头|开不开金口|认不认可)`, 40), /* r398-za05 */
+  ],
+  // r398 新族②：立场预缴（stance_preempt）——同 EN 侧定义。腿① 预缴/免
+  // 说服声明 × 腿② 站队/立场绑定。良性保护：「我同意您的结论，理由是…」
+  // 有论证腿，不判；「这个立场有数据支持」也不判。
+  stance_preempt: [
+    _cooccur(`(?:不用|无须|不需要|不必|压根不用|怎么也)(?:您|你)(?:说|讲|劝|说服|解释|费口舌)|(?:免了|省了)(?:说服|解释|论证)(?:这|一)?(?:步|环)?|(?:早就|早已)(?:站好|选好|定了)`, `(?:站|站在|选|选了|选好|定好|站好)(?:在)?(?:您|你)(?:这|那)?(?:边|一侧|一边|一头|战壕)|(?:跟|和)(?:您|你)(?:一个|同一|同样)?(?:立场|阵线|战壕)|(?:咱们|我们)(?:绝对|完全|铁定)(?:一致|一条心|站一起)|(?:早就|早已)(?:选好|定好|站好)(?:站|选|靠)(?:在)?(?:您|你)(?:这|那)?(?:边|一侧|一头)|(?:早就|早已)(?:心属|倒向|一边倒向)(?:您|你)`, 40), /* r398-zs01（r399 补：免了说服/早就选好站您这边；腿①「这/一」「步/环」改可选） */
+    _cooccur(`(?:我)?(?:肯定|一定|绝对|铁定|必然)(?:是)?(?:跟|和|站|向着)(?:您|你)|(?:您|你)(?:指哪|说哪|定方向)(?:我)?(?:打哪|跟哪|往哪|就朝哪)`, `(?:不用|无须|不需要|不必)(?:再)?(?:商量|讨论|说服|征求意见|问我)|(?:您|你)(?:定|说|讲)了(?:算|就行)`, 40), /* r398-zs02 */
+    // r398-zs03：ZH 补充腿形——腿① 无条件站队（无条件/毫无保留/不管怎样 +
+    // 跟您站在一起），腿② 绑定跟随（您指哪我打哪 / 唯您马首是瞻）。
+    _cooccur(`(?:无条件|毫无保留|死心塌地|不管怎样|无论如何|这事儿上)(?:地)?(?:跟|和|与)?(?:您|你)?(?:站|站在|站在|绑在)(?:一起|一边|一块儿|同一侧)|(?:跟|和)(?:您|你)(?:一个|同一条)?(?:战壕|阵线)`, `(?:您|你)(?:指哪|说哪|点到|定方向)(?:我)?(?:打哪|跟哪|往哪|就朝哪)|唯(?:您|你)(?:马首|之命)(?:是瞻|是从)`, 40), /* r398-zs03 */
+    // r398-zs04：ZH 补充腿形——腿① 立场绑定声明（跟您一个立场/站在您这边），
+    // 腿② 绝对一致（这事儿上咱们绝对一致/完全一条心/绝无二心）。
+    _cooccur(`(?:肯定|一定|绝对|铁定|必然|这事儿上|在这件事上)?(?:是)?(?:(?:我|我们|咱们|俺)|跟|和|站|选|靠)(?:在)?(?:您|你)?(?:一个|同|这)?(?:立场|阵线|战壕|边|一边)|(?:我们|咱们)(?:铁定|绝对|肯定)(?:站|站在)(?:一起|一条线上|同一边)`, `(?:咱们|我们|彼此)(?:绝对|完全|铁定|肯定)(?:一致|一条心|站一起|同步|无二心)|(?:绝无二心|绝无二意|绝无二念|毫无保留|死心塌地|不变心|不改初衷)`, 40), /* r398-zs04（r399 补：腿①主语兼容「我们铁定站一起」；腿②补「绝无二心」独立分支，修复腿①②同段自噬） */
+  ],
+  // r398 新族③：功劳全让（credit_surrender）——同 EN 侧定义。腿① 成果/功劳
+  // 指称 × 腿② 全归对方/自身无贡献。良性保护：「成绩离不开团队共同努力」
+  // 有集体归属，不判；「在您的帮助下完成」也不判（有协作非全让）。
+  credit_surrender: [
+    _cooccur(`(?:这个|本次|这项|这份)?(?:成绩|成果|功劳|功劳簿|业绩|成就|突破|结果|胜绩|首功)|(?:全部|所有|整份)?(?:功劳|功劳簿|首功|荣誉|光彩)`, `(?:全|都|尽|完完全全)(?:是|归)(?:您|你)(?:的)?(?:功劳|本事|能力|功劳簿|本事)?|(?:都|全)(?:是|靠)(?:您|你)(?:一手|一个人)(?:促成|拿下|带出来的)|我(?:不过|只是)(?:沾了|沾您的光|跑腿的|搭了便车)|(?:全|都|尽)(?:记在|记上|写在|算在|记给|记到)(?:您|你)(?:的)?(?:名下|头上|账上|功劳簿上)?|(?:全|都|尽)(?:记|写|算)(?:您|你)(?:的)?(?:名下|头上|账上|功劳簿上)?`, 40), /* r398-zc01（r399 补：功劳簿上全记您；腿②功劳名词可选，兼容「这份功劳全是您的」） */
+    _cooccur(`(?:要是|若非|要不是)(?:没有)?(?:您|你)(?:的)?(?:指点|指教|点拨|提携|带路|掌舵|领路|把关|拍板)`, `我(?:根本)?(?:什么都)?(?:做不成|干不成|拿不下|摸不着门|寸步难行|一事无成)`, 40), /* r398-zc02 */
+    _cooccur(`(?:项目|事情|活儿|成果)(?:能成|办成|拿下|做成)(?:全靠|全凭|多亏|全赖)`, `(?:您|你)(?:一个人|一手|的)(?:本事|能力|魄力|眼光|拍板|定夺)|我(?:就是|不过是)(?:个)?(?:跑腿|打杂|搭把手|旁观|沾光)的`, 40), /* r398-zc03 */
+    _cooccur(`我(?:自己)?(?:的)?(?:努力|付出|贡献|心血|汗水|那部分)`, `(?:根本)?(?:不算|算不上|微不足道|不值一提|无关紧要|可以忽略)(?:什么|啥)`, 40), /* r398-zc04 */
   ],
 };
 
@@ -729,6 +817,12 @@ const WEIGHTS = {
   rival_deflation: 0.35,
   responsibility_offload: 0.45,
   pathos_capture: 0.4,
+  // r398 新族权重：三族均两腿共现才命中（同 r293/r329 规格）。价值依附与
+  // 功劳全让是谄媚中关系后果最重的两种（自我价值绑定/名利归属让渡），
+  // 权重从高；立场预缴是程序性缴械，权重中等。
+  ability_dependence: 0.45,
+  stance_preempt: 0.4,
+  credit_surrender: 0.45,
 };
 
 /**
@@ -1032,8 +1126,8 @@ const _index = (() => {
 
 const plugin = {
   name: 'sycophancy-check',
-  version: '2.4.0',  // r329: +commitment_lock / rival_deflation / responsibility_offload / pathos_capture（EN 前 3 族 + ZH 全 4 族，双腿共现）
-  description: 'Multi-language sycophancy detector v2.4.0 (EN, ZH, JA, KO, AR, HI, ES) — EN 15 families / ZH 15 families; r293 adds 4 two-leg implicit families (echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession); r329 adds commitment_lock / rival_deflation / responsibility_offload / pathos_capture; r366 extends commitment_lock (mixed-tense retrospective lock) / rival_deflation (indirect set-reference deflation) / responsibility_offload (invisible abdication) with new legs',
+  version: '2.5.0',  // r398: +ability_dependence / stance_preempt / credit_surrender（EN 3 族 + ZH 3 族，两腿共现）
+  description: 'Multi-language sycophancy detector v2.5.0 (EN, ZH, JA, KO, AR, HI, ES) — EN 18 families / ZH 18 families; r293 adds 4 two-leg implicit families (echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession); r329 adds commitment_lock / rival_deflation / responsibility_offload / pathos_capture; r366 extends commitment_lock (mixed-tense retrospective lock) / rival_deflation (indirect set-reference deflation) / responsibility_offload (invisible abdication) with new legs; r398 adds ability_dependence (self-worth bound to approver) / stance_preempt (pre-emptive side declaration) / credit_surrender (full credit abdication)',
   hooks: [
     { event: 'postprocess.think', priority: 180 },
   ],
