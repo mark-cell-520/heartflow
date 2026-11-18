@@ -447,7 +447,7 @@ const A_ZH5 = [
 // 腿①机遇/日常偶遇锚点（英文）
 const A_EN5 = [
   // ①-j1 人生机遇场景
-  /\b(?:exam|exams|examination|interview|interviews|promotion|job\s+offer|offer\s+letter|hiring|tenure\s+review|performance\s+review|admission|admissions|dissertation\s+defense)\b/i,
+  /\b(?:exam|exams|examination|interview|interviews|promotion|title\s+evaluation|job\s+offer|offer\s+letter|hiring|tenure\s+review|performance\s+review|admission|admissions|dissertation\s+defense)\b/i,
   // ①-j2 日常偶遇随机事件
   /\b(?:red\s+lights?|green\s+lights?|traffic\s+lights?|queues?|checkout|checkout\s+lane|waiting\s+line|taxi|cabs?|hail(?:ing)?\s+a|ride[- ]hail|roll\s+call|called\s+on|clearance|sale\s+rack|parking\s+spot)\b/i,
 ];
@@ -479,6 +479,9 @@ const B_EN5 = [
   /\b(?:always\s+(?:take|takes|taking|took|sit|sits|sitting|go|goes|going|use|uses|using)\s+the\s+same)\b/i,
   // ②-i3 翻正仪式（flip my coin upright——物主不限于 the）
   /\b(?:flip(?:ping|ped)?\s+(?:the\s+|my\s+|your\s+|his\s+|her\s+)?(?:coin|lucky\s+coin)\s+(?:upright|heads?\s+up|to\s+heads)|turn(?:ing|ed)?\s+(?:the\s+|my\s+)?(?:coin|lucky\s+coin)\s+upright)\b/i,
+  // ②-i4 仪式动词（存量 ②-b 在第一链，本链需自带——「I always pray
+  // before the title evaluation」的人生机遇场景同族变体）
+  /\b(?:pray\w*|prayer|prayers|bless\w*|ritual\w*|ceremon\w+)\b/i,
 ];
 
 // 腿③机遇影响断言（中文）——机遇/概率名词 × 影响断言；必须含机遇
@@ -496,6 +499,9 @@ const C_ZH5 = [
   /(?:概率|几率|机会|希望|运气)[^。，！？；\n]{0,8}(?:就是|真的|仿佛|好像|似乎|总是|往往|一定|肯定)?(?:会|能)?(?:更|变)?(?:小|低|少)(?:一些|一点)?/,
   // ③-j4 提升动词 × 机遇名词（提高通过率/提升上岸概率）
   /(?:提高|提升|增加|拉高|抬高|改善)(?:了)?(?:我的|他的|她的|咱们的|全家的)?(?:通过率|录取率|上岸率|成功率|成绩|分数|概率|几率|机会|运气|运势)/,
+  // ③-j5 r734b 反序形（通过率就是会提升/上岸率会变大——存量 ③-d2 在
+  // 第一链，本链需自带；「答辩穿红衬衫，通过率就是会提升」原穿透）
+  /(?:通过率|录取率|上岸率|成功率|成绩|分数|概率|几率|机会|运气|运势)[^。，！？；\n]{0,8}(?:就是|真的|仿佛|好像|似乎|总是|往往|一定|肯定)?(?:会|能|将)?(?:提升|提高|增加|拉高|变大|变高|变好|上升|升高|上涨)/,
 ];
 
 // 腿③机遇影响断言（英文）
