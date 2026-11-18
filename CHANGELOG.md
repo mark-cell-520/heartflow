@@ -1,6 +1,19 @@
 ---
 
-# 6.8.195 变更日志条目
+# 6.8.196 变更日志条目
+
+## [6.8.196] - 2026-11-18
+
+### appeal_to_ignorance 第 62 维新增「免证形」路由——诉诸明显性/常识免证族（r395，真升级②：既有维度全新措辞家族）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r393 false_dilemma 析取消去、r394 straw_man 极端歪曲归述后续）。海外扫描 arXiv/GitHub/S2 落盘 `coordination/agent4/scout/`（statistical reasoning fallacy detection / causal reasoning bias benchmark 两轴）后，按同池穿透探针定拨：`scripts/round-395/probe-pool.js` 跨 rhetorical_question / persuasive_definition / time-window cherry picking / appeal to obviousness 等六家族，再以 `probe-time-window.js`（12 攻击 + 10 良性）、`probe-obviousness.js`（12 攻击 + 10 良性）二段深探——obviousness 穿透 **10/12** 最高（time_window 8/12 / persuasive_definition 3/6 / rhetorical_question 2/6 / pre_post 1/5 / mechanism_plausibility 1/4），良性 1/10 非 pass 系存量 confidence 基线非本族增量，定为 r395 落地族。
+- 缺口解剖：`src/index.js` FALLACY_PATTERNS 有 `appeal_to_obviousness` / `appeal_to_common_sense` 两个启发式标签（权重 0.2），但 gate 层零维度覆盖——「这是常识问题，不需要数据」「It is self-evident that the plan is flawed」「稍微有点经验的人都认同这个判断，这就是不争的事实」这一族宣称主张因「显而易见/不言而喻/明摆着/self-evident/common sense」而**免于举证**，整族穿透。
+- `src/appeal-to-ignorance.js`（第 62 维 appeal_to_ignorance，既有路由 R1 推定形/R2 需求形/R2b 门槛形/R3 回应质疑形）：新增路由 R4 免证形（union，与 R1-R3 互补）——强标记单腿即判（ZH：不言而喻/明摆着/不争的事实/稍微有点常识的人都不会/长眼睛的都/三岁小孩都明白/最基本的道理；EN：self-evident / plain to see / obvious to all / anyone with common sense / with half a brain you could tell），弱标记（常识/稍微想想/common sense）须与免证动作同语言配对（不需要数据/用不着分析/心里都清楚；EN no analysis is needed / without any evidence）。中英分语言配对，避免英文免证词配中文明显标记的偶然共现。豁免四形：概念/教学转述（公理/axiom/不证自明/教材/谬误名）、纠正形（不是替代/not always/否定标记）、已核验与索取证据形（需要/必须+数据、做了检验、need more data/testing is required）。`detect`/`checkAppealToIgnorance(text, inject)` inject 支持 + `__internals` 透传。**「明眼人一看就知道」类蔑视形刻意不入表**——归 appeal_to_ridicule（第 129 维）射程，保精度（gate 层仍由存量维度兜住无缺口）。**src/index.js 零改动、dimMap 键数仍 265**（② scope 纪律）。
+- 验证（本轮全部实测）：立项探针复跑攻击穿透 10/12 → gate 层 **17/17 非 pass**（16 条 appeal_to_ignorance 本维承重，1 条存量维度代拦）；良性模块层 **0/16** 误伤（含索取证据形/概念教学形/纠正形/否定标记形/常识中性用法）；轮测 `test/round-395-appeal-to-obviousness.test.js` **19 断言全绿**（17 攻击全腿 + 11 良性零误伤 + 精度保持 + 8 常量注入删条负例 8/8 翻转 + E1/E2 加性证明 + F1-F3 gate 归因 + G1 接线零改动纪律）；存量轮测不回归：round-486-appeal-to-ignorance 59/59、round-290 51/51、round-707 10/11（唯一失败 G2 系 fallacy_of_relevance 存量行为、改动前后同失败、与本轮无关且该文件不带 .test.js 后缀不在 run-all 发现范围）。
+- 四门禁（HEAD 提交态实跑）：verify **16/0**、guard-abilities **20/20@265**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 
 ## [6.8.195] - 2026-11-18
 
