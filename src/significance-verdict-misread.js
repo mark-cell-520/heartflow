@@ -243,16 +243,14 @@ function allMatches(re, text) {
   return out;
 }
 
-// p 值数值过滤：只把 ≥0.05 的 p 值当不显著锚（p = 0.03 是显著结果）。
-// p 值形（含 p>0.05 / p 值大于 0.05）本身已带比较词，无需再验数值；
-// 「p = X」形须验 X ≥ 0.05。
+// p 值数值过滤：只把 ≥0.05 的 p 值当不显著锚（p = 0.03 是显著结果，不能作
+// 不显著锚）。按数值真值判，不按小数位数判——r387 实现期实测按位数判会把
+// "0.03"（两位、但 0.03 < 0.05）误放行，必须 parseFloat 后比 0.05。
 function pvalueNonSig(m) {
-  const num = m.raw.match(/0?\.(\d+)/);
+  const num = m.raw.match(/(\d*\.\d+)/);
   if (!num) return false;
-  const digits = num[1];
-  // 0.0X：X≥5 才算不显著（0.05 / 0.06 / 0.12 / 0.32）；0.5 / 0.7 等整数十分位
-  if (digits.length === 1) return Number(digits) >= 5;
-  return true;
+  const v = parseFloat(num[1]);
+  return Number.isFinite(v) && v >= 0.05;
 }
 
 // 腿②守卫（r375/r377/r378/r379/r381/r385/r386 同款）：紧前否定窗（ZH 6 字 /
