@@ -1,0 +1,451 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/SzXYsDPsryHm2adatWvF01fG+jo</id>
+  <title>arXiv Query: search_query=all:statistical OR all:reasoning OR all:fallacy OR all:misinterpretation&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T23:43:53Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:reasoning+OR+(all:fallacy+OR+all:misinterpretation))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>354446</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21608v1</id>
+    <title>Latent Lattice Language Models</title>
+    <updated>2026-11-16T18:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.21608v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21608v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models typically increase per-token computation through deeper or looped layers and latent reasoning steps, while richer residual connections improve information flow across layers. We instead increase computational capacity: the number of active computational states a model maintains. We introduce the Lattice of Latents, a set of per-layer horizontal latent streams that run recurrently along time, alongside the vertical residual stream that flows through depth. Like hyper-connections, mHC, and attention or value residuals, the Lattice enhances the residual stream, but rather than adding or rerouting residual pathways through depth, it provides companion computational states that persist across tokens. Unlike hybrid Transformer-SSM architectures, whose recurrent states primarily serve as internal memory for sequence mixing, these latents directly condition the vertical stream's attention, KV-cache writes, MLP computation, and decoding. On Transformers trained on 20B FineWeb-Edu tokens, a 406M-parameter Lattice model lowers validation perplexity from 15.41 to 14.40 over a parameter-matched Transformer. These gains extend across architectural variants. The Lattice composes with prior residual-stream enhancements: with hyper-connections and input residuals, it lowers validation perplexity from 15.41 (base Transformer) and 14.22 (Transformer with the same enhancements) to 13.61. On Gated DeltaNet, Mamba-2, Triadic GDN, and GDN-Mamba-2 hybrids, it improves perplexity at every tested native state size, with Lattice-GDN and Lattice-Triadic-GDN variants outperforming pure baselines with 4x larger native states. These results identify persistent per-layer state as a complementary axis for scaling language-model computation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:38Z</published>
+    <arxiv:comment>Project page: https://shivamduggal4.github.io/latent-lattice-language-model/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Shivam Duggal</name>
+    </author>
+    <author>
+      <name>Zongze Wu</name>
+    </author>
+    <author>
+      <name>William T. Freeman</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Richard Zhang</name>
+    </author>
+    <author>
+      <name>Eli Shechtman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21607v1</id>
+    <title>ScaleVLA: Scaling Vision-Language-Action Models to 552 Billion Parameters</title>
+    <updated>2026-11-16T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.21607v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21607v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier Vision-Language Models (VLMs) such as GPT-6 Astra have demonstrated remarkable capabilities in robot control, suggesting that broad pretraining provides knowledge valuable for physical action. Yet most Vision-Language-Action (VLA) policies still rely on much smaller VLM backbones, leaving this potential largely untapped. We ask whether frontier-scale representations can provide a stronger foundation for robot learning. We introduce ScaleVLA, which connects a 552B DeepSeek-V4.1-Flash backbone to a trainable action DiT, and systematically compare VLMs from 2B to 552B under a shared training setup. We evaluate three fundamental capabilities of robot foundation models. In sample efficiency, just 10 demonstrations outperform a 2B backbone trained with 50 (87.8% vs. 85.6%). In generalization, LIBERO-PRO success reaches 45.1%, compared with at most 31.3% for smaller backbones. In precise manipulation, real-world charger insertion improves from 4/10 to 9/10 successes, with gains concentrated in contact-sensitive alignment. Despite its scale, ScaleVLA achieves 216 ms median latency per action chunk. Our findings suggest that frontier VLMs can serve not only as reasoning agents, but also as powerful representational foundations for efficient and generalizable robot policies.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:37Z</published>
+    <arxiv:comment>Tech Report</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Ruixi Yu</name>
+    </author>
+    <author>
+      <name>Dairu Liu</name>
+    </author>
+    <author>
+      <name>Xuchuan Chen</name>
+    </author>
+    <author>
+      <name>Zekun Qi</name>
+    </author>
+    <author>
+      <name>Zekai Li</name>
+    </author>
+    <author>
+      <name>Zhuo Cao</name>
+    </author>
+    <author>
+      <name>Luyang Niu</name>
+    </author>
+    <author>
+      <name>Yingsheng Zhang</name>
+    </author>
+    <author>
+      <name>Sikai Liang</name>
+    </author>
+    <author>
+      <name>Ke Fan</name>
+    </author>
+    <author>
+      <name>He Wang</name>
+    </author>
+    <author>
+      <name>Li Yi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21605v1</id>
+    <title>ViRA: Toward Ultra-High-Resolution Visual Agents via Cross-Input Relative Policy Optimization</title>
+    <updated>2026-11-16T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21605v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21605v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Visual agents answer questions about ultra-high-resolution photos by zooming into the relevant regions. However, existing agents often answer from common sense instead of reading the evidence. Reinforcement learning (RL) on the final answer cannot correct this, because a guess earns the same reward as reading. We propose Cross-Input Relative Policy Optimization (CrossRPO), which trains agents on contrast sets. A contrast set asks one question about several versions of an image that differ only in a small region with the evidence and have different answers, so only reading the evidence solves the whole set. CrossRPO rewards solving the whole set, and we prove that it does not reinforce a set answered from common sense. We build contrast sets for training (ViRA-Train) and evaluation (ViRA-Bench) by editing one small object in images of 21 to 120 megapixels, and we photograph further sets with real changes (ViRA-Bench-Real) to exclude editing traces. We train two Visual Reasoning Agents, ViRA-9B and ViRA-27B, with CrossRPO on only about 3,500 items of ViRA-Train each. CrossRPO achieves 63.3% set accuracy on ViRA-Bench at the maximum resolution, against 59.3% for GRPO. ViRA-9B is the most accurate open model of its size on all benchmarks, and ViRA-27B outperforms Claude Haiku 5.5 and GPT-6-Luna, both at their highest thinking level, on most benchmarks.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:04Z</published>
+    <arxiv:comment>74 pages, 11 figures, 26 tables. Code: https://github.com/huawei-lin/ViRA</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Huawei Lin</name>
+    </author>
+    <author>
+      <name>Jinting Liu</name>
+    </author>
+    <author>
+      <name>Tongyan Wang</name>
+    </author>
+    <author>
+      <name>Xuyang Chen</name>
+    </author>
+    <author>
+      <name>Ruihua Shi</name>
+    </author>
+    <author>
+      <name>Zhichao Xu</name>
+    </author>
+    <author>
+      <name>Jiaxin Qin</name>
+    </author>
+    <author>
+      <name>Guoshenghui Zhao</name>
+    </author>
+    <author>
+      <name>Baijian Yang</name>
+    </author>
+    <author>
+      <name>Yingjie Victor Chen</name>
+    </author>
+    <author>
+      <name>Tan Yu</name>
+    </author>
+    <author>
+      <name>Weijie Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21592v1</id>
+    <title>Connectivity from activity in spiking neural networks</title>
+    <updated>2026-11-16T18:56:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.21592v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21592v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show that a wide range of recurrent neural network models obey a simple set of equations tying synaptic connectivity and single-cell response properties to neural correlations. Our modeling framework considers networks in a stationary, asynchronous state and contains a broad class of synaptic filters, spiking nonlinearities, and random-plus-structured connectivity. The resulting equations naturally decompose into contributions from monosynaptic, disynaptic, and higher order paths through the network. We leverage this decomposition to express the effective monosynaptic connection between two neurons in terms of experimentally measurable statistics of the activity, and in particular, their high-frequency correlations. In this way, we show that it is possible to recover network connectivity from neural activity.</summary>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:56:17Z</published>
+    <arxiv:comment>29 pages, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.dis-nn"/>
+    <author>
+      <name>Albert J. Wakhloo</name>
+    </author>
+    <author>
+      <name>Sebastian Mizera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21584v1</id>
+    <title>CertiSum: Bitwise-Identical MXFP4 Training Across Platforms and Parallelism Layouts</title>
+    <updated>2026-11-16T18:54:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.21584v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21584v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Training with MXFP4, a 4-bit microscaling format, is non-deterministic: identical inputs can produce different results across parallelism layouts and GPU vendors. These differences complicate debugging and training audits and can cause training and inference engines to disagree. We present CertiSum to make MXFP4 training bitwise invariant across runs, parallelism layouts, and GPU vendors. Its key insight is that native FP32 accumulation of MXFP4 products is often already exact for every summation order. CertiSum collects statistics during quantization to certify native matrix multiplication results, recomputes uncertified outputs exactly, and uses exact kernels directly where certification rarely succeeds. CertiSum keeps quantization blocks unchanged across layouts and merges partial sums without rounding, including in attention and weight-gradient computation. In 200-step Qwen3-8B-Base experiments, CertiSum preserves training states bit for bit across AMD MI350X and NVIDIA GB200 and across changes in data, tensor, and context parallelism on MI350X. Across three 8B--14B models on FineWeb-Edu using MI350X, it adds 11.8--60.5% to training-step latency relative to its non-exact MXFP4 counterpart at the larger evaluated input shapes, with speedups of up to $1.24\times$ over BF16 and $1.70\times$ over deterministic BF16.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:54:07Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Steve Rhyner</name>
+    </author>
+    <author>
+      <name>Yubo Gao</name>
+    </author>
+    <author>
+      <name>Stefan de Lasa</name>
+    </author>
+    <author>
+      <name>Sankeerth Durvasula</name>
+    </author>
+    <author>
+      <name>Nandita Vijaykumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21581v1</id>
+    <title>Emptiness formation in quantum fluids: a hydrodynamic solution</title>
+    <updated>2026-11-16T18:50:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.21581v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21581v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop an auxiliary-kernel method for constructing the hydrodynamic instantons that govern macroscopic emptiness formation in one-dimensional Galilean quantum fluids. The key step is to represent the equation of state by an auxiliary integral kernel inspired by the Bethe ansatz. For equations of state admitting such a representation, we reduce the imaginary-time hydrodynamic problem to a single integral equation. Its solution determines the full density and current profiles, the vacuum boundary, and the leading emptiness rate. Notably, the construction does not require microscopic integrability. For the Lieb--Liniger gas, we derive the previously conjectured integral equation for the leading rate and use a known elliptic solution to obtain explicit expressions for the rate and vacuum boundary. Direct hydrodynamic numerics support the predicted boundary. We also recover known instanton solutions for a family of polytropic fluids.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:50:44Z</published>
+    <arxiv:comment>53 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Alexander G. Abanov</name>
+    </author>
+    <author>
+      <name>Boris A. Khanikati</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21564v1</id>
+    <title>Assessing Distributional Covariate Balance After Weighting: A Practical Guide</title>
+    <updated>2026-11-16T18:40:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.21564v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21564v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Health researchers commonly use weighting methods to improve covariate balance when estimating program and intervention effects from observational data. Standardized mean differences (SMDs) and variance ratios assess particular features of balance but may overlook residual differences elsewhere in the covariate distribution. This paper provides practical guidance for using Kolmogorov-Smirnov (KS), Anderson-Darling (AD), and Cramer-von Mises (CVM) statistics as complementary distributional balance diagnostics. In an empirical evaluation of a disease management program, weighting based on a main-effects propensity-score model produced SMD and KS statistics below commonly used or proposed balance thresholds of 0.10 for two continuous covariates, which would conventionally be interpreted as indicating acceptable balance. Nevertheless, permutation tests identified residual distributional differences. Adding quadratic terms for these covariates approximately halved their KS statistics, improved variance balance, and eliminated evidence of residual distributional differences, while leaving the estimated program effect substantively unchanged. Supporting simulations showed that KS, AD, and CVM differed in sensitivity to different forms of distributional discrepancy and that the calibration of resampling-based p-values depended on how the reference distribution was constructed. These findings support a practical approach that combines conventional balance measures, graphical assessment, complementary distributional diagnostics, weighting-model refinement, and outcome adjustment when important residual imbalance remains.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:40:49Z</published>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Ariel Linden</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21562v1</id>
+    <title>Severe but Harmless: Stress-Testing Shift Severity for Frozen Time-Series Forecasters</title>
+    <updated>2026-11-16T18:40:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.21562v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21562v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zero-shot time-series foundation models (TSFMs) have become attractive alternatives to task-specific models because they handle diverse downstream tasks, including anomaly detection and forecasting, without per-series training. However, time-series data undergo distribution shifts, and the dissimilarity between two regimes is commonly scored with statistical measures such as Wasserstein-1, where a higher score is read as a more severe shift. In systematic experiments using three established severity measures on nine regime shifts from three standard traffic datasets, we show that these measures do not reliably predict degradation for instance-normalized TSFMs. The regimes rated most severe are not the regimes that degrade the models most, and degradation reaches 29% in the lowest-scoring regime. In most cases, the audit shows no positive relationship between measured severity and model degradation. We provide an equivariance-based stress-testing analysis that explains why severity readings can become decoupled from model degradation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:40:35Z</published>
+    <arxiv:comment>10 pages, 6 figures, 5 tables. Accepted at IEEE BigData 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Korede R. Bishi</name>
+    </author>
+    <author>
+      <name>Dominic Okonkwo</name>
+    </author>
+    <author>
+      <name>Adetayo Okunoye</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21558v1</id>
+    <title>Benefits and Barriers to Human-AI Teaming for Crisis Counseling</title>
+    <updated>2026-11-16T18:38:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.21558v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21558v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: AI systems are increasingly deployed to support mental health clinicians, yet real-world evidence remains limited. In crisis counseling, where clients often seek human connection, understanding whether AI augmentation preserves or undermines meaningful human engagement is essential.
+  Methods: In a mixed-methods study of a counselor-facing AI copilot on a WhatsApp-based crisis hotline in India (Mar.-Oct. 2025), counselors could request, edit, and send AI messages. We analyzed 20 interviews, 8 shadowing sessions, 56 survey responses, and edits in 27,778 copilot messages from 108 counselors via thematic analysis (Technology Acceptance Model 2, plus inductive coding of emergent factors), and survey statistics.
+  Results: Counselors reported high copilot acceptance (survey): 98.2% found it helpful; 89.3% likely to continue use; 80.4% reported efficiency gains. Interviews highlighted sentence scaffolding, empathetic phrasing, stress reduction, catching missed details, and efficiency. Barriers (survey) included repetitive outputs (23.2%), lack of context (17.9%), and authenticity concerns (10.7%). While 69.6% (survey) reported skill enhancement, interviews surfaced skill atrophy concerns. Counselors frequently accepted copilot suggestions, editing to remove questions, adjust tone, or personalize style.
+  Conclusion: In one of the largest real-world deployments of a counselor-facing mental health AI copilot, counselors reported reduced cognitive load, empathetic communication, and greater efficiency, alongside concerns about skill atrophy, authenticity, and over-reliance. In settings like crisis counseling where clients seek human connection, AI tools must balance operational support with preserving clinical skill and genuine therapeutic engagement. Designs soliciting approval or editing of complete drafts may overweight efficiency at the expense of sustained human engagement.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:38:15Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Ivy Pham</name>
+    </author>
+    <author>
+      <name>Akshay Swaminathan</name>
+    </author>
+    <author>
+      <name>Sebastian Garcia</name>
+    </author>
+    <author>
+      <name>Jaimie Lim</name>
+    </author>
+    <author>
+      <name>Gloria Ye</name>
+    </author>
+    <author>
+      <name>Divyanjali Verma</name>
+    </author>
+    <author>
+      <name>Alan Pham</name>
+    </author>
+    <author>
+      <name>Chastin Chung</name>
+    </author>
+    <author>
+      <name>Shreya Shah</name>
+    </author>
+    <author>
+      <name>Shaked Azzam</name>
+    </author>
+    <author>
+      <name>Sharang Phadke</name>
+    </author>
+    <author>
+      <name>Ivan Lopez</name>
+    </author>
+    <author>
+      <name>William Wang</name>
+    </author>
+    <author>
+      <name>Angelina Wang</name>
+    </author>
+    <author>
+      <name>Nigam H. Shah</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21545v1</id>
+    <title>Right Reason, Wrong Advice: Evaluating Recourse in LLM Explanations of Denied Requests</title>
+    <updated>2026-11-16T18:30:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.21545v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21545v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models increasingly write the explanations people receive when a rule system denies their request. If several rules deny the request independently, an explanation can name a true reason and still leave the person denied after they fix it. We call the missing property recourse validity: changing what the explanation cites, without changing what was asked for, can flip the decision. We compute it exactly, and a hitting-set argument predicts from the policy alone when a correct reason fails. In six of seven rule systems ported from access control and US benefit eligibility, a single correct reason almost never gives recourse when several reasons apply. Across 20 LLMs, checks of whether the cited reasons are correct, computed or asked of an LLM judge, are close to chance at spotting this failure, as the argument predicts. A strong judge asked whether acting on the explanation would work does spot it. Stronger and reasoning models do better but still fail on many denials with four or more independent reasons. Asking for every rule helps every open model with room to improve. Explanations of eligibility decisions should be built from the decision function and judged by whether acting on them works.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:30:11Z</published>
+    <arxiv:comment>21 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21541v1</id>
+    <title>SciResearch-Eval: Evaluating Scientific Judgment in Autonomous Experimental Agents</title>
+    <updated>2026-11-16T18:27:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.21541v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21541v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce SciResearch-Eval, an interactive benchmark of scientific judgment built on a standard laboratory problem: measuring a material's thermal properties by heating it and fitting a heat-conduction simulator. An agent designs its own experiments, uses a supplied simulator that may be under-resolved or physically wrong, and reports each property with a 95% interval. To our knowledge it is the first benchmark to combine agent-designed experiments, a deliberately flawed simulator, and proper scoring of calibrated intervals against exact ground truth. On a held-out split (93 tasks, 9 models, 2,511 episodes), models handle procedural traps. When the simulator is missing physics, most report wrong values while stating they are 95% sure: their ranges contain the truth in 20-62% of cases, against 94% for GPT-6 Astra and 99% for Claude Fable 5.2. At default effort the failing Claude 5.5 models rarely diagnose the missing physics (Opus in 35% of episodes, against 66% for Astra), and even when they do, their ranges often miss; Astra and Fable design experiments in which the flawed simulator is accurate, such as gentle heating, which keeps Astra calibrated even when it does not name the cause. Asking for wider intervals does not help; stating the strategy improves interval scores 1.6-2.5-fold, replicated on a pre-registered fresh split, but coverage barely moves. A pre-registered effort ablation shows that the correction is latent in the Claude 5.5 models: at maximum effort Opus improves more than tenfold and is no longer detectably behind Astra at default, but only with 13-31 times more reasoning; older and open-weight models gain nothing. Fable 5.2 is the most accurate model at default effort (interval score 1.9 times better than Astra's) but writes 6 times as many tokens, and at Astra's token count it falls short. We release the environment, graders and harness.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:27:09Z</published>
+    <arxiv:comment>28 pages, 7 figures. Code and leaderboard: https://github.com/Btwestyo/sciresearch-eval</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Brian T. Weston</name>
+    </author>
+    <author>
+      <name>Alondra Torres Contreras</name>
+    </author>
+    <author>
+      <name>Aldair E. Gongora</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21538v1</id>
+    <title>Optimistic Verifiers Get Hacked: Reward Hacking Under an Exact Process Oracle</title>
+    <updated>2026-11-16T18:25:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.21538v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21538v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning from verifiable rewards inherits whatever its verifier gets wrong. Outside mathematics and code the verifier is a proxy, a rubric, a learned judge or a hand-written checker, and its distance from the true objective is never measured, so a rising reward cannot be told apart from a hack. We build a setting where the true reward is exactly computable at the process level: executable authorization policies over 124,416 contexts admit an oracle that lists every minimal sufficient reason for every decision. We compile these policies into exact process rewards, degrade the verifier along seven realistic axes (outcome-only, sufficiency, recall-only, extraction noise, coarse taxonomy, stale policy, LLM judge), and train against each while the exact verifier scores every rollout. Four phenotypes appear. Optimistic verifiers are hacked by padding: the sufficiency proxy ends at 0.940 while true faithfulness falls from 0.731 to 0.667 on 96 held-out episodes. Outcome-only verifiers saturate and stop teaching, noise dilutes, and ranking-preserving gaps do no harm. A model-free audit of the verifier, its selection error and gap sign, together with a short saturation pilot, anticipates which phenotype a run will produce. Across nine configurations spanning two frameworks, two model vendors, two adapter sizes, three precisions, two initialisations and two seeds, the phenotypes recur, sufficiency damage is positive in all 10 replication cells and beyond two standard errors in 7, and optimistic gaps remain the steeper branch. The damage magnitude does not replicate, and five pre-registered attempts to explain it are reported as they fell. We release the testbed, the training instrumentation, and 14 real public policies (Cedar, OPA, Gatekeeper) ported to executable oracles.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:25:42Z</published>
+    <arxiv:comment>30 pages. A shorter version, "The Verifier Gap", appears at the NeurIPS 2026 Workshop on Meta-Agents (non-archival)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+    <author>
+      <name>Manoranjan Gandhudi</name>
+    </author>
+    <author>
+      <name>Gangadharan G. R.</name>
+    </author>
+    <author>
+      <name>Arun Prakash</name>
+    </author>
+    <author>
+      <name>S. Senthilkumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21535v1</id>
+    <title>Evaluating Cultural Reasoning and Robustness in LLMs for Spanish Political Discourse</title>
+    <updated>2026-11-16T18:24:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.21535v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21535v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are increasingly used to interpret, generate, and mediate public-facing language, which makes their reliability especially consequential in politically sensitive settings. Although sentiment analysis is a common task in this area, affective meaning in social media discourse is often conveyed through culturally situated and pragmatically indirect cues that are not well captured by label-centric evaluation alone. In this paper, we evaluate the robustness of LLMs for sentiment analysis of Spanish political discourse from social media, with emphasis on culturally situated affective interpretation. We introduce a diagnostic protocol that combines three independent human annotation views into Gold and Ambiguous subsets, and extends the corpus with a Synthetic subset built from sentiment-flipped counterfactuals selected through model-conditioned perplexity and LLM-as-a-judge criteria. Using this framework, we compare proprietary and open-weight models under zero-shot and few-shot prompting, focusing on predictive robustness across human agreement conditions and counterfactual shift. Our results show that annotation ambiguity and counterfactual perturbation reveal failure modes that conventional evaluation on the original corpus tends to obscure. GPT-4.1-mini remains the most stable among the evaluated models, whereas the two smaller open-weight models degrade more markedly under synthetic perturbations, and few-shot prompting provides only limited gains. Overall, the paper contributes a reproducible protocol for robustness-oriented evaluation in political sentiment analysis, an empirical characterization of model behavior under ambiguity and sentiment-flipped counterfactuals, and a publicly available Spanish social media dataset with three-way human sentiment annotations.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:24:48Z</published>
+    <arxiv:comment>Accepted for publication in Latin American Conference on Informatics (CLEI 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jorge Valverde-Rebaza</name>
+    </author>
+    <author>
+      <name>Nathan Garcia-Larios</name>
+    </author>
+    <author>
+      <name>Karime Ruvalcaba-Perez</name>
+    </author>
+    <author>
+      <name>Alejandro Rendon</name>
+    </author>
+    <author>
+      <name>Santiago Sanchez-Ballesteros</name>
+    </author>
+    <author>
+      <name>Alejandro Martin del Campo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21529v1</id>
+    <title>Procedure without Judgment: What Small Language Models Learn under an Exact Verifier</title>
+    <updated>2026-11-16T18:20:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.21529v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21529v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When an authorization policy blocks an agent's tool call, the audit log should name the facts that forced the decision and nothing more. For an executable policy over an enumerable context space this minimal sufficient reason can be computed exactly, so an explanation is scored against ground truth rather than a proxy for it. We use that exactness to ask what a model can learn from a verifier that has no error in it. The explainer sees one request and one decision, never the policy, and has thirty turns in which it may call the policy on altered requests and ask whether a candidate set of facts is sufficient. Frontier models find the exact reason about half the time with the tools alone, and one sentence telling them to shrink the answer lifts Haiku 4.5 from 58% to 75%. A 4B model fine-tuned on 2000 traces of the deletion algorithm reaches 92% on the policy it was trained on. Teacher kind is what moves this: at matched data size the algorithm-taught student leads the frontier-taught one in all three training seeds, and the two arms never overlap. What the student learns is a fixed schedule of sufficiency checks, and the schedule does not travel. On three public policies it never saw, its answers stay sufficient (94%) and stop being minimal (48%), while Haiku under the same sentence is exact on all 47 episodes. Reinforcement learning from the exact reward leaves held-out accuracy where it was and inverts the strategy, from probing the policy to spending the entire budget on sufficiency checks. The oracle made the effect of training legible, but it did not make training better.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:20:09Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+    <author>
+      <name>Manoranjan Gandhudi</name>
+    </author>
+    <author>
+      <name>Gangadharan G. R.</name>
+    </author>
+    <author>
+      <name>Arun Prakash</name>
+    </author>
+    <author>
+      <name>S. Senthilkumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21515v1</id>
+    <title>Beyond Leaderboard Ranks: Selecting Software Engineering Agents Under Budget Constraints</title>
+    <updated>2026-11-16T18:10:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.21515v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21515v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Teams that adopt LLM agents for issue resolution must decide which agent to pay for, and how much to spend finding out. Leaderboard ranks give weak evidence for this decision. Accuracy differences may be statistically unresolved, reported costs may be inconsistent, and evaluating candidate agents can itself be expensive. We investigate budget-constrained agent selection using 58,197 run--task records extracted from the Holistic Agent Leaderboard (HAL), focusing on SWE-bench and six additional benchmarks.
+  Across seven benchmarks, 27 of 35 steps along the accuracy--cost Pareto frontiers are statistically unresolved. On SWE-bench, a run costing $34.16 trails the $170.78 leader by 14.6 percentage points, but the available tasks cannot statistically distinguish their accuracy. Reported costs also differ from standardized token-based estimates by up to 11.7x, while selective task evaluation can bias estimates of full-benchmark execution cost.
+  We therefore compare evaluation strategies under explicit evaluation budgets and deployment-cost caps. Under advance knowledge of task costs, successive halving reaches our uncertainty-aware selection target on SWE-bench using 6.6% of exhaustive evaluation spend, achieving the lowest cost on six of seven benchmarks and tying on the seventh. Its advantage narrows when task costs are unknown before execution or exact-best selection is required.
+  Our findings motivate decision-oriented agent evaluation that accounts for accuracy uncertainty, validates execution costs, and compares complex selection methods against simple adaptive allocation.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:10:37Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Srinath Srinivasan</name>
+    </author>
+    <author>
+      <name>Tim Menzies</name>
+    </author>
+  </entry>
+</feed>

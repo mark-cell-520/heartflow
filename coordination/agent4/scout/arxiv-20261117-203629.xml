@@ -1,0 +1,410 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/5gU+TfCrSykyJLnbvsN1k+SnYE8</id>
+  <title>arXiv Query: search_query=all:lead-time OR all:bias OR all:length-time OR all:bias OR all:screening OR all:survival OR all:overdiagnosis&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T20:36:30Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:lead-time+OR+(all:bias+OR+(all:length-time+OR+(all:bias+OR+(all:screening+OR+(all:survival+OR+all:overdiagnosis)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>196004</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21602v1</id>
+    <title>Quantifying the added value of human forecaster discussions for tropical cyclone intensity prediction</title>
+    <updated>2026-11-16T18:58:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.21602v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21602v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The National Hurricane Center routinely releases Tropical Cyclone Discussions that offer insights into its tropical cyclone forecasts. This study examines the added value of these discussions for intensity forecasting beyond a set of numerical predictors. For 637 Atlantic and eastern North Pacific tropical cyclones from the 2002-2023 hurricane seasons, we analyze the discussion text and its combination with 13 hurricane environmental predictors from SHIPS and ERA5 10-meter wind fields, for forecasting intensity changes at lead times of 24 to 120 hours using three modeling methods. In one approach, an end-to-end deep learning framework for the text shows that the discussions alone offer comparable value for 24-hour intensity forecasts to the SHIPS predictors. Adding discussion information to the SHIPS predictors in an ensemble of five such models reduces the mean absolute error of 24-hour maximum sustained wind forecasts for 2022-2023 cyclones from 9.89 to 8.90 kt, with a confidence interval that excludes zero when whole storms are resampled. The ERA5 wind fields have a minor effect on mean absolute error in wind predictions, and model rankings differ across predicted variables, lead times and model types. We provide prediction intervals for these forecasts, whose coverage falls below the 90% target during rapid intensification. Analysis of the text shows that words related to intensity and intensity change (such as intensify, weaken, eyewall and category) are important for the model predictions. This retrospective study shows the added value of the forecasters' discussions and suggests that multi-modal learning can help understand the predictive contribution of expert human judgment. The reanalysis data differ from real-time analyses, and the discussions are issued at least three hours after the valid time of the other inputs, so these results should not be interpreted operationally.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:55Z</published>
+    <arxiv:comment>74 pages, 24 figures, 35 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Ilia Azizi</name>
+    </author>
+    <author>
+      <name>Frederick Iat-Hin Tam</name>
+    </author>
+    <author>
+      <name>Marc-Olivier Boldi</name>
+    </author>
+    <author>
+      <name>Valérie Chavez-Demoulin</name>
+    </author>
+    <author>
+      <name>Tom Beucler</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21596v1</id>
+    <title>SADL: On the Demand-Supply Geometry of Representation Collapse</title>
+    <updated>2026-11-16T18:58:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.21596v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21596v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In Joint-Embedding Predictive Architectures (JEPAs), a well-constrained projector output does not by itself prevent representation collapse. We find that, from initialization, the encoder representation is dominated by a component shared by different inputs. A batch-normalized projector removes this component, so regularization after the projector cannot correct it, and the differences between representations shrink until they collapse. We propose SADL (Supply And Demand Loss), which keeps the original training objective and constrains the encoder directly when needed. SADL compares the representation differences that the projector output demands with the differences the encoder can retain and pass on to the projector, and adds a constraint on the encoder only when supply falls short of demand. It works with different Demand Regularizers and introduces no auxiliary networks, additional trainable parameters, or architectural changes. In single-task and jointly trained four-task LeWorldModel (LeWM) and INTACT experiments, SADL lowers the collapse rate over ten random seeds from 50% to 0%. After one epoch of training, encoder effective rank is 3.4-6.4 times that of the corresponding baseline without SADL, and latent prediction error falls to 1/20-1/303 of it. Without additional tuning, SADL stays robust as its loss weight spans orders of magnitude, and with several Demand Regularizers INTACT exceeds 95% mean search-free control success. On four image datasets, SADL also consistently improves accuracy and stability across random seeds. These results show that matching the representation differences a regularizer demands with the differences the encoder can supply leads to faster and more stable representation learning in control and image classification.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:03Z</published>
+    <arxiv:comment>49 pages, including references and appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Junhan Sun</name>
+    </author>
+    <author>
+      <name>Yigui Feng</name>
+    </author>
+    <author>
+      <name>Mingzhe Liu</name>
+    </author>
+    <author>
+      <name>Haoyan Xu</name>
+    </author>
+    <author>
+      <name>Lei Ye</name>
+    </author>
+    <author>
+      <name>Ziqi Han</name>
+    </author>
+    <author>
+      <name>Hanru Bai</name>
+    </author>
+    <author>
+      <name>Yanzhao Zhang</name>
+    </author>
+    <author>
+      <name>Hao Zhao</name>
+    </author>
+    <author>
+      <name>Guofeng Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21594v1</id>
+    <title>Surrogate-Assisted Compact-Model Extraction for SKY130 CMOS at 77 K</title>
+    <updated>2026-11-16T18:57:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.21594v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21594v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cryogenic circuit design requires compact transistor models that reproduce measured low-temperature behavior and run in standard circuit simulators. We fit BSIM4 parameters to measured I-V curves of SkyWater 130 nm (SKY130) transistors at 77 K using a neural surrogate of NGSpice. The surrogate maps compact-model parameters and device geometry to the complete set of output and transfer characteristics. Extraction is a bounded least-squares search: a bank of NGSpice simulations supplies initial candidates, finite differences of the surrogate supply the local Jacobian, and NGSpice re-simulates the resulting cards before selection. On 18 measured geometries, we compare a search over seven card parameters with a search over 43 parameters selected by NGSpice sensitivity. Relative to NGSpice re-simulations of the previously released cards, the two searches reduce the in-sample mean relative root-mean-square error (RRMS) by 17% and 26%, respectively. The 43-parameter search has the lower overall error, but the seven-parameter search has the lower mean on high-bias curves, and some individual curves have higher error than with the released cards under both searches.</summary>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.app-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:57:06Z</published>
+    <arxiv:primary_category term="physics.ins-det"/>
+    <author>
+      <name>Aaron Wang</name>
+    </author>
+    <author>
+      <name>Olivia Gzamouranis</name>
+    </author>
+    <author>
+      <name>Vaibhav Lohia</name>
+    </author>
+    <author>
+      <name>Hershel Fei Xun Weiner</name>
+    </author>
+    <author>
+      <name>Olivia Seidel</name>
+    </author>
+    <author>
+      <name>Richard Cavanaugh</name>
+    </author>
+    <author>
+      <name>Giuseppe Di Guglielmo</name>
+    </author>
+    <author>
+      <name>Nhan Tran</name>
+    </author>
+    <author>
+      <name>Davide Braga</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21593v1</id>
+    <title>Electrostatic and magnetic control of the anomalous Josephson phase in ferromagnetic hybrid junctions</title>
+    <updated>2026-11-16T18:57:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.21593v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21593v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report phase-sensitive measurements of Josephson junctions formed in InAs nanowires with epitaxial ferromagnetic EuS and superconducting Al shells. Using a superconducting interferometer, we observe a continuous, hysteretic anomalous phase shift under axial magnetic-field sweeps. A remanent phase bias persists at zero applied field and depends on magnetic history. Electrostatic gating strongly modifies the magnitude of the phase response, revealing its sensitivity to the transverse electronic structure of the nanowire. Self-consistent electrostatic simulations show that the effective Rashba spin-orbit coupling follows the measured gate-dependent phase response, suggesting its central role in the electrostatic control of the anomalous Josephson phase.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:57:00Z</published>
+    <arxiv:comment>14 pages 7+5 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>D. Rana</name>
+    </author>
+    <author>
+      <name>O. S. Kurapati</name>
+    </author>
+    <author>
+      <name>N. Vanjarapu</name>
+    </author>
+    <author>
+      <name>J. Zhao</name>
+    </author>
+    <author>
+      <name>J. B. F. Wolters</name>
+    </author>
+    <author>
+      <name>Y. Liu</name>
+    </author>
+    <author>
+      <name>P. Krogstrup</name>
+    </author>
+    <author>
+      <name>A. L. R. Manesco</name>
+    </author>
+    <author>
+      <name>S. D. Escribano</name>
+    </author>
+    <author>
+      <name>E. Prada</name>
+    </author>
+    <author>
+      <name>S. Vaitiekėnas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21585v1</id>
+    <title>Hyperbolic systems with non-diagonalisable principal part and variable multiplicities, IV: time-dependent characteristics, representation of solutions and regularity</title>
+    <updated>2026-11-16T18:54:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.21585v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21585v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider first-order linear hyperbolic systems with time-dependent pseudo-differential principal symbols and characteristic roots of variable multiplicity. Building on the time-independent work of Kamotski and the first author, we introduce a finite-type condition along the lifted bicharacteristic flow that accounts for the contact of time-dependent characteristic roots. Under this condition, we construct a representation of solutions using time-dependent Fourier integral operators and a Picard series whose terms become increasingly smooth. This leads to an asymptotic expansion in smoothness and local \(L^p\) regularity estimates with the expected loss of derivatives. We also apply these results to higher-order scalar weakly hyperbolic equations with involutive characteristics and time-dependent principal symbols. Finally, we consider upper triangular systems with possibly non-diagonalisable principal parts and derive a representation formula involving integrated Fourier integral operators. This extends the earlier results of Garetto, Jäh and the first author to time-dependent principal parts.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:54:20Z</published>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Michael Ruzhansky</name>
+    </author>
+    <author>
+      <name>Bolys Sabitbek</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21581v1</id>
+    <title>Emptiness formation in quantum fluids: a hydrodynamic solution</title>
+    <updated>2026-11-16T18:50:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.21581v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21581v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop an auxiliary-kernel method for constructing the hydrodynamic instantons that govern macroscopic emptiness formation in one-dimensional Galilean quantum fluids. The key step is to represent the equation of state by an auxiliary integral kernel inspired by the Bethe ansatz. For equations of state admitting such a representation, we reduce the imaginary-time hydrodynamic problem to a single integral equation. Its solution determines the full density and current profiles, the vacuum boundary, and the leading emptiness rate. Notably, the construction does not require microscopic integrability. For the Lieb--Liniger gas, we derive the previously conjectured integral equation for the leading rate and use a known elliptic solution to obtain explicit expressions for the rate and vacuum boundary. Direct hydrodynamic numerics support the predicted boundary. We also recover known instanton solutions for a family of polytropic fluids.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:50:44Z</published>
+    <arxiv:comment>53 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Alexander G. Abanov</name>
+    </author>
+    <author>
+      <name>Boris A. Khanikati</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21571v1</id>
+    <title>DynSurvX: Time-Resolved Explanations for Dynamic Survival Predictions</title>
+    <updated>2026-11-16T18:43:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.21571v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21571v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent survival models integrating longitudinal data achieve strong predictive performance, but their predictions are often difficult to interpret, limiting their clinical use. We propose DynSurvX, a model-agnostic explainability framework for dynamic survival prediction with mixed static and longitudinal covariates. Based on Shapley values, DynSurvX introduces a hierarchical two-phase strategy that first identifies influential longitudinal features and then adaptively refines their temporal importance, enabling fine-grained explanations while reducing computational cost. The framework provides time-resolved explanations that evolve as new patient data become available. Experiments on simulated and two clinical datasets show varying agreement with theoretical importance across prediction models, with closer agreement for better-performing models, alongside clinically interpretable insights in real-world settings. It remains robust across prediction settings and reduces computation time by 41--80\% relative to the temporal explanation baseline, making dynamic explanations practical.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:43:35Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Van Tuan Nguyen</name>
+    </author>
+    <author>
+      <name>Agathe Guilloux</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21567v1</id>
+    <title>Peak state transfer in trees and the cost of distance</title>
+    <updated>2026-11-16T18:41:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.21567v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21567v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>There is peak state transfer between vertices $u$ and $v$ in a graph $G$ if there exists a time $t$ for which $|(\mathrm{e}^{\mathrm i t M})_{u,v}|$ saturates the triangle inequality imposed by its spectral decomposition and $M$ is either the adjacency or Laplacian matrix. We show that peak state transfer at distance $d$ requires $\frac{d^3}{24}(1 + o(1))$ edges in the adjacency case, $Ω(d^2)$ edges in the Laplacian case, and that the leading coefficient in the former is tight. We find a family of graphs with Laplacian peak state transfer at distance $d$ and $Θ(d^5)$ edges, showing that peak state transfer is achievable in a polynomial graph size. In contrast, Laplacian perfect state transfer costs at least $Ω(2^{d/2})$ edges when the distance partition of vertices around one vertex is almost equitable. Finally, we show that Laplacian peak state transfer in trees requires $Ω(d!)$ edges, and we characterize all trees of diameter $\leq 4$ admitting Laplacian peak state transfer, thus answering a pair of questions posed by Coutinho, Guo, and Schmeits.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:41:31Z</published>
+    <arxiv:comment>23 pages, 0 figures</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Andrew Osborne</name>
+    </author>
+    <author>
+      <name>Andrew A. Houck</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21566v1</id>
+    <title>Second scaling regime in high-dimensional function approximation and curse of dimensionality</title>
+    <updated>2026-11-16T18:41:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.21566v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21566v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>High-dimensional function approximation is often subject to the curse of dimensionality, commonly described by a hypercube scaling regime with a large expense of $R^d$ grid points, where $R$ denotes the side length of a hypercube in $d$ dimensions. Here we show that a second scaling regime, which we call the lattice ball scaling regime, also arises and is relevant for practical applications. In this regime, the expense scales as $d^{R^2}/(R^2!)$ and therefore grows polynomially with $d$. This regime arises without additional special assumptions of special types of function spaces or error norms. The lattice ball scaling regime occurs when $R^2\ll d$, due to the discrete nature of counting the expense as the number of lattice points inside a hypersphere. Here we investigate this regime, which arises from the classical problem of approximating high-dimensional functions from common spaces of analytic or $m$-times continuously differentiable functions using orthogonal series (spectral method) such as Fourier, Chebyshev, and Legendre polynomial series. For many applications, the expense in the lattice ball scaling regime can be substantially smaller than that of the hypercube scaling regime, making accurate approximations more accessible. Numerical illustrations include classifying images of handwritten digits from the MNIST dataset and learning the solution operators of partial differential equations, such as Burgers' equation and the radiative transfer equation. The potential for connections with artificial neural networks and other machine learning methods is also discussed.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:41:07Z</published>
+    <arxiv:comment>12 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Shukai Du</name>
+    </author>
+    <author>
+      <name>Thu Le</name>
+    </author>
+    <author>
+      <name>Samuel N. Stechmann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21563v1</id>
+    <title>Wildfire-SSR: Geolocation-Aware Multimodal Fusion for Structure-Level Wildfire Risk Assessment</title>
+    <updated>2026-11-16T18:40:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.21563v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21563v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Structure-level wildfire vulnerability assessment is critical for reducing losses in wildland-urban interface communities, yet existing methods often fail to combine parcel-scale ignition pathways with community-scale geographic coverage. This study introduces Wildfire-SSR (Satellite and Street-view for wildfire Risk), a geolocation-aware multimodal framework that integrates macro-scale satellite context with micro-scale street-view evidence. A Vision-Language Model extracts wildfire-relevant building and site attributes from pre-event street-view panoramas and converts them into structured semantic text. These features are spatially aligned with satellite imagery through a decoupled cross-attention fusion decoder, while a frozen satellite-pretrained DINOv3 encoder captures overhead visual context. Alternative geolocation embedding strategies are evaluated to anchor text-derived features within each satellite patch. The framework is tested on approximately 37,000 structures affected by the 2025 Eaton and Palisades fires in Los Angeles, using wildfire risk labels derived from relative post-event damage patterns to better represent inherent structural vulnerability. Rotary Positional Embedding provides the strongest spatial grounding, achieving a building localization F1 score of 0.6735 and a harmonic mean F1 score of 0.2476 for five-class pixel-level risk classification, outperforming unimodal baselines and an unanchored multimodal configuration. The model also shows a conservative bias in higher-risk classes, reducing severe-risk underestimation, and completes end-to-end assessment of the study area in 37 minutes on a single GPU. Wildfire-SSR reframes cross-view fusion as localized semantic alignment and provides a scalable tool for mitigation prioritization, resilience planning, and insurance-oriented wildfire risk assessment.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:40:49Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yu-Hsuan Ho</name>
+    </author>
+    <author>
+      <name>Yiming Xiao</name>
+    </author>
+    <author>
+      <name>Hao-En Lai</name>
+    </author>
+    <author>
+      <name>Ali Mostafavi</name>
+    </author>
+    <author>
+      <name>Samuel D. Brody</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21560v1</id>
+    <title>Optimal Quantum Sensing Algorithms for Discrete-Frequency Spectroscopy</title>
+    <updated>2026-11-16T18:39:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.21560v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21560v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spectroscopy is a versatile tool that drives scientific discovery and underpins modern technologies. Quantum sensing offers promising opportunities to advance spectroscopy through enhanced sensitivity and spectral and spatial resolution. However, existing approaches largely focus on improving general measurement capabilities, often overlooking the structure of specific sensing tasks and leaving potential performance gains untapped. Here, we develop an algorithmic approach to quantum sensing tailored to various spectroscopic tasks, providing new avenues for improvement. Specifically, we consider general time-varying signals supported on a known set of $N$ candidate frequencies, a setting we call discrete-frequency spectroscopy. We formulate three types of practically motivated sensing tasks---Detection, Search, and Learning---that require progressively more spectral information. For all tasks, we design optimal quantum sensing algorithms achieving a $\sqrt{N}$ speedup over conventional frequency-scanning approaches. Optimal Detection and Search need only a single-qubit sensor under $π$-pulse control, whereas optimal Learning provably requires coherent processing with a quantum computer. End-to-end numerical simulations incorporating various experimental imperfections predict up to two-orders-of-magnitude speedup in Detection. As an example, we analyze the feasibility of our Detection and Search algorithms for real-world molecular screening based on state-of-the-art nitrogen-vacancy centers. We also show how quantum-computing-enhanced Learning enables wireless communication in a weak-signal regime where conventional methods fail. Our results establish a practical route toward realizing quantum advantages via designing task-specific sensing algorithms.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:39:57Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Yu-Jie Liu</name>
+    </author>
+    <author>
+      <name>Richard R. Allen</name>
+    </author>
+    <author>
+      <name>Ruohan Shen</name>
+    </author>
+    <author>
+      <name>Bingtian Ye</name>
+    </author>
+    <author>
+      <name>Timothy T. Chang</name>
+    </author>
+    <author>
+      <name>Joonhee Choi</name>
+    </author>
+    <author>
+      <name>Soonwon Choi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21559v1</id>
+    <title>Reference Forcing: Long Video Generation with Region-Guided Drift Correction</title>
+    <updated>2026-11-16T18:39:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.21559v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21559v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Long video generation should keep the subject and background consistent while supporting rich, natural motion. However, autoregressive models are often distilled with distribution matching distillation (DMD) over short windows, which does not train them to keep this consistency over long ranges. As a result, the subject and background can drift over time. Methods that manage the key-value (KV) cache retain or retrieve history to reduce drift. Yet this history may itself have drifted. We propose Reference Forcing, which uses the initial frames as an appearance reference. We first build a teacher that uses attention masks to force each region of a new frame to attend to the same region in the initial frames. The teacher finds these regions with off-the-shelf segmentation models. We then distill this behavior into a separate attention path of the student, which needs no external models at inference. We further introduce value correction, which corrects drifted values in the KV cache toward the matching values of drift-free initial frames. Experiments show that Reference Forcing achieves state-of-the-art subject and background consistency among long-video methods on different base models, and its advantage grows with video length. Ablations show both components are needed to gain consistency without losing motion. More visualizations and code are available at https://zhaosheng-thu.github.io/reference-force/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:39:47Z</published>
+    <arxiv:comment>17 pages, 12 figures, 3 tables. Project page: https://zhaosheng-thu.github.io/reference-force/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Sheng Zhao</name>
+    </author>
+    <author>
+      <name>Haitian Zheng</name>
+    </author>
+    <author>
+      <name>Weikai Lin</name>
+    </author>
+    <author>
+      <name>Junjie Zhao</name>
+    </author>
+    <author>
+      <name>Yuhao Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21554v1</id>
+    <title>Reading or Remembering? Measuring Temporal Contamination in Language Models</title>
+    <updated>2026-11-16T18:34:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.21554v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21554v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models are now used to read central-bank text for economic forecasting, but most were trained on text written after the documents they read. A model reading a 2021 FOMC statement may already know that inflation rose in 2022, so part of its apparent skill can be memory of the outcome, a temporal form of test-set contamination. We measure this memory on FOMC statements and minutes from 2000 to 2026 by comparing modern open models with chronologically consistent models, which are trained only on text from before a fixed date. Asked about past GDP outcomes given only a date, models that cannot know the answer still reach an AUC of up to 0.64 from priors on dates and eras, so chance is the wrong baseline. Against these memory-free models on the same questions, most modern models recall which years had strong growth. Membership-inference scores sort documents by era and document type rather than by whether a model saw them, as exact counts in an open pretraining corpus show. In real-time nowcasts, every lookahead premium we estimate on US GDP is smaller than the forecast comparison can detect at macroeconomic sample sizes, and none on GDP or inflation survives correction for multiple testing. Lookahead audits should therefore measure memory directly against memory-free models on the same items.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:34:08Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+    <author>
+      <name>Gangadharan G. R.</name>
+    </author>
+    <author>
+      <name>S. Senthilkumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21552v1</id>
+    <title>Benchmarking memory and nonlinear processing capacity of quantum recurrent neural networks for time series prediction</title>
+    <updated>2026-11-16T18:32:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.21552v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21552v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum machine learning has emerged as a promising approach to time series prediction. While quantum reservoir computing has been widely explored for this setting, variational quantum models tailored to sequential data remain comparatively understudied, largely because they are difficult to train. In this work, we present a rigorous benchmark of variational quantum recurrent neural networks (QRNNs) on time series prediction tasks, focusing on two key capabilities: memory and nonlinear processing. We introduce a task-driven methodology that quantifies model capacity, enabling an intuitive and fair comparison across architectures, including classical recurrent baselines. We evaluate the proposed framework on two generic benchmark tasks and on a synthetic dataset describing a chaotic system. Overall, the quantum models achieve performance comparable to their classical counterparts, but classical models scale better with the memory size within the range studied. Notably, one QRNN variant shows higher average capacity on the task designed to jointly probe memory and nonlinear capacity. Moreover, our results show that quantum models offer better capacity when we are able to find a good parameter initialization. However, the increasing sensitivity to initialization leads to a lower probability of finding good solutions as the model size increases. These results provide a principled starting point for designing richer quantum recurrent architectures and for assessing where they may offer practical benefits.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:32:05Z</published>
+    <arxiv:comment>20 pages, 7 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>José Daniel Viqueira</name>
+    </author>
+    <author>
+      <name>Andrés Gómez</name>
+    </author>
+    <author>
+      <name>David Mera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21543v1</id>
+    <title>Hadron structure on the 16-cell honeycomb</title>
+    <updated>2026-11-16T18:28:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.21543v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21543v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In previous work we started a program of studying non-perturbative QCD on the 4-dimensional 16-cell honeycomb lattice instead of the usually adopted cubic lattice. It was shown that in several observables much smaller cut-off effects are observed, undoubtedly a result of the larger space-time symmetry of this discretization. In the present work further consequences are worked out, relevant for the lattice determination of hadronic structure functions. The key ingredient is the larger set of irreducible representations of the 16-cell honeycomb symmetry group relative to the cubic lattice, leading to more protection from mixing and thus less power divergences. A second ingredient is that more irreducible representations are available for a hadron at rest, which also leads to computational gain in practice. The analysis is given in full detail for both polarized and unpolarized and both forward and off-forward matrix elements of twist-2 and twist-3 operators. It is shown that a larger set of moments can be determined with continuum-like renormalization and at rest, than on the cubic lattice.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:28:52Z</published>
+    <arxiv:comment>46 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Sandor Katz</name>
+    </author>
+    <author>
+      <name>Daniel Nogradi</name>
+    </author>
+  </entry>
+</feed>

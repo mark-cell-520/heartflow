@@ -1,0 +1,3 @@
+significance-effect-size {"hit":true,"dimension":"significance_effect_size","severity":62,"score":0.62,"count":1,"evidence":["显著性陈述「p = 0.06」→ 实质性裁定「确实有效」（推断标记「说明」）"],"details":"显著性≠重要性(1处: 拿统计显著性「p = 0.06」直接推出实质性结论「确实有效」，缺效应量/置信区间口径)(zh)","guidance":"显著性≠重要性指把统计显著性直接当成实质重要性——p 值过线只说明「差异不太可能是噪声」，不说明「差异大、有用、值得推广」：样本量足够大时，任何微不足道的差异都能显著。请补上效应口径再下结论：给出效应量与置信区间（d 值、均值差、区间宽窄）、说明样本量、把结论改成实际差异幅度（从 2% 降到 1.9% 而不是「降低一半」），或明确指出显著不等于
+p-hacking {"hit":false,"score":0,"detail":"","count":0}
+effect-measure-misread {"hit":false,"score":0,"detail":"","count":0}

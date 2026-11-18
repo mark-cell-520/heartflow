@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/zK/KTQnemAKMWLGoOvGIQO1Gd5E</id>
+  <title>arXiv Query: search_query=all:logical OR all:fallacy OR all:detection OR all:rule-based: OR all:composition OR all:fallacy OR all:status OR all:quo OR all:bias OR all:decoy OR all:effect OR all:publication OR all:bias OR all:complex OR all:question&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T00:08:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:logical+OR+(all:fallacy+OR+(all:detection+OR+(all:rule-based:+OR+(all:composition+OR+(all:fallacy+OR+(all:status+OR+(all:quo+OR+(all:bias+OR+(all:decoy+OR+(all:effect+OR+(all:publication+OR+(all:bias+OR+(all:complex+OR+all:question)))))))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1482759</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18563v1</id>
+    <title>Pairing AIS with RF: Analysis of a Markovian Approach for Maritime Data Fusion</title>
+    <updated>2026-11-13T18:59:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.18563v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18563v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Monitoring maritime activities is important for safety and security, particularly for detecting illegal activities, but remains challenging due to the size and complexity of the maritime domain. The Automatic Identification System (AIS) is commonly used for this purpose, despite its known vulnerabilities. In contrast, space-based radio frequency (RF) observations provide an independent source of vessel activity but lack ship identification and therefore cannot identify vessels on their own. Following the CRISP-DM process, this study applies a Pair Hidden Markov Model (PHMM) to align individual RF detections with AIS trajectories, using temporal and spatial information while modeling noise and timing discrepancies. We evaluate it on NOAA AIS data with synthetic RF detections against nearest-neighbor baselines and analyze its errors with bias tests on trajectory length, sampling density, stationarity and AIS--RF distance. The length-corrected Forward score reaches a top-1 precision of $0.7776$ on the validation split of multi-candidate detections, where errors are possible, and an AUC of $0.637$ for detecting dark vessels among the detections that pass the prefilter. With a single RF detection, the score mostly reflects the AIS trajectory itself, and its errors favor longer and more stationary trajectories. A log-odds score, which compares the full model with a null model without match transitions, raises precision to $0.8580$ and AUC to $0.852$. Its length-corrected variant no longer shows a significant bias towards stationary trajectories and short inter-message distances, but still favors candidates farther from the RF detection. A time-weighted nearest-neighbor baseline without fitting remains ahead (precision $0.9013$, AUC $0.904$), so this single-detection, hand-designed PHMM formulation approaches but does not beat it.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:59:43Z</published>
+    <arxiv:comment>10 pages, 5 figures, accepted at the 13th IEEE Special Session Privacy and Security of Big Data of IEEE BigData 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Daniel Grimm</name>
+    </author>
+    <author>
+      <name>Kyra Jongman</name>
+    </author>
+    <author>
+      <name>Renato Cordeiro Ferreira</name>
+    </author>
+    <author>
+      <name>Giuseppe Cascavilla</name>
+    </author>
+    <author>
+      <name>Alfredo Cuzzocrea</name>
+    </author>
+    <author>
+      <name>Willem-Jan Van Den Heuvel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18559v1</id>
+    <title>BAL: Bidirectional Autoregression in Latent Space for Learning Human Movement Representations</title>
+    <updated>2026-11-13T18:58:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.18559v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18559v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Learning semantically meaningful human movement representations from 3D pose sequences is essential for human behavior modeling. Existing self-supervised methods derive supervision from artificial assumptions, e.g., invariance to augmentation within a certain range or recoverability of masked regions at a certain temporal scale, introducing heuristic hyperparameters that make the learned semantics sensitive to their settings. We propose BAL, a self-supervised framework that instead exploits supervision intrinsic to human movement: the natural ordering structure of everyday behavior. BAL autoregressively predicts in a semantically abstract latent space, analogous to how humans anticipate others' actions rather than their precise joint configurations. Bidirectional autoregressive prediction, both forward and backward in time, fully leverages these ordering constraints while enabling representation extraction using both past and future context at inference. To suppress representation collapse, BAL decomposes each prediction target into a global component capturing sequence-level semantics and a local component capturing context-independent movement. We prove that the local targets retain nontrivial angular diversity unless the representations are completely collapsed, preserving a meaningful training signal. Experiments on large-scale datasets demonstrate that BAL's representations are highly effective for motion captioning, forecasting, and interpolation, outperforming baselines on most evaluation metrics.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:54Z</published>
+    <arxiv:comment>Accepted to NeurIPS 2026. Project page: https://github.com/kyotovision-public/bal</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Genki Kinoshita</name>
+    </author>
+    <author>
+      <name>Ko Nishino</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18558v1</id>
+    <title>Reconstruction of Dynamical Dark Energy and Gravity from latest cosmological data</title>
+    <updated>2026-11-13T18:58:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.18558v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18558v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent cosmological observations have renewed interest in non-standard late-time evolution. We investigate whether departures from the standard expansion history are accompanied by modifications of gravitational dynamics through a joint, non-parametric reconstruction of the effective dark energy density, $Ω_{\rm X}(a)$, and the gravitational response functions $μ(a)$ and $Σ(a)$. Combining CMB, DESI DR2 BAO, Pantheon+, and large scale structure observations, including DES Year 3 $6\times2$pt data, we perform reconstructions with and without a theory motivated correlation prior derived from stable Horndeski models. We find a persistent maximum in $Ω_{\rm X}$ at $z\simeq0.5$--$0.7$, corresponding to a crossing of the effective phantom divide. This feature is already present in the CMB+BAO combination and remains robust when modifications to clustering and lensing are allowed. The reconstructed gravitational response exhibits suggestive enhancements in $μ$ and $Σ$ over approximately the same redshift range, although these departures are less significant. Including LSS information instead favours a reduced lensing response, $Σ&lt;1$, while leaving the background feature largely unchanged. An interpretation within Generalized Brans-Dicke theories illustrates how modifications to the effective gravitational coupling and a scalar-mediated fifth force may contribute to these trends. Our results indicate that current departures from $Λ$CDM are most significant in the expansion history, while leaving open the possibility of correlated modifications to gravitational dynamics that future Stage IV surveys can test.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:51Z</published>
+    <arxiv:comment>16 pages, 10 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Maria Luisa Gallavotti</name>
+    </author>
+    <author>
+      <name>Alessandra Silvestri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18557v1</id>
+    <title>Does Dark Energy Evolve $\textit{and}$ Cluster?</title>
+    <updated>2026-11-13T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.18557v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18557v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent cosmological observations have renewed interest in dynamical dark energy, and naturally raise the question of whether departures from the standard expansion history are accompanied by modifications of gravitational dynamics. We address this question through a joint, non-parametric reconstruction of the effective dark-energy contribution to the expansion and the gravitational responses governing clustering and lensing, complemented by a combined covariance-mode analysis, without imposing model-specific relations between the sectors. Combining CMB, DESI DR2 BAO, and Pantheon+ supernova observations, and subsequently adding large scale structure observations including DES Year 3 $6\times2$pt data and other surveys, we recover a broad maximum in the effective dark-energy density near $z\simeq0.6$--$0.7$. The gravitational responses exhibit suggestive low-redshift enhancements over their GR values, approximately coincident with the background feature. Adding large scale structure information preserves the background feature but favours a mildly reduced lensing response. The combined covariance-mode analysis identifies the combinations of background and gravitational responses most tightly constrained by current observations and quantifies their departures from $Λ$CDM. The leading modes are decisively background dominated, while the gravitational sector remains less precisely constrained. Thus, present data cannot yet determine whether the suggestive low-redshift features in the two sectors share a common physical origin, a question that ongoing Stage-IV surveys will be able to address</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:50Z</published>
+    <arxiv:comment>4 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Maria Luisa Gallavotti</name>
+    </author>
+    <author>
+      <name>Alessandra Silvestri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18556v1</id>
+    <title>From pure spinor modules to superspace superfields</title>
+    <updated>2026-11-13T18:58:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.18556v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18556v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We relate the pure spinor formalism to the superspace description of constrained superfields and gauge multiplets, mainly for abelian two-dimensional N=(2,2) supersymmetry, with three- and four-dimensional N=1 examples for comparison. For each multiplet we give an explicit module over the supertranslation Chevalley-Eilenberg algebra and match its reconstruction with the known superfields. First-order constraints come from modules supported on linear subspaces of the nilpotence variety, and higher-order ones, such as the complex-linear constraint, from Yoneda products of their Ext classes. Requiring a connection to act on given matter and its conjugate restricts its curvature, which yields the ordinary, twisted and semichiral vector multiplets with their field strengths. The module of each vector multiplet is the fiber product over the origin of the coordinate rings of the matter supports: its potentials are differences of partial potentials, and its gauge parameters are the matter superfields. For the large vector multiplet this fiber product is not a quotient of the pure spinor ring; its field strengths are four odd semichiral superfields, and partial regluing gives its constrained versions.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:58:43Z</published>
+    <arxiv:comment>38 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Ondrej Hulik</name>
+    </author>
+    <author>
+      <name>Raphael Senghaas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18548v1</id>
+    <title>Limitations of nonreversible lifts for subgeometric diffusions</title>
+    <updated>2026-11-13T18:53:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.18548v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18548v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the effect of lifting on continuous-time Markov processes with potentially subgeometric convergence rates. Using a series of weak Poincaré-type inequalities, we derive a bound on the maximum acceleration that can be obtained through lifting. We present several examples to explore the sharpness of our derived bound, where the resulting bound has the same square-root order as in the spectral gap setting. Our results provide a framework for understanding the potential and limitations of non-reversible lifting beyond geometric convergence.</summary>
+    <category term="stat.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:53:51Z</published>
+    <arxiv:comment>20 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="stat.CO"/>
+    <author>
+      <name>Mengxi Gao</name>
+    </author>
+    <author>
+      <name>Gareth O. Roberts</name>
+    </author>
+    <author>
+      <name>Andi Q. Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18547v1</id>
+    <title>Polynomial-Time Solvability of the Multi-Dimensional Slope Change Problem</title>
+    <updated>2026-11-13T18:52:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.18547v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18547v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Slope change detection seeks to identify changes in the trends of time-ordered signals. We study the problem of fitting a multidimensional time series by continuous piecewise-linear functions with a shared continuous breakpoint and unrestricted slopes. We consider both the dense setting, in which every dimension may change slope, and the sparse setting, in which at most $k$ dimensions may change slope. Although the resulting optimization problems are nonconvex mixed integer nonlinear programs and may have irrational optimal solutions even for rational data, we prove that all six variants, corresponding to the $\ell_1$, $\ell_2$, and $\ell_\infty$ losses in both settings, are exactly solvable in polynomial time. For least-squares loss, we obtain efficient algorithms requiring $O(JT)$ operations in the dense setting and $O(J^2T\log J)$ operations in the sparse setting, where $T$ is the number of time points and $J$ is the number of dimensions. We implement these least-squares algorithms and evaluate them on simulated data and three real-world time series, namely, surface temperatures (ERA5), hand-tracking data from a mixed-reality headset (HoloAssist), and turbofan engine sensor data (NASA C-MAPSS). The dense algorithm solves instances with up to $J=10^5$ and $T=100$, that is, $10^7$ observations, in less than $0.1$ seconds on a laptop, while the sparse algorithm solves instances with about $10^3$ dimensions and up to $T=240$ in under a second. Compared with a mixed-integer nonlinear programming (MINLP) formulation solved by Gurobi, our algorithms are several orders of magnitude faster (approximately $8.9 \times 10^3$ to $3.4 \times 10^6$ times) on instances where Gurobi terminates within its default optimality tolerance of $0.01\%$ optimality gap. On larger instances, Gurobi frequently reaches a 10,000-second time limit with substantial optimality gaps.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:52:54Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Apoorva Narula</name>
+    </author>
+    <author>
+      <name>Santanu S. Dey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18546v1</id>
+    <title>Modeling the Frictional Contact of Continuum Robots with Environments through Linear Complementarity Problem</title>
+    <updated>2026-11-13T18:51:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.18546v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18546v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Accurate friction modeling in continuum robots is essential for precise motion control and path planning. However, current approaches make predictions only for the mechanism's internal friction that is limited by the boundary forces of the Coulomb friction cone, which fail to characterize the static friction and motion hysteresis. In this paper, we propose a novel friction model based on complementarity constraints under the Coulomb friction assumption. This model predicts various friction effects caused by environmental interactions, including both static and sliding frictions and hysteresis behavior, as well as the corresponding robot deformation induced by these interactions, which are crucial for the practical motion planning and control of continuum robots. Additionally, real-time implementation of this model can be achieved, meeting the demand for computational efficiency in robotic applications. Experimental validations demonstrated that this model is able to reduce the maximum tip position error from 45.4 mm in the frictionless model to 5.85 mm in our friction-included model with a 287.9 mm-long tendon-driven continuum robot.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:51:17Z</published>
+    <arxiv:comment>Accepted for publication in International Journal of Robotics Research (IJRR). 21 pages, 18 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Jia Shen</name>
+    </author>
+    <author>
+      <name>Junhyoung Ha</name>
+    </author>
+    <author>
+      <name>Yue Chen</name>
+    </author>
+    <arxiv:doi>10.1177/02783649261504037</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1177/02783649261504037" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18545v1</id>
+    <title>From smoothed analysis to backward error: The power of adaptive perturbations</title>
+    <updated>2026-11-13T18:50:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.18545v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18545v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Smoothed analysis has become a central tool in theoretical computer science, often allowing for significant improvements to worst-case running times if we settle for a solution to a small random perturbation of the problem instance. This is closely related to the classical concept of backward error in numerical analysis, which allows an algorithm to return a solution to an arbitrary perturbation of the problem.
+  Despite the qualitative similarity of these concepts, we show that they can exhibit large quantitative differences. Notably, we prove that, while a linear system with any $n \times n$ matrix $A$ can be solved to backward error $ε$ using $O(\log(n) / ε)$ matrix-vector products with $A$, any algorithm that solves a random $ε$-sized perturbation of $A$ requires $Ω(n)$ matrix-vector products. This means that a useful perturbation for solving a linear system in backward error must be adaptive to the input. Interestingly, however, randomness is still essential: we show that any deterministic method that attains small backward error for all linear systems provably requires $Ω(n)$ matrix-vector products, resulting in the first separation between randomized and deterministic algorithms in a natural computational model for solving linear systems. Finally, we show that matrix structure can significantly affect backward error complexity. For example, we show a deterministic $O(1/ε)$ matrix-vector product algorithm for symmetric linear systems.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:50:40Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Michał Dereziński</name>
+    </author>
+    <author>
+      <name>Michael W. Mahoney</name>
+    </author>
+    <author>
+      <name>Raphael A. Meyer</name>
+    </author>
+    <author>
+      <name>Christopher Musco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18543v1</id>
+    <title>Imitation Bootstrapped Multi-Agent Reinforcement Learning</title>
+    <updated>2026-11-13T18:50:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.18543v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18543v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Demonstrations are an effective way to accelerate single-agent reinforcement learning (RL), but extending this idea to multi-agent reinforcement learning (MARL) is non-trivial as it is difficult and often impossible for a single person to teleoperate multiple agents simultaneously. Round-Robin Behavior Cloning (R2BC) addresses this by letting a single demonstrator control one agent at a time while the others execute their current policies. However, the resulting imitation policies are limited by the quality of the demonstrations. We propose Imitation Bootstrapped Multi-Agent Reinforcement Learning (IBMARL), a framework that extends Imitation Bootstrapped Reinforcement Learning (IBRL) to cooperative teams and uses R2BC to train the imitation policies. At each time step, every agent receives one action proposal from its imitation policy and one from its RL policy, and an ensemble of centralized critics selects among the per-agent combinations of the two. A gated imitation penalty, a soft Q-filtered behavior cloning loss, regularizes each RL policy toward its imitation policy only where the critics value the imitation action more, so that after training each agent executes its RL policy alone, without the centralized critics. On four cooperative multi-agent RL benchmarks, IBMARL surpasses its imitation policies $2.6$-$4.2\times$ faster than demonstration-based baselines on two tasks, is the only method to surpass it on the other two, and exceeds the demonstrator itself on two of the four. With real human demonstrations IBMARL still surpasses imitation learning alone, and does so more than twice as fast as the best baseline.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:50:05Z</published>
+    <arxiv:comment>9 pages, 5 figures. Code, videos and results: https://zhanghutony.github.io/ibmarl/. A preliminary version appeared at the PhysCollaBot Workshop at IROS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Tony H. Zhang</name>
+    </author>
+    <author>
+      <name>Connor Mattson</name>
+    </author>
+    <author>
+      <name>Daniel S. Brown</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18541v1</id>
+    <title>No free lattice contains an infinite ascending chain of copies of FL(3)</title>
+    <updated>2026-11-13T18:49:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.18541v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18541v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>No free lattice contains an infinite strictly ascending chain of sublattices isomorphic to FL(3), the free lattice on three generators; this answers a question that R. A. Dean asked and the second author's 1997 notes on the problem left open. Every such chain would yield, inside FL(3), a coherent chain of proper self-embeddings $Θ_0, Θ_1, Θ_2, \dots$ with $Θ_k \circ Θ_j = Θ_j$ for $j &lt; k$, so that each later embedding fixes the image of each earlier one pointwise. Every proper self-embedding of FL(3) whose fixed sublattice contains a free generating triple fixes one of the three generators, say $z$, because a power of it or of its dual lies above the identity, and a self-embedding that moves every generator and lies above the identity fixes at most eleven elements. Up to duality, a proper self-embedding fixing the image of such a $Θ_1$ pointwise fixes only elements above $z \wedge (x \vee y)$, where no free generating triple containing $z$ can lie. We also verify the one-step example of the 1997 notes, prove that no step toward such a chain is self-similar, and show that the configuration the argument rules out at length three does occur at length two.
+  Without freeness the answer reverses: FL(3) contains an infinite strictly ascending chain of 3-generated sublattices, so the lattice analogue of Takahasi's chain condition for free groups fails. The theorem itself is checked by the Agda proof assistant under its safe flags, for free lattices over generators with decidable equality, and its formal proof uses no classical principle: finite searches and an induction on a finite set replace the infinite pigeonhole principle by which a chain yields a coherent chain.</summary>
+    <category term="math.RA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:49:26Z</published>
+    <arxiv:comment>59 pages, 13 figures; the main theorem is checked in Agda; the formal development is available at https://github.com/ualib/agda-deans-problem</arxiv:comment>
+    <arxiv:primary_category term="math.RA"/>
+    <author>
+      <name>William DeMeo</name>
+    </author>
+    <author>
+      <name>Ralph Freese</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18539v1</id>
+    <title>Geometric Quantization of the Giant Graviton Master Moduli Space</title>
+    <updated>2026-11-13T18:48:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.18539v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18539v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We describe a remarkable reorganization of the space of gauge invariant operators of free or twisted $U(N)$ gauge theories as combinations of single-trace and determinant operators modulo certain "open loop equations". The reorganization has a transparent holographic interpretation, describing how states at finite $N$ can be reproduced by imposing certain $N$-independent gauge constraints on the combination of the closed strings Fock space and a geometric quantization of the moduli space of Giant Graviton D-branes, with quantization parameter $N^{-1}$. The moduli space of Giant Graviton D-branes is reproduced from tachyon condensation of auxiliary D-brane/anti-D-brane pairs which are "Koszul dual" to the D-brane system which supports the original gauge theory. We describe how to impose the open loop equations via certain BRST complexes and conjecture that their homology recovers the finite $N$ BPS Hilbert space in the limit of large auxiliary rank. The BRST construction conjecturally categorifies Murthy's Giant Graviton Expansion of indices counting $U(N)$-invariant BPS operators.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:48:14Z</published>
+    <arxiv:comment>37+21 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Kasia Budzik</name>
+    </author>
+    <author>
+      <name>Davide Gaiotto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18538v1</id>
+    <title>Why Finite Intelligence Works in an Infinite World: A Mathematical Theory</title>
+    <updated>2026-11-13T18:47:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.18538v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18538v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An information system often has to learn before it knows what it will be asked. A finite representation can succeed without recording an infinite environment in full when those asks share collective structure, rather than demand unrelated facts scattered arbitrarily across it. We formalize this phenomenon through future-task information, the minimum retained information needed to preserve decision value relative to the available evidence. A joint decision-regret state records posterior comparisons among actions for every permitted task. Under compactness assumptions, every retained representation admits a calibrated replacement based on this state, preserving all task regrets without increasing information; the resulting information-regret curve equals an operational coding rate. Two exact boundaries govern finite preservation: weak-star closure for a fixed action count, and the singular mass of the source-evidence law when all finite action menus are admitted. Collective structure determines information requirements beyond individual-question difficulty. Families with identical source laws, pairwise task metrics, and individual-task rates can have different high-resolution exponents. Covariance-identical coordinate and parity families have different exact rate-distortion curves, with optimal parity retention characterized by a sharp Fourier-entropy inequality. For balanced nested task families, refinement sizes and weighted reach determine the rate within an additive constant, attained by prefix coding under explicit decay conditions. Nonlinear learning and computational separations distinguish preservation from efficient discovery and use. The proposed mathematical theory identifies which shared decision requirements allow finite information to remain useful for infinitely many possible purposes.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:47:24Z</published>
+    <arxiv:comment>56 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Mojtaba Soltanalian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18537v1</id>
+    <title>Valid Inequalities for Bilevel 0-1 Shortest-Path Problems</title>
+    <updated>2026-11-13T18:47:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.18537v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18537v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We characterize valid inequalities for bilevel programs in which the leader makes binary decisions, and the follower solves a shortest-path problem. We exploit a dualize-and-combine reformulation and show that even with ideal formulations for the leader and the follower primal solution sets, fractional solutions may still appear in the continuous relaxation. From that reformulation, we identify that the interaction between the leader variables and the follower dual variables, which we capture through a leader-potential set, is the key structure to be convexified to guarantee that a continuous relaxation recovers the optimal value of the original problem, closing the objective gap. Furthermore, we characterize the valid inequalities for the leader-potential set through network flows, and identify a family of inequalities we name root cuts that suffice to recover the optimal value. Complementary to the structural results, we prove that the cut generation problem is NP-hard even with partially fixed coefficients and a network with two nodes and two parallel arcs. Motivated by the complexity result, we propose a constructive method to fix coefficients in the valid inequalities while preserving separation guarantees, by exploiting the network structure.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:47:23Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Bruno M. Pacheco</name>
+    </author>
+    <author>
+      <name>Margarida Carvalho</name>
+    </author>
+    <author>
+      <name>Kim Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.18535v1</id>
+    <title>A Surrogate Boundary Condition for Improved Accuracy and Performance of Local Modeling in Radiation Transport Simulations</title>
+    <updated>2026-11-13T18:46:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.18535v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.18535v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Monte Carlo neutronics analysis of tokamak designs is computationally expensive due to the complex CAD geometries required to accurately model them. Design iteration of port plugs using global transport in the full model is impractical because of the computational cost. To circumvent this, local modeling methods are used. In the local modeling method, a boundary condition is assumed on the port plug, such that particles that leave the port plug do not require transport in the surrounding global model. For this purpose, vacuum and reflective boundaries are assumed, both of which provide poor approximation of the true transport physics in the global model. To improve on current techniques, a surrogate model is presented that provides a physics-informed boundary condition for the component. A neural network is trained to reproduce the boundary condition on the component that represents the behavior of particles returning from the surrounding geometry. Monte Carlo transport is only necessary within the component, and approximate physics from the surrounding region are retained. This approach allows the design in the component to be iterated without requiring full model transport and joining of the component mesh to the global mesh in each iteration. In this work, the surrogate model is evaluated against vacuum and reflective boundaries-- outperforming both in accuracy, with surrogate predictions of the flux in the port plug differing less than 12% from the global transport solution in any given energy bin. The surrogate boundary condition is also demonstrated to be more performant than global transport for the simplified benchmark geometry.</summary>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-13T18:46:36Z</published>
+    <arxiv:primary_category term="physics.comp-ph"/>
+    <author>
+      <name>Jonathan Trieloff</name>
+    </author>
+    <author>
+      <name>Ethan Peterson</name>
+    </author>
+  </entry>
+</feed>

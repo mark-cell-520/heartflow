@@ -1,0 +1,12 @@
+'use strict';
+const hf = require('../../src/gate.js');
+const r = hf.check('竞拍下这个搜索关键词说明市场认可这个流量价值，我们的出价是合理的。');
+console.log('top keys:', Object.keys(r).join(','));
+console.log('action:', r.action);
+console.log('traceSummary:', r.traceSummary);
+console.log('findings:', JSON.stringify(r.findings, null, 1).slice(0, 1500));
+const g = hf.gate('竞拍下这个搜索关键词说明市场认可这个流量价值，我们的出价是合理的。');
+console.log('--- gate() ---');
+console.log('action:', g.action);
+console.log('findings dims:', (g.findings || []).map(f => f.dimension).join(','));
+console.log('traceSummary:', g.traceSummary);

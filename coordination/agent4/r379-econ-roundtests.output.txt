@@ -1,0 +1,17 @@
+round-295-econ-reasoning-wiring.test.js:   ✓ H2 analyze 对同一输入确定性（无随机/无状态泄漏）  结果: 101 通过, 0 失败 
+round-364-jevons-paradox.test.js:   ✓ G 登记：claims.jsonl 含 r364 认领（agent-4/dimension）  测试结果: 69 通过, 1 失败, 共 70 个 
+round-366-carbon-leakage.test.js:   ✓ G 登记：claims.jsonl 含 r366 认领（agent-4/dimension）  测试结果: 50 通过, 0 失败, 共 50 个 
+round-367-price-control.test.js:   ✓ G5 VERSION 未被 r367 改动（r370 bump 后基线同步为 6.8.190）  测试结果: 29 通过, 1 失败, 共
+round-368-mercantilism.test.js:   ✓ G5 VERSION 未被 r368 改动（r370 bump 后基线同步为 6.8.190）  测试结果: 37 通过, 1 失败, 共 
+round-369-paradox-of-thrift.test.js:  测试结果: 36 通过, 1 失败, 共 37 个 负例注入: 13/13 翻转 
+round-371-decoy-effect.test.js:  测试结果: 42 通过, 1 失败, 共 43 个 负例注入: 16/16 翻转 
+round-372-healthy-user-bias.test.js:  测试结果: 41 通过, 1 失败, 共 42 个 负例注入: 10/10 翻转 
+round-373-behavior-layer-wiring.test.js: PASS patternDetector 与 hf.patternDetector 接线一致（_modules 可达）  round-373 behavior wiring: 6 �
+round-373-extraordinary-claims.test.js:  测试结果: 43 通过, 1 失败, 共 44 个 负例注入: 16/16 翻转 
+round-373-tax-incidence.test.js: round-373 tax_incidence: 55 passed, 0 failed 
+round-374-stock-flow-conflation.test.js:  测试结果: 45 通过, 1 失败, 共 46 个 负例注入: 16/16 翻转 
+round-375-government-household-analogy.test.js:  测试结果: 44 通过, 1 失败, 共 45 个 负例注入: 14/14 翻转 
+round-376-money-creation.test.js:   ✓ F2 本族对 money_illusion 的攻击样本零命中（互不覆盖）  r376-money-creation: 41 通过 / 2 失
+round-377-linear-tax-revenue.test.js:   ✓ F4 本族良性句不被 tax_incidence 误判（互补不重叠；tax_incidence 自身攻击样本除外�
+round-378-insurance-claim-loss.test.js:   ✓ E6 本族良性句不被 adverse_selection 误判  结果: 37 通过, 0 失败 
+round-379-flat-rate-bias.test.js: # skipped 0 # todo 0 # duration_ms 2196.341495 

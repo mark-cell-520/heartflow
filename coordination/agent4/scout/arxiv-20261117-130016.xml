@@ -1,0 +1,1390 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/lGlUfcFE4blwDx1yS60/gc29cIU</id>
+  <title>arXiv Query: search_query=all:logical OR all:fallacies OR all:taxonomy OR all:argumentation&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T13:00:16Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:logical+OR+(all:fallacies+OR+(all:taxonomy+OR+all:argumentation))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>96453</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21578v1</id>
+    <title>Resolving and Suppressing Temporally Correlated Noise in Quantum Error Correction</title>
+    <updated>2026-11-16T18:49:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.21578v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21578v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scaling fault-tolerant quantum error correction (QEC) requires suppressing errors in both space and time, yet standard logical memory experiments primarily probe spatial faults. Here, we use a 105-qubit Willow superconducting quantum processor to realize and scale the surface code stability experiment, which is alternatively sensitive to temporal error chains. Scaling from patch sizes of $3 \times 3$ to $7 \times 7$, we realize a timelike block suppression factor of $μ_T = 1.47 \pm 0.25$, demonstrating the ability to maintain temporal error suppression as the number of qubits increases. By extending the stability experiment for many cycles, we uncover a sum-of-exponentials behavior in error suppression caused by a temporally correlated error: data-qubit heating to the third excited state $|3\rangle$. We fully capture this effect with a parameter-free, device-level leakage model incorporating higher-state transport during syndrome extraction cycles. To suppress this error, we develop and realize a walking stability circuit, reaching a logical error probability floor of $\le 3.20\times 10^{-8}$ at 60 cycles---two orders of magnitude below the standard construction---and limited by ionizing radiation error bursts. Finally, by adaptively terminating syndrome extraction based on decoder confidence in an offline analysis, we reduce spacetime logical error by 38% and time overhead by 34% compared to the optimal fixed-cycle strategy.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:49:49Z</published>
+    <arxiv:comment>34 pages, 18 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Alec Eickbusch</name>
+    </author>
+    <author>
+      <name>Nick Noll</name>
+    </author>
+    <author>
+      <name>Michael Newman</name>
+    </author>
+    <author>
+      <name>Matt McEwen</name>
+    </author>
+    <author>
+      <name>Leigh S. Martin</name>
+    </author>
+    <author>
+      <name>Alexis Morvan</name>
+    </author>
+    <author>
+      <name>Gabrielle Roberts</name>
+    </author>
+    <author>
+      <name>Chunyang Ding</name>
+    </author>
+    <author>
+      <name>Volodymyr Sivak</name>
+    </author>
+    <author>
+      <name>Nathan Lacroix</name>
+    </author>
+    <author>
+      <name>Laura De Lorenzo</name>
+    </author>
+    <author>
+      <name>Felix Borjans</name>
+    </author>
+    <author>
+      <name>Yan-Cheng Wei</name>
+    </author>
+    <author>
+      <name>Alexandre Bourassa</name>
+    </author>
+    <author>
+      <name>Rodrigo G. Cortiñas</name>
+    </author>
+    <author>
+      <name>Emma Rosenfeld</name>
+    </author>
+    <author>
+      <name>Vladislav D. Kurilovich</name>
+    </author>
+    <author>
+      <name>Andreas Bengtsson</name>
+    </author>
+    <author>
+      <name>Kevin J. Satzinger</name>
+    </author>
+    <author>
+      <name>Dmitry Abanin</name>
+    </author>
+    <author>
+      <name>Amira Abbas</name>
+    </author>
+    <author>
+      <name>Rajeev Acharya</name>
+    </author>
+    <author>
+      <name>Laleh Aghababaie Beni</name>
+    </author>
+    <author>
+      <name>Ross Alcaraz</name>
+    </author>
+    <author>
+      <name>Sayra Alcaraz</name>
+    </author>
+    <author>
+      <name>Trond I. Andersen</name>
+    </author>
+    <author>
+      <name>Benjamin Anker</name>
+    </author>
+    <author>
+      <name>Markus Ansmann</name>
+    </author>
+    <author>
+      <name>Frank Arute</name>
+    </author>
+    <author>
+      <name>Kunal Arya</name>
+    </author>
+    <author>
+      <name>Walt Askew</name>
+    </author>
+    <author>
+      <name>Nikita Astrakhantsev</name>
+    </author>
+    <author>
+      <name>Juan Atalaya</name>
+    </author>
+    <author>
+      <name>Lamia Ateshian</name>
+    </author>
+    <author>
+      <name>Christopher Ayala</name>
+    </author>
+    <author>
+      <name>Ryan Babbush</name>
+    </author>
+    <author>
+      <name>Akim Babenko</name>
+    </author>
+    <author>
+      <name>Brian Ballard</name>
+    </author>
+    <author>
+      <name>Joseph C. Bardin</name>
+    </author>
+    <author>
+      <name>Hector Bates</name>
+    </author>
+    <author>
+      <name>Majid Bigdeli Karimi</name>
+    </author>
+    <author>
+      <name>Alexander Bilmes</name>
+    </author>
+    <author>
+      <name>Simon Bilodeau</name>
+    </author>
+    <author>
+      <name>Chris Bohn</name>
+    </author>
+    <author>
+      <name>Pablo Bonilla</name>
+    </author>
+    <author>
+      <name>Jenna Bovaird</name>
+    </author>
+    <author>
+      <name>Dylan Bowers</name>
+    </author>
+    <author>
+      <name>Leon Brill</name>
+    </author>
+    <author>
+      <name>Peter Brooks</name>
+    </author>
+    <author>
+      <name>Michael Broughton</name>
+    </author>
+    <author>
+      <name>David A. Browne</name>
+    </author>
+    <author>
+      <name>Brett Buchea</name>
+    </author>
+    <author>
+      <name>Bob B. Buckley</name>
+    </author>
+    <author>
+      <name>Chris Bunch</name>
+    </author>
+    <author>
+      <name>Tim Burger</name>
+    </author>
+    <author>
+      <name>Brian Burkett</name>
+    </author>
+    <author>
+      <name>Jamal Busnaina</name>
+    </author>
+    <author>
+      <name>Nicholas Bushnell</name>
+    </author>
+    <author>
+      <name>Jonas Bylander</name>
+    </author>
+    <author>
+      <name>Anthony Cabrera</name>
+    </author>
+    <author>
+      <name>Juan Campero</name>
+    </author>
+    <author>
+      <name>Hung-Shen Chang</name>
+    </author>
+    <author>
+      <name>Gloria Chen</name>
+    </author>
+    <author>
+      <name>Larry Chen</name>
+    </author>
+    <author>
+      <name>Silas Chen</name>
+    </author>
+    <author>
+      <name>Federico Chianese</name>
+    </author>
+    <author>
+      <name>Ben Chiaro</name>
+    </author>
+    <author>
+      <name>Liang-Ying Chih</name>
+    </author>
+    <author>
+      <name>Agnetta Y. Cleland</name>
+    </author>
+    <author>
+      <name>Bryan Cochrane</name>
+    </author>
+    <author>
+      <name>Matt Cockrell</name>
+    </author>
+    <author>
+      <name>Josh Cogan</name>
+    </author>
+    <author>
+      <name>Tom Connolly</name>
+    </author>
+    <author>
+      <name>Harold Cook</name>
+    </author>
+    <author>
+      <name>William Courtney</name>
+    </author>
+    <author>
+      <name>Alexander L. Crook</name>
+    </author>
+    <author>
+      <name>Ben Curtin</name>
+    </author>
+    <author>
+      <name>Adam Dally</name>
+    </author>
+    <author>
+      <name>Martin Damyanov</name>
+    </author>
+    <author>
+      <name>Sayan Das</name>
+    </author>
+    <author>
+      <name>Dripto M. Debroy</name>
+    </author>
+    <author>
+      <name>Sean Demura</name>
+    </author>
+    <author>
+      <name>Himadri Dey</name>
+    </author>
+    <author>
+      <name>Leon Ding</name>
+    </author>
+    <author>
+      <name>Howard A. Dobbs</name>
+    </author>
+    <author>
+      <name>Ebru Dogan</name>
+    </author>
+    <author>
+      <name>Paul Donohoe</name>
+    </author>
+    <author>
+      <name>Ilya Drozdov</name>
+    </author>
+    <author>
+      <name>Andrew Dunsworth</name>
+    </author>
+    <author>
+      <name>Rasmus Edholm</name>
+    </author>
+    <author>
+      <name>Valerie Ehimhen</name>
+    </author>
+    <author>
+      <name>Aviv Moshe Elbag</name>
+    </author>
+    <author>
+      <name>Lior Ella</name>
+    </author>
+    <author>
+      <name>Mahmoud Elzouka</name>
+    </author>
+    <author>
+      <name>David Enriquez</name>
+    </author>
+    <author>
+      <name>Catherine Erickson</name>
+    </author>
+    <author>
+      <name>Lara Faoro</name>
+    </author>
+    <author>
+      <name>Parvin Fathi</name>
+    </author>
+    <author>
+      <name>Vinicius S. Ferreira</name>
+    </author>
+    <author>
+      <name>Marcos Flores</name>
+    </author>
+    <author>
+      <name>Leslie Flores Burgos</name>
+    </author>
+    <author>
+      <name>Sam Fontes</name>
+    </author>
+    <author>
+      <name>Ebrahim Forati</name>
+    </author>
+    <author>
+      <name>Jeremiah Ford</name>
+    </author>
+    <author>
+      <name>Brooks Foxen</name>
+    </author>
+    <author>
+      <name>Masaya Fukami</name>
+    </author>
+    <author>
+      <name>Alan Wing Lun Fung</name>
+    </author>
+    <author>
+      <name>Lenny Fuste</name>
+    </author>
+    <author>
+      <name>Suhas Ganjam</name>
+    </author>
+    <author>
+      <name>Gonzalo Garcia</name>
+    </author>
+    <author>
+      <name>Christopher Garrick</name>
+    </author>
+    <author>
+      <name>Robert Gasca</name>
+    </author>
+    <author>
+      <name>Helge Gehring</name>
+    </author>
+    <author>
+      <name>Robert Geiger</name>
+    </author>
+    <author>
+      <name>Élie Genois</name>
+    </author>
+    <author>
+      <name>William Giang</name>
+    </author>
+    <author>
+      <name>Dar Gilboa</name>
+    </author>
+    <author>
+      <name>James E. Goeders</name>
+    </author>
+    <author>
+      <name>Edward C. Gonzales</name>
+    </author>
+    <author>
+      <name>Sofia Gonzalez Garcia</name>
+    </author>
+    <author>
+      <name>Mike Gore</name>
+    </author>
+    <author>
+      <name>Raja Gosula</name>
+    </author>
+    <author>
+      <name>Stijn J. de Graaf</name>
+    </author>
+    <author>
+      <name>Alejandro Grajales Dau</name>
+    </author>
+    <author>
+      <name>Dietrich Graumann</name>
+    </author>
+    <author>
+      <name>Joel Grebel</name>
+    </author>
+    <author>
+      <name>Alex Greene</name>
+    </author>
+    <author>
+      <name>Jeremy Grill</name>
+    </author>
+    <author>
+      <name>Jonathan A. Gross</name>
+    </author>
+    <author>
+      <name>Jose Guerrero</name>
+    </author>
+    <author>
+      <name>Loïck Le Guevel</name>
+    </author>
+    <author>
+      <name>Marika Gugole</name>
+    </author>
+    <author>
+      <name>Simon Gustavsson</name>
+    </author>
+    <author>
+      <name>Steve Habegger</name>
+    </author>
+    <author>
+      <name>Tanner Hadick</name>
+    </author>
+    <author>
+      <name>Ali Hadjikhani</name>
+    </author>
+    <author>
+      <name>Michael C. Hamilton</name>
+    </author>
+    <author>
+      <name>Bianca Hanly</name>
+    </author>
+    <author>
+      <name>Monica Hansen</name>
+    </author>
+    <author>
+      <name>Matthew P. Harrigan</name>
+    </author>
+    <author>
+      <name>Patrick Harrington</name>
+    </author>
+    <author>
+      <name>Sean D. Harrington</name>
+    </author>
+    <author>
+      <name>Jeanne Hartshorn</name>
+    </author>
+    <author>
+      <name>Christian Heslin</name>
+    </author>
+    <author>
+      <name>Stephen Heslin</name>
+    </author>
+    <author>
+      <name>Paula Heu</name>
+    </author>
+    <author>
+      <name>Oscar Higgott</name>
+    </author>
+    <author>
+      <name>Reno Hiltermann</name>
+    </author>
+    <author>
+      <name>Devon Hollowood</name>
+    </author>
+    <author>
+      <name>Mike Hucka</name>
+    </author>
+    <author>
+      <name>Christopher Hudspeth</name>
+    </author>
+    <author>
+      <name>Ashley Huff</name>
+    </author>
+    <author>
+      <name>William J. Huggins</name>
+    </author>
+    <author>
+      <name>Lev B. Ioffe</name>
+    </author>
+    <author>
+      <name>Aditya Jayaraman</name>
+    </author>
+    <author>
+      <name>Evan Jeffrey</name>
+    </author>
+    <author>
+      <name>Shaun Jevons</name>
+    </author>
+    <author>
+      <name>Zhang Jiang</name>
+    </author>
+    <author>
+      <name>Xiaoxuan Jin</name>
+    </author>
+    <author>
+      <name>Tomas Jochym-O'Connor</name>
+    </author>
+    <author>
+      <name>Shunnee Joseph</name>
+    </author>
+    <author>
+      <name>Chaitali Joshi</name>
+    </author>
+    <author>
+      <name>Kelsey Josund</name>
+    </author>
+    <author>
+      <name>Kelsey Judd</name>
+    </author>
+    <author>
+      <name>Pavol Juhas</name>
+    </author>
+    <author>
+      <name>Andreas Kabel</name>
+    </author>
+    <author>
+      <name>Hui Kang</name>
+    </author>
+    <author>
+      <name>Kiseo Kang</name>
+    </author>
+    <author>
+      <name>Bharath Kannan</name>
+    </author>
+    <author>
+      <name>Amir H. Karamlou</name>
+    </author>
+    <author>
+      <name>Ryan Kaufman</name>
+    </author>
+    <author>
+      <name>Kostyantyn Kechedzhi</name>
+    </author>
+    <author>
+      <name>Tanuj Khattar</name>
+    </author>
+    <author>
+      <name>Mostafa Khezri</name>
+    </author>
+    <author>
+      <name>Seon Kim</name>
+    </author>
+    <author>
+      <name>Paul V. Klimov</name>
+    </author>
+    <author>
+      <name>Can M. Knaut</name>
+    </author>
+    <author>
+      <name>Tom Ko</name>
+    </author>
+    <author>
+      <name>Bryce Kobrin</name>
+    </author>
+    <author>
+      <name>Fedor Kostritsa</name>
+    </author>
+    <author>
+      <name>John Mark Kreikebaum</name>
+    </author>
+    <author>
+      <name>Ryuho Kudo</name>
+    </author>
+    <author>
+      <name>Ben Kueffler</name>
+    </author>
+    <author>
+      <name>Vitali Kutsko</name>
+    </author>
+    <author>
+      <name>Dylan Lane</name>
+    </author>
+    <author>
+      <name>Tiano Lange-Dei</name>
+    </author>
+    <author>
+      <name>Brandon W. Langley</name>
+    </author>
+    <author>
+      <name>Pavel Laptev</name>
+    </author>
+    <author>
+      <name>Kim-Ming Lau</name>
+    </author>
+    <author>
+      <name>Emma Leavell</name>
+    </author>
+    <author>
+      <name>Justin Ledford</name>
+    </author>
+    <author>
+      <name>Joy Lee</name>
+    </author>
+    <author>
+      <name>Kenny Lee</name>
+    </author>
+    <author>
+      <name>Nathalie de Leon</name>
+    </author>
+    <author>
+      <name>Brian J. Lester</name>
+    </author>
+    <author>
+      <name>Wendy Leung</name>
+    </author>
+    <author>
+      <name>Lily Li</name>
+    </author>
+    <author>
+      <name>Ming Li</name>
+    </author>
+    <author>
+      <name>Wing Yan Li</name>
+    </author>
+    <author>
+      <name>Alexander T. Lill</name>
+    </author>
+    <author>
+      <name>Mike Lindmark</name>
+    </author>
+    <author>
+      <name>William P. Livingston</name>
+    </author>
+    <author>
+      <name>Matthew T. Lloyd</name>
+    </author>
+    <author>
+      <name>Jing Lu</name>
+    </author>
+    <author>
+      <name>Erik Lucero</name>
+    </author>
+    <author>
+      <name>Daniel Lundahl</name>
+    </author>
+    <author>
+      <name>Aaron Lunt</name>
+    </author>
+    <author>
+      <name>Donald Macaskill</name>
+    </author>
+    <author>
+      <name>Sid Madhuk</name>
+    </author>
+    <author>
+      <name>Brian Maertz</name>
+    </author>
+    <author>
+      <name>Aniket Maiti</name>
+    </author>
+    <author>
+      <name>Ashley Maloney</name>
+    </author>
+    <author>
+      <name>Salvatore Mandrà</name>
+    </author>
+    <author>
+      <name>Bhavik Markana</name>
+    </author>
+    <author>
+      <name>Orion Martin</name>
+    </author>
+    <author>
+      <name>Eric Mascot</name>
+    </author>
+    <author>
+      <name>Paul Masih Das</name>
+    </author>
+    <author>
+      <name>Anselme Massimino</name>
+    </author>
+    <author>
+      <name>Melvin Mathews</name>
+    </author>
+    <author>
+      <name>Cameron Maxfield</name>
+    </author>
+    <author>
+      <name>Jarrod R. McClean</name>
+    </author>
+    <author>
+      <name>Seneca Meeks</name>
+    </author>
+    <author>
+      <name>Anthony Megrant</name>
+    </author>
+    <author>
+      <name>Tim Menke</name>
+    </author>
+    <author>
+      <name>Zlatko K. Minev</name>
+    </author>
+    <author>
+      <name>Reza Molavi</name>
+    </author>
+    <author>
+      <name>Sebastian Molina</name>
+    </author>
+    <author>
+      <name>Shirin Montazeri</name>
+    </author>
+    <author>
+      <name>William Morong</name>
+    </author>
+    <author>
+      <name>Wojtek Mruczkiewicz</name>
+    </author>
+    <author>
+      <name>Aki Nakamura</name>
+    </author>
+    <author>
+      <name>Konstantin Nesterov</name>
+    </author>
+    <author>
+      <name>Roselle Ngaloy</name>
+    </author>
+    <author>
+      <name>Anthony Nguyen</name>
+    </author>
+    <author>
+      <name>Murray Nguyen</name>
+    </author>
+    <author>
+      <name>Chia-Hung Ni</name>
+    </author>
+    <author>
+      <name>Murphy Yuezhen Niu</name>
+    </author>
+    <author>
+      <name>Sergey Novikov</name>
+    </author>
+    <author>
+      <name>Ricky Oliver</name>
+    </author>
+    <author>
+      <name>William D. Oliver</name>
+    </author>
+    <author>
+      <name>Christopher Olson</name>
+    </author>
+    <author>
+      <name>Raymond Orosco</name>
+    </author>
+    <author>
+      <name>Amr Osman</name>
+    </author>
+    <author>
+      <name>Kristoffer Ottosson</name>
+    </author>
+    <author>
+      <name>Alice Pagano</name>
+    </author>
+    <author>
+      <name>Agustin Di Paolo</name>
+    </author>
+    <author>
+      <name>Seong Hyeon Park</name>
+    </author>
+    <author>
+      <name>Manan Patel</name>
+    </author>
+    <author>
+      <name>Sherman Peek</name>
+    </author>
+    <author>
+      <name>David Peterson</name>
+    </author>
+    <author>
+      <name>Alex Pizzuto</name>
+    </author>
+    <author>
+      <name>Thomas Plumb-Reyes</name>
+    </author>
+    <author>
+      <name>Elias Portoles</name>
+    </author>
+    <author>
+      <name>Rebecca Potter</name>
+    </author>
+    <author>
+      <name>Orion Pritchard</name>
+    </author>
+    <author>
+      <name>Sam Probst</name>
+    </author>
+    <author>
+      <name>Michael Qian</name>
+    </author>
+    <author>
+      <name>Chris Quintana</name>
+    </author>
+    <author>
+      <name>Matthew Rakher</name>
+    </author>
+    <author>
+      <name>Ganesh Ramachandran</name>
+    </author>
+    <author>
+      <name>Arpit Ranadive</name>
+    </author>
+    <author>
+      <name>Armin Razavi</name>
+    </author>
+    <author>
+      <name>Matthew J. Reagor</name>
+    </author>
+    <author>
+      <name>Ants Remm</name>
+    </author>
+    <author>
+      <name>Rachel Resnick</name>
+    </author>
+    <author>
+      <name>Andrew Reynolds</name>
+    </author>
+    <author>
+      <name>David M. Rhodes</name>
+    </author>
+    <author>
+      <name>Daniel Riley</name>
+    </author>
+    <author>
+      <name>Roberto Rodriguez</name>
+    </author>
+    <author>
+      <name>Emma Ropes</name>
+    </author>
+    <author>
+      <name>Lucia B. De Rose</name>
+    </author>
+    <author>
+      <name>Eliott Rosenberg</name>
+    </author>
+    <author>
+      <name>Dario Rosenstock</name>
+    </author>
+    <author>
+      <name>Elizabeth Rossi</name>
+    </author>
+    <author>
+      <name>Pedram Roushan</name>
+    </author>
+    <author>
+      <name>David A. Rower</name>
+    </author>
+    <author>
+      <name>Robert Salazar</name>
+    </author>
+    <author>
+      <name>Kannan Sankaragomathi</name>
+    </author>
+    <author>
+      <name>Murat Can Sarihan</name>
+    </author>
+    <author>
+      <name>Max Schaefer</name>
+    </author>
+    <author>
+      <name>Sebastian Schroeder</name>
+    </author>
+    <author>
+      <name>Henry F. Schurkus</name>
+    </author>
+    <author>
+      <name>Aria Shahingohar</name>
+    </author>
+    <author>
+      <name>Michael J. Shearn</name>
+    </author>
+    <author>
+      <name>Aaron Shorter</name>
+    </author>
+    <author>
+      <name>Vladimir Shvarts</name>
+    </author>
+    <author>
+      <name>Mauricio Sifontes</name>
+    </author>
+    <author>
+      <name>Spencer Small</name>
+    </author>
+    <author>
+      <name>W. Clarke Smith</name>
+    </author>
+    <author>
+      <name>David A. Sobel</name>
+    </author>
+    <author>
+      <name>Barrett Spells</name>
+    </author>
+    <author>
+      <name>Sofia Springer</name>
+    </author>
+    <author>
+      <name>Praveen Sriram</name>
+    </author>
+    <author>
+      <name>George Sterling</name>
+    </author>
+    <author>
+      <name>Scott Stonemeyer</name>
+    </author>
+    <author>
+      <name>John Su</name>
+    </author>
+    <author>
+      <name>Jordan Suchard</name>
+    </author>
+    <author>
+      <name>Philippe Suchsland</name>
+    </author>
+    <author>
+      <name>Youngkyu Sung</name>
+    </author>
+    <author>
+      <name>Aaron Szasz</name>
+    </author>
+    <author>
+      <name>Alexander Sztein</name>
+    </author>
+    <author>
+      <name>Tomoyuki Tanaka</name>
+    </author>
+    <author>
+      <name>Madeline Taylor</name>
+    </author>
+    <author>
+      <name>Jothi Priyanka Thiruraman</name>
+    </author>
+    <author>
+      <name>Douglas Thor</name>
+    </author>
+    <author>
+      <name>Brandur Thorgrimsson</name>
+    </author>
+    <author>
+      <name>Dogan Timucin</name>
+    </author>
+    <author>
+      <name>Eifu Tomita</name>
+    </author>
+    <author>
+      <name>Alfredo Torres</name>
+    </author>
+    <author>
+      <name>M. Mert Torunbalci</name>
+    </author>
+    <author>
+      <name>Edoardo Trabaldo</name>
+    </author>
+    <author>
+      <name>Hao Tran</name>
+    </author>
+    <author>
+      <name>Takahiro Tsunoda</name>
+    </author>
+    <author>
+      <name>Justin Vargas</name>
+    </author>
+    <author>
+      <name>Gopinath Vasalamarri</name>
+    </author>
+    <author>
+      <name>Sergey Vdovichev</name>
+    </author>
+    <author>
+      <name>Guifre Vidal</name>
+    </author>
+    <author>
+      <name>Benjamin Villalonga</name>
+    </author>
+    <author>
+      <name>Jeremy Volkman</name>
+    </author>
+    <author>
+      <name>Meghan Voorhees</name>
+    </author>
+    <author>
+      <name>Steven Waltman</name>
+    </author>
+    <author>
+      <name>Jonathan Waltz</name>
+    </author>
+    <author>
+      <name>Danni Wang</name>
+    </author>
+    <author>
+      <name>Shannon X. Wang</name>
+    </author>
+    <author>
+      <name>Brayden Ware</name>
+    </author>
+    <author>
+      <name>James D. Watson</name>
+    </author>
+    <author>
+      <name>Yonghua Wei</name>
+    </author>
+    <author>
+      <name>Travis Weidel</name>
+    </author>
+    <author>
+      <name>Tom Westerhout</name>
+    </author>
+    <author>
+      <name>Theodore White</name>
+    </author>
+    <author>
+      <name>Dominik Wild</name>
+    </author>
+    <author>
+      <name>Kristi Wong</name>
+    </author>
+    <author>
+      <name>Bryan W. K. Woo</name>
+    </author>
+    <author>
+      <name>Christopher J. Wood</name>
+    </author>
+    <author>
+      <name>Maddy Woodson</name>
+    </author>
+    <author>
+      <name>Cheng Xing</name>
+    </author>
+    <author>
+      <name>Z. Jamie Yao</name>
+    </author>
+    <author>
+      <name>Ping Yeh</name>
+    </author>
+    <author>
+      <name>Bicheng Ying</name>
+    </author>
+    <author>
+      <name>Juhwan Yoo</name>
+    </author>
+    <author>
+      <name>Noureldin Yosri</name>
+    </author>
+    <author>
+      <name>Elliot Young</name>
+    </author>
+    <author>
+      <name>Grayson Young</name>
+    </author>
+    <author>
+      <name>Adam Zalcman</name>
+    </author>
+    <author>
+      <name>Ran Zhang</name>
+    </author>
+    <author>
+      <name>Yaxing Zhang</name>
+    </author>
+    <author>
+      <name>Yiqing Zhou</name>
+    </author>
+    <author>
+      <name>Ningfeng Zhu</name>
+    </author>
+    <author>
+      <name>Nicholas Zobrist</name>
+    </author>
+    <author>
+      <name>Zhenjie Zou</name>
+    </author>
+    <author>
+      <name>Alexander N. Korotkov</name>
+    </author>
+    <author>
+      <name>Sergio Boixo</name>
+    </author>
+    <author>
+      <name>Hartmut Neven</name>
+    </author>
+    <author>
+      <name>Kevin C. Miao</name>
+    </author>
+    <author>
+      <name>Alex Opremcak</name>
+    </author>
+    <author>
+      <name>Zijun Chen</name>
+    </author>
+    <author>
+      <name>Cody Jones</name>
+    </author>
+    <author>
+      <name>Julian Kelly</name>
+    </author>
+    <author>
+      <name>Dvir Kafri</name>
+    </author>
+    <author>
+      <name>Charles Neill</name>
+    </author>
+    <author>
+      <name>Craig Gidney</name>
+    </author>
+    <author>
+      <name>Yu Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21574v1</id>
+    <title>Counterexamples to Grad's conjecture of any knot type</title>
+    <updated>2026-11-16T18:44:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.21574v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21574v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We construct smooth magnetohydrostatic counterexamples to Grad's conjecture in toroidal domains of arbitrary knot type. The magnetic field is nonvanishing, and nested pressure tori fill the domain outside a nondegenerate magnetic axis. The equilibria have trivial Euclidean symmetry group and occur in smooth families of inequivalent configurations. On each regular pressure torus the magnetic flow is smoothly conjugate to a linear flow with any prescribed positive constant slope. A variation of this argument gives equilibria of arbitrary knot type with twist (that is, nonconstant rotational transform) and any finite regularity. A key ingredient of the proof is a deformation method that creates knot topology from axial symmetry by separating the sheets of a covering immersion into a braid, which may be useful in other deformation problems.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:44:39Z</published>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Alberto Enciso</name>
+    </author>
+    <author>
+      <name>Javier Peñafiel-Tomás</name>
+    </author>
+    <author>
+      <name>Daniel Peralta-Salas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21572v1</id>
+    <title>Fourier Algebras of HLS Groupoids: Lifts, Amenability, and Spectrum</title>
+    <updated>2026-11-16T18:43:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.21572v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21572v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the Fourier algebra of a certain class of groupoids, called the HLS groupoids, within Paterson's continuous framework for locally compact groupoids. We develop the basic harmonic analysis of HLS groupoids by obtaining concrete descriptions of their topology, representations, and Fourier algebra. We then study the restriction maps from the Fourier algebra $A(\mathcal{G})$ of an HLS groupoid $\mathcal{G}$ to the Fourier algebras of its isotropy subgroups, and construct explicit norm-preserving lifts for these restriction maps. As applications, we describe the norm of every element of $A(\mathcal{G})$ in terms of the norms of its restrictions to the isotropy subgroups. We prove an analogue of Leptin's theorem characterizing when $A(\mathcal{G})$ has a bounded approximate identity. We also show that the Gelfand spectrum of $A(\mathcal{G})$ is homeomorphic to $\mathcal{G}$. Finally, using abstract arguments that, unlike our methods for HLS groupoids, do not yield explicit constructions, we show that norm-preserving lifts exist and that the Gelfand spectrum of the Fourier algebra is homeomorphic to the groupoid for every étale groupoid. This generalizes Eymard's theorem and answers a question of Paterson for étale groupoids.</summary>
+    <category term="math.FA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:43:47Z</published>
+    <arxiv:primary_category term="math.FA"/>
+    <author>
+      <name>Joseph DeGaetani</name>
+    </author>
+    <author>
+      <name>Mahya Ghandehari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21569v1</id>
+    <title>Heavy-Light Wall Crossings and Motivic Asymptotics of Moduli Spaces of Curves. Part II: Tameness of Motivic Measures</title>
+    <updated>2026-11-16T18:42:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.21569v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21569v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper is concerned with the study of the fixed-genus asymptotics of motivic measures of moduli spaces of stable pointed curves and their minimal all-light Hassett compactifications as the number of markings tends to infinity. A motivic wall-crossing argument gives a universal change of variables between the two generating series, depending only on the value of the Lefschetz class. For an arbitrary motivic measure, we use stabilization graphs and support patterns to express the all-light series in terms of universal chain factors and finite residual quotient families. This formal decomposition isolates the rational trivalent contribution without requiring a fixed-locus formula for finite quotients.
+  To pass from formal identities to asymptotics, we formulate analytic hypotheses (the $\mathrm{H}_g$-hypotheses) for scalar realizations with positive real Lefschetz value. We introduce vertex tameness and residual-quotient tameness, whose conjunction, graph tameness, provides geometric sufficient conditions for the $\mathrm{H}_g$-hypotheses. In genus at least two, this yields explicit leading asymptotics in both chambers, depending only on the genus and the Lefschetz value; genera zero and one are treated separately. As an application, we prove graph tameness for Hodge-Deligne evaluations and deduce fixed-product universality and asymptotic concentration of Hodge numbers on the diagonal.</summary>
+    <category term="math.AG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:42:43Z</published>
+    <arxiv:comment>62 pages; 8 figures</arxiv:comment>
+    <arxiv:primary_category term="math.AG"/>
+    <author>
+      <name>Giordano Cotti</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21551v1</id>
+    <title>Complex Moments of the Derivative of the Riemann Zeta Function</title>
+    <updated>2026-11-16T18:32:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.21551v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21551v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the complex moments of the derivative of the Riemann zeta function through a random Euler product model. For each fixed $σ&gt;1/2$ and every $s\in\mathbb{C}$ with $\operatorname{Re}(s)&gt;0$, we show, under the Lindelöf hypothesis, that the $2s$-th moment of $|ζ'(σ+\mathrm{i}t)|$ over $t\in[1,T]$ converges, as $T\to\infty$, to the corresponding moment of the derivative of the random Euler product. We then establish, unconditionally, an asymptotic formula for the latter moment as $σ\downarrow 1/2$ throughout the half-plane $\operatorname{Re}(s)&gt;0$. For positive real moments, our approach is based on a change-of-measure argument and a Gaussian limit theorem for the logarithmic derivative under a tilted probability measure. For general complex moments, we combine Fourier analysis of weighted complex measures with regularized Riesz distributions. As an application, under the Lindelöf hypothesis, we resolve the conjecture of Simm and Wei [J. Lond. Math. Soc. 113 (2026)] on the complex moments of the derivative of the Riemann zeta function for every $s\in\mathbb C$ with $\operatorname{Re}(s)&gt;0$. We establish the predicted asymptotic formula as $σ\downarrow1/2$, with the leading order $s^2+2s$ and an explicit leading coefficient involving an arithmetic factor and the confluent hypergeometric function of the first kind. The conjecture also holds unconditionally when $\operatorname{Re}(s)\in (0,2)$.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:32:03Z</published>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Joseph Najnudel</name>
+    </author>
+    <author>
+      <name>Fei Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21545v1</id>
+    <title>Right Reason, Wrong Advice: Evaluating Recourse in LLM Explanations of Denied Requests</title>
+    <updated>2026-11-16T18:30:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.21545v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21545v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models increasingly write the explanations people receive when a rule system denies their request. If several rules deny the request independently, an explanation can name a true reason and still leave the person denied after they fix it. We call the missing property recourse validity: changing what the explanation cites, without changing what was asked for, can flip the decision. We compute it exactly, and a hitting-set argument predicts from the policy alone when a correct reason fails. In six of seven rule systems ported from access control and US benefit eligibility, a single correct reason almost never gives recourse when several reasons apply. Across 20 LLMs, checks of whether the cited reasons are correct, computed or asked of an LLM judge, are close to chance at spotting this failure, as the argument predicts. A strong judge asked whether acting on the explanation would work does spot it. Stronger and reasoning models do better but still fail on many denials with four or more independent reasons. Asking for every rule helps every open model with room to improve. Explanations of eligibility decisions should be built from the decision function and judged by whether acting on them works.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:30:11Z</published>
+    <arxiv:comment>21 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21538v1</id>
+    <title>Optimistic Verifiers Get Hacked: Reward Hacking Under an Exact Process Oracle</title>
+    <updated>2026-11-16T18:25:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.21538v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21538v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning from verifiable rewards inherits whatever its verifier gets wrong. Outside mathematics and code the verifier is a proxy, a rubric, a learned judge or a hand-written checker, and its distance from the true objective is never measured, so a rising reward cannot be told apart from a hack. We build a setting where the true reward is exactly computable at the process level: executable authorization policies over 124,416 contexts admit an oracle that lists every minimal sufficient reason for every decision. We compile these policies into exact process rewards, degrade the verifier along seven realistic axes (outcome-only, sufficiency, recall-only, extraction noise, coarse taxonomy, stale policy, LLM judge), and train against each while the exact verifier scores every rollout. Four phenotypes appear. Optimistic verifiers are hacked by padding: the sufficiency proxy ends at 0.940 while true faithfulness falls from 0.731 to 0.667 on 96 held-out episodes. Outcome-only verifiers saturate and stop teaching, noise dilutes, and ranking-preserving gaps do no harm. A model-free audit of the verifier, its selection error and gap sign, together with a short saturation pilot, anticipates which phenotype a run will produce. Across nine configurations spanning two frameworks, two model vendors, two adapter sizes, three precisions, two initialisations and two seeds, the phenotypes recur, sufficiency damage is positive in all 10 replication cells and beyond two standard errors in 7, and optimistic gaps remain the steeper branch. The damage magnitude does not replicate, and five pre-registered attempts to explain it are reported as they fell. We release the testbed, the training instrumentation, and 14 real public policies (Cedar, OPA, Gatekeeper) ported to executable oracles.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:25:42Z</published>
+    <arxiv:comment>30 pages. A shorter version, "The Verifier Gap", appears at the NeurIPS 2026 Workshop on Meta-Agents (non-archival)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+    <author>
+      <name>Manoranjan Gandhudi</name>
+    </author>
+    <author>
+      <name>Gangadharan G. R.</name>
+    </author>
+    <author>
+      <name>Arun Prakash</name>
+    </author>
+    <author>
+      <name>S. Senthilkumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21500v1</id>
+    <title>Exponential Quantum Memory Advantage for Late-Graph Smoothness and Spectral Estimation</title>
+    <updated>2026-11-16T18:00:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.21500v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21500v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Graph signal processing tests how smoothly the decisions of next-generation massive sensor networks with $N$ nodes vary over their neighbour graph. Memory becomes the bottleneck when the neighbour graph arrives only after data erasure, a late-graph setting motivated by dispersed sensor networks and telemetry. We analyse three collection scenarios, reliable rounds, continuous broadcast and ordered capture, and test the Dirichlet energy $\mathcal E_G=\mathbf z^{\mathsf T}\mathbf L\mathbf z/N$ of the fused decision map $\mathbf z\in\{\pm1\}^N$, with late-graph Laplacian $\mathbf L$, against two thresholds. Hidden Matching uses $O(\log N)$ qubits on fused bits, but in reliable rounds and continuous broadcast, where nodes report $b$ sub-bits separately, a classical record buffer before it uses $O(N b)$ bits; classical methods need $Ω(\sqrt N)$ bits in the worst case. The recently introduced Quantum Oracle Sketching builds quantum oracles from random data streams without storing them. We combine coherent loading of separately reported sub-bits, exact in reliable rounds and by Quantum Oracle Sketching in continuous broadcast, with nonlinear fusion and Hidden Matching readout. The register count $R$ does not grow with $N$, and the memory is $O(\log N)$ logical qubits and classical bits, at fixed $b$, graph bounds, thresholds and error targets: an exponential memory advantage over every classical receiver and over Hidden Matching with that buffer. We prove unbiasedness in reliable rounds, preparation bounds in continuous broadcast, classical lower bounds and, for a planner-supplied multi-hop coefficient stream, spectral error bounds. Broadcast simulations match analytic averages at $N=1024$, without resolved bias growth up to $N=2^{20}$. Fault-tolerant hardware, gate rates and, in continuous broadcast, report counts remain open.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:00:35Z</published>
+    <arxiv:comment>19 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Burhan Gülbahar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21462v1</id>
+    <title>Multi-bubble blowup for the energy supercritical Schrödinger equation</title>
+    <updated>2026-11-16T17:44:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.21462v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21462v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This article establishes the existence of finite time multi-bubble Type II blowup solutions for the focusing energy supercritical nonlinear Schrödinger equation. Given integers $K\geq 2$ and $L\geq 2$, a positive integer exponent $p$, and a dimension $d&gt;d_\ast(p,K,L)$, we construct solutions concentrating at any prescribed $K$ distinct points $\{x_j\}_{j=1}^K\subset\mathbb R^d$, with the asymptotic form \begin{equation*} ψ(t,x)=λ^{\frac1p}(t)\sum_{j=1}^K Q\big(λ(t)(x-x_j)\big)+ζ^\ast(x)+o_{\dot H^σ}(1),\qquad t\to0, \end{equation*} where $λ(t)=t^{-\frac12-ν}$, $ν=-\frac12-\frac{L}{λ_+}$, $s_c=\frac d2-\frac1p$, and $s_c&lt;σ&lt;s_c+\frac{4ν}{1+2ν}$. Here $Q$ is the positive radial stationary profile, $λ_+$ is the slow characteristic exponent in its asymptotic expansion at infinity and $ζ^\ast$ is the limiting radiation determined by the outer profile. The proof combines a matched asymptotic construction of a finite order approximate solution with high order energy estimates and a compactness argument. The key ingredients are the elimination of the self-similar oscillatory branch through a quantized choice of blowup rate and the quantitative control of the combined algebraic tails of the translated ground state potentials.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:44:13Z</published>
+    <arxiv:comment>59 pages</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Xuanying Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21452v1</id>
+    <title>A Taxonomy and Taxonomy-Guided Benchmark Reduction for Spreadsheet Tasks</title>
+    <updated>2026-11-16T17:38:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.21452v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21452v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spreadsheets let millions of end users without programming training do computational work, and teams are increasingly building AI agents to help them. Evaluating each candidate agent configuration across many tasks is costly. Benchmark reduction can lower this cost by selecting a small subset of tasks whose outcomes predict full-benchmark scores, but selecting tasks only for predictive accuracy can leave whole categories of spreadsheet work untested. We contribute a taxonomy of spreadsheet tasks, grounded in a review of benchmarks and refined with the Excel Agent product team at Microsoft, and a benchmark-reduction method that favors taxonomic diversity among similarly predictive choices. On benchmark logs from Microsoft, taxonomy-guided selection broadens coverage at little or no cost in predictive accuracy and often improves prediction on configurations excluded from selection. Broader coverage can therefore support, rather than compromise, predictive accuracy. Generalization remains limited across time: subsets selected using little recent history predict poorly for configurations much later in time. Beyond benchmark reduction, the taxonomy provides a reusable framework for auditing gaps in task coverage, as teams at Microsoft have done.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:38:37Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Bogdan Vasilescu</name>
+    </author>
+    <author>
+      <name>Emerson Murphy-Hill</name>
+    </author>
+    <author>
+      <name>Anikesh Parashar</name>
+    </author>
+    <author>
+      <name>Aayush Kumar</name>
+    </author>
+    <author>
+      <name>Gustavo Soares</name>
+    </author>
+    <author>
+      <name>Mar Ginés Marín</name>
+    </author>
+    <author>
+      <name>Sumit Gulwani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21428v1</id>
+    <title>Conditioned Reactive-Power Tuning Manifolds in Constrained Inverse Source Problems</title>
+    <updated>2026-11-16T17:20:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.21428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study a constrained inverse source problem for time-harmonic Maxwell fields in a homogeneous isotropic spherical region loaded by a (possibly active) metamaterial with parameter vector $θ\coloneqq (\varepsilon,μ)$. For a prescribed exterior field (represented by finitely many vector-spherical-wave coefficients), we consider the unique minimum-energy source that realizes the constraint and analyze its complex power $P(θ)$. Our focus is the \emph{tuning manifold} $\mathcal{M}=\{θ:\Im P(θ)=0\}$, i.e., the set of material parameters for which the minimum-energy source is \emph{self-tuned} in the sense of vanishing reactive power. We prove (i) differentiability of the optimal-source map and of $P(θ)$ away from a closed singular set, (ii) generic local manifold structure of $\mathcal{M}$ via an implicit-function argument, and (iii) quantitative conditioning/robustness bounds that relate parameter drift in $θ$ to reactive-power error and distance to $\mathcal{M}$. In the electrically small regime $k_0a\ll 1$, we derive a controlled low-order asymptotic reduction of $\Im P(θ)$ in terms of static electric and magnetic dipole profiles, with uniform remainder estimates on compact regular parameter sets. This yields local approximations of tuning curves and their conditioning without requiring a closed-form scalar profile. Numerical continuation experiments validate the one-parameter dipole reduction, the mixed-dipole tuning curves, and the identification of robust versus fragile segments of $\mathcal{M}$</summary>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:20:14Z</published>
+    <arxiv:comment>32 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="math-ph"/>
+    <author>
+      <name>Mohamed R. Khodja</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21424v1</id>
+    <title>Instant Folded Strings: Fractal Decay and ANEC Saturation</title>
+    <updated>2026-11-16T17:13:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.21424v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21424v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Instant Folded Strings (IFSs) present a puzzle. On the one hand, they appear to be an intrinsic part of string theory: they are fundamental closed strings nucleated classically in backgrounds in which the string coupling grows toward the future, and they have been argued to play an important role in black-hole interiors and cosmology. On the other hand, their energy-momentum tensor violates the Averaged Null Energy Condition (ANEC), placing IFSs in tension with standard causality and unitarity arguments. We show that finite string coupling resolves this tension by triggering a decay cascade that saturates the ANEC in Minkowski spacetime. The remnant of the original IFS persists indefinitely, continuously seeding a self-similar fragmentation cascade that produces infinitely many strings over its full history. In the semiclassical regime, the cascade is governed by a single Malthusian exponent, $κ_{\mathrm{IFS}}=2\sqrt{2}-2$, which controls the branching growth, pressure decay, cutoff-ANEC convergence, and anomalous non-integer dependence on the string coupling. The complete state has vanishing total energy and momentum while remaining highly excited and carrying negative integrated pressure on every finite time slice. This provides a concrete example of genuinely stringy low-energy dynamics in which microscopic null-energy consistency coexists with macroscopic negative pressure.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:13:21Z</published>
+    <arxiv:comment>120 pages, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Nissan Itzhaki</name>
+    </author>
+    <author>
+      <name>Uri Peleg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21423v1</id>
+    <title>Emergent Steering Beyond Endpoint Alignment in Chemical Reaction Models</title>
+    <updated>2026-11-16T17:13:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.21423v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21423v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning models for chemical reaction prediction are usually evaluated by endpoint accuracy, but endpoint correctness alone does not reveal how a model represents chemical transformation or why it fails. We introduce UniRxnAxis, a unified forward-retrosynthesis framework that models both tasks as direction-conditioned endpoint redistribution in a shared latent space. By aligning source states, transformed states, and encoded target endpoints, UniRxnAxis enables directional auditing of learned latent updates. This shared latent geometry allows the learned displacement (from the encoder source state $S_0$ to the decoder-facing transformed state $S_1$) to be decomposed into an endpoint-parallel component and an endpoint-orthogonal residual, which we call emergent steering. Our evaluation shows that emergent steering is functionally important: in retrosynthesis, it recovers most of the model's utility, remains effective under random, shuffled, and prototype controls, and directly affects which bond edits are promoted or suppressed. The residual-over-parallel ordering persists across alignment strengths, after decoder-interface calibration, against angle-matched random axes, and in a second graph-edit architecture, although its magnitude depends on the reference axis and optimization. The decomposition also supports a proxy taxonomy of model-side failures, showing how reaction models can be audited beyond endpoint accuracy.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:13:17Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yili Shen</name>
+    </author>
+    <author>
+      <name>Kehan Guo</name>
+    </author>
+    <author>
+      <name>Haomin Zhuang</name>
+    </author>
+    <author>
+      <name>Xiangliang Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21416v1</id>
+    <title>Polynomial bounds for quasiplanar graphs</title>
+    <updated>2026-11-16T17:05:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.21416v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21416v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A graph $G$ is $k$-quasiplanar if it can be drawn in the plane without $k$ pairwise crossing edges. It was a longstanding conjecture that $n$-vertex $k$-quasiplanar graphs have $O_k(n)$ edges. This was recently resolved by Sadhu and, independently, by Pach, Tardos, and Zeng, based on a theorem in topology proven by Beeker and Lazarovich. These papers showed that $k$-quasiplanar graphs have at most $k^{O(k)}n$ edges.
+  In this note, we greatly improve the dependence on $k$ and show that every $k$-quasiplanar $n$-vertex graph has at most $O(k^2n)$ edges. The proof is based on a geometric charging scheme and Erdős-Szekeres type combinatorial arguments.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T17:05:20Z</published>
+    <arxiv:comment>11 pages</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Aleksa Milojević</name>
+    </author>
+    <author>
+      <name>Patryk Morawski</name>
+    </author>
+    <author>
+      <name>Benny Sudakov</name>
+    </author>
+    <author>
+      <name>Istvan Tomon</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21389v1</id>
+    <title>Vanishing Relative Distance of Uniformly Random CSS LDPC Codes Built from Permutation Matrices</title>
+    <updated>2026-11-16T16:48:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.21389v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21389v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Classical random regular low-density parity-check codes can have minimum distance growing linearly with block length. We study CSS check matrices formed as full $J\times L$ arrays of arbitrary $P\times P$ permutation matrices, sampled uniformly subject to commutation. For fixed column weight $J\ge3$ and fixed even row weight $L&gt;2J$, we prove that the relative minimum distance converges to zero in probability as $P\to\infty$, with block length $n=LP$. We analyze the weight enumerators that count all nontrivial logical representatives after excluding stabilizers. A coefficientwise lower bound shows that, at every fixed relative weight $0&lt;α&lt;1$ along even-weight sequences, exponentially many such representatives exist with high probability. Their typical and mean counts have exponent lower bound $h_2(α)/2$, where $h_2$ is the binary entropy function. We compare this bound with the classical LDPC and dense CSS mean weight-distribution exponents. The existence, with high probability, of a logical operator below every fixed target weight $δn$ yields the distance conclusion.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T16:48:21Z</published>
+    <arxiv:comment>17 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Kenta Kasai</name>
+    </author>
+  </entry>
+</feed>

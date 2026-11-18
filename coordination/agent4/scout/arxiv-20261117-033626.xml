@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/m0fZUbaGWQzXDbmc8vCFkMf0sc8</id>
+  <title>arXiv Query: search_query=all:lump OR all:of OR all:labor OR all:fallacy OR all:paradox OR all:of OR all:thrift OR all:economic OR all:reasoning OR all:cognitive OR all:bias OR all:benchmark&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T03:36:34Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:lump+OR+(all:of+OR+(all:labor+OR+(all:fallacy+OR+(all:paradox+OR+(all:of+OR+(all:thrift+OR+(all:economic+OR+(all:reasoning+OR+(all:cognitive+OR+(all:bias+OR+all:benchmark))))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>354150</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19725v1</id>
+    <title>The Cost of Quantum State Conversion</title>
+    <updated>2026-11-15T02:13:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.19725v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19725v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Which losses in quantum-state preparation can better control remove, and which are imposed by the available resources? We determine the least entropy production for converting known full-rank states using fresh thermal auxiliaries of fixed size and bounded energy range, with arbitrary driven joint control. For every reachable target, the asymptotic infimum is the decrease of a computable function of the state's spectrum. Explicit finite protocols approach this limit, including at saturated resource constraints. The result therefore supplies an attainable benchmark for state preparation, rather than only a lower bound. Reusable memory changes both reachability and the cost without enlarging any fresh auxiliary. A uniform memory gives an exact rescaling of the resource parameter; all memory states preparable from it under the same constraint have the same reachable targets and asymptotic costs. Externally supplied biased memories can do better, revealing a preparation resource distinct from dimension. With sufficient fixed memory, protocols reach exact product endpoints while dissipation decreases inversely with operation count. These results connect algorithmic cooling, quantum resource theories, and constructive control by separating unavoidable loss from the overhead of a chosen implementation.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T02:13:28Z</published>
+    <arxiv:comment>13 pages, 3 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Ansh Mishra</name>
+    </author>
+    <author>
+      <name>Aryan Senthilkumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19720v1</id>
+    <title>Sim-to-Real Room-Mediated Object-Goal Navigation with ROS 2 and Nav2</title>
+    <updated>2026-11-15T02:07:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.19720v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19720v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Although object-goal navigation (ObjectNav) approaches are usually evaluated in simulation, which offers scale and repeatable environments, real-world deployments are rarely examined beyond feasibility demonstrations. This paper presents the deployment of Room-Mediated Co-occurrence, an ObjectNav policy that reasons over Room Probability Vectors (RPVs), on two robotic platforms (Boston Dynamics Spot and Clearpath Robotics TurtleBot 4) through a robot-agnostic ROS 2 bridge. We study how these semantic priors generalise to physical environments and describe the adaptations required to transfer RPV from simulation to hardware, covering sensing, localisation, and the action interface. Across 66 trials on Spot, searching for 11 object categories from two starting positions in a university postgraduate research facility, RPV achieves a raw Success Rate (SR) of 0.455. Our analysis identifies undetected glass walls, entry into off-limits areas, limited usable depth range, target size, and mismatch between the room lexicon and physical layout as plausible contributors to the 8.4 percentage-point gap between the real-world SR and the reported simulated SR of 0.539. Code is available at https://github.com/Matthew-K-Chua/rpv-ros2-bridge.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T02:07:36Z</published>
+    <arxiv:comment>9 pages. Accepted to ACRA (Australasian Conference on Robotics and Automation) 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Matthew Chua</name>
+    </author>
+    <author>
+      <name>Adam Scicluna</name>
+    </author>
+    <author>
+      <name>Gavin Paul</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19719v1</id>
+    <title>Found, but Not Fixed : From Software Vulnerability Discovery to Fixes with Iterative LLM Pipelines</title>
+    <updated>2026-11-15T02:02:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.19719v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19719v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Software vulnerabilities persist as a critical threat despite the deployment of sophisticated detection tools and AI assistants. While detection has advanced, the subsequent code repair phase remains a primary bottleneck; manual intervention is inherently slow, costly, and prone to introducing secondary regressions and issues. In this paper, we investigate whether an iterative, LLM-based pipeline can provide a robust solution for the automated repair of vulnerable functions in real-world code. We propose a generalized framework that leverages the reasoning capabilities of Large Language Models (LLMs) through a multi-stage feedback loop. We benchmark this approach against state-of-the-art models, including GPT-4o, GPT-5.1, and Gemini 3 Flash, demonstrating that such a pipeline can achieve high-quality code repair. To support the broader security community, we provide our evaluation framework, fine-tuned weights, and comprehensive experimental dataset on our website: https://sites.google.com/view/llm4cve</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T02:02:33Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Youssef Gamal</name>
+    </author>
+    <author>
+      <name>Mohamad Fakih</name>
+    </author>
+    <author>
+      <name>Halima Bouzidi</name>
+    </author>
+    <author>
+      <name>Rahul Dharmaji</name>
+    </author>
+    <author>
+      <name>Gustavo Quiros Araya</name>
+    </author>
+    <author>
+      <name>Oluwatosin Ogundare</name>
+    </author>
+    <author>
+      <name>Mst Ayesha Siddika</name>
+    </author>
+    <author>
+      <name>Mohammad Abdullah Al Faruque</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19710v1</id>
+    <title>Joint Learning of Factual and Counterfactual Worlds for Causal Prior-data Fitted Networks</title>
+    <updated>2026-11-15T01:41:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.19710v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19710v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Estimating treatment effects is central to science across many disciplines and requires counterfactual reasoning about alternative worlds. In the real world, however, each unit reveals its outcome only under the factual world. Thus, the factual and counterfactual outcomes can never be jointly learned by any model trained on real data. The problem is therefore tractable only in synthetic settings, where both worlds can be generated. Recent progress on prior-data fitted networks (PFNs) has shown that models pre-trained purely on synthetic data can transfer to real-world prediction. This paradigm has since carried over to causal effect estimation. Despite this fully synthetic setup, existing causal PFNs carry the real-world constraint into their training objective, confining learning to a single world's outcome per unit. The dependence between the two worlds is thereby lost, and the density of the treatment effect relies by default on independence, which is implausible in practice. We therefore propose joint learning, a training setup in which a causal PFN learns the joint distribution of the factual and counterfactual outcomes of each unit. From the joint distribution, we obtain both the response and the individual treatment effect densities, and at inference, we apply optimal transport across units to obtain an approximation of the average treatment effect density. Ours is therefore the first causal PFN approach to provide all three densities together while accounting for the cross-world dependence. We apply joint learning and optimal transport to existing causal PFNs and evaluate it across semi-synthetic, synthetic, and real benchmarks spanning diverse causal scenarios. The jointly trained models significantly improve upon their baselines in point estimation and uncertainty quantification in most settings, indicating that joint learning is a preferable training setup for causal PFNs.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T01:41:28Z</published>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Furkan Danisman</name>
+    </author>
+    <author>
+      <name>Luke Zhang</name>
+    </author>
+    <author>
+      <name>Zhijing Jin</name>
+    </author>
+    <author>
+      <name>Dehan Kong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19706v1</id>
+    <title>MOUSSE: Multilingual Overlapped Speech Separation with Predictive Uncertainty Estimation</title>
+    <updated>2026-11-15T01:25:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.19706v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19706v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent generative speech separation methods have shown promising performance, yet mixtures of overlapping speech in different languages remain underexplored. To this end, we first curate MuSSeD, an English-Korean benchmark comprising two- to four- speaker mixtures across varying overlap ratios. We further propose MOUSSE, a flow matching framework that incorporates boundary-aware training and frame-wise predictive uncertainty through a permutation-invariant Gaussian negative log-likelihood. The predicted scale is further used to adapt classifier-free guidance during sampling. MOUSSE achieves 13.18 dB SI-SDRi and 0.175 ESTOIi, outperforming discriminative and flow matching-based separation baselines, with a 1.58 dB SI-SDRi improvement over the strongest model.</summary>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T01:25:10Z</published>
+    <arxiv:comment>Submitted to ICASSP 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.SD"/>
+    <author>
+      <name>Su Yeon Shim</name>
+    </author>
+    <author>
+      <name>Yejin Jeon</name>
+    </author>
+    <author>
+      <name>David Ifeoluwa Adelani</name>
+    </author>
+    <author>
+      <name>Young-Joo Suh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19701v1</id>
+    <title>Multiaccuracy as an Error Benchmark for Learning with Distribution Shift</title>
+    <updated>2026-11-15T01:12:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.19701v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19701v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agnostic learning has a well-developed theory of computational and statistical complexity. For learning with distribution shift, even the choice of an appropriate error benchmark remains challenging. Testable learning with distribution shift (TDS) was introduced to develop computational foundations for this setting: using labeled training data and unlabeled test data, the learner must either produce a predictor with low test error or detect distribution shift. However, standard agnostic TDS guarantees allow a constant-factor amplification of the optimum error even when the training and test distributions coincide. They therefore do not directly recover the guarantee of classical agnostic learning.
+  We introduce shift multiaccuracy, a stronger error benchmark inspired by multiaccuracy from algorithmic fairness. This yields a TDS formulation that becomes equivalent to multiaccuracy when there is no shift. Using a recent nontrivial reduction from agnostic learning to multiaccurate prediction from prior work, we obtain the first TDS framework that formally generalizes agnostic learning through an efficient reduction preserving the training marginal. The framework retains existing algorithmic upper bounds and inherits computational lower bounds from agnostic learning. Moreover, we establish a direct connection between our model and identity testing, yielding the first statistical characterization of agnostic TDS learning, in terms of Rademacher complexity.
+  More broadly, we argue that shift multiaccuracy might be of independent interest in unsupervised domain adaptation, as it leads to sharper out-of-distribution generalization guarantees, and can be minimized directly, since its definition does not involve the unobserved test labels.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T01:12:18Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Konstantinos Stavropoulos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19695v1</id>
+    <title>Equivalent-circuit analysis of the transverse resonant beam coupling impedance due to ceramic-chamber RF shields in the J-PARC Main Ring spill-feedback quadrupoles</title>
+    <updated>2026-11-15T00:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.19695v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19695v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Ceramic vacuum chambers in fast-ramping or fast-response magnets are equipped with RF shields of conducting strips closed through lumped capacitors, which form a resonant circuit coupled to the transverse dipole moment of the beam. We evaluate the transverse beam coupling impedance due to the RF shields of the ceramic chambers in the spill-feedback quadrupole magnets of the J-PARC Main Ring. The RF shield is modelled by a magneto-quasi-static partial element equivalent circuit, and the laminated yoke of the magnet by a two-dimensional field solution with a complex permeability. The analysis shows a low-$Q$ resonant coupling impedance. The yoke lowers the resonance frequency and raises the shunt impedance per quality factor, and its effect cannot be neglected. The quality factor is determined mainly by the losses in the capacitors and in the laminations. The predicted peak impedance of the three chambers exceeds the resistive-wall impedance of the whole ring. The model can be applied to other machines and to the design of future rapid-cycling synchrotrons.</summary>
+    <category term="physics.acc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-15T00:59:36Z</published>
+    <arxiv:comment>18 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="physics.acc-ph"/>
+    <author>
+      <name>Masahito Tomizawa</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19663v1</id>
+    <title>When AI Agents Should Repair, Replan, or Abandon: A Threshold Theory of Plan Commitment</title>
+    <updated>2026-11-14T23:19:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.19663v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19663v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI agents often discover mid-execution that their plan is broken, for example when an action fails or a tool is withdrawn. Deployed systems use conventions such as retry loops or "always replan," and a recent benchmark finds no fixed strategy dominates. This paper derives the optimal policy. In the model, a disruption destroys the causal support of part of a plan; repair is a partial reset that preserves the plan's structure, replanning is a full reset, and changing a plan is costly because others have conditioned on it. The optimal policy is a threshold in effective disruption depth: repair shallow damage, replan after deep damage, and abandon the goal when even a fresh plan is not worth its cost. Depth depends on plan structure. In expectation, a single broken action forces 1+R(G)/n actions to be revalidated, where R(G) counts the pairs of actions joined by a dependency path; to first order, a fully serial plan switches to replanning at raw damage about w times smaller than a plan of w parallel chains. A closed-form stability-price threshold determines when a worse repaired plan should be kept over a better fresh one. As language-model planners push replanning costs toward zero, the stability price becomes the only force sustaining plan commitment. Under repeated disruptions, revision frictions make commitment hysteresis optimal: the agent keeps executing a plan it would never choose fresh, and each repair adds patch debt until the debt outweighs repair's cost advantage and the agent rebuilds. A value-of-diagnosis result states when measuring damage is worth its compute and shows that "always replan" is optimal when damage is predictably deep and replanning is the better fallback. A separately implemented numerical checker tests each proposition (zero violations; 1.6 million static-model evaluations), and the model's regime map reproduces that benchmark's regime flips qualitatively.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T23:19:31Z</published>
+    <arxiv:comment>22 pages, 6 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Gaurav Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19656v1</id>
+    <title>BadGCL: Towards Persistent Backdoor Attack on Graph Continual Learning Systems</title>
+    <updated>2026-11-14T22:56:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.19656v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19656v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Backdoor attacks pose a persistent security threat to machine learning systems, yet their behavior under graph continual learning (GCL) remains underexplored. Conventional graph backdoor attacks often lose effectiveness as models are updated across successive tasks, creating the impression that continual updates naturally weaken malicious associations. This work reveals a contrasting vulnerability: knowledge-preservation mechanisms in GCL can also preserve early injected backdoors when the poisoned update is compatible with the clean-task signal being retained. For graph data, this risk is amplified by structural triggers, which are embedded into the message-passing paths of graph neural networks (GNNs) and can induce stable representation shifts across tasks. To expose this risk, we propose BadGCL, a model-agnostic framework for persistent backdoor attacks under a strict early-stage intervention setting. BadGCL learns topology-aware structural triggers using a gradient mutual-information objective that couples poisoned gradients with clean-task optimization signals, together with a propagation consistency objective that stabilizes trigger-induced effects through graph message passing. We provide theoretical analysis showing that gradient compatibility and propagation stability jointly support long-term backdoor persistence under benign continual updates. Extensive experiments across task-IL and class-IL protocols, four GCL benchmarks, and diverse victim systems show that BadGCL achieves persistent attack effectiveness with limited clean-utility degradation, substantially outperforming graph and continual-learning backdoor baselines and remaining robust against representative defenses.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T22:56:28Z</published>
+    <arxiv:comment>Accepted in KDD 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Dong Li</name>
+    </author>
+    <author>
+      <name>Yufei Han</name>
+    </author>
+    <author>
+      <name>Xintao Wu</name>
+    </author>
+    <author>
+      <name>Xujiang Zhao</name>
+    </author>
+    <author>
+      <name>Wei Cheng</name>
+    </author>
+    <author>
+      <name>Chen Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19650v1</id>
+    <title>With the Right Representation, Classical Machine Learning Rivals Deep Models for Olfactory Mixture Similarity</title>
+    <updated>2026-11-14T22:42:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.19650v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19650v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Modeling olfactory mixtures remains a critical challenge in machine olfaction because the task requires reasoning over relationships between sets of odorants rather than over individual molecules in isolation. However, prior comparisons between deep and classical approaches also varied how the relationship between the two mixtures was represented, since the classical baselines primarily relied on weak representations that described each mixture independently and provided little direct signal about how the mixtures differed. In this work, we revisit classical learning using explicit symmetric comparison features on unordered pairs of mixtures, evaluating these representations with XGBoost and kernel ridge regression (KRR). We find that XGBoost with explicit comparison features achieves performance competitive with specialized deep mixture models on the main benchmark. Ablation studies show that coordinate-wise absolute differences alone provide strong predictive performance, while combining them with sums and products yields further improvements. KRR also benefits substantially from explicit comparison features, with further gains from appropriate kernel choice and preprocessing. Overall, these results suggest that explicitly encoding how two mixtures differ is an important ingredient for classical machine learning in low-data olfactory mixture prediction.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T22:42:09Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Ze Dong</name>
+    </author>
+    <author>
+      <name>Yi Wang</name>
+    </author>
+    <author>
+      <name>Ambuj Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19649v1</id>
+    <title>LoopFill: Pipelined Multi-Token Speculative Decoding for Looped Transformers</title>
+    <updated>2026-11-14T22:35:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.19649v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19649v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Looped Transformers improve parameter efficiency by repeatedly applying the same Transformer layers. During autoregressive decoding, however, generating each token requires several sequential passes through these layers, leading to high decoding latency. Pipelined self-speculative methods use shallow-loop predictions to process tokens at different loops in the same batch, but each token must reach the drafting depth before the next can enter the pipeline. We introduce LoopFill, a training-free speculative decoding algorithm for looped LLM that combines multi-token suffix drafts with shallow-loop predictions in a single draft tree. Both drafters contribute to one tree, so a suffix lookup can immediately extend a shallow prediction and several future tokens can enter the pipeline together. The shared block computes the highest-scoring draft candidates at different loop depths in one batch, and full-depth verification preserves the model's autoregressive output distribution. Across seven benchmarks, LoopFill's average speedup over greedy autoregressive decoding is $5.85\times$ on Ouro-2.6B and $5.13\times$ on Huginn-3.5B. The speedups exceed those of LoopAhead, the strongest baseline, by \(40\%\) on Ouro-2.6B and \(25\%\) on Huginn-3.5B.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T22:35:41Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Siqi Zhu</name>
+    </author>
+    <author>
+      <name>Suozhi Huang</name>
+    </author>
+    <author>
+      <name>Yi Zhao</name>
+    </author>
+    <author>
+      <name>Jiaxuan You</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19643v1</id>
+    <title>SG-LegalClarify: A Large-Scale Benchmark for Legal Reasoning and Ambiguity Recognition in Singapore Law</title>
+    <updated>2026-11-14T22:16:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.19643v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19643v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Singapore offers a distinctive testbed for legal reasoning by large language models (LLMs). Its legal system combines inherited English common law with jurisdiction-specific statutes, requiring models to distinguish local doctrine from generic common-law intuition. This setting also highlights the challenge of recognizing underspecification in lay legal queries, because the facts material to a legal outcome depend on the governing doctrine. Yet legal benchmarks rarely cover Singapore law or test this form of ambiguity recognition. To address these gaps, we introduce SG-LegalClarify, a large-scale benchmark for open-ended legal reasoning and ambiguity recognition in Singapore law. SG-LegalClarify contains 1,100 lawyer-authored source questions spanning 10 legal domains, including 340 fully specified and 760 underspecified questions. Each underspecified question has a fixed hidden-fact assignment and a fully specified counterpart, yielding 1,860 evaluation instances. Responses are graded with lawyer-authored Issue, Rule, Application, and Conclusion (IRAC) rubrics. We evaluate 19 LLMs, closed-book and with web search, using a multi-turn pipeline in which models decide whether to answer or clarify, and a user simulator reveals hidden facts only when asked. We find the benchmark far from saturated: the best models satisfy only 69.8% of mandatory rubric items closed-book (average 53.8%) and 77.8% with web search (average 63.0%). Models also struggle to recognize when clarification is necessary. We will release the public split of our benchmark, the model outputs on it, and the evaluation pipeline to support future research.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T22:16:38Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Ziwei Gu</name>
+    </author>
+    <author>
+      <name>Michael S. Lee</name>
+    </author>
+    <author>
+      <name>Drew Rein</name>
+    </author>
+    <author>
+      <name>Yash Maurya</name>
+    </author>
+    <author>
+      <name>Vikneswaran Kumaran</name>
+    </author>
+    <author>
+      <name>Darshini Ramiah</name>
+    </author>
+    <author>
+      <name>Chenguang Wang</name>
+    </author>
+    <author>
+      <name>Udari Madhushani Sehwag</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19636v1</id>
+    <title>ROUNDS: Source-Framed Diagnostic Revision after Multi-Turn Clinical Evidence</title>
+    <updated>2026-11-14T21:45:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.19636v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19636v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) achieve high scores on medical benchmarks, but does this performance translate into reliable diagnosis as a conversation unfolds? In diagnostic conversations, users can provide clinical findings across multiple turns, ask for a diagnosis without supplying answer options, and introduce opinions from others. Models must therefore form diagnoses from the available evidence and decide how to respond to subsequent advice. We introduce ROUNDS, a framework that evaluates these abilities after a fixed sequence of clinical evidence delivered over multiple turns. ROUNDS compares diagnosis with and without answer options, presents the same incorrect diagnosis under clinician and lay framing, and varies support for competing diagnoses in written five-clinician panels. Across seven models and 1,035 cases from five datasets, average accuracy was 76.9% with answer options and 57.0% without them. Clinician-framed misleading advice produced lower final accuracy than lay-framed advice in every model, with differences of 4.6 to 38.2 percentage points. Initially correct diagnoses more often became incorrect answers than abstentions, and many adopted the suggested disease. Conversely, accuracy increased as more panel members supported the correct diagnosis, including when the majority opinion remained unchanged. These findings reveal a gap between medical benchmark performance and reliable diagnosis in conversation: models respond to external opinions, but remain vulnerable to abandoning correct diagnoses without new clinical evidence.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T21:45:59Z</published>
+    <arxiv:comment>Accepted at Machine Learning for Health (ML4H) 2026, Proceedings Track; to appear in Proceedings of Machine Learning Research (PMLR). 17 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jinrui Fang</name>
+    </author>
+    <author>
+      <name>Runhan Chen</name>
+    </author>
+    <author>
+      <name>Yining Wu</name>
+    </author>
+    <author>
+      <name>Jiawei Xu</name>
+    </author>
+    <author>
+      <name>Xu Yang</name>
+    </author>
+    <author>
+      <name>Jian Yu</name>
+    </author>
+    <author>
+      <name>Wenqi Shi</name>
+    </author>
+    <author>
+      <name>Ying Ding</name>
+    </author>
+    <author>
+      <name>Yuji Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19625v1</id>
+    <title>Robust Well-Log Reconstruction Across Point Gaps and Whole Wells via Boundary-Gated Soft-Thresholding Kalman Fusion</title>
+    <updated>2026-11-14T21:17:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.19625v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19625v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Missing wireline logs hinder subsurface characterization. Deep reconstruction networks suffer from gap-boundary steps and cross-basin shifts, while interpolation and Gaussian smoothers struggle with long intervals and outliers. We propose boundary-gated soft-thresholding Kalman fusion (ST-KF), unifying multiresolution wavelet shrinkage, distance-gated residual prior learning, and closed-form robust Kalman smoothing with learning--inference decoupling. Across two public benchmarks totaling 263 wells in the Norwegian North Sea and New Zealand's Taranaki Basin, ST-KF ranks first over 0.15--100-m anchored gaps with 0.09% parameter overhead. Against the strongest of nine baselines, pooled RMSE falls by 5.0%--8.3% for bulk density and 6.4%--15.6% for compressional slowness; against the four strongest baselines, reductions are 0.7%--4.1% for neutron porosity and 1.3%--2.9% for photoelectric factor. Ablations and sensitivity analyses confirm operator synergy and stable performance: removing state-space fusion increases short-gap errors by up to 58.8%, while zero-shot transfer cuts anchored errors by 14%--68%. The results show that local borehole continuity transfers across basins whereas cross-property mappings shift with regional geology, supporting measurement-guided log reconstruction.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T21:17:44Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yongan Zhang</name>
+    </author>
+    <author>
+      <name>Zhihan Qiu</name>
+    </author>
+    <author>
+      <name>Yizheng Li</name>
+    </author>
+    <author>
+      <name>Youzhuang Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.19624v1</id>
+    <title>Well-Log Reconstruction with Pre-trained Geological Knowledge: A Knowledge-Conditioned Large-Language-Model Generative Agent</title>
+    <updated>2026-11-14T21:14:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.19624v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.19624v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Missing well-log intervals make subsurface reconstruction ill-posed. Existing numerical regression models lack geological prior knowledge to constrain ambiguous inverse mappings. We propose GeoLog-Agent, a knowledge-conditioned generative agent using pre-trained large language models (LLMs) as a source of geological priors. A universal Geo-Harness translates LLM stratigraphic reasoning into formation-anchored petrophysical trajectories, feature-wise linear modulation, and conditional adversarial constraints. On the Norwegian North Sea benchmark, GeoLog-Agent achieves a mean $R^2$ of 0.9307 and a peak $R^2$ of 0.9713. It exceeds the nine-baseline average $R^2$ of 0.8387 by 0.0920, with a 30.97% average RMSE reduction, and exceeds the strongest baseline by 0.0274--0.0498 in $R^2$, with 16.25%--24.05% lower RMSE. Ablations confirm the effectiveness and synergy of geological prior reasoning, multi-scale dilated generation, and conditional adversarial modules. Transferring the coupling mechanism to six conventional deep learning models improves their $R^2$ by 0.0162--0.0789 with cross-well stability. These results demonstrate how foundation-model domain reasoning can constrain deep generative reconstruction of missing petrophysical measurements.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-14T21:14:27Z</published>
+    <arxiv:comment>35 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yongan Zhang</name>
+    </author>
+    <author>
+      <name>Yitao Yu</name>
+    </author>
+    <author>
+      <name>Yizheng Li</name>
+    </author>
+    <author>
+      <name>An Gong</name>
+    </author>
+    <author>
+      <name>Youzhuang Sun</name>
+    </author>
+  </entry>
+</feed>

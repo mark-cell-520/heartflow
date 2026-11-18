@@ -1,0 +1,585 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/OXJcx8uqW2+EEXUEEW2T4KK6Zes</id>
+  <title>arXiv Query: search_query=all:statistical OR all:reasoning OR all:fallacy OR all:diagnosis OR all:base OR all:rate OR all:sensitivity OR all:specificity&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T22:18:34Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:reasoning+OR+(all:fallacy+OR+(all:diagnosis+OR+(all:base+OR+(all:rate+OR+(all:sensitivity+OR+all:specificity))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1491103</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21610v1</id>
+    <title>Hyperkagome antiferromagnetism in the iron garnet Almandine Fe$_3$Al$_2$Si$_3$O$_{12}$</title>
+    <updated>2026-11-16T18:59:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.21610v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21610v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Antiferromagnets on the hyperkagome lattice provide a three-dimensional route to strong magnetic frustration, but experimentally accessible realizations with well-established microscopic Hamiltonians remain scarce. Garnets are a broad family of materials in which magnetic ions can form two interpenetrating hyperkagome lattices, giving rise to spin glass, spin-liquid and hidden-order physics. Here we identify the iron aluminosilicate garnet almandine, Fe$_3$Al$_2$Si$_3$O$_{12}$, as a spin-$2$ hyperkagome antiferromagnet. Using density functional theory energy mapping, we determine a Heisenberg Hamiltonian for the high-spin Fe$^{2+}$ moments and find dominant nearest-neighbor antiferromagnetic exchange, as well as significant longer-range interactions. Classical Monte Carlo simulations of this Hamiltonian, combined with quantum-to-classical rescaling of the spin length, show a transition to antiferromagnetic order at $T_{\rm N}\approx9.8$K, in excellent agreement with specific heat experiments. The resulting non-collinear magnetic state is naturally described by magnetic toroidal octupolar order, which we connect to known results for the highly frustrated hyperkagome antiferromagnet gadolinium gallium garnet, Gd$_3$Ga$_5$O$_{12}$. We also calculate magnetic neutron diffraction amplitudes as well as static and dynamic structure factors using semiclassical dynamics, providing quantitative predictions for future neutron scattering experiments. Our results establish almandine as a chemically accessible realization of frustrated hyperkagome magnetism in the garnet family.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:56Z</published>
+    <arxiv:comment>14+12 pages, 5+12 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>Minnong Zhang</name>
+    </author>
+    <author>
+      <name>Harald O. Jeschke</name>
+    </author>
+    <author>
+      <name>Daniel Guterding</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21608v1</id>
+    <title>Latent Lattice Language Models</title>
+    <updated>2026-11-16T18:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.21608v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21608v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models typically increase per-token computation through deeper or looped layers and latent reasoning steps, while richer residual connections improve information flow across layers. We instead increase computational capacity: the number of active computational states a model maintains. We introduce the Lattice of Latents, a set of per-layer horizontal latent streams that run recurrently along time, alongside the vertical residual stream that flows through depth. Like hyper-connections, mHC, and attention or value residuals, the Lattice enhances the residual stream, but rather than adding or rerouting residual pathways through depth, it provides companion computational states that persist across tokens. Unlike hybrid Transformer-SSM architectures, whose recurrent states primarily serve as internal memory for sequence mixing, these latents directly condition the vertical stream's attention, KV-cache writes, MLP computation, and decoding. On Transformers trained on 20B FineWeb-Edu tokens, a 406M-parameter Lattice model lowers validation perplexity from 15.41 to 14.40 over a parameter-matched Transformer. These gains extend across architectural variants. The Lattice composes with prior residual-stream enhancements: with hyper-connections and input residuals, it lowers validation perplexity from 15.41 (base Transformer) and 14.22 (Transformer with the same enhancements) to 13.61. On Gated DeltaNet, Mamba-2, Triadic GDN, and GDN-Mamba-2 hybrids, it improves perplexity at every tested native state size, with Lattice-GDN and Lattice-Triadic-GDN variants outperforming pure baselines with 4x larger native states. These results identify persistent per-layer state as a complementary axis for scaling language-model computation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:38Z</published>
+    <arxiv:comment>Project page: https://shivamduggal4.github.io/latent-lattice-language-model/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Shivam Duggal</name>
+    </author>
+    <author>
+      <name>Zongze Wu</name>
+    </author>
+    <author>
+      <name>William T. Freeman</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Richard Zhang</name>
+    </author>
+    <author>
+      <name>Eli Shechtman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21607v1</id>
+    <title>ScaleVLA: Scaling Vision-Language-Action Models to 552 Billion Parameters</title>
+    <updated>2026-11-16T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.21607v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21607v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier Vision-Language Models (VLMs) such as GPT-6 Astra have demonstrated remarkable capabilities in robot control, suggesting that broad pretraining provides knowledge valuable for physical action. Yet most Vision-Language-Action (VLA) policies still rely on much smaller VLM backbones, leaving this potential largely untapped. We ask whether frontier-scale representations can provide a stronger foundation for robot learning. We introduce ScaleVLA, which connects a 552B DeepSeek-V4.1-Flash backbone to a trainable action DiT, and systematically compare VLMs from 2B to 552B under a shared training setup. We evaluate three fundamental capabilities of robot foundation models. In sample efficiency, just 10 demonstrations outperform a 2B backbone trained with 50 (87.8% vs. 85.6%). In generalization, LIBERO-PRO success reaches 45.1%, compared with at most 31.3% for smaller backbones. In precise manipulation, real-world charger insertion improves from 4/10 to 9/10 successes, with gains concentrated in contact-sensitive alignment. Despite its scale, ScaleVLA achieves 216 ms median latency per action chunk. Our findings suggest that frontier VLMs can serve not only as reasoning agents, but also as powerful representational foundations for efficient and generalizable robot policies.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:37Z</published>
+    <arxiv:comment>Tech Report</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Ruixi Yu</name>
+    </author>
+    <author>
+      <name>Dairu Liu</name>
+    </author>
+    <author>
+      <name>Xuchuan Chen</name>
+    </author>
+    <author>
+      <name>Zekun Qi</name>
+    </author>
+    <author>
+      <name>Zekai Li</name>
+    </author>
+    <author>
+      <name>Zhuo Cao</name>
+    </author>
+    <author>
+      <name>Luyang Niu</name>
+    </author>
+    <author>
+      <name>Yingsheng Zhang</name>
+    </author>
+    <author>
+      <name>Sikai Liang</name>
+    </author>
+    <author>
+      <name>Ke Fan</name>
+    </author>
+    <author>
+      <name>He Wang</name>
+    </author>
+    <author>
+      <name>Li Yi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21605v1</id>
+    <title>ViRA: Toward Ultra-High-Resolution Visual Agents via Cross-Input Relative Policy Optimization</title>
+    <updated>2026-11-16T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21605v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21605v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Visual agents answer questions about ultra-high-resolution photos by zooming into the relevant regions. However, existing agents often answer from common sense instead of reading the evidence. Reinforcement learning (RL) on the final answer cannot correct this, because a guess earns the same reward as reading. We propose Cross-Input Relative Policy Optimization (CrossRPO), which trains agents on contrast sets. A contrast set asks one question about several versions of an image that differ only in a small region with the evidence and have different answers, so only reading the evidence solves the whole set. CrossRPO rewards solving the whole set, and we prove that it does not reinforce a set answered from common sense. We build contrast sets for training (ViRA-Train) and evaluation (ViRA-Bench) by editing one small object in images of 21 to 120 megapixels, and we photograph further sets with real changes (ViRA-Bench-Real) to exclude editing traces. We train two Visual Reasoning Agents, ViRA-9B and ViRA-27B, with CrossRPO on only about 3,500 items of ViRA-Train each. CrossRPO achieves 63.3% set accuracy on ViRA-Bench at the maximum resolution, against 59.3% for GRPO. ViRA-9B is the most accurate open model of its size on all benchmarks, and ViRA-27B outperforms Claude Haiku 5.5 and GPT-6-Luna, both at their highest thinking level, on most benchmarks.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:04Z</published>
+    <arxiv:comment>74 pages, 11 figures, 26 tables. Code: https://github.com/huawei-lin/ViRA</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Huawei Lin</name>
+    </author>
+    <author>
+      <name>Jinting Liu</name>
+    </author>
+    <author>
+      <name>Tongyan Wang</name>
+    </author>
+    <author>
+      <name>Xuyang Chen</name>
+    </author>
+    <author>
+      <name>Ruihua Shi</name>
+    </author>
+    <author>
+      <name>Zhichao Xu</name>
+    </author>
+    <author>
+      <name>Jiaxin Qin</name>
+    </author>
+    <author>
+      <name>Guoshenghui Zhao</name>
+    </author>
+    <author>
+      <name>Baijian Yang</name>
+    </author>
+    <author>
+      <name>Yingjie Victor Chen</name>
+    </author>
+    <author>
+      <name>Tan Yu</name>
+    </author>
+    <author>
+      <name>Weijie Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21604v1</id>
+    <title>FaceJev: Direct Visual Decisions for Face Forgery Detection</title>
+    <updated>2026-11-16T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21604v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21604v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Face forgery detection methods often perform well on seen manipulations but generalize poorly to unseen ones. Multimodal Large Language Models (MLLMs) can recognize facial parts and assess their visual plausibility. Existing MLLM-based methods typically express these judgments through textual explanations, but seldom treat individual part decisions as explicit learning targets. We present FaceJev, an MLLM-based method for face forgery detection through direct visual decisions. Following the Jev formulation, FaceJev answers eight independent questions about facial parts using a shared image encoding and reads anomaly probabilities from the native answer logits. A face is classified as forged if any part is predicted to be abnormal, directly linking the detection result to the part decisions. We construct PartForensics, a dataset of approximately 160k images with binary anomaly targets for the eight facial parts, to supervise these decisions. We further propose FS-GRPO, which optimizes each part decision through an exact reward comparison with its alternative, using both detection and part rewards. FaceJev outperforms the strongest baseline by 7.25 percentage points on unseen manipulations. Extensive ablation studies validate our design choices and the effectiveness of the main components.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Siran Peng</name>
+    </author>
+    <author>
+      <name>Tianshuo Zhang</name>
+    </author>
+    <author>
+      <name>Yibo Xue</name>
+    </author>
+    <author>
+      <name>Ajian Liu</name>
+    </author>
+    <author>
+      <name>Haoyuan Zhang</name>
+    </author>
+    <author>
+      <name>Weisong Zhao</name>
+    </author>
+    <author>
+      <name>Shuhuan Chen</name>
+    </author>
+    <author>
+      <name>Xiangyu Zhu</name>
+    </author>
+    <author>
+      <name>Zhen Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21598v1</id>
+    <title>Mitigating Catastrophic Forgetting with Physics-Indexed Specialist Memory: the Evolutionary Neuroplastic Agent</title>
+    <updated>2026-11-16T18:58:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.21598v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21598v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Continual reinforcement learning requires adaptation to changing conditions while preserving performance under previously encountered dynamics. It was investigated whether specialists generated by evolutionary search can provide a reusable memory when combined with environment detection and failure-driven search. The Evolutionary Neuroplastic Agent (ENA) evolves small neural networks without gradients, archives selected policies by detected dynamic regime, and retrieves them through Bayesian policy reuse. The architecture was evaluated in non-stationary CartPole and HalfCheetah environments. In the 30-replicate CartPole ablation, the complete architecture achieved a mean success rate of 83.2% across the five test environments. Among variants that learned the harder CartPole environments, the complete architecture showed the most consistent retention. A selection ablation also showed that the retrieval rule affected performance. In the evaluated sequences, ENA adapted more slowly than PPO on CartPole and achieved lower returns than SAC on HalfCheetah. The evidence concerns the complete architecture and does not isolate gradient-free optimization as the cause of retention or establish superiority over other continual-learning methods.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:20Z</published>
+    <arxiv:comment>25 pages, 7 figures, 23 tables. Code and data: https://github.com/blasvicco/ena/tree/v1</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Blas Eugenio Vicco Zarate</name>
+    </author>
+    <author>
+      <name>Miguel Hernán Vicco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21597v1</id>
+    <title>Optimal Autoregressive Chain-of-Thought Learning via Bagging</title>
+    <updated>2026-11-16T18:58:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.21597v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21597v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study how to learn an autoregressive next-token generator $f\colonΣ^\star\toΣ$ from a class $\mathcal{F}$, given chain-of-thought (CoT) demonstrations of length $T$ generated by $f$. We present a simple algorithm based on bagging, which outputs a majority vote of generators that are trained to be CoT-consistent on bootstrap samples of the training data. For binary token sets, it achieves the optimal sample complexity of $O((d_{\mathrm{VC}}+\log(1/δ))/ε)$, independent of the CoT length $T$, where $d_{\mathrm{VC}}$ is the VC dimension of $\mathcal{F}$. For finite token sets $Σ$, the VC dimension is replaced by a multiclass analogue, the Graph dimension $d_{\mathrm{G}}$, and the sample complexity is optimal up to a $\log|Σ|$ factor. The number of generators in the majority-vote ensemble is $O(\log(T/δ))$, and we show that the ensemble can be distilled into a single generator in $\mathcal{F}$ at the expense of $n\log(nT)$ unlabeled prompts.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:07Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Awni Altabaa</name>
+    </author>
+    <author>
+      <name>John Lafferty</name>
+    </author>
+    <author>
+      <name>Omar Montasser</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21596v1</id>
+    <title>SADL: On the Demand-Supply Geometry of Representation Collapse</title>
+    <updated>2026-11-16T18:58:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.21596v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21596v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In Joint-Embedding Predictive Architectures (JEPAs), a well-constrained projector output does not by itself prevent representation collapse. We find that, from initialization, the encoder representation is dominated by a component shared by different inputs. A batch-normalized projector removes this component, so regularization after the projector cannot correct it, and the differences between representations shrink until they collapse. We propose SADL (Supply And Demand Loss), which keeps the original training objective and constrains the encoder directly when needed. SADL compares the representation differences that the projector output demands with the differences the encoder can retain and pass on to the projector, and adds a constraint on the encoder only when supply falls short of demand. It works with different Demand Regularizers and introduces no auxiliary networks, additional trainable parameters, or architectural changes. In single-task and jointly trained four-task LeWorldModel (LeWM) and INTACT experiments, SADL lowers the collapse rate over ten random seeds from 50% to 0%. After one epoch of training, encoder effective rank is 3.4-6.4 times that of the corresponding baseline without SADL, and latent prediction error falls to 1/20-1/303 of it. Without additional tuning, SADL stays robust as its loss weight spans orders of magnitude, and with several Demand Regularizers INTACT exceeds 95% mean search-free control success. On four image datasets, SADL also consistently improves accuracy and stability across random seeds. These results show that matching the representation differences a regularizer demands with the differences the encoder can supply leads to faster and more stable representation learning in control and image classification.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:03Z</published>
+    <arxiv:comment>49 pages, including references and appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Junhan Sun</name>
+    </author>
+    <author>
+      <name>Yigui Feng</name>
+    </author>
+    <author>
+      <name>Mingzhe Liu</name>
+    </author>
+    <author>
+      <name>Haoyan Xu</name>
+    </author>
+    <author>
+      <name>Lei Ye</name>
+    </author>
+    <author>
+      <name>Ziqi Han</name>
+    </author>
+    <author>
+      <name>Hanru Bai</name>
+    </author>
+    <author>
+      <name>Yanzhao Zhang</name>
+    </author>
+    <author>
+      <name>Hao Zhao</name>
+    </author>
+    <author>
+      <name>Guofeng Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21594v1</id>
+    <title>Surrogate-Assisted Compact-Model Extraction for SKY130 CMOS at 77 K</title>
+    <updated>2026-11-16T18:57:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.21594v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21594v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cryogenic circuit design requires compact transistor models that reproduce measured low-temperature behavior and run in standard circuit simulators. We fit BSIM4 parameters to measured I-V curves of SkyWater 130 nm (SKY130) transistors at 77 K using a neural surrogate of NGSpice. The surrogate maps compact-model parameters and device geometry to the complete set of output and transfer characteristics. Extraction is a bounded least-squares search: a bank of NGSpice simulations supplies initial candidates, finite differences of the surrogate supply the local Jacobian, and NGSpice re-simulates the resulting cards before selection. On 18 measured geometries, we compare a search over seven card parameters with a search over 43 parameters selected by NGSpice sensitivity. Relative to NGSpice re-simulations of the previously released cards, the two searches reduce the in-sample mean relative root-mean-square error (RRMS) by 17% and 26%, respectively. The 43-parameter search has the lower overall error, but the seven-parameter search has the lower mean on high-bias curves, and some individual curves have higher error than with the released cards under both searches.</summary>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.app-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:57:06Z</published>
+    <arxiv:primary_category term="physics.ins-det"/>
+    <author>
+      <name>Aaron Wang</name>
+    </author>
+    <author>
+      <name>Olivia Gzamouranis</name>
+    </author>
+    <author>
+      <name>Vaibhav Lohia</name>
+    </author>
+    <author>
+      <name>Hershel Fei Xun Weiner</name>
+    </author>
+    <author>
+      <name>Olivia Seidel</name>
+    </author>
+    <author>
+      <name>Richard Cavanaugh</name>
+    </author>
+    <author>
+      <name>Giuseppe Di Guglielmo</name>
+    </author>
+    <author>
+      <name>Nhan Tran</name>
+    </author>
+    <author>
+      <name>Davide Braga</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21593v1</id>
+    <title>Electrostatic and magnetic control of the anomalous Josephson phase in ferromagnetic hybrid junctions</title>
+    <updated>2026-11-16T18:57:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.21593v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21593v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report phase-sensitive measurements of Josephson junctions formed in InAs nanowires with epitaxial ferromagnetic EuS and superconducting Al shells. Using a superconducting interferometer, we observe a continuous, hysteretic anomalous phase shift under axial magnetic-field sweeps. A remanent phase bias persists at zero applied field and depends on magnetic history. Electrostatic gating strongly modifies the magnitude of the phase response, revealing its sensitivity to the transverse electronic structure of the nanowire. Self-consistent electrostatic simulations show that the effective Rashba spin-orbit coupling follows the measured gate-dependent phase response, suggesting its central role in the electrostatic control of the anomalous Josephson phase.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:57:00Z</published>
+    <arxiv:comment>14 pages 7+5 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>D. Rana</name>
+    </author>
+    <author>
+      <name>O. S. Kurapati</name>
+    </author>
+    <author>
+      <name>N. Vanjarapu</name>
+    </author>
+    <author>
+      <name>J. Zhao</name>
+    </author>
+    <author>
+      <name>J. B. F. Wolters</name>
+    </author>
+    <author>
+      <name>Y. Liu</name>
+    </author>
+    <author>
+      <name>P. Krogstrup</name>
+    </author>
+    <author>
+      <name>A. L. R. Manesco</name>
+    </author>
+    <author>
+      <name>S. D. Escribano</name>
+    </author>
+    <author>
+      <name>E. Prada</name>
+    </author>
+    <author>
+      <name>S. Vaitiekėnas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21592v1</id>
+    <title>Connectivity from activity in spiking neural networks</title>
+    <updated>2026-11-16T18:56:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.21592v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21592v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show that a wide range of recurrent neural network models obey a simple set of equations tying synaptic connectivity and single-cell response properties to neural correlations. Our modeling framework considers networks in a stationary, asynchronous state and contains a broad class of synaptic filters, spiking nonlinearities, and random-plus-structured connectivity. The resulting equations naturally decompose into contributions from monosynaptic, disynaptic, and higher order paths through the network. We leverage this decomposition to express the effective monosynaptic connection between two neurons in terms of experimentally measurable statistics of the activity, and in particular, their high-frequency correlations. In this way, we show that it is possible to recover network connectivity from neural activity.</summary>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:56:17Z</published>
+    <arxiv:comment>29 pages, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.dis-nn"/>
+    <author>
+      <name>Albert J. Wakhloo</name>
+    </author>
+    <author>
+      <name>Sebastian Mizera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21590v1</id>
+    <title>The Provenance-Privacy Paradox: Can Private Cloud Compute (PCC) Prove That Apple Reference Images Are Not Used for Learning?</title>
+    <updated>2026-11-16T18:56:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.21590v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21590v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Apple Reference Image (ARI) combines camera-sensor signatures, Secure Enclave attestation (SEP), cryptographic timestamp bounds, Private Cloud Compute (PCC), and a final post-quantum signature to establish photographic provenance. PCC is central to this process because it validates the secure digital negative and develops authenticated raw sensor measurements into a reference JPEG. Although the secure digital negative is encrypted during transmission, the authorized PCC workload must process the raw pixels in plaintext. This requirement creates a provenance-privacy paradox: cloud processing strengthens the provenance guarantee while giving an Apple-authorized, machine-learning-capable workload access to valuable, hardware-authenticated raw imagery. We argue that workload attestation and transparency-log inclusion verify software identity and authorization but do not, by themselves, prove that an authorized workload cannot learn from or retain information derived from the photograph.
+  We implement this counterexample in a Python- and Docker-based experimental testbed that models relevant ARI and PCC functions. Across 27 public-domain photographs, a baseline workload and a learning-enabled workload both passed the same verification checks and returned byte-for-byte identical JPEGs. However, the learning-enabled workload retained a first-layer gradient of approximately 48 KB from which its 64 x 64 input was reconstructed with a maximum absolute per-pixel error of 6 x 10^-8. The additional processing overhead was small relative to image decoding and processing. These results do not demonstrate that Apple currently trains on ARI photographs or reproduce production PCC, but identify non-learning and non-retention as independently verifiable assurance requirements.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:56:06Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Mohammad I. Husain</name>
+    </author>
+    <author>
+      <name>Viet Nguyen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21587v1</id>
+    <title>Commissioning of GEM Detectors for the Super Bigbite Spectrometer</title>
+    <updated>2026-11-16T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.21587v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21587v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report on the commissioning and cosmic characterization of the Gas Electron Multiplier (GEM) trackers for the recently completed first round of the Super Bigbite Spectrometer (SBS) experimental program conducted in Hall A of the Thomas Jefferson National Accelerator Facility. The SBS GEM trackers rank as one of the largest deployments of triple GEM detectors in operation and were critical to the success of the SBS program. Categorized by their readout strip orientation, the 56 individual SBS GEM modules range in active areas from 60cmx50cm (XY) to 150cmx40cm (UV, XW) and were fabricated at the University of Virginia. Large area layers were assembled from four XY GEM modules or a single UV or XW GEM module. The front-end electronics were based on APV25 chips with output sent to custom developed 40 MHz Multi-purpose Digitizers (MPDs). Prior to the installation of the GEM-based tracking systems for SBS experiments, the GEM modules underwent extensive cosmic-ray testing to characterize the performance of each module, including detector stability, efficiency, uniformity, timing performance, and spatial resolution.</summary>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:55:10Z</published>
+    <arxiv:comment>17 pages, 26 figures. To be submitted to Nuclear Instruments &amp; Methods in Physics Research, Section A</arxiv:comment>
+    <arxiv:primary_category term="physics.ins-det"/>
+    <author>
+      <name>A. Rathnayake</name>
+    </author>
+    <author>
+      <name>E. W. Wertz</name>
+    </author>
+    <author>
+      <name>V. Gamage</name>
+    </author>
+    <author>
+      <name>J. McMurtry</name>
+    </author>
+    <author>
+      <name>C. H. Leung</name>
+    </author>
+    <author>
+      <name>A. Ahmed</name>
+    </author>
+    <author>
+      <name>I. Albayrak</name>
+    </author>
+    <author>
+      <name>V. V. N. Arachchillage</name>
+    </author>
+    <author>
+      <name>X. Bai</name>
+    </author>
+    <author>
+      <name>J. A. Boyd</name>
+    </author>
+    <author>
+      <name>A. Camsonne</name>
+    </author>
+    <author>
+      <name>E. Cisbani</name>
+    </author>
+    <author>
+      <name>C. W. Cotton</name>
+    </author>
+    <author>
+      <name>B. D. Purijjala</name>
+    </author>
+    <author>
+      <name>S. Dhital</name>
+    </author>
+    <author>
+      <name>D. Di</name>
+    </author>
+    <author>
+      <name>K. T. Evans</name>
+    </author>
+    <author>
+      <name>E. Fuchey</name>
+    </author>
+    <author>
+      <name>T. Gautam</name>
+    </author>
+    <author>
+      <name>K. Gnanvo</name>
+    </author>
+    <author>
+      <name>C. Ghosh</name>
+    </author>
+    <author>
+      <name>S. Jeffas</name>
+    </author>
+    <author>
+      <name>S. Jian</name>
+    </author>
+    <author>
+      <name>M. Kohl</name>
+    </author>
+    <author>
+      <name>N. Liyanage</name>
+    </author>
+    <author>
+      <name>B. J. Moffit</name>
+    </author>
+    <author>
+      <name>P. Musico</name>
+    </author>
+    <author>
+      <name>H. Nguyen</name>
+    </author>
+    <author>
+      <name>M. Nycz</name>
+    </author>
+    <author>
+      <name>R. Perrino</name>
+    </author>
+    <author>
+      <name>A. J. R. Puckett</name>
+    </author>
+    <author>
+      <name>D. M. Rathnayake</name>
+    </author>
+    <author>
+      <name>B. Raydo</name>
+    </author>
+    <author>
+      <name>L. G. Re</name>
+    </author>
+    <author>
+      <name>B. Sawatzky</name>
+    </author>
+    <author>
+      <name>M. Suresh</name>
+    </author>
+    <author>
+      <name>H. Szumila-Vance</name>
+    </author>
+    <author>
+      <name>B. Wojtsekhowski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21586v1</id>
+    <title>Beyond Job Titles: Interpreting Early-Career Job Advertisements with Sparse Autoencoders and Semantic Clustering</title>
+    <updated>2026-11-16T18:54:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.21586v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21586v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Job titles and job descriptions alone provide limited insight into how technical roles differ in a changing job market. To assess how such roles differ in their work and industry applications, we design and compare two methods based on deep learning and transformer representations using 36,081 early-career job postings collected from LinkedIn in the United States between December 2025 and October 2026.
+  We first apply PERC, short for Preprocessing (P), Embedding (E), Dimensionality Reduction (R) and Clustering (C). We employ GPT-6 Luna to classify job description passages into Team context, Role task and Qualifications. We then create combinations of these sections and examine whether embedding and clustering the segmented passages produce meaningful semantic clusters about different job roles. We use Maximum Mean Discrepancy (MMD) to rank observed differences between embedding distributions and employ a pretrained sparse autoencoder (SAE) to extract features from layer-19 representations of Llama-3.1-8B-Instruct. Lastly, we employ GPT-6 Luna to come up with hypotheses about job roles' feature patterns, and GPT-6.1 Terra to investigate whether those patterns exist in held-out job descriptions from unseen companies.
+  Some example findings include Data Scientist advertisements placing more emphasis on machine learning model development, Data Analyst advertisements on reporting business performance, and Machine Learning Engineer advertisements on applying developed models in real-world settings. We also observe differences in the applications described by Data Analyst and Business Analyst advertisements across selected months, although our dataset's scale and uneven coverage limit their interpretation. Overall, we present a realistic application of SAEs and PERC to unstructured textual data and examine how automated insight extraction could support manual analysis of job descriptions.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:54:40Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yisong Cao</name>
+    </author>
+    <author>
+      <name>Leah Kim</name>
+    </author>
+    <author>
+      <name>Brian Wright</name>
+    </author>
+    <author>
+      <name>Ali Rivera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21584v1</id>
+    <title>CertiSum: Bitwise-Identical MXFP4 Training Across Platforms and Parallelism Layouts</title>
+    <updated>2026-11-16T18:54:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.21584v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21584v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Training with MXFP4, a 4-bit microscaling format, is non-deterministic: identical inputs can produce different results across parallelism layouts and GPU vendors. These differences complicate debugging and training audits and can cause training and inference engines to disagree. We present CertiSum to make MXFP4 training bitwise invariant across runs, parallelism layouts, and GPU vendors. Its key insight is that native FP32 accumulation of MXFP4 products is often already exact for every summation order. CertiSum collects statistics during quantization to certify native matrix multiplication results, recomputes uncertified outputs exactly, and uses exact kernels directly where certification rarely succeeds. CertiSum keeps quantization blocks unchanged across layouts and merges partial sums without rounding, including in attention and weight-gradient computation. In 200-step Qwen3-8B-Base experiments, CertiSum preserves training states bit for bit across AMD MI350X and NVIDIA GB200 and across changes in data, tensor, and context parallelism on MI350X. Across three 8B--14B models on FineWeb-Edu using MI350X, it adds 11.8--60.5% to training-step latency relative to its non-exact MXFP4 counterpart at the larger evaluated input shapes, with speedups of up to $1.24\times$ over BF16 and $1.70\times$ over deterministic BF16.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:54:07Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Steve Rhyner</name>
+    </author>
+    <author>
+      <name>Yubo Gao</name>
+    </author>
+    <author>
+      <name>Stefan de Lasa</name>
+    </author>
+    <author>
+      <name>Sankeerth Durvasula</name>
+    </author>
+    <author>
+      <name>Nandita Vijaykumar</name>
+    </author>
+  </entry>
+</feed>

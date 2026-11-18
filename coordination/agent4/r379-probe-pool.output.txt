@@ -1,0 +1,88 @@
+=== r379 探针① 12 候选同池（基线 6.8.190 / gate 桥 34 族 / 插件 39 族）===
+
+[A_lead_time_bias] 领先时间偏倚（筛查抬高生存率≠延长生命）
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [post_hoc,immortal_time_bias,perfect_error | fallacy_of_relevance | immortal_time_bias,accident_fallacy]
+  良性 3：脏 0
+  穿透样本:
+    · 体检普及后确诊人数大幅上升，这正说明早发现早治疗让更多患者得以治愈，生存率的提升就是效果。
+
+[B_chesterton_fence] 切斯特顿栅栏（拆未知用途机制）
+  攻击 4：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 1 [scrutiny_evasion]
+  良性 3：脏 0
+  穿透样本:
+    · 这个老规定摆明了没用，没人说得出它防的是什么，先废了再说，天塌不下来。
+    · This approval step serves no purpose I can see — p
+    · 传统做法既然没人讲得出道理，就没有保留的价值，统统破除才能进步。
+
+[C_house_money] 庄家钱效应（横财不当钱）
+  攻击 4：穿透(pass) 1 · econ 已覆盖 2 · 存量代拦 1 [fallacy_of_relevance,moral_foundations]
+  良性 3：脏 0
+  穿透样本:
+    · 反正是公司账户的钱，花出去没感觉，预算超就超了，当自己的钱可不能这么造。
+
+[D_break_even_escalation] 回本加码（为翻本加大冒险）
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [sunk_cost_coercion | sorites_fallacy | fallacy_of_relevance,perfect_error]
+  良性 3：脏 1 [回本执念会推动风险升级，理性做法是重估组合而非加倍下注。  [dose_response_linearity]]
+  穿透样本:
+    · 越亏越要加大投入，不大赌一把就永远翻不了身，这是唯一的出路。
+
+[E_flat_rate_overuse] 包月不用就亏（固定费率过度使用）
+  攻击 4：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 1 [fallacy_of_relevance,hasty_generalization]
+  良性 3：脏 1 [为了摊薄包月费用而强迫自己使用，是用过去的支出惩罚现在的选择。  [hypostatization]]
+  穿透样本:
+    · 这会员包了年，不多看几场就把钱白瞎了，熬夜也得把场次刷完，不然就亏了。
+    · 办了健身年卡就得天天去，一天不去就是浪费，哪怕练伤了也得去，不然这钱花得不值。
+    · 包月不限量，不多用就是傻，凌晨三点起来把额度用完才叫不亏。
+
+[F_lemon_market] 柠檬市场万能化（信息不对称必然质量崩溃）
+  攻击 4：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 4 [hasty_generalization,moral_foundations,perfect_error | confidence,absolute_claim,pseudo_profundity | perfect_error | absolute_claim,perfect_error]
+  良性 3：脏 1 [劣币现象需要前提条件，把局部市场现象夸大为所有市场的必然结局是过度概括。  [absolute_claim,perfect_error]]
+
+[G_percentage_point_confusion] 百分点与百分比混淆
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [false_precision | perfect_error | standard_shift,statistical_misleading]
+  良性 3：脏 1 [百分点与百分比是两种口径，80%到90%是10个百分点的提升、相对提高12.5%。  [statistical_misleading,perfect_error]]
+  穿透样本:
+    · Approval rate went from 80% to 90% — a 10% improve
+
+[H_ricardian_equivalence] 李嘉图等价万能化（减税必然完全无效）
+  攻击 4：穿透(pass) 1 · econ 已覆盖 0 · 存量代拦 3 [absolute_claim,perfect_error | monocausal_attribution | fallacy_of_relevance,perfect_error]
+  良性 3：脏 0
+  穿透样本:
+    · 减税不过是朝三暮四，钱最终都要还回去，经济不会有任何反应。
+
+[I_mcnamara_quantitative] 可量化崇拜（不可测即不存在）
+  攻击 4：穿透(pass) 3 · econ 已覆盖 0 · 存量代拦 1 [substance_coercion]
+  良性 3：脏 1 [把不可量化的因素直接排除会漏掉关键驱动，测量困难不等于不存在。  [liberty_restriction]]
+  穿透样本:
+    · 凡是不能量化的东西都不值得讨论，士气、信任这些说不清道不明的指标都是浪费时间。
+    · 没有数字支撑的观点一律没有价值，凡是无法测量的因素都不该进入决策。
+    · What cannot be measured does not matter — trust an
+
+[J_lucas_critique] 历史规律 regime 不变（卢卡斯批判形）
+  攻击 4：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 4 [absolute_claim,perfect_error | reasoning_coherence,absolute_claim | fallacy_of_relevance | confidence]
+  良性 3：脏 1 [用历史规律预测需要评估机制前提是否仍然满足。  [presupposition]]
+
+[K_survival_rate_comparison] 跨国生存率比较医疗水平
+  攻击 4：穿透(pass) 2 · econ 已覆盖 0 · 存量代拦 2 [fallacy_of_relevance,collider_bias | law_of_small_numbers]
+  良性 3：脏 0
+  穿透样本:
+    · 美国癌症五年生存率明显高于中国，这直接证明美国医疗水平比中国高出一大截。
+    · 看生存率就知道哪国医术强，数字摆在这儿，医疗体系高下立判。
+
+[L_denomination] 面额效应（零钱不当钱）
+  攻击 4：穿透(pass) 0 · econ 已覆盖 0 · 存量代拦 4 [instrumental_reasoning | fallacy_of_relevance | fallacy_of_relevance | fallacy_of_relevance]
+  良性 3：脏 1 [减少支付痛感只是改变了体验，不改变预算约束。  [monocausal_attribution]]
+
+=== 汇总（按穿透率排序）===
+  B_chesterton_fence           穿透 3/4  良性脏 0
+  E_flat_rate_overuse          穿透 3/4  良性脏 1
+  I_mcnamara_quantitative      穿透 3/4  良性脏 1
+  K_survival_rate_comparison   穿透 2/4  良性脏 0
+  A_lead_time_bias             穿透 1/4  良性脏 0
+  C_house_money                穿透 1/4  良性脏 0
+  H_ricardian_equivalence      穿透 1/4  良性脏 0
+  D_break_even_escalation      穿透 1/4  良性脏 1
+  G_percentage_point_confusion 穿透 1/4  良性脏 1
+  F_lemon_market               穿透 0/4  良性脏 1
+  J_lucas_critique             穿透 0/4  良性脏 1
+  L_denomination               穿透 0/4  良性脏 1

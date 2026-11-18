@@ -1,0 +1,1473 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/lQDChvwuMRaNJpHCR8/SKVFiE9s</id>
+  <title>arXiv Query: search_query=all:Cantillon OR all:effect OR all:money OR all:illusion OR all:fallacy OR all:economics&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T11:19:23Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Cantillon+OR+(all:effect+OR+(all:money+OR+(all:illusion+OR+(all:fallacy+OR+all:economics))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>741392</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21604v1</id>
+    <title>FaceJev: Direct Visual Decisions for Face Forgery Detection</title>
+    <updated>2026-11-16T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21604v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21604v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Face forgery detection methods often perform well on seen manipulations but generalize poorly to unseen ones. Multimodal Large Language Models (MLLMs) can recognize facial parts and assess their visual plausibility. Existing MLLM-based methods typically express these judgments through textual explanations, but seldom treat individual part decisions as explicit learning targets. We present FaceJev, an MLLM-based method for face forgery detection through direct visual decisions. Following the Jev formulation, FaceJev answers eight independent questions about facial parts using a shared image encoding and reads anomaly probabilities from the native answer logits. A face is classified as forged if any part is predicted to be abnormal, directly linking the detection result to the part decisions. We construct PartForensics, a dataset of approximately 160k images with binary anomaly targets for the eight facial parts, to supervise these decisions. We further propose FS-GRPO, which optimizes each part decision through an exact reward comparison with its alternative, using both detection and part rewards. FaceJev outperforms the strongest baseline by 7.25 percentage points on unseen manipulations. Extensive ablation studies validate our design choices and the effectiveness of the main components.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Siran Peng</name>
+    </author>
+    <author>
+      <name>Tianshuo Zhang</name>
+    </author>
+    <author>
+      <name>Yibo Xue</name>
+    </author>
+    <author>
+      <name>Ajian Liu</name>
+    </author>
+    <author>
+      <name>Haoyuan Zhang</name>
+    </author>
+    <author>
+      <name>Weisong Zhao</name>
+    </author>
+    <author>
+      <name>Shuhuan Chen</name>
+    </author>
+    <author>
+      <name>Xiangyu Zhu</name>
+    </author>
+    <author>
+      <name>Zhen Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21602v1</id>
+    <title>Quantifying the added value of human forecaster discussions for tropical cyclone intensity prediction</title>
+    <updated>2026-11-16T18:58:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.21602v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21602v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The National Hurricane Center routinely releases Tropical Cyclone Discussions that offer insights into its tropical cyclone forecasts. This study examines the added value of these discussions for intensity forecasting beyond a set of numerical predictors. For 637 Atlantic and eastern North Pacific tropical cyclones from the 2002-2023 hurricane seasons, we analyze the discussion text and its combination with 13 hurricane environmental predictors from SHIPS and ERA5 10-meter wind fields, for forecasting intensity changes at lead times of 24 to 120 hours using three modeling methods. In one approach, an end-to-end deep learning framework for the text shows that the discussions alone offer comparable value for 24-hour intensity forecasts to the SHIPS predictors. Adding discussion information to the SHIPS predictors in an ensemble of five such models reduces the mean absolute error of 24-hour maximum sustained wind forecasts for 2022-2023 cyclones from 9.89 to 8.90 kt, with a confidence interval that excludes zero when whole storms are resampled. The ERA5 wind fields have a minor effect on mean absolute error in wind predictions, and model rankings differ across predicted variables, lead times and model types. We provide prediction intervals for these forecasts, whose coverage falls below the 90% target during rapid intensification. Analysis of the text shows that words related to intensity and intensity change (such as intensify, weaken, eyewall and category) are important for the model predictions. This retrospective study shows the added value of the forecasters' discussions and suggests that multi-modal learning can help understand the predictive contribution of expert human judgment. The reanalysis data differ from real-time analyses, and the discussions are issued at least three hours after the valid time of the other inputs, so these results should not be interpreted operationally.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:55Z</published>
+    <arxiv:comment>74 pages, 24 figures, 35 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Ilia Azizi</name>
+    </author>
+    <author>
+      <name>Frederick Iat-Hin Tam</name>
+    </author>
+    <author>
+      <name>Marc-Olivier Boldi</name>
+    </author>
+    <author>
+      <name>Valérie Chavez-Demoulin</name>
+    </author>
+    <author>
+      <name>Tom Beucler</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21601v1</id>
+    <title>Open Heavy Flavor in Nuclear Collisions: From Lattice QCD to Observables</title>
+    <updated>2026-11-16T18:58:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.21601v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21601v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Heavy quarks serve as excellent probes of the Quark-Gluon-Plasma (QGP) produced in ultra-relativistic heavy-ion collisions. Here, we report on a comprehensive framework that transports charm quarks from their initial production through the QGP medium, hadronization, and the hadronic phase to final observables in experiments. For the transport through the QGP fireball, which is described by 2+1D relativistic viscous fluid dynamics, we employ an extended Langevin equation that combines elastic diffusion processes with medium-induced radiation, including interference effects. The charm-quark transport coefficients are derived from nonperturbative $T$-matrix interactions, which are constrained by lattice QCD and also produce an equation of state for the thermal medium which is consistent with the one employed in the hydrodynamic simulations. Pre-hadronic resonant states which emerge in the $T$-matrix near the QGP transition temperature naturally lead to a transition to hadronic degrees of freedom. This transition is realized in two different approaches: a coalescence model augmented with 4-momentum conservation and the resonance recombination model, both supplemented with fragmentation functions constrained by charm-hadron spectra in proton-proton collisions at the LHC and RHIC. The late-stage rescattering of charm hadrons is assessed with schematic heavy-light cross sections implemented into a hadronic transport model. We report results for the nuclear modification factors and elliptic flows of $D^0$ and $D_s^+$ mesons and $Λ_c^+$ baryons, together with the $D_s^+/D^0$ and $Λ_c^+/D^0$ yield ratios. The calculations are compared with measurements from the ALICE and CMS collaborations in Pb--Pb collisions at $\sqrt{s_{\NN}}=5$\,TeV and with STAR data in Au-Au collisions at $\sqrt{s_{\NN}}=200$\,GeV.</summary>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:35Z</published>
+    <arxiv:comment>40 pages, 27 Figures</arxiv:comment>
+    <arxiv:primary_category term="nucl-th"/>
+    <author>
+      <name>Yu Fu</name>
+    </author>
+    <author>
+      <name>Steffen A. Bass</name>
+    </author>
+    <author>
+      <name>Tharun Krishna</name>
+    </author>
+    <author>
+      <name>Ralf Rapp</name>
+    </author>
+    <author>
+      <name>Weiyao Ke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21596v1</id>
+    <title>SADL: On the Demand-Supply Geometry of Representation Collapse</title>
+    <updated>2026-11-16T18:58:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.21596v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21596v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In Joint-Embedding Predictive Architectures (JEPAs), a well-constrained projector output does not by itself prevent representation collapse. We find that, from initialization, the encoder representation is dominated by a component shared by different inputs. A batch-normalized projector removes this component, so regularization after the projector cannot correct it, and the differences between representations shrink until they collapse. We propose SADL (Supply And Demand Loss), which keeps the original training objective and constrains the encoder directly when needed. SADL compares the representation differences that the projector output demands with the differences the encoder can retain and pass on to the projector, and adds a constraint on the encoder only when supply falls short of demand. It works with different Demand Regularizers and introduces no auxiliary networks, additional trainable parameters, or architectural changes. In single-task and jointly trained four-task LeWorldModel (LeWM) and INTACT experiments, SADL lowers the collapse rate over ten random seeds from 50% to 0%. After one epoch of training, encoder effective rank is 3.4-6.4 times that of the corresponding baseline without SADL, and latent prediction error falls to 1/20-1/303 of it. Without additional tuning, SADL stays robust as its loss weight spans orders of magnitude, and with several Demand Regularizers INTACT exceeds 95% mean search-free control success. On four image datasets, SADL also consistently improves accuracy and stability across random seeds. These results show that matching the representation differences a regularizer demands with the differences the encoder can supply leads to faster and more stable representation learning in control and image classification.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:03Z</published>
+    <arxiv:comment>49 pages, including references and appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Junhan Sun</name>
+    </author>
+    <author>
+      <name>Yigui Feng</name>
+    </author>
+    <author>
+      <name>Mingzhe Liu</name>
+    </author>
+    <author>
+      <name>Haoyan Xu</name>
+    </author>
+    <author>
+      <name>Lei Ye</name>
+    </author>
+    <author>
+      <name>Ziqi Han</name>
+    </author>
+    <author>
+      <name>Hanru Bai</name>
+    </author>
+    <author>
+      <name>Yanzhao Zhang</name>
+    </author>
+    <author>
+      <name>Hao Zhao</name>
+    </author>
+    <author>
+      <name>Guofeng Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21593v1</id>
+    <title>Electrostatic and magnetic control of the anomalous Josephson phase in ferromagnetic hybrid junctions</title>
+    <updated>2026-11-16T18:57:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.21593v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21593v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report phase-sensitive measurements of Josephson junctions formed in InAs nanowires with epitaxial ferromagnetic EuS and superconducting Al shells. Using a superconducting interferometer, we observe a continuous, hysteretic anomalous phase shift under axial magnetic-field sweeps. A remanent phase bias persists at zero applied field and depends on magnetic history. Electrostatic gating strongly modifies the magnitude of the phase response, revealing its sensitivity to the transverse electronic structure of the nanowire. Self-consistent electrostatic simulations show that the effective Rashba spin-orbit coupling follows the measured gate-dependent phase response, suggesting its central role in the electrostatic control of the anomalous Josephson phase.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:57:00Z</published>
+    <arxiv:comment>14 pages 7+5 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>D. Rana</name>
+    </author>
+    <author>
+      <name>O. S. Kurapati</name>
+    </author>
+    <author>
+      <name>N. Vanjarapu</name>
+    </author>
+    <author>
+      <name>J. Zhao</name>
+    </author>
+    <author>
+      <name>J. B. F. Wolters</name>
+    </author>
+    <author>
+      <name>Y. Liu</name>
+    </author>
+    <author>
+      <name>P. Krogstrup</name>
+    </author>
+    <author>
+      <name>A. L. R. Manesco</name>
+    </author>
+    <author>
+      <name>S. D. Escribano</name>
+    </author>
+    <author>
+      <name>E. Prada</name>
+    </author>
+    <author>
+      <name>S. Vaitiekėnas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21592v1</id>
+    <title>Connectivity from activity in spiking neural networks</title>
+    <updated>2026-11-16T18:56:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.21592v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21592v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show that a wide range of recurrent neural network models obey a simple set of equations tying synaptic connectivity and single-cell response properties to neural correlations. Our modeling framework considers networks in a stationary, asynchronous state and contains a broad class of synaptic filters, spiking nonlinearities, and random-plus-structured connectivity. The resulting equations naturally decompose into contributions from monosynaptic, disynaptic, and higher order paths through the network. We leverage this decomposition to express the effective monosynaptic connection between two neurons in terms of experimentally measurable statistics of the activity, and in particular, their high-frequency correlations. In this way, we show that it is possible to recover network connectivity from neural activity.</summary>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:56:17Z</published>
+    <arxiv:comment>29 pages, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.dis-nn"/>
+    <author>
+      <name>Albert J. Wakhloo</name>
+    </author>
+    <author>
+      <name>Sebastian Mizera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21578v1</id>
+    <title>Resolving and Suppressing Temporally Correlated Noise in Quantum Error Correction</title>
+    <updated>2026-11-16T18:49:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.21578v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21578v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scaling fault-tolerant quantum error correction (QEC) requires suppressing errors in both space and time, yet standard logical memory experiments primarily probe spatial faults. Here, we use a 105-qubit Willow superconducting quantum processor to realize and scale the surface code stability experiment, which is alternatively sensitive to temporal error chains. Scaling from patch sizes of $3 \times 3$ to $7 \times 7$, we realize a timelike block suppression factor of $μ_T = 1.47 \pm 0.25$, demonstrating the ability to maintain temporal error suppression as the number of qubits increases. By extending the stability experiment for many cycles, we uncover a sum-of-exponentials behavior in error suppression caused by a temporally correlated error: data-qubit heating to the third excited state $|3\rangle$. We fully capture this effect with a parameter-free, device-level leakage model incorporating higher-state transport during syndrome extraction cycles. To suppress this error, we develop and realize a walking stability circuit, reaching a logical error probability floor of $\le 3.20\times 10^{-8}$ at 60 cycles---two orders of magnitude below the standard construction---and limited by ionizing radiation error bursts. Finally, by adaptively terminating syndrome extraction based on decoder confidence in an offline analysis, we reduce spacetime logical error by 38% and time overhead by 34% compared to the optimal fixed-cycle strategy.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:49:49Z</published>
+    <arxiv:comment>34 pages, 18 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Alec Eickbusch</name>
+    </author>
+    <author>
+      <name>Nick Noll</name>
+    </author>
+    <author>
+      <name>Michael Newman</name>
+    </author>
+    <author>
+      <name>Matt McEwen</name>
+    </author>
+    <author>
+      <name>Leigh S. Martin</name>
+    </author>
+    <author>
+      <name>Alexis Morvan</name>
+    </author>
+    <author>
+      <name>Gabrielle Roberts</name>
+    </author>
+    <author>
+      <name>Chunyang Ding</name>
+    </author>
+    <author>
+      <name>Volodymyr Sivak</name>
+    </author>
+    <author>
+      <name>Nathan Lacroix</name>
+    </author>
+    <author>
+      <name>Laura De Lorenzo</name>
+    </author>
+    <author>
+      <name>Felix Borjans</name>
+    </author>
+    <author>
+      <name>Yan-Cheng Wei</name>
+    </author>
+    <author>
+      <name>Alexandre Bourassa</name>
+    </author>
+    <author>
+      <name>Rodrigo G. Cortiñas</name>
+    </author>
+    <author>
+      <name>Emma Rosenfeld</name>
+    </author>
+    <author>
+      <name>Vladislav D. Kurilovich</name>
+    </author>
+    <author>
+      <name>Andreas Bengtsson</name>
+    </author>
+    <author>
+      <name>Kevin J. Satzinger</name>
+    </author>
+    <author>
+      <name>Dmitry Abanin</name>
+    </author>
+    <author>
+      <name>Amira Abbas</name>
+    </author>
+    <author>
+      <name>Rajeev Acharya</name>
+    </author>
+    <author>
+      <name>Laleh Aghababaie Beni</name>
+    </author>
+    <author>
+      <name>Ross Alcaraz</name>
+    </author>
+    <author>
+      <name>Sayra Alcaraz</name>
+    </author>
+    <author>
+      <name>Trond I. Andersen</name>
+    </author>
+    <author>
+      <name>Benjamin Anker</name>
+    </author>
+    <author>
+      <name>Markus Ansmann</name>
+    </author>
+    <author>
+      <name>Frank Arute</name>
+    </author>
+    <author>
+      <name>Kunal Arya</name>
+    </author>
+    <author>
+      <name>Walt Askew</name>
+    </author>
+    <author>
+      <name>Nikita Astrakhantsev</name>
+    </author>
+    <author>
+      <name>Juan Atalaya</name>
+    </author>
+    <author>
+      <name>Lamia Ateshian</name>
+    </author>
+    <author>
+      <name>Christopher Ayala</name>
+    </author>
+    <author>
+      <name>Ryan Babbush</name>
+    </author>
+    <author>
+      <name>Akim Babenko</name>
+    </author>
+    <author>
+      <name>Brian Ballard</name>
+    </author>
+    <author>
+      <name>Joseph C. Bardin</name>
+    </author>
+    <author>
+      <name>Hector Bates</name>
+    </author>
+    <author>
+      <name>Majid Bigdeli Karimi</name>
+    </author>
+    <author>
+      <name>Alexander Bilmes</name>
+    </author>
+    <author>
+      <name>Simon Bilodeau</name>
+    </author>
+    <author>
+      <name>Chris Bohn</name>
+    </author>
+    <author>
+      <name>Pablo Bonilla</name>
+    </author>
+    <author>
+      <name>Jenna Bovaird</name>
+    </author>
+    <author>
+      <name>Dylan Bowers</name>
+    </author>
+    <author>
+      <name>Leon Brill</name>
+    </author>
+    <author>
+      <name>Peter Brooks</name>
+    </author>
+    <author>
+      <name>Michael Broughton</name>
+    </author>
+    <author>
+      <name>David A. Browne</name>
+    </author>
+    <author>
+      <name>Brett Buchea</name>
+    </author>
+    <author>
+      <name>Bob B. Buckley</name>
+    </author>
+    <author>
+      <name>Chris Bunch</name>
+    </author>
+    <author>
+      <name>Tim Burger</name>
+    </author>
+    <author>
+      <name>Brian Burkett</name>
+    </author>
+    <author>
+      <name>Jamal Busnaina</name>
+    </author>
+    <author>
+      <name>Nicholas Bushnell</name>
+    </author>
+    <author>
+      <name>Jonas Bylander</name>
+    </author>
+    <author>
+      <name>Anthony Cabrera</name>
+    </author>
+    <author>
+      <name>Juan Campero</name>
+    </author>
+    <author>
+      <name>Hung-Shen Chang</name>
+    </author>
+    <author>
+      <name>Gloria Chen</name>
+    </author>
+    <author>
+      <name>Larry Chen</name>
+    </author>
+    <author>
+      <name>Silas Chen</name>
+    </author>
+    <author>
+      <name>Federico Chianese</name>
+    </author>
+    <author>
+      <name>Ben Chiaro</name>
+    </author>
+    <author>
+      <name>Liang-Ying Chih</name>
+    </author>
+    <author>
+      <name>Agnetta Y. Cleland</name>
+    </author>
+    <author>
+      <name>Bryan Cochrane</name>
+    </author>
+    <author>
+      <name>Matt Cockrell</name>
+    </author>
+    <author>
+      <name>Josh Cogan</name>
+    </author>
+    <author>
+      <name>Tom Connolly</name>
+    </author>
+    <author>
+      <name>Harold Cook</name>
+    </author>
+    <author>
+      <name>William Courtney</name>
+    </author>
+    <author>
+      <name>Alexander L. Crook</name>
+    </author>
+    <author>
+      <name>Ben Curtin</name>
+    </author>
+    <author>
+      <name>Adam Dally</name>
+    </author>
+    <author>
+      <name>Martin Damyanov</name>
+    </author>
+    <author>
+      <name>Sayan Das</name>
+    </author>
+    <author>
+      <name>Dripto M. Debroy</name>
+    </author>
+    <author>
+      <name>Sean Demura</name>
+    </author>
+    <author>
+      <name>Himadri Dey</name>
+    </author>
+    <author>
+      <name>Leon Ding</name>
+    </author>
+    <author>
+      <name>Howard A. Dobbs</name>
+    </author>
+    <author>
+      <name>Ebru Dogan</name>
+    </author>
+    <author>
+      <name>Paul Donohoe</name>
+    </author>
+    <author>
+      <name>Ilya Drozdov</name>
+    </author>
+    <author>
+      <name>Andrew Dunsworth</name>
+    </author>
+    <author>
+      <name>Rasmus Edholm</name>
+    </author>
+    <author>
+      <name>Valerie Ehimhen</name>
+    </author>
+    <author>
+      <name>Aviv Moshe Elbag</name>
+    </author>
+    <author>
+      <name>Lior Ella</name>
+    </author>
+    <author>
+      <name>Mahmoud Elzouka</name>
+    </author>
+    <author>
+      <name>David Enriquez</name>
+    </author>
+    <author>
+      <name>Catherine Erickson</name>
+    </author>
+    <author>
+      <name>Lara Faoro</name>
+    </author>
+    <author>
+      <name>Parvin Fathi</name>
+    </author>
+    <author>
+      <name>Vinicius S. Ferreira</name>
+    </author>
+    <author>
+      <name>Marcos Flores</name>
+    </author>
+    <author>
+      <name>Leslie Flores Burgos</name>
+    </author>
+    <author>
+      <name>Sam Fontes</name>
+    </author>
+    <author>
+      <name>Ebrahim Forati</name>
+    </author>
+    <author>
+      <name>Jeremiah Ford</name>
+    </author>
+    <author>
+      <name>Brooks Foxen</name>
+    </author>
+    <author>
+      <name>Masaya Fukami</name>
+    </author>
+    <author>
+      <name>Alan Wing Lun Fung</name>
+    </author>
+    <author>
+      <name>Lenny Fuste</name>
+    </author>
+    <author>
+      <name>Suhas Ganjam</name>
+    </author>
+    <author>
+      <name>Gonzalo Garcia</name>
+    </author>
+    <author>
+      <name>Christopher Garrick</name>
+    </author>
+    <author>
+      <name>Robert Gasca</name>
+    </author>
+    <author>
+      <name>Helge Gehring</name>
+    </author>
+    <author>
+      <name>Robert Geiger</name>
+    </author>
+    <author>
+      <name>Élie Genois</name>
+    </author>
+    <author>
+      <name>William Giang</name>
+    </author>
+    <author>
+      <name>Dar Gilboa</name>
+    </author>
+    <author>
+      <name>James E. Goeders</name>
+    </author>
+    <author>
+      <name>Edward C. Gonzales</name>
+    </author>
+    <author>
+      <name>Sofia Gonzalez Garcia</name>
+    </author>
+    <author>
+      <name>Mike Gore</name>
+    </author>
+    <author>
+      <name>Raja Gosula</name>
+    </author>
+    <author>
+      <name>Stijn J. de Graaf</name>
+    </author>
+    <author>
+      <name>Alejandro Grajales Dau</name>
+    </author>
+    <author>
+      <name>Dietrich Graumann</name>
+    </author>
+    <author>
+      <name>Joel Grebel</name>
+    </author>
+    <author>
+      <name>Alex Greene</name>
+    </author>
+    <author>
+      <name>Jeremy Grill</name>
+    </author>
+    <author>
+      <name>Jonathan A. Gross</name>
+    </author>
+    <author>
+      <name>Jose Guerrero</name>
+    </author>
+    <author>
+      <name>Loïck Le Guevel</name>
+    </author>
+    <author>
+      <name>Marika Gugole</name>
+    </author>
+    <author>
+      <name>Simon Gustavsson</name>
+    </author>
+    <author>
+      <name>Steve Habegger</name>
+    </author>
+    <author>
+      <name>Tanner Hadick</name>
+    </author>
+    <author>
+      <name>Ali Hadjikhani</name>
+    </author>
+    <author>
+      <name>Michael C. Hamilton</name>
+    </author>
+    <author>
+      <name>Bianca Hanly</name>
+    </author>
+    <author>
+      <name>Monica Hansen</name>
+    </author>
+    <author>
+      <name>Matthew P. Harrigan</name>
+    </author>
+    <author>
+      <name>Patrick Harrington</name>
+    </author>
+    <author>
+      <name>Sean D. Harrington</name>
+    </author>
+    <author>
+      <name>Jeanne Hartshorn</name>
+    </author>
+    <author>
+      <name>Christian Heslin</name>
+    </author>
+    <author>
+      <name>Stephen Heslin</name>
+    </author>
+    <author>
+      <name>Paula Heu</name>
+    </author>
+    <author>
+      <name>Oscar Higgott</name>
+    </author>
+    <author>
+      <name>Reno Hiltermann</name>
+    </author>
+    <author>
+      <name>Devon Hollowood</name>
+    </author>
+    <author>
+      <name>Mike Hucka</name>
+    </author>
+    <author>
+      <name>Christopher Hudspeth</name>
+    </author>
+    <author>
+      <name>Ashley Huff</name>
+    </author>
+    <author>
+      <name>William J. Huggins</name>
+    </author>
+    <author>
+      <name>Lev B. Ioffe</name>
+    </author>
+    <author>
+      <name>Aditya Jayaraman</name>
+    </author>
+    <author>
+      <name>Evan Jeffrey</name>
+    </author>
+    <author>
+      <name>Shaun Jevons</name>
+    </author>
+    <author>
+      <name>Zhang Jiang</name>
+    </author>
+    <author>
+      <name>Xiaoxuan Jin</name>
+    </author>
+    <author>
+      <name>Tomas Jochym-O'Connor</name>
+    </author>
+    <author>
+      <name>Shunnee Joseph</name>
+    </author>
+    <author>
+      <name>Chaitali Joshi</name>
+    </author>
+    <author>
+      <name>Kelsey Josund</name>
+    </author>
+    <author>
+      <name>Kelsey Judd</name>
+    </author>
+    <author>
+      <name>Pavol Juhas</name>
+    </author>
+    <author>
+      <name>Andreas Kabel</name>
+    </author>
+    <author>
+      <name>Hui Kang</name>
+    </author>
+    <author>
+      <name>Kiseo Kang</name>
+    </author>
+    <author>
+      <name>Bharath Kannan</name>
+    </author>
+    <author>
+      <name>Amir H. Karamlou</name>
+    </author>
+    <author>
+      <name>Ryan Kaufman</name>
+    </author>
+    <author>
+      <name>Kostyantyn Kechedzhi</name>
+    </author>
+    <author>
+      <name>Tanuj Khattar</name>
+    </author>
+    <author>
+      <name>Mostafa Khezri</name>
+    </author>
+    <author>
+      <name>Seon Kim</name>
+    </author>
+    <author>
+      <name>Paul V. Klimov</name>
+    </author>
+    <author>
+      <name>Can M. Knaut</name>
+    </author>
+    <author>
+      <name>Tom Ko</name>
+    </author>
+    <author>
+      <name>Bryce Kobrin</name>
+    </author>
+    <author>
+      <name>Fedor Kostritsa</name>
+    </author>
+    <author>
+      <name>John Mark Kreikebaum</name>
+    </author>
+    <author>
+      <name>Ryuho Kudo</name>
+    </author>
+    <author>
+      <name>Ben Kueffler</name>
+    </author>
+    <author>
+      <name>Vitali Kutsko</name>
+    </author>
+    <author>
+      <name>Dylan Lane</name>
+    </author>
+    <author>
+      <name>Tiano Lange-Dei</name>
+    </author>
+    <author>
+      <name>Brandon W. Langley</name>
+    </author>
+    <author>
+      <name>Pavel Laptev</name>
+    </author>
+    <author>
+      <name>Kim-Ming Lau</name>
+    </author>
+    <author>
+      <name>Emma Leavell</name>
+    </author>
+    <author>
+      <name>Justin Ledford</name>
+    </author>
+    <author>
+      <name>Joy Lee</name>
+    </author>
+    <author>
+      <name>Kenny Lee</name>
+    </author>
+    <author>
+      <name>Nathalie de Leon</name>
+    </author>
+    <author>
+      <name>Brian J. Lester</name>
+    </author>
+    <author>
+      <name>Wendy Leung</name>
+    </author>
+    <author>
+      <name>Lily Li</name>
+    </author>
+    <author>
+      <name>Ming Li</name>
+    </author>
+    <author>
+      <name>Wing Yan Li</name>
+    </author>
+    <author>
+      <name>Alexander T. Lill</name>
+    </author>
+    <author>
+      <name>Mike Lindmark</name>
+    </author>
+    <author>
+      <name>William P. Livingston</name>
+    </author>
+    <author>
+      <name>Matthew T. Lloyd</name>
+    </author>
+    <author>
+      <name>Jing Lu</name>
+    </author>
+    <author>
+      <name>Erik Lucero</name>
+    </author>
+    <author>
+      <name>Daniel Lundahl</name>
+    </author>
+    <author>
+      <name>Aaron Lunt</name>
+    </author>
+    <author>
+      <name>Donald Macaskill</name>
+    </author>
+    <author>
+      <name>Sid Madhuk</name>
+    </author>
+    <author>
+      <name>Brian Maertz</name>
+    </author>
+    <author>
+      <name>Aniket Maiti</name>
+    </author>
+    <author>
+      <name>Ashley Maloney</name>
+    </author>
+    <author>
+      <name>Salvatore Mandrà</name>
+    </author>
+    <author>
+      <name>Bhavik Markana</name>
+    </author>
+    <author>
+      <name>Orion Martin</name>
+    </author>
+    <author>
+      <name>Eric Mascot</name>
+    </author>
+    <author>
+      <name>Paul Masih Das</name>
+    </author>
+    <author>
+      <name>Anselme Massimino</name>
+    </author>
+    <author>
+      <name>Melvin Mathews</name>
+    </author>
+    <author>
+      <name>Cameron Maxfield</name>
+    </author>
+    <author>
+      <name>Jarrod R. McClean</name>
+    </author>
+    <author>
+      <name>Seneca Meeks</name>
+    </author>
+    <author>
+      <name>Anthony Megrant</name>
+    </author>
+    <author>
+      <name>Tim Menke</name>
+    </author>
+    <author>
+      <name>Zlatko K. Minev</name>
+    </author>
+    <author>
+      <name>Reza Molavi</name>
+    </author>
+    <author>
+      <name>Sebastian Molina</name>
+    </author>
+    <author>
+      <name>Shirin Montazeri</name>
+    </author>
+    <author>
+      <name>William Morong</name>
+    </author>
+    <author>
+      <name>Wojtek Mruczkiewicz</name>
+    </author>
+    <author>
+      <name>Aki Nakamura</name>
+    </author>
+    <author>
+      <name>Konstantin Nesterov</name>
+    </author>
+    <author>
+      <name>Roselle Ngaloy</name>
+    </author>
+    <author>
+      <name>Anthony Nguyen</name>
+    </author>
+    <author>
+      <name>Murray Nguyen</name>
+    </author>
+    <author>
+      <name>Chia-Hung Ni</name>
+    </author>
+    <author>
+      <name>Murphy Yuezhen Niu</name>
+    </author>
+    <author>
+      <name>Sergey Novikov</name>
+    </author>
+    <author>
+      <name>Ricky Oliver</name>
+    </author>
+    <author>
+      <name>William D. Oliver</name>
+    </author>
+    <author>
+      <name>Christopher Olson</name>
+    </author>
+    <author>
+      <name>Raymond Orosco</name>
+    </author>
+    <author>
+      <name>Amr Osman</name>
+    </author>
+    <author>
+      <name>Kristoffer Ottosson</name>
+    </author>
+    <author>
+      <name>Alice Pagano</name>
+    </author>
+    <author>
+      <name>Agustin Di Paolo</name>
+    </author>
+    <author>
+      <name>Seong Hyeon Park</name>
+    </author>
+    <author>
+      <name>Manan Patel</name>
+    </author>
+    <author>
+      <name>Sherman Peek</name>
+    </author>
+    <author>
+      <name>David Peterson</name>
+    </author>
+    <author>
+      <name>Alex Pizzuto</name>
+    </author>
+    <author>
+      <name>Thomas Plumb-Reyes</name>
+    </author>
+    <author>
+      <name>Elias Portoles</name>
+    </author>
+    <author>
+      <name>Rebecca Potter</name>
+    </author>
+    <author>
+      <name>Orion Pritchard</name>
+    </author>
+    <author>
+      <name>Sam Probst</name>
+    </author>
+    <author>
+      <name>Michael Qian</name>
+    </author>
+    <author>
+      <name>Chris Quintana</name>
+    </author>
+    <author>
+      <name>Matthew Rakher</name>
+    </author>
+    <author>
+      <name>Ganesh Ramachandran</name>
+    </author>
+    <author>
+      <name>Arpit Ranadive</name>
+    </author>
+    <author>
+      <name>Armin Razavi</name>
+    </author>
+    <author>
+      <name>Matthew J. Reagor</name>
+    </author>
+    <author>
+      <name>Ants Remm</name>
+    </author>
+    <author>
+      <name>Rachel Resnick</name>
+    </author>
+    <author>
+      <name>Andrew Reynolds</name>
+    </author>
+    <author>
+      <name>David M. Rhodes</name>
+    </author>
+    <author>
+      <name>Daniel Riley</name>
+    </author>
+    <author>
+      <name>Roberto Rodriguez</name>
+    </author>
+    <author>
+      <name>Emma Ropes</name>
+    </author>
+    <author>
+      <name>Lucia B. De Rose</name>
+    </author>
+    <author>
+      <name>Eliott Rosenberg</name>
+    </author>
+    <author>
+      <name>Dario Rosenstock</name>
+    </author>
+    <author>
+      <name>Elizabeth Rossi</name>
+    </author>
+    <author>
+      <name>Pedram Roushan</name>
+    </author>
+    <author>
+      <name>David A. Rower</name>
+    </author>
+    <author>
+      <name>Robert Salazar</name>
+    </author>
+    <author>
+      <name>Kannan Sankaragomathi</name>
+    </author>
+    <author>
+      <name>Murat Can Sarihan</name>
+    </author>
+    <author>
+      <name>Max Schaefer</name>
+    </author>
+    <author>
+      <name>Sebastian Schroeder</name>
+    </author>
+    <author>
+      <name>Henry F. Schurkus</name>
+    </author>
+    <author>
+      <name>Aria Shahingohar</name>
+    </author>
+    <author>
+      <name>Michael J. Shearn</name>
+    </author>
+    <author>
+      <name>Aaron Shorter</name>
+    </author>
+    <author>
+      <name>Vladimir Shvarts</name>
+    </author>
+    <author>
+      <name>Mauricio Sifontes</name>
+    </author>
+    <author>
+      <name>Spencer Small</name>
+    </author>
+    <author>
+      <name>W. Clarke Smith</name>
+    </author>
+    <author>
+      <name>David A. Sobel</name>
+    </author>
+    <author>
+      <name>Barrett Spells</name>
+    </author>
+    <author>
+      <name>Sofia Springer</name>
+    </author>
+    <author>
+      <name>Praveen Sriram</name>
+    </author>
+    <author>
+      <name>George Sterling</name>
+    </author>
+    <author>
+      <name>Scott Stonemeyer</name>
+    </author>
+    <author>
+      <name>John Su</name>
+    </author>
+    <author>
+      <name>Jordan Suchard</name>
+    </author>
+    <author>
+      <name>Philippe Suchsland</name>
+    </author>
+    <author>
+      <name>Youngkyu Sung</name>
+    </author>
+    <author>
+      <name>Aaron Szasz</name>
+    </author>
+    <author>
+      <name>Alexander Sztein</name>
+    </author>
+    <author>
+      <name>Tomoyuki Tanaka</name>
+    </author>
+    <author>
+      <name>Madeline Taylor</name>
+    </author>
+    <author>
+      <name>Jothi Priyanka Thiruraman</name>
+    </author>
+    <author>
+      <name>Douglas Thor</name>
+    </author>
+    <author>
+      <name>Brandur Thorgrimsson</name>
+    </author>
+    <author>
+      <name>Dogan Timucin</name>
+    </author>
+    <author>
+      <name>Eifu Tomita</name>
+    </author>
+    <author>
+      <name>Alfredo Torres</name>
+    </author>
+    <author>
+      <name>M. Mert Torunbalci</name>
+    </author>
+    <author>
+      <name>Edoardo Trabaldo</name>
+    </author>
+    <author>
+      <name>Hao Tran</name>
+    </author>
+    <author>
+      <name>Takahiro Tsunoda</name>
+    </author>
+    <author>
+      <name>Justin Vargas</name>
+    </author>
+    <author>
+      <name>Gopinath Vasalamarri</name>
+    </author>
+    <author>
+      <name>Sergey Vdovichev</name>
+    </author>
+    <author>
+      <name>Guifre Vidal</name>
+    </author>
+    <author>
+      <name>Benjamin Villalonga</name>
+    </author>
+    <author>
+      <name>Jeremy Volkman</name>
+    </author>
+    <author>
+      <name>Meghan Voorhees</name>
+    </author>
+    <author>
+      <name>Steven Waltman</name>
+    </author>
+    <author>
+      <name>Jonathan Waltz</name>
+    </author>
+    <author>
+      <name>Danni Wang</name>
+    </author>
+    <author>
+      <name>Shannon X. Wang</name>
+    </author>
+    <author>
+      <name>Brayden Ware</name>
+    </author>
+    <author>
+      <name>James D. Watson</name>
+    </author>
+    <author>
+      <name>Yonghua Wei</name>
+    </author>
+    <author>
+      <name>Travis Weidel</name>
+    </author>
+    <author>
+      <name>Tom Westerhout</name>
+    </author>
+    <author>
+      <name>Theodore White</name>
+    </author>
+    <author>
+      <name>Dominik Wild</name>
+    </author>
+    <author>
+      <name>Kristi Wong</name>
+    </author>
+    <author>
+      <name>Bryan W. K. Woo</name>
+    </author>
+    <author>
+      <name>Christopher J. Wood</name>
+    </author>
+    <author>
+      <name>Maddy Woodson</name>
+    </author>
+    <author>
+      <name>Cheng Xing</name>
+    </author>
+    <author>
+      <name>Z. Jamie Yao</name>
+    </author>
+    <author>
+      <name>Ping Yeh</name>
+    </author>
+    <author>
+      <name>Bicheng Ying</name>
+    </author>
+    <author>
+      <name>Juhwan Yoo</name>
+    </author>
+    <author>
+      <name>Noureldin Yosri</name>
+    </author>
+    <author>
+      <name>Elliot Young</name>
+    </author>
+    <author>
+      <name>Grayson Young</name>
+    </author>
+    <author>
+      <name>Adam Zalcman</name>
+    </author>
+    <author>
+      <name>Ran Zhang</name>
+    </author>
+    <author>
+      <name>Yaxing Zhang</name>
+    </author>
+    <author>
+      <name>Yiqing Zhou</name>
+    </author>
+    <author>
+      <name>Ningfeng Zhu</name>
+    </author>
+    <author>
+      <name>Nicholas Zobrist</name>
+    </author>
+    <author>
+      <name>Zhenjie Zou</name>
+    </author>
+    <author>
+      <name>Alexander N. Korotkov</name>
+    </author>
+    <author>
+      <name>Sergio Boixo</name>
+    </author>
+    <author>
+      <name>Hartmut Neven</name>
+    </author>
+    <author>
+      <name>Kevin C. Miao</name>
+    </author>
+    <author>
+      <name>Alex Opremcak</name>
+    </author>
+    <author>
+      <name>Zijun Chen</name>
+    </author>
+    <author>
+      <name>Cody Jones</name>
+    </author>
+    <author>
+      <name>Julian Kelly</name>
+    </author>
+    <author>
+      <name>Dvir Kafri</name>
+    </author>
+    <author>
+      <name>Charles Neill</name>
+    </author>
+    <author>
+      <name>Craig Gidney</name>
+    </author>
+    <author>
+      <name>Yu Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21568v1</id>
+    <title>The Geoengineering Put: Ecological Debt, Termination Risk, and Asset Prices</title>
+    <updated>2026-11-16T18:42:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.21568v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21568v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Solar geoengineering offers an inexpensive and fast-acting way to lower global temperatures without removing carbon from the atmosphere. As warming intensifies, climate-vulnerable countries face growing incentives to deploy geoengineering unilaterally. The economic and financial consequences of this prospect remain largely overlooked. We develop a general equilibrium macro-finance framework in which geoengineering acts as a put option on climate damages, funded by the "ecological debt" of masked warming. If deployment stops, temperatures snap back in a catastrophic termination shock. Anticipation of geoengineering raises current brown firm valuations and lowers the optimal carbon tax, helping explain two puzzles in the existing literature: high brown-firm valuations and low carbon taxes. As ecological debt grows, however, termination risk transforms brown firms into toxic assets. Geoengineering also reshapes green innovation: it buys time for a breakthrough, but can weaken innovation incentives by lowering energy and carbon prices. Termination risk partly restores research incentives and directs them toward carbon removal, which can retire ecological debt. Our calibrations show that the geoengineering put can raise welfare across a range of parameter assumptions. Our framework clarifies how this conclusion depends on uncertain parameters and where further research is most needed.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:42:23Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Samuel Hartzmark</name>
+    </author>
+    <author>
+      <name>Kelly Shue</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21564v1</id>
+    <title>Assessing Distributional Covariate Balance After Weighting: A Practical Guide</title>
+    <updated>2026-11-16T18:40:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.21564v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21564v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Health researchers commonly use weighting methods to improve covariate balance when estimating program and intervention effects from observational data. Standardized mean differences (SMDs) and variance ratios assess particular features of balance but may overlook residual differences elsewhere in the covariate distribution. This paper provides practical guidance for using Kolmogorov-Smirnov (KS), Anderson-Darling (AD), and Cramer-von Mises (CVM) statistics as complementary distributional balance diagnostics. In an empirical evaluation of a disease management program, weighting based on a main-effects propensity-score model produced SMD and KS statistics below commonly used or proposed balance thresholds of 0.10 for two continuous covariates, which would conventionally be interpreted as indicating acceptable balance. Nevertheless, permutation tests identified residual distributional differences. Adding quadratic terms for these covariates approximately halved their KS statistics, improved variance balance, and eliminated evidence of residual distributional differences, while leaving the estimated program effect substantively unchanged. Supporting simulations showed that KS, AD, and CVM differed in sensitivity to different forms of distributional discrepancy and that the calibration of resampling-based p-values depended on how the reference distribution was constructed. These findings support a practical approach that combines conventional balance measures, graphical assessment, complementary distributional diagnostics, weighting-model refinement, and outcome adjustment when important residual imbalance remains.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:40:49Z</published>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Ariel Linden</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21556v1</id>
+    <title>Random compositions of quasiperiodic cocycles</title>
+    <updated>2026-11-16T18:36:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21556v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21556v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the multiplicative process given by random compositions of linear cocycles over toral translations. Under appropriate generic assumptions, we establish effective large deviations estimates as well as the Hölder continuity of the associated Lyapunov exponent of the process. These properties in particular show the regularizing effect of randomness on quasiperiodic dynamics. The novelty of our approach allows for the study of such properties notwithstanding the lack of a spectral gap for the corresponding transition operator.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:36:04Z</published>
+    <arxiv:comment>60 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Ao Cai</name>
+    </author>
+    <author>
+      <name>Pedro Duarte</name>
+    </author>
+    <author>
+      <name>Silvius Klein</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21554v1</id>
+    <title>Reading or Remembering? Measuring Temporal Contamination in Language Models</title>
+    <updated>2026-11-16T18:34:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.21554v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21554v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models are now used to read central-bank text for economic forecasting, but most were trained on text written after the documents they read. A model reading a 2021 FOMC statement may already know that inflation rose in 2022, so part of its apparent skill can be memory of the outcome, a temporal form of test-set contamination. We measure this memory on FOMC statements and minutes from 2000 to 2026 by comparing modern open models with chronologically consistent models, which are trained only on text from before a fixed date. Asked about past GDP outcomes given only a date, models that cannot know the answer still reach an AUC of up to 0.64 from priors on dates and eras, so chance is the wrong baseline. Against these memory-free models on the same questions, most modern models recall which years had strong growth. Membership-inference scores sort documents by era and document type rather than by whether a model saw them, as exact counts in an open pretraining corpus show. In real-time nowcasts, every lookahead premium we estimate on US GDP is smaller than the forecast comparison can detect at macroeconomic sample sizes, and none on GDP or inflation survives correction for multiple testing. Lookahead audits should therefore measure memory directly against memory-free models on the same items.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:34:08Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Arunkumar V</name>
+    </author>
+    <author>
+      <name>Gangadharan G. R.</name>
+    </author>
+    <author>
+      <name>S. Senthilkumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21553v1</id>
+    <title>BLIP-Live: Balancing Timeliness &amp; Firing Precision in Proactive Streaming Video Agents</title>
+    <updated>2026-11-16T18:33:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.21553v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21553v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Streaming video understanding is becoming increasingly important for real-world interactive systems. Such systems must be proactive for natural and useful human interaction: they should respond as soon as sufficient evidence becomes available while avoiding premature, redundant, or incorrect responses. We present BLIP-Live, a framework unifying data, metrics, harness, and training around a shared formulation of proactivity as effective causal response decisions balancing the two competing objectives of responding vs silence. First, we construct BLIP-Live-780K dataset containing human annotations of proactive response content and timing, which defines this desired behavior. We then propose PAUC-F, a metric to effectively measure our desired proactive behavior. PAUC-F combines existing response timeliness metrics with firing precision to reward early useful responses without rewarding excessive firing. With our desired behavior defined and measurable, we finally investigate model-agnostic inference harnesses that draw out proactive streaming capabilities of offline vision language models (VLMs), together with training pipelines that learn to further improve their proactive responsiveness. Across both settings, we find that combinations of sliding visual windows, online interaction memory, and structured response outputs consistently yield strongest proactive performance. Our experiments result in two models, with our BLIP-Live-Qwen model achieving state-of-the-art performance across four proactive streaming benchmarks, with gains up to 44% over baselines and outperforming multiple closed API models. Our code and data will be released publicly.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:33:47Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Kanchana Ranasinghe</name>
+    </author>
+    <author>
+      <name>Honglu Zhou</name>
+    </author>
+    <author>
+      <name>Dominick Reilly</name>
+    </author>
+    <author>
+      <name>Le Xue</name>
+    </author>
+    <author>
+      <name>Shusheng Yang</name>
+    </author>
+    <author>
+      <name>Juan Carlos Niebles</name>
+    </author>
+    <author>
+      <name>Silvio Savarese</name>
+    </author>
+    <author>
+      <name>Ran Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21550v1</id>
+    <title>ONAM: Fitting Orthogonal Neural Additive Models for Post-Hoc Interpretability of Black-Box Predictions</title>
+    <updated>2026-11-16T18:31:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.21550v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21550v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Modern machine learning models, such as artificial neural networks, achieve high predictive performance through increasingly complex black-box architectures, limiting their use in settings where transparency, interpretability, and fairness are required. Here we present the R package ONAM, which provides a novel and practical implementation of functional decomposition, a technique to facilitate the interpretability of black-box models through structured effect representations. ONAM implements an algorithmic framework for the post-hoc decomposition of predictions into components associated with different input features. The package is designed for usability and efficiency, including functionalities for visualization as well as quantitative measures to assess interpretability. As a model-agnostic method, it can be applied to a wide range of prediction models. We describe the mathematical foundations, algorithmic design, and software architecture of ONAM. A central result of the proposed methodology is that the resulting decomposition satisfies the condition of hierarchical orthogonality, thereby guaranteeing that all components are identifiable and uniquely defined.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:31:29Z</published>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>David Köhler</name>
+    </author>
+    <author>
+      <name>Matthias Schmid</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21543v1</id>
+    <title>Hadron structure on the 16-cell honeycomb</title>
+    <updated>2026-11-16T18:28:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.21543v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21543v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In previous work we started a program of studying non-perturbative QCD on the 4-dimensional 16-cell honeycomb lattice instead of the usually adopted cubic lattice. It was shown that in several observables much smaller cut-off effects are observed, undoubtedly a result of the larger space-time symmetry of this discretization. In the present work further consequences are worked out, relevant for the lattice determination of hadronic structure functions. The key ingredient is the larger set of irreducible representations of the 16-cell honeycomb symmetry group relative to the cubic lattice, leading to more protection from mixing and thus less power divergences. A second ingredient is that more irreducible representations are available for a hadron at rest, which also leads to computational gain in practice. The analysis is given in full detail for both polarized and unpolarized and both forward and off-forward matrix elements of twist-2 and twist-3 operators. It is shown that a larger set of moments can be determined with continuum-like renormalization and at rest, than on the cubic lattice.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:28:52Z</published>
+    <arxiv:comment>46 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Sandor Katz</name>
+    </author>
+    <author>
+      <name>Daniel Nogradi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21539v1</id>
+    <title>Seen but Unsaid: Locating and Repairing Cross-Image Comparison in Vision-Language Models</title>
+    <updated>2026-11-16T18:25:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.21539v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21539v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language models (VLMs) often fail to match a point or an object across two images, even when the answer can be decoded from their own hidden states. We trace this failure from the visual tokens to the answer letter, in Qwen3-VL (2B-32B), InternVL3.5-8B, and Gemma-3-12B, on synthetic shape matching, same-instance point correspondence (HPatches), and semantic correspondence (SPair-71k), and find two distinct failure points, a small set of attention heads that carries the comparison, and a repair that touches 0.02% of the parameters. Two failure points: exact copies are compared but not read out. An answer-position probe exceeds the calibrated output by 15 to 25 points in every family, for nameable and unnameable shapes alike, and steering along the probe's direction moves no more answers than random directions. Semantic correspondences are present in the visual tokens but never reach the answer. One pathway: redistributing the cross-image attention of 16-32 heads, with its mass preserved, removes 17-22 points of synthetic and 15-32 points of HPatches accuracy, against at most 7 for random or attention-matched heads. A lever that training finds on its own: training only these heads' query and key projections raises SPair-71k accuracy by 28.3 points (Qwen3-VL-8B) and 25.1 points (InternVL3.5-8B), beats both layer-matched and attention-matched heads, and transfers to HPatches and BLINK. An unconstrained all-layer adapter routes 21-51% of its gain through the attention of the same heads, against at most 7% for random heads, and does so by changing what they read (83-86% of the effect) rather than their weights. Every decision rule was frozen before its run, and every reported number is recomputed by independent verification scripts.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:25:57Z</published>
+    <arxiv:comment>18 pages, 3 figures, 19 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zhaoning Zhang</name>
+    </author>
+  </entry>
+</feed>

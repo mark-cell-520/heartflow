@@ -1,0 +1,41 @@
+ok   round-295-econ-reasoning-wiring.test.js
+ok   round-296-incentive-blind-spot-wiring.test.js
+ok   round-303-average-marginal-rate.test.js
+ok   round-305-meta-anchor-legs.test.js
+ok   round-309-selection-on-outcome-groups.test.js
+FAIL(exit) round-310-peak-end-event-day-verdicts.test.js
+not ok 1 - test/round-310-peak-end-event-day-verdicts.test.js
+FAIL(exit) round-311-sig-verdict-ma-legs.test.js
+not ok 1 - test/round-311-sig-verdict-ma-legs.test.js
+ok   round-316-auction-victory-break-even-exit.test.js
+ok   round-317-money-label-craft-effort-selective-report.test.js
+FAIL(exit) round-318-default-value-anchor.test.js
+not ok 1 - test/round-318-default-value-anchor.test.js
+FAIL(exit) round-319-bnpl-process-sell-margin-significance.test.js
+not ok 1 - test/round-319-bnpl-process-sell-margin-significance.test.js
+ok   round-331-illusion-of-control.js
+ok   round-336-opportunity-cost-neglect.test.js
+ok   round-339-confounding-by-indication.test.js
+ok   round-343-incentive-conflation.test.js
+ok   round-344-mirror-conflation.test.js
+ok   round-345-incentive-conflation-connectives.test.js
+ok   round-346-incidence-misread-incentive-legs.test.js
+ok   round-360-will-rogers-phenomenon.test.js
+ok   round-361-will-rogers-gaps.test.js
+ok   round-362-will-rogers-gaps2.test.js
+ok   round-363-tragedy-commons-firstmover.test.js
+ok   round-364-jevons-paradox.test.js
+ok   round-366-carbon-leakage.test.js
+ok   round-367-price-control.test.js
+ok   round-368-mercantilism.test.js
+ok   round-369-paradox-of-thrift.test.js
+ok   round-371-decoy-effect.test.js
+ok   round-372-healthy-user-bias.test.js
+ok   round-373-extraordinary-claims.test.js
+ok   round-374-stock-flow-conflation.test.js
+ok   round-375-government-household-analogy.test.js
+ok   round-376-money-creation.test.js
+ok   round-377-linear-tax-revenue.test.js
+ok   round-378-insurance-claim-loss.test.js
+ok   round-379-flat-rate-bias.test.js
+存量 econ 轮测：36 个文件，fail 4

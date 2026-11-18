@@ -1,0 +1,352 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/Y2yE3O3ivL9WzGU3K5hMWHY5TEE</id>
+  <title>arXiv Query: search_query=all:per-protocol OR all:analysis OR all:intention-to-treat OR all:healthy OR all:adherer OR all:bias&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T04:16:53Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:per-protocol+OR+(all:analysis+OR+(all:intention-to-treat+OR+(all:healthy+OR+(all:adherer+OR+all:bias))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>673405</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23230v1</id>
+    <title>On the multiplicity of crossing limit cycles of double diagonalizable piecewise linear vector fields</title>
+    <updated>2026-11-17T18:59:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.23230v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23230v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider planar piecewise linear vector fields with two zones separated by a straight line and having two diagonalizable components, which we call the \emph{double diagonalizable configuration}. In this configuration, the Poincaré half-maps correspond to separatrices of saddle points in the foliations of symmetric differential forms $ω_r(x)-ω_r(y)$, where $ω_r$ is a rational $1$-form with exactly three simple poles. Limit cycles correspond to non-diagonal intersections of two such separatrices, and the multiplicity of a limit cycle is precisely the order of contact at the intersection point. We prove that two distinct separatrices which are not nested segments of the same straight line have a contact of order at most $4$ at a diagonal point and at most $2$ at a non-diagonal point. As a consequence, we obtain that the multiplicity of limit cycles in the double diagonalizable configuration is at most two, this bound being sharp.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:59:55Z</published>
+    <arxiv:comment>13 figures; submitted</arxiv:comment>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Lucas Queiroz Arakaki</name>
+    </author>
+    <author>
+      <name>Daniel Panazzolo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23223v1</id>
+    <title>Equilibrium Statistics and Stability in Random Two-Population and Three-Population Evolutionary Games</title>
+    <updated>2026-11-17T18:57:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.23223v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23223v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multi-population matrix evolutionary games provide a framework for studying adaptation and strategic interactions among heterogeneous agents. When payoffs are uncertain, however, analysing a specified game does not reveal how frequently different evolutionary outcomes occur or how their probabilities depend on modelling assumptions. We study two- and three-population games with two strategies per population and both within- and between-population pairwise interactions, with payoffs fixed during each evolutionary trajectory. For two populations, we derive equilibrium-existence probabilities and analytical stability results for generic games and three structured classes: diversity, exclusive, and avoidance games. For generic two-population games, independent Gaussian sampling of payoff entries and of replicator coefficients produces different equilibrium statistics. Interaction structure further distinguishes coexistence from attraction: diversity and exclusive games share the same interior-existence probability, but only exclusive games admit asymptotically stable interior equilibria. Avoidance games admit transversely attracting equilibrium families without locally asymptotically stable individual points. For generic three-population games under independent payoff sampling, we obtain existence probabilities for all equilibrium types and joint existence-and-stability probabilities for boundary equilibria. Monte Carlo simulations support the analytical predictions and quantify multistability, while phase portraits illustrate initial-condition dependence. Under the same Gaussian payoff-sampling protocol, simulations show a lower frequency of fully mixed equilibria but a higher frequency of multistability for three populations than for two.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:35Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Zhao Song</name>
+    </author>
+    <author>
+      <name>Manh Hong Duong</name>
+    </author>
+    <author>
+      <name>The Anh Han</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23218v1</id>
+    <title>What Does a Bias Head Measure? Non-Identifiability in Head-Level Bias Attribution</title>
+    <updated>2026-11-17T18:57:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.23218v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23218v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Methods that localise social bias in large language models to individual attention heads and remove it by ablation are validated by their effect on a fairness metric, never by evidence that the statistic selecting the heads measures bias. We audit this on Qwen-2.5-7B-Instruct and Llama-3.1-8B-Instruct. The head map correlates at $ρ= -0.950$ and $-0.768$ with a label-blind response-length map, apparently identifying a surface confound. An intervention that breaks the length-label coupling rejects this reading: with the prompt held fixed, response length explains 1% of the statistic's variance. What does explain it is prompt identity, at 64% of variance, in an ordering that is not monotonic in length. Within any fixed prompt the fairness label, response length and the presence of a protected-group token are collinear at $φ= 0.95$, partly by definition of the labelling rule, so no observational analysis can attribute the map to any of them, and no method in this family performs an experiment that could. The substantive claims fail independently: bias selectivity is not late-layer-concentrated on either model under either reference reading, and no head set we tested reduces the unfairness rate when ablated. Its complement, scored on the opposite label, reliably destroys refusal behaviour ($p = 2.7\times10^{-5}$), demonstrating that the pipeline detects effects at this scale.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:57:08Z</published>
+    <arxiv:comment>18 pages, 13 tables. Under review at ACL Rolling Review (October 2026 cycle)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>S. M Seefat Alam</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23217v1</id>
+    <title>Near Resonance, Less Ordered: Radius and Mass Ordering in Compact Multi-planet Systems</title>
+    <updated>2026-11-17T18:56:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.23217v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23217v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Compact multi-planet systems exhibit a tendency for planetary radii to follow ordered sequences with orbital position, suggesting that these non-random patterns preserve a fossil record of their formation. Here, we investigate whether ordering of planet radii and masses with orbital period is related to proximity to mean-motion resonances. We compare near-resonant and non-resonant systems using complementary rank- and inversion-based measures of ordering, while accounting for differences in planet multiplicity and uncertainties in the measured planetary properties. We find that radii and masses are less monotonically ordered in near-resonant systems than in non-resonant systems, with the primary radius analysis providing stronger evidence than the mass analysis. This result is opposite to the naive expectation that dynamical instabilities should erase the primordial ordering of initially resonant systems and leave non-resonant systems in a more disordered state.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:56:45Z</published>
+    <arxiv:comment>12 pages, 5 figures, submitted to ApJ Letters</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Agustin Heron</name>
+    </author>
+    <author>
+      <name>Songhu Wang</name>
+    </author>
+    <author>
+      <name>Cristobal Petrovich</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23213v1</id>
+    <title>Modeling quantum information scrambling in realistic protein NMR experiments</title>
+    <updated>2026-11-17T18:52:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.23213v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23213v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Out-of-time-order correlators (OTOCs) are important probes of operator spreading and information scrambling, and have recently been proposed as a means of extracting molecular structural information through nuclear magnetic resonance (NMR). Realizing this potential requires accurate modeling of OTOCs in complex molecular environments within experimentally relevant settings. Here, we develop an end-to-end computational pipeline connecting molecular structures to OTOC dynamics in protein systems. Our framework incorporates molecular motion through molecular dynamics simulations, orientational averaging appropriate for powder samples, and spin-network truncation, using an experimentally realizable double-quantum effective Hamiltonian. We apply this framework to a dataset of over 350 carbon-carbon spin pairs across 10 protein systems, spanning interspin distances of 5-17 A. We find that OTOC arrival times scale approximately linearly with interspin distance, revealing system-dependent operator-spreading velocities that enable correlations to propagate over extended distances within milliseconds. Our sensitivity analysis further shows that individual OTOCs predominantly constrain a single structural parameter, primarily associated with interspin distance. Together, these findings highlight the potential of OTOCs to probe spatially extended spin correlations on timescales compatible with solid-state NMR experiments.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:52:24Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Alec F. White</name>
+    </author>
+    <author>
+      <name>Joseph Haslehurst</name>
+    </author>
+    <author>
+      <name>Daniel R. Moberg</name>
+    </author>
+    <author>
+      <name>Justin Provazza</name>
+    </author>
+    <author>
+      <name>Nicholas C. Rubin</name>
+    </author>
+    <author>
+      <name>Thomas E. O'Brien</name>
+    </author>
+    <author>
+      <name>Christian Bengs</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23212v1</id>
+    <title>EviSlide-MIL: Multi-Query Pooling and Shared Prediction for Class-Incremental Whole-Slide Image Classification</title>
+    <updated>2026-11-17T18:50:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.23212v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23212v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Histopathological analysis of whole-slide images (WSIs) plays a critical role in cancer diagnosis, and multiple instance learning (MIL) is widely adopted for WSI analysis under weak supervision. As new tumor subtypes are introduced, extending existing MIL models requires learning new classes while retaining knowledge of previously learned ones. This presents a class-incremental learning challenge, where models must acquire new classes with limited access to historical training data and recognize all learned classes without task identifiers at inference. A major obstacle is forgetting, as updates to feature aggregation and prediction modules can degrade performance on previously learned classes. To address this challenge, we propose \textbf{EviSlide-MIL}, a class-incremental WSI framework that integrates multiple learnable queries per class with a shared prediction module. The queries aggregate frozen patch features into class-specific representations, while the shared prediction module limits parameter growth across incremental stages. By freezing queries associated with previously learned classes, EviSlide-MIL preserves their attention patterns for identical inputs, while experience replay and knowledge distillation further mitigate forgetting as shared parameters are updated. Experiments on eight tumor subtypes from The Cancer Genome Atlas demonstrate that EviSlide-MIL achieves improved performance and reduced forgetting compared with competing methods across most learning settings, demonstrating its potential for scalable and knowledge-preserving WSI classification. Code and pretrained models will be released.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:50:42Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zhouhan Qian</name>
+    </author>
+    <author>
+      <name>Sicheng Chen</name>
+    </author>
+    <author>
+      <name>Chad Wong</name>
+    </author>
+    <author>
+      <name>Tianyi Zhang</name>
+    </author>
+    <author>
+      <name>Enhui Chai</name>
+    </author>
+    <author>
+      <name>Zeyu Liu</name>
+    </author>
+    <author>
+      <name>Fei Xia</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23210v1</id>
+    <title>Non-homogeneous parabolic conormal boundary problem with singular-degenerate coefficients</title>
+    <updated>2026-11-17T18:49:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.23210v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23210v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study non-homogeneous conormal boundary value problems for a class of divergence-form parabolic equations whose volumetric heat-capacity coefficients belong to a Muckenhoupt class of weights. Consequently, the equations exhibit singular, degenerate, or simultaneously singular-degenerate behavior. Under smallness conditions on the partial mean oscillation of the diffusion coefficients and the weighted mean oscillation of the volumetric heat-capacity coefficient, we establish regularity estimates, existence, and uniqueness results in appropriate weighted Sobolev spaces. To obtain these results, we employ the level-set argument introduced by Caffarelli and Peral. We also establish weighted parabolic cylinders, weighted inequalities, and a weighted Aubin-Lions compactness theorem, which are essential tools in our analysis.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:49:55Z</published>
+    <arxiv:comment>33 pages, comments are welcome</arxiv:comment>
+    <arxiv:primary_category term="math.AP"/>
+    <author>
+      <name>Junyuan Fang</name>
+    </author>
+    <author>
+      <name>Tuoc Phan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23207v1</id>
+    <title>Local interference algorithms for observables in large random circuits</title>
+    <updated>2026-11-17T18:48:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23207v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23207v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In quantum dynamics, it is generally believed that interference effects lead to a sign problem for classical Monte Carlo sampling methods, rendering sampling ineffective. In this paper we show that this is generically not the case for the task of simulating the evolution of observables in random instances of circuit dynamics. Specifically, we consider two examples of observables which give large signals despite the randomness of the dynamics: first order out-of-time-ordered correlators (OTOCs) in unstructured random circuits without conservation laws and time-ordered charge-charge correlators (TOCs) in particle number-preserving random circuits. We show that these observables can be approximated by classical stochastic processes and that these approximations can be systematically improved with a series expansion that incorporates coherent corrections associated with clusters of gates. We design and implement algorithms that combine Monte Carlo sampling and tensor network methods to approximate the series. We observe numerically that the computational complexity of approximating TOCs and OTOCs scales polynomially in the circuit size and in the target precision. We study the accuracy of these algorithms by directly mapping their ensemble-averaged errors to partition functions of replica statistical models, allowing for perturbative analysis and numerics in $1$d brickwork geometries. Our theoretical analysis explains the empirical observation of polynomial complexity of these algorithms and is consistent with polynomial complexity extending to arbitrarily small precision and to the thermodynamic limit.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:48:27Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Philippe Suchsland</name>
+    </author>
+    <author>
+      <name>Brayden Ware</name>
+    </author>
+    <author>
+      <name>Vladislav D. Kurilovich</name>
+    </author>
+    <author>
+      <name>Vadim Smelyanskiy</name>
+    </author>
+    <author>
+      <name>Kostyantyn Kechedzhi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23206v1</id>
+    <title>Reading Scene States: Uncovering Safety Failures in Vision-Language Models</title>
+    <updated>2026-11-17T18:48:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.23206v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23206v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language models (VLMs) can provide harmful assistance by interpreting visual events, even without an explicit request for the underlying harmful objective. We identify this \textbf{scene-state safety vulnerability} and introduce \textbf{SceneSafetyBench}, comprising 375 image--question pairs spanning Initial, Medium, and Ultimate scene states and five visual presentations. Across eight VLMs, scene-state inputs elicit harmful assistance with attack success rates (ASRs) of 45.6--72.3\%. Comparative analysis across three VLMs shows that scene-state inputs most closely resemble QR-related images in their layer-wise safety-related signal profiles, while exhibiting lower average late-layer readouts and distinct signal dynamics during generation. To turn this vulnerability into a systematic attack, we propose \textbf{S3TA}, which translates harmful objectives into scene states, queries image--question pairs independently, and assembles the responses. On seven MM-SafetyBench categories across eight open-weight and commercial VLMs, S3TA achieves a model-average ASR of \textbf{71.2\%, exceeding the strongest baseline by 6.1 percentage points}. Text-side filters and visual moderation provide limited protection. These findings highlight the need to safeguard the assistance models infer through scene-grounded reasoning, beyond screening input content.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:48:02Z</published>
+    <arxiv:comment>VLM safety, multimodal jailbreaks, and scene-state reasoning</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tongxi Wu</name>
+    </author>
+    <author>
+      <name>Yuyang Cheng</name>
+    </author>
+    <author>
+      <name>Jiacheng Xian</name>
+    </author>
+    <author>
+      <name>Menglin Yang</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Jian Zhang</name>
+    </author>
+    <author>
+      <name>Yang Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23204v1</id>
+    <title>A comparative exploration of Steinerberger curvature and resistance curvature in model and real-world complex networks</title>
+    <updated>2026-11-17T18:46:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.23204v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23204v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Discrete curvature extends the concept of curvature from continuous spaces to discrete structures such as graphs and networks. It provides a mathematical framework for characterising local and global network geometry, that offers insights into structural properties such as connectivity and clustering. In this study, we investigate Steinerberger curvature (SBC) and resistance curvature (RC) and examine their relationships with established graph curvature measures, namely Forman-Ricci, Augmented Forman-Ricci, and Ollivier-Ricci curvatures, a notion of scalar sectional curvature, as well as conventional vertex-based measures. A systematic comparative analysis is conducted across various synthetic network models and real-world networks, focusing on curvature distributions, correlations with structural measures, and the identification of structurally important vertices through network disintegration experiments based on global efficiency. Our results show that SBC generally exhibits weaker correlations with other measures. On the other hand, RC is strongly positively correlated with established discrete Ricci curvature measures, whereas it is predominantly negatively correlated with conventional vertex-based measures like degree and centrality-based measures. Furthermore, RC achieves a reduction in communication efficiency comparable to or faster than established Ricci curvature measures. These findings suggest that SBC captures structural characteristics that are largely distinct from those reflected by other measures, while RC exhibits distinct structural associations and shows significant potential for identifying vertices critical to network connectivity.</summary>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:46:54Z</published>
+    <arxiv:comment>40 pages, 5 main figures, 3 supplementary figures, 1 main table, 17 supplementary tables</arxiv:comment>
+    <arxiv:primary_category term="cs.SI"/>
+    <author>
+      <name>Madhumita Mondal</name>
+    </author>
+    <author>
+      <name>Priyank Vasu</name>
+    </author>
+    <author>
+      <name>Areejit Samal</name>
+    </author>
+    <author>
+      <name>Jürgen Jost</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23201v1</id>
+    <title>Governance Risks in Decentralized Autonomous Organizations (DAOs): Implications for Traditional Financial Institutions</title>
+    <updated>2026-11-17T18:42:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.23201v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23201v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As financial institutions increasingly interact with blockchain ecosystems through decentralized finance, stablecoins, tokenized assets, and distributed ledger infrastructure, they come to depend on systems governed wholly or partly by decentralized autonomous organizations (DAOs). This paper examines how DAO governance differs from traditional corporate governance and what this implies for risk management in regulated financial institutions. Using a qualitative comparative framework grounded in OECD governance principles, Basel Committee guidance, and FINMA circulars, the study maps DAO deliberation, voting, and accountability mechanisms against established governance and risk-management principles and illustrates associated risks through selected real-world cases. The analysis shows that DAOs preserve core governance functions but redistribute them across token holders, delegates, community forums, smart contracts, and legal wrapper entities. This creates distinct risks, including voting-power concentration, weak proposal controls, legal uncertainty, and unclear accountability, which established frameworks do not fully capture, while also offering two transferable strengths: a transparent, traceable decision record and a direct link between approval and execution. The paper contributes a structured assessment framework linking DAO governance characteristics to existing governance, outsourcing, technology-risk, and operational-resilience processes, enabling institutions to address DAO-governed dependencies through targeted extensions of current practices rather than a separate risk framework.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:42:34Z</published>
+    <arxiv:comment>16 pages, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Christian Plöschberger</name>
+    </author>
+    <author>
+      <name>Irene Buller</name>
+    </author>
+    <author>
+      <name>Mark Christopher Ballandies</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23199v1</id>
+    <title>Circular Vector Tomography with Partial Radial Data</title>
+    <updated>2026-11-17T18:40:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.23199v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23199v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this article, we introduce and study several generalized circular Radon transforms acting on smooth vector fields compactly supported in a planar annulus, with centers restricted to the outer acquisition circle and truncated measurement radii. The operators of interest are the longitudinal and transverse circular Radon transforms and their weighted analogues. We characterize the kernels of the individual unweighted transforms. Then we establish the reconstruction of a vector field from the combined longitudinal and transverse circular Radon transform data. We further show that the pairs formed by each transform and its weighted analogue is not sufficient for the complete recovery of a vector field. However, we demonstrate that full reconstruction is possible with suitable additional data. Finally, we numerically implement and validate the derived inversion formulas.</summary>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:40:44Z</published>
+    <arxiv:primary_category term="math.CA"/>
+    <author>
+      <name>Rahul Bhardwaj</name>
+    </author>
+    <author>
+      <name>Indrani Zamindar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23197v1</id>
+    <title>Structure--Residual Inductive Biases for Language Model Pretraining</title>
+    <updated>2026-11-17T18:38:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.23197v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23197v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Next-token prediction is relied upon to learn both predictive behavior and internal representations. We ask whether representation structure itself should be an explicit inductive bias. Motivated by the two-part coding view of Kolmogorov complexity, we study a structure--residual principle in which a representation separates structure from realization detail. We instantiate this principle in two complementary ways. Boundary Bottleneck Concept (BBC) routes information from token segments through boundary carriers while preserving local autoregressive computation. Continuous Concept (CC) regularizes representation geometry and induces a spectral decomposition into low-frequency structure and high-frequency residual. We derive coding bounds for both views and show that multiplicity-corrected boundary attention becomes exact as the within-segment path energy vanishes. Empirically, BBC and CC exhibit strikingly different depth preferences: BBC works best in early layers, whereas CC is most effective in later layers. At 300M training tokens, combining BBC and CC improves NLL by 1.44\% on GPT-2 Medium. These gains persist with training runs up to 20B tokens. Representation diagnostics show that BBC increases the relative predictive importance of boundary states, while CC reduces spectral residual energy. Together, these results suggest that structure--residual biases can improve language-model pretraining beyond next-token prediction. Code: https://github.com/haihuang-ml/structure-residual</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:38:27Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Hai Huang</name>
+    </author>
+    <author>
+      <name>Bartosz Żuk</name>
+    </author>
+    <author>
+      <name>Rassul Magauin</name>
+    </author>
+    <author>
+      <name>Jiaxin Huang</name>
+    </author>
+    <author>
+      <name>Xue Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23195v1</id>
+    <title>Multifractal analysis of Takagi-type functions built from beta-expansion cylinders</title>
+    <updated>2026-11-17T18:38:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.23195v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23195v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study a family of Takagi functions obtained by placing a normalized tent on each beta-expansion cylinder, with amplitude $β^{-αn}$ at order $n$, where $β&gt;1$ and $0&lt;α\le1$. We characterize their pointwise Hölder regularity in terms of cylinder lengths and distances from the point under consideration. The characterization holds more generally for nested interval partitions with exponentially decreasing mesh, without requiring interval lengths at a given order to be comparable. For beta-expansion cylinders, we compute the full multifractal spectrum whenever the remainders of the expansion of $1$ have a finite upper exponential decay rate. The functions are monofractal when this rate vanishes, as it does for Parry, Pisot and Salem bases. When it is positive, the spectrum is affine on a nondegenerate interval. The bases defined by $\sum_{k\ge0}β_\ell^{-\ell^k}=1$, for integers $\ell\ge2$, give explicit non-monofractal examples. We also prove that every function in the family is nowhere differentiable.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:38:09Z</published>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Samuel Nicolay</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23194v1</id>
+    <title>Global genetic inference at the scale of mass disasters</title>
+    <updated>2026-11-17T18:37:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.23194v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23194v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>DNA-based disaster victim identification is commonly performed sequentially, with matches accepted before all genetic evidence is considered jointly. However, early matches may be incorrect or inconsistent with the globally most likely assignment, and treating them as final can affect subsequent identifications. Joint analysis avoids this dependence on decision order, but combinatorial growth has historically made it prohibitive in large cases. In this paper, we show that the general joint identification problem is NP-hard and develop a local-to-global framework for joint genetic inference at scale. We reduce the search using genetic compatibility tests, likelihood-based pruning of unlikely assignments, and symmetry reductions. We represent pedigree likelihoods as polynomials and reformulate the Elston-Stewart algorithm for efficient parallel likelihood evaluation on GPUs. Together, these advances yield a manageable set of candidate assignments and their likelihoods, from which we construct an integer linear program that resolves competing identifications and determines the global maximum-likelihood assignment. In small benchmarks, the method recovers the exhaustive-search optimum with up to 99.96% fewer likelihood evaluations. We also apply it to simulated disasters involving up to 10 thousand victims and missing persons. The framework is not limited to a single global optimum but yields a list of probable alternative assignments, thus providing a flexible tool to be used alongside other forensic evidence.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T18:37:15Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Yourie Weesie</name>
+    </author>
+    <author>
+      <name>Ritsaart Bergsma</name>
+    </author>
+    <author>
+      <name>Aafko Boonstra</name>
+    </author>
+  </entry>
+</feed>

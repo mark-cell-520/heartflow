@@ -1,0 +1,20 @@
+  ✓ FLAT_ZH        [mode] 命中 true → 注入后 false
+  ✓ FLAT_EN        [mode] 命中 true → 注入后 false
+  ✓ UNDERUSE_ZH    [mode] 命中 true → 注入后 false
+  ✓ UNDERUSE_EN    [mode] 命中 true → 注入后 false
+  ✓ WASTE_ZH       [mode] 命中 true → 注入后 false
+  ✓ WASTE_EN       [mode] 命中 true → 注入后 false
+  ✓ MUSTFREQ_ZH    [mode] 命中 true → 注入后 false
+  ✓ MUSTFREQ_EN    [mode] 命中 true → 注入后 false
+  ✓ DILUTE_ZH      [mode] 命中 true → 注入后 false
+  ✓ DILUTE_EN      [mode] 命中 true → 注入后 false
+  ✓ CONCEPT_ZH     [guard] 命中 false → 注入后 true
+  ✓ CONCEPT_EN     [guard] 命中 false → 注入后 true
+  ✓ CORRECT_ZH     [guard] 命中 false → 注入后 true
+  ✓ CORRECT_EN     [guard] 命中 false → 注入后 true
+  ✓ NEG_ZH         [guard] 命中 false → 注入后 true
+  ✓ NEG_EN         [guard] 命中 false → 注入后 true
+  ✓ HEDGE_ZH       [guard] 命中 false → 注入后 true
+  ✓ HEDGE_EN       [guard] 命中 false → 注入后 true
+
+结果: 18 通过, 0 失败

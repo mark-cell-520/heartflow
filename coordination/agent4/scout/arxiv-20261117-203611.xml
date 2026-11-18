@@ -1,0 +1,429 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/QASV9gIEVLPI7MhIYyjE8ZLXpE0</id>
+  <title>arXiv Query: search_query=all:statistical OR all:causal OR all:reasoning OR all:fallacy OR all:detection OR all:benchmark&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-17T20:36:11Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:causal+OR+(all:reasoning+OR+(all:fallacy+OR+(all:detection+OR+all:benchmark))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>739924</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21608v1</id>
+    <title>Latent Lattice Language Models</title>
+    <updated>2026-11-16T18:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.21608v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21608v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language models typically increase per-token computation through deeper or looped layers and latent reasoning steps, while richer residual connections improve information flow across layers. We instead increase computational capacity: the number of active computational states a model maintains. We introduce the Lattice of Latents, a set of per-layer horizontal latent streams that run recurrently along time, alongside the vertical residual stream that flows through depth. Like hyper-connections, mHC, and attention or value residuals, the Lattice enhances the residual stream, but rather than adding or rerouting residual pathways through depth, it provides companion computational states that persist across tokens. Unlike hybrid Transformer-SSM architectures, whose recurrent states primarily serve as internal memory for sequence mixing, these latents directly condition the vertical stream's attention, KV-cache writes, MLP computation, and decoding. On Transformers trained on 20B FineWeb-Edu tokens, a 406M-parameter Lattice model lowers validation perplexity from 15.41 to 14.40 over a parameter-matched Transformer. These gains extend across architectural variants. The Lattice composes with prior residual-stream enhancements: with hyper-connections and input residuals, it lowers validation perplexity from 15.41 (base Transformer) and 14.22 (Transformer with the same enhancements) to 13.61. On Gated DeltaNet, Mamba-2, Triadic GDN, and GDN-Mamba-2 hybrids, it improves perplexity at every tested native state size, with Lattice-GDN and Lattice-Triadic-GDN variants outperforming pure baselines with 4x larger native states. These results identify persistent per-layer state as a complementary axis for scaling language-model computation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:38Z</published>
+    <arxiv:comment>Project page: https://shivamduggal4.github.io/latent-lattice-language-model/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Shivam Duggal</name>
+    </author>
+    <author>
+      <name>Zongze Wu</name>
+    </author>
+    <author>
+      <name>William T. Freeman</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Richard Zhang</name>
+    </author>
+    <author>
+      <name>Eli Shechtman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21607v1</id>
+    <title>ScaleVLA: Scaling Vision-Language-Action Models to 552 Billion Parameters</title>
+    <updated>2026-11-16T18:59:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.21607v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21607v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier Vision-Language Models (VLMs) such as GPT-6 Astra have demonstrated remarkable capabilities in robot control, suggesting that broad pretraining provides knowledge valuable for physical action. Yet most Vision-Language-Action (VLA) policies still rely on much smaller VLM backbones, leaving this potential largely untapped. We ask whether frontier-scale representations can provide a stronger foundation for robot learning. We introduce ScaleVLA, which connects a 552B DeepSeek-V4.1-Flash backbone to a trainable action DiT, and systematically compare VLMs from 2B to 552B under a shared training setup. We evaluate three fundamental capabilities of robot foundation models. In sample efficiency, just 10 demonstrations outperform a 2B backbone trained with 50 (87.8% vs. 85.6%). In generalization, LIBERO-PRO success reaches 45.1%, compared with at most 31.3% for smaller backbones. In precise manipulation, real-world charger insertion improves from 4/10 to 9/10 successes, with gains concentrated in contact-sensitive alignment. Despite its scale, ScaleVLA achieves 216 ms median latency per action chunk. Our findings suggest that frontier VLMs can serve not only as reasoning agents, but also as powerful representational foundations for efficient and generalizable robot policies.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:37Z</published>
+    <arxiv:comment>Tech Report</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Ruixi Yu</name>
+    </author>
+    <author>
+      <name>Dairu Liu</name>
+    </author>
+    <author>
+      <name>Xuchuan Chen</name>
+    </author>
+    <author>
+      <name>Zekun Qi</name>
+    </author>
+    <author>
+      <name>Zekai Li</name>
+    </author>
+    <author>
+      <name>Zhuo Cao</name>
+    </author>
+    <author>
+      <name>Luyang Niu</name>
+    </author>
+    <author>
+      <name>Yingsheng Zhang</name>
+    </author>
+    <author>
+      <name>Sikai Liang</name>
+    </author>
+    <author>
+      <name>Ke Fan</name>
+    </author>
+    <author>
+      <name>He Wang</name>
+    </author>
+    <author>
+      <name>Li Yi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21605v1</id>
+    <title>ViRA: Toward Ultra-High-Resolution Visual Agents via Cross-Input Relative Policy Optimization</title>
+    <updated>2026-11-16T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21605v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21605v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Visual agents answer questions about ultra-high-resolution photos by zooming into the relevant regions. However, existing agents often answer from common sense instead of reading the evidence. Reinforcement learning (RL) on the final answer cannot correct this, because a guess earns the same reward as reading. We propose Cross-Input Relative Policy Optimization (CrossRPO), which trains agents on contrast sets. A contrast set asks one question about several versions of an image that differ only in a small region with the evidence and have different answers, so only reading the evidence solves the whole set. CrossRPO rewards solving the whole set, and we prove that it does not reinforce a set answered from common sense. We build contrast sets for training (ViRA-Train) and evaluation (ViRA-Bench) by editing one small object in images of 21 to 120 megapixels, and we photograph further sets with real changes (ViRA-Bench-Real) to exclude editing traces. We train two Visual Reasoning Agents, ViRA-9B and ViRA-27B, with CrossRPO on only about 3,500 items of ViRA-Train each. CrossRPO achieves 63.3% set accuracy on ViRA-Bench at the maximum resolution, against 59.3% for GRPO. ViRA-9B is the most accurate open model of its size on all benchmarks, and ViRA-27B outperforms Claude Haiku 5.5 and GPT-6-Luna, both at their highest thinking level, on most benchmarks.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:04Z</published>
+    <arxiv:comment>74 pages, 11 figures, 26 tables. Code: https://github.com/huawei-lin/ViRA</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Huawei Lin</name>
+    </author>
+    <author>
+      <name>Jinting Liu</name>
+    </author>
+    <author>
+      <name>Tongyan Wang</name>
+    </author>
+    <author>
+      <name>Xuyang Chen</name>
+    </author>
+    <author>
+      <name>Ruihua Shi</name>
+    </author>
+    <author>
+      <name>Zhichao Xu</name>
+    </author>
+    <author>
+      <name>Jiaxin Qin</name>
+    </author>
+    <author>
+      <name>Guoshenghui Zhao</name>
+    </author>
+    <author>
+      <name>Baijian Yang</name>
+    </author>
+    <author>
+      <name>Yingjie Victor Chen</name>
+    </author>
+    <author>
+      <name>Tan Yu</name>
+    </author>
+    <author>
+      <name>Weijie Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21604v1</id>
+    <title>FaceJev: Direct Visual Decisions for Face Forgery Detection</title>
+    <updated>2026-11-16T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.21604v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21604v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Face forgery detection methods often perform well on seen manipulations but generalize poorly to unseen ones. Multimodal Large Language Models (MLLMs) can recognize facial parts and assess their visual plausibility. Existing MLLM-based methods typically express these judgments through textual explanations, but seldom treat individual part decisions as explicit learning targets. We present FaceJev, an MLLM-based method for face forgery detection through direct visual decisions. Following the Jev formulation, FaceJev answers eight independent questions about facial parts using a shared image encoding and reads anomaly probabilities from the native answer logits. A face is classified as forged if any part is predicted to be abnormal, directly linking the detection result to the part decisions. We construct PartForensics, a dataset of approximately 160k images with binary anomaly targets for the eight facial parts, to supervise these decisions. We further propose FS-GRPO, which optimizes each part decision through an exact reward comparison with its alternative, using both detection and part rewards. FaceJev outperforms the strongest baseline by 7.25 percentage points on unseen manipulations. Extensive ablation studies validate our design choices and the effectiveness of the main components.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:59:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Siran Peng</name>
+    </author>
+    <author>
+      <name>Tianshuo Zhang</name>
+    </author>
+    <author>
+      <name>Yibo Xue</name>
+    </author>
+    <author>
+      <name>Ajian Liu</name>
+    </author>
+    <author>
+      <name>Haoyuan Zhang</name>
+    </author>
+    <author>
+      <name>Weisong Zhao</name>
+    </author>
+    <author>
+      <name>Shuhuan Chen</name>
+    </author>
+    <author>
+      <name>Xiangyu Zhu</name>
+    </author>
+    <author>
+      <name>Zhen Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21600v1</id>
+    <title>How VLMs Plan What's Next</title>
+    <updated>2026-11-16T18:58:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.21600v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21600v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When a vision-language model describes an image, it names one object at a time and it rarely repeats itself, yet how the model plans this order is far from obvious. We characterize the mechanism a VLM uses to decide where to look before it looks. The mechanism has four main parts. First, binding heads match the relevant text tokens against the image and resolve them into pointers to the matched image region. Second, the same binding heads bind each written answer to the region it came from, and the model turns it into a progress signal: a cursor, the position in the image up to which the list has been written. Third, a select step chooses the nearest unwritten region after the cursor, or stops. Finally, gaze heads execute the chosen pointer and return a concept of what is drawn there, which language heads and the late MLPs turn into a word in the language of the question. We validate each part of this mechanism through causal patching in Qwen3-VL models on a synthetic visual retrieval task, and test our mechanisms against alternative hypotheses. We further show that the mechanism holds across input formats, natural photographs, and languages, and that its binding, relay, and gaze heads appear at every model size from 2B to 32B. This work allows us to investigate how a VLM turns a question and an image into a sequence of answers, layer by layer and token by token. More broadly, it opens a way to study how models plan over complex multi-step tasks with long rollouts. Our project is available at https://plan.baulab.info/</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:30Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rohit Gandikota</name>
+    </author>
+    <author>
+      <name>Arnab Sen Sharma</name>
+    </author>
+    <author>
+      <name>Adam Belfki</name>
+    </author>
+    <author>
+      <name>David Bau</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21598v1</id>
+    <title>Mitigating Catastrophic Forgetting with Physics-Indexed Specialist Memory: the Evolutionary Neuroplastic Agent</title>
+    <updated>2026-11-16T18:58:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.21598v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21598v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Continual reinforcement learning requires adaptation to changing conditions while preserving performance under previously encountered dynamics. It was investigated whether specialists generated by evolutionary search can provide a reusable memory when combined with environment detection and failure-driven search. The Evolutionary Neuroplastic Agent (ENA) evolves small neural networks without gradients, archives selected policies by detected dynamic regime, and retrieves them through Bayesian policy reuse. The architecture was evaluated in non-stationary CartPole and HalfCheetah environments. In the 30-replicate CartPole ablation, the complete architecture achieved a mean success rate of 83.2% across the five test environments. Among variants that learned the harder CartPole environments, the complete architecture showed the most consistent retention. A selection ablation also showed that the retrieval rule affected performance. In the evaluated sequences, ENA adapted more slowly than PPO on CartPole and achieved lower returns than SAC on HalfCheetah. The evidence concerns the complete architecture and does not isolate gradient-free optimization as the cause of retention or establish superiority over other continual-learning methods.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:58:20Z</published>
+    <arxiv:comment>25 pages, 7 figures, 23 tables. Code and data: https://github.com/blasvicco/ena/tree/v1</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Blas Eugenio Vicco Zarate</name>
+    </author>
+    <author>
+      <name>Miguel Hernán Vicco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21592v1</id>
+    <title>Connectivity from activity in spiking neural networks</title>
+    <updated>2026-11-16T18:56:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.21592v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21592v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We show that a wide range of recurrent neural network models obey a simple set of equations tying synaptic connectivity and single-cell response properties to neural correlations. Our modeling framework considers networks in a stationary, asynchronous state and contains a broad class of synaptic filters, spiking nonlinearities, and random-plus-structured connectivity. The resulting equations naturally decompose into contributions from monosynaptic, disynaptic, and higher order paths through the network. We leverage this decomposition to express the effective monosynaptic connection between two neurons in terms of experimentally measurable statistics of the activity, and in particular, their high-frequency correlations. In this way, we show that it is possible to recover network connectivity from neural activity.</summary>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:56:17Z</published>
+    <arxiv:comment>29 pages, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.dis-nn"/>
+    <author>
+      <name>Albert J. Wakhloo</name>
+    </author>
+    <author>
+      <name>Sebastian Mizera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21584v1</id>
+    <title>CertiSum: Bitwise-Identical MXFP4 Training Across Platforms and Parallelism Layouts</title>
+    <updated>2026-11-16T18:54:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.21584v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21584v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Training with MXFP4, a 4-bit microscaling format, is non-deterministic: identical inputs can produce different results across parallelism layouts and GPU vendors. These differences complicate debugging and training audits and can cause training and inference engines to disagree. We present CertiSum to make MXFP4 training bitwise invariant across runs, parallelism layouts, and GPU vendors. Its key insight is that native FP32 accumulation of MXFP4 products is often already exact for every summation order. CertiSum collects statistics during quantization to certify native matrix multiplication results, recomputes uncertified outputs exactly, and uses exact kernels directly where certification rarely succeeds. CertiSum keeps quantization blocks unchanged across layouts and merges partial sums without rounding, including in attention and weight-gradient computation. In 200-step Qwen3-8B-Base experiments, CertiSum preserves training states bit for bit across AMD MI350X and NVIDIA GB200 and across changes in data, tensor, and context parallelism on MI350X. Across three 8B--14B models on FineWeb-Edu using MI350X, it adds 11.8--60.5% to training-step latency relative to its non-exact MXFP4 counterpart at the larger evaluated input shapes, with speedups of up to $1.24\times$ over BF16 and $1.70\times$ over deterministic BF16.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:54:07Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Steve Rhyner</name>
+    </author>
+    <author>
+      <name>Yubo Gao</name>
+    </author>
+    <author>
+      <name>Stefan de Lasa</name>
+    </author>
+    <author>
+      <name>Sankeerth Durvasula</name>
+    </author>
+    <author>
+      <name>Nandita Vijaykumar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21581v1</id>
+    <title>Emptiness formation in quantum fluids: a hydrodynamic solution</title>
+    <updated>2026-11-16T18:50:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.21581v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21581v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop an auxiliary-kernel method for constructing the hydrodynamic instantons that govern macroscopic emptiness formation in one-dimensional Galilean quantum fluids. The key step is to represent the equation of state by an auxiliary integral kernel inspired by the Bethe ansatz. For equations of state admitting such a representation, we reduce the imaginary-time hydrodynamic problem to a single integral equation. Its solution determines the full density and current profiles, the vacuum boundary, and the leading emptiness rate. Notably, the construction does not require microscopic integrability. For the Lieb--Liniger gas, we derive the previously conjectured integral equation for the leading rate and use a known elliptic solution to obtain explicit expressions for the rate and vacuum boundary. Direct hydrodynamic numerics support the predicted boundary. We also recover known instanton solutions for a family of polytropic fluids.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:50:44Z</published>
+    <arxiv:comment>53 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Alexander G. Abanov</name>
+    </author>
+    <author>
+      <name>Boris A. Khanikati</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21580v1</id>
+    <title>Gravitational Waves from Population III Black Hole Mergers in Primordial Gas Disks: Constraining Astrophysical Scenarios with the Laser Interferometer Space Antenna and the Einstein Telescope</title>
+    <updated>2026-11-16T18:50:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.21580v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21580v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The first generation of metal-free Population III (Pop~III) stars provides a possible formation channel for the black hole (BH) seeds in the early Universe. Their remnants may grow through gas accretion and mergers, producing gravitational wave (GW) signals detectable by future observatories. We develop a semi-analytical model of fragmentation in a primordial self-gravitating gas disk within minihaloes at $z &gt; 15$, motivated by high-resolution cosmological simulations. The resulting Pop~III stars form around a central primary, some leaving massive BH remnants that migrate towards the central BH through dynamical friction from gas and dark matter, while the central BH grows through accretion and mergers. For a $10^6~{\rm M_\odot}$ halo at $z=20$, we explore how the initial mass function (IMF) and BH accretion efficiency affect detectability with the Laser Interferometer Space Antenna (LISA) and the Einstein Telescope (ET). We find that both detectors can potentially reveal mergers of Pop III remnant BHs, but favor different astrophysical conditions. LISA pinpoints more massive central BHs ($\sim10^3$-$10^4 {\rm M_\odot}$), grown rapidly through mutual mergers alongside efficient gas accretion ($f_{\rm Edd}=1$), and a relatively top-heavy IMF ($α=0.8$). In contrast, detectability with ET favors lower-mass BHs, with less efficient accretion ($f_{\rm Edd}=0.01$) and a steeper IMF ($α=1.5$). These results highlight the potential of LISA and ET to probe Pop~III BH formation, growth, and mergers across different regions of parameter spaces, jointly constraining Pop~III star formation and early BH seed evolution.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:50:28Z</published>
+    <arxiv:comment>Submitted to ApJL. Comments welcome</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Maulik Bhatt</name>
+    </author>
+    <author>
+      <name>Lucio Mayer</name>
+    </author>
+    <author>
+      <name>Pedro R. Capelo</name>
+    </author>
+    <author>
+      <name>Simona Gallerani</name>
+    </author>
+    <author>
+      <name>Andrea Pallottini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21579v1</id>
+    <title>ScenarioForge: Resource-Grounded Generation and Execution Validation of Cyber Exercises</title>
+    <updated>2026-11-16T18:49:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.21579v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21579v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyber-range and capture-the-flag scenario construction remains labor-intensive because authors must coordinate infrastructure, vulnerable services, attack paths, artifacts, and success conditions. LLMs can propose detailed exercises, but plausible descriptions do not guarantee deployable software or verifiable objectives. We present ScenarioForge, which turns high-level requirements into resource-grounded topologies, services, traffic, segmentation, and challenge chains, then instantiates and validates them in the Common Open Research Emulator (CORE). The ScenarioForge Execution Dataset contains 226 materialized scenarios covering 294 Vulhub images and all 85 custom-built challenge-resource generators developed with our AI-assisted scaffolding. All 226 passed construction, preview, sequencing, deployment, strict runtime validation, and live artifact checks; their 867 steps, each an individually verifiable challenge objective, comprise 457 vulnerability-backed and 410 generated-resource-backed instances. In a separate 50-prompt matched benchmark, ScenarioForge+Qwen3.8 and ScenarioForge+GPT5.6 each achieved 50/50 (100%) topology/build success and 160/160 intent fields; direct frontier generation reached 41/50 builds and 147/160 fields only with the full cumulative scaffold: structure, vocabulary, policy, and container-image guidance. The test still omitted ScenarioForge's downstream challenge-resource generation, dependency/flag sequencing, deployment, and live validation. The artifacts support operationally rich, reproducible exercises for training and evaluation.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:49:56Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Jaime C. Acosta</name>
+    </author>
+    <author>
+      <name>Anantaa Kotal</name>
+    </author>
+    <author>
+      <name>Aritran Piplai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21565v1</id>
+    <title>When Do Histology Foundation Models Need Geometric Test-Time Augmentation?</title>
+    <updated>2026-11-16T18:41:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.21565v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21565v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time augmentation (TTA) aggregates model predictions across multiple transformed views of an input during inference. Because histology images lack a canonical orientation, $D_4$ TTA---pooling across the 8 rotations and reflections of a square---is a standard default in computational pathology. However, the rise of self-supervised histology foundation models (FMs) with inherent rotational invariance calls its continued utility into question. We benchmark 9 histology FMs and 6 general-purpose models across four patch-level and two whole-slide image (WSI) datasets. We find that $D_4$ TTA remains a reliable post hoc improvement, but benefits diminish from $+1.98$ percentage points (pp) for general-purpose backbones to $+0.50$ pp for histology FMs on TCGA-UT, and shrink further for the largest models. To eliminate computational overhead, our experiments demonstrate that entropy routing---applying TTA selectively to uncertain predictions---recovers most of the gain while augmenting only ${\sim}13\%$ of samples. Finally, we show that patch-level TTA improvements do not transfer to slide-level multiple instance learning (MIL). Code: https://github.com/lars-chen/histology-tta</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:41:01Z</published>
+    <arxiv:comment>17 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Lars Chen</name>
+    </author>
+    <author>
+      <name>Valentino F. Foit</name>
+    </author>
+    <author>
+      <name>Dorry Segev</name>
+    </author>
+    <author>
+      <name>Michal Mankowski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21564v1</id>
+    <title>Assessing Distributional Covariate Balance After Weighting: A Practical Guide</title>
+    <updated>2026-11-16T18:40:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.21564v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21564v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Health researchers commonly use weighting methods to improve covariate balance when estimating program and intervention effects from observational data. Standardized mean differences (SMDs) and variance ratios assess particular features of balance but may overlook residual differences elsewhere in the covariate distribution. This paper provides practical guidance for using Kolmogorov-Smirnov (KS), Anderson-Darling (AD), and Cramer-von Mises (CVM) statistics as complementary distributional balance diagnostics. In an empirical evaluation of a disease management program, weighting based on a main-effects propensity-score model produced SMD and KS statistics below commonly used or proposed balance thresholds of 0.10 for two continuous covariates, which would conventionally be interpreted as indicating acceptable balance. Nevertheless, permutation tests identified residual distributional differences. Adding quadratic terms for these covariates approximately halved their KS statistics, improved variance balance, and eliminated evidence of residual distributional differences, while leaving the estimated program effect substantively unchanged. Supporting simulations showed that KS, AD, and CVM differed in sensitivity to different forms of distributional discrepancy and that the calibration of resampling-based p-values depended on how the reference distribution was constructed. These findings support a practical approach that combines conventional balance measures, graphical assessment, complementary distributional diagnostics, weighting-model refinement, and outcome adjustment when important residual imbalance remains.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:40:49Z</published>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Ariel Linden</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21562v1</id>
+    <title>Severe but Harmless: Stress-Testing Shift Severity for Frozen Time-Series Forecasters</title>
+    <updated>2026-11-16T18:40:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.21562v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21562v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zero-shot time-series foundation models (TSFMs) have become attractive alternatives to task-specific models because they handle diverse downstream tasks, including anomaly detection and forecasting, without per-series training. However, time-series data undergo distribution shifts, and the dissimilarity between two regimes is commonly scored with statistical measures such as Wasserstein-1, where a higher score is read as a more severe shift. In systematic experiments using three established severity measures on nine regime shifts from three standard traffic datasets, we show that these measures do not reliably predict degradation for instance-normalized TSFMs. The regimes rated most severe are not the regimes that degrade the models most, and degradation reaches 29% in the lowest-scoring regime. In most cases, the audit shows no positive relationship between measured severity and model degradation. We provide an equivariance-based stress-testing analysis that explains why severity readings can become decoupled from model degradation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:40:35Z</published>
+    <arxiv:comment>10 pages, 6 figures, 5 tables. Accepted at IEEE BigData 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Korede R. Bishi</name>
+    </author>
+    <author>
+      <name>Dominic Okonkwo</name>
+    </author>
+    <author>
+      <name>Adetayo Okunoye</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.21560v1</id>
+    <title>Optimal Quantum Sensing Algorithms for Discrete-Frequency Spectroscopy</title>
+    <updated>2026-11-16T18:39:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.21560v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.21560v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spectroscopy is a versatile tool that drives scientific discovery and underpins modern technologies. Quantum sensing offers promising opportunities to advance spectroscopy through enhanced sensitivity and spectral and spatial resolution. However, existing approaches largely focus on improving general measurement capabilities, often overlooking the structure of specific sensing tasks and leaving potential performance gains untapped. Here, we develop an algorithmic approach to quantum sensing tailored to various spectroscopic tasks, providing new avenues for improvement. Specifically, we consider general time-varying signals supported on a known set of $N$ candidate frequencies, a setting we call discrete-frequency spectroscopy. We formulate three types of practically motivated sensing tasks---Detection, Search, and Learning---that require progressively more spectral information. For all tasks, we design optimal quantum sensing algorithms achieving a $\sqrt{N}$ speedup over conventional frequency-scanning approaches. Optimal Detection and Search need only a single-qubit sensor under $π$-pulse control, whereas optimal Learning provably requires coherent processing with a quantum computer. End-to-end numerical simulations incorporating various experimental imperfections predict up to two-orders-of-magnitude speedup in Detection. As an example, we analyze the feasibility of our Detection and Search algorithms for real-world molecular screening based on state-of-the-art nitrogen-vacancy centers. We also show how quantum-computing-enhanced Learning enables wireless communication in a weak-signal regime where conventional methods fail. Our results establish a practical route toward realizing quantum advantages via designing task-specific sensing algorithms.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-16T18:39:57Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Yu-Jie Liu</name>
+    </author>
+    <author>
+      <name>Richard R. Allen</name>
+    </author>
+    <author>
+      <name>Ruohan Shen</name>
+    </author>
+    <author>
+      <name>Bingtian Ye</name>
+    </author>
+    <author>
+      <name>Timothy T. Chang</name>
+    </author>
+    <author>
+      <name>Joonhee Choi</name>
+    </author>
+    <author>
+      <name>Soonwon Choi</name>
+    </author>
+  </entry>
+</feed>

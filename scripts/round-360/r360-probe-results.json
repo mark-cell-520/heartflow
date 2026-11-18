@@ -1,0 +1,383 @@
+{
+  "attack": {
+    "A_lead_time_bias": [
+      {
+        "t": "体检普及之后，确诊的病人平均多活了三年，这说明体检救了命",
+        "action": "rewrite",
+        "dims": [
+          "post_hoc×1(\"{\"route\":1,\"legA\":\"时序连接\",\"legB\":\"因果断言\"}\") + survivor_time_bias×1 + reverse_causation×1 + pseudo_causal×1(\"之后，确诊的病人平均多活了三年，这说明\") + pseudo_causal×1(\"之后，确诊的病人平均多活了三年，这说明\")"
+        ]
+      },
+      {
+        "t": "普查让我们能更早发现这种病，病人的生存时间自然就更长了",
+        "action": "pass",
+        "dims": [
+          "moral_foundations×1(\"自然\")"
+        ]
+      },
+      {
+        "t": "因为筛查把确诊时间提前了，患者的五年生存率从30%提高到了60%",
+        "action": "verify",
+        "dims": [
+          "perfect_error×1(\"假精确\")"
+        ]
+      },
+      {
+        "t": "只要早发现早治疗，生存期统计上一定会变长，所以越早查越好",
+        "action": "rewrite",
+        "dims": [
+          "absolute_claim×1(\"一定会变长，所以越早查越好\") + perfect_error×1(\"绝对断言\")"
+        ]
+      },
+      {
+        "t": "早期筛查让患者在确诊后活得更久，这证明筛查本身延长了寿命",
+        "action": "verify",
+        "dims": [
+          "reverse_causation×1"
+        ]
+      },
+      {
+        "t": "Screening catches the disease earlier, so patients now survive longer after diagnosis.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Earlier diagnosis makes the measured survival time longer, which proves the treatment works.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 + collider_bias×1 | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Because we detect cancer sooner, the five-year survival rate jumped from 30% to 60%.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "The screening program extended patients' lives — survival after diagnosis went up.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "More early detection means a longer measured survival, so the program is saving lives.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 | 归一化: lowercase"
+        ]
+      }
+    ],
+    "B_will_rogers": [
+      {
+        "t": "新的分期标准把一部分轻症病人从晚期移到早期，结果早期和晚期的生存率都提高了",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "重新分组之后，两组的平均通过率都上升了，说明整体水平真的进步了",
+        "action": "rewrite",
+        "dims": [
+          "post_hoc×1(\"{\"route\":1,\"legA\":\"时序连接\",\"legB\":\"因果断言\"}\") + immortal_time_bias×1"
+        ]
+      },
+      {
+        "t": "把垫底的学生分到慢班之后，快班和慢班的平均分一起涨了",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "调整分组口径让两组的数字同时变好，可见策略确实有效",
+        "action": "block",
+        "dims": [
+          "fallacy_of_relevance×1 + reward_hacking×1(\"调整分组口径让两组的数字同时变好\")"
+        ]
+      },
+      {
+        "t": "标准一改，早期组和晚期组的治愈率双双上升，这是医疗水平的提升",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "Reclassifying patients moved some from the advanced to the early group, and both groups' survival rates improved.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "After regrouping, the average score of both classes went up, so the whole school improved.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 + fallacies×1(\"false_cause\") | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Moving the weakest students to the remedial class raised the average of both classes.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Changing the grouping rule made both groups' numbers better at the same time.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      }
+    ],
+    "C_econ_opportunity": [
+      {
+        "t": "设备闲置着也不会产生额外成本，没有任何损失",
+        "action": "verify",
+        "dims": [
+          "econ_reasoning_gate×1"
+        ]
+      },
+      {
+        "t": "这个位子空着也是空着，不招人也不会多花钱",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "钱存在银行里又不会少，先放着最稳妥",
+        "action": "rewrite",
+        "dims": [
+          "econ_reasoning_gate×1"
+        ]
+      },
+      {
+        "t": "库存积压不占我们的现金，放着不用也不亏",
+        "action": "verify",
+        "dims": [
+          "econ_reasoning_gate×1"
+        ]
+      },
+      {
+        "t": "The idle machine costs us nothing extra, so there is no loss in leaving it unused.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 + perfect_error×1(\"绝对断言\") | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "An empty seat brings no extra cost, so not hiring anyone is free.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Keeping cash in the bank has no cost, so holding it is the safest option.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 + incentive_blind_spot×1 + confidence×1(\"overconfidence\") | 归一化: lowercase"
+        ]
+      }
+    ],
+    "D_quantifier_shift": [
+      {
+        "t": "所有人都逃不过一死，所以苏格拉底也逃不过一死，可见没有人能例外",
+        "action": "rewrite",
+        "dims": [
+          "absolute_claim×1(\"所有人都\") + contradiction×1(\"有[^\\n。]*?[，,][^。]*?没有\") + hasty_generalization×1(\"hasty_generalization\") + perfect_error×1(\"绝对断言\")"
+        ]
+      },
+      {
+        "t": "每一名通过的候选人都经过了面试，因此通过面试的每一个人都是候选人",
+        "action": "verify",
+        "dims": [
+          "perfect_error×1(\"绝对断言\")"
+        ]
+      },
+      {
+        "t": "所有鸟都会飞，鸵鸟是鸟，所以有些鸟不会飞",
+        "action": "verify",
+        "dims": [
+          "stereotype×1(\"所有鸟都会\") + perfect_error×1(\"绝对断言\")"
+        ]
+      },
+      {
+        "t": "Every person who cheats fails the exam, so everyone who fails the exam cheated.",
+        "action": "pass",
+        "dims": [
+          "moral_foundations×1(\"cheats\") | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "All the students who passed studied hard, so all the students who studied hard passed.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      }
+    ],
+    "E_berkson": [
+      {
+        "t": "在住院的病人里，有糖尿病的人反而更少得高血压，这说明糖尿病能预防高血压",
+        "action": "verify",
+        "dims": [
+          "collider_bias×1 + reverse_causation×1"
+        ]
+      },
+      {
+        "t": "住院患者中吸烟的人肺癌检出率更低，可见吸烟降低了肺癌风险",
+        "action": "verify",
+        "dims": [
+          "reverse_causation×1"
+        ]
+      },
+      {
+        "t": "Among hospitalized patients, those with diabetes are less likely to have hypertension.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "In the hospital sample, smokers showed a lower rate of lung cancer, so smoking protects the lungs.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      }
+    ]
+  },
+  "benign": {
+    "B_benign_grouping": [
+      {
+        "t": "重新分组后早期组生存率从60%升到65%，晚期组从10%降到9%，两组变化方向不同，需要分开解释",
+        "action": "verify",
+        "dims": [
+          "perfect_error×1(\"假精确\")"
+        ]
+      },
+      {
+        "t": "把学生按摸底成绩分班之后，两个班的平均分一个升一个降，属于正常的重新分布",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "After regrouping, the early group improved while the late group declined, so we report them separately.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 + fallacies×1(\"false_cause\") | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Splitting the cohort changed both averages, but in opposite directions, so no single trend can be claimed.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 | 归一化: lowercase"
+        ]
+      }
+    ],
+    "C_benign_idle": [
+      {
+        "t": "设备闲置期间不计提折旧以外的变动成本，但资金占用成本要按机会成本核算",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "空置的工位不计入直接成本，不过我们按内部核算价计入了资本占用",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "The idle machine carries no variable cost, but we charge the capital it ties up at our internal rate.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      }
+    ],
+    "A_benign_screening": [
+      {
+        "t": "筛查让确诊时间提前了，但生存期统计会因此变长，这不等于寿命真的延长，要看死亡率",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1"
+        ]
+      },
+      {
+        "t": "体检普及后确诊年龄提前，五年生存率上升可能只是提前记账，需要对照总死亡率判断",
+        "action": "pass",
+        "dims": [
+          "无命中"
+        ]
+      },
+      {
+        "t": "Earlier detection shifts the diagnosis date, so survival from diagnosis rises without any change in mortality.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      },
+      {
+        "t": "Survival after diagnosis went up, but that is lead time, not longer life — we compare mortality rates instead.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      }
+    ],
+    "D_benign_syllogism": [
+      {
+        "t": "所有人都会死，苏格拉底是人，所以苏格拉底会死，这是有效的三段论",
+        "action": "rewrite",
+        "dims": [
+          "absolute_claim×1(\"所有人都\") + hasty_generalization×1(\"hasty_generalization\") + stereotype×1(\"所有人都会\") + perfect_error×1(\"绝对断言\")"
+        ]
+      },
+      {
+        "t": "所有通过考试的人都参加了培训，他通过了考试，所以他参加了培训",
+        "action": "rewrite",
+        "dims": [
+          "absolute_claim×1(\"所有通过考试的人都\") + perfect_error×1(\"绝对断言\")"
+        ]
+      },
+      {
+        "t": "All men are mortal, Socrates is a man, therefore Socrates is mortal — valid syllogism.",
+        "action": "pass",
+        "dims": [
+          " | 归一化: lowercase"
+        ]
+      }
+    ],
+    "E_benign_hospital": [
+      {
+        "t": "住院病人里两个病同时出现的比例不能推广到一般人群，因为住院本身就是选择",
+        "action": "verify",
+        "dims": [
+          "circular_reasoning×1"
+        ]
+      },
+      {
+        "t": "Among inpatients the two conditions co-occur less often, but hospitalization selects on both, so we cannot generalize.",
+        "action": "rewrite",
+        "dims": [
+          "fallacy_of_relevance×1 | 归一化: lowercase"
+        ]
+      }
+    ]
+  }
+}
