@@ -1,5 +1,20 @@
 ---
 
+# 6.8.194 变更日志条目
+
+## [6.8.194] - 2026-11-18
+
+### false_dilemma 第 65 维新增「析取消去谬误」措辞家族（r393，真升级②：既有维度全新措辞家族）
+
+- 轮次背景：r392 掉线，其 WIP 被远端以 188954e 固化——commit message 声称「dimMap 266 / src/index.js 八处接线 / VERSION 6.8.194 / 四门禁全绿」均不在 diff 内（diff 实际只有 `src/disjunctive-fallacy.js` + 轮测 + 探针脚本），判 overclaim。r393 接手后重定 scope：新 dimMap 键须改 `src/index.js`（1 号独占接线区，agent-4 红线不碰），故以「既有第 65 维 false_dilemma 新增措辞家族」形式接入（真升级②）。
+- `src/disjunctive-fallacy.js`：r392 版接手固化。判据为「非穷尽析取 × 排除确证」（false disjunctive syllogism / non-exhaustive disjunction）——给出要么A要么B的选项集后，否定一支（不是A / 排除A / if not A）直接推出另一支确证（那就是B / 只能是B / it must be B），跳过「选项集未必穷尽，排除一支不等于确证另一支」的纪律。双腿（D1 析取选项集 × D2 否定支×推出支）+ r393 腿③析取对立归责（「要么接受这个方案，要么就是跟团队过不去」——隐式排除无显式否定词）+ r393 腿④结果归因排除（「方案没成功，说明执行的人能力不行」——无析取词无排除动词）+ CONCEPT/FACTUAL 双豁免（概念教学/事实二元/程序性二元）+ 推出支对冲守卫 + `detect(text, inject)` inject 支持（负例注入用）。射程与既有路由分界：本模块在推理层，false_dilemma 路由①-⑨在框架层（选项集压缩/站队胁迫）。
+- `src/false-dilemma.js`：路由⑩——union 语义族接入，`R.DSF` 命名空间透传给模块 detect（避与自身同名 FACTUAL_ZH 等常量碰撞）；header docstring 补 r393 家族射程说明。`src/index.js` 零改动、dimMap 键数仍 265（scope 纪律，轮测 J 节断言）。
+- 验证：立项探针 `scripts/round-393/probe-takeover.js`（合并树 188954e）18 条攻击 gate 层 14/18 穿透、良性 1/12 非 pass（contradiction 存量基线）；接线后 gate 层 19/19 非 pass（0 穿透）、良性 1/15 非 pass（同为 contradiction 存量基线）；归属证明 `scripts/round-393/probe-attribution.js`——checkFalseDilemma 层 R.DSF 全删后 18/19 转 miss（唯一例外由既有路由⑨a 要么-frame×贬损标签兜底，union 先例）；模块层 18/18 命中、良性 0/15 误伤、常量级注入 10/10 翻转；轮测 `test/round-393-disjunctive-fallacy.test.js` 65 断言全绿（19 攻击全腿 + 9 豁免 + 10 良性 + gate 归因 + 句子级/常量级双轨负例注入 + 归属证明 + scope 纪律）。
+- 四门禁（HEAD 提交态实跑）：verify 16/0、guard-abilities 20/20@265、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零新增。
+- 工程治理：hf4-commit.sh 白名单误吞 147 个外来未跟踪件（r332-r392 旧轮脚本 + src/.r191 探针 + 外来 round-307 测试 + agent4 历史 scout 产物）——磁盘副本转存 `/data/home/.hermes/cache/scratch/quarantine-r393`，`git rm --cached` 提交移除，该脚本停用，此后显式 `git add` 提交。
+
+---
+
 # 6.8.193 变更日志条目
 
 ## [6.8.193] - 2026-11-18
