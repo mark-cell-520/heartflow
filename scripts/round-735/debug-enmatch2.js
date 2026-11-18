@@ -1,0 +1,10 @@
+'use strict';
+console.log('sanity includes:', 'caring'.includes('care'));
+console.log('sanity len:', 'caring'.length, 'care'.length);
+const I = require('/data/home/heartflow/src/circular-reasoning.js').__internals();
+const a = 'caring'; const b = 'care';
+console.log('step1 !a||!b:', !a || !b);
+console.log('step2 a===b:', a === b);
+console.log('step3:', a.length >= 4 && b.length >= 4 && (a.includes(b) || b.includes(a)));
+console.log('via internals:', I.enMatch(a, b));
+console.log('enStem(a):', I.enStem(a), 'enStem(b):', I.enStem(b));

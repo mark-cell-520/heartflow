@@ -1,0 +1,14 @@
+'use strict';
+const M = require('/data/home/heartflow/src/circular-reasoning.js');
+const { checkCircularReasoning, __internals } = M;
+const I = __internals();
+const zh = '安全的状态就是没有危险，所以零事故的系统自然是安全的。';
+const en = 'Wisdom is defined as wise judgment, therefore his decisions reflect wisdom.';
+console.log('ZH base:', JSON.stringify(checkCircularReasoning(zh)));
+console.log('ZH no-ANTONYM:', JSON.stringify(checkCircularReasoning(zh, { ANTONYM_ZH: [] })));
+console.log('EN base:', JSON.stringify(checkCircularReasoning(en)));
+console.log('EN no-SYN:', JSON.stringify(checkCircularReasoning(en, { TAUT_SYN_EN: [] })));
+console.log('ZH defCircular base:', JSON.stringify(I.defCircular(zh, true, {})));
+console.log('ZH restateSo base:', JSON.stringify(I.restateSo(zh, true, {})));
+console.log('EN defCircular base:', JSON.stringify(I.defCircular(en, false, {})));
+console.log('EN restateSo base:', JSON.stringify(I.restateSo(en, false, {})));

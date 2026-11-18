@@ -1,0 +1,10 @@
+'use strict';
+const M = require('/data/home/heartflow/src/circular-reasoning.js');
+const { checkCircularReasoning, __internals } = M;
+const I = __internals();
+const t = '安全就是不出事故，所以安全很重要';
+console.log('full:', JSON.stringify(checkCircularReasoning(t)));
+console.log('defCircular:', JSON.stringify(I.defCircular(t, true, {})));
+console.log('restateSo:', JSON.stringify(I.restateSo(t, true, {})));
+console.log('checkZh:', JSON.stringify(I.checkZh(t)));
+console.log('RESTART_TAIL:', String(I.RESTART_TAIL));
