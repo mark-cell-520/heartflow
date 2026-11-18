@@ -1,5 +1,25 @@
 ---
 
+# 6.8.201 变更日志条目
+
+## [6.8.201] - 2026-11-19
+
+### accident_fallacy 第 260 维新增「引用规则族」措辞家族（r400，真升级②）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r399 genetic_fallacy 词源谬误族后）。海外扫描 arXiv/GitHub/S2 **空返**（arXiv 15 条查询词被 OR 化成无关噪声、GitHub 0 条、S2 429 限流——scout 原始输出落 `coordination/agent4/scout/`），按 claim 回退条款以既有形态自建同池探针（`scripts/round-400/probe-pool.js`，三候选家族同池）。定拨：**F1 偶例谬误·引用规则族**（dim=accident_fallacy）6/10 真穿透（action=pass，另 4 条被存量 fallacy_of_relevance 代拦）且良性唯一 FP 为既有 crisis_exceptionalism（与本模块无关）；F2 诉诸定义裁决族（circular_reasoning 宿主）与 F3 affirming_disjunct 补形穿透低、误伤杂，不落地。该族为 r735 探针遗留缺口（当时 accident 引用规则族 4/8 穿透、腿①缺形）的正式落地。
+- 缺口解剖：第 260 维 `src/accident-fallacy.js` 存量判据腿①只收「规则是/规矩是/一般来说」这类**宣告形**（RULE_ZH/EN），腿②只收生理/环境/制度边界例外（EXC_ZH/EN）；「规则被**引用转述**（规则说X/规定必须Y/手册写明Z/药典说…；EN the rule says / the law forbids / policy requires / regulations prohibit）后，套用到其适用范围之外的**紧急例外情形**上（救护车/抢救/火灾）」整族穿透——「规则说车辆不得逆行，所以救护车也不该逆行」「Company policy requires all packages to be inspected, so the ambulance crew's equipment must wait in line」正是偶例谬误（accident fallacy）引用规则形的教科书形。
+- 实现（`src/accident-fallacy.js`，第 260 维 accident_fallacy；src/index.js 零改动、dimMap 键数仍 266）：
+  - 腿①新增 RULE_QUOTE_ZH/EN：ZH 规则名词族（规则|规矩|规定|规章|条例|法律|法规|军规|纪律|制度|章程|公约|条款|守则|规范|手册|指南|药典|说明书|办法|细则|标准，可带 中/里/上/明确 前缀）× 引用动词（说|讲|规定|要求|写明|载明|禁止|严禁|不许|不得|必须|应当|明确）；EN the (rule|regulation|law|policy|guideline|manual|handbook|procedure|protocol|sop) (says|states|requires|mandates|forbids|prohibits|stipulates|specifies|provides)。
+  - 腿②新增 EMERG_ZH/EN 紧急例外情形：ZH 救护车|急救|抢救|急诊|消防|救火|灭火|火情|火灾|出警|救援|抢险|救灾|急性阑尾炎|阑尾炎|昏厥|大出血|难产|休克|突发疾病|急性病|绿色通道；EN fire|ambulance|paramedic|rescue|evacuation|burning|blaze|resuscitation|life-threatening（收词刻意收窄，不收裸 emergency——「Generally, emergency supplies should also be stocked」类政策建议句会误伤）。
+  - 豁免新增 EXEMPT_CORRECT 明文宣告豁免形：规则引用后**显式承认**例外（「所以救护车有紧急任务豁免，依规可逆行」）是正确响应形状，与存量「有例外」守卫同族（ZH 有/设有/另有/订有 + 豁免/除外/但书/变通、另有规定/安排/办法；EN has/have/there is + explicit exemption/carve-out）。
+  - 接线方式：RULE_QUOTE/EMERG 以数组拼接进 findRuleLeg/findExcLeg 的常量列表（`R.RULE_QUOTE_ZH || RULE_QUOTE_ZH` 形态，负例注入可逐族置空）；四个新常量 `__internals` 已透传。
+- 验证（本轮全部实测）：立项探针 12 攻击 6 穿透、12 良性 1 误伤（既有 crisis_exceptionalism）→ 落地后攻击 **12/12 非 pass**（10 条 accident_fallacy 直接承重、2 条由存量 fallacy_of_relevance 代拦——军规×违法命令样本的例外腿「违法命令」不在词表内，如实记录射程边界）、良性 **12/12 单维零命中**；轮测 `test/round-400-accident-quote-rule.test.js` **76 断言全绿**（A/B 攻击 11 模块层命中 + 军规样本 gate 层非 pass + C 良性 13 零误伤 + D 存量 round-372 回归 12 + E gate 归因 15 + F 负例注入 **5 常量 11 样本全翻转**）；存量 round-372 轮测 **50/50** 不回归；相邻存量 round-371-decoy-effect 42/1（1 失败为基线既有、git checkout 对照实证与本轮无关）、round-370/round-371-norm-desensitize-ext 无 .test.js 后缀不在 run-all 射程（r399 交接项）。
+- 全量回归（提交态实跑，JOBS=4，898.5s）：**24,687 通过 / 207 失败 / 24,894 总**（data/test-count.json @ 2026-11-18T21:42:53Z），与 r399 基线 24,640/205/24,845 差 passed +47 / failed +2 / total +49。passed 增量含本轮轮测池内解析计入 76/76（单独 mount 复测 76/76）与 reward-hacking-dsec/remaining6 两个 r399 池内 Command failed 文件的恢复计数；failed +2 为 reward-hacking-metric-self-gaming-round91 与 reward-hacking-report-fudging-round55 两个文件并发池 Command failed 抖动（单独 mount 分别 19/0、10/0 全过，r398 规格表已载该类为长期噪声）；G5/G6 VERSION 硬编码断言（r367–r375 旧轮测写死 6.8.192）失败文件与基线逐条一致，仅消息内版本号随 bump 漂移。
+- 已知边界（如实记录，不伪装覆盖）：① 规则文本自身含否定词（不能/禁止/不应）时否定守卫（NEG_ZH）把规则内容的否定误判为例外的否定，「规则说车辆不能逆行，所以救护车也不该逆行」漏判——语义上不可区分，留给后续轮次；② 规则文本含纪律标记词（审批/审核/流程/合规）时 EXEMPT_DISCIPLINE 优先豁免（该豁免保护正当流程纪律陈述，优先于本族判定）。
+- 四门禁（提交态实跑）：verify **16/0**、guard-abilities **20/20@266**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 # 6.8.200 变更日志条目
 
 ## [6.8.200] - 2026-11-18

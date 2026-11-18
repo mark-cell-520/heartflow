@@ -1,3 +1,12 @@
+## r400 — accident_fallacy 第 260 维新增「引用规则族」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
+
+- **轮次**：4 号 r400（dimension）。HEAD 起点 7d7377a（VERSION 6.8.200，与 heartflow/main 一致），收尾 6.8.201。基线四门禁全绿后动手。
+- **选题与定拨**：海外扫描 arXiv/GitHub/S2 空返（arXiv 15 条查询词被 OR 化成无关噪声、GitHub 0 条、S2 429）→ 按 claim 回退条款自建同池探针（`scripts/round-400/probe-pool.js`）。三家族同池定拨：F1 偶例谬误·引用规则族（dim=accident_fallacy）**6/10 真穿透**且良性唯一 FP 为既有 crisis_exceptionalism（与本模块无关）；F2 诉诸定义裁决族（circular_reasoning 宿主）、F3 affirming_disjunct 补形穿透低、误伤杂，不落地。F1 即 r735 探针遗留缺口（4/8 穿透、腿①缺形）的正式落地。
+- **实现**（`src/accident-fallacy.js`，第 260 维；src/index.js 零改动、dimMap 键数仍 266）：腿①新增 RULE_QUOTE_ZH/EN 引用式规则宣告（规则/规定/规章/条例/法律/军规/纪律/制度/章程/条款/守则/规范/手册/指南/药典/说明书 × 说/规定/要求/写明/载明/禁止/严禁/不许/不得/必须/应当；EN the rule says / law forbids / policy requires / regulations prohibit）；腿②新增 EMERG_ZH/EN 紧急例外情形（救护车/急救/抢救/急诊/消防/救火/火灾/出警/救援/抢险/阑尾炎/大出血/难产/休克/突发疾病；EN fire/ambulance/paramedic/rescue/evacuation/burning/resuscitation/life-threatening，刻意不收裸 emergency 防政策建议句误伤）；豁免新增 EXEMPT_CORRECT 明文宣告豁免形（「所以救护车有紧急任务豁免」类正确响应）。接线走 findRuleLeg/findExcLeg 常量列表拼接 + `__internals` 透传，负例注入可逐族置空。
+- **验证**：落地后攻击 **12/12 非 pass**（10 条 accident_fallacy 直接承重 + 2 条存量 fallacy_of_relevance 代拦，军规×违法命令样本例外腿不在词表内——如实记录射程边界）、良性 **12/12 单维零命中**；轮测 `test/round-400-accident-quote-rule.test.js` **76 断言全绿**（攻击 11 模块层 + 军规样本 gate 层 + 良性 13 + 存量 round-372 回归 12 + gate 归因 15 + 负例注入 **5 常量 11 样本全翻转**）；存量 round-372 **50/50** 不回归；round-371-decoy-effect 42/1（失败为基线既有，git checkout 对照实证与本轮无关）。四门禁：verify 16/0、guard-abilities 20/20@266、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零新增。全量回归 24,687/207/24,894（JOBS=4，898.5s），+2 失败为 reward-hacking 家族并发池 Command failed 抖动（单独 mount 19/0、10/0 全过）。
+- **已知边界**：① 规则文本含否定词（不能/禁止/不应）时否定守卫把规则内容的否定误判为例外的否定（「规则说车辆不能逆行，所以救护车也不该逆行」漏判）；② 规则文本含纪律标记词（审批/审核/流程/合规）时 EXEMPT_DISCIPLINE 优先豁免。
+- **VERSION**：6.8.200 → 6.8.201（sync-version.js 同步 package.json / SKILL.md / src/core/version.js 兜底 / heartflow.js BUILD_DATE）。
+
 ## r399 — genetic_fallacy 第 131 维新增「词源谬误族」措辞家族（真升级②）+ stereotype_origin 第 146 维兄弟谬误名 META 豁免（round-693 G2 回归修复）
 
 - **轮次号说明（承接掉线轮）**：r399 于 2026-11-18T16:59:01Z 认领（agent-4，kind=dimension），方向为「逻辑谬误家族扩展轴续（r398 red_herring 回应冲淡族后）」。上一轮在四门禁复跑后触及迭代上限，工作区留下未提交的引擎改动（`src/genetic-fallacy.js` 词源族 WIP）与轮测；本轮（18:10Z 起）先诊断其交接的回归项，再收尾落地。诊断结论修正了上一轮的归因猜测：round-693 G2 失败**不是**词源族改动引入（git stash 对照实证 HEAD 提交态即失败），而是 r715 第 146 维与 r693 良性集的射程交叉缺口，已同轮修复。
