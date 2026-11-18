@@ -126,6 +126,22 @@
  *   · hot_hand/gamblers_fallacy/wishful_thinking 领地（连胜
  *     延续/连败反转/纯愿望断言）——无主观控制行为×随机事件×
  *     影响断言三腿共现。
+ *
+ * [r396 扩族] 日常生活与人生机遇场景控制幻觉族（第 5 链，真升级
+ * ②——既有维度全新措辞家族）：存量四链覆盖赌博/体育/现代游戏
+ * 场域，但「幸运领带面试/转发锦鲤上岸/固定周三加油排队/同座位
+ * 被点名/翻正硬币打车」等人生机遇（考试/面试/评审/评职称）与
+ * 日常偶遇（红灯/排队/取号/打车/点名）场景 11/17 全穿透。新链
+ * 判据同三腿结构：腿①机遇/日常偶遇锚点（面试/考研/上岸/红灯/
+ * 排队/取号/打车/点名；EN exam/interview/promotion/queue/
+ * checkout/taxi/roll call），腿②主观控制行为扩展（幸运领带/
+ * 锦鲤/红衬衫/固定周三/同一条路/同一个座位/翻正硬币；EN lucky
+ * tie/koi/same route/same seat/flip my coin upright），腿③机遇
+ * 影响断言（概率明显更大/运气总会更好/被点到的几率仿佛都会小
+ * 一些；EN my chances are always higher/improves my odds of）。
+ * 与存量链共享豁免与否定守卫；技能域（准备/练习提高通过率）不
+ * 满足腿②（只收幸运仪物/固定习惯仪式），机制实证形（这条路的
+ * 红灯配时我实测过）不含机遇名词 × 影响断言，天然排除。
  */
 'use strict';
 
@@ -403,6 +419,103 @@ const C_EN4 = [
   /\bcontrol\s+(?:the\s+)?(?:payout|drop|jackpot|outcome|reels?)\b/i,
 ];
 
+// ─── [r396] 日常生活与人生机遇场景控制幻觉族（新措辞家族）────────────
+// 零命中探针 scripts/round-396/probe-daily-chance.js：存量四链（经典
+// 赌博 + r315 体育幸运仪式 + r323 现代游戏抽奖）对「幸运领带面试/
+// 转发锦鲤上岸/固定周三加油排队/同座位被点名/翻正硬币打车」等人生
+// 机遇与日常偶遇场景攻击 11/17 全穿透（余 6 条被存量维度代拦或属
+// 回归样本），良性零新增误伤（存量 standard_shift/monocausal 各 2 条
+// 与本族无关，diag 实证改动前后同伤）。核心判别同族哲学：腿①是
+// 概率性/半随机结果（机遇评审、摇号排队、偶遇打车），腿②是主观
+// 控制线索（幸运仪物、固定习惯仪式、翻正物件），腿③必须含
+// 机遇/概率名词 × 影响断言——纯行为描述（每天走同一条路）与
+// 机制实证（这条路的红灯配时我实测过）不计，技能域（准备/练习
+// 提高通过率）天然不满足腿②。
+// 腿①机遇/日常偶遇锚点（中文）
+const A_ZH5 = [
+  // ①-j1 人生机遇场景（考试/面试/评审类概率性结果）
+  /(?:考试|考研|面试|答辩|评审|评职称|考评|绩效考核|上岸|录取|招生|选拔|招聘|竞聘|论文送审| offer)/i,
+  // ①-j2 日常偶遇随机事件（红灯/排队/取号/打车/点名）
+  // r396b 补「打到车/叫到车」形（原表只有「打车」连续形，「打到车的
+  // 运气就会更好」因 打到 插入整句穿透——161 轮裸名词/变体矩阵教训）
+  /(?:红灯|绿灯|排队|取号|叫号|顺序号|打到车|打到的|叫到车|拦到车|打车|出租车|网约车|叫车|特价|促销|打折|点名|点到)/,
+  // ①-j3 经典随机装置（翻正硬币族可挂任意随机锚点——存量 ①-a 在
+  // 第一链，本链需自带，否则「抽奖前把硬币翻正」跨链不组合）
+  /(?:抽奖|彩票|中奖|摇号|开奖|开彩)/,
+];
+
+// 腿①机遇/日常偶遇锚点（英文）
+const A_EN5 = [
+  // ①-j1 人生机遇场景
+  /\b(?:exam|exams|examination|interview|interviews|promotion|job\s+offer|offer\s+letter|hiring|tenure\s+review|performance\s+review|admission|admissions|dissertation\s+defense)\b/i,
+  // ①-j2 日常偶遇随机事件
+  /\b(?:red\s+lights?|green\s+lights?|traffic\s+lights?|queues?|checkout|checkout\s+lane|waiting\s+line|taxi|cabs?|hail(?:ing)?\s+a|ride[- ]hail|roll\s+call|called\s+on|clearance|sale\s+rack|parking\s+spot)\b/i,
+];
+
+// 腿②主观控制行为扩展（中文）——幸运仪物（领带/锦鲤/红衬衫）+
+// 固定习惯仪式（同一条路/同一个座位/固定时间窗口）+ 翻正物件
+const B_ZH5 = [
+  // ②-i1 幸运仪物扩展（存量 ②-e 只收袜/币/数字，不收服饰与吉祥物；
+  // r396c 补幸运币——存量 ②-e 有但第一链的 ① 无「考试」机遇锚点，
+  // 「考前摸幸运币，考试成绩往往会更好」跨链不组合）
+  /(?:幸运领带|幸运围巾|幸运手链|幸运手绳|幸运项链|幸运币|锦鲤|转发锦鲤|接锦鲤|吸欧气|吸福气|欧皇|红衬衫|红衣服|红色衬衫|红色T恤|吉祥物)/,
+  // ②-i2 固定习惯仪式（同一条路/同一个座位/固定时间窗口）
+  /(?:同一条路|同一条道|同一个座位|同一个位置|同一座位|固定座位|固定周三|固定周[一二三四五六日]|固定(?:在|这个)?窗口|这个窗口|老窗口|老位置)/,
+  // ②-i3 硬币/物件翻正仪式
+  /(?:翻正|翻过来|摆正|翻硬币|硬币翻|正过来|翻过来摆)/,
+  // ②-i4 仪式动词（存量 ②-b/②-g 在第一链，本链需自带——
+  // 「评职称前拜一拜」「考前烧香」的人生机遇场景同族变体）
+  /(?:拜一拜|拜拜|拜佛|拜神|上香|烧香|求签|祈祷|祷告|祈福|默念|许愿)/,
+];
+
+// 腿②主观控制行为扩展（英文）
+const B_EN5 = [
+  // ②-i1 幸运仪物扩展
+  /\b(?:lucky\s+(?:tie|necktie|scarf|dress|shirt|blouse|koi|fish|coin|pen|underwear|boxers))\b/i,
+  /\b(?:forward(?:ing|ed)?\s+the\s+(?:lucky\s+)?koi|rub(?:bing)?\s+the\s+(?:lucky\s+)?koi)\b/i,
+  // ②-i2 固定习惯仪式
+  /\b(?:same\s+(?:route|way|path|lane|checkout\s+lane|seat|spot|desk|chair|routine|schedule|time\s+slot))\b/i,
+  /\b(?:every\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i,
+  /\b(?:always\s+(?:take|takes|taking|took|sit|sits|sitting|go|goes|going|use|uses|using)\s+the\s+same)\b/i,
+  // ②-i3 翻正仪式（flip my coin upright——物主不限于 the）
+  /\b(?:flip(?:ping|ped)?\s+(?:the\s+|my\s+|your\s+|his\s+|her\s+)?(?:coin|lucky\s+coin)\s+(?:upright|heads?\s+up|to\s+heads)|turn(?:ing|ed)?\s+(?:the\s+|my\s+)?(?:coin|lucky\s+coin)\s+upright)\b/i,
+];
+
+// 腿③机遇影响断言（中文）——机遇/概率名词 × 影响断言；必须含机遇
+// 名词（概率/几率/机会/运气/通过率/成绩），纯行为描述与机制实证形
+// （通行更快/排队更短因为换班）天然不匹配
+const C_ZH5 = [
+  // ③-j1 机遇名词 × 提升向比较（概率明显更大/运气总会更好/希望一直很大）
+  /(?:概率|几率|机会|希望|运气|运势|通过率|上岸率|录取率|评上的?机会|成绩|分数|排名)[^。，！？；\n]{0,8}(?:就是|真的|仿佛|好像|似乎|总是|往往|一定|肯定|都会|也会|通常|明显|一直)?(?:会|能|将)?(?:更|比)?(?:高|大|好|强|多)(?:一些|一点|不少|得多|很多)?/,
+  // ③-j2 变高/变大族（概率真的会变高/中的机会就是会变大）
+  /(?:概率|几率|机会|希望|运气|运势|通过率|成绩|录取率)[^。，！？；\n]{0,8}(?:就是|真的|仿佛|好像|似乎|总是|往往|一定|肯定)?(?:会|能)?(?:变|变)(?:得)?(?:高|大|好|强)/,
+  // ③-j3 下降族（被点到的几率仿佛都会小一些——仪式减霉运同族反向断言）
+  // r396b：原表 (更|变) 必需，「都会小一些」无 更/变 前缀整句穿透；
+  // 改为可选（②仪式锚点 + ①随机锚点双门禁下裸下降形不构成良性误伤：
+  // 「认真准备落榜几率自然会小」的 ② 是技能动词不在仪式表）
+  /(?:概率|几率|机会|希望|运气)[^。，！？；\n]{0,8}(?:就是|真的|仿佛|好像|似乎|总是|往往|一定|肯定)?(?:会|能)?(?:更|变)?(?:小|低|少)(?:一些|一点)?/,
+  // ③-j4 提升动词 × 机遇名词（提高通过率/提升上岸概率）
+  /(?:提高|提升|增加|拉高|抬高|改善)(?:了)?(?:我的|他的|她的|咱们的|全家的)?(?:通过率|录取率|上岸率|成功率|成绩|分数|概率|几率|机会|运气|运势)/,
+];
+
+// 腿③机遇影响断言（英文）
+const C_EN5 = [
+  // ③-j1 机遇名词 × 比较/提升（my chances of promotion are always higher）
+  /\b(?:my|your|his|her|their|our|the)\s+(?:chances?|odds|probability|likelihood|luck)\s+(?:of\s+(?:\w+\s+){0,3})?(?:are|is|stay|stays|remain|remains|get|gets|got)?\s*(?:always\s+|really\s+|genuinely\s+)?(?:higher|greater|better|stronger|bigger)\b/i,
+  // ③-j2 more likely to pass/get/be admitted（更可能上岸/拿到 offer）
+  /\bmore\s+likely\s+to\s+(?:pass|passing|get|getting|land|landing|win|winning|be\s+(?:admitted|accepted|hired|promoted|called))\b/i,
+  // ③-j3 成绩/结果提升（improves my grades / boosts my score）
+  /\b(?:improves?|improved|raises?|raised|boosts?|boosted|increases?|increased|enhances?|enhanced)\s+(?:my|your|his|her|their|our)\s+(?:grades?|score|scores|mark|marks|gpa|results?)\b/i,
+  // r396b 补：improves/raises + odds/chances/luck of（存量 ③-a/③-f 在
+  // 第一链，本链需自带——「improves my chances of getting the offer」
+  // 「raises my odds of passing」跨链不组合）
+  /\b(?:improves?|improved|raises?|raised|increases?|increased|boosts?|boosted|enhances?|enhanced)\s+(?:my|your|his|her|their|our|the)?\s*(?:odds|chances?|probability|likelihood|luck)\s+of\b/i,
+  // r396b 补：my luck gets better / my odds go up（存量 ③-g 在第一链；
+  // r396c 补名词与动词间的插入语容忍——「my luck hailing a taxi
+  // gets better」中 hailing a taxi 插入，原表零容忍整句穿透）
+  /\b(?:my|your|his|her|their|our|the)\s+(?:odds|chances?|luck|probability|likelihood|fortunes?)\s+(?:\w+\s+){0,4}?(?:improves?|improved|go(?:es)?\s+up|rises?|increases?|gets?\s+better)\b/i,
+];
+
 // ─── 双腿距离窗（腿①×腿② 与 腿②×腿③ 分别落在窗内，腿②控制行为是桥）
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -506,6 +619,15 @@ function findSignatures(text, R) {
       a: R.A_EN4 || A_EN4, b: R.B_EN4 || B_EN4, c: R.C_EN4 || C_EN4,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
+    // [r396] 日常生活与人生机遇场景控制幻觉族（新措辞家族，独立链）
+    {
+      a: R.A_ZH5 || A_ZH5, b: R.B_ZH5 || B_ZH5, c: R.C_ZH5 || C_ZH5,
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      a: R.A_EN5 || A_EN5, b: R.B_EN5 || B_EN5, c: R.C_EN5 || C_EN5,
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
   ];
   for (const { a, b, c, win, lang } of langs) {
     const am = collect(text, a, true);
@@ -571,6 +693,7 @@ module.exports = {
     A_ZH, A_EN, B_ZH, B_EN, C_ZH, C_EN,
     A_ZH3, A_EN3, B_ZH3, B_EN3, C_ZH3, C_EN3,
     A_ZH4, A_EN4, B_ZH4, B_EN4, C_ZH4, C_EN4,
+    A_ZH5, A_EN5, B_ZH5, B_EN5, C_ZH5, C_EN5,
     CONCEPT_ZH, CONCEPT_EN,
     PAIR_ZH, PAIR_EN,
   }),
