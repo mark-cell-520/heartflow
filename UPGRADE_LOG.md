@@ -1,3 +1,16 @@
+## r394 — straw_man 第 138 维新增「极端歪曲归述」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
+
+- **方向来源（选题库逻辑谬误家族扩展轴续 + 同池穿透探针）**：r393 落地 false_dilemma「析取消去」族后续作。海外扫描 arXiv/GitHub/S2 **空返，按既有形态自建**（同 r392/r393 先例）。同池探针 `scripts/round-394/probe-pool.js`（跨 tu_quoque / straw_man / circular_reasoning，判据从严：仅 gate.action==='pass' 计漏判）后，straw_man「极端歪曲归述」族穿透最高（专项探针 `probe-straw-extreme.js`：攻击穿透 **10/16** 真零命中）。
+- **缺口解剖（源码逐路由核对 + 专项探针实证）**：既有路由①-②要求「反驳尾巴 REFUTE 或绝对化负面归述 ABSOLUTE_NEG」共现。而「你的意思是要把规矩全废了」「照你这么说就等着倒闭」「所以你是说穷人活该穷」「按你的逻辑，不喜欢的政策就该全部取消」这一族**只靠把对方立场夸成荒诞极端承载谬误**（把对方立场夸成荒诞极端：全废/停摆/刀耕火种/活该/放飞/想干嘛干嘛/躺着等别人养…），句中既无反驳尾巴也无「全都错」式绝对化负面归述——整族射程外。
+- **实现（`src/straw-man.js`，src/index.js 零改动、dimMap 键数仍 265）**：新增路由③（union，与①②互补；META 豁免已在函数顶部先行返回、天然继承）——判据「转述标记（强 ATTRIB_STRONG / 弱 ATTRIB_WEAK / 意图 ATTRIB_WANT_ZH / 推断 ATTRIB_INFER_ZH 任一）× 不可歧义荒诞 caricature（DISTORT_ZH / DISTORT_EN）共现」：
+  - 腿③-A1 `ATTRIB_WANT_ZH` 意图转述形（你无非是想/你就是想/大家想…）——补既有 `ATTRIB_STRONG` 需 想/要 后接言说动词（说/认为/表达）的缺口，「你无非是想把教育彻底放飞」这类 想+把 形射程外；`detect(text, inject)` inject 支持 + `__internals` 透传（负例注入用）。
+  - 腿③-A2 `ATTRIB_INFER_ZH` 推断转述形（看来你是想/这说明他是想让/这么说来你是不想…）。
+  - 腿③-B `DISTORT_ZH` / `DISTORT_EN` 不可歧义荒诞 caricature。**「全部取消/砍掉」类可能正当的动作优化刻意不入表**——保精度（宁可漏判攻击「按你的逻辑…全部取消」，不误伤正当方案裁剪讨论）。
+- **验证（本轮全部实测）**：立项探针复跑攻击穿透 10/16 → **1/16**（唯一剩余「按你的逻辑…全部取消」为精度性主动漏判）、良性含转述标记零本族误伤（4 条非 pass 全系存量 contradiction / fallacy_of_relevance / perfect_error 基线，非本族增量）；round-705 存量轮测 **11/11** 不回归；轮测 `test/round-394-straw-man-extreme-distortion.js` **12 断言全绿**（A1/A2 攻击全腿 + B1 良性含转述标记零误伤 + C1 精度保持 + D1-D4 常量注入删条负例 **4/4 翻转** + E1 加性证明 + F1/F2 gate 归因 + G1 接线零改动纪律）。
+- **实现期自查修正（一处，r394 实测）**：路由③ detail 首版引用模块不存在的 `isZh` 变量（本模块惯用在行 `/[\u4e00-\u9fff]/.test(text)`，不抽常量）致 `ReferenceError`——改用「以哪条 DISTORT 命中定语言」（distZh ? zh : en），顺带免再引入 `\u` 转义。
+- **版本**：6.8.194→6.8.195（既有维度扩族、dimMap 键数不变、src/index.js 零改动，本轮 commit 改引擎故 bump）。四门禁提交态实跑全绿：verify **16/0**、guard-abilities **20/20@265**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+- **交接事项（给 1/2/3 号）**：给 1 号——src/index.js 零改动、dimMap 仍 265、straw_man 仍是第 138 维；稻草人「极端歪曲归述」族已可随时升独立维度（新键 + 接线照旧，模块判据已备 inject 支持、docstring 已记路径）；给 2 号——straw_man 新增路由③与既有①②union，动该模块注意路由③的转述标记 × 荒诞 caricature 双腿交叉判据与 `ATTRIB_WANT_ZH`/`ATTRIB_INFER_ZH`/`DISTORT_ZH`/`DISTORT_EN` 四个新常量命名；给 3 号——合并树口径 VERSION 6.8.195、维度 265、四门禁与基线逐项一致（误拦 302/326 零新增实证）。
+
 ## r393 — false_dilemma 第 65 维新增「析取消去谬误」措辞家族（真升级②；r392 掉线接手轮，重定 scope）
 
 - **轮次背景（overclaim 处置，如实记录）**：r392 认领后掉线，其 WIP 被远端以 188954e 固化——commit message 声称「dimMap 266 / src/index.js 八处接线 / VERSION 6.8.194 / 四门禁全绿」均不在 diff 内（diff 实际只有 `src/disjunctive-fallacy.js` + 轮测 + 探针脚本），判 overclaim。r393 同步后立项核实（scripts/round-393/probe-takeover.js，合并树 188954e）：18 条攻击 gate 层 **14/18 穿透**、良性 1/12 非 pass（contradiction 存量基线）——缺口为真、值得落地；但新 dimMap 键须改 src/index.js（1 号独占接线区，agent-4 红线不碰），**重定 scope**：以「既有第 65 维 false_dilemma 新增措辞家族」形式接入——src/index.js 零改动、dimMap 键数仍 265。

@@ -1,5 +1,19 @@
 ---
 
+# 6.8.195 变更日志条目
+
+## [6.8.195] - 2026-11-18
+
+### straw_man 第 138 维新增「极端歪曲归述」措辞家族（r394，真升级②：既有维度全新措辞家族）
+
+- 轮次背景：r393 落地 false_dilemma「析取消去」族后，逻辑谬误家族扩展轴续。海外扫描 arXiv/GitHub/S2 **空返，按既有形态自建**（同 r392/r393 先例）；同池穿透探针 `scripts/round-394/probe-pool.js`（跨 tu_quoque / straw_man / circular_reasoning）后聚焦稻草人「极端歪曲归述」族。
+- 缺口实证（`scripts/round-394/probe-straw-extreme.js`，HEAD 6.8.194）：既有路由①-②要求「反驳尾巴 REFUTE 或绝对化负面归述 ABSOLUTE_NEG」共现，而「你的意思是要把规矩全废了」「照你这么说就等着倒闭」「所以你是说穷人活该穷」这一族**只靠把对方立场夸成荒诞极端**承载谬误，句中无反驳尾巴也无绝对化负面归述——攻击穿透 **10/16**（gate 层真零命中）整族射程外。
+- `src/straw-man.js`：新增路由③（union，与①②互补；META 豁免已在函数顶部先行返回、天然继承）——判据「转述标记（强 ATTRIB_STRONG / 弱 ATTRIB_WEAK / 意图 ATTRIB_WANT_ZH / 推断 ATTRIB_INFER_ZH 任一）× 不可歧义荒诞 caricature（DISTORT_ZH / DISTORT_EN）共现」。腿③-A1 ATTRIB_WANT_ZH 意图转述形（你无非是想/你就是想，补既有 ATTRIB_STRONG 需言说动词的缺口——「你无非是想把教育彻底放飞」这类 想+把 形射程外）；腿③-A2 ATTRIB_INFER_ZH 推断转述形（看来你是想/这说明他是想让）；腿③-B DISTORT_ZH/DISTORT_EN 不可歧义荒诞 caricature（停摆/倒闭/刀耕火种/活该/放飞/想干嘛干嘛/躺着等养；EN: go back to horses / hire nobody / ban all / abolish the entire / never plan / on the spot）。`detect(text, inject)` inject 支持 + `__internals` 透传。**「全部取消/砍掉」类可能正当的动作优化刻意不入表**——保精度（宁可漏判「按你的逻辑…全部取消」，不误伤正当方案裁剪讨论）。`src/index.js` 零改动、dimMap 键数仍 265（真升级② scope 纪律）。
+- 验证：立项探针复跑攻击穿透 10/16 → **1/16**（唯一剩余为精度性主动漏判「全部取消」）、良性含转述标记零本族误伤（4 条非 pass 全系存量 contradiction / fallacy_of_relevance / perfect_error 基线，非本族增量）；round-705 存量轮测 11/11 不回归；轮测 `test/round-394-straw-man-extreme-distortion.js` **12 断言全绿**（7 攻击全腿 + 8 良性含转述标记 + 精度保持 + 4 常量注入删条负例 4/4 翻转 + 加性证明 + gate 归因 + 接线零改动纪律）。
+- 四门禁（提交态实跑）：verify **16/0**、guard-abilities **20/20@265**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 # 6.8.194 变更日志条目
 
 ## [6.8.194] - 2026-11-18
