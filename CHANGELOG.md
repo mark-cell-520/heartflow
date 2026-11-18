@@ -1,5 +1,23 @@
 ---
 
+# 6.8.198 变更日志条目
+
+## [6.8.198] - 2026-11-18
+
+### circular_reasoning 第 136 维新增「同义反复论证族」（r735，真升级②：既有维度全新措辞家族）
+
+- 轮次背景：逻辑谬误家族扩展轴续（r734 控制幻觉人生机遇族后）。海外扫描 arXiv（parse-fail 空返）/ GitHub（0 repo）/ S2（背景文献无可集成纯规则方案）空返，按既有形态自建，产物落盘 `coordination/agent4/scout/`。同池探针四家族定拨后，二段深探（`scripts/round-735/probe-round2.js`）聚焦 G1 so_restatement 与 G3 definitional_selfproof：G1 攻击穿透 ZH 6/12、EN 10/12，G3 穿透 ZH 6/12、EN 12/12——穿透样本全维度零命中，定为本轮落地族。
+- 缺口解剖：第 136 维 `src/circular-reasoning.js` 存量判据只认两种语序——「因为A，所以A'」（because-split）与「A，A'」（逗号 chain）；「A，所以A'」的**结论前置复述**与**同义反复定义当论证前提**整族穿透（「幸福的定义就是感到幸福，所以感到幸福的人一定幸福」「Truth is what is true, therefore this statement is true.」）。
+- 实现（`src/circular-reasoning.js`，第 136 维 circular_reasoning；src/index.js 零改动、dimMap 键数仍 266）：新增第 5 链（union，与存量四链互补）：
+  - R5a 定义循环框（四腿共现，缺一不判）：腿① DEF_FRAME_ZH/EN 定义式等同框（的定义/本质是、所谓…是、句首 X 就是；EN is defined as / is what is / means）；腿② TAUT 同义反复体（子串包含 / ANTONYM_ZH 反义否定「没/无/不+反义词」/ TAUT_SYN_ZH 显式同义表）；腿③ USE_ZH/EN 论证化使用（所以/因此/因而/故而/于是/从而；EN therefore/thus/hence/so）——裸定义句不判；腿④ RESTATE_CONC 结论必须是定义体的复述（结论含术语 ∧ 与定义体有共享片段；反义否定形豁免）——挡住「教育的本质是培养人，所以教育要面向全体学生」类引入新内容的假阳性与 persuasive-definition 争议释义。
+  - R5b 结论前置复述框（两腿共现）：CONN_ZH/CONN_EN 切出 A|B，复用存量 REPEAT×FRAME 双腿（commonZhNgrams/enMatch × zhDefinitionalFrame/enDefinitionalFrame），补两个纯系词应用框：f9 ZH_COPULAR（「主语(+副词)+是+谓词」且谓词含重复词——存量 f8 只收「(代词)是X」形）与 e10 EN_COPULAR（右句谓词组不经 enWords 停词过滤——just/safe 这类谓词核心词恰在 EN_STOP 里，过滤后无 pair 可配整族恒死；窗宽 6 词覆盖 "we have had no accidents and are safe" 形）。
+  - 豁免：沿用入口五条全局豁免（META/NUMERIC/EVIDENCE/REPORTING），另加 DEF_HEDGE_ZH/EN 定义存疑豁免（「这只是其中一种定义」「one of several definitions」「学界有分歧」）。
+- 落地修正（逐条复跑实证）：① 定义体只取到第一个分句边界/论证标记为止——否则结论里的术语会被当成定义体的复述（「安全就是不出事故，所以安全很重要」假阳性）；② 腿④补术语谓词位判定（尾 2 字内且前 6 字内有修饰/系词），「效率值得重视」类术语居句首当主语、后跟新谓词的不判；③ e10 右句谓词不经 enWords 停词过滤；④ ANTONYM_ZH 支持「没/无/不 + (有|是)? + 反义词」；⑤ 恢复调试期误删的攻击样本。
+- 验证（本轮全部实测）：模块层轮测 60/60（34 攻击 + 26 良性），`scripts/round-735/selftest-module.js` 63/63；gate 层攻击 **34/34 非 pass 且 circular_reasoning finding 在场**；良性 gate 层与基线逐项一致（G1 3/12、G3 1/12 改动前后同批零新增，承维全为存量维度：empty_answer ×2 / prompt_injection+moral_foundations ×1 / 无 finding ×1）；轮测 `test/round-735-circular-tautology-restate.test.js` **11 断言全绿**（34 攻击 + 26 良性 + 边界锁 C1-C5 五组 + 存量回归 D1/D2 + gate 归因 E1/E2 + 13 常量注入删条 **13/13 翻转**）；存量轮测不回归：round-701 18/18、round-463/417/431 全通过。
+- 四门禁（HEAD 提交态实跑）：verify **16/0**、guard-abilities **20/20@266**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
+
+---
+
 # 6.8.197 变更日志条目
 
 ## [6.8.197] - 2026-11-18
