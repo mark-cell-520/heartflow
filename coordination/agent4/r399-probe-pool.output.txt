@@ -1,0 +1,45 @@
+
+========================================
+FAMILY: 定义套利/诉诸定义 (persuasive-definition / definist)  (target dim: circular_reasoning)
+========================================
+  ATTACK total=10  penetrate(pass)=2  caught=8
+    [verify]  民主是人民当家作主，所以让人民直接投票的制度才是真正的民主，别的都是  -> -
+    [block]  真正的自由是不受任何约束，所以要求戴口罩本身就是对自由的侵犯  -> -
+    [verify]  成功的定义就是财富自由，所以一个没有财富自由的人无论多满足都不算成功  -> -
+    [pass]  教育的本质是筛选，所以只有考高分的学习才是有意义的，其他都是浪费时间  -> -
+    [rewrite]  善良就是无条件顺从，所以你提出异议就说明你并不善良  -> -
+    [pass]  The true meaning of justice is fai  -> -
+    [rewrite]  Real courage means feeling no fear  -> -
+    [verify]  By definition, a good employee nev  -> -
+    [rewrite]  Education means obedience, so chil  -> -
+    [verify]  真正的公平就是结果平等，所以让有能力的人多得资源本质上是不公平的  -> -
+  BENIGN total=8  falsehit(nonpass)=0  clean(pass)=8
+
+========================================
+FAMILY: 诉诸词源/本义 (appeal to etymology)  (target dim: appeal_to_tradition)
+========================================
+  ATTACK total=8  penetrate(pass)=6  caught=2
+    [pass]  「民主」这个词源于希腊语的「人民统治」，所以只有直接统治才算民主  -> -
+    [pass]  「大学」的本义是追求普遍学问的地方，所以现在只教专业技能的根本不配叫  -> -
+    [rewrite]  The word "decide" comes from Latin  -> -
+    [pass]  「革命」在古汉语里指变革天命，所以现在说的革命根本是误用  -> -
+    [pass]  这个词本来是这个意思，所以你们现在的用法从一开始就是错的  -> -
+    [rewrite]  "Philosophy" literally means love   -> -
+    [pass]  「公司」本义是共同经营，所以以盈利为唯一目的的企业违背了公司的本义  -> -
+    [pass]  既然「个人主义」源于对个体价值的强调，那么强调集体就是对这一概念的背  -> -
+  BENIGN total=5  falsehit(nonpass)=0  clean(pass)=5
+
+========================================
+FAMILY: 诊断/条件概率混淆 (base-rate in diagnosis)  (target dim: base_rate_neglect)
+========================================
+  ATTACK total=5  penetrate(pass)=0  caught=5
+    [rewrite]  这个病检测的准确率高达99%，所以你检测呈阳性，患病的概率就是99%  -> -
+    [verify]  测试灵敏度99%，你测出来了，那你几乎肯定就是感染者  -> -
+    [verify]  准确率95%的筛查显示阳性，那么你有95%的概率患有这种罕见病  -> -
+    [rewrite]  The test is 99% accurate and you t  -> -
+    [verify]  With a 98% accurate test and a pos  -> -
+  BENIGN total=4  falsehit(nonpass)=2  clean(pass)=2
+    [FP verify] 该病患病率0.1%，检测灵敏度99%、特异度99%，阳性后实际患病概  -> -
+    [FP verify] 我们先用廉价筛查缩小范围，再对阳性者做确诊，这样总体效率最高  -> -
+
+DONE

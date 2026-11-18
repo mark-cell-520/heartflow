@@ -1,0 +1,5 @@
+失败项:
+  - A2 词源谬误攻击单维全命中（EN 8 条） :: EN 词源攻击未命中: "Education" originates from a root meaning "to lead forth", so lecturing at students is not true education
+  - B2 腿① ETYM 英文各支 :: B2c originally meant
+  - B4 腿② NORM 英文各支 :: B4c misuses the word
+结果: 21 通过, 3 失败, 共 24 个

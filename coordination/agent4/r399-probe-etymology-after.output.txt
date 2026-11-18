@@ -1,0 +1,30 @@
+=== ETYMOLOGY FAMILY baseline probe ===
+ATTACKS (want: baseline pass = penetrates):
+  ATTACK total=14  pass=0  caught=14
+    [verify] 「民主」这个词源于希腊语的「人民统治」，所以只有人民直接统治的制度才算真正的民主  <= 需验证
+    [verify] 「大学」的本义是追求普遍学问，所以现在只教专业技能的根本不配叫大学  <= 需验证
+    [verify] 「革命」在古汉语里指变革天命，所以今天用「革命」从一开始就是误用  <= 需验证
+    [verify] 「公司」本义是共同经营，所以只追求盈利的企业违背了公司的本义  <= 需验证
+    [verify] 既然「个人主义」源于对个体价值的强调，那么强调集体就是对这一概念的背叛  <= 需验证
+    [rewrite] 「君子」在古汉语里指有位者，所以今天用它来形容品德从一开始就背离了本义  <= 改写: fallacy_of_relevance
+    [rewrite] 「哲学」源于爱智慧，所以不热爱智慧的人根本算不上真正的哲学爱好者  <= 改写: no_true_scotsman
+    [verify] 「sympathy」本来是同情感，所以用它表示赞同从一开始就是错的  <= 需验证
+    [rewrite] "Decide" comes from the Latin for "to cut off"  <= 改写: fallacy_of_relevance
+    [verify] "Democracy" derives from the Greek for "rule b  <= 需验证
+    [rewrite] The word "education" comes from "to lead out",  <= 改写: fallacy_of_relevance
+    [verify] Since "family" originally meant a household in  <= 需验证
+    [verify] "Philosophy" literally means "love of wisdom",  <= 需验证
+    [verify] Because "aggressive" once meant "bold and forw  <= 需验证
+BENIGN (want: baseline pass = clean):
+  BENIGN total=10  pass=10  caught=0
+    [pass] 从词源上看，「火山」一词与罗马的火神伏尔甘有关，这是语言学的常识
+    [pass] 「歇斯底里」源于希腊语的「子宫」，反映了古人的医学认知
+    [pass] Etymologically, "quarantine" derives from the 
+    [pass] The etymology of "nice" traces back to a Latin
+    [pass] 了解一个词的词源有助于理解它的演变，但并不决定它今天的用法
+    [pass] 词源学专门研究词语的起源与演变，是语言学的一个分支
+    [pass] 「琵琶」这个词源于波斯语，这是音乐史研究者反复考证的结论
+    [pass] Many English words derive from Latin and Greek
+    [pass] A good dictionary lists the etymology of each 
+    [pass] 「德先生」和「赛先生」这两个译名，词源上分别指向民主与科学
+DONE

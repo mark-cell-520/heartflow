@@ -1,0 +1,16 @@
+TEXT: 这个词源于人民统治，所以只有直接统治才算民主
+  action: pass | reason: 通过
+  traceSummary: "无命中"
+
+TEXT: The word "decide" comes from Latin meaning "
+  action: rewrite | reason: 改写: fallacy_of_relevance
+  traceSummary: "fallacy_of_relevance×1 | 归一化: lowercase"
+
+TEXT: "Philosophy" literally means love of wisdom,
+  action: rewrite | reason: 改写: illicit_conversion
+  traceSummary: "illicit_conversion×1(\"EN_BARE\") + circular_reasoning×1 | 归一化: lowercase"
+
+TEXT: 「民主」这个词源于希腊语的「人民统治」，所以只有直接统治才算民主
+  action: pass | reason: 通过
+  traceSummary: "无命中"
+

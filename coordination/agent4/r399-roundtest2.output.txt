@@ -1,0 +1,3 @@
+失败项:
+  - A2 词源谬误攻击单维全命中（EN 8 条） :: EN 词源攻击未命中: The term "democracy" traces back to "demos" meaning people, so representative systems are not genuine democracy
+结果: 23 通过, 1 失败, 共 24 个

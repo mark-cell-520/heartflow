@@ -1,0 +1,18 @@
+TEXT: 这个词源于人民统治，所以只有直接统治才算民主
+  top-level keys: action,reason,score,traceSummary
+  gate.action: undefined | r.action: pass
+  findings dims: (none)
+  checked_by: 
+
+TEXT: The word "decide" comes from Latin meani
+  top-level keys: action,reason,score,traceSummary
+  gate.action: undefined | r.action: rewrite
+  findings dims: (none)
+  checked_by: 
+
+TEXT: "Philosophy" literally means love of wis
+  top-level keys: action,reason,score,traceSummary
+  gate.action: undefined | r.action: rewrite
+  findings dims: (none)
+  checked_by: 
+
