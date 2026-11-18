@@ -276,6 +276,23 @@ const FAMILIES = [
   //   arXiv 15 条全为物理/ML 领域 surrogate model、S2 连续 429——按既有
   //   形态自建）
   { key: 'surrogate_endpoint_misread',         mod: './surrogate-endpoint-misread.js',         fn: 'detectSurrogateEndpointMisread',       zh: '替代终点误读',            en: 'surrogate-endpoint misread (surrogate marker improvement as hard-endpoint benefit)', round: 'r389' },
+  // r392 新增（选题库续统计素养轴）：按方案分析集误读（per-protocol analysis
+  //   misread / completer-analysis leap——随机对照试验只统计完成方案/依从/
+  //   未脱落的受试者，组间比较退化为自选择人群比较，疗效被系统性高估；把按
+  //   方案集算出的结果直接兑现为「药物真实效果/疗效确凿」即犯此误读）。双腿
+  //   （分析集限定锚 只统计/排除/按方案集/依从者亚组 × 疗效兑现结论 真实疗效/
+  //   确凿/药物确实有效）+ CONCEPT/CORRECT 两组豁免 + 腿①紧前否定守卫（「不能
+  //   只看坚持服药的人」）+ 腿②紧前否定/对冲双守卫；不强制推断标记（腿②自身
+  //   即兑现结构，r389 判据的本族变体——中性报告「疗效显著/风险下降一半」天然
+  //   不判）。与 healthy_user_bias（r372 自选择行为群体 × 健康归因）射程错开：
+  //   本族腿①是试验分析集操作、腿②是试验疗效兑现，交集句可双触发（r379 union
+  //   先例）；与 confounding_by_indication（r339）/proxy_metric_goal（第187维）
+  //   /survivor_time_bias 不重叠。立项探针 scripts/round-392/
+  //   probe-per-protocol.js：攻击 11/18 穿透（真零命中）、良性 21/25 基线通过
+  //   （4 条存量误伤非本族增量）、射程对照 1/7（proxy 攻击形不越界）；模块自测
+  //   攻击 26/26 + 良性 34/34；海外扫描 arXiv parse-fail / GitHub 0 / S2 429
+  //   ——空返，按既有形态自建。
+  { key: 'per_protocol_misread',               mod: './per-protocol-misread.js',               fn: 'detectPerProtocolMisread',             zh: '按方案分析集误读',        en: 'per-protocol misread (completer-subgroup effect cashed out as the drug\'s true effect)', round: 'r392' },
 ];
 
 const _cache = new Map();
