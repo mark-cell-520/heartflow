@@ -73,7 +73,7 @@
 const MEAN_ZH = [
   /人均(?:收入|GDP|gdp|可支配|住房|面积|支出|消费|产量|寿命|薪资|工资|纯收入)?/,
   /平均每(?:人|户|家|个|名|位|套|间|年|月|天|次|地|国|校|班|科)/,
-  /平均(?:房价|收入|分|值|数|水平|工资|薪资|寿命|年龄|身高|体重|成绩|销量|单价|时长|年龄|速率|速度|规模|支出|成本|学费|租金|利率|涨幅|增长率|通过率|分数|绩点)/,
+  /平均(?:房价|收入|分|值|数|水平|工资|薪资|年薪|薪酬|月薪|待遇|寿命|年龄|身高|体重|成绩|销量|单价|时长|速率|速度|规模|支出|成本|学费|租金|利率|涨幅|增长率|通过率|分数|绩点)/,
   /(?:平均值|平均数|均值|均分|全班平均|全年级平均|全市平均|全国平均|全县平均)/,
   // 「每户平均」「每人平均」倒装形态
   /每(?:人|户|家|名|位|个|套|间)(?:的)?平均/,
@@ -92,12 +92,12 @@ const MEAN_EN = [
 const TYPICAL_ZH = [
   // 多数指称（核心：大多数/大部分/多数/绝大多数 + 后续名词或直接谓语）
   /(?:大多数|大部分|多半|多数|绝大多数|绝多数|十之八九|八九成|七成|八成|九成|六成|五成)(?:人|家庭|户|学生|同学|百姓|老百姓|民众|居民|员工|家长|购房者|消费者|企业|公司|国家|城市|地区|孩子|老人|男人|女人|男人|女生|男生|从业者|用户|客户|患者|病例|房子|房源|产品|商品)?/,
-  // 「普遍/普遍都」分布描述
-  /普遍(?:都|是|在|达到|处于|有|超过|高于|低于|约|为|能|可以)/,
+  // 「普遍/普遍都」分布描述（动词承接：过上了/做到了/达到了/生活在/处于…）
+  /普遍(?:都|是|在|达到|处于|有|超过|高于|低于|约|为|能|可以|过上|做到|实现|生活在|享受到|处于|反映|呈现|达到)/,
   // 「都在…左右/以上/以下」——多数处在该水平的等价表述
   /都(?:处在|处于|达到|考到|落在|维持在|保持在|稳定在|徘徊在|集中在|分布在|挤在)/,
-  // 「随便（一个/一套/哪）」个体指称
-  /随便(?:一个|一套|一栋|一户|一家|一所|一所|哪|哪个|多少|拉|找|挑|问|说)/,
+  // 「随便（一个/一套/哪）」个体指称（含「拉出来/拉出/找出来/挑出来」等动态指称）
+  /随便(?:一个|一套|一栋|一户|一家|一所|哪|哪个|多少|拉(?:出来|出)?|找(?:出来|出)?|挑(?:出来|出)?|问|说)/,
   // 「任何（一）个/人」个体指称
   /任何(?:一个|一家|一户|一套|一栋|一人|一名|一位)/,
   // 「人人/个个/大家（都）」群体指称
@@ -114,6 +114,15 @@ const TYPICAL_EN = [
   /\b(?:the\s+)?(?:average|typical|ordinary|median|regular)\s+(?:person|people|individual|household|family|student|consumer|customer|user|worker|citizen|resident|employee)\b/i,
   /\bany\s+(?:given\s+)?(?:one|person|individual|household|family|student|home|house|case)\b/i,
   /\b(?:everyone|everybody|each\s+person)\s+(?:earns?|makes?|has|have|gets?|is|are)\b/i,
+  // r395 补腿：「每期都是该均值」的均匀分布断言——mean-as-typical 的周期性变体。
+  // 攻击样本：'Average rainfall is 500mm, which means it rains 500mm every month.'
+  // / 'The average is 500 a day, so it happens 500 times each day.'
+  // 纪律（防误伤）：JS 无后顾，故把「统计量/数值 + ... + 周期词」写进正则本体，
+  // 要求周期词之前（同一分句内）确有统计量或数字。
+  // 误伤对照（不命中）：'Every month we review the metrics...'（无统计量/数字在前）
+  /\b(?:average|mean|median|per)\s+(?:of\s+)?[\d,.]+\s*(?:a|per|each|every)\s+(?:month|day|year|week|hour|quarter|season)\b/i,
+  // 数字 + 可选单位（mm/k/%/times）+ 周期词：'it rains 500mm every month'
+  /\b[\d,.]+\s*(?:[a-z]{1,6}\s+)?(?:times?\s+)?(?:a|per|each|every)\s+(?:month|day|year|week|hour|quarter|season)\b/i,
   /\btyp(?:ical|ically)\b/i,
 ];
 
@@ -152,8 +161,23 @@ const EXEMPT_DESCRIPTIVE_ZH = [
   /(?:人均|平均|均值)(?:收入|GDP|gdp|住房|面积|支出|消费|产量|寿命|工资|薪资|分|值|数|水平|成绩|销量|单价|成本|房价)(?:仅|只)(?:为|是|有|达到|到|超)/,
   /(?:人均|平均|均值)(?:为|是|达到|提高到|提升到|增长到|上升到|下降到|降至)[^。，；]{0,10}(?:元|万|亿|千|百分点|%|％)/,
 ];
+// 纯描述豁免（EN）——「平均工资是 X」如实陈述统计量。
+// r395 修复：原规则在
+// 「The average income is 80,000, so most people earn around 80,000.」上误杀
+// （前半是描述、后半是推断）。纪律：单条正则的后瞻会被回溯绕过
+// （实测：\\b 边界回溯后前瞻放行），故改为**函数级显式判定**：
+// 描述短语之后若紧跟推论连接词（so/therefore/meaning/which means...），
+// 说明这是「统计量→推断」的谬误句，不予豁免。
+// 良性对照（仍应豁免）：'The average income is 80,000.' / 'Average rainfall was 500mm.'
+// 攻击（应命中）：'The average income is 80,000, so most people earn around 80,000.'
 const EXEMPT_DESCRIPTIVE_EN = [
   /\baverag(?:e|ed)\s+(?:income|score|salary|price|cost|value)\s+(?:is|was|are|were|stood\s+at|reached|came\s+in\s+at)\b/i,
+];
+// 推论连接词：描述短语之后出现即判定为「统计量→推断」结构，撤回纯描述豁免
+const INFERENCE_CONNECTORS_EN = [
+  /\b(?:so|therefore|thus|hence|meaning|suggesting|indicating|proving|showing|that\s+means)\b/i,
+  /\bwhich\s+(?:means|suggests|implies|shows)\b/i,
+  /\bmeans\s+that\b/i,
 ];
 
 function anyHit(list, text) {
@@ -193,10 +217,17 @@ function checkMeanAsTypical(text, inject) {
   const DES_Z = R.EXEMPT_DESCRIPTIVE_ZH || EXEMPT_DESCRIPTIVE_ZH;
   const DES_E = R.EXEMPT_DESCRIPTIVE_EN || EXEMPT_DESCRIPTIVE_EN;
 
-  // 分布纪律语言 / 元陈述 / 纯描述 → 不是在犯本谬误
+  // 分布纪律语言 / 元陈述 → 不是在犯本谬误
   if (anyHit(ED_Z, text) || anyHit(ED_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(EM_Z, text) || anyHit(EM_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
-  if (anyHit(DES_Z, text) || anyHit(DES_E, text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // 纯描述豁免（EN）：只在描述短语之后**不紧跟推论连接词**时生效。
+  // r395 修复：「The average income is 80,000, so most people earn around 80,000.」
+  // 前半是描述、后半是推断——原样豁免会误杀。此处显式判定：
+  // 描述短语命中 + 全文含推论连接词 → 判定为「统计量→推断」谬误句，不豁免。
+  if (anyHit(DES_E, text) && !anyHit(INFERENCE_CONNECTORS_EN, text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  if (anyHit(DES_Z, text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 腿① 平均数统计量
   let meanCount = countMatches(M_Z, text) + countMatches(M_E, text);

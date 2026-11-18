@@ -4,6 +4,10 @@
 
 ## [6.8.197] - 2026-11-18
 
+### 第 267 维度 mean_as_typical（均值当典型值 / 分布误读）接线闭环（r397，真升级①：新判别维度）
+
+`src/mean-as-typical.js` 模块层早已完工但从未接线（dimMap/VERIFY_DIMS/allDims/summary/DIM_GUIDANCE/require/dispatch 全部缺席，gate.action 恒 pass）。本轮在 `src/index.js` 补齐八处接线，维度数 265→266、VERIFY 232→233。判据为双腿共现 + 邻近窗 + 三组豁免：腿① 平均数统计量（人均/平均每/平均分/均值；EN average/mean，必须带「平均/人均」标记）× 腿② 多数/典型个体指称（大多数人/大部分/多数/随便哪个；EN most/typical/the average person）；豁免分布纪律语言在场（中位数/众数/长尾/右偏）、平均数被质疑的元陈述、平均数纯描述无个体层结论。与 ecological_fallacy（群体→个体属性迁移）、law_of_small_numbers（小样本波动）、count_rate_conflation（绝对计数缺分母）射程错开。轮测 49/49；变体矩阵攻击 8/8 非 pass（中英双语、裸名词、倒装、长句、个体指称形）、良性 6/6 pass；五门禁 verify 16/0、guard-abilities 20/20@266、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零新增。详见 UPGRADE_LOG.md r397。
+
 ### illusion_of_control 第 256 维新增「日常生活与人生机遇场景」措辞家族（r734，真升级②：既有维度全新措辞家族）
 
 - 轮次背景：逻辑谬误家族扩展轴续（r395 诉诸无知免证族后）。**轮次号说明**：原认领 r396 与 1 号 10-30 已发布轮次撞号（`test/round-396-zh-softdb-bare-conn-qualifies.test.js` 由 bc6fc0f 引入），按 r333 撞号先例重编号为 r734（全局最大轮 +1）。海外扫描 arXiv（parse-fail）/ GitHub（0 repo）/ S2（15 条背景文献无可集成纯规则方案）空返，按既有形态自建。
@@ -12,7 +16,6 @@
 - 落地修正（r734b，复跑实证）：①-j2 补「打到车/叫到车」变体（原表只有连续形「打车」）、A_ZH5 补抽奖/彩票锚点（翻正硬币族可挂经典随机锚点）、B_ZH5 补幸运币/拜一拜/上香/祈祷仪式动词（存量表在第一链，本链需自带，否则跨链不组合）、③-j3 补下降族反序形（「都会小一些」无 更/变 前缀）、C_EN5 补 improves-odds-of 与 luck-gets-better 形（含插入语容忍）、③-j5 补反序形（通过率就是会提升）、B_EN5 补 pray/ritual、A_EN5 补 title evaluation——修后 19/19 攻击全部由本维承重（「红衬衫」由 pseudo_causal 代拦转本维、「pray before the title evaluation」由 perfect_error 代拦转本维）。
 - 验证（本轮全部实测）：立项探针攻击穿透 11/17 → 落地后 gate 层 **19/19 非 pass 且 illusion_of_control finding 在场**；良性 **5/16 与基线逐项一致**（存量 standard_shift ×2 / monocausal ×2 / 存量链 FP ×1，零新增误伤，B2/B3 轮测实证杀新常量后状态不变）；轮测 `test/round-734-illusion-of-control-daily-chance.test.js` **17 断言全绿**（19 攻击全腿 + 11 良性干净 pass + 5 存量 FP 实证 + 8 存量回归 + 6 常量注入删条 16/16 翻转 + 加性证明 + gate 归因 + 接线零改动纪律）；注入删条矩阵（`scripts/round-734/matrix-module.js`）实证 16 条样本由新常量独占承重（1 条「Rubbing my lucky coin」与存量链①双承重，删任一单常量不 miss）。
 - 四门禁（HEAD 提交态实跑）：verify **16/0**、guard-abilities **20/20@265**、doc-numbers **24/0**、双向召回 **52/52** + 误拦 **302/326**（与基线逐项一致，零新增误伤）。
-
 ---
 
 # 6.8.196 变更日志条目

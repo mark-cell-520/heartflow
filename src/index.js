@@ -768,6 +768,11 @@ const { checkCoerciveAffection } = require('./coercive-affection.js');
 // 全命中，但 src/index.js 从未 require/dispatch——属「已加载未 dispatch」能力，
 // r361 补齐九处接线。变量名 qss——quantifier scope shift 缩写，grep 0 命中。
 const { checkQuantifierScopeShift } = require('./quantifier-scope-shift.js');
+// [r397 接线] 第 267 维度 mean_as_typical（均值当典型值谬误）require。模块
+// 层由 r394/r395 起草并补齐中英双腿与三组豁免（模块层矩阵攻击 16/16、
+// 良性 15/15），但 src/index.js 从未 require/dispatch——探针实测 gate 层
+// ZH 侧 4/4 穿透、EN 侧 1/2 穿透。变量名 mat——mean as typical 缩写。
+const { checkMeanAsTypical } = require('./mean-as-typical.js');
 // [r367 接线] 第 260 维度 package_deal（一揽子谬误：把多个独立命题打包成
 // 不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制单条独立判断）require。
 // 缺口实证见 scripts/round-367/probe-package-deal.js（11 条攻击样本 8 条穿透
@@ -2429,6 +2434,13 @@ function discriminate(text, evidence = [], contentMode) {
   // dispatch。半成品模块层 4/4 全命中而 gate 层穿透（未 require 未 dispatch），
   // 本行让量词辖域移位以独立维度名进入 findings/scores/dimMap。
   const qss = _applyPedagogyRelaxation(checkQuantifierScopeShift(_normText), "quantifier_scope_shift", pedagogyRelaxation);
+  // [r397 接线] 第 267 维度 mean_as_typical（均值当典型值谬误）独立
+  // dispatch。模块层双腿（平均数统计量×多数/典型个体指称）与三组豁免
+  // 已由 r394/r395 备齐，src/index.js 从未 require/dispatch——探针实测
+  // gate 层 ZH 侧 4/4 穿透（「班级平均分是85分，可见班上大部分同学都考到
+  // 85分以上」等）、EN 侧 1/2 穿透。本行让分布误读以独立维度名进入
+  // findings/scores/dimMap。
+  const mat = _applyPedagogyRelaxation(checkMeanAsTypical(_normText), "mean_as_typical", pedagogyRelaxation);
   // [r367 接线] 第 260 维度 package_deal（一揽子谬误）独立 dispatch。探针
   // 实证 gate 层穿透（8/11 漏判），本行让「打包绑定 × 全有或全无」以独立
   // 维度名进入 findings/scores/dimMap。
@@ -3190,6 +3202,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r361 接线] 第 258 维度 quantifier_scope_shift 参与判定（量词辖域
     // 移位）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: qss.score, name:'quantifier_scope_shift'},
+    // [r397 接线] 第 267 维度 mean_as_typical 参与判定（均值当典型值
+    // / 分布误读）。
+    {score: mat.score, name:'mean_as_typical'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -3848,6 +3863,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位：
     // ∀x∃y 推不出 ∃y∀x）dimMap 登记。qss。
     quantifier_scope_shift: qss,
+    // [r397 接线] 第 267 维度 mean_as_typical（均值当典型值 / 分布误读）
+    // dimMap 登记。mat——mean as typical 缩写。r394/r395 起草模块层、
+    // 本轮补齐九处接线，探针实证 gate 层 ZH 4/4、EN 1/2 穿透。
+    mean_as_typical: mat,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定腿 × 全有或
     // 全无腿 × 邻近窗 × 六组豁免）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4395,6 +4414,11 @@ function discriminate(text, evidence = [], contentMode) {
     'no_true_scotsman': "不得**先立一个带 authenticity 标准的类别，再用行为把反例驱逐出该类别，使类别不可证伪**——「真正的X不会这样」：先规定「真正的专家/粉丝/朋友/领导」应当如何，再把不符合该行为标准的对象开除类别：「真正爱你的男人，不会计较你花多少钱」「真正的专家不会犯这种低级错误」「真正有格局的领导，不会盯着考勤」「真兄弟不会计较这些，计较就不是真兄弟」「合格的妈妈怎么会让孩子哭成这样」「真爱一个人就不会计较得失」「He is not a true fan if he criticizes the team.」「If she were a real friend, she would have shown up.」这类**authenticity 短语×驱逐断言**的话术当循环定义谬误（样本形状与负例见 test/round-728-no-true-scotsman.js）。判据：腿① AUTH authenticity 短语——「真正/真心/真爱/合格/称职/敬业/但凡/有良心/有自尊/吃得苦」+ 社会角色名词（专家/粉丝/朋友/兄弟/男人/女人/领导/学生…）或 true/real/genuine + fan/expert/friend/partner…；腿② EXCLUSION 驱逐断言——否定行为谓词（不会/从来不/怎么会/算不上/根本不/就不配/would never/not a true…），或 CONDITIONAL 反事实条件句（如果她是真朋友，早就…/If she were a real friend, she would have…）。两腿共现才判，缺腿不判——只说「真正的专家」而无驱逐断言是普通描述不判；只说「他不会计较」而无 authenticity 短语是普通陈述不判。多处共现或含类别否认/反事实条件则加权。正当做法是**给出可检验的类别定义**（操作化指标/可复现的标准）再评估个体是否符合，或承认反例并修正定义而非开除反例。边界：无真正的苏格兰人谬误的概念转述（「这是无真正的苏格兰人谬误」）、术语约定与定义先行（先定义「真正的粉丝」的标准/约定术语/可检验的定义）、对冲（也许/可能/未必/not necessarily）、否定翻转（不是不会/不意味着/does not mean）、证据挑战（自称真正的专家但拿不出依据）明确不判。",
     // [r231 接手] 第 216 维度 self_fulfilling_prophecy（自我应验预言）guidance。
     'self_fulfilling_prophecy': "不得**把预期自己制造出来的结果当成预期准确的独立证据**——自我应验预言与自败预言：信念/预言在场 → 主体或他人顺应信念行动 → 结果反向印证预言，于是结果被当作信念正确的证明，而这一结果本身就是信念驱动行为造出来的：「因为他知道自己会被歧视，所以他干脆不申请，最后果然没能入选」「所有投资人都不看好这家公司，撤资之后它果然就倒闭了」「早就有人说这个项目会黄，结果大家真的都按会黄的方式准备，项目就黄了」「因为害怕考试成绩差，她提前放弃了复习，最后成绩真的很差」「他一再说这段感情撑不过三年，对方最后真的选择了离开」「The team believed they would fail the audit, so they stopped trying and failed.」「The prophecy of a bank run caused depositors to withdraw, and the bank did collapse.」「He kept insisting the relationship would not last three years, and in the end she really did leave.」这类**信念/预言腿×信念驱动行为腿×结果反向印证腿**的话术当循环确认（样本形状与负例见 test/self-fulfilling-prophecy.test.js）。判据：腿① EXPECT 信念/预言在场——心理动词（相信/认为/觉得/担心/害怕/生怕/预期/断定/心想）+ 结果性预期（会/必然/注定/迟早），或言语动词（说/预言/断言/强调/警告/提醒/不看好）+ 频率或来源限定（早就有人/有人说/大家都/他一再/反复/不断/多次）；EN believed/thought/expected/feared/worried/predicted/prophesied/insisted/kept saying + would/will/was bound to。腿② BEHAVIOR 信念驱动行为在场，两种子形：(a) 自我挫败行为（干脆不/提前放弃/放弃/不再/停止/撤回/撤资/退出/不申请/不尝试/不作为/逃避/按…的方式准备；EN stopped trying/gave up/withdrew/pulled out/quit/stopped applying/didn't bother/resigned themselves to）；(b) 他人顺从行为（对方/他们/大家/别人/团队/储户/投资者/客户/员工 + 选择了离开/取款/撤资/退出/放弃/离开/照办/跟进；EN depositors withdrew/investors fled/staff started looking for other jobs）。腿③ CONFIRM 结果反向印证在场：果然/果真/真的/最后真的/结果真的/不出所料/意料之中/应验/说中了/猜中了/就…了；EN as predicted/as expected/sure enough/came true/did in fact/ended up/and indeed。三腿共现才判，缺腿不判——只有信念没有行为传导是 wishful_thinking 的地盘；只有结果没有信念在场是普通叙述。**信念本身不产生结果，是顺应信念的行为产生了结果**，再把结果当成信念准确的独立证据就构成正反馈闭环：正当做法是**拆开传导链**——结果里有多少是预期自己制造的、多少有独立依据，再决定能否把结果当证据（例：把「他果然没入选」改成「他没申请，所以未入选这一结果不能证明歧视预期准确」/EN: separate what the belief produced from what the evidence independently shows），或明确标注这是预期驱动而非独立验证。为什么取 verify 级：自我应验预言在心理学、社会学、组织行为学里是正当研究对象（罗森塔尔效应、标签效应、皮革马利翁效应），文学与历史叙事也大量使用，rewrite/block 会误伤；verify 的含义是「这段文本把预期驱动的结果当成预期准确的独立证据，需先拆开传导链再把结论当证据用」。边界：wishful_thinking 管「我想所以会成」的单向愿望必然化，不要求行为传导腿也不要求结果确认腿；unfalsifiable_confirmation 管「实现/没实现都算对」的对举极性，本族要求单向印证；pseudo_causal/post_hoc 管编造或误用因果机制、时间先后当因果，本族的因果链可以完全真实，错在把自造结果当作独立证据；appeal_to_consequences 管「后果糟所以不是真的」，方向相反；anonymous_source_claim 管来源不可指认，本族不关心来源只关心传导链结构。明确不判（豁免）：证据支持的预测（数据显示/研究表明/模型预测/统计表明/forecast based on/according to the data）+ 结果；预备性/防护性行为（带伞/准备/防范/加固/备份/上保险/演练/prepared/insured/backed up）——「担心下雨所以带伞，结果真的下雨了」是正确预判，本族核心反例；元话语/教学转述（自我应验预言/自败预言/罗森塔尔效应/皮革马利翁效应/标签效应/预期效应/self-fulfilling prophecy/rosenthal effect/pygmalion effect/labeling theory）；显式对冲（可能/也许/未必/不一定/大概率/might/maybe/possibly）；疑问句（含 ?/？）；复述他人观点/新闻报道（据报道/他说/according to/witnesses said）；否定翻转（不意味着/并不能说明/does not mean/不等于）。",
+    // [r397 接线] 第 267 维度 mean_as_typical（均值当典型值 / 分布误读）
+    // guidance。mat——mean as typical 缩写。模块层 r394 立项（穿透探针
+    // 攻击 5/6、良性 3/3）、r395 起草双腿与豁免，src/index.js 从未接线，
+    // 本轮补齐。
+    'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）guidance。
@@ -6084,6 +6108,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 中项问题。
     'coercive_affection',
     'quantifier_scope_shift',
+    // [r397 接线] 第 267 维度 mean_as_typical（均值当典型值 / 分布误读：
+    // 平均数→多数个体）。verify 级——单句可能是教学中反例或转述，且
+    // ecological_fallacy/law_of_small_numbers/statistical_misleading/
+    // count_rate_conflation 均不覆盖「均值当众数/典型值用」这一结构，
+    // rewrite/block 会误伤正常统计描述。
+    'mean_as_typical',
   ]);
   // pass：无问题通过
 
@@ -6551,6 +6581,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）。
       // qss。模块 r361 前已存在（466 行）但从未 dispatch，本轮补齐接线。
       quantifier_scope_shift: qss,
+      // [r397 接线] 第 267 维度 mean_as_typical（均值当典型值 / 分布误读）。
+      // mat——mean as typical 缩写。r394/r395 起草模块层、本轮补齐接线，
+      // 探针实证 gate 层 ZH 4/4、EN 1/2 穿透。
+      mean_as_typical: mat,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6735,6 +6769,9 @@ function discriminate(text, evidence = [], contentMode) {
     // ∀x∃y 推不出 ∃y∀x）。qss——quantifier scope shift 缩写。同上：
     // 九处一次接齐。
     quantifier_scope_shift: qss,
+    // [r397 接线] 第 267 维度 mean_as_typical 补登记（均值当典型值 /
+    // 分布误读）。mat——mean as typical 缩写。同上：九处一次接齐。
+    mean_as_typical: mat,
     // [r323] 第 255 维度 red_herring 补登记（转移话题/偷换论题：用
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。
