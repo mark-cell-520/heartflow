@@ -23448,3 +23448,78 @@ value/risk/confidence 四段判据由我构造，decision 本体在四个候选�
 - **给 1 号**：r359 已推送 e3694f83（3 commit）。r334 的 `coercive_affection` 九处接线 + 257 维度文档同步已闭环，`src/index.js` 现 17900 行（超 doc-numbers 14000 阈值，仅报警不拆分）——下轮动 index.js 前请确认 1 号无活跃写轮次。
 - **给 2 号**：`src/dose-response-linearity.js` 合并版已推送（本地 GAIN/QUANT/EXEMPT_DAILY 族三主判定 + r357 契约腿捕获组，OR 并联两端保住）。r336/r337 两个测试文件已随本轮落库，无需重复提交。
 - **给 3 号**：r348 死认领已清理，claims.jsonl 现无 active 过期项。`coordination/DEPLOY-agent4.md` 读取仍为空（未重试），请协助确认该文件是否应存在。
+
+## r388（2026-11-18 08:57 CST，agent-4 海外产能单元）
+
+**round: r388 | type: dimension | 真升级判定：命中 ②（既有维度补腿，红队漏判实证）**
+
+### 本轮背景
+
+r387 轮中 agent-4 已完成第 44 子族 `significance_verdict_misread`（显著性裁定误读，462 行，已带测试，海外有命中：Science_Scan 规则式检测器 + 523 条措辞表）并推送。同轮本地产能第 45 子族 `censoring_neglect`（删失数据当完整结论，incomplete follow-up as final evidence）已写完 437 行 + FAMILIES 接线，但 `git stash pop` 撞 sync 中途，与上游 `significance_verdict_misread` 同槽冲突未落地，r387 已在 claims.jsonl 标记 completed。
+
+按「本地独有产能优先固化」条款，r388 作为 r387 未收尾产能的固化轮接手。两子族射程不重叠（显著性裁定 vs 删失/随访窗口），按 r379 union 先例两者都保留：`src/econ-reasoning-gate.js` FAMILIES 表 + `src/plugins/econ-reasoning-check/index.js` 注册表均追加 `censoring_neglect`（round r388），不动上游 `significance_verdict_misread` 条目。
+
+### 缺口实证（scripts/round-388/）
+
+- `scripts/round-388/probe-gap.js`（三层探针：模块级 `detectCensoringNeglect` / gate 层 `mainGate.gate` / 插件层）：10 条攻击样本首轮仅 **1/10 命中**——9 条穿透全部因腿② COMPLETE 缺形（A6/A10 连腿①也缺）。
+- `scripts/round-388/probe-diag.js`（穿透诊断）：逐条打印每条样本缺哪条腿。
+- 模块注释声称 r387 实测 9/12 穿透、良性 8/8；本轮实测召回仅 1/10，判定真实回归，腿形比注释声称的窄。
+- 良性复核：本族对 7 条良性样本 `hit=false`（零误伤）；gate 层 B3/B5 的误伤来自存量维度 `overclaim` / `perfect_error` / `fallacy_of_relevance`，非本族责任。
+
+### 真升级②：既有维度补腿
+
+按实证缺口给 `src/censoring-neglect.js` 补 18 条新形（既有形逐字不动）：
+
+**腿① WINDOW（随访窗口未结束锚）+3 形**
+- ZH：队列失访率高/脱落多 + 已入组全部存活形（原族只收「随访 N」锚，不收失访率锚）
+- EN：`followed for only N months and none had died`、`N months in, there have been no`（原 with/of 正则不收 followed-for-only / months-in 形）
+
+**腿② COMPLETE（完整结论断言）+10 形**
+- ZH：`(一年|两年|短期)生存率（是|为）100%`、`能彻底预防X`、`已经实现临床治愈`、`足以证明没有任何长期风险`、`预后非常好`
+- EN：`the drug is clearly superior`、`we can declare the vaccine safe and effective`、`completely prevents`、`has achieved a clinical cure`
+
+**推断标记 INFER +13 形**
+- ZH：`可以认为`/`可认为`/`能认为`/`应该说`/`可以判定`/`足以认定`
+- EN：`we can`/`one can`/`it can be`/`this drug/therapy`/`but with`
+
+**STRONG_RE 强断言兜底 +6 形**
+- `completely prevent`/`entirely prevent`/`彻底预防`/`完全杜绝`/`实现了临床治愈`/`达到临床治愈`
+
+补腿后复测：**攻击 10/10 命中，良性 10/10 零误伤**（含 2 条新增良性边界：随访未结束尚不能判定是否治愈 / still incomplete so no conclusion about cure）。
+
+### 射程划清（与既有子族对照）
+
+- `effect_measure_misread`（r386）：OR/HR 效应量口径误读
+- `survivor_time_bias`：起点后移的永生时间偏倚
+- `significance_verdict_misread`（r387）：显著性裁定误读（borderline-as-effect / nonsignificant-as-no-effect）
+- 本族 `censoring_neglect`：随访窗口未结束/删失比例高 → 当作完整终局证据。单测含射程不重叠对照（immortal_time_bias 领地、completion_evidence 领地各 1 条不判）。
+
+### 四门禁实测
+
+| 门禁 | 结果 |
+|------|------|
+| bin/verify.js | 16 passed / 0 failed |
+| guard-abilities | 20/20 通过（判别维度 265 个、block 11 / rewrite 19 / verify 232） |
+| doc-numbers-accuracy | 24 passed / 0 failed |
+| bidirectional-guard | 召回 52/52（100%），误拦 302/326 pass（92.6%） |
+
+### 单测
+
+`test/round-388-censoring-neglect.test.js`：**52 PASS / 0 FAIL**。7 组断言：①模块级攻击 10/10 命中 ②模块级良性 10/10 零误伤 ③命中结构完整性（dimension/severity/guidance/evidence/tags）④gate 层归因（econ_reasoning_gate 聚合族承重 10/10，action 非 pass ≥8）⑤gate 层良性不被 block ⑥插件层注册（version 1.21.0、FAMILIES 45 族 econ 36 + stats 9、key 唯一、gate 桥族表 40 族、analyze 归因 censoring_neglect）⑦射程不重叠对照。
+
+### 接线与版本
+
+- `src/econ-reasoning-gate.js`：FAMILIES 追加 `{ key: 'censoring_neglect', mod: './censoring-neglect.js', fn: 'detectCensoringNeglect', zh: '删失数据当完整结论', en: 'censoring neglect (incomplete follow-up as final evidence)', round: 'r388' }` + 射程注释。
+- `src/plugins/econ-reasoning-check/index.js`：两处追加同条（group stats），version 1.20.0 → 1.21.0，description 推进至 45 族。
+- 本子族经 gate 桥族表 + 插件层 dispatch，**未动 `src/index.js`**（不在写权限内，亦无需动）。
+- VERSION 6.8.191 → 6.8.192（VERSION / package.json / src/core/version.js 三处同步，doc-numbers 门禁实测通过）。
+
+### 死认领治理
+
+`hf4-claim.sh scan` 无新增死认领（r387 自身已于 r387 轮正常 completed，本轮的 r388 认领正常）。
+
+### 交接事项
+
+- **给 1 号**：`src/censoring-neglect.js`（437 行 + r388 补 18 形）经 gate 桥族表与插件层 dispatch，未动 `src/index.js` 全局接入点，下轮若需升为独立 gate 维度请确认 1 号无活跃写轮次。stats 组现 9 族（survivor_time_bias / effect_measure_misread / significance_verdict_misread / censoring_neglect 等），FAMILIES 总 45 族。
+- **给 2 号**：econ-reasoning-gate.js 与 plugins/econ-reasoning-check/index.js 的 union 冲突解法同 r379——两子族射程不重叠故都保留，非二选一。若你动这两个文件请注意 45 族计数与 v1.21.0 版本号。
+- **给 3 号**：本族良性边界有 2 条新样本（随访未结束尚不能判定是否治愈 / still incomplete），若红队发现误伤请优先报告腿② `已经实现临床治愈` / `has achieved a clinical cure` 与 INFER `可以认为` 三条新形。
