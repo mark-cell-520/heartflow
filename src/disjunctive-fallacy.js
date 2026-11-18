@@ -1,12 +1,22 @@
 /**
- * src/disjunctive-fallacy.js — 「析取消去谬误」检测器（第 266 判别维度）
+ * src/disjunctive-fallacy.js — 「析取消去谬误」检测器（非穷尽析取 × 排除确证）
  *
- * v6.8.194 新增（round-392）。心虫 decision 本体裁决 accelerate
- * （confidence 0.7 / priority 40；cognitiveLoad 与 uncertainty 引擎默认
- * 档为 "unknown"，非实质背书）。立项探针 scripts/round-392/probe-cand2.js
- * 实测：析取消去族 ZH+EN **5/5 穿透零命中**（既有 false_dilemma 只管
- * 「选项集压缩」，不收「排除一支确证另一支」），良性 5/6 pass（唯一非 pass
- * 为既有 monocausal_attribution 基线误伤，非本族增量）。
+ * v6.8.194（round-393）。立项探针 scripts/round-392/probe-cand2.js 实测：
+ * 析取消去族 ZH+EN **5/5 穿透零命中**（既有 false_dilemma 只管
+ * 「选项集压缩」，不收「排除一支确证另一支」的推理层谬误），良性 5/6
+ * pass（唯一非 pass 为既有 monocausal_attribution 基线误伤，非本族增量）。
+ * r393 接手核实（scripts/round-393/probe-takeover.js，合并树 HEAD
+ * 188954e）：18 条攻击样本 gate 层 **14/18 穿透**（4 条被存量
+ * pseudo_profundity / false_dilemma / thirdparty_harm_coercion /
+ * scrutiny_evasion 代拦），良性 1/12 非 pass（contradiction 存量基线
+ * 误伤）——缺口为真。
+ *
+ * 接入形式（r393 定 scope，重要）：本模块**不独立成维**。新 dimMap 键
+ * 须改 src/index.js（1 号独占接线区，agent-4 红线不碰），故以「既有
+ * 第 65 维 false_dilemma 新增措辞家族」形式接入——src/false-dilemma.js
+ * 路由⑩调用本模块 detect()（union 语义，与 econ-reasoning-gate
+ * FAMILIES 聚合同设计）。若后续要升独立维度（dimMap 266），由 1 号
+ * 接线，本模块判据可直接复用。
  *
  * 辨别的族（false disjunctive syllogism / non-exhaustive disjunction）：
  * 句子以「要么A要么B / 或者A或者B / Either A or B」给出选项集后，排除
@@ -19,16 +29,17 @@
  *   · 归因排除：方案没成功，说明执行的人能力不行（不是方案问题→是人问题）
  *   · 身份排除：你不认同公司的决定，那你就是想跳槽了
  *   · 责任排除：这不是我造成的，那就是你的责任
+ *   · [r393] 腿③析取对立归责：要么接受这个方案，要么就是跟团队过不去
+ *     （隐式排除，无显式否定词——析取框架自身构成对立归责）
+ *   · [r393] 腿④结果归因排除：项目失败了，说明市场根本不需要这个产品
+ *     （结果失败锚 × 归因推出锚，句中既无析取词也无排除动词）
  *   · EN 同构：Either you agree with the plan or you are against progress
  *
- * 为什么现有 265 维拦不住（r392 立项核查）：
- *   · false_dilemma 管「选项集压缩」（只有两种/没有中间选项/二选一），
- *     射程在**框架层**；本族射程在**推理层**——选项集可以只是并列给出，
- *     谬误发生在「排除一支→确证另一支」的推理步骤上。
- *   · affirming_the_consequent / denying_the_antecedent 管条件句变形，
- *     本族锚是析取词（要么/或者/either-or），非条件句。
- *   · monocausal_attribution 管单因归因，本族未必有因果主张——
- *     「你要么同意要么反对」式的立场归属同样命中。
+ * 与 false_dilemma 既有路由的射程分界：false_dilemma 管「选项集压缩」
+ * （只有两种/没有中间选项/二选一/站队胁迫），射程在**框架层**；本族射程
+ * 在**推理层**——选项集可以只是并列给出，谬误发生在「排除一支→确证
+ * 另一支」的推理步骤上。交集句（「要么接受这个方案，要么就是跟团队
+ * 过不去」）双触发属 union 先例，非二选一。
  *
  * 判据（D1 × D2 两交叉，任一语言分支内成立即命中）：
  *   D1 析取选项集在场 —— 要么/或者/either…or/不是A就是B
@@ -136,22 +147,34 @@ const NEG_GUARD_EN = /\b(?:is|are)\s+not\s+(?:necessarily|automatically|always)\
 const HEDGE_ZH = /(?:误解|谬误|误用|误读|陷阱|不等于|未必|不一定|不见得|简单化|以偏概全|非黑即白)/;
 const HEDGE_EN = /\b(?:misconception|fallacy|misuse|mistake|error|trap|not\s+necessarily|may\s+not|might\s+not|possibly|perhaps|oversimplif(?:y|ied|ication))\b/i;
 
+// ─── [r393] inject 支持（负例测试用，同 false-dilemma.js 惯例）────
+// 键名与上方常量一一对应；detect(text, inject) 时以 inject 值整体替换
+// 对应常量（注入 /$^/ 即「删条」——该模式不再命中，守卫/腿须转红）。
+const DSF_CONSTS = {
+  DISJ_ZH, DISJ_EN, NEG_BRANCH_ZH, INFER_BRANCH_ZH, EXCLUDE_INFER_EN,
+  NEGATE_ZH, DISJ_BLAME_ZH, RESULT_FAIL_ZH, BLAME_INFER_ZH,
+  FACTUAL_ZH, FACTUAL_EN, CONCEPT_ZH, CONCEPT_EN,
+  NEG_GUARD_ZH, NEG_GUARD_EN, HEDGE_ZH, HEDGE_EN,
+};
+
 /**
- * detect(text) — 返回 { hit, score, family, details }
+ * detect(text, inject) — 返回 { hit, score, family, details }
  * hit=true 当且仅当 D1 × D2 两腿共现且不在豁免内。
  * 两腿判据：任一语言分支内 D1 与 D2 同时成立即命中（跨语种不混判）。
+ * inject：可选，以 { 常量名: 正则 } 覆盖 DSF_CONSTS 成员（负例注入用）。
  */
-function detect(rawText) {
+function detect(rawText, inject) {
   if (!rawText || typeof rawText !== 'string') {
     return { hit: false, score: 0, family: 'disjunctive_fallacy', details: '' };
   }
+  const R = Object.assign({}, DSF_CONSTS, inject || {});
   const text = rawText;
 
   // 豁免先行：事实穷尽/程序性析取/概念教学——整句豁免。
-  if (FACTUAL_ZH.test(text) || FACTUAL_EN.test(text)) {
+  if (R.FACTUAL_ZH.test(text) || R.FACTUAL_EN.test(text)) {
     return { hit: false, score: 0, family: 'disjunctive_fallacy', details: '豁免：事实穷尽或程序性析取' };
   }
-  if (CONCEPT_ZH.test(text) || CONCEPT_EN.test(text)) {
+  if (R.CONCEPT_ZH.test(text) || R.CONCEPT_EN.test(text)) {
     return { hit: false, score: 0, family: 'disjunctive_fallacy', details: '豁免：概念教学/框架词共现' };
   }
 
@@ -159,8 +182,8 @@ function detect(rawText) {
   let details = '';
 
   // 中文分支：D1 析取框架 × D2 排除确证（否定支与推出支同句共现）
-  const d1zh = DISJ_ZH.test(text);
-  const d2zh = NEG_BRANCH_ZH.test(text) && INFER_BRANCH_ZH.test(text);
+  const d1zh = R.DISJ_ZH.test(text);
+  const d2zh = R.NEG_BRANCH_ZH.test(text) && R.INFER_BRANCH_ZH.test(text);
   if (d1zh && d2zh) {
     // 守卫：推出支对冲短语共现且无强推出标记时不判（防「这可能是误解」类）。
     // [r392] 守卫改为只查推出标记**之前**的显式对冲（「未必是」「不一定是」），
@@ -174,8 +197,8 @@ function detect(rawText) {
 
   // 英文分支：either…or 在场 × 排除确证结构；或条件式排除单腿
   // （If it is not A, then it must be B —— 析取结构由条件句自身承担）。
-  const d1en = DISJ_EN.test(text);
-  const d2en = EXCLUDE_INFER_EN.test(text);
+  const d1en = R.DISJ_EN.test(text);
+  const d2en = R.EXCLUDE_INFER_EN.test(text);
   if (!hit && ((d1en && d2en) || d2en)) {
     if (/\b(?:is|are)\s+not\s+(?:necessarily|automatically|always)\b/i.test(text) && !/\b(?:must|has\s+to|can\s+only)\s+be\b/i.test(text)) {
       return { hit: false, score: 0, family: 'disjunctive_fallacy', details: '守卫：推出支否定对冲（EN）' };
@@ -186,8 +209,8 @@ function detect(rawText) {
 
   // 中文分支的紧凑形：D1 析取 + 近距否定标记 + 推出标记（无长跨距连接时）
   // 「不是A，只能是B」：D1 由「不是…就是…」承担，否定+推出同句紧凑共现。
-  if (!hit && d1zh && NEGATE_ZH.test(text) && /(?:只能|必然是|肯定是|准是|那就是|即为)/.test(text)) {
-    if (!(NEG_GUARD_ZH.test(text) && !/(?:只能|必然|肯定|准是)/.test(text))) {
+  if (!hit && d1zh && R.NEGATE_ZH.test(text) && /(?:只能|必然是|肯定是|准是|那就是|即为)/.test(text)) {
+    if (!(R.NEG_GUARD_ZH.test(text) && !/(?:只能|必然|肯定|准是)/.test(text))) {
       hit = true;
       details = '析取消去谬误（紧凑形）：否定一支＋只能是/那就是另一支';
     }
@@ -195,14 +218,14 @@ function detect(rawText) {
 
   // [r393] 腿③：析取对立归责——「要么X，要么就是Y」隐式排除，无显式
   // 否定词。析取框架自身构成对立归责（否定一支即推出另一支的确证语气）。
-  if (!hit && DISJ_BLAME_ZH.test(text)) {
+  if (!hit && R.DISJ_BLAME_ZH.test(text)) {
     hit = true;
     details = '析取消去谬误（析取对立归责）：要么X要么就是Y——否定一支即归责另一支，选项集未必穷尽';
   }
 
   // [r393] 腿④：结果归因排除——结果失败锚 × 单支归因推出锚，反向排除
   // 他因单推一支（「方案没成功，说明执行的人能力不行」）。
-  if (!hit && RESULT_FAIL_ZH.test(text) && BLAME_INFER_ZH.test(text)) {
+  if (!hit && R.RESULT_FAIL_ZH.test(text) && R.BLAME_INFER_ZH.test(text)) {
     hit = true;
     details = '析取消去谬误（结果归因排除）：以结果失败反推单一归因，排除他因';
   }
@@ -212,12 +235,12 @@ function detect(rawText) {
   }
 
   // 对冲窗双向检查：句中自带 hedge 框架词时降权为不判（讨论谬误本身）。
-  if ((HEDGE_ZH.test(text) && !/(?:只能|必然|肯定|准是|必定)/.test(text)) ||
-      (HEDGE_EN.test(text) && !/\b(?:must|has\s+to|can\s+only)\s+be\b/i.test(text))) {
+  if ((R.HEDGE_ZH.test(text) && !/(?:只能|必然|肯定|准是|必定)/.test(text)) ||
+      (R.HEDGE_EN.test(text) && !/\b(?:must|has\s+to|can\s+only)\s+be\b/i.test(text))) {
     return { hit: false, score: 0, family: 'disjunctive_fallacy', details: '守卫：对冲短语共现（讨论谬误本身）' };
   }
 
   return { hit: true, score: 0.72, family: 'disjunctive_fallacy', details };
 }
 
-module.exports = { detect, DISJ_ZH, DISJ_EN, NEG_BRANCH_ZH, INFER_BRANCH_ZH, EXCLUDE_INFER_EN, NEGATE_ZH, DISJ_BLAME_ZH, RESULT_FAIL_ZH, BLAME_INFER_ZH, FACTUAL_ZH, FACTUAL_EN, CONCEPT_ZH, CONCEPT_EN, NEG_GUARD_ZH, NEG_GUARD_EN, HEDGE_ZH, HEDGE_EN };
+module.exports = { detect, DSF_CONSTS, DISJ_ZH, DISJ_EN, NEG_BRANCH_ZH, INFER_BRANCH_ZH, EXCLUDE_INFER_EN, NEGATE_ZH, DISJ_BLAME_ZH, RESULT_FAIL_ZH, BLAME_INFER_ZH, FACTUAL_ZH, FACTUAL_EN, CONCEPT_ZH, CONCEPT_EN, NEG_GUARD_ZH, NEG_GUARD_EN, HEDGE_ZH, HEDGE_EN };

@@ -24,6 +24,13 @@
  *       插入×品质标签（不转这个帖子，你就是没良心）；EN if you're
  *       not with us, you're against us / either you join … or you
  *       are dead weight。良性二元陈述无定性等式，双因子交叉豁免
+ *   · [r393] 析取消去谬误（推理层补腿）：排除一支确证另一支——你要么
+ *       支持这个政策，要么你就是不爱国 / 方案没成功，说明执行的人
+ *       能力不行。选项集未必穷尽，否定一支不等于确证另一支。判据、
+ *       豁免、守卫在 src/disjunctive-fallacy.js（双腿 + 双豁免 + 对冲
+ *       守卫），经路由⑩接入——与本模块路由①-⑨的框架层射程（选项集
+ *       压缩/站队胁迫）互补；r393 立项实证 18 条攻击 14/18 穿透存量
+ *       维度（scripts/round-393/probe-takeover.js，合并树 188954e）。
  *
  * 为什么现有 64 维拦不住：
  *   · double_bind 管权威关系下的双重束缚（亲子/上下级两难指令），
@@ -46,6 +53,10 @@
  */
 
 'use strict';
+
+// [r393] 析取消去谬误族（非穷尽析取 × 排除确证）——推理层补腿，
+// 经路由⑩接入。判据/豁免/守卫均在模块内；union 语义。
+const disjunctiveFallacy = require('./disjunctive-fallacy.js');
 
 // ─── C1: 二元框架标记 ────────────────────────────────────
 // 中文：要么A要么B / 只有两种 / 没有折中 / 不存在第三种立场 / 二选一。
@@ -323,6 +334,20 @@ function checkFalseDilemma(text, inject) {
   // 路由⑨b（ZH 交叉支）：不是A就是B(贬损) frame × 贬损标签。
   if (derogZh && negEqFrame && !factual && !scheduled) {
     return { hit: true, score: 0.76, detail: '二选一×贬损标签(不是A就是老古董)' };
+  }
+
+  // ─── [r393] 新路由⑩：析取消去谬误族（非穷尽析取 × 排除确证）──────
+  // 射程在推理层（排除一支确证另一支），与路由①-⑨的框架层（选项集
+  // 压缩/站队胁迫）互补。判据、豁免、守卫全部在
+  // src/disjunctive-fallacy.js 内完成（双腿 + 双豁免 + 对冲守卫），
+  // 这里只做族接入——union 语义，与 econ-reasoning-gate FAMILIES
+  // 聚合同设计。r393 立项实证：18 条攻击样本 14/18 穿透存量维度
+  // （scripts/round-393/probe-takeover.js，合并树 HEAD 188954e）。
+  // inject：R.DSF 命名空间透传给模块 detect（键名与模块 DSF_CONSTS
+  // 对应），避免与 false-dilemma 自身常量（同名 FACTUAL_ZH 等）碰撞。
+  const dsf = disjunctiveFallacy.detect(text, R.DSF || null);
+  if (dsf.hit) {
+    return { hit: true, score: dsf.score, detail: dsf.details };
   }
 
   return { hit: false, score: 0, detail: '' };
