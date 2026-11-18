@@ -143,8 +143,8 @@ const EVIDENCE_EXEMPT = /(?:实验|验证|复核|证实|测试|测量|文献|评
 const REPORTING_EXEMPT = /(?:[他她你我这它]们?(?:说|表示|认为|提到|透露)|表示|认为|提到|写道|反映|告诉|宣称|声称|据称|据报道|强调|指出|承诺|保证)/;
 
 // ─── 豁免三：评析这套话术本身 / 概念分析 ────────────────────────
-const META_EXEMPT_ZH = /(?:循环论证|同义反复|丐词魔术|begging\s*the\s*question|circular\s+reasoning|tautolog)(?:是|属于|是一种|正是|称为|叫做|指|举例|例如|比如|案例|教学|分析|识别|检测)/;
-const META_EXEMPT_EN = /\b(?:circular\s+reasoning|begging\s+the\s+question|tautology)\s+(?:is|are|refers\s+to|means|describes)\b/i;
+const META_EXEMPT_ZH = /(?:循环论证|同义反复|丐词魔术|诉诸定义(?:裁决)?|规定性定义|begging\s*the\s*question|circular\s+reasoning|tautolog)(?:是|属于|是一种|正是|称为|叫做|指|举例|例如|比如|案例|教学|分析|识别|检测)/;
+const META_EXEMPT_EN = /\b(?:circular\s+reasoning|begging\s+the\s+question|tautology|definist(?:\s+fallacy)?|persuasive\s+definition)\s+(?:is|are|refers\s+to|means|describes)\b/i;
 
 // ─── 数字/百分比（量化陈述自带外部锚点）────────────────────────
 const NUMERIC = /\d|%|％/;
@@ -431,6 +431,34 @@ const ZH_COPULAR = /^(?:这|那|它|其)?[^。]{0,10}?(?:显然|明显|当然|�
 // 停词过滤（just/safe 这类谓词核心词恰在 EN_STOP 里，过滤后无 pair 可配）。
 const EN_COPULAR = /^(?:(?:it|this|that|he|she|they|we|our|your|the|a|an)\s+)?(?:[a-z]+\s+){0,6}(?:is|are)\s+(?:of\s+|full\s+of\s+)?([^.]{0,30})$/i;
 
+// ─── [r401 新增族] 诉诸定义裁决族：定义立规 × 案件裁决 ────────────
+// 辨别的族：**规定性定义被拿来直接裁决个案**（「教育的本质是筛选，
+// 所以只有考高分的学习才是有意义的」——定义体不是同义反复（筛选
+// 不复述教育），结论也不是对定义体的复述，而是把定义当尺子给个案
+// 下裁决）。存量五链（含 r735 R5a/R5b）对该族 ZH 1/6、EN 1/4 穿透
+// （穿透样本全维度零命中，r401 探针实测）。
+//
+// R6 三腿共现，缺一不判：
+//   腿① DEF_STIP 规定性定义框（X 的本质/真正含义/真正意义/核心/实质/
+//        真谛/内涵/精髓 是/在于 Y；EN the true meaning/essence/nature
+//        of X is Y / real X means Y）——与 R5a 的分界：本腿**不要求**
+//        定义体复述术语，定义体是带评价的新内容；
+//   腿② USE 论证化使用标记（沿用 R5a 的 USE_ZH/USE_EN）；
+//   腿③ VERDICT 案件裁决标记——结论必须是**把定义套到个案上的裁决
+//        断语**（只有…才/无论…都/称不上/根本不/说明不/证明不；EN
+//        proves/shows/means、anyone who…is not、is not truly、
+//        counts as、nothing but），挡住「定义Y，所以关于X的中性
+//        新断言」这类非裁决用法。
+// 豁免沿用入口全局豁免 + DEF_HEDGE（定义被显式标为多家存疑时不判）。
+// 腿① R6 规定性定义框（中文，捕获组 = 被规定术语 X）
+const DEF_STIP_ZH = /(?:^|[。，,；;！!？?])(?:所谓的?)?([\u4e00-\u9fff]{1,8}?)(?:的)?(?:本质|真正含义|真正意义|核心|实质|真谛|内涵|精髓)(?:就)?(?:是|在于)/;
+// 腿① R6 规定性定义框（英文；捕获组 1 = of 形术语，捕获组 2 = means 形术语）
+const DEF_STIP_EN = /\b(?:the\s+)?(?:(?:true|real|actual|essential)\s+)?(?:meaning|essence|nature)\s+of\s+([a-z][a-z\s-]{2,28}?)\s+is\b|\b(?:real|true)\s+([a-z][a-z\s-]{2,28}?)\s+means\b/i;
+// 腿③ R6 案件裁决标记（中文）
+const VERDICT_ZH = /(?:只有[^。，,；;]{0,14}?才|无论[^。，,；;]{0,14}?都|本身就?是|实质上就是|根本就?不|压根不|完全不算|绝不算|并不算|算不上|称不上|充其量|只不过|不过是|无非[是也]|说明[^。，,；;]{0,10}?(?:不|没)|证明[^。，,；;]{0,10}?(?:不|没))/;
+// 腿③ R6 案件裁决标记（英文）
+const VERDICT_EN = /\b(?:proves?|shows?|means?|reveals?|confirms?)\b|\b(?:anyone|anything|nobody|nothing|no\s+one|those\s+who|people\s+who)\b|\bi[st]\s+not\s+(?:truly|really|genuinely|real|actual)|cannot\s+be\b|\bcounts?\s+as\b|\bnothing\s+but\b|\bmerely\b|\bdefeats?\s+the\s+purpose\b/i;
+
 /** R5a 腿②（中文）：定义体是否复述术语本身。返回复述形（substring/antonym/syn）或 null */
 function tautZh(term, body, R) {
   if (!term || !body) return null;
@@ -592,6 +620,31 @@ function restateSo(text, isZh, R) {
   return false;
 }
 
+/** R6：诉诸定义裁决框（三腿共现：规定性定义 × 论证化使用 × 案件裁决） */
+function definistVerdict(text, isZh, R) {
+  const USE = isZh ? (R.USE_ZH || USE_ZH) : (R.USE_EN || USE_EN);
+  // 腿②：论证化使用标记的位置即结论起点
+  let uIdx = -1;
+  for (const re of USE) {
+    const m = text.match(re);
+    if (m && (uIdx < 0 || m.index < uIdx)) uIdx = m.index;
+  }
+  if (uIdx < 0) return false;
+  const conc = text.slice(uIdx).replace(isZh
+    ? /^(?:所以|因此|因而|故而|于是|从而)/
+    : /^(?:\b(?:therefore|thus|hence|consequently)\b|so\b)/i, '');
+  // 腿③：结论必须是案件裁决断语（定义被套到个案上）
+  const VERDICT = isZh ? (R.VERDICT_ZH || VERDICT_ZH) : (R.VERDICT_EN || VERDICT_EN);
+  if (!VERDICT.test(conc)) return false;
+  // 腿①：规定性定义框必须出现在论证标记之前（定义先行、裁决在后）
+  const FRAME = isZh ? (R.DEF_STIP_ZH || DEF_STIP_ZH) : (R.DEF_STIP_EN || DEF_STIP_EN);
+  const fm = text.slice(0, uIdx).match(FRAME);
+  if (!fm) return false;
+  const term = (fm[1] || fm[2] || '').trim();
+  if (!term) return false;
+  return { term, route: isZh ? 'definist-zh' : 'definist-en' };
+}
+
 /** 数组版 anyHit（正则列表任一命中） */
 function anyHitArr(list, text) {
   for (const re of list) { if (re.test(text)) return true; }
@@ -668,6 +721,20 @@ function checkCircularReasoning(text, inject) {
           : `circular reasoning×conclusion-first restatement(${s5.route}:${s5.rep})`,
       };
     }
+    // [r401] 新族路由 R6：诉诸定义裁决（规定性定义立规 × 案件裁决应用）。
+    // 与 R5a 的分界：定义体不复述术语（不是同义反复），结论也不是复述
+    // 定义体，而是拿定义当尺子给个案下裁决。
+    const d6 = definistVerdict(text, isZh, R);
+    if (d6) {
+      return {
+        hit: true,
+        score: 0.5,
+        count: 1,
+        detail: isZh
+          ? `循环论证×诉诸定义裁决(${d6.route}:${d6.term})`
+          : `circular reasoning×definist verdict(${d6.route}:${d6.term})`,
+      };
+    }
   }
   return { hit: false, score: 0, detail: '', count: 0 };
 }
@@ -682,5 +749,7 @@ module.exports = {
     DEF_FRAME_ZH, DEF_FRAME_EN, USE_ZH, USE_EN, CONN_ZH, CONN_EN,
     TAUT_SYN_ZH, TAUT_SYN_EN, ANTONYM_ZH, DEF_HEDGE_ZH, DEF_HEDGE_EN, ZH_COPULAR, EN_COPULAR,
     tautZh, tautEn, defCircular, restateSo, restateConcZh, restateConcEn,
+    // [r401] 诉诸定义裁决族（R6 规定性定义 × 论证化使用 × 案件裁决）
+    DEF_STIP_ZH, DEF_STIP_EN, VERDICT_ZH, VERDICT_EN, definistVerdict,
   }),
 };
