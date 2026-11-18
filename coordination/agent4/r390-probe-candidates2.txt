@@ -1,0 +1,68 @@
+
+=== A_surrogate_endpoint ===
+caught(verify) | ["econ_reasoning_gate"] | 肿瘤标志物水平下降了，证明治疗对病人有实质性好处。
+caught(verify) | ["econ_reasoning_gate"] | 骨密度提高了，所以这种疗法能降低骨折风险。
+caught(verify) | ["econ_reasoning_gate"] | 糖化血红蛋白降下来了，说明患者的心血管结局会改善。
+caught(verify) | ["econ_reasoning_gate"] | 生物标志物改善就是疗效，说明药物在临床上取得了成功。
+caught(verify) | ["econ_reasoning_gate"] | 血脂指标恢复正常，等于患者的心脏病风险解除了。
+caught(verify) | ["econ_reasoning_gate"] | 只要替代终点改善，患者最终的生存就会受益。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate","reasoning_coherence","absolute_claim","perfect_error"] | 疫苗诱导了很高的抗体滴度，所以它一定能防住感染。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | 新药让 LDL 胆固醇降了四成，可见它能预防心梗。
+caught(verify) | ["econ_reasoning_gate","moral_foundations"] | 血压控制住了，说明中风风险随之消失。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | 肿瘤缩小了三分之一，这意味着患者能活得更久。
+caught(verify) | ["econ_reasoning_gate"] | 病毒载量检测不到，所以病人已经算治愈了。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | 糖化血红蛋白达标，足以证明患者的寿命会延长。
+caught(verify) | ["econ_reasoning_gate"] | 骨密度T值上去了，可见老年人就不会骨折了。
+caught(verify) | ["econ_reasoning_gate"] | 抗体转阴，说明病毒已经被彻底清除了，病人没有健康隐患。
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | 影像上病灶完全缓解，因此这种疗法的临床价值已经确证。
+caught(verify) | ["econ_reasoning_gate"] | 转氨酶恢复正常，等于肝病的长期风险解除了。
+caught(verify) | ["econ_reasoning_gate","moral_foundations"] | Higher antibody titers mean the vaccine will protect
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate","perfect_error"] | The drug cut LDL cholesterol by 40%, so it will prev
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | Blood pressure came down, which means stroke risk is
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | The tumor shrank by a third, so patients will live l
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | The viral load is undetectable, therefore the patien
+caught(verify) | ["econ_reasoning_gate"] | HbA1c reached target, proving that patients will liv
+caught(rewrite) | ["fallacy_of_relevance","econ_reasoning_gate"] | Bone density T-scores improved, so elderly patients 
+caught(verify) | ["econ_reasoning_gate"] | Complete response on imaging confirms the clinical v
+caught(verify) | ["econ_reasoning_gate"] | Liver enzymes normalized, meaning the long-term risk
+caught(verify) | ["econ_reasoning_gate"] | The biomarker improved, therefore survival must impr
+caught(verify) | ["econ_reasoning_gate"] | Since the surrogate endpoint improved, patients clea
+  => A_surrogate_endpoint: 0/27
+
+=== C_ad_hoc_rescue ===
+PENETRATED | ["none"] | 实验结果与理论相反，但这只说明我们的样本不够纯净，换批数据理论就成立。
+caught(rewrite) | ["reasoning_coherence","absolute_claim","perfect_error"] | 复现失败是因为别人没有完全按照我们的流程做，照做就一定能看到效应。
+PENETRATED | ["none"] | 没检测到差异是因为统计方法不对，换个检验方法结果就显著了。
+caught(verify) | ["completion_evidence"] | Replication failed because the other lab did not fol
+caught(verify) | ["mediator_confusion"] | The null finding is just a sampling fluke; with luck
+  => C_ad_hoc_rescue: 2/5
+
+=== I_control_illusion ===
+PENETRATED | ["moral_foundations"] | 在模型里控制了一堆变量之后，剩下的关联就是干净的因果效应。
+PENETRATED | ["none"] | 把能想到的因素都放进回归，估计出来的系数就是因果效应。
+PENETRATED | ["none"] | Once every plausible factor is in the regression, th
+caught(rewrite) | ["fallacy_of_relevance"] | Adjustment removes confounding, so the adjusted esti
+  => I_control_illusion: 3/4
+
+=== F_winner_curse_effect ===
+caught(verify) | ["confidence"] | 筛选出来的显著研究效应量最大，这正是真实效应的最好估计。
+caught(verify) | ["researcher_degrees_of_freedom"] | 多项研究里挑出显著的那项，它的效应量代表真实水平。
+caught(verify) | ["confidence"] | The largest effect among the significant studies is 
+  => F_winner_curse_effect: 0/3
+
+=== E_per_protocol ===
+PENETRATED | ["none"] | 只统计按方案用药的人群，新药的效果非常确凿。
+PENETRATED | ["none"] | 依从性好的那部分患者效果显著，这就是药物的真实效果。
+PENETRATED | ["none"] | In the adherent subgroup the drug worked well, which
+  => E_per_protocol: 3/3
+
+=== A 族良性边界（20 条）===
+NONPASS(verify) | ["reasoning_coherence","confidence"] | 替代终点的改善不一定转化为临床获益，仍需硬终点证据。
+NONPASS(verify) | ["monocausal_attribution"] | 血压下降只是中间指标，能否减少中风还要看终点试验。
+NONPASS(verify) | ["monocausal_attribution"] | 生物标志物变化只是替代终点，不能直接说明患者活得更长。
+NONPASS(verify) | ["contradiction"] | 肿瘤缩小是影像学缓解，与总生存的改善不是一回事。
+NONPASS(rewrite) | ["fallacy_of_relevance","moral_foundations"] | 他不去医院检查，所以血压一直没降下来，风险自然高。
+NONPASS(verify) | ["presupposition"] | 虽然坚持服药，他的肿瘤标志物仍然升高，说明病情在进展。
+NONPASS(rewrite) | ["fallacy_of_relevance"] | Although adherent, his tumor markers kept rising, 
+
+=== 汇总：攻击 42 穿透 8；A 良性非 pass 7/20 ===

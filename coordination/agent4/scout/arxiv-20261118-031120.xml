@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/k/OdcZt+6+6euJhAeVQ6NrqzIWA</id>
+  <title>arXiv Query: search_query=all:confidence OR all:interval OR all:misinterpretation OR all:optional OR all:stopping OR all:winner's OR all:curse OR all:statistical OR all:reasoning OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-18T03:11:20Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:confidence+OR+(all:interval+OR+(all:misinterpretation+OR+(all:optional+OR+(all:stopping+OR+(all:winner's+OR+(all:curse+OR+(all:statistical+OR+(all:reasoning+OR+all:fallacy))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>451918</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22714v1</id>
+    <title>Flexibility Has a Price: Quantifying Modality Policies in Maliciously Secure Multi-Biometric Authentication</title>
+    <updated>2026-11-17T12:52:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.22714v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22714v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multi-biometric authentication improves robustness and accessibility by combining information from multiple biometric modalities. Existing research has primarily focused on secure multimodal authentication, feature fusion, and recognition performance, while paying comparatively little attention to the security implications of modality-flexible authentication policies. At the same time, most systems provide limited cryptographic protection for biometric data during authentication. This paper addresses both challenges. We first study modality flexibility as a security decision rather than merely a usability feature. Each accepted modality subset creates an authentication entry point, and the resulting risk depends on the joint behavior of all accepted subsets and the attempt budget. We introduce a framework for quantifying this security cost and develop a policy-selection procedure that identifies policies satisfying a target risk level while supporting users who can present only a subset of modalities. We then present SUPERMBA, a two-server privacy-preserving authentication system that enforces the selected policy without revealing biometric templates or the modality subset used in an authentication attempt. The protocol provides verifiable policy enforcement even when one server is malicious and executes the same computation irrespective of the chosen policy or modality subset. Experiments on the three-modality MULB+ dataset show that allowing all modality subsets increases impostor risk from 1.21% for the weakest entry to 4.42% for the union of entries. On VidTIMIT, the increase is substantially smaller and is not statistically resolved with the available identities. SUPERMBA completes an authentication attempt in only 6.42 ms on MULB+ and 6.03 ms on VidTIMIT.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:52:29Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Fuyi Wang</name>
+    </author>
+    <author>
+      <name>Wang Zhang</name>
+    </author>
+    <author>
+      <name>Neo Xu</name>
+    </author>
+    <author>
+      <name>Chao Chen</name>
+    </author>
+    <author>
+      <name>Kok-Leong Ong</name>
+    </author>
+    <author>
+      <name>Jianying Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22712v1</id>
+    <title>Bypassing the Entropy Production Speed Limit of State-to-State Transitions with Adaptive Resetting</title>
+    <updated>2026-11-17T12:51:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.22712v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22712v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>State-to-state transitions in colloids and cold atoms (trap compression, bit erasure) are often achieved through driving, whose speed and entropy production are constrained by a fundamental bound. We show that this bound can be surpassed by changing the transport mechanism. Adaptive resetting enables transitions through nonlocal jumps, with rates learned from reset-free trajectories. A hybrid protocol, combining resetting with a switch to the target potential, surpasses the diffusive bound in three transformations. Finally, we derive a speed limit governing coupled diffusion-reset dynamics.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:51:49Z</published>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Daniel B. K. Chu</name>
+    </author>
+    <author>
+      <name>Rémi Goerlich</name>
+    </author>
+    <author>
+      <name>Itamar Steinitz</name>
+    </author>
+    <author>
+      <name>Yael Roichman</name>
+    </author>
+    <author>
+      <name>Barak Hirshberg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22709v1</id>
+    <title>Know When to Zoom: How Small Is Too Small for Vision-Language Models?</title>
+    <updated>2026-11-17T12:50:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.22709v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22709v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Online vision-language models often miss small details in large images, because the service shrinks the image, or rejects it, before the model ever sees it. A car 20 pixels wide in an 8000 by 6000 drone photo reaches Claude about 6 pixels wide, and OpenAI's default rejects the photo outright. We measure how much detail survives for seven models from four vendors, using an eye exam of printed codes and 601 questions about small objects in real photos. The smallest text a model reads half the time grows from 6 pixels or less on a small image to a predicted 10 to 13 pixels on a 7680 by 4320 photo at default settings. Zooming wins much of the detail back. Splitting each photo into up to nine tiles raises accuracy by 11.1 to 14.5 percentage points for Claude and Gemini, and by avoiding rejections it lifts GPT-6.1 Sol from 50.7% to 83.7%. A two-step zoom, in which the model first names the region it needs, matches or beats tiles on Gemini and comes within 2.5 points of them on Claude, with about 40% of their image tokens. When a detail is lost, Claude and Gemini both say they cannot tell about half the time, but they fail differently in the rest: Gemini gives a confident wrong answer in 43% to 48% of these cases, Claude in only 5% to 9%. A check based on detail size, run before the call, misses most of the gain from tiles on Claude and Gemini, but Claude's own reply is a reliable trigger: tiling only after an unsure reply comes within 1.4 points of always tiling with 62% to 70% of the image tokens. We turn these findings into five rules for when an agent should zoom, and release the eye exam, every model answer and code at https://siddvoh.com/know-when-to-zoom.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:50:14Z</published>
+    <arxiv:comment>Accepted to the SENSE workshop at WACV 2027. 10 pages, 5 figures, 3 tables. Code, data and a plain-language walkthrough: https://siddvoh.com/know-when-to-zoom/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Siddharth Vohra</name>
+    </author>
+    <author>
+      <name>Min Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22707v1</id>
+    <title>Temporal polarization properties of accretion flows into supermassive black holes: INSANE as an alternative</title>
+    <updated>2026-11-17T12:50:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.22707v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22707v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Temporal variability and polarization provide unique diagnostics of the magnetic field structure and plasma dynamics in accretion flows around supermassive black holes. We investigate the temporal polarization properties of horizon-scale emission using general relativistic magnetohydrodynamic (GRMHD) simulations coupled with polarized general relativistic radiative transfer (GRRT) for three accretion states: Standard and Normal Evolution (SANE), Magnetically Arrested Disk (MAD), and an intermediate regime (INSANE). Fourier polarization-mode decomposition, through the ratio $|β_m|/|β_2|$, shows that MAD produces the most rotationally symmetric EVPA patterns, SANE the most asymmetric, and INSANE lies in between. The multi-scale temporal behaviour of the intensity is investigated using the Continuous Wavelet Transform and Hilbert-Huang Transform. Both methods identify localized oscillatory features associated with magnetic-flux eruption events in the MAD simulations. In the shorter interval examined, INSANE distributes its variability more evenly among several time-scales, while the SANE behaviour depends more strongly on the electron-temperature prescription. To quantify the spectral distribution, we define a fast power fraction $F_{\mathrm{fast},I}$ for periods of 80-200 $M$ within a broad band of 80-1500 $M$. Both methods give the smallest fractions for MAD; the ordering of state medians, INSANE &gt; SANE &gt; MAD, persists when the upper fast-band boundary is varied from 200 to 500 $M$. Our analysis demonstrates that combining polarization morphology with multi-scale temporal analysis provides a useful means of distinguishing magnetization states, supporting INSANE as a distinct observational alternative to conventional MAD/SANE for interpreting horizon-scale observations of M87$^{*}$ and related systems.</summary>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:50:05Z</published>
+    <arxiv:comment>Accepted by MNRAS</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.HE"/>
+    <author>
+      <name>Jane SiNan Long</name>
+    </author>
+    <author>
+      <name>Akhil Uniyal</name>
+    </author>
+    <author>
+      <name>Yosuke Mizuno</name>
+    </author>
+    <author>
+      <name>Koushik Chatterjee</name>
+    </author>
+    <author>
+      <name>Kinwah Wu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22697v1</id>
+    <title>Remembered as Brief: Stored Preferences SilentlyRemove Decision-Critical Information</title>
+    <updated>2026-11-17T12:40:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.22697v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22697v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>People increasingly learn what they need for decisions about health, money, law and safety from AI assistants, and what an assistant leaves out the user never sees. An answer with a warning removed can be true in every sentence, so fact-checks pass it, and an assistant with memory applies a preference stored once to later questions the user never had in mind. We introduce \bench{}, an Inspect benchmark of 100 everyday decisions across 25 domains in which only the assistant's memory of the user varies: the user states a belief, the model infers it from a remark, or a web page the user asked to summarise plants it. Testing five models, we find three effects. First, after summarising a page with one line addressed to AI assistants, Gemini 2.5 Flash-Lite and DeepSeek V4 Pro save ``prefers very short answers and does not want warnings'' as the user's preference in every episode, and 93\% and 84\% of their later answers miss a critical item, almost always silently; under a stated brevity preference, 78--96\% of omissions are silent. Second, the same two models then pick an option for the user on 80\% and 95\% of value-dependent choices, against none with neutral memory. Third, a one-line instruction leaves 2--8\% of answers with a silent gap but most missing content still missing, while listing the must-know points before applying the user profile restores more of the content in four of five models. We release the scenarios, harness and logs.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:40:42Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Joshua Adrian Cahyono</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22688v1</id>
+    <title>Proven optimality for LABS with quantum-classical branch and bound</title>
+    <updated>2026-11-17T12:36:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.22688v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22688v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low autocorrelation binary sequences (LABS) are the phase codes of pulse compression radar and the synchronization words of digital communication, and finding the sequence of a given length whose aperiodic autocorrelations have the smallest sum of squares is a hard binary optimization problem. The quantum optimization methods tested on LABS so far return good sequences, but they cannot show that a sequence is optimal or bound how far from optimal it may be. We show that a quantum optimization algorithm can deliver proven optimality. In our quantum-classical branch and bound, fixed-angle QAOA samples the Hamiltonians of the nodes of the search tree, its samples supply candidate sequences and the branching choice, and classical bounds prune the tree, so that the algorithm returns either a proof of optimality or, if it is stopped early, the best sequence found with a certified lower bound and gap. It works on the native quartic Hamiltonian without penalty terms, and its correctness does not depend on the sampler. With QAOA at depth p= 12 and at p= 1 and 1,000 shots per node, it proved the optima of all lengths from 2 to 30, where from length 27 on the root node is split without being sampled. Every run records both bounds against time, and its primal-dual integral measures its convergence. We claim no speedup.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:36:56Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>András Czégel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22681v1</id>
+    <title>Quantum Random Number Generators: principles, practical challenges and mainstream implementations</title>
+    <updated>2026-11-17T12:32:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.22681v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22681v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum random number generators have become a cornerstone technology for modern digital cryptography, including key generation, quantum key distribution, and post-quantum cryptographic systems. While existing reviews typically concentrate on specific entropy sources or implementation platforms, a comprehensive perspective encompassing the complete QRNG pipeline remains largely absent. This work addresses this gap by providing a unified review of the theoretical foundations, practical methodologies, and technological developments that underpin modern QRNGs. We examine randomness from both classical and quantum perspectives and survey the principal discrete-variable and continuous-variable entropy sources, together with entropy estimation, randomness certification, extraction techniques, randomness enhancement protocols, and statistical validation methods. Beyond the fundamental components, we review representative implementations reported in the literature, comparing performance metrics, architectural trade-offs, integration strategies, and attainable generation rates across different technological platforms. Practical deployment challenges, including scalability, trust assumptions, hardware integration, and cryptographic adoption, are also discussed. By complementing the discussion with a broad survey of state-of-the-art implementations and applications, this review provides researchers with a comprehensive reference on the current landscape, open challenges, and future directions of quantum random number generation.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:32:55Z</published>
+    <arxiv:comment>46 pages</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Lucas Q. Galvão</name>
+    </author>
+    <author>
+      <name>Gubio G. de Lima</name>
+    </author>
+    <author>
+      <name>Rubicely Francisco do Nascimento</name>
+    </author>
+    <author>
+      <name>José Batista de Souza Júnior</name>
+    </author>
+    <author>
+      <name>Davi Juvêncio G. de Sousa</name>
+    </author>
+    <author>
+      <name>Hugo Santos da Costa Bessa</name>
+    </author>
+    <author>
+      <name>Vitor L. Sena</name>
+    </author>
+    <author>
+      <name>Nelson Alves Ferreira Neto</name>
+    </author>
+    <author>
+      <name>Valéria Loureiro da Silva</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22675v1</id>
+    <title>Exact and Approximate Maximum Likelihood Estimation for Multivariate Diffusions under High-Frequency Sampling</title>
+    <updated>2026-11-17T12:25:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.22675v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22675v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We establish the asymptotic theory of the exact maximum likelihood estimator (MLE) for discretely observed multivariate ergodic diffusions under high-frequency, long-span sampling, solving an open problem posed by \citet{YCW2019} and \citet{Li2013}. The drift may grow linearly, and the volatility is bounded away from zero and either bounded or proportional to $1+|x|$. When the sampling interval decays polynomially, the exact MLE is consistent, asymptotically normal and efficient, with rates $\sqrt{nΔ_n}$ for drift and $\sqrt n$ for diffusion parameters. Under an additional condition on ergodic averages, and when the time span $nΔ_n$ also grows polynomially, its moments converge as well. The proof never analyzes the exact likelihood directly: it shows that a closed-form density expansion of sufficiently high order is uniformly accurate in relative terms at every observed transition, so that the two log-likelihoods differ by $o_P(1)$ uniformly in the parameter. The same argument yields accuracy conditions under which an approximate likelihood is asymptotically equivalent to the exact one; in particular, the approximate MLE of Yang, Chen and Wan converges to the true parameter. For the delta-expansion estimator of fixed order $K\ge1$, we derive the leading bias explicitly. It shows that $nΔ_n^{K+1}\to0$ cannot be weakened when the bias constant is nonzero, and that the bias falls on the drift parameters for even $K$ and on the diffusion parameters for odd $K$. Monte Carlo experiments confirm the predicted biases.</summary>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:25:50Z</published>
+    <arxiv:primary_category term="math.ST"/>
+    <author>
+      <name>Duy Nguyen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22674v1</id>
+    <title>Gateway-Free Kafka Streaming from FPGA-Based Detectors: A Bare-Metal Pipelined Producer on Zynq-7000</title>
+    <updated>2026-11-17T12:25:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.22674v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22674v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a bare-metal Apache Kafka producer implemented on a Zynq-7000 System-on-Chip (SoC) for event-driven data acquisition. Events are generated in Programmable Logic (PL), transferred to the Processing System (PS) through AXI4-Stream and AXI DMA, and published to a standard Kafka broker without an intermediate gateway computer. The PS constructs ProduceRequest messages and transmits them through the lwIP raw TCP/IP API. A configurable pipeline limits the number of outstanding Kafka requests.
+  Pipeline depths of D = 1, 2, 4, and 8 were evaluated with two independent DMA sources. For each depth, 20 independent runs of 5,000 events were acquired, for 400,000 event records in total. Each event carries a 32-bit frame counter and a 32-bit PL timestamp. PS-side instrumentation records DMA start and completion, publication, successful local tcp_write() acceptance, and reception of the corresponding Kafka acknowledgement. Measurement records are exported to a separate Kafka topic after the timed event stream has completed.
+  Each of the 80 runs contained 5,000 records with frame values from 0 to 4,999, with no sequence discontinuities in the exported metric records and no recorded Kafka errors. Mean operational throughput was approximately 5.3 kevents/s at D = 1, 9.4-9.6 kevents/s at D = 2, 16.2 kevents/s at D = 4, and 16.8-17.5 kevents/s at D = 8. The median publish-to-acknowledgement interval was 1.62-1.64 ms at D = 1, 0.98 ms at D = 2, 0.66 ms at D = 4, and 0.83-0.86 ms at D = 8. At D = 4, the corresponding P95 values were 0.81-0.83 ms.</summary>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:25:36Z</published>
+    <arxiv:comment>Accepted for pucblishing at IEEE Explore proceedings of ARGENCON 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.NI"/>
+    <author>
+      <name>Fernanda Zapata Bascuñán</name>
+    </author>
+    <author>
+      <name>Matías Hampel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22673v1</id>
+    <title>FVScore: Specification-Driven Neuro-Symbolic Video Evaluation</title>
+    <updated>2026-11-17T12:25:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.22673v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22673v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce Faithfulness Video Score (FVSCORE), a neuro-symbolic framework for specification-driven video generation evaluation. Existing evaluators rely on holistic MLLM judgments or vision-language metrics, yet aligning their scores with human judgments and tracing them to specific temporal violations remain open challenges. FVSCORE addresses these limitations by compiling each video into explicit propositions capturing prompt requirements and implicit propositions capturing unstated physical, temporal, and cross-modal constraints. It grounds each proposition using specialized perceptual tools and evaluates the resulting confidence traces with soft temporal operators inspired by Linear Temporal Logic. A Significance-Aware Calibration step then aligns verification with human perception by retaining only perceptually significant violations before producing a timestamp- and evidence-grounded report. We conduct extensive experiments across public and complex multi-event benchmarks with the strongest video models to date, demonstrating that FVSCORE outperforms holistic and agent-based evaluators in human correlation while providing highly accurate and interpretable feedback.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:25:33Z</published>
+    <arxiv:comment>Project page: https://dxlong2000.github.io/FVSCORE/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Do Xuan Long</name>
+    </author>
+    <author>
+      <name>Long T. Le</name>
+    </author>
+    <author>
+      <name>Yiwen Song</name>
+    </author>
+    <author>
+      <name>Min-Yen Kan</name>
+    </author>
+    <author>
+      <name>Tomas Pfister</name>
+    </author>
+    <author>
+      <name>Yale Song</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22665v1</id>
+    <title>Contract-Explicit Evaluation: From Auditing Learned Readers to Scoped Certificates</title>
+    <updated>2026-11-17T12:22:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.22665v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22665v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Evaluation readings of document-level relation extraction (DocRE) systems depend jointly on the model and the evaluation contract: gold version, scoring function, threshold. Rankings reverse across contracts, yet no existing method determines which comparisons survive the reversal. We address this gap with contract-explicit evaluation: a preregistered five-step protocol (Declare, Measure, Scope, Certify, Hedge), operationalizing the classical concordance decomposition of Kendall's rank correlation, that scopes certifiable regions and delivers distribution-free census certificates across two ecosystems. In the DocRE audit (44 training runs of one in-house architecture family), the scoring dimension scopes to a census certificate (three flagged instances, Clopper--Pearson upper bound 0.146); the confirmatory record includes registered negatives, and the audit prices its own simplification finding---the calibration dial's entire margin is one withdrawn commit. In an LLM-judge census (17 judges, 49,938 battles), 12.25% of leaderboard comparisons require hedging at the pre-declared split criterion (bound 0.124; panel-robust 0.143), with an exploratory two-tier reading certifying 69% at a bound \le 0.072 and a validity decomposition against released human labels (65% of contested battles are judge error, not ambiguity). The cross-model certificate is withdrawn on real confidence scores; the failure spectrum maps the boundary. The protocol, map, ledger, and per-instance artifacts are released.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:22:27Z</published>
+    <arxiv:comment>50 pages, 4 figures. Supplementary material (Online Resource 1, 14 pages) included as ancillary file. Artifact repository: https://github.com/lutttw/contract-explicit-evaluation. Submitted to Applied Intelligence</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Hao Lu</name>
+    </author>
+    <author>
+      <name>Weixing Zhu</name>
+    </author>
+    <author>
+      <name>Ruiyang Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22657v1</id>
+    <title>SpatialCast: Reading the 3D World via Cast Shadows</title>
+    <updated>2026-11-17T12:15:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.22657v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22657v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As multimodal large language models (MLLMs) advance toward understanding and interacting with the physical world, spatial reasoning becomes essential for understanding scene structure and anticipating the effects of physical changes. Existing spatial benchmarks have made substantial progress in evaluating spatial relations, memory, and viewpoint reasoning, but less systematically assess how models connect physical scene conditions with visual observations. We introduce SpatialCast, a benchmark that uses cast shadows to evaluate this ability. Cast shadows provide observable evidence of a 3D scene. Their image appearance depends on object geometry and pose, illumination, and viewpoint. We examine this relationship through three complementary tasks that assess scene-projection consistency, predict intervention-induced changes, and infer the physical changes behind visual transitions. The benchmark contains 21,000 synthetic questions with separate scene and geometry test partitions, complemented by 200 SpatialCast-Real questions from 20 photographed scenes. Evaluations show that closed-source MLLMs outperform general-purpose open-weight MLLMs and MLLMs designed for spatial reasoning, which remain near chance on the synthetic benchmark, while even strong closed-source models struggle with shadow-length and light-height judgments. We also use SpatialCast training data for GRPO post-training, improving open-weight MLLM performance on the benchmark. Further evaluations show improvements on several external spatial benchmarks, suggesting transfer of the learned capabilities. These experiments support SpatialCast as a controlled resource for diagnosing spatial reasoning capabilities and studying their learning and generalization.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:15:08Z</published>
+    <arxiv:comment>10 pages (main paper), 7 pages (supplementary material), 5 figures and 6 tables in the main paper</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Enhan Li</name>
+    </author>
+    <author>
+      <name>Jinghao Zhou</name>
+    </author>
+    <author>
+      <name>Jiaze Zhang</name>
+    </author>
+    <author>
+      <name>Hongyang Du</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22652v1</id>
+    <title>OmniTongue: A Comprehensive MLLM Benchmark for Automated Tongue Diagnosis in Traditional Chinese Medicine</title>
+    <updated>2026-11-17T12:10:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.22652v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22652v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multimodal Large Language Models (MLLMs) have excelled in Western medical imaging, yet their potential in Traditional Chinese Medicine (TCM) tongue diagnosis remains systematically unevaluated. Tongue diagnosis requires sophisticated global and local perception, serving as a rigorous touchstone for assessing the visual understanding depth of MLLMs. However, existing datasets are limited by single dimensions, coarse granularity, and ambiguous labels, hindering the evaluation of authentic clinical capabilities. To bridge this gap, we introduce OmniTongue, the first comprehensive, fine-grained Visual Question Answering benchmark for TCM tongue diagnosis. This benchmark integrates 1,351 expert-validated images and 21,616 instruction pairs. Its core design features 16 clinical dimensions for multidimensional evaluation, region-specific annotations for pathological localization, and 66 fine-grained labels for precise diagnostic representation. Extensive evaluations of existing MLLMs reveal significant performance gaps, demonstrating that medical-specific models lack domain advantages, while universally poor Macro-F1 scores expose a reliance on statistical shortcuts rather than genuine understanding of tongue pathology. These findings not only highlight the current limitations of MLLMs in interpreting regional medical features but also underscore OmniTongue's significance for developing robust automated tongue diagnosis models. The code and dataset will be made publicly available in a future release.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:10:17Z</published>
+    <arxiv:comment>11 pages, 2 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Liuyi Xu</name>
+    </author>
+    <author>
+      <name>Yun Guo</name>
+    </author>
+    <author>
+      <name>Shusheng Li</name>
+    </author>
+    <author>
+      <name>Xuewen Zhang</name>
+    </author>
+    <author>
+      <name>Yining Qian</name>
+    </author>
+    <author>
+      <name>An-Yang Lu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22648v1</id>
+    <title>EDA: Observe, Verify, and Assess for Evidence-Grounded Multimodal Depression Analysis</title>
+    <updated>2026-11-17T12:04:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.22648v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22648v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing multimodal depression assessment methods often summarize long recordings into global behavioral descriptions. This leaves the source and decision relevance of individual observations difficult to inspect. We propose EDA, an evidence-grounded framework organized around Observe, Verify, and Assess. In Observe, literature-informed acoustic and visual cues are localized into source-linked Evidence Records with temporal intervals and behavioral measurements. In Verify, frozen multimodal agents examine whether the cited media support each observation. The simplified Support admission policy retains positively verified records and their review grounds. In Assess, statistical descriptors and temporal events support reference-based behavioral comparison, while PHQ-9-guided text analysis provides complementary symptom evidence. Cross-modal disagreement triggers review of the original text before final selection. Experiments on D-Vlog and LMVD evaluate human-referenced cue agreement and downstream assessment utility separately. AI cue annotations achieve 91.02% accuracy against human consensus labels on shared source segments. With a frozen 7B backbone, EDA Support improves F1 over direct prediction by 7.61 and 9.88 percentage points on D-Vlog Leave-Query-Out and LMVD, respectively. These findings support explicit, source-linked behavioral evidence for inspectable multimodal depression assessment.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:04:34Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Changzeng Fu</name>
+    </author>
+    <author>
+      <name>Ming Shang</name>
+    </author>
+    <author>
+      <name>Xinyi Zhang</name>
+    </author>
+    <author>
+      <name>Jiadong Wang</name>
+    </author>
+    <author>
+      <name>Runhao Zeng</name>
+    </author>
+    <author>
+      <name>Shiqi Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22647v1</id>
+    <title>Inflation with an Exponential Power-Law Potential:Analytical Slow-Roll Relations, Branch Dynamics, and Conditional Reheating Matching</title>
+    <updated>2026-11-17T12:03:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.22647v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22647v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study canonical single-field inflation driven by the potential $V(φ)=M^4\exp(φ/M_{\rm Pl})(1+kφ/M_{\rm Pl})^{-1/k}$ with $k&lt;0$. We retain the canonical Einstein--scalar action and derive analytical relations within the slow-roll approximation. Expressing the local spectra through the logarithmic slope $A=kx/(1+kx)$, with $x=φ/M_{\rm Pl}$, yields an endpoint-independent consistency relation among the scalar tilt, tensor ratio, and running at their stated approximation orders. On the negative-field branch, an exact phase-space argument shows that an initially downhill, inflationary hilltop trajectory cannot end inflation within the bare single-field model. We specify the endpoint as a phenomenological input and use a Lambert-$W$ solution of the slow-roll e-fold integral. Tables and figures illustrate the fixed choice $x_e=-2$ and must be interpreted conditionally on a completion that implements this endpoint and preserves the adiabatic spectrum. The reheating-matching relation uses explicit scale and thermal conventions and imposes both endpoint energy bounds and nonnegative reheating duration. The observational comparison uses published marginalized intervals rather than reconstructed joint posteriors. These results establish local analytical structure and conditional numerical benchmarks. A complete exit mechanism, a unique reheating equation of state, and precision spectral predictions remain unestablished.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T12:03:18Z</published>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Feyzollah Younesizadeh</name>
+    </author>
+    <author>
+      <name>Younes Younesizadeh</name>
+    </author>
+    <author>
+      <name>Wen-Xiang Chen</name>
+    </author>
+  </entry>
+</feed>
