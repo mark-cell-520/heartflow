@@ -1,6 +1,6 @@
 {
   "agent": "agent-4",
-  "version": "6.8.201",
+  "version": "6.8.202",
   "gates": [
     {"name": "bin/verify.js", "status": "PASS", "detail": "passed=16 failed=0"},
     {"name": "scripts/guard-abilities.js", "status": "PASS", "detail": "能力检查 20/20 全通过；判别维度 266 个"},
