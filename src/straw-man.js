@@ -55,6 +55,15 @@
  *   · 绝对化负面归述只与强归谬形配对——「你的意思是所有测试都要
  *     重跑吗」这种带绝对词的良性确认问句不判（攻击形「你不就是
  *     想说领导决策都有问题吗」靠强标记 × 都有问题命中）。
+ *   · [r394] 路由③ 极端歪曲归述（转述标记 × 极端化歪曲内容）：
+ *     「你的意思是要把规矩全废了」「照你这么说就等着倒闭」「所以
+ *     你是说穷人活该穷」——谬误只靠把对方立场夸成荒诞极端承载，句
+ *     中无反驳尾巴也无绝对化负面归述。判据：转述标记（强/弱/意图
+ *     ATTRIB_WANT/推断 ATTRIB_INFER 任一）× 不可歧义的荒诞 caricature
+ *     （DISTORT：停摆/倒闭/刀耕火种/活该/放飞/想干嘛干嘛…；EN: go back
+ *     to horses / hire nobody / ban all / on the spot…）共现。「全部取消」
+ *     类可能正当的动作优化不入表（保精度）。池化探针 r394 实测攻击
+ *     穿透 10/16、良性含转述标记零本族误伤。
  *
  * 为什么取 VERIFY 级：单句可能是正常的强烈反驳（「按你的逻辑，这
  * 个方案第三步推不出来」是具体推演质疑）、文学对白引述、谬误
@@ -177,6 +186,40 @@ const ABSOLUTE_NEG_EN = new RegExp(
   'i'
 );
 
+// ─── [r394] 腿③ 极端歪曲归述（把对方立场夸成荒诞极端再反驳）──────────
+// 池化探针 r394（scripts/round-394/probe-straw-extreme.js，HEAD 6.8.194）
+// 实测：既有路由①-②要求「反驳尾巴 REFUTE 或绝对化负面归述 ABSOLUTE_NEG」
+// 共现，而「你的意思是要把规矩全废了」「照你这么说就等着倒闭」「所以
+// 你是说穷人活该穷」这一族稻草人**只靠歪曲内容本身**承载谬误——把对方
+// 立场夸成荒诞极端（全废/停摆/刀耕火种/活该/放飞/想干嘛干嘛…），句中既
+// 无反驳尾巴也无「全都错」式绝对化负面归述，整族射程外：攻击穿透 10/16。
+// 真升级②：既有第 138 维的全新措辞家族，维度计数不变、src/index.js 零改动。
+//
+// 判据：转述标记（强 ATTRIB_STRONG / 弱 ATTRIB_WEAK / 意图 ATTRIB_WANT /
+// 推断 ATTRIB_INFER 任一）× 不可歧义的荒诞 caricature（DISTORT）共现。
+// 边界（实测良性含转述标记 + 「全部/所有」的正当确认问句零本族误伤）：
+//   · 单纯陈述荒诞后果而无转述标记不判（「如果什么都不做就会落后」）；
+//   · 正当澄清/复述（「你的意思是全部样本都要重新标注？」「Do you mean
+//     we should run the tests first?」）无荒诞歪曲标记，双腿交叉天然豁免；
+//   · 「全部取消/砍掉」这类**可能正当**的动作优化刻意不入表——只收不可
+//     歧义的荒诞 caricature，保精度（宁可漏判攻击 4「按你的逻辑…全部
+//     取消」，不误伤正当的方案裁剪讨论）。
+
+// 腿③-A1 意图转述形（你无非是想/你就是想…，无显式言说动词）。既有
+// ATTRIB_STRONG 要求 想/要 后接言说动词（说/认为/表达），「你无非是想
+// 把教育彻底放飞」这类 想+把 形射程外；仅与 DISTORT 交叉才判，防「你想
+// 要什么颜色」类良性确认。
+const ATTRIB_WANT_ZH = /(?:你|你们|大家|咱们)(?:无非|不过|说到底|根本上|左右|只是|就是|就)?是?(?:想|要|打算|准备)/;
+
+// 腿③-A2 推断转述形（看来你是想/这说明他是想…把对方立场推断成荒诞极端）。
+const ATTRIB_INFER_ZH = /(?:看来|可见|由此看来|由此可见|这说明|这意味着|足以说明|足以见得|这么说来|说到底|归根到底)[^。！？；]{0,10}(?:你|你们|他|她|它|对方)?(?:是)?(?:想|要|打算|准备|意图|意在|不想|不肯|不愿)/;
+
+// 腿③-B 极端化歪曲内容标记（中文）——只收不可歧义的荒诞 caricature。
+const DISTORT_ZH = /(?:等着|只能等着|注定|势必|必将|干脆|只会)[^。！？；]{0,6}(?:倒闭|破产|完蛋|垮台|垮掉|瘫痪|停摆|崩盘|一败涂地|坐以待毙|等死|玩完)|(?:倒闭|停摆|瘫痪|崩盘|垮台|一败涂地|坐以待毙)|(?:回到|退回|倒退到|打回|滚回|还不如)[^。！？；]{0,8}(?:刀耕火种|石器|原始社会|农耕|丛林|过去|从前|老路|零起点)|(?:刀耕火种|石器时代|原始社会)|(?:想干嘛干嘛|想怎样就怎样|想干什么就干什么|为所欲为|无法无天|放任自流|谁也不管|谁都不管)|(?:彻底|完全|只管|一味)放飞|(?:活该|自作自受|自作孽|自找)[^。！？；]{0,8}(?:穷|苦|受罪|倒霉|失败|挨饿|受苦|吃亏|挨打|的)|(?:躺着|坐等|坐吃)[^。！？；]{0,6}(?:被?养|救济|山空|别人)|(?:一概|统统|全都|一刀切|彻底|完全)[^。！？；]{0,3}(?:禁|禁掉|禁绝|废除|解散|取缔)/;
+
+// 腿③-B 极端化歪曲内容标记（英文）。
+const DISTORT_EN = /\bgo back to (?:horses|the stone age|scratch|square one|zero)\b|\bban all\b|\b(?:hire|employ) (?:nobody|no one)\b|\babolish the (?:entire|whole)\b|\bnever (?:plan|work|do anything|try|meet|ship)\b|\bstart (?:from|at) (?:zero|scratch|square one)\b|\bscrap the (?:whole|entire)\b|\bon the spot\b/i;
+
 // ─── 豁免：评析这套话术本身 / 概念分析 ────────────────────────────
 const META_EXEMPT_ZH = new RegExp(
   '(?:这|那就是|这就是|这正是|那正是|属于|属于一种|就是|犯了|这是)(?:一种|典型的|常见的|经典的|明显的|标准的)?(?:稻草人|稻草人谬误|稻草人论证|稻草人谬说)' +
@@ -206,6 +249,10 @@ function checkStrawMan(text, inject) {
   const ABS_EN_ = R.ABSOLUTE_NEG_EN || ABSOLUTE_NEG_EN;
   const META_ZH_ = R.META_EXEMPT_ZH || META_EXEMPT_ZH;
   const META_EN_ = R.META_EXEMPT_EN || META_EXEMPT_EN;
+  const WANT_ZH_ = R.ATTRIB_WANT_ZH || ATTRIB_WANT_ZH;
+  const INFER_ZH_ = R.ATTRIB_INFER_ZH || ATTRIB_INFER_ZH;
+  const DISTORT_ZH_ = R.DISTORT_ZH || DISTORT_ZH;
+  const DISTORT_EN_ = R.DISTORT_EN || DISTORT_EN;
 
   // 在评析这套话术 → 不是运用它
   if (META_ZH_.test(text) || META_EN_.test(text)) {
@@ -236,10 +283,28 @@ function checkStrawMan(text, inject) {
     };
   }
 
+  // ─── [r394] 路由③：极端歪曲归述 ──────────────────────────────
+  // (转述标记 强/弱/意图/推断任一) × 不可歧义荒诞 caricature 共现。
+  // 复用既有 ATTRIB_STRONG/WEAK（含 EN，见 strong/weak），新增
+  // ATTRIB_WANT/INFER（ZH）与 DISTORT（中英）。与路由①② union，
+  // 仅在它们未命中时补判；META 豁免已在函数顶部先行返回，天然继承。
+  const wantZh = WANT_ZH_.test(text);
+  const inferZh = INFER_ZH_.test(text);
+  const distZh = DISTORT_ZH_.test(text);
+  const distEn = DISTORT_EN_.test(text);
+  if ((distZh || distEn) && (strong || weak || wantZh || inferZh)) {
+    return {
+      hit: true,
+      score: 0.56,
+      count: 1,
+      detail: distZh ? '稻草人谬误×极端歪曲归述(把对方立场夸成荒诞极端)' : 'straw man×extreme-distortion restatement(en)',
+    };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
   checkStrawMan,
-  __internals: () => ({ ATTRIB_STRONG_ZH, ATTRIB_WEAK_ZH, ATTRIB_STRONG_EN, ATTRIB_WEAK_EN, REFUTE_ZH, REFUTE_EN, ABSOLUTE_NEG_ZH, ABSOLUTE_NEG_EN, META_EXEMPT_ZH, META_EXEMPT_EN }),
+  __internals: () => ({ ATTRIB_STRONG_ZH, ATTRIB_WEAK_ZH, ATTRIB_STRONG_EN, ATTRIB_WEAK_EN, REFUTE_ZH, REFUTE_EN, ABSOLUTE_NEG_ZH, ABSOLUTE_NEG_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ATTRIB_WANT_ZH, ATTRIB_INFER_ZH, DISTORT_ZH, DISTORT_EN }),
 };
