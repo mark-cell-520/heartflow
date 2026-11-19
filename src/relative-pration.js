@@ -45,6 +45,31 @@
  *     · RP_DISMISS_EN +12（you're lucky / be thankful / it could be
  *       worse / first-world problems / you have it easy 等）
  *   仍守双腿共现（sufferHit AND dismissHit，缺一不判），ZH 侧零改动。
+ *
+ * [r405] 「无家可归/安身缺口」措辞家族（真升级②——已有维度的全新措辞
+ *   家族，同池探针定拨：攻击穿透 5/8、良性零误伤，src/index.js 零改动、
+ *   dimMap 键数不变）：
+ *   改前探针实证（coordination/agent4/r405-probe-pool.output.txt，v6.8.203
+ *   gate() 全量）：「你抱怨房租贵？想想还有多少人无家可归」「At least you
+ *   have a bed to sleep in; some people have nowhere to sleep at night.」
+ *   「You think your workload is bad? Some people do not even have a job.」
+ *   「Stop complaining about the commute—some people walk for hours…」
+ *   「You call this exhausting? Plenty of people cannot even afford a place
+ *   to stay.」均穿透——根因：腿①具体苦难参照只覆盖「没饭吃/睡大街/失业」
+ *   等生存缺口，**安身缺口**（无家可归/流离失所/nowhere to sleep/cannot
+ *   afford a place）整族缺席。本家族新增：
+ *     · RP_SUFFER_ZH +7：无家可归/流离失所/居无定所/无处安身/上无片瓦/
+ *       露宿街头/风餐露宿
+ *     · RP_SUFFER_EN +4：do not even have a job|place / walk (for) N
+ *       hours|miles / nowhere to sleep|live|stay / cannot (even) afford
+ *       a place|home|house|room|bed
+ *     · RP_DISMISS_ZH/EN 反问式压制形（腿②扩展）：你+抱怨/喊/嫌/叫苦/
+ *       叫累/哭/诉苦+？；EN you think|call|say + your|this|that|it + ？
+ *       （宾语锁对方诉求，「You think the housing crisis is serious?」
+ *       类议题提问不误伤——轮测 B 组实证）
+ *   仍守双腿共现（sufferHit AND dismissHit，缺一不判）：「无家可归是
+ *   城市治理的重要议题，需要系统性的住房保障方案」类政策讨论无腿②，
+ *   模块层零命中（轮测 B 组实证）。
  */
 'use strict';
 
@@ -60,6 +85,11 @@ const RP_SUFFER_ZH = [
   '搬砖', '全年无休', '通勤[两三四五六]?[个]?小时', '熬夜到天亮', '没坐过飞机', '没出过国',
   '看不起病', '买不起房', '租不起房', '活不下去', '撑不下去', '揭不开锅',
   '大山里', '山沟里', '山区', '西部',
+  // [r405] 无家可归/安身缺口族（真升级②新增措辞家族）：只收**具体**安身
+  // 处境短语，延续「不收抽象 worse off」的防误伤设计；仍须腿②压制诉求
+  // 共现，「无家可归是城市治理议题」类政策讨论无压制标记不判。
+  '无家可归', '流离失所', '居无定所', '无处安身', '上无片瓦',
+  '露宿街头', '风餐露宿',
   '(?:多少|有人|别人|其他人|人家|还有的人|好多人|许多人|多少人)[^。，！？!?]{0,8}躺[在床]',
   'roof over your head',
 ].map((s) => new RegExp(s, 'i'));
@@ -116,6 +146,17 @@ const RP_SUFFER_EN = [
   // 断水 / 无医 / 远行（不含 walk-miles：与 RP_WEAK_ZH 的 'walk ten miles' 重叠，
   // 保留会双重覆盖既有 subject×weak 攻击、破坏 r726 负例注入的腿依赖断言）
   /\b(?:no (?:clean|drinking|safe) water|no access to (?:clean )?(?:water|healthcare|medicine|education))\b/i,
+  // [r405] 无家可归/安身缺口族（英文，真升级②新增措辞家族）：与中文侧
+  // 「无家可归/流离失所」对应，仍只收具体处境短语、须腿②压制共现。
+  // do not even have a job / a place
+  /(?:don'?t|doesn'?t|do not|does not)\s+even\s+have\s+(?:a|any)\s+(?:job|work|income|place)\b/i,
+  // walk for hours / walk 3 miles（远行取工；"walk an hour" 不收——量词
+  // 白名单外，良性通勤讨论高频形）
+  /\bwalk(?:s|ed|ing)?\s+(?:for\s+)?(?:\d+|two|three|four|five|several|many)?\s*(?:hours?|miles?)\b/i,
+  // nowhere to sleep / live / stay
+  /\bnowhere\s+to\s+(?:sleep|live|stay|go)\b/i,
+  // cannot (even) afford a place / home / house / room / bed
+  /(?:can'?t|cannot|couldn'?t)\s+(?:even\s+)?afford\s+(?:a\s+|any\s+)?(?:place|home|house|room|bed)\b/i,
 ].map((r) => r);
 
 // ── 腿②：压制诉求 ──────────────────────────────────────────────
@@ -132,6 +173,9 @@ const RP_DISMISS_ZH = [
   '别[喊叫]疼', '别怕苦', '别怕累', '别身在福中不知福',
   '有什么好[抱怨喊嫌]', '偷着乐', '庆幸吧', '该庆幸',
   '别[不知足]',
+  // [r405] 反问式压制（「你抱怨房租贵？」「你嫌累？」）——第二人称质疑 +
+  // 疑问收尾；仍须腿①具体苦难共现，良性提问（无苦难短语）不判。
+  '你[^。！？!?]{0,10}(?:抱怨|喊|嫌|叫苦|叫累|哭|诉苦)[^。！？!?]{0,10}[？?]',
 ].map((s) => new RegExp(s));
 
 const RP_DISMISS_EN = [
@@ -159,6 +203,12 @@ const RP_DISMISS_EN = [
   /don'?t\s+have\s+(?:a\s+)?right\s+to\s+complain/i,
   /you\s+don'?t\s+know\s+how\s+good\s+you\s+(?:have|had)\s+it/i,
   /first[- ]world\s+problems?/i,
+  // [r405] 反问式压制（「You think your workload is bad?」「You call this
+  // exhausting?」）——句首第二人称质疑 + 疑问收尾，本身即「这算什么」的
+  // 反问形。宾语锁 your/this/that/it（指向**对方**的诉求），「You think
+  // the housing crisis is serious?」类议题提问不误伤；仍须腿①具体苦难
+  // 共现，良性提问（无苦难短语）不判。
+  /you\s+(?:think|call|say)\s+(?:your|this|that|it)\b[^?]{0,50}\?/i,
 ].map((r) => r);
 
 // ── 守卫常量（可被负例注入）────────────────────────────────────
