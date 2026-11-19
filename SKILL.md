@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,341 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 272 | `dimMap` keys in `src/index.js` |
 | MCP tools | 192 | tool definitions exposed via `tools/list` |
-| Test suite | 25,352 passing / 225 failing | `node test/run-all.js`（r417 轮全量实测 25,352/225/25,577（854 文件，data/test-count.json @ 2026-11-19T21:15:18Z；较 r415 基线 25,306/228/25,534 差 passed +46 / failed -3 / total +43——其中 +16 为本轮轮测 round-417-tu-quoque-common-practice.test.js 16 断言（run-all 计数层已正确解析其「16 passed / 0 failed」汇总行，日志显示层因只滤中文关键词行而显示「(无输出)」，属显示层现象非漏计）；其余差值为 r416 fix 于基线测量后落地（存量单测 round-375-government-household-analogy 38过/7败→43过/1败）与磁盘外来未跟踪测试文件 test/round-307-sorites-goal-dismissal.test.js 进入测量及并发池输出归属噪声；**失败清单 151 文件与 r415 基线逐条 diff 零新增零减少**，比对实录 coordination/agent4/probes/r417-runall.log））|
+| Test suite | 25,373 passing / 225 failing | `node test/run-all.js`（r418 轮全量实测 25,373/225/25,598（855 文件，data/test-count.json @ 2026-11-19T22:51:07Z；较 r417 基线 25,352/225/25,577 差 passed +21 / failed 0 / total +21——全部 +21 为本轮轮测 round-418-genetic-endorse.test.js 21 断言；**硬失败清单 149 文件与 r417 基线逐条 diff 零新增零减少**（另有 63 个「未输出汇总行」历史文件与基线相同），比对实录 coordination/agent4/probes/r418-runall.log））|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
