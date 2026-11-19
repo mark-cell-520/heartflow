@@ -74,6 +74,7 @@ const BENIGN = [
   '这件事没有任何证据表明方案是错的',                                // 单腿：无载体名词（证据不在表）
   '大家没有任何退路可言，但我们可以一起想办法',                      // hmm 占位（见下修正）
   'You can either continue or exit; we respect both choices.',        // EN either-frame 无压迫
+  '唯一的选择就是明天继续讨论',                                      // 程序性措辞（继续讨论）守卫
 ];
 
 // 修正：上一条占位样本改为真正的单腿守卫句（无「办法/路/退路/出路」载体名词）
@@ -110,7 +111,7 @@ t('B2 模块层：detail 归因「他法排除」', () => {
 });
 
 // ─── C 组：良性零误伤 ─────────────────────────────────────────
-t('C1 模块层：16 条良性全部不命中', () => {
+t('C1 模块层：17 条良性全部不命中', () => {
   for (const s of BENIGN) {
     const r = checkFalseDilemma(s);
     assert.ok(!r.hit, `良性误伤: ${s} → ${r.detail}`);
@@ -259,6 +260,13 @@ t('F10 注入：抹 EXALT_GUARD_EN 后「we can figure it out」良性转红（�
   assert.ok(!checkFalseDilemma(s).hit, '守卫激活时误判');
   const r = checkFalseDilemma(s, { EXALT_GUARD_EN: NEVER });
   assert.ok(r.hit, '抹掉 EXALT_GUARD_EN 后未转红（守卫不承重）');
+});
+
+t('F11 注入：抹 EXALT_GUARD_ZH 后「继续讨论」程序性良性转红（守卫承重）', () => {
+  const s = '唯一的选择就是明天继续讨论';
+  assert.ok(!checkFalseDilemma(s).hit, '守卫激活时误判');
+  const r = checkFalseDilemma(s, { EXALT_GUARD_ZH: NEVER });
+  assert.ok(r.hit, '抹掉 EXALT_GUARD_ZH 后未转红（守卫不承重）');
 });
 
 // ─── G 组：全角折叠不逃（pipeline 入口 NFKC 预折叠）────────────

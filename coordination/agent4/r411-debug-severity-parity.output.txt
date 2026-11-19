@@ -1,0 +1,4 @@
+verify	这件事没有灰色地带	[false_dilemma@72]	score=0.69
+rewrite	没有中间路线，必须选边站	[false_dilemma@78,exclusive_trust@50,fallacies@40]	score=0.33
+rewrite	这是唯一的出路	[false_dilemma@74]	score=0.68
+verify	人生没有退路，只能向前	[false_dilemma@74,no_fallback@25]	score=0.65
