@@ -1,0 +1,23 @@
+  ✅ gate 层攻击 10/10 非 pass 且 special_pleading 在场
+  ✅ 模块层攻击 10/10 命中且 detail 归因 different-label
+  ✅ 模块层良性 10/10 不命中
+  ✅ 存量代拦样本（no_fallback/false_balance）findings 不含 special_pleading
+  ✅ internals 导出路由⑤四组常量可达
+  ✅ OTHERS_LABEL_ZH 置空 → 中文攻击停命中（腿①承重）
+  ✅ SELF_LABEL_ZH 置空 → 中文攻击停命中（腿②承重）
+  ✅ OTHERS_LABEL_EN 置空 → 英文攻击停命中（腿①承重）
+  ✅ SELF_LABEL_EN 置空 → 英文攻击停命中（腿②承重）
+  ✅ 存量路由①规则他指×自我例外 仍命中
+  ✅ 存量路由②他人受管×自我豁免 仍命中
+  ✅ 存量路由③特殊身份×例外许可 仍命中
+  ✅ 存量路由④同行为不同定性 仍命中
+  ✅ 顶层三豁免不回归（EVIDENCE/META/STRICTER）
+  ✅ 单腿不判：只有他人标签（无自我腿）
+  ✅ 单腿不判：只有自我标签（无他人腿）
+  ✅ 伪双标不判：两腿行为词不同
+  ✅ 同名同标豁免：别人加班叫奉献，我加班也叫奉献
+  ✅ 一视同仁在场豁免：不同标签 + 一个标准
+  ✅ 英文同名同标豁免
+  ✅ 全角标点分隔的双腿攻击句仍命中
+
+r413 special-pleading-same-label: 21 passed / 0 failed

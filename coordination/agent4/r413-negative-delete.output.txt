@@ -1,0 +1,11 @@
+[RED] 变红 ✅ OTHERS_LABEL_ZH（腿① 他人标签·中文）  基线命中=true 删后命中=false | 别人迟到叫纪律涣散，我迟到叫时间灵活
+[RED] 变红 ✅ SELF_LABEL_ZH（腿② 自我标签·中文）  基线命中=true 删后命中=false | 人家犯错叫态度问题，我犯错就叫疏忽
+[RED] 变红 ✅ OTHERS_LABEL_EN（腿① 他人标签·英文）  基线命中=true 删后命中=false | When others arrive late it is called ind
+[RED] 变红 ✅ SELF_LABEL_EN（腿② 自我标签·英文）  基线命中=true 删后命中=false | When they cut corners it is called slopp
+[RED] 变红 ✅ OTHERS_LABEL_ZH（腿① 他人标签·交叉样本）  基线命中=true 删后命中=false | 同事加班叫本分，我加班叫奉献
+[RED] 变红 ✅ SELF_LABEL_ZH（腿② 自我标签·交叉样本）  基线命中=true 删后命中=false | 别人拒绝叫不负责任，我拒绝叫原则性强
+[RED] 变红 ✅ OTHERS_LABEL_EN（腿① 他人标签·交叉样本）  基线命中=true 删后命中=false | When they cut corners it is called slopp
+[RED] 变红 ✅ SELF_LABEL_EN（腿② 自我标签·交叉样本）  基线命中=true 删后命中=false | When others arrive late it is called ind
+
+r413 负例删条: 8 注入 → 8 变红 / 0 未变红
+清理完成：internals 四组路由⑤常量完整=true，工作区无残留注入、无文件改动
