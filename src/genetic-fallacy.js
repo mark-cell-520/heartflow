@@ -76,6 +76,22 @@
  * 良性（词源的事实陈述、明确否认词源决定当下用法的反谬误陈述、语言学
  * 教学/词典释义）只有腿①没有腿②，双腿共现天然豁免；行动级同为 VERIFY。
  *
+ * [r412] 新增「推断式规范结论」句式族（etymological fallacy 的推论变体）：
+ * 存量 r399 词源族的腿② NORM 只收**定义/规范直陈**（才算/不配叫/是
+ * 误用/违背本义），漏掉**由词源直接推断当下用法或立场**的推论句——
+ * 「本义是暴民统治，所以现在鼓吹民主的人其实在鼓吹暴民政治」「原
+ * 本指贵妇人，所以说别人是 lady 就是在抬高对方」「本义是尺子，所
+ * 以今天拿它当标准就是在偷换概念」。这类句子的谬误结构与词源族完全
+ * 同构（引用词的起源 → 裁定词的当下含义/使用者的资格），只是结论换
+ * 成了「所以现在……其实是在……」的推断形。判据同为双腿共现：
+ *   腿① ETYM 词源/本义标记（沿用存量常量，ZH/EN）；
+ *   腿② NORM2 推断式规范结论（新增，见下常量注释）；
+ *   豁免沿用 ETYM_META（评析词源谬误话术本身）＋ 新增 NORM2 自身
+ *   的反谬误对冲组（HEDGE，见常量注释）：明确指出「词义会随时代变
+ *   化/本义不等于当下用法」的句子只有腿①＋对冲、无规范断言，不判。
+ * 良性集：词源事实陈述、词义演变承认、语言学教学、词典释义、明确
+ * 否认词源决定当下用法的反谬误陈述。
+ *
  * 明确不判的（豁免——这些是正当的来源采信、事实陈述与概念分析）：
  *   · 正当来源采信：以**验证过程**为据（经过审计/同行评审/临床验证/
  *     官方统计/检测认证）——与「按身份下结论」的区别正是本维度的判据
@@ -175,6 +191,45 @@ const ETYM_NORM_EN = /\b(?:(?:is|are)\s+not\s+(?:a\s+|an\s+)?(?:real|true|proper
 const ETYM_META_ZH = /(?:词源谬误|语源谬误|诉诸词源|以词源论|本义主义|词源主义|词源决定论)/;
 const ETYM_META_EN = /\b(?:etymological\s+fallacy|appeal\s+to\s+etymology|argument\s+from\s+etymology)\b/i;
 
+// ─── [r412] 腿② NORM2：推断式规范结论（词源谬误族的推论变体）──────────
+// 结构：推断连接词 × 当下时点标记 × 「其实/本质上/说到底是在」裁定形。
+// 三支（任中其一即命中，缺一不判——与词源腿共现才生效）：
+//   a 实是在裁定（所以现在……其实是在……/就是说……就是在……）；
+//   b 本质裁定（本质上是在/说到底是在/骨子里是在/无非是/不过是）；
+//   c 立场裁定（就是在为……背书/站台/正名/辩护/洗地/铺路/开脱）。
+// 与存量 NORM 直陈形（才算/不配叫/误用）正交：那边裁「词的资格」，
+// 这边裁「用词者的当下行为/立场」。裸名词自查：「所以现在……是
+// 在……」去掉「其实」仍命中（a 支本身即含裸形分支）。
+const ETYM_NORM2_ZH = new RegExp(
+  // a 实是在裁定：推断连接词（可省略）＋当下时点（现在/如今/当下/今天/时下/当今，可省略）＋其实/事实上/说到底/本质上/骨子里/说白了＋是在/就是在
+  '(?:所以|因此|因而|故|可见|足见|这说明|那就是说|也就是说|就是说|换言之|换句话说)?[^。！？；\\n]{0,12}?(?:其实|事实上|说到底|本质上|骨子里|说白了|老实说|实际上)[^。！？；\\n]{0,10}?(?:就是)?在(?:鼓吹|抬高|贬低|偷换|歪曲|滥用|误用|美化|洗白|抹黑|贬损|抬高|神化|丑化|篡改|背叛|否定|肯定|支持|反对|吹捧|捧杀)?[^。！？；\\n]{0,14}' +
+  // b 本质裁定：本质上/说到底/骨子里/无非是/不过是/不外是＋是（动词）
+  '|(?:本质上|说到底|骨子里|归根到底|归根结底|无非是?|不外是?|不过是?)[^。！？；\\n]{0,16}' +
+  // d 裸形「就是在＋裁定动词」：无「其实/本质上」前缀的直接推断裁定
+  // （就是说……就是在抬高对方 / 所以今天……就是在偷换概念）。161 轮
+  // 教训自查：本支即 a 支去掉裁定副词后的裸形，动词表与 a 支共用。
+  '|(?:就是说|也就是说|那就是说|换言之|换句话说|所以|因此|因而|故|可见|足见|这说明)[^。！？；\\n]{0,18}?就是在(?:鼓吹|抬高|贬低|偷换|歪曲|滥用|误用|美化|洗白|抹黑|贬损|神化|丑化|篡改|背叛|否定|吹捧|捧杀|浪费|犯罪|耍流氓|说漂亮话|抬轿子)' +
+  // c 立场裁定：就是在（为|替|给）……背书/站台/正名/辩护/洗地/铺路/开脱/张目
+  '|就是在(?:为|替|给|帮)[^。！？；\\n]{0,12}(?:背书|站台|正名|辩护|洗地|铺路|开脱|张目)'
+);
+// EN：so what they call X is really just Y / thus calling it Z is merely ... /
+// it is really glorifying ... / in essence it is nothing but ...
+const ETYM_NORM2_EN = new RegExp(
+  // a really just / really only + be/is/means
+  "\\b(?:so|thus|therefore|hence|which\\s+means|that\\s+means|in\\s+other\\s+words|in\\s+effect)\\b[^.]{0,60}?\\b(?:is|are|was|were)\\s+(?:really\\s+)?(?:just|only|merely|simply|nothing\\s+but|essentially|at\\s+its\\s+core)\\b[^.]{0,40}" +
+  // b in essence / at its core / boils down to
+  "|\\b(?:in\\s+essence|at\\s+its\\s+core|boils?\\s+down\\s+to|amounts?\\s+to\\s+nothing\\s+(?:but|more\\s+than))\\b[^.]{0,50}" +
+  // c really glorifying / just rebranding / merely relabeling / nothing but ...
+  "|\\b(?:really|just|merely|simply)\\s+(?:glorifying|rebranding|relabeling|whitewashing|laundering|sanitizing|euphemizing|elevating|demeaning|distorting)\\b",
+  'i'
+);
+
+// [r412] NORM2 族反谬误对冲：明确指出词义随时代变化/本义≠当下用法的
+// 句子（「本义是X，但现代用法早已泛化」「词义会随时代演变」）只有腿①
+// ＋对冲、无规范断言——对冲形把「引用词源」降格为事实陈述的引子，不判。
+const ETYM_HEDGE_ZH = /(?:词义|语义|词意|含义|用法)?(?:会|随|已经|早已|都在)?(?:随[着]?[^。！？；\n]{0,6}(?:演变|变化|变迁|发展|更替|扩展|泛化|转移|漂移)|发生了?[^。！？；\n]{0,4}(?:变化|演变|引申|扩展|转移)|早已(?:泛化|演变|变化|转移|引申)|已经(?:泛化|演变|变化|引申|转移|不同)|不能(?:简单|机械|直接)?(?:地)?(?:以|用|拿|按)[^。！？；\n]{0,4}本义|不等于[^。！？；\n]{0,6}(?:当下|现在|如今|今天)|不代表[^。！？；\n]{0,6}(?:当下|现在|如今|今天)|并不决定[^。！？；\n]{0,8}|不应当[^。！？；\n]{0,4}(?:以|用|拿|按)[^。！？；\n]{0,4}本义)/;
+const ETYM_HEDGE_EN = /\b(?:word\s+meanings?\s+(?:change|shift|evolve|drift|broaden)|semantic\s+(?:change|shift|drift)|meaning\s+has\s+(?:changed|shifted|evolved|broadened)|no\s+longer\s+means|does\s+not\s+(?:determine|decide|govern)\s+(?:its\s+)?(?:current|modern|present|today'?s)\s+use|meaning\s+evolves?|evolved?\s+over\s+time|shifted?\s+over\s+time)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空白正则替换指定常量
@@ -243,10 +298,39 @@ function checkGeneticFallacy(text, inject) {
     };
   }
 
+  // ─── [r412] 新路由：推断式规范结论（词源谬误族推论变体）────────────
+  // 双腿共现：腿① 词源/本义标记 × 腿② NORM2 推断式规范结论。
+  // 存量路由裁「词的资格」（才算/不配叫/误用），本路由裁「用词者的当
+  // 下行为/立场」（所以现在……其实是在……）。与存量路由 union 语义：
+  // 存量命中走存量，本路由兜住其射程外的推断形变体。
+  // 对冲组先于判定：明确指出词义演变/本义≠当下用法的句子，是引用词源
+  // 的事实陈述而非规范裁定，不判（防误伤语言学正确陈述）。
+  const ETYM_NORM2_ZH_ = R.ETYM_NORM2_ZH || ETYM_NORM2_ZH;
+  const ETYM_NORM2_EN_ = R.ETYM_NORM2_EN || ETYM_NORM2_EN;
+  const ETYM_HEDGE_ZH_ = R.ETYM_HEDGE_ZH || ETYM_HEDGE_ZH;
+  const ETYM_HEDGE_EN_ = R.ETYM_HEDGE_EN || ETYM_HEDGE_EN;
+
+  if (etymZh || etymEn) {
+    if (ETYM_META_ZH_.test(text) || ETYM_META_EN_.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+    if (ETYM_HEDGE_ZH_.test(text) || ETYM_HEDGE_EN_.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+    if (ETYM_NORM2_ZH_.test(text) || ETYM_NORM2_EN_.test(text)) {
+      return {
+        hit: true,
+        score: 0.6,
+        count: 1,
+        detail: isZh ? '词源谬误×本义推断裁定(zh)' : '词源谬误×本义推断裁定(en)',
+      };
+    }
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
   checkGeneticFallacy,
-  __internals: () => ({ SOURCE_ZH, SOURCE_EN, QUALITY_ZH, QUALITY_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ETYM_ZH, ETYM_EN, ETYM_NORM_ZH, ETYM_NORM_EN, ETYM_META_ZH, ETYM_META_EN }),
+  __internals: () => ({ SOURCE_ZH, SOURCE_EN, QUALITY_ZH, QUALITY_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ETYM_ZH, ETYM_EN, ETYM_NORM_ZH, ETYM_NORM_EN, ETYM_META_ZH, ETYM_META_EN, ETYM_NORM2_ZH, ETYM_NORM2_EN, ETYM_HEDGE_ZH, ETYM_HEDGE_EN }),
 };

@@ -1,3 +1,20 @@
+## r412 — 升级轮：词源谬误族「推断式规范结论」句式族（genetic_fallacy 维度新族，真升级②）（v6.8.207→6.8.208）
+
+- **轮次性质**：自主升级轮。阶段0 merge 上游 heartflow/main（4c29853b，agent-4 r411 dimension 工作，含 false_dilemma 第65维他法排除新路由⑪）后承接；claims.jsonl 冲突按 union 惯例保留 r410/r411 两条 release 记录，merge commit 0a997cfc。
+- **方向轮换**：r405–r411 连续 7 轮逻辑谬误扩展轴后，本轮按纪律转向「证据充分性与幻觉检测 / 不确定性量化」。三层海外搜索（HN Algolia、Semantic Scholar、GitHub API）全部无可用纯规则方案（UQLM 等均 LLM 依赖型，不符心虫架构；S2 空返）——如实记录，不假造论文集成。转内部路径后，按撞墙纪律先对 r399 词源族做缺口实证（探针显示真实漏判），确认族已存在但句式射程不全，故在既有维度内扩族而非新建维度。
+- **真升级判定**：②「已有维度的全新句式族」。存量 r399 词源路由只收定义/规范直陈（才算/不配叫/是误用/违背本义），本族收「所以现在……其实是在……」的推断形——两类措辞结构正交，不是给旧族加样本。
+- **实现**（`src/genetic-fallacy.js`，+86 行）：
+  - 新增常量 `ETYM_NORM2_ZH` / `ETYM_NORM2_EN`（腿②，三支：a 实是在裁定、b 本质裁定、c 立场裁定 + d 裸形「就是在＋裁定动词」）与 `ETYM_HEDGE_ZH` / `ETYM_HEDGE_EN`（反谬误对冲组，+2 组豁免）。
+  - `checkGeneticFallacy` 内新增 r412 路由：腿①（存量 ETYM）× 腿② NORM2 共现判定；META 豁免先于判定；HEDGE 对冲形把「引用词源」降格为事实陈述，不判。
+  - `__internals` 导出新常量（供逐常量负例注入）。
+  - 161 轮教训自查：首版漏「就是说别人是 lady 就是在抬高对方」/「所以今天拿它当标准就是在偷换概念」两条（缺裁定副词前缀）——补 d 裸形分支后 6/6 全命中。
+- **验证**（全部本轮真实运行）：
+  - 五门禁：`bin/verify.js` 16/16、`scripts/guard-abilities.js` 20/20、`test/doc-numbers-accuracy.test.js` 24/24、`scripts/bidirectional-guard.js` 召回 52/52 + 误拦 302/326（与基线 diff 零新增）。
+  - 负例注入测试 `test/round-412-etymological-inference-norm.js`：**45 passed / 0 failed**（攻击 15 + 良性 10 + META 豁免 3 + 逐常量承重注入 6 组 + 存量回归 4 + 共现纪律 3）。含 EN 侧逐常量置空验证（ETYM_EN / ETYM_NORM2_EN 置空后攻击句不命中，证明双腿承重）与对冲句 HEDGE 置空转命中验证（证明对冲承重）。
+  - 变体矩阵（gate 层端到端，stash 前后对照）：攻击 6/6 全非 pass 且 genetic_fallacy 承重（v1 裸名词、v2 带修饰、v3 倒装、v4 长句含对冲语义、v5 英文、v6 混合）；良性 5 例中 4 pass，1 例（b1「但词义会随时代演变」）verify——经 stash 对照确认为存量维度 monocausal_attribution 的既有基线误伤，非本轮引入（本模块对该句 hit:false，HEDGE 正确生效）。
+- **运行态**：supervisorctl restart heartflow-mcp 后 health 与 status 确认版本生效。
+- **已知边界**：词源谬误族的「考证式」变体（「本义是X，可见古人早已洞察……」——用词源为立场增信而非裁定资格）暂不判，下轮可继续；b1 类既有基线误伤属 monocausal_attribution 议题，不在本轮范围。
+
 ## r411 — 每日审计·修复轮（22:30 cron）：homogeneity_assumption 豁免组①否定剥离表补口语缩合形（P1）+ README badge 口径漂移（P2）（v6.8.206→6.8.207）
 
 - **轮次性质**：每日审计 cron 的修复轮，非升级轮。审计对象为过去 24h 升级产出（r404/r406/r410 三个新维度接线）。全程亲自跑验证，未采信自报告。
