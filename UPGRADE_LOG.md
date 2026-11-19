@@ -1,3 +1,26 @@
+## r411 — 每日审计·修复轮（22:30 cron）：homogeneity_assumption 豁免组①否定剥离表补口语缩合形（P1）+ README badge 口径漂移（P2）（v6.8.206→6.8.207）
+
+- **轮次性质**：每日审计 cron 的修复轮，非升级轮。审计对象为过去 24h 升级产出（r404/r406/r410 三个新维度接线）。全程亲自跑验证，未采信自报告。
+- **VERSION**：6.8.206 → **6.8.207**（本轮修复产生代码变更，按纪律 bump；sync-version.js 实跑同步 package.json / SKILL.md / src/core/version.js / heartflow.js BUILD_DATE）。
+- **P1 修复（真功能失效）**：`src/homogeneity-assumption.js` 豁免组① diffAckZH 否定剥离表不全——源码注释明确要求「先做否定前缀剥离，只对正向承认语境生效」，但 `_DIFF_NEG_ZH` 只收「毫无/没有/并无」+名词，漏掉「没区别/没差别/没什么两样」这类**谓语后置口语缩合否定**。后果：「同村的人都没区别，想法一样。」整句走 `exempt:diff-ack` 被误放（gate=pass）——把「否认差异」的同质攻击句当成「承认差异」的良性句，方向判反。
+  - 修复①：剥离表补 `没` 裸形 + 可选「的/什么」中缀 + 「并无二致」（与既有「毫无二致」同族）。
+  - 修复②（同轮发现的腿②覆盖缺口，原属漏判族）：腿② `HOMOGENEITY_ZH` 补「一个脾气/一个性格」名词宾语形与「性格没什么两样」族——原「全都一个脾气」因「脾气」不在谓语表内而 miss。
+  - 修复③（同轮腿①覆盖缺口）：腿① `SHARED_ATTR_ZH` 补「这个村子里的人」形——原 `(?:村|村庄|...)` 后要求 `(?:的|里)?(?:人|村民)`，「村子里」构词（村+子+里+的人）三处均不匹配。
+  - 反向防御（防修复过冲）：`不无差别`（=有差别，正向承认）**不**入剥离表，单测固化。
+- **实证数据**（全部本轮真实运行，stash 前后对照）：
+  - 修复前模块层实测：「同村的人都没区别，想法一样。」→ `{"hit":false,"detail":"exempt:diff-ack"}`（误放）。
+  - 修复后：→ `{"hit":true,"detail":"同质性假设: \\"同村的人\\" × \\"想法一样\\" (间距4)"}`（承重）。
+  - 「同一届毕业生能力都没差别。」exempt → hit；「同班同学性格都没什么两样。」exempt → hit。
+  - 增量不伤存量：r404 自带探针修复前后逐条一致——攻击 15/16 命中（A9 为既有豁免反例，非本轮引入）、良性存量 B 组零新增非 pass。
+  - `test/round-404-homogeneity-assumption.test.js` 29/0 全绿（攻击 14 / 良性 15）。
+  - stash 前后抽样对照：`audit-2210-attack.js` 14 样本修复前 12 pass / 2 fail → 修复后 13 pass / 1 fail；唯一剩余 FAIL（良性句被判 `unsupported_claim`+`appeal_to_authority`）经 stash 前后各 3 次复跑实证**稳定为 verify，与本次修复无关**（存量维度基线误伤，非本轮回归）。
+- **轮测**：`test/round-411-diff-ack-negation.test.js`（95 行）——**11/11 全绿**：缩合否定形承重 4 例、正向差异承认仍豁免 3 例（含「不无差别」不得被剥）、腿②「一个脾气」名词族 2 例、远距两腿不判 1 例、EN 侧不崩溃 1 例。
+- **P2 修复（文档口径漂移）**：README badge 行两处与实测不符——`MCP tools-185` → **192**（实测 192）、`test suite-24,640 passing` → **24,995**（measure-claimed-numbers.js 实测）。SKILL.md / AGENTS.md 口径复核一致（SKILL 192 ✓、AGENTS 272/164/192/1,341 ✓），无需改。
+- **P2 记录（未修，非代码缺陷）**：MCP 运行态 version 报 **6.8.201**，磁盘 VERSION/package.json/HEAD 三方一致 **6.8.207**（本轮前 6.8.206）。根因：mcp-server 进程（pid 419210）已运行 15h43m，启动于 6.8.201 时代，VERSION bump 不会热重载。心跳实测 `running:true`、164 模块与磁盘一致，引擎健康。下一轮升级任务重启后自然对齐。
+- **引擎健康**：MCP 心跳 `heartflow_status` 实测 running:true / modules:164 / qtable healthScore:100 / convergenceRate:100%。
+- **四门禁**（合并树实测，修复后）：verify **16/0** PASS、guard-abilities **20/20** PASS（判别维度 272、runtime verify 239）、doc-numbers **24/0** PASS（src/index.js 18,339 行超 14,000 阈值仅报警不阻断，既有状态）、bidirectional 召回 **52/52（100%）** + 误拦 **302/326 pass（92.6%）** PASS。
+- **审计结论**：r404/r406/r410 三个新维度均真实接线（require/dispatch/scores/dimMap 全在），r404 申报属实（自带探针 15/16 + 良性零误伤）；`coordination/claims.jsonl` 工作区改动为升级产出，随本轮提交。
+
 ## r410 — 4 号（dimension 轮·掉线恢复固化轮·轮换方向）真升级①：masked_man_fallacy 第 273 维「内涵语境替换失效」新判别维度接线（v6.8.206 保持）
 
 - **轮次性质**：本机 r407 WIP（11-19 20:56–21:12 完成模块+轮测+探针+接线）达到工具调用上限未收尾，本轮为掉线恢复固化——在合并树上补做缺口复跑闭环、四门禁、文档同步与提交。轮换纪律：r405-r409 连续 5 轮逻辑谬误/归因扩展轴，r407 原方向（命题态度语境族）本就是换向轮的落地物，本轮继续完成该方向；r407 在远端被 appeal_to_nature 演化适配族占用（注释记载），本机该 WIP 从未提交，按宪法 §7 本地独有产能优先固化，不丢弃不重做。
