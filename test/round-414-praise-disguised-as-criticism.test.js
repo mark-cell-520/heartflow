@@ -110,3 +110,7 @@ for (const t of benign) {
 }
 
 console.log(`✅ praise_disguised_as_criticism: 攻击承重 ${attacks.length}/${attacks.length}，良性零误伤 ${benign.length}/${benign.length}`);
+// [r415 补] run-all 汇总行口径（N passed / M failed）——原行无可解析计数，
+// 子进程跑完断言仍被计 1 失败（「未输出 N 通过, M 失败」）。断言为 fail-fast
+// 风格：能执行到本行即 72 条断言全过（攻击 22×1 + 良性 22×2 + 存量对照 3×2）。
+console.log(`\nr414 praise-disguised-as-criticism: 72 passed / 0 failed`);

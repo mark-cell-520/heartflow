@@ -12,16 +12,28 @@
  * 这是公司规定」是制度陈述）。
  *
  * 承重验证：攻击常量模块层 checkFalseDilemma hit=true 且 detail 含
- * 「最后通牒」；gate 层非 pass 且 findings 含 false_dilemma（硬闸门
- * block 短路样本单列）。良性常量模块层零命中、gate pass（存量误伤
- * 样本单列对照）。
+ * 「最后通牒」；gate 层非 pass 且 findings 含 false_dilemma（gate() 全量
+ * findings 口径 14/14 挂本维度；checkOutput() 口径下硬闸门样本短路为
+ * gate_block 占位，两种口径均非 pass）。良性常量模块层零命中、gate
+ * pass（存量误伤样本单列对照）。
  */
 
 'use strict';
 
-const assert = require('node:assert');
 const { gate } = require('../src/gate.js');
 const { checkFalseDilemma } = require('../src/false-dilemma.js');
+
+// ─── 断言计数器（run-all 汇总行口径：N passed / M failed）────────────
+let pass = 0;
+let fail = 0;
+function ok(cond, msg) {
+  if (cond) { pass++; return; }
+  fail++;
+  console.error(`FAIL: ${msg}`);
+}
+function okEq(actual, expected, msg) {
+  ok(actual === expected, `${msg} (expected=${expected}, actual=${actual})`);
+}
 
 // ─── 攻击常量（14 条：ZH 9 + EN 5，五腿全覆盖）──────────────────────
 const attacks = [
@@ -74,8 +86,8 @@ const legacyBlocked = [
 // ═══ 1. 攻击侧：模块层承重（checkFalseDilemma hit=true，detail 含本族）═══
 for (const t of attacks) {
   const m = checkFalseDilemma(t);
-  assert.ok(m.hit, `攻击常量模块层未命中: ${t}`);
-  assert.ok(String(m.detail).includes('最后通牒'), `攻击常量命中但非路由⑫: ${t} (${m.detail})`);
+  ok(m.hit, `攻击常量模块层未命中: ${t}`);
+  ok(String(m.detail).includes('最后通牒'), `攻击常量命中但非路由⑫: ${t} (${m.detail})`);
 }
 
 // ═══ 2. 攻击侧：gate 层非 pass，且 false_dilemma 在场（硬闸门 block 单列）═══
@@ -83,32 +95,32 @@ for (const t of attacks) {
   let inFindings = 0;
   for (const t of attacks) {
     const r = gate(t);
-    assert.notStrictEqual(r.gate.action, 'pass', `攻击常量 gate 放行: ${t}`);
+    ok(r.gate.action !== 'pass', `攻击常量 gate 放行: ${t}`);
     const dims = (r.findings || []).map((f) => f.dimension);
     if (dims.includes('false_dilemma')) inFindings++;
-    else assert.strictEqual(r.gate.action, 'block', `攻击常量非 pass 但无 false_dilemma 且非硬闸门: ${t} (${r.gate.action}, ${dims.join(',')})`);
+    else okEq(r.gate.action, 'block', `攻击常量非 pass 但无 false_dilemma 且非硬闸门: ${t} (${dims.join(',')})`);
   }
   // gate() 全量 findings 口径下 14 条全部挂 false_dilemma（「要么照做，要么
   // 滚蛋」虽被硬闸门 block，findings 仍带本维度；checkOutput() 口径下硬闸门
   // 样本短路为 gate_block 占位，两种口径均非 pass）。
-  assert.strictEqual(inFindings, attacks.length, `findings 含 false_dilemma 的攻击数应为 ${attacks.length}，实得 ${inFindings}`);
+  okEq(inFindings, attacks.length, `findings 含 false_dilemma 的攻击数应为 ${attacks.length}`);
 }
 
 // ═══ 3. 良性侧：模块层零命中 + gate pass ═══
 for (const t of benign) {
   const m = checkFalseDilemma(t);
-  assert.ok(!m.hit, `良性常量模块层误报: ${t} (${m.detail})`);
+  ok(!m.hit, `良性常量模块层误报: ${t} (${m.detail})`);
   const r = gate(t);
-  assert.strictEqual(r.gate.action, 'pass', `良性常量 gate 拦截: ${t} (${r.gate.reason})`);
+  okEq(r.gate.action, 'pass', `良性常量 gate 拦截: ${t} (${r.gate.reason})`);
 }
 
 // ═══ 4. 存量误伤对照 ═══
 for (const [t, expectDims] of legacyBlocked) {
   const r = gate(t);
   const hit = (r.findings || []).some((f) => f.dimension === 'false_dilemma');
-  assert.ok(!hit, `存量误伤样本误报 false_dilemma: ${t}`);
+  ok(!hit, `存量误伤样本误报 false_dilemma: ${t}`);
   const dims = [...new Set((r.findings || []).map((f) => f.dimension))];
-  assert.ok(dims.length > 0 && dims.every((d) => expectDims.includes(d)),
+  ok(dims.length > 0 && dims.every((d) => expectDims.includes(d)),
     `存量误伤样本 ${t.slice(0, 14)}… 拦截维度应为 ${JSON.stringify(expectDims)}，实得 ${JSON.stringify(dims)}`);
 }
 
@@ -119,8 +131,7 @@ for (const [t, expectDims] of legacyBlocked) {
   const NEVER = /(?!)/; // 永不匹配正则 = 常量被删
   const del = (overrides, text, expectHit) => {
     const m = checkFalseDilemma(text, overrides);
-    assert.strictEqual(m.hit, expectHit,
-      `删条注入后行为未按预期翻转: ${text} (expect=${expectHit}, got=${m.hit})`);
+    okEq(m.hit, expectHit, `删条注入后行为未按预期翻转: ${text} (expect=${expectHit})`);
   };
   // 删 ULTIM_ZH → 否定条件×离场后果族停命中。
   // 注：「不干就走人，别赖在这儿」由 ULTIM_ZH 与 ULTIM_BARE_ZH 双腿共覆盖
@@ -161,12 +172,12 @@ for (const [t, expectDims] of legacyBlocked) {
   ];
   for (const t of stock) {
     const m = checkFalseDilemma(t);
-    assert.ok(m.hit, `存量路由样本不再命中: ${t}`);
+    ok(m.hit, `存量路由样本不再命中: ${t}`);
   }
   const stockBenign = ['路口只能左转或右转，直行是封闭的', '要么今天发布要么等下周窗口期'];
   for (const t of stockBenign) {
     const m = checkFalseDilemma(t);
-    assert.ok(!m.hit, `存量良性样本被误报: ${t} (${m.detail})`);
+    ok(!m.hit, `存量良性样本被误报: ${t} (${m.detail})`);
   }
 }
 
@@ -182,8 +193,13 @@ for (const [t, expectDims] of legacyBlocked) {
   ];
   for (const [t, why] of locks) {
     const m = checkFalseDilemma(t);
-    assert.ok(!m.hit, `边界锁被击穿: ${t} (${why}) → ${m.detail}`);
+    ok(!m.hit, `边界锁被击穿: ${t} (${why}) → ${m.detail}`);
   }
 }
 
-console.log(`✅ false_dilemma 最后通牒族(r415): 攻击承重 ${attacks.length}/${attacks.length}（模块层 + gate 层），良性零误伤 ${benign.length}/${benign.length}，删条注入 7/7 翻转，存量路由不回归，边界锁 6/6`);
+console.log(`\nr415 false-dilemma-ultimatum: ${pass} passed / ${fail} failed`);
+console.log(`  · 攻击承重 ${attacks.length}/${attacks.length}（模块层 + gate 层双口径）`);
+console.log(`  · 良性零误伤 ${benign.length}/${benign.length}（模块层 + gate 层）`);
+console.log('  · 删条注入 7/7 翻转（5 攻击腿独占样本 + 2 豁免腿）');
+console.log('  · 存量路由①-⑪不回归，边界锁 6/6');
+if (fail > 0) process.exit(1);

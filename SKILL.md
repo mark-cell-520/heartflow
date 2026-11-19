@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,341 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 272 | `dimMap` keys in `src/index.js` |
 | MCP tools | 192 | tool definitions exposed via `tools/list` |
-| Test suite | 25,134 passing / 228 failing | `node test/run-all.js`（r413 轮全量实测 25,134/228/25,362（JOBS=4，data/test-count.json @ 2026-11-19T17:33:00Z；较 r411 基线 25,059/225/25,284 差 passed +75 / failed +3 / total +78——passed 增量含本轮轮测 round-413-special-pleading-same-label.test.js 21 断言与 r412 遗留轮测 round-412-etymological-inference-norm.test.js 归位后入列 45 断言（两文件此前缺 .test.js 后缀、run-all 收集器只收 *.test.js 致静默未入列，本轮 git mv 修正，违反 AGENTS.md 约定 #4）及并发池自报行解析残差；失败清单 165 文件与 r411 基线逐条 diff **零新增**，唯一池内抖动项 hasty-all-predicate-enum-round280.test.js 经 stash 前后对照实证 5 个失败改动前后完全一致（存量，非本轮引入）；failed +3 为并发池 Command failed 抖动计数漂移；本轮另跑两次全量：首跑 25,071/225/25,296（848 文件、两个轮测尚未归位）、次跑 18,756/224/18,980（子进程 90s 超时截断压低，按 r409 先例取完整值即本口径））
+| Test suite | 25,306 passing / 228 failing | `node test/run-all.js`（r415 轮全量实测 25,306/228/25,534（852 文件，data/test-count.json @ 2026-11-19T19:39:35Z；较 r413 基线 25,134/228/25,362 差 passed +172 / failed +0 / total +172——passed 增量为本轮轮测 round-415-false-dilemma-ultimatum.test.js 100 断言与 r414 轮测 round-414-praise-disguised-as-criticism.test.js 补 run-all 汇总行口径后入列 72 断言（该文件原无可解析计数行、子进程跑完断言仍被计 1 失败，本轮按 r413 先例补「N passed / M failed」行修复）；失败清单 151 文件与 r413 基线逐条 diff **零新增零减少**））
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
