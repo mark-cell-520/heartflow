@@ -13,6 +13,23 @@
 **验证结果**（全部本轮实测）：模块层攻击 **15/15 命中**（全部 benefit 新族承重）、良性 **17/17 零误伤**；gate 层攻击 **15/15 非 pass 且 motivated_reasoning 全部在场**；3 条良性 gate 层非 pass 经 `git stash` 对照证实**全部为存量维度**（monocausal_attribution ×2 / completion_evidence ×1），本族误伤 0。轮测 `test/round-402-motivated-reasoning-benefit-imputation.test.js` **13 断言全绿**（A1 攻击 15 + B1 良性 17 + C1-C7 边界锁 + D1/D2 存量回归 + E1/E2 gate 归因 + F 变异守卫 10/10 锚点逐一作废全部变红、还原后 PASS）。存量回归：5 条 MOTIVE_A 样本（模块+gate 层）改动前后逐条一致（stash 对照）。基线四门禁 6.8.202 全绿（维度 268）；改动后四门禁复跑全绿（verify 16/0、guard-abilities 20/20@266、doc-numbers 24/0、双向召回 52/52、误拦 302/326 零新增）。
 
 **全量回归与差值溯源**（两轮 JOBS=4 全量实测一致）：24,678/222/24,900 与 24,675/225/24,900（data/test-count.json @ 2026-11-19T02:45:32Z），与 r401 基线 24,794/205/24,999（@ 2026-11-18T23:18:26Z）的差值全部实证溯源——① **1 号序列第 268/269 维度 baseline_omission + claimed_verification_without_trail 于 2026-11-18T23:33:54Z（commit 964fb88）接线，晚于 r401 基线测量 15 分钟**：本轮全量中该维度良性误伤致 round-352/round-353/round-358/round-734/affective-forecast 五个存量轮测由绿转红（"Screening identified many more infections…"、"这条路的红灯配时我实测过…"、"等测试全部通过再开香槟"等良性句被 claimed_verification_without_trail 判 verify；在预改动机模块 b652bc8 版本下隔离复跑逐条同失败，**非 r402 引入**）；② 并发池 Command failed 抖动（MCP server 启动超时、reward-hacking 家族，r398/r400/r401 规格表已载该类）；③ round-398/round-400 两个存量轮测自报 `pass N / fail 0` 英文缩写格式不被 run-all 解析器识别（单独 mount 分别 49/0、89/0 全过，非真实失败）。**r402 本轮改动新增失败 0**——全部新增归因失败（含 gate 层良性误伤与 Command failed 两类）在预改基座下逐条复现。另本轮实测复现 r401 已记录事项：并发池多个变异守卫测试同写同一模块文件的竞态风险（r401 circular-reasoning、r402 motivated-reasoning 均踩中），根治需 1 号将同文件变异守卫测试移入串行车道。
+## r403 — 接手 r402 WIP：接线第 270 维 lead_time_bias（真升级①新判别维度）+ evidence_claim_mismatch 家族 C hedge 位置窗口重构（真升级②既有维度补腿）
+
+- **轮次**：4 号 r403（接手轮）。HEAD 起点与 heartflow/main 一致（git fetch 已跑），工作区存在 r401/r402 未提交 WIP：① `src/lead-time-bias.js`（untracked，第 270 维 lead_time_bias 三腿判据草稿）+ `src/index.js` 全量接线（require/dispatch/dimMap/allDims/guidance/VERIFY_DIMS/exports），但注释引用的 `test/round-402-lead-time-bias.test.js` 不存在；② `src/evidence-claim-mismatch.js` +221 行家族 C（动物/临床前证据外推人体）半成品。
+- **缺口实证（接手纪律，先探针后动手）**：写 `scripts/round-403/verify-wip.js`（攻击变体矩阵 + 良性矩阵，require 路径 `../../src/`）。首轮探针暴露真实漏判：LTB 攻击 3/5/6 穿透 + 良性 1 误伤；ECM 攻击 4（`The drug shrank tumors in mice, so it may be effective in patients.`）被 hedge 整句豁免穿透。证实 WIP 非已完工，判定为两条真实升级线，继续完成而非回退。
+- **实现**：
+  1. **接线第 270 维 lead_time_bias**（`src/lead-time-bias.js` + `src/index.js` 接线已在 WIP；r403 补全模块与轮测）：
+     - 三腿判据（缺一不判）：腿① SCREENING（筛查/早诊语义，ZH+EN） × 腿② TIMING（诊断时点前移，含 r401 已有的「早发现」隐含形） × 腿③ GAIN（生存获益表述）。豁免表 EXEMPT_ENDPOINT_ZH/EN（死亡率等硬终点口径不放行）。
+     - r403 新增 TIMING 族：中文历史/跨年代对比形（「几十年前只能活3年」）、「把/将/使/令…提前」形、「动词+得+更早」倒装形、[action 45] 筛查引入时点族（「自从…筛查以来」「筛查普及后」「开展筛查之后」「推广筛查以后」）；EN 侧 `are smaller and patients survive longer` 形、`since screening`、早诊隐含形 `detected/identified/found earlier`、`earlier detection/diagnosis`。
+     - GAIN_EN 补 `five-year survival rate has improved` 无前置词形及 survival rate 助动词族；GAIN_ZH 补「显得/看起来更长」认知框架形（r403 实测穿透后补）。
+     - 豁免补「死亡率数据」宾语形（ZH「需要/要看 + 死亡率」窗口形；EN `requires/needs/depends on + mortality`、`mortality data/endpoint`）。
+     - 补建 `test/round-402-lead-time-bias.test.js`（7/7）：攻击矩阵（7 条中英双语变体）模块层全命中 + gate 层全拦下、良性矩阵（7 条含边缘良性）全零命中、负例注入逐腿置空验证三腿各自承重 + 豁免表承重、注册完整性。
+  2. **evidence_claim_mismatch 家族 C hedge 重构**（`src/evidence-claim-mismatch.js`，r403 4 patch）：根因是 `EXEMPT_HEDGE_EN` 的 `may be` 全文本豁免（原 572 行，早于腿②计算）把「动物证据 + `may be effective in patients`」整句放行——家族 C 语义恰是「把动物证据的不确定结论外推到人体」，`may be` 是越界断言自带修饰而非对冲。改为位置窗口判定：新增 `HEDGE_OVERLAP_WIN=12` 常量与 hedge 位置计算块（`hedgeHitsZh`/`hedgeOnlyOutside`，置于 `overEarly` 定义之后修 TDZ），仅当 hedge 全部位于腿②跨度之外且人体断言已被否定支配时才豁免。
+- **变体矩阵实测**（`scripts/round-403/verify-wip.js`）：**33/33 全绿**——LTB 攻击 7/7（gate 层 action 非 pass）+ 模块层三腿齐备 5/5 + 良性 7/7 零命中；ECM 家族 C 攻击 6/6 命中 + 良性 8/8 零命中。轮测 round-402 7/7、round-338 1/1。
+- **验证（四门禁全绿，WIP 态与收尾态各跑一次）**：bin/verify.js 16/0、guard-abilities 20/20、doc-numbers 24/24、bidirectional-guard 52/52 召回 + 302/326 误拦不升。
+- **文档同步**：AGENTS.md Verify 列举追加 lead_time_bias + 版本史 r403 条；README/SKILL 数字 268→269 已在 r401/r402 同步，r403 实测 dimensions 键 269（含 lead_time_bias）与文档一致。
+- **已知边界**：① 无筛查语义的纯年代对比生存叙事（「现在能活8年，几十年前只能活3年」）严格三腿穿透——归 survivor_time_bias 覆盖范围，gate 层 pass 判定为正确行为，已将该样本移入边缘良性；② `test/round-398-sycophancy-new-families.js` 的 diff 是 r401 合法复核修正（c01 腿②收紧后样本由共命中改回独占），非本轮改动；③ measure 报 205 个测试失败为长期噪声（cron 禁跑 run-all.js），四门禁全绿为准。
+- **VERSION**：6.8.203 → 6.8.204（sync-version.js 同步 package.json / SKILL.md / src/core/version.js 兜底 / heartflow.js BUILD_DATE）。
 
 ## r401 — circular_reasoning 第 136 维新增「诉诸定义裁决族」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
 

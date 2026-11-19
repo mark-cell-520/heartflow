@@ -181,10 +181,10 @@ check('r398: 删腿翻转——目标样本 exclusively 由 r398 新腿命中', 
     ['credit_surrender', 'EN_SIGNALS', 0, 'This success is entirely your credit — I contributed nothing.', true],
     ['credit_surrender', 'EN_SIGNALS', 1, 'Had it not been for your steering, I would have accomplished nothing.', true],
     ['credit_surrender', 'EN_SIGNALS', 2, 'My contribution counts for nothing here.', true],
-    // 「My own efforts were irrelevant — the win was all yours.」同时命中 c03
-    // （my efforts × were irrelevant）与 c01（the win × was all you(s)）——
-    // 两腿集合在该形态上固有重叠，非缺陷；作为非独占样本保留。
-    ['credit_surrender', 'EN_SIGNALS', 2, 'My own efforts were irrelevant — the win was all yours.', false],
+    ['credit_surrender', 'EN_SIGNALS', 2, 'My own efforts were irrelevant — the win was all yours.', true],
+    // 注（r401 复核）：c01「was all you(s)」腿② 已加 (?![a-z]) 收紧
+    // （r400），前缀吞并 yours 的误报已修；本样本现 legs=[2] 独占成立，
+    // 故由共命中样本改回独占样本。原 exclusive=false 断言随之失效。
   ];
   for (const [family, lang, idx, text, exclusive] of cases) {
     const legs = mod[lang][family];

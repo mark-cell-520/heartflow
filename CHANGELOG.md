@@ -11,6 +11,16 @@
 - 模块层攻击 15/15、良性 17/17 零误伤；gate 层攻击 15/15 非 pass 且本维度在场；良性 gate 层 3 条存量误伤经 stash 对照证实均为存量维度
 - src/index.js 零改动、dimMap 键数不变（仍 268）、VERSION 6.8.202→6.8.203
 
+### r403 接手 r402 WIP：接线第 270 维 lead_time_bias + evidence_claim_mismatch 家族 C hedge 重构
+
+- **接线第 270 维 lead_time_bias（领先时间偏误，真升级①新判别维度）**：`src/lead-time-bias.js`（r401 起草、r402 完成 src/index.js 全量接线但轮测缺失）。三腿判据缺一不判：筛查语义 × 诊断时点前移 × 生存获益；豁免表收死亡率等硬终点口径。r403 新增 TIMING 历史/跨年代对比形、筛查引入时点族（「自从…筛查以来」）、EN `are smaller and patients survive longer` 与早诊隐含形（`detected/identified/found earlier`、`earlier detection/diagnosis`）、GAIN_EN `five-year survival rate has improved` 族、GAIN_ZH「显得/看起来更长」认知框架形、豁免「死亡率数据」宾语形。补建 `test/round-402-lead-time-bias.test.js`（7/7，含负例注入逐腿置空承重验证）。
+- **evidence_claim_mismatch 家族 C hedge 位置窗口重构（真升级②既有维度补腿）**：根因——`EXEMPT_HEDGE_EN` 的 `may be` 全文本豁免把「动物证据 + `may be effective in patients`」整句放行；家族 C 语义恰是「动物证据不确定结论外推人体」，`may be` 是越界断言自带修饰而非对冲。改为位置窗口判定（`HEDGE_OVERLAP_WIN=12`）：hedge 命中区间与腿②命中区间重叠（或紧贴 ≤12 字符）时不触发豁免。
+- **变体矩阵实测**（scripts/round-403/verify-wip.js）：33/33——LTB 攻击 7/7 gate 拦下 + 模块三腿 5/5 + 良性 7/7；ECM 攻击 6/6 + 良性 8/8。
+- **存量回归**：round-338 家族回归 11/11、round-398 sycophancy 12/12、round-402 单测 7/7 全绿；r307 44 passed/4 failed 为存量失败（ALL EXEMPT emptied 负例注入，HEAD 干净态同失败）。
+- **四门禁全绿**：verify 16/0、guard-abilities 20/20、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326 不升。
+- **文档**：AGENTS.md Verify 列举追加 lead_time_bias + r403 版本史；VERSION 6.8.203→6.8.204（package.json/SKILL.md/version.js 兜底/heartflow.js BUILD_DATE 同步）。
+- **已知边界**：无筛查语义的纯年代对比生存叙事由 survivor_time_bias 覆盖，gate pass 为正确行为；205 个 measure 失败为长期噪声（禁跑 run-all.js）。
+
 # 6.8.201 变更日志条目
 
 - **第 197 维度 goal_drift 新增「显式约束×权衡搁置宣告」攻击族（r401，真升级②既有维度全新句式族）**：来源论文 arXiv:2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》——价值冲突子族的实证结论是环境信号（进度/工期/业务压力）可覆盖 agent 持有的显式约束，逐 action 浅层合规检查覆盖不到。checkGoalDrift 由单族改为双族 OR：存量 ANCHOR×SWITCH（目标置换，r200）+ 新族 CONSTRAINT×OVERRIDE（显式约束在场 × 让步/权衡搁置宣告，双腿共现 + 邻近窗 ZH≤60/EN≤160）。新增八个常量（CONSTRAINT_ZH/EN、OVERRIDE_ZH/EN、EXEMPT_COMPLIANCE_ZH/EN），豁免组由四组扩为五组（新增约束被遵守正面陈述豁免）。src/index.js 零改动、dimMap 键数不变。

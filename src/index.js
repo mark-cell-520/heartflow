@@ -787,6 +787,16 @@ const { checkBaselineOmission } = require('./baseline-omission.js');
 // 只有通过核验的才成为事实」。变量名 cvw——claimed verification
 // without trail 缩写，grep 0 命中。
 const { checkClaimedVerificationWithoutTrail } = require('./claimed-verification-without-trail.js');
+// [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误：筛查把确诊时点
+// 提前但病人实际死亡时间没变，以「从确诊起算的生存期」变长为证据宣称
+// 筛查有效——把记账起点前移造成的生存期假性延长误认为真实获益）require。
+// 模块 r401 起草（18KB，中英三腿共现 + 三组豁免，探针实证攻击 16/17 +
+// 9/10、良性 0/16 + 0/20 零误伤），但 src/index.js 从未 require/dispatch
+// ——属「已加载未 dispatch」能力。缺口实证：scripts/round-401/
+// probe-candidates.js + probe-leadtime.js（Berkson/Neyman/Protopathic/
+// Verification/Lead-time 五候选族同池实测后定拨本族）。变量名 ltb——
+// lead time bias 缩写，grep 0 命中。
+const { checkLeadTimeBias } = require('./lead-time-bias.js');
 // [r367 接线] 第 260 维度 package_deal（一揽子谬误：把多个独立命题打包成
 // 不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制单条独立判断）require。
 // 缺口实证见 scripts/round-367/probe-package-deal.js（11 条攻击样本 8 条穿透
@@ -2466,6 +2476,13 @@ function discriminate(text, evidence = [], contentMode) {
   // 「I verified it myself and it works.」等），零维度承重。本行让「空核验
   // 宣称」以独立维度名进入 findings/scores/dimMap。
   const cvw = _applyPedagogyRelaxation(checkClaimedVerificationWithoutTrail(_normText), "claimed_verification_without_trail", pedagogyRelaxation);
+  // [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误）独立 dispatch。
+  // 模块 r401 起草但从未 dispatch——探针实测 gate 层本族中英双语攻击穿透
+  // （「筛查让癌症更早被发现，所以患者的生存时间更长了」「Screening
+  // detected the tumor two years earlier, so patients lived two years
+  // longer.」等），零维度承重。本行让「领先时间偏误」以独立维度名进入
+  // findings/scores/dimMap。
+  const ltb = _applyPedagogyRelaxation(checkLeadTimeBias(_normText), "lead_time_bias", pedagogyRelaxation);
   // [r367 接线] 第 260 维度 package_deal（一揽子谬误）独立 dispatch。探针
   // 实证 gate 层穿透（8/11 漏判），本行让「打包绑定 × 全有或全无」以独立
   // 维度名进入 findings/scores/dimMap。
@@ -3237,6 +3254,9 @@ function discriminate(text, evidence = [], contentMode) {
     // （空核验宣称：核验动作在场但轨迹缺失）。同 r331 先例：dimMap 与
     // allDims 两处都接。
     {score: cvw.score, name:'claimed_verification_without_trail'},
+    // [r402 接线] 第 270 维度 lead_time_bias 参与判定（领先时间偏误：筛查
+    // 提前确诊时点≠延长寿命）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: ltb.score, name:'lead_time_bias'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -3906,6 +3926,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验
     // 宣称）dimMap 登记。cvw——claimed verification without trail 缩写。
     claimed_verification_without_trail: cvw,
+    // [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误：筛查提前确诊
+    // 时点造成的生存期假性延长）dimMap 登记。ltb——lead time bias 缩写。
+    lead_time_bias: ltb,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
     // 全无）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4465,6 +4488,9 @@ function discriminate(text, evidence = [], contentMode) {
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r361 接线] 第 258 维度 quantifier_scope_shift（量词辖域移位）guidance。
     'quantifier_scope_shift': "不得**把「对每个 x 各有一个 y」偷换成「有一个 y 对所有 x 成立」**——量词辖域移位（quantifier scope shift / scope fallacy，∀x∃y 推不出 ∃y∀x）是把逐点成立的断言整体化为同一对象的普遍断言：「对每个员工都有一个工位，所以存在一个工位是所有员工共用的」「每个人都有一位守护天使，所以有一位守护天使守护所有人」「有人迟到了，所以所有人都必须提前到」（Every student has a mentor, so there is a mentor for every student. / Each child has a parent, so there is a parent for all children.）。∀x∃y（每个人有自己的）与 ∃y∀x（有一个共用的）是逻辑强度完全不同的两个命题，前者弱、后者强，用推断连接词把前者接到后者上等于把弱命题伪装成强命题。判据**四腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① SCOPE-PREMISE 辖域前提（对每个/每一个/每个/每人/人人/每个人/各有一位/各自有/每人都有一个/任何人都有一个；EN every / each / every person / everyone has / each child / anyone has，含裸名词形：单独出现「每个」「人人」即命中腿①）；腿② EXISTENCE 存在量词结论（存在一个/有一个/某一个/某个/同一个/共用/共享/只用同一个/统统归；EN there is one / there exists / one single / the same / shared by all / a common，含裸名词形：单独出现「同一个」「共用」即命中腿②）；腿③ INFERENCE 推断连接词（所以/因此/这说明/就意味着/那就是/可见/故而；EN so / therefore / which means / hence / thus / that means，含倒装形：结论在前、前提在后作理由）；腿④ PREDICATE-SHARED 谓域共享——结论中的谓词与前提中的谓词同族（工位-工位/导师-导师/天使-天使/工位-座位；mentor-mentor/angel-angel），确保偷换的是同一个关系而非两个无关陈述。四腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「辖域移位」叙述。边界：undistributed_middle（中项不周延）管三段论中项未周延，本族管量词辖域顺序；affirming_the_consequent/denying_the_antecedent 管条件句逆/否误用，本族不依赖条件句；fallacy_of_relevance 管相关性缺失，本族的推理形式本身无效；hasty_generalization 管样本不足的归纳，本族是演绎形式的误用而非样本问题；whole_part_transfer 管整体部分性质互推，本族管的是量词嵌套顺序而非整体-部分。明确不判：正确辖域表述（每个人有各自的工位，不是同一个/每人都配了一把钥匙，钥匙不通用——**把 ∀x∃y 与 ∃y∀x 区分开是正确判别**）、同一性本来成立的陈述（全校共用一个食堂/大家共用一条网线——**对象真的是同一个时不是移位**）、提问句式（含 ?/？）、否定与对冲（不意味着/不代表/未必/不一定/取决于；EN does not mean / not necessarily / depends on）、概念教学（量词辖域/辖域移位/quantifier scope / scope fallacy / ∀x∃y）。",
+    // [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误：筛查提前确诊
+    // 时点造成的生存期假性延长）guidance。ltb——lead time bias 缩写。
+    'lead_time_bias': "不得**把「筛查让确诊时点提前」当成「筛查延长了寿命」的证据**——领先时间偏误（lead-time bias / lead time artifact）：以确诊日为起算点，筛查只是把发现疾病的日子往前挪，从确诊到死亡的时长必然被拉长，但病人的实际死亡日期没有变。拿「筛查组比未筛查组活得更久」直接宣称筛查救命，等于把记账起点前移造成的生存期假性延长误认为真实获益。样本形状：「有了筛查项目之后，患者的平均生存时间从2年延长到了5年，说明筛查显著延长了生命。」「这个病现在确诊后平均能活8年，而几十年前只能活3年，医学进步真大。」「普查让我们更早发现癌症，所以患者的生存期明显变长了。」「因为疾病被更早发现，患者的生存率大幅提高。」「Screening advanced the date of diagnosis by two years, so patients appeared to live longer.」「Tumors found by screening are smaller and patients survive longer.」（样本形状与负例见 test/round-402-lead-time-bias.test.js）。判据**三腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① SCREENING 筛查/早诊语义（筛查/普查/筛癌/体检/两癌筛查/钼靶/乳腺X线/肠镜/胃镜/PSA/低剂量CT/防癌体检/癌症筛查/早筛/肿瘤筛查/定期检查/健康体检；EN screening / mammogram / colonoscopy / PSA / annual physical / check-up）；腿② DIAGNOSIS_TIMING 诊断时点提前（早发现/更早发现/提前发现/提前确诊/提早诊断/诊断时间提前/发现得更早/时间提前了/比以往提前/检出更早；EN earlier / advanced the date of diagnosis / at an early stage / caught earlier / detected sooner）；腿③ SURVIVAL_GAIN 生存获益（生存期/存活期/生存时间/寿命/活得更久/多活了/生存期延长/生存时间延长/生存率提高/生存率大幅提高/五年生存率/10年生存率/患者活到/能活N年；EN survival / lived longer / survival time / survival rate / live N years）。缺腿不判——只有筛查无时点提前（「开展筛查项目」）是中性描述；有时点提前无获益断言（「筛查能更早发现问题」）是正当的健康宣教。边界：survivor_time_bias（第226维）管以「从确诊起算」为准的生存期比较中零时偏置（immortal time / length-time bias），本族特指**筛查语境下诊断时点前移≠寿命延长**的口径误读，三腿结构不重叠；survivorship_bias（第132维）管只看活下来的人造成的高估，本族活着的与死去的都在统计内、错在起算点前移；selection_bias（第168维）管进入筛查组的人本身更健康（self-selection），本族不依赖人群差异、单句即可构成口径谬误；base_rate_neglect（第169维）管忽略先验概率，本族先验（真实死亡率）正是应当被拿出来对比的量；activity_outcome_confusion（第184维）管把活动本身当结果，本族的活动（筛查）确实产生了可测结果（早诊），错在对结果的解释口径；hindsight_bias（第175维）管事后诸葛亮，本族不涉及事后视角。verify 级——单句可能是正当的 RCT 死亡率结论转述、他人宣传话术引述、或作者正要批判 lead-time bias；verify 的含义是「这个以生存期变长为依据的筛查有效性宣称没有区分提前确诊与延长寿命，需要补死亡率/总生存期口径的对照数据才能采信」，调用方应要求补硬终点证据，而不是把「生存期变长」当「筛查救命」。明确不判（豁免）：①硬终点口径（死亡率下降/死亡风险降低/总体生存期显著改善/总生存期/OS/疾病特异性生存期/RCT死亡率终点；EN mortality reduction / overall survival / OS / disease-specific survival / death rate）——作者已在正确口径上陈述；②元陈述破除（领先时间偏误/lead-time bias/lead time artifact/lead time effect/生存期假性延长/假性获益/时间偏倚）——正在指出本谬误本身；③机制性治愈口径（治愈/根治/完全缓解/癌细胞清除/肿瘤消失；EN cured / eradicated / complete remission）——有治愈机制时不涉及生存期起算问题。",
     // [r398 接线] 第 268 维度 baseline_omission（基线缺失：无对照比例结果断言）guidance。
     'baseline_omission': "不得**把一个没有对照组、基线或分母口径的比例结果当成疗效/效果的证明**——基线缺失（baseline omission / uncontrolled rate claim）：报告治愈率、满意度、成功率却不交代自愈率是多少、安慰剂组表现如何、样本分母是谁，等于把「无人对照的百分比」伪装成「效果证据」。样本形状：「这种新疗法治愈率高达九成，效果惊人。」「用了我们的产品，百分之八十的客户都满意。」「本课程学员九成实现了收入翻倍。」「这种药的缓解率达到百分之八十五。」「The new treatment cures ninety percent of patients.」「Our product achieves an eighty percent success rate.」「After the training, ninety percent of students doubled their income.」（模块层矩阵攻击 12/12、良性 10/10，见 src/baseline-omission.js）。判据**双腿共现 + 三组豁免，缺一不判**：腿① RATE_RESULT 比例结果——治愈率/缓解率/成功率/满意率/满意度/达标率/留存率/复购率/完成率/合格率/通过率/有效率/好评率/完课率/及格率/转化率/退货率/退订率/增幅/降幅/中奖率/命中率/占有率（EN cure/recovery/success/satisfaction/retention/pass/completion/response/conversion rate）或腿①b RATE_RESULT_VERB 结果动词×比例（治愈/治好了/缓解/改善/满意/认可/达标/完成/通过/留存/复购/翻倍/提升 × 九成/八成/百分之N/N% / ninety percent / N out of N）；腿② CLAIM_EFFECT 疗效/效果断言（高达/达到/惊人/显著/明显/完胜/效果看得见/证明有效/疗效确切/遥遥领先/都很满意/大获成功/好评如潮/很成功/成效显著；EN achieves/delivers/proves/remarkable/impressive/dramatic/industry-leading/overwhelmingly positive/cures…percent）。缺腿不判——只报数字无效果断言（「治愈率90%，待验证」）是中性披露，归 verify 前的 unsupported_claim。边界：statistical_misleading（第58维）管**基数小到没意义**（样本 2→8 人），要求句中给出绝对量；本族可完全无数字细节、只给大比例，错在无参照系——它给了大基数（样本量 12000）会早退放过，而「样本量 12000 的治愈率九成」若无对照组仍是本族；percentage_overflow 管**百分比超 100** 的算术错误，本族百分比完全合法；base_rate_neglect（第169维）管**阳性信号→高置信后验**（检测阳性所以几乎肯定得病），错在忽略先验，本族错在缺对照组、腿②是疗效断言而非置信模态；weak_evidence_strong_claim（第245维）管**证据强度与结论强度不匹配**的泛化结构，不特指比例结果缺对照；unsupported_claim 管泛化无依据断言，本族有依据（百分比结果）、错在依据不完整。verify 级——单句可能是合规披露中的一句、转述他人宣传话术、或作者正要批判该数据缺对照；verify 的含义是「这个比例结果没有对照参照系，需要补上对照组、基线或分母口径才能判断它是否构成疗效证据」，调用方应要求补对照数据，而不是接受孤立百分比当效果证明。明确不判（豁免）：①对照/基线纪律语言在场（对照组/控制组/基线组/基线值/安慰剂/双盲/随机对照/RCT/历史对照/行业均值/基准值/分母/样本量/参与人数/统计口径/与…相比/环比/同比；EN control group/placebo/randomized/baseline/benchmark/compared with/versus/sample size/out of N）；②数字被质疑或待核验的元陈述（需要验证/数据存疑/样本太小/缺乏对照/孤证/尚未核验/未公布；EN unverified/needs verification/sample too small/lacks control/insufficient evidence）；③统计教学/谬误分析转述（谬误/案例教学/反例/典型错误/教学/教材/举例/示例/剖析；EN fallacy/case study/for example/illustrates/textbook）。",
     // [r366] 第 259 维度 existential_fallacy（存在谬误）guidance。
@@ -6173,6 +6199,10 @@ function discriminate(text, evidence = [], contentMode) {
     // （来源不可指认）/completion_evidence（完成宣称缺完成证据）均不覆盖
     // 「核验动作在场但轨迹缺失」这一结构，rewrite/block 会误伤正常披露。
     'claimed_verification_without_trail',
+    // [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误）进 VERIFY_DIMS。
+    // 同 survivor_time_bias(226)/baseline_omission(268) 先例：本族是筛查
+    // 效能宣称的口径误读（单句可能是正当的 RCT 结论转述），verify 级。
+    'lead_time_bias',
   ]);
   // pass：无问题通过
 
@@ -6650,6 +6680,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r400 接线] 第 269 维度 claimed_verification_without_trail 补登记
       // （空核验宣称）。cvw——claimed verification without trail 缩写。
       claimed_verification_without_trail: cvw,
+      // [r402 接线] 第 270 维度 lead_time_bias 补登记（领先时间偏误：筛查
+      // 提前确诊时点造成的生存期假性延长）。ltb——lead time bias 缩写。
+      lead_time_bias: ltb,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6843,6 +6876,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r400 接线] 第 269 维度 claimed_verification_without_trail 补登记
     // （空核验宣称）。cvw——claimed verification without trail 缩写。
     claimed_verification_without_trail: cvw,
+    // [r402 接线] 第 270 维度 lead_time_bias 补登记（领先时间偏误：筛查
+    // 提前确诊时点造成的生存期假性延长）。ltb——lead time bias 缩写。
+    lead_time_bias: ltb,
     // [r323] 第 255 维度 red_herring 补登记（转移话题/偷换论题：用
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。

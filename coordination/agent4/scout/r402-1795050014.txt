@@ -1,0 +1,26 @@
+=== r402 SCOUT Thu Nov 19 01:00:14 UTC 2026 ===
+--- HN: hallucination detection ---
+22p Real-time AI hallucination detection with timeplus: A chess example | https://www.timeplus.com/post/ai-chess-hallucination-detection
+7p HDM-1 beats GPT-4o-mini in LLM hallucination detection tasks | https://www.aimon.ai/sandbox
+5p An open source common knowledge and context based Hallucination Detection Model | https://huggingface.co/AimonLabs/hallucination-detection-model
+4p Show HN: HalluMix – A Benchmark for Real-World LLM Hallucination Detection | https://huggingface.co/blog/quotientai/hallumix
+3p Show HN: UQLM – Closed-book hallucination detection with UQ | https://github.com/cvs-health/uqlm
+3p Hallucination Detection Comparison | https://blueguardrails.com/en/blog/hallucination-detection-comparison
+3p Fathom: AI hallucination detection from SAE activation geometry (pre-registered) | https://zenodo.org/records/19382453
+2p Domain-Specific Hallucination Detection in Large Language Models | https://arxiv.org/abs/2609.11878
+--- HN: claim verification ---
+9p Stripe closed our non-profit's account with 0% | 
+9p Show HN: Stamp – A Cryptographic Identity System | 
+1p Show HN: Factcheck – An open-source YouTube fact-checker. I need your help | https://github.com/humanchaos/factcheck
+4p Troy Hunt analyzed the Carhartt breach with LLMs | https://www.troyhunt.com/a-cautionary-tale-about-data-breach-claims-verification-and-carhartt/
+157p Users claim Discord's age verification can be tricked with video game characters | https://www.thepinknews.com/2025/07/25/discord-video-game-characters-age-verification-checks-uk-online-safety-act/
+3p NASA veteran's propellantless drive claim awaits independent verification | https://www.popularmechanics.com/science/a74399234/nasa-veteran-says-drive-needs-no-propellant-survived-independent-test/
+1p Age verification biz claims no-payment model for 40% of Brits ahead of pr0n ban | https://www.theregister.co.uk/2019/05/08/age_verification_biz_claims_no_payment_model/
+2p Show HN: AutoManus MCP Server – create a sales rep agent from Claude in 1 min [video] | https://www.youtube.com/watch?v=4Mdzehq4ghg&list=PLE9hy4A7ZTmpGq7GHf5tgGFWh2277AeDR&index=37
+--- S2: evidence sufficiency claim verification ---
+--- GitHub: hallucination detection ---
+1217* cvs-health/uqlm |  [JMLR 2026] UQLM: A Python package for LLM hallucination detection using uncertainty quan
+1141* EdinburghNLP/awesome-hallucination-detection | List of papers on hallucination detection in LLMs.
+635* potsawee/selfcheckgpt | SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for Generative Large Languag
+371* GingerCohle/VLMCSHFG | This is the official code repo for "Vision-Language Models Empowered Nighttime Object Dete
+316* Infosys/Infosys-Responsible-AI-Toolkit | The Infosys Responsible AI toolkit incorporates various features including safety, securit

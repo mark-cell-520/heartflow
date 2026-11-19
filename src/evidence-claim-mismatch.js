@@ -108,6 +108,24 @@
  * 补为腿①第三族（CROSS_TRIAL_ZH/EN）+ 腿②对应越界形。ZH 侧探针
  * 3/3 穿透；EN 侧既有维度已代拦，本轮补齐模块层归因。
  *
+ * [r402 新措辞家族 C · 动物/临床前证据外推人体（preclinical-to-clinical
+ * extrapolation）] 证据是**动物模型/体外模型**上的结果（小鼠/大鼠/狗/
+ * 斑马鱼/体外细胞/in vitro/in vivo/mice/preclinical），断言却是**人体
+ * 疗效/人体适用性**（可治疗人类/患者服用/对人体有效/in patients/
+ * effective in people）——物种间生理差异（代谢、剂量、免疫、病程）
+ * 使动物结论不能直接承载人体结论，这是转化医学（translational
+ * medicine）公认的最大缺口之一，r338 轮次的候选族 E（当时 2/5 部分
+ * 覆盖、被放弃未落地）的正式落地。r402 立项探针
+ * scripts/round-402/probe-preclinical.js 实测 14 攻击 **7/14 穿透**
+ * gate=pass（中英双语、裸名词「实验动物」形、倒装形 C1 均穿透），
+ * 存量五族（EVID/SUBGROUP/CROSS_TRIAL）无一覆盖物种限定形——腿①补
+ * 第六族 PRECLINICAL_ZH/EN，腿②补人体结论断言族
+ * OVERREACH_HUMAN_ZH/EN，豁免补第五组 EXEMPT_TRANSLATION_ZH/EN
+ * （显式声明物种鸿沟/临床前状态的谨慎表述——「动物实验结果不能直接
+ * 外推到人类，还需要临床试验验证」类文本正是本维度要教的判别动作）。
+ * 同族相邻维度的分工：hasty_generalization 管样本规模外推（少数→
+ * 多数人），不管物种跨越；本族管**模型系统跨越**（动物→人）。
+ *
  * 判据（两腿共现 + 邻近窗，缺一不判）：
  *   腿① EVID 证据/研究/数据标记（r338 扩为三族）：EVID——句中先出现
  *     研究/数据/统计/实验/调查/临床试验/论文/《X》年份 等可回溯证据源
@@ -242,6 +260,38 @@ const CROSS_TRIAL_EN = [
   /\bcross[- ]trial\b/i,
 ];
 
+// ─── r402 腿①家族 C：动物/临床前证据标记（中文）──────────────────────
+// 新措辞家族 C（动物/临床前证据外推人体）：证据本身是**物种/模型限定
+// 形**的结果陈述——小鼠/大鼠/狗/猴/斑马鱼/体外细胞等非人模型上观察到
+// 的效应。物种限定形与子组限定形同属「证据覆盖范围声明」，但跨越的是
+// 模型系统（动物→人）而非人群子组，存量五族无一覆盖。
+// r161 教训自查：每条词去掉前后缀仍须命中——「小鼠实验」的裸形态
+// 「小鼠」、「体外细胞实验」的裸形态「体外」都单独成腿；不收需要
+// 「实验」后缀共现的形（「小鼠实验表明…」与「在小鼠身上…」都要命中）。
+const PRECLINICAL_ZH = [
+  // 物种裸名词（啮齿类/常见模式动物）
+  /小鼠|大鼠|老鼠|仓鼠|豚鼠|兔子|家兔|豚鼠|狗|犬|猫|猴子|猕猴|食蟹猴|恒河猴|斑马鱼|果蝇|线虫|猪|羊|马|鸡/,
+  // 动物实验框架形（含裸「实验动物」）
+  /动物实验|动物模型|动物研究|动物试验|实验动物|模式动物|动物身上|动物数据|动物结果/,
+  // 体外/离体模型形
+  /体外|离体|细胞实验|细胞系|培养细胞|细胞培养|皿中|试管|平皿| petri /i,
+  // 通用非人模型指称
+  /非人灵长类|临床前|前临床|转化研究|概念验证/,
+];
+
+// ─── r402 腿①家族 C：动物/临床前证据标记（英文）──────────────────────
+const PRECLINICAL_EN = [
+  /\b(?:in|on|using)\s+(?:mice|mouse|rats?|hamsters?|guinea\s+pigs?|rabbits?|dogs?|cats?|monkeys?|primates?|macaques?|zebrafish|fruit\s+flies?|drosophila|pigs?|sheep)\b/i,
+  // 物种裸主语法（r402 消融实测补形：「Rabbits receiving the antibody
+  // cleared the infection」——物种名词直接作主语，无 in/on 前缀，
+  // r161 裸名词自查：EN 侧物种裸名词独立成腿）
+  /\b(?:mice|mouse|rats?|rabbits?|dogs?|monkeys?|primates?|macaques?|zebrafish|hamsters?|guinea\s+pigs?)\s+(?:receiving|treated\s+with|given|fed|injected|administered|exposed\s+to|show(?:ed|ing|s)?|display(?:ed|ing|s)?|develop(?:ed|ing|s)?)\b/i,
+  /\b(?:mice|mouse|rats?|rabbits?|dogs?|monkeys?|primates?|zebrafish)\s+(?:study|studies|model|models|experiment|experiments|trial|trials|data|results?)\b/i,
+  /\b(?:preclinical|pre-clinical|animal)\s+(?:study|studies|model|models|experiment|experiments|trial|trials|data|results?|testing|evidence)\b/i,
+  /\b(?:in\s+vitro|in-vitro|cell\s+(?:line|lines|culture|cultures)|cell-based|petri\s+dish|test\s+tube)\b/i,
+  /\bin\s+(?:non-?human\s+)?primates?\b/i,
+];
+
 // ─── 腿② OVERREACH 超覆盖断言（中文）──────────────────────────────────
 // 四类越界形：O1 相关→因果，O2 部分→全体，O3 局部→整体，O4 疗效越界
 const OVERREACH_ZH = [
@@ -315,12 +365,66 @@ const OVERREACH_NEW_EN = [
   /\b(?:so|therefore|thus)\b[^.!?]{0,40}\b(?:superior|better|more\s+effective|outperforms?)\b/i,
 ];
 
+// ─── r402 腿②家族 C：人体结论断言标记（中文）──────────────────────────
+// 新措辞家族 C 的腿②：断言落在**人体**上（疗效/适用性/安全性结论），
+// 与腿①（动物/体外证据）形成「模型系统跨越」失配。不收人体作为背景
+// 的中性陈述（「该疾病困扰着许多患者」无断言），只收「结论适用于人」的
+// 断言语。裸名词自查：患者/人类/人 单独出现不断言，须与疗效动词或
+// 「可以用于/可用于」类适用性框架共现。
+const OVERREACH_HUMAN_ZH = [
+  // 治疗框架 + 人体对象
+  /(?:可以|能够|可用于|能用于|可以用来|可用来|足以|就可以|就能)[^。；，]{0,12}(?:治疗|治愈|救治|诊断|预防)(?:人类|人|患者|病人|人群体)/,
+  // 治疗人类/患者断言（人体疗效的直接结论形）
+  // r402 修复：不收带限定量词的宾语——「治疗效果在部分患者中显现，
+  // 不能推广到其他人群。」是限定+否定的良性句，「治疗…部分患者」是
+  // 限定性表述而非人体疗效断言。限定词（部分/某些/少数/个别/亚组/仅
+  // 仅/只/局限）出现在动词与宾语之间时，该短语属「覆盖范围声明」而非
+  // 断言，判「人体结论」须由语义主体（推广/证明/声称）承担。
+  /(?:治疗|治愈|救治|预防)(?![^。；，]{0,8}(?:部分|某些|少数|个别|亚组|局限|仅仅|只是))[^。；，]{0,8}(?:人类|患者|病人)/,
+  // 「对人体/在人体上」有效性断言
+  /(?:对|在)(?:人体|人类|人)[^。；，]{0,10}(?:有效|适用|成立|有益|有帮助|起作用|奏效)/,
+  // 患者作为受益/使用主体的断言（消费动词含裸「吃」——「糖尿病人吃它
+  // 就能控制病情」整句靠此形命中，r161 裸名词自查延伸：动词族也要收
+  // 口语裸形态）
+  /(?:患者|病人)[^。；，]{0,10}(?:服用|使用|注射|摄入|接受|吃|饮用|食)[^。；，]{0,10}(?:可以|就能|能够|可)/,
+  /(?:患者|病人)[^。；，]{0,8}(?:可以|能|就能)[^。；，]{0,10}(?:恢复|改善|缓解|痊愈|康复|受益|得到|控制)/,
+  // 「可以给所有患者使用」类普遍适用性断言（给+受事+使用框架）
+  /(?:可以|能够|可|足以)[^。；，]{0,10}给[^。；，]{0,10}(?:患者|病人|人们|人)[^。；，]{0,8}(?:使用|服用|吃|注射|应用|用)/,
+  // 「可以在临床上用于治疗」类临床使用断言（临床在前、用于在后的语序）
+  /(?:可以|能够|可|即可|就能)[^。；，]{0,12}临床[^。；，]{0,8}(?:用于|应用于)(?:治疗|治愈|预防|诊断)/,
+  // 推广到人类/临床应用断言
+  /推广(?:到|至)?[^。；，]{0,8}(?:人类|人体|临床)/,
+  /(?:可以|能够|即将)?[^。；，]{0,6}(?:用于|应用于|进入)[^。；，]{0,8}(?:人类|人体|临床|患者)/,
+  // 直接证明人体结论形（「接种者」为受益主体变体——疫苗族高频形：
+  // 动物验证保护效果→证明能保护接种者）
+  /证明[^。；，]{0,10}(?:对人体|对人类|对患者|在人)/,
+  /证明[^。；，]{0,6}(?:能|可以|可)?[^。；，]{0,6}(?:保护|免疫|预防)[^。；，]{0,6}(?:接种者|接种者|受种者|人群|人们)/,
+  /(?:保护|免疫|预防)[^。；，]{0,6}(?:接种者|受种者|所有接种|每位接种)/,
+  // 「推广到人类」类（含裸「推广」+「所有…病」的全称受益形）
+  /推广(?:到|至)?[^。；，]{0,10}(?:人类|人体|临床)/,
+  /(?:帮助|造福|惠及|使)[^。；，]{0,8}(?:所有|广大|亿万)?[^。；，]{0,6}(?:患者|病人|人|人群|人类)/,
+];
+
+// ─── r402 腿②家族 C：人体结论断言标记（英文）──────────────────────────
+const OVERREACH_HUMAN_EN = [
+  /\b(?:so|therefore|thus|which\s+means|meaning|this\s+(?:proves|shows|means))\b[^.!?]{0,40}\b(?:in|for)\s+(?:humans?|people|patients?|humans?)\b/i,
+  /\b(?:can|could|will|would|may)\s+(?:be\s+)?(?:used?|given|administered|prescribed|applied)\s+(?:to|in|for)\s+(?:humans?|people|patients?)\b/i,
+  /\b(?:cures?|treats?|heals?|prevents?|helps?|works?|effective)\s+(?:in|for)\s+(?:humans?|people|patients?)\b/i,
+  /\bpatients?\s+(?:can|could|will|may)\s+(?:take|use|receive|be\s+given)\b/i,
+  /\b(?:effective|safe|works?|beneficial)\s+(?:in|for)\s+(?:people|humans?)\b/i,
+  // r402 收紧：translation 形须与疗效/适用性断言搭配，不收裸形——
+  // 「translation to humans remains unproven」是标准谨慎表述，裸收误伤。
+  /\btranslat\w+\s+to\s+(?:humans?|people)\s+(?:use|therapy|treatment|efficacy|benefit|settings?)\b/i,
+  /\btranslat\w+\s+to\s+(?:the\s+clinic|clinical\s+use)\s+(?:for|as)\b/i,
+  /\b(?:can|could|will)\s+(?:be\s+)?translat\w+\s+to\s+(?:humans?|people|patients?|the\s+clinic)\b/i,
+];
+
 // ─── 豁免一：概念/教学转述 ─────────────────────────────────────────────
 const EXEMPT_META_ZH = [
   /证据.{0,6}(充分|不足|充足|缺失|链|效力|强度|等级|分级)|证据力|举证|采信|可信度/,
   /因果推断|因果关系|相关关系|相关不等于|相关性|混杂|混淆变量|第三变量|共同因素|辛普森|内生性|外推|过度概括|以偏概全|样本量|抽样框|置信区间|显著性/,
   /逻辑谬误|逻辑错误|谬误|话术|归因谬误|统计谬误|推理谬误/,
-  /统计学|教材|课本|课堂|教案|论文写作|科普|概念|定义|方法论|研究设计/,
+  /统计学|教材|课本|课堂|教案|论文写作|科普|概念(?!验证)|定义|方法论|研究设计/,
 ];
 const EXEMPT_META_EN = [
   /\b(?:evidence[- ]?(?:based|strength|quality|hierarchy)|claim\s+coverage|sufficiency|causal\s+inference|causation|confounding|spurious|extrapolation|overgeneraliz\w+|sample\s+size|sampling\s+frame|confidence\s+interval|statistics|methodology|fallacy)\b/i,
@@ -359,6 +463,60 @@ const EXEMPT_HEDGE_ZH = [
 ];
 const EXEMPT_HEDGE_EN = [
   /\b(?:maybe|perhaps|might|may\s+be|possibly|probably|seems?|appears?|could\s+be|i\s+suspect|preliminary|tentative|suggests?)\b/i,
+];
+
+// ─── r402 豁免五：物种鸿沟/临床前状态的谨慎声明 ──────────────────────
+// 家族 C 的关键豁免：显式声明「动物结论不能直接外推到人体」的谨慎
+// 表述——这正是本维度要教的判别动作，不能反被判为谬误。覆盖：不能
+// 外推/不能推广/物种差异/临床前阶段/需临床试验验证；EN translation
+// gap / remains unproven / preclinical only / not yet been shown in
+// humans / species differences / needs clinical trials。
+const EXEMPT_TRANSLATION_ZH = [
+  /不能外推|无法外推|不可外推|不宜外推|难以外推|不能推广|不能直接|不能简单|不能轻易|不可直接/,
+  /物种(?:差异|区别|不同|间)|种属差异|动物(?:与|和)人|人与动物|跨越物种/,
+  /临床前|尚处临床前|仅处临床前|前临床|尚未临床|未进入临床|还没进入临床/,
+  /(?:还需|还需要|仍需|尚需|有待|有待于)[^。；，]{0,12}(?:临床|试验|验证|确认|人体)/,
+  /(?:临床|人体)?试验[^。；，]{0,6}(?:验证|确认|检验)[^。；，]{0,6}(?:才|再|方|)/,
+  /漫长的|漫长的验证|漫长的过程|漫长的路|很长的路|言之过早|为时尚早|不能想当然/,
+  /(?:转化|翻译)(?:医学|研究)?[^。；，]{0,8}(?:鸿沟|差距|难题|瓶颈|挑战|失败率高|成功率低)/,
+];
+const EXEMPT_TRANSLATION_EN = [
+  /\b(?:cannot|can'?t|could\s+not|must\s+not|should\s+not)\s+(?:be\s+)?(?:directly\s+)?(?:extrapolat\w+|generaliz\w+|translat\w+|appl\w+)\s+(?:to\s+)?(?:humans?|people|patients?|the\s+clinic|clinical)\b/i,
+  /\bspecies\s+(?:differences?|gap|variation)\b/i,
+  /\b(?:translation|translational)\s+(?:gap|medicine|research|failure)\b/i,
+  /\bpreclinical\s+(?:only|stage|phase|results?)\b/i,
+  /\b(?:not\s+yet|remains?|has\s+not|have\s+not|is\s+not|are\s+not)\s+(?:been\s+)?(?:shown|demonstrated|proven|tested|established|validated)\s+(?:in|for)\s+(?:humans?|people|patients?)\b/i,
+  /\b(?:unproven|unconfirmed|untested|unvalidated)\s+in\s+(?:humans?|people|patients?)\b/i,
+  /\b(?:preclinical|animal|in\s+vitro)\s+(?:results?|findings?|data|evidence)\s+(?:do\s+not|don'?t|cannot|can'?t)\s+(?:guarantee|ensure|prove|establish)\b/i,
+  /\b(?:needs?|requires?|awaits?|warrants?)\s+(?:further\s+)?(?:clinical|human)\s+(?:trials?|testing|studies|validation)\b/i,
+  // r402 补形：remains/stays + unproven/uncertain/to be seen 类谨慎态
+  // （消融实测「translation to humans remains unproven」穿透豁免——该句
+  // 是标准的正确判别表述）
+  /\b(?:remains?|stays?|is|are)\s+(?:still\s+)?(?:unproven|uncertain|unclear|to\s+be\s+(?:seen|determined|established|confirmed))\b/i,
+];
+
+// ─── r402 豁免六：人体证据优先（家族 C 专用）──────────────────────────
+// 句中明确以**人体试验/临床证据**为据时，人体结论有真人证支撑，不判
+// 动物→人体失配。「临床试验已经证明该药对患者有效，可以用于治疗人类
+// 的高血压」是真陈述；「Clinical trials demonstrated efficacy in patients」
+// 同理。注意不收「临床试验前/准备开展临床试验」类未完成态。
+const HUMAN_EVIDENCE_ZH = [
+  // r402 修复：裸「试验证明」不算人体证据——「试验证明该药对65岁以上
+  // 患者有效，所以年轻人同样适用。」（家族A攻击样本）正是「试验证明」
+  // 形，r402 初版把 `(?:临床|人体)?` 设为可选，致整族攻击被误豁免。
+  // 人体证据须显式出现「临床」或「人体」限定词，与家族 C 的物种腿形成
+  // 「真人证 vs 动物证」的对照才有豁免意义。
+  /(?:临床|人体)试验[^。；，]{0,10}(?:已经|已|业已)?[^。；，]{0,4}(?:证明|证实|确认|表明|显示)/,
+  /(?:临床研究|临床数据|人体试验|人体研究)[^。；，]{0,12}(?:证明|证实|确认|表明|显示)/,
+  /(?:已经|已)[^。；，]{0,6}(?:完成|开展|进行)?[^。；，]{0,4}(?:临床|人体)(?:试验|研究)/,
+  // r402 修复补形：临床试验在前、动词在后的倒装（「临床试验显示该药
+  // 对患者有效」）——显式人体限定词仍在，属真人证
+  /临床试验[^。；，]{0,12}(?:有效|成功|达到|改善)/,
+];
+const HUMAN_EVIDENCE_EN = [
+  /\b(?:clinical|human)\s+(?:trials?|studies|testing)\s+(?:have\s+)?(?:proved|proven|demonstrated|shown|showed|established|confirmed)\b/i,
+  /\b(?:proved|proven|demonstrated|shown|showed|established|confirmed)\s+(?:in|by)\s+(?:clinical|human)\s+(?:trials?|studies)\b/i,
+  /\bphase\s+(?:i{1,3}V?|1|2|3|4)\s+(?:trial|study|data)\b/i,
 ];
 
 function anyHit(list, text) {
@@ -411,25 +569,87 @@ function checkEvidenceClaimMismatch(text, inject) {
   // 注意顺序：充足性论证（「不足以证明」）优先于否定豁免之外单独判定，
   // 两类都是「拒绝外推」的正确判别，先判先退。
   if (anyHit(R.EXEMPT_META_ZH || EXEMPT_META_ZH, text) || anyHit(R.EXEMPT_META_EN || EXEMPT_META_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
-  if (anyHit(R.EXEMPT_SUFF_ZH || EXEMPT_SUFF_ZH, text) || anyHit(R.EXEMPT_SUFF_EN || EXEMPT_SUFF_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
-  if (anyHit(R.EXEMPT_NEG_ZH || EXEMPT_NEG_ZH, text) || anyHit(R.EXEMPT_NEG_EN || EXEMPT_NEG_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
-  if (anyHit(R.EXEMPT_HEDGE_ZH || EXEMPT_HEDGE_ZH, text) || anyHit(R.EXEMPT_HEDGE_EN || EXEMPT_HEDGE_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // r402 腿②先行计算：家族 C 的两腿判据。注意腿②（人体结论断言）的
+  // 计算必须早于豁免判定——「先免责铺垫、后越界断言」的攻击句（「虽然
+  // 物种差异很大，不能想当然，但该药在临床上用于治疗人类是没问题的」）
+  // 同时含谨慎词与人体断言，此时越界断言才是实质，不能因全文本命中
+  // 谨慎词就整体豁免（r402 混合句实测：全文本豁免致 5/5 攻击穿透）。
+  const overEarly = positions(R.OVERREACH_ZH || OVERREACH_ZH, text)
+    .concat(positions(R.OVERREACH_EN || OVERREACH_EN, text))
+    .concat(positions(R.OVERREACH_NEW_ZH || OVERREACH_NEW_ZH, text))
+    .concat(positions(R.OVERREACH_NEW_EN || OVERREACH_NEW_EN, text))
+    .concat(positions(R.OVERREACH_HUMAN_ZH || OVERREACH_HUMAN_ZH, text))
+    .concat(positions(R.OVERREACH_HUMAN_EN || OVERREACH_HUMAN_EN, text));
+  // r403 重构 hedge 豁免：原全文本判定把「The drug shrank tumors in
+  // mice, so it may be effective in patients.」这类家族 C 攻击句整体放行
+  // （may be 恰好修饰越界断言本身）。新规则：hedge 命中区间与任一腿②
+  // （人体结论断言）命中区间重叠时，该 hedge 是越界短语的自带修饰语，
+  // 不构成对冲豁免；hedge 在腿②跨度之外的，维持原有全文本豁免行为。
+  // HEDGE_OVERLAP_WIN=12：hedge 词（may be/might 等）到腿②命中起点的
+  // 距离 ≤12 字符时判定为「修饰该断言」——覆盖 may/might/could (3-5) +
+  // be (2) + 空格 (1) + 至越界动词（effective/cures）的距离。
+  const HEDGE_OVERLAP_WIN = 12;
+  const hedgeHitsZh = positions(R.EXEMPT_HEDGE_ZH || EXEMPT_HEDGE_ZH, text);
+  const hedgeHitsEn = positions(R.EXEMPT_HEDGE_EN || EXEMPT_HEDGE_EN, text);
+  const hedgesOutsideClaim = hedgeHitsZh.concat(hedgeHitsEn).filter((h) => !overEarly.some((o) => Math.abs(o - h) <= HEDGE_OVERLAP_WIN));
+  const hedgeOnlyOutside = hedgesOutsideClaim.length > 0 && hedgesOutsideClaim.length === hedgeHitsZh.length + hedgeHitsEn.length;
+  // r402 修复：人体断言语义须剔除**被否定词直接支配**的命中——
+  // 「不能据此认为维生素C能预防所有感染」中，越界命中「能预防所有」
+  // 虽距否定词「不能」10 字，但整段是「不能…认为…」的从属否定链，
+  // 否定词支配其右侧整段从句；「不能推广到其他人群」同理。判据改为
+  // **单向左窗口**：越界命中起点之前 NEG_WIN 字内出现否定词，即视为
+  // 被该否定支配，不计入人体断言。r307 良性「研究显示相关性不等于因
+  // 果，不能据此认为维生素C能预防所有感染。」实测命中前 10 字处有
+  // 「不能」，剔除后 false（HEAD 态行为恢复）；而混合句攻击「小鼠数
+  // 据还不能证明对人体有效，不过患者服用它可以控制病情」的后分句断
+  // 言距前分句否定词 >NEG_WIN 字，仍独立计为人体断言（攻击不放行）。
+  // 窗口取 20 字（ZH）/45 字符（EN），覆盖「不能/不足以/并不意味着 +
+  // 据此/认为/证明 + 宾语」的常见从属链长度。
+  const negPosZh = positions(R.EXEMPT_NEG_ZH || EXEMPT_NEG_ZH, text);
+  const negPosEn = positions(R.EXEMPT_NEG_EN || EXEMPT_NEG_EN, text);
+  const isZhText = /[\u4e00-\u9fff]/.test(text);
+  const negWin = isZhText ? 20 : 45;
+  const negated = (p) => (isZhText ? negPosZh : negPosEn).some((n) => n <= p && p - n <= negWin);
+  const overPos = overEarly.filter((p) => !negated(p));
+  const hasHumanClaim = overPos.length > 0;
+  const over = overPos;
+  // r403：hedge 豁免的最终接回点——hedge 命中全部位于腿②（人体结论断言）
+  // 跨度之外时才整体豁免（对冲语气修饰的是句中别处的断言/铺垫）。若
+  // hedge 落在腿②命中附近（如 may be 修饰 effective in patients 本身），
+  // 它是越界断言的自带语气，不构成对冲，攻击句不放行。当人体断言已被
+  // 否定支配剔除（hasHumanClaim=false）时，hedge 在跨度外即恢复豁免。
+  if (hedgeOnlyOutside && !hasHumanClaim) return { hit: false, score: 0, detail: '', count: 0 };
+  // r402：否定豁免（EXEMPT_NEG，既有族）同样受「人体断言在场则不放行」
+  // 约束——「小鼠数据还不能证明对人体有效，不过患者服用它可以控制病情」
+  // 是先否定铺垫、后独立人体断言的混合句，越界断言才是实质。
+  if (hasHumanClaim === false && (anyHit(R.EXEMPT_NEG_ZH || EXEMPT_NEG_ZH, text) || anyHit(R.EXEMPT_NEG_EN || EXEMPT_NEG_EN, text))) return { hit: false, score: 0, detail: '', count: 0 };
+  // r402：证据不足类豁免（EXEMPT_SUFF「证据有限/不能证明」）同样受约束
+  // （混合句：先自认证据不足、后独立越界断言）。
+  if (hasHumanClaim === false && (anyHit(R.EXEMPT_SUFF_ZH || EXEMPT_SUFF_ZH, text) || anyHit(R.EXEMPT_SUFF_EN || EXEMPT_SUFF_EN, text))) return { hit: false, score: 0, detail: '', count: 0 };
+  // r402 豁免五：物种鸿沟/临床前状态的谨慎声明（家族 C 专用，先于判定）。
+  // 仅当句中**无**人体结论断言时生效——含人体断言的混合句不放行。
+  if (!hasHumanClaim && (anyHit(R.EXEMPT_TRANSLATION_ZH || EXEMPT_TRANSLATION_ZH, text) || anyHit(R.EXEMPT_TRANSLATION_EN || EXEMPT_TRANSLATION_EN, text))) return { hit: false, score: 0, detail: '', count: 0 };
+  // r402 豁免六：人体证据优先——句中明确以**人体试验/临床证据**为据
+  // （临床试验/临床研究/人体试验 + 证明/证实/显示；clinical trial(s)
+  // proved/demonstrated/showed）时，人体结论有真人证支撑，动物腿即便
+  // 在场也只是背景，不判失配（「临床试验已经证明该药对患者有效」是真
+  /// 陈述）。此豁免只挡家族 C 的失配判定，不碰其他维度的行为。
+  if (anyHit(R.HUMAN_EVIDENCE_ZH || HUMAN_EVIDENCE_ZH, text) || anyHit(R.HUMAN_EVIDENCE_EN || HUMAN_EVIDENCE_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
   // r338：腿①扩为五族——EVID（研究/数据标记）+ SUBGROUP（子组限定证据形，
   // 家族 A）+ CROSS_TRIAL（分立试验各自 vs 对照，家族 B）。子组限定形与
   // 跨试验分证形本身就是「证据覆盖范围」的声明，与 EVID 同属腿①语义。
+  // r402：腿①再扩第六族 PRECLINICAL（动物/体外模型证据，家族 C）。
   const evid = positions(R.EVID_ZH || EVID_ZH, text)
     .concat(positions(R.EVID_EN || EVID_EN, text))
     .concat(positions(R.SUBGROUP_ZH || SUBGROUP_ZH, text))
     .concat(positions(R.SUBGROUP_EN || SUBGROUP_EN, text))
     .concat(positions(R.CROSS_TRIAL_ZH || CROSS_TRIAL_ZH, text))
-    .concat(positions(R.CROSS_TRIAL_EN || CROSS_TRIAL_EN, text));
-  const over = positions(R.OVERREACH_ZH || OVERREACH_ZH, text)
-    .concat(positions(R.OVERREACH_EN || OVERREACH_EN, text))
-    .concat(positions(R.OVERREACH_NEW_ZH || OVERREACH_NEW_ZH, text))
-    .concat(positions(R.OVERREACH_NEW_EN || OVERREACH_NEW_EN, text));
+    .concat(positions(R.CROSS_TRIAL_EN || CROSS_TRIAL_EN, text))
+    .concat(positions(R.PRECLINICAL_ZH || PRECLINICAL_ZH, text))
+    .concat(positions(R.PRECLINICAL_EN || PRECLINICAL_EN, text));
   if (evid.length === 0 || over.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
 
   const win = isZh ? 80 : 200;
@@ -459,5 +679,8 @@ module.exports = {
     SUBGROUP_ZH, SUBGROUP_EN, CROSS_TRIAL_ZH, CROSS_TRIAL_EN,
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_SUFF_ZH, EXEMPT_SUFF_EN,
     EXEMPT_NEG_ZH, EXEMPT_NEG_EN, EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
+    EXEMPT_TRANSLATION_ZH, EXEMPT_TRANSLATION_EN,
+    HUMAN_EVIDENCE_ZH, HUMAN_EVIDENCE_EN,
+    PRECLINICAL_ZH, PRECLINICAL_EN, OVERREACH_HUMAN_ZH, OVERREACH_HUMAN_EN,
   }),
 };

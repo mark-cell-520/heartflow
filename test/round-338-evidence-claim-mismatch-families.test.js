@@ -101,12 +101,18 @@ t('良性-七条零误伤（模块层不命中 + gate 层放行）', () => {
 // 说明：A1/A6（因此…所有/works for everyone）另有 r307 存量 O2 形承重，
 // 故 SUBGROUP 注入验证的是「该族标记承重」的其余样本；OVERREACH_NEW
 // 注入删掉 r338 全部新增越界形，验证腿②新增部分各自承重。
+// r402 修正：OVERREACH_NEW 注入组须同时删 OVERREACH_HUMAN（家族 C 新增
+// 的腿②越界族）——A6「It was effective in patients over 65, which means
+// younger patients benefit too.」的腿②由 OVERREACH_NEW_EN（which means
+// …younger）与 OVERREACH_HUMAN_EN（effective in）双族承重，只删前者时
+// 后者仍支撑命中。两族同属腿②越界断言语义，注入组一并删除才符合
+// 「删后负责样本全部变红」的原意。
 const INJ = {
   SUBGROUP_ZH: { SUBGROUP_ZH: [] },
   SUBGROUP_EN: { SUBGROUP_EN: [] },
   CROSS_TRIAL_ZH: { CROSS_TRIAL_ZH: [] },
   CROSS_TRIAL_EN: { CROSS_TRIAL_EN: [] },
-  OVERREACH_NEW: { OVERREACH_NEW_ZH: [], OVERREACH_NEW_EN: [] },
+  OVERREACH_NEW: { OVERREACH_NEW_ZH: [], OVERREACH_NEW_EN: [], OVERREACH_HUMAN_ZH: [], OVERREACH_HUMAN_EN: [] },
 };
 // 各注入组负责的样本（删后必须不再命中）
 const INJ_OWN = {
@@ -115,7 +121,10 @@ const INJ_OWN = {
   CROSS_TRIAL_ZH: B_ATTACK.slice(0, 3),     // 家族 B 三条 ZH 全部依赖跨试验标记腿①
   CROSS_TRIAL_EN: B_ATTACK.slice(3),        // 家族 B 两条 EN 全部依赖跨试验标记腿①
   OVERREACH_NEW: [
-    // 删新增越界形后不再命中的样本（存量 O2 承重的 A1/A6 除外）
+    // 删新增越界形（含 r402 OVERREACH_HUMAN）后不再命中的样本。
+    // r402 修正：A6 原注释称由存量 O2 承重，实测其腿②由
+    // OVERREACH_NEW_EN + OVERREACH_HUMAN_EN 双新族承重（r307 存量 O2
+    // 不参与），故归本组负责。
     A_ATTACK[1], A_ATTACK[2], A_ATTACK[3], A_ATTACK[4],  // A2-A5 ZH
     A_ATTACK[6], A_ATTACK[7],                            // A7/A8 EN
     B_ATTACK[0], B_ATTACK[1], B_ATTACK[2],               // B ZH 三条
