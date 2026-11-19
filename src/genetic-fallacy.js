@@ -89,8 +89,30 @@
  *   豁免沿用 ETYM_META（评析词源谬误话术本身）＋ 新增 NORM2 自身
  *   的反谬误对冲组（HEDGE，见常量注释）：明确指出「词义会随时代变
  *   化/本义不等于当下用法」的句子只有腿①＋对冲、无规范断言，不判。
- * 良性集：词源事实陈述、词义演变承认、语言学教学、词典释义、明确
- * 否认词源决定当下用法的反谬误陈述。
+ *   良性集：词源事实陈述、词义演变承认、语言学教学、词典释义、明确
+ *   否认词源决定当下用法的反谬误陈述。
+ *
+ * [r418] 新增「考证式古人印证增信族」（etymological fallacy 的增信
+ * 方向）：存量词源族裁「本义→定义/用法/资格」（规范贬损方向），本族
+ * 是同一谬误结构的**增信背书**方向——「这个词源于X，可见古人早已懂
+ * 得Y的真谛」，用起源的古老性冒充命题的真理性。判据同为双腿共现：
+ *   腿① ETYM 词源/本义标记（沿用存量常量）；
+ *   腿② ENDORSE 古人印证增信 = 古人族名词 × 认知/积淀动词，三支：
+ *      a 古人族 + ≤12字 + 认知动词（古人早就把道理说透了）；
+ *      b 古人族 + 早已/早就/果然 + ≤14字 + 认知或积淀动词（祖先早
+ *         已把骨气刻进文化基因）；
+ *      c 可见/足见/足以证明 + ≤10字 + 古人族 + ≤14字 + 认知动词
+ *         （可见古希腊人早已懂得自由的真谛）；
+ *      EN: ancients/Greeks/forefathers + already/long ago +
+ *         understood/figured out，及 shows/proves + 古人族 + already
+ *         + understood 两形。
+ *   豁免三层：ETYM_META、ETYM_HEDGE（沿用）+ ENDORSE_REFUTE（新增：
+ *   「缺乏文献依据/词源不能证明思想史」——明确指出词源不足以证明
+ *   思想史内容的反驳句只有腿①＋反驳，不判）。
+ *   与 appeal_to_tradition（老祖宗传下的就是好——传统整体承袭）射程
+ *   分工：本族管**词源/本义**这一语言事实被用来给立场增信。良性集：
+ *   词源事实陈述、词义演变承认、语言学教学、反驳词源增信的反谬误陈
+ *   述（见 test/round-418-genetic-endorse.test.js）。
  *
  * 明确不判的（豁免——这些是正当的来源采信、事实陈述与概念分析）：
  *   · 正当来源采信：以**验证过程**为据（经过审计/同行评审/临床验证/
@@ -230,6 +252,59 @@ const ETYM_NORM2_EN = new RegExp(
 const ETYM_HEDGE_ZH = /(?:词义|语义|词意|含义|用法)?(?:会|随|已经|早已|都在)?(?:随[着]?[^。！？；\n]{0,6}(?:演变|变化|变迁|发展|更替|扩展|泛化|转移|漂移)|发生了?[^。！？；\n]{0,4}(?:变化|演变|引申|扩展|转移)|早已(?:泛化|演变|变化|转移|引申)|已经(?:泛化|演变|变化|引申|转移|不同)|不能(?:简单|机械|直接)?(?:地)?(?:以|用|拿|按)[^。！？；\n]{0,4}本义|不等于[^。！？；\n]{0,6}(?:当下|现在|如今|今天)|不代表[^。！？；\n]{0,6}(?:当下|现在|如今|今天)|并不决定[^。！？；\n]{0,8}|不应当[^。！？；\n]{0,4}(?:以|用|拿|按)[^。！？；\n]{0,4}本义)/;
 const ETYM_HEDGE_EN = /\b(?:word\s+meanings?\s+(?:change|shift|evolve|drift|broaden)|semantic\s+(?:change|shift|drift)|meaning\s+has\s+(?:changed|shifted|evolved|broadened)|no\s+longer\s+means|does\s+not\s+(?:determine|decide|govern)\s+(?:its\s+)?(?:current|modern|present|today'?s)\s+use|meaning\s+evolves?|evolved?\s+over\s+time|shifted?\s+over\s+time)\b/i;
 
+// ─── [r418] 新族：考证式古人印证增信（etymological fallacy 增信方向）──
+// 存量词源族（r399/r412）裁「本义→定义/用法/资格」（才算/不配叫/其
+// 实在……），方向是**规范贬损**；本族是同一谬误结构的**增信背书**方
+// 向：引用词源不是为了裁定当下用法，而是为了给某个立场增信——
+// 「这个词源于X，可见古人早已懂得Y的真谛」，用「起源的古老性」冒充
+// 「命题的真理性」。判据同为双腿共现（腿①沿用 ETYM，缺一不判）：
+//   腿② ENDORSE 古人印证增信 = 古人族名词 × 认知/积淀动词，
+//      三支：a 古人族 + ≤12字 + 认知动词（古人早就把道理说透了）；
+//      b 古人族 + 早已/早就/果然 + ≤14字 + 认知或积淀动词（祖先
+//      早已把骨气刻进文化基因 / 先贤果然早已参透天道）；
+//      c 可见/足见/足以证明 + ≤10字 + 古人族 + ≤14字 + 认知动词
+//      （可见古希腊人早已懂得自由的真谛）。EN 对应 ancients/Greeks/
+//      forefathers + already/long ago + understood/figured out，以及
+//      shows/proves + 古人族 + already + understood 两形。
+// 豁免三层：ETYM_META（评析词源谬误话术本身）、ETYM_HEDGE（词义演
+// 变/本义≠当下用法的反谬误陈述）、ENDORSE_REFUTE（「缺乏文献依据/
+// 词源不能证明思想史」——明确指出词源不足以证明思想史内容的反驳句
+// 只有腿①＋反驳，是反面教材不是运用）。与既有维度的射程分工：
+// appeal_to_tradition 管「老祖宗传下的就是好」（传统整体承袭），本
+// 族管**词源/本义**这一语言事实被用来给立场增信；genetic 存量路由管
+// 来源→质量贬损或定义裁定，本族管来源→可信性背书，方向相反、措辞
+// 结构正交（无「才算/不配叫/其实是在」裁定词，有「古人早已懂得」
+// 印证结构）。
+// 池化探针 r418（coordination/agent4/probes/r418-probe-pool.js，HEAD
+// 6.8.208）：四家族同池定拨 F1——攻击穿透 12/13（全池最高）、模块层
+// 真零命中 0/13、良性 0/11 本族误伤。真升级②：既有第 131 维的全新
+// 措辞家族，维度计数不变、src/index.js 零改动（同 r406-r417）。
+
+// 古人族名词（中文）：古人/先贤/先民/祖先一族 + 古希腊人/古罗马人一类
+// 复合形（「古希腊人」中「古」与「人」被「希腊」隔开，裸「古人」不命中）。
+const ENDORSE_NOUN_ZH = '(?:古圣先贤|先贤|先哲|先圣|前贤|古圣|往圣|先民|先祖|祖先|老祖宗|前人|古人|古希腊人|古罗马人|古埃及人|古印度人|古巴比伦人|古代希腊人|古代罗马人|古代先哲|古代圣贤|上古之人|远古先民)';
+// 认知/积淀动词表（中文）：懂得/看透/参透一族 + 刻进/融入/积淀一族。
+const ENDORSE_VERB_ZH = '(?:懂得|看懂|看透|参透|悟透|洞察|看穿|明白|理解|想通|说透|讲透|抵达|达到|深知|领会|悟出|悟到|认识|想到|预见|预示|晓得|刻进|融入|写入|浓缩|积淀|渗透|内化)';
+// 腿②（中文）三支：a 古人族＋认知动词；b 古人族＋早已族＋认知/积淀动词；
+// c 可见/足见/足以证明＋古人族＋认知动词。
+const ENDORSE_ZH = new RegExp([
+  '(?:' + ENDORSE_NOUN_ZH + ')[^。！？；]{0,12}(?:' + ENDORSE_VERB_ZH + ')',
+  '(?:' + ENDORSE_NOUN_ZH + ')[^。！？；]{0,4}(?:早已|早就|已然|果然|果真|原来|想必|定然|早)[^。！？；]{0,14}(?:' + ENDORSE_VERB_ZH + ')',
+  '(?:可见|足见|足以证明|可见一斑|印证了|说明了|证明)[^。！？；]{0,10}(?:' + ENDORSE_NOUN_ZH + ')[^。！？；]{0,14}(?:' + ENDORSE_VERB_ZH + ')',
+].join('|'));
+// 腿②（英文）两支：a 古人族＋already/long ago＋认知动词（the ancients
+// had it figured out all along）；b shows/proves＋古人族＋already＋认知
+// 动词（which shows the Greeks already understood compassion）。
+const ENDORSE_EN = new RegExp([
+  "\\b(?:the\\s+)?(?:ancients|forefathers|forebears|sages|philosophers|greeks|romans|ancestors|people\\s+back\\s+then)\\b[^.]{0,30}?\\b(?:already|long\\s+ago|all\\s+along|had\\s+it)\\b[^.]{0,25}?\\b(?:understood|knew|figured\\s+out|grasped|saw|recognized|comprehended|discovered|realized|mastered)\\b",
+  "\\b(?:shows?|proves|proving|demonstrates?|indicating|meaning)\\b[^.]{0,40}?\\b(?:the\\s+)?(?:ancients|greeks|forefathers|forebears|sages|ancestors)\\b[^.]{0,25}?\\b(?:already|long)\\b[^.]{0,20}?\\b(?:understood|knew|figured\\s+out|grasped|comprehended|discovered|realized)\\b",
+].join('|'), 'i');
+// [r418] 本族反谬误对冲：明确指出「词源不足以证明思想史内容」的反驳句
+// （所谓古人早已想通的说法缺乏文献依据 / 词源不能证明思想史）——只有
+// 腿①＋反驳，是反面教材不是运用，不判。
+const ENDORSE_REFUTE_ZH = /(?:缺乏|缺少|没有|无)[^。！？；]{0,10}(?:文献依据|文献|史料依据|史实依据|实据|证据|依据|证明)|(?:不能|无法|不足以|未必|难以)[^。！？；]{0,8}(?:证明|说明|印证)[^。！？；]{0,10}(?:思想史|古人|先贤|先民|祖先|历史|智慧|真谛|道理|境界|水平)/;
+const ENDORSE_REFUTE_EN = /\b(?:lacks?|without|little|no)\s+(?:documentary\s+|historical\s+|textual\s+|archaeological\s+)?(?:evidence|basis|support|proof)\b[^.]{0,30}\b(?:that|showing|to\s+show)\b|(?:cannot|can'?t|does\s+not|doesn'?t)\s+(?:be\s+)?prov(?:e|en|ing)\b[^.]{0,40}\b(?:that|what|thought|thinking)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空白正则替换指定常量
@@ -327,10 +402,42 @@ function checkGeneticFallacy(text, inject) {
     }
   }
 
+  // ─── [r418] 新路由：考证式古人印证增信（词源谬误族增信方向）────────
+  // 双腿共现：腿① 词源/本义标记 × 腿② ENDORSE 古人印证增信。
+  // 存量路由裁「本义→定义/资格/当下行为裁定」（规范贬损方向），本路
+  // 由裁「本义→古人早已懂得→立场可信」（增信背书方向），同一谬误结
+  // 构的反方向，措辞结构正交（见常量块射程分工注释）。对冲三层先于判
+  // 定：ETYM_META（评析词源谬误本身）、ETYM_HEDGE（词义演变反谬误陈
+  // 述）、ENDORSE_REFUTE（词源不足以证明思想史的反驳句）。
+  const ENDORSE_ZH_ = R.ENDORSE_ZH || ENDORSE_ZH;
+  const ENDORSE_EN_ = R.ENDORSE_EN || ENDORSE_EN;
+  const ENDORSE_REFUTE_ZH_ = R.ENDORSE_REFUTE_ZH || ENDORSE_REFUTE_ZH;
+  const ENDORSE_REFUTE_EN_ = R.ENDORSE_REFUTE_EN || ENDORSE_REFUTE_EN;
+
+  if (etymZh || etymEn) {
+    if (ETYM_META_ZH_.test(text) || ETYM_META_EN_.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+    if (ETYM_HEDGE_ZH_.test(text) || ETYM_HEDGE_EN_.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+    if (ENDORSE_REFUTE_ZH_.test(text) || ENDORSE_REFUTE_EN_.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+    if (ENDORSE_ZH_.test(text) || ENDORSE_EN_.test(text)) {
+      return {
+        hit: true,
+        score: 0.6,
+        count: 1,
+        detail: isZh ? '词源谬误×古人印证增信(zh)' : '词源谬误×古人印证增信(en)',
+      };
+    }
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
   checkGeneticFallacy,
-  __internals: () => ({ SOURCE_ZH, SOURCE_EN, QUALITY_ZH, QUALITY_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ETYM_ZH, ETYM_EN, ETYM_NORM_ZH, ETYM_NORM_EN, ETYM_META_ZH, ETYM_META_EN, ETYM_NORM2_ZH, ETYM_NORM2_EN, ETYM_HEDGE_ZH, ETYM_HEDGE_EN }),
+  __internals: () => ({ SOURCE_ZH, SOURCE_EN, QUALITY_ZH, QUALITY_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ETYM_ZH, ETYM_EN, ETYM_NORM_ZH, ETYM_NORM_EN, ETYM_META_ZH, ETYM_META_EN, ETYM_NORM2_ZH, ETYM_NORM2_EN, ETYM_HEDGE_ZH, ETYM_HEDGE_EN, ENDORSE_ZH, ENDORSE_EN, ENDORSE_REFUTE_ZH, ENDORSE_REFUTE_EN }),
 };
