@@ -1,0 +1,10 @@
+[RED] sv1_survived → 停命中 | 这套拳法流传了四百年，要是没用早就失传了
+[RED] sc1_counterfactual_death → 停命中 | 祖宗传下来的规矩用了上千年，要是害人早就亡了
+[RED] sc2_proven_worth → 停命中 | 这道菜的做法传了五百年，能不好吃吗
+[RED] sv1_survived → 停命中 | A remedy that has survived a thousan
+[RED] sv2_stood → 停命中 | The temple has stood here for eight 
+[RED] sc1_would_have → 停命中 | If the old way were wrong, it would 
+[RED] sc2_cannot_be → 停命中 | A remedy that has survived a thousan
+[RED] sc3_proves_worth → 停命中 | This technique has been passed down 
+
+r408 负例删条: 8 注入 → 8 变红 / 0 未变红
