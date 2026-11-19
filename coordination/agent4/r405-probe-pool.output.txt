@@ -1,0 +1,86 @@
+
+=== F3_affirming_disjunct_extension 攻击（漏判=checkOutput pass）===
+  [pass] none | 他在北京或者上海工作，既然有人在北京见到他，那就说明他不在上海
+  [pass] none | 他在北京或者上海工作，昨天有人在北京见到他，上海出局
+  [verify] circular_reasoning | He works in Beijing or Shanghai; someone s
+  [pass] none | She is in the library or the lab; classmat
+  [pass] none | 方案A或者方案B，评委们选了A，B落选
+  [pass] none | 报告是用 Python 或者 R 写的，作者承认用了 Python，R 可以排除了
+  [verify] circular_reasoning | The meeting is on Monday or Tuesday; the i
+  [pass] none | 机票是国航或者东航的，订单页显示国航，东航可以划掉了
+  [verify] circular_reasoning | The bug is in the parser or the lexer; the
+  [verify] false_dilemma | 他不是去了图书馆就是去了实验室，同学说在图书馆看到他了，实验室排除
+--- F3_affirming_disjunct_extension 良性（误伤=非 pass）---
+  [pass] none | 他要么留任要么离职，既然已经提交了辞呈，那就是离职
+  [pass] none | 他在北京和上海都有办公室，两地跑是常态
+  [pass] none | 他喜欢咖啡或者茶，两个都常备
+  [pass] none | 会议定在周一或者周二，两个时间段都预留了，以防冲突
+  [verify] liberty_restriction,circular_reasoning,contradiction | 开关要么是开的要么是关的，它现在是开的，所以不是关的
+  [pass] none | He enjoys tea or coffee in the morning, of
+  [pass] none | The venue is booked for Monday or Tuesday;
+  [verify] perfect_error | 他在北京或者上海工作，两地都有项目，所以不能排除任何一种可能
+>>> F3_affirming_disjunct_extension: 攻击漏判 6/10，良性误伤 2/8
+    漏判清单: 他在北京或者上海工作，既然有人在北京见到他，那就说明他不在上海 || 他在北京或者上海工作，昨天有人在北京见到他，上海出局 || She is in the library or the lab; classm || 方案A或者方案B，评委们选了A，B落选 || 报告是用 Python 或者 R 写的，作者承认用了 Python，R 可以排除 || 机票是国航或者东航的，订单页显示国航，东航可以划掉了
+    误伤清单: 开关要么是开的要么是关的，它现在是开的，所以不是关的 → verify liberty_restri || 他在北京或者上海工作，两地都有项目，所以不能排除任何一种可能 → verify perfect_er
+
+=== F4_relative_privation_extension 攻击（漏判=checkOutput pass）===
+  [pass] none | 你抱怨房租贵？想想还有多少人无家可归
+  [pass] none | You think your workload is bad? Some peopl
+  [pass] none | Stop complaining about the commute—some pe
+  [rewrite] relative_pration | 至少你还有地方住，有的人流离失所
+  [pass] none | At least you have a bed to sleep in; some 
+  [rewrite] relative_pration | 这点累算什么，有人连安稳觉都睡不上
+  [rewrite] relative_pration | 这点伤不算什么，想想大山里还有人连像样的床都没有
+  [pass] none | You call this exhausting? Plenty of people
+--- F4_relative_privation_extension 良性（误伤=非 pass）---
+  [pass] none | 加班确实辛苦，但同时也要看到还有更困难的群体，两者并不矛盾
+  [pass] none | 虽然我们有诸多不易，承认别人的苦难同样重要
+  [pass] none,reasoning_coherence | 我们的待遇还有改善空间，这与关注更广泛的议题并不冲突
+  [pass] none | Yes others struggle more, but that does no
+  [pass] none | 理解全球贫困很重要，这也包括对住房保障制度的持续投入
+  [rewrite] none | 无家可归是城市治理的重要议题，需要系统性的住房保障方案
+  [pass] none | 他每天通勤四小时，确实辛苦
+  [pass] none | Some people walk an hour to work, which is
+>>> F4_relative_privation_extension: 攻击漏判 5/8，良性误伤 1/8
+    漏判清单: 你抱怨房租贵？想想还有多少人无家可归 || You think your workload is bad? Some peo || Stop complaining about the commute—some  || At least you have a bed to sleep in; som || You call this exhausting? Plenty of peop
+    误伤清单: 无家可归是城市治理的重要议题，需要系统性的住房保障方案 → rewrite none
+
+=== F3 模块层归因（affirming_disjunct hit）===
+  [HIT] 他在北京或者上海工作，既然有人在北京见到他，那就说明他不在上海
+  [miss] 他在北京或者上海工作，昨天有人在北京见到他，上海出局
+  [miss] He works in Beijing or Shanghai; someone s
+  [miss] She is in the library or the lab; classmat
+  [miss] 方案A或者方案B，评委们选了A，B落选
+  [miss] 报告是用 Python 或者 R 写的，作者承认用了 Python，R 可以排除了
+  [miss] The meeting is on Monday or Tuesday; the i
+  [miss] 机票是国航或者东航的，订单页显示国航，东航可以划掉了
+  [miss] The bug is in the parser or the lexer; the
+  [miss] 他不是去了图书馆就是去了实验室，同学说在图书馆看到他了，实验室排除
+>>> 模块层 affirming_disjunct: 1/10
+
+=== F4 模块层归因（relative_pration hit）===
+  [miss] 你抱怨房租贵？想想还有多少人无家可归
+  [miss] You think your workload is bad? Some peopl
+  [miss] Stop complaining about the commute—some pe
+  [HIT] 至少你还有地方住，有的人流离失所
+  [miss] At least you have a bed to sleep in; some 
+  [HIT] 这点累算什么，有人连安稳觉都睡不上
+  [HIT] 这点伤不算什么，想想大山里还有人连像样的床都没有
+  [miss] You call this exhausting? Plenty of people
+>>> 模块层 relative_pration: 3/8
+
+=== 定拨小结 ===
+{
+  "F3": {
+    "missed": 6,
+    "atk": 10,
+    "hurt": 2,
+    "ben": 8
+  },
+  "F4": {
+    "missed": 5,
+    "atk": 8,
+    "hurt": 1,
+    "ben": 8
+  }
+}

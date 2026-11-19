@@ -1,0 +1,14 @@
+RP_SUFFER_ZH 无家可归: exit=1 ✅ 变红
+RP_SUFFER_ZH 流离失所: exit=1 ✅ 变红
+RP_SUFFER_ZH 居无定所: exit=1 ✅ 变红
+RP_SUFFER_ZH 无处安身: exit=1 ✅ 变红
+RP_SUFFER_ZH 上无片瓦: exit=1 ✅ 变红
+RP_SUFFER_ZH 露宿街头: exit=1 ✅ 变红
+RP_SUFFER_ZH 风餐露宿: exit=1 ✅ 变红
+RP_SUFFER_EN do-not-even-have-a-job: exit=1 ✅ 变红
+RP_SUFFER_EN walk-hours-miles: exit=1 ✅ 变红
+RP_SUFFER_EN nowhere-to-sleep: exit=1 ✅ 变红
+RP_SUFFER_EN cannot-afford-a-place: exit=1 ✅ 变红
+RP_DISMISS_EN 反问式压制: exit=1 ✅ 变红
+RP_DISMISS_ZH 反问式压制: exit=1 ✅ 变红
+结果: 20 通过, 0 失败, 共 20 个

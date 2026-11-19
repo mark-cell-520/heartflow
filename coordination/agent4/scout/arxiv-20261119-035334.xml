@@ -1,0 +1,458 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/x7PE1IzYpnhrUayP/n+BgcOQ9rc</id>
+  <title>arXiv Query: search_query=all:logical OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-19T03:53:35Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:logical+OR+all:fallacy&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>42699</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24381v1</id>
+    <title>How to Turn an Attention Neural Network into an Interpretable Hard-Logic Predicate Circuit: Truth-Table Predicate Extraction and State-Machine Merging under Ship-of-Theseus Replacement</title>
+    <updated>2026-11-18T13:10:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.24381v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24381v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We convert a trained attention network as a whole, attention included, into a hard-logic predicate circuit that runs in its place. Every unit of the circuit is a 0/1 predicate on tokens, and every map between predicates is a minimised truth table. Short tables, such as the product of a query code and a key code, are minimised exactly, and wide feature-to-feature transitions become implication rules by noise-tolerant minimisation. Blocks are replaced one at a time from the output down, in the manner of the Ship of Theseus, and after each replacement the remaining soft part re-adapts to the frozen circuit. Attention selection takes two forms, a row-wise comparison of integer scores (order selection) and a learned rule (rule selection). Both are fitted on the ordinary training set alone, and only on the examples that the teacher classifies correctly, so that the circuit imitates the teacher where the teacher is right. On TweetEval-emotion, the complete circuit of DistilGPT2 reaches a test gold accuracy of 66.5 $\pm$ 1.3% with order selection and 57.4 $\pm$ 2.5% with rule selection over three seeds, against 74.7% for the teacher and 64.0% for a bag of word pieces fitted on the same tweets, and that of BERT-base reaches 70.0 $\pm$ 0.5% with order selection and 63.7 $\pm$ 1.2% with rule selection against 77.8%. The circuit needs no multiplier and no weight traffic, and its exported hardware description reproduces it bit for bit. By a synthesis-based estimate it classifies one tweet in about 1-2 $μ$s (DistilGPT2) and 3-5 $μ$s (BERT) on an FPGA card and in 5-9 $μ$s on a palm-sized board whose module draws 7.5-15 W, two to three orders of magnitude faster than the network on a GPU at batch 1 (measured, 0.9-2.6 ms for DistilGPT2 including an optimised CUDA-graph baseline), at a cost of 8.5 (DistilGPT2) and 8.6 (BERT) points of gold accuracy for the synthesised seed-0 circuits.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T13:10:32Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yuchen Li</name>
+    </author>
+    <author>
+      <name>Zongqi Fan</name>
+    </author>
+    <author>
+      <name>Xintong Li</name>
+    </author>
+    <author>
+      <name>Nguyen H. Tran</name>
+    </author>
+    <author>
+      <name>Ken-Tye Yong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24328v1</id>
+    <title>QuFrame: Pauli Frame Tracking for Fault-Tolerant Quantum Control</title>
+    <updated>2026-11-18T12:30:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.24328v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24328v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fault-tolerant quantum computing requires continuous quantum error correction (QEC) to suppress physical noise. While Clifford-only workloads can defer corrections to software post-processing, universal computation breaks this paradigm: executing non-Clifford gates via magic-state gadgets introduces hard, real-time control-flow dependencies on error-corrected measurements. Consequently, the controller must extract syndromes, decode them, and update the Pauli frame in real time, closing the entire QEC loop within a strict $1\,μ\text{s}$ cycle. However, prior proposals on Pauli frame tracking remain largely theoretical, leaving the microarchitectural bottlenecks of tracking, resolving, and synchronizing frame updates across distributed control pipelines unaddressed.
+  To this end, we present QuFrame, a control microarchitecture for real-time Pauli frame tracking that closes the QEC loop within $1\,μ\text{s}$ while sustaining QPU-rate throughput. By introducing QuFrameISA, we cleanly decouple instruction execution from continuous Pauli frame management. Execution is distributed across per-qubit Instruction Resolution Engines (IREs) that resolve instructions against the frame via a single table lookup, while a Pauli Frame Management Unit enables independent, lock-free concurrent commits. To strictly guarantee the $1\,μ\text{s}$ deadline, QuFrame pairs an asynchronous primary decoder with an on-chip fallback decoder that resolves in $144\,\text{ns}$, natively reconciling divergent updates in hardware without degrading logical error rates.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T12:30:48Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Aleksandra Świerkowska</name>
+    </author>
+    <author>
+      <name>Ilgaz Er</name>
+    </author>
+    <author>
+      <name>Emmanouil Giortamis</name>
+    </author>
+    <author>
+      <name>Pramod Bhatotia</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24235v1</id>
+    <title>Canonical Proof Nets for Intuitionistic Multiplicative Linear Logic</title>
+    <updated>2026-11-18T11:09:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.24235v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24235v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the problem of finding canonical representations of proofs in the multiplicative fragment of intuitionistic linear logic with units.
+  We show that, contrary to the classical case, it is possible to define a notion of proof nets for this fragment which is provided with a polynomial-time sequentialization procedure and is both canonical and efficient. In particular, we show that sequent calculus derivations differing only by a permutation of independent rule applications are translated to the same proof net, and that the translations between sequent calculus and proof nets are inverse to each other.</summary>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T11:09:48Z</published>
+    <arxiv:primary_category term="cs.LO"/>
+    <author>
+      <name>Matteo Acclavio</name>
+    </author>
+    <author>
+      <name>Willem Heijltjes</name>
+    </author>
+    <author>
+      <name>Dominic J. D. Hughes</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24169v1</id>
+    <title>Matching-Logic-Based Understanding of Polynomial Functors and their Initial/Final Models Revisited</title>
+    <updated>2026-11-18T10:11:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.24169v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24169v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many data types used in programming are initial algebras or final coalgebras of polynomial functors. We show how to specify them uniformly in matching logic, using the representation of polynomial functors as unary container functors $X\mapsto\sum_{a:A}X^{B[a]}$. For each container functor, we give a matching logic theory of its initial algebra and one of its final coalgebra. Besides the no-junk and no-confusion axioms and their duals, these theories include axioms about the elements that represent functions, for the initial algebra, and a bisimilarity axiom and a realisation axiom, for the final coalgebra; the existence axioms use free set variables to range over all subsets of a model. We prove that, in every model, the algebra extracted from the model is an initial algebra (a W-type) and the extracted coalgebra is a final coalgebra (an M-type) of the container extracted from the model, i.e., the one given by the model's interpretation of the shapes and positions, and that such models exist. So the data types are captured relative to the interpretation of the sorts of shapes and positions, and absolutely whenever these sorts are fixed by auxiliary specifications, which we show for finite sets, products, dependent sums, and (co)inductive sorts built from them. We derive the induction, coinduction, and bisimulation principles as theorems, and illustrate the approach on lists and on Moore machines. This paper revises and substantially extends a paper published in EPTCS 389 (FROM 2023): several axioms are corrected, and the adequacy and satisfiability proofs are new.</summary>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T10:11:27Z</published>
+    <arxiv:comment>44 pages. Revised and substantially extended version of arXiv:2309.13798 (EPTCS 389, FROM 2023); Appendix C lists the changes</arxiv:comment>
+    <arxiv:primary_category term="cs.LO"/>
+    <author>
+      <name>Dorel Lucanu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24161v1</id>
+    <title>AVTR: Adaptive Multimodal Reasoning with Visual Imagination</title>
+    <updated>2026-11-18T10:05:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.24161v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24161v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language Models increasingly rely on textual reasoning to solve advanced multimodal tasks. Despite its effectiveness, this paradigm faces two fundamental limitations. First, relying on textual reasoning alone can limit perceptual ability in vision-centric questions, where accurate answers depend on interpreting task-relevant visual evidence. Second, applying textual reasoning uniformly across inputs overlooks question-dependent variation in both reasoning modality and depth, often producing verbose and unnecessary traces when little logical inference is required. To this end, we propose Adaptive Visual-Textual Reasoning (AVTR), which introduces visual imagination as a complementary reasoning modality to textual thinking, enabling the model to revisit its visual observations and distill the salient evidence through generative visual reflection. Furthermore, we formulate reasoning-modality selection as a learned routing problem, allowing a single policy to adaptively harness the complementary strengths of visual reflection and textual reasoning in response to the perceptual and inferential demands of the input. Across 16 benchmarks, AVTR improves the average score by 4.5 points over Qwen3.5 baseline, while reducing inference latency by 33\%. It also scales effectively into a smaller size backbone, outperforming the evaluated 2B-scale baselines.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T10:05:18Z</published>
+    <arxiv:comment>Project page: https://xiaoqian-shen.github.io/AVTR</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Xiaoqian Shen</name>
+    </author>
+    <author>
+      <name>Yunyang Xiong</name>
+    </author>
+    <author>
+      <name>Changsheng Zhao</name>
+    </author>
+    <author>
+      <name>Saksham Suri</name>
+    </author>
+    <author>
+      <name>Chong Zhou</name>
+    </author>
+    <author>
+      <name>Zechun Liu</name>
+    </author>
+    <author>
+      <name>Zhipeng Cai</name>
+    </author>
+    <author>
+      <name>Zhuang Liu</name>
+    </author>
+    <author>
+      <name>Qi Qian</name>
+    </author>
+    <author>
+      <name>Wei Wen</name>
+    </author>
+    <author>
+      <name>Hongyu Xu</name>
+    </author>
+    <author>
+      <name>Hanxian Huang</name>
+    </author>
+    <author>
+      <name>Ernie Chang</name>
+    </author>
+    <author>
+      <name>Yanbei Chen</name>
+    </author>
+    <author>
+      <name>Vikas Chandra</name>
+    </author>
+    <author>
+      <name>Raghuraman Krishnamoorthi</name>
+    </author>
+    <author>
+      <name>Mohamed Elhoseiny</name>
+    </author>
+    <author>
+      <name>Lemeng Wu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24073v1</id>
+    <title>3D GameDev Arena: Benchmarking Coding Agents That Plan, Build, and Playtest extreme Long-Horizon Browser Games</title>
+    <updated>2026-11-18T09:03:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.24073v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24073v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents now resolve repository issues and generate compact playable games, but whether they can build a large 3D game from scratch remains open. Such games tightly couple mechanics, scenes, assets, and interaction logic, and their quality rests on player enjoyment, which existing benchmarks rarely assess. Thus, we introduce 3D GameDev Arena, a first extreme long-horizon benchmark of 108 from-scratch game-development tasks across 14 genres. Given only a text specification and UI/UX reference images, a fully automated plan--implement--test--repair pipeline builds each task into a self-contained browser game. Runs average $\sim$1,000 LLM calls ; the longest uses 14,407 calls, 2.13B tokens, and 608 assets. Evaluation spans (1) objective code-level functional acceptance against the game specification, (2) agent-based QA and playtesting of 3D presentation and playability, and (3) blind pairwise Bradley-Terry human preference in a public arena. The preliminary findings indicate that long-horizon 3D game development remains far from solved, and code-level correctness alone does not dictate player preference. The public arena is hosted online.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T09:03:53Z</published>
+    <arxiv:comment>23 Pages</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Bizhe Bai</name>
+    </author>
+    <author>
+      <name>Jiliang Jian</name>
+    </author>
+    <author>
+      <name>Yuqing Yan</name>
+    </author>
+    <author>
+      <name>Tao Chen</name>
+    </author>
+    <author>
+      <name>Ying Wen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24044v1</id>
+    <title>Accelerating Quantum Error Correction Simulations under Coherent Noise with Compiled Clifford-Augmented Matrix Product States</title>
+    <updated>2026-11-18T08:31:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.24044v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24044v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reliable assessment of quantum error correction requires understanding how coherent errors affect logical performance. Although tensor networks naturally capture coherent interference, entanglement growth and large qubit counts make repeated sampling costly. Here we develop a compiled Clifford-Augmented Matrix Product State (CAMPS) framework that reuses Clifford transformations across shots, recycles qubits released by measurements, evolves a compressed residual state, and accelerates sampling through rotation fusion and compilation tailored to the MPS layout. Surface-code benchmarks under fixed-sign coherent noise yield accurate logical error estimates at small bond dimensions, while random-sign simulations up to distance $d=9$ and on the $[[72,12,6]]$ bivariate bicycle code match the Pauli-twirling approximation results. Compared with uncompiled CAMPS, compiled CAMPS converges at smaller bond dimensions and achieves order-of-magnitude sampling speedups at equal bond dimension, opening a scalable route to studying coherent error propagation in larger fault-tolerant circuits.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T08:31:41Z</published>
+    <arxiv:comment>Main text (8 pages, 6 figures), supplement (16 pages, 7 figures)</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Jiale Huang</name>
+    </author>
+    <author>
+      <name>Yaojian Chen</name>
+    </author>
+    <author>
+      <name>Ke Liu</name>
+    </author>
+    <author>
+      <name>Dingshun Lv</name>
+    </author>
+    <author>
+      <name>Mingpu Qin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24032v1</id>
+    <title>Test-Time Symmetrization: Scaling Laws for Model-Agnostic Learning under Structure</title>
+    <updated>2026-11-18T08:20:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.24032v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24032v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time compute has emerged as a powerful way to improve the accuracy of language models at inference time, with scaling laws quantifying how accuracy improves with additional forward passes. Existing scaling laws, however, focus on repeated sampling from a fixed prompt, even though many tasks admit multiple equivalent representations of the same underlying problem. A graph does not depend on how its nodes are numbered, and a program does not depend on the names of its variables, yet language models can change their answers under such rewritings. In this paper, we study test-time symmetrization, which uses forward passes on rewritings of the input and aggregates the resulting answers over the group $G$ of rewritings. We prove that no amount of sampling and repeated decoding from a single representation can replace rewriting, while only $O(\log |G|)$ random rewritings suffice to recover the information provided by all $|G|$ rewritings. The same set of $O(\log |G|)$ rewritings provides simultaneous approximation across models, decoding rules, and sampled reasoning traces, and the logarithmic scaling is optimal in general. We validate the theory with experiments on Qwen2.5-7B, Phi-4-mini, Llama-3.1-8B, and Qwen2.5-14B, with chain-of-thought reasoning, on graph reasoning, logical deduction, and multiple-choice question answering. At the same number of forward passes, spending them on rewritings of the input is substantially more accurate than spending them on repeated sampling from the original prompt whenever the model's answer depends on how the input is written, and the number of rewritings needed grows only logarithmically with the number of possible rewritings, as the theory predicts. Our results provide a principled way to enforce symmetries at inference time when they cannot be built into the model, which we call model-agnostic symmetrization.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T08:20:34Z</published>
+    <arxiv:comment>38 pages, 13 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Behrooz Tahmasebi</name>
+    </author>
+    <author>
+      <name>Melanie Weber</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24013v1</id>
+    <title>Topological Quantum Reservoir Computing</title>
+    <updated>2026-11-18T08:04:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.24013v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24013v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scaling universal quantum computation and implementing quantum machine learning with protected logical qubits remain challenging. To harness the computational potential of existing fault-tolerant quantum platforms, we introduce topological quantum reservoir computing, a novel approach using protected degrees of freedom for storage and the host system's intrinsic dynamics for information processing. Using a one-dimensional Kitaev chain, we show how long-lived Majorana edge modes and fast bulk responses support these complementary functions within the same many-body system. We identify the tradeoffs governing access to protected memory and show how matched interfaces enable programmable writing and interactions enable autonomous information consolidation from the bulk to the edge. These mechanisms improve performance on tasks requiring long-term retention of temporal information. Our results establish topology as a new resource for quantum reservoir computing and open a route toward near-term quantum computing and quantum machine learning.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T08:04:49Z</published>
+    <arxiv:comment>7 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Zhi-Lei Zhang</name>
+    </author>
+    <author>
+      <name>Lianxiang Cui</name>
+    </author>
+    <author>
+      <name>C. P. Sun</name>
+    </author>
+    <author>
+      <name>Kohei Nakajima</name>
+    </author>
+    <author>
+      <name>Kazuyuki Aihara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23923v1</id>
+    <title>General Noise Channels and Mid-Circuit Measurements for Pre-Trajectory Sampling with Batched Execution</title>
+    <updated>2026-11-18T06:15:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.23923v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23923v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many studies of quantum protocols require fast sampling of large amounts of measurement data from noisy quantum circuits, such as for training machine-learning decoders for quantum error correction. Exact simulation of realistic noise is expensive, while stabilizer-based simulators are fast but approximate, for example through Pauli twirling, which generally alters the output statistics. Pre-trajectory sampling with batched execution (PTSBE) accelerates exact trajectory simulation by sampling noise before state evolution. This method requires the outcome probability of every stochastic event to be independent of the state, which excludes mid-circuit measurements and general Kraus channels. We present a generalization of PTSBE to measurement and Kraus operators without approximation. Each event is partially pre-sampled, while deferred outcomes are drawn during grouped execution via multinomial branching and cached-state reuse. We implement the method for GPUs as an extension of CUDA-Q. On distance-3 topological code memories under amplitude damping, it is up to 24x faster than conventional trajectory sampling in CUDA-Q. On 30-qubit random circuits with mid-circuit measurements, it is up to 83x faster and outperforms the near-Clifford simulator Clifft when more than about 25% of the gates are non-Clifford. With repeated sampling of each final state, its sampling rate per trajectory exceeds that of CUDA-Q by nearly five orders of magnitude. Our method also allows us to compare exact amplitude damping with its Pauli-twirled channel on a surface-code memory, revealing that twirling overestimates the detection rate by 21% and raises the logical error rate of a lookup decoder by 8%. This work makes exact, high-throughput simulation practical for general noisy circuits, from data generation for training decoders to studying measurement-based fault-tolerant protocols under realistic noise.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T06:15:37Z</published>
+    <arxiv:comment>25 pages, 8 figures (4 in the main text, 4 in the Supplementary Information)</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Louis Follet</name>
+    </author>
+    <author>
+      <name>Paavai Pari</name>
+    </author>
+    <author>
+      <name>Isidor Schoch</name>
+    </author>
+    <author>
+      <name>Thien Nguyen</name>
+    </author>
+    <author>
+      <name>Justin G. Lietz</name>
+    </author>
+    <author>
+      <name>Daniel Lowell</name>
+    </author>
+    <author>
+      <name>Brucek Khailany</name>
+    </author>
+    <author>
+      <name>Krysta M. Svore</name>
+    </author>
+    <author>
+      <name>Dirk R. Englund</name>
+    </author>
+    <author>
+      <name>Taylor L. Patti</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23919v1</id>
+    <title>Fault-tolerant quantum processor with minimal external control</title>
+    <updated>2026-11-18T06:09:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.23919v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23919v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Contemporary classical information processors integrate tens of billions of transistors printed on a chip, yet are fully controlled through comparatively few external wires. This is possible because data flows through hard-coded operations in step with a global clock and is steered by external instructions. Today's solid-state quantum processors are different -- every qubit receives instructions from outside the chip via its own dedicated control line, and error correction adds a further torrent of syndrome data that is transported off-chip. Here we show that the external control of a quantum chip can be greatly simplified. We propose a fault-tolerant architecture for universal quantum computation, inspired by modern classical processors, in which quantum information flows through a fixed, clocked device, propelled by local gates in a planar array. Our quantum processor receives an input stream of classical instructions via a small, constant number of external wires, each attached to a single qubit. Except for those few qubits coupled to external wires, all qubits evolve under a periodically-applied geometrically-local depth-3 circuit, which is fixed at the time the device is fabricated. Assuming a noiseless global clock (so that every operation is applied on schedule, though imperfectly), we establish an accuracy threshold theorem: For physical noise below a universal threshold -- afflicting every gate, measurement, and wire -- a chip with $n$ physical qubits can run any quantum algorithm that uses~$n/{\sf polylog}(n/ε)$ logical qubits, where $ε$ is the error rate per logical gate. Each logical gate takes time~$n/{\sf polylog}(n/ε)$; an alternative design, in which quantum operations remain strictly local and noisy, but on-chip wires broadcast noiseless classical signals instantaneously, reduces the time per logical gate to ${\sf polylog}(n/ε)$.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T06:09:26Z</published>
+    <arxiv:comment>Reader's guide included at the end of section 1</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Christopher A. Pattison</name>
+    </author>
+    <author>
+      <name>Jeongwan Haah</name>
+    </author>
+    <author>
+      <name>John Preskill</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23878v1</id>
+    <title>HETEROVLM: Edge Multi-Request Vision-Language Model Serving on a Heterogeneous Versal SoC with AI Engines and Programmable Logic</title>
+    <updated>2026-11-18T05:30:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.23878v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23878v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Edge devices in vehicles and robots serve concurrent requests with different deadlines to a vision-language model (VLM), each mixing a compute-bound encoder and prefill with a memory-bound decode. GPU serving targets datacenter throughput with per-iteration host scheduling: an urgent request waits for the running iteration, and small-batch decode costs much energy per token. Prior accelerators on Versal AI Engine (AIE) SoCs map one model onto a fixed AIE dataflow graph for one input stream, without decode or request scheduling. HETEROVLM keeps the AIE graph static and makes it schedulable. The AIE array runs the encoder, prefill and attention, and the programmable logic (PL) holds GEMV engines for small decode steps and a scheduler that orders short work units by class and deadline. Concurrent requests share one decode step that reads the weights once. An urgent request preempts at a work-unit boundary, and the paused request resumes from its results in DDR. On an AMD Versal VC1902, text and camera questions get their first tokens in 140 and 303 ms. HETEROVLM decodes a single request 1.3x and 4.0x faster than NVIDIA Tesla T4 and Jetson Orin Nano GPUs, with 61% and 73% of their energy per token, and uses 51% of the energy per token of an NVIDIA GeForce RTX 3090 Ti. The same bitstream serves multiple VLMs by loading their own instruction programs and weights. A demo is available at https://anonymous.4open.science/r/demo heterovlm-EFM2/.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T05:30:36Z</published>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Zhiheng Chen</name>
+    </author>
+    <author>
+      <name>Yu-An Chou</name>
+    </author>
+    <author>
+      <name>Yifan Zhang</name>
+    </author>
+    <author>
+      <name>Ye Qiao</name>
+    </author>
+    <author>
+      <name>Saptarshi Mitra</name>
+    </author>
+    <author>
+      <name>Sitao Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23826v1</id>
+    <title>Slice Isolation-as-a-Service: An Isolation Mechanism to Proactively Defend Cross-Slice Attacks in 5G-Advanced and Beyond</title>
+    <updated>2026-11-18T04:26:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.23826v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23826v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As cellular networks transition toward 5G-Advanced and Sixth Generation (6G) architectures, Network Slicing (NS) remains essential for multiplexing heterogeneous services over shared physical infrastructure. However, deploying critical Ultra-Reliable Low Latency Communications (URLLC) alongside standard broadband introduces severe cross-slice vulnerabilities. The implicit assumption that logical slicing inherently guarantees security fails against data plane exploits, as shared User Plane Functions (UPFs) remain susceptible to resource starvation and protocol tunneling. To address this, we propose the Slice Isolation-as-a-Service framework, which treats topological data plane isolation as an on-demand, monetizable capability. We formulate the multi-UPF resource allocation problem as a Mixed-Integer Nonlinear Programming (MINLP) model to strictly enforce physical and virtual isolation boundaries based on tenant security tiers, minimizing provisioning costs and end-to-end latency. To validate the framework, we engineered a novel containerized Fifth Generation (5G) testbed integrating Free5GC with Nokia Containerlab. Empirical evaluations under active volumetric flooding and the recently discovered GTP-in-GTP reflection attacks reveal that shared and Virtualized Network Function (VNF)-only isolation fail catastrophically, suffering up to 30% packet loss and complete bandwidth starvation. Our results prove that MINLP-driven strict physical isolation successfully neutralizes cross-slice injection and preserves 99.999% reliability for mission-critical slices, confirming our isolation framework as a crucial proactive defense for next-generation core networks.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T04:26:33Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Abdulaziz Abdulghaffar</name>
+    </author>
+    <author>
+      <name>Ashraf Matrawy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23806v1</id>
+    <title>Breaking the Myth of Four-Tier Stacked Transistors for Logic: an Investigation from Process to Device and Block-Level PPA</title>
+    <updated>2026-11-18T04:11:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.23806v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23806v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For the first time, this work evaluated whether 4-tier stacked transistors can translate the straightforward density gains into realistic chip-level scaling benefits. A practical dual-sided 4-tier transistor-stacking CFFET (Flipped CFET-to-CFET) process was proposed, on which a DTCO framework spanning standard-cell design, local interconnects, RO analysis, and physical implementation was built under 2A node design rules. The CFFET was also benchmarked with its 2-tier transistor-stacking counterparts FFET. Among CFFET configurations, the best-performing Symmetric Power still lags FFET by 11.2% in RO frequency due to the complex MOL parasitics. At the block level, CFFET reduces the Ibex RISC-V core area by only 12.8% (far below the 40% nominal cell-height reduction), while running 10.9% slower at iso-power. We further introduced a novel Tetris-like cell stitching to minimize the area overhead, which allows non-rectangular cell design and recovers 7.4% area in a 1-bit ALU design. An optimized NanoStack CFFET was finally proposed, inspired by previous work. This work indicates that straightforward vertical 4-tier stacking proves insufficient to guarantee enough PPA benefits, though the resulting design insights may guide future advanced architectures.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T04:11:50Z</published>
+    <arxiv:comment>4 pages,17 figures,conference</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>Jianxiang Jin</name>
+    </author>
+    <author>
+      <name>Haoran Lu</name>
+    </author>
+    <author>
+      <name>Yihan Luo</name>
+    </author>
+    <author>
+      <name>Yanbang Chu</name>
+    </author>
+    <author>
+      <name>Yibo Zhang</name>
+    </author>
+    <author>
+      <name>Jingru Jiang</name>
+    </author>
+    <author>
+      <name>Yuji Cheng</name>
+    </author>
+    <author>
+      <name>Wanyue Peng</name>
+    </author>
+    <author>
+      <name>Xun Jiang</name>
+    </author>
+    <author>
+      <name>Feiyu Teng</name>
+    </author>
+    <author>
+      <name>Kairang Guo</name>
+    </author>
+    <author>
+      <name>Ming Li</name>
+    </author>
+    <author>
+      <name>Yibo Lin</name>
+    </author>
+    <author>
+      <name>Runsheng Wang</name>
+    </author>
+    <author>
+      <name>Heng Wu</name>
+    </author>
+    <author>
+      <name>Ru Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.23762v1</id>
+    <title>Addressable transversal CCZ gates on almost good quantum LDPC codes and nearly optimal magic state protocols</title>
+    <updated>2026-11-18T03:16:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.23762v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.23762v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Assuming uniform subfield product expansion, we construct quantum low-density parity-check (qLDPC) codes with distances $Ω_ε(N/\log^2N)$ and at least $N^{1-ε}$ individually addressable logical CCZ gates on pairwise disjoint triples of logical qubits, for every fixed $0&lt;ε&lt;1$. With all logical qubits outside these triples initialized to $|0\rangle$, any subset of the corresponding logical CCZ gates can be implemented with a transversal physical CCZ circuit. As applications, we obtain two nearly optimal magic state protocols: CCZ distillation with arbitrarily small overhead exponent $γ\rightarrow 0$ and error suppression of nearly linear order, and a magic state fountain that directly prepares $N^{1-ε}$ encoded CCZ magic states with nearly linear distance $Ω_ε(N/\log^2N)$. The construction uses balanced products of expanding graph covers. The assumption concerns Reed--Solomon codes on three subfields of characteristic two and pairwise coprime extension degrees, a local hypothesis studied in a companion manuscript. We design the expanding graph covers to admit many common classical codewords, which yield logical operators whose pairings select the logical CCZ gates independently. Without the product expansion assumption, the graph covers also yield classical LDPC codes over a fixed field with almost linear dimension and linear distance that satisfy a multiplication property: the coordinatewise product of any three codewords lies in a second LDPC code of linear distance.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T03:16:56Z</published>
+    <arxiv:comment>69 pages + Appendices</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Shi Jie Samuel Tan</name>
+    </author>
+    <author>
+      <name>Guanyu Zhu</name>
+    </author>
+  </entry>
+</feed>

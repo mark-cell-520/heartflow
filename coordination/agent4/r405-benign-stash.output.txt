@@ -1,0 +1,16 @@
+--- AFTER(r405改动在位) ---
+{"t":"无家可归是城市治理的重要议题，需要系统性的住房保障方案","action":"rewrite","dims":"none","module":0}
+{"t":"You think the housing crisis i","action":"verify","dims":"vagueness","module":0}
+{"t":"灾民流离失所，应急安置和长期住房保障都要跟上","action":"pass","dims":"none","module":0}
+{"t":"许多人无家可归，收容所 capacity 需要扩建——这是社","action":"pass","dims":"none","module":0}
+{"t":"他露宿街头一周了，社工已经介入","action":"pass","dims":"none","module":0}
+{"t":"你觉得房租高吗？我们可以对比各城市的收入房价比数据","action":"pass","dims":"none","module":0}
+--- BEFORE(改动stash) ---
+{"t":"无家可归是城市治理的重要议题，需要系统性的住房保障方案","action":"rewrite","dims":"none","module":0}
+{"t":"You think the housing crisis i","action":"verify","dims":"vagueness","module":0}
+{"t":"灾民流离失所，应急安置和长期住房保障都要跟上","action":"pass","dims":"none","module":0}
+{"t":"许多人无家可归，收容所 capacity 需要扩建——这是社","action":"pass","dims":"none","module":0}
+{"t":"他露宿街头一周了，社工已经介入","action":"pass","dims":"none","module":0}
+{"t":"你觉得房租高吗？我们可以对比各城市的收入房价比数据","action":"pass","dims":"none","module":0}
+--- DIFF(before→after) ---
+(无输出=改动对这些样本零影响)

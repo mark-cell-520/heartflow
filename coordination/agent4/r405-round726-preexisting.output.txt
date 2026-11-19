@@ -1,0 +1,3 @@
+== r726 诉诸更惨新维度轮测试 ==
+结果: 22 通过, 1 失败
+  ❌ 登记-VERIFY_DIMS 含 relative_pration :: VERIFY_DIMS 未含 relative_pration

@@ -1,0 +1,33 @@
+arXiv entries: 15
+ - How to Turn an Attention Neural Network into an Interpretable Hard-Logic Predicate Circuit: Truth-Table Predic
+ - QuFrame: Pauli Frame Tracking for Fault-Tolerant Quantum Control
+ - Canonical Proof Nets for Intuitionistic Multiplicative Linear Logic
+ - Matching-Logic-Based Understanding of Polynomial Functors and their Initial/Final Models Revisited
+ - AVTR: Adaptive Multimodal Reasoning with Visual Imagination
+ - 3D GameDev Arena: Benchmarking Coding Agents That Plan, Build, and Playtest extreme Long-Horizon Browser Games
+ - Accelerating Quantum Error Correction Simulations under Coherent Noise with Compiled Clifford-Augmented Matrix
+ - Test-Time Symmetrization: Scaling Laws for Model-Agnostic Learning under Structure
+ - Topological Quantum Reservoir Computing
+ - General Noise Channels and Mid-Circuit Measurements for Pre-Trajectory Sampling with Batched Execution
+ - Fault-tolerant quantum processor with minimal external control
+ - HETEROVLM: Edge Multi-Request Vision-Language Model Serving on a Heterogeneous Versal SoC with AI Engines and 
+ - Slice Isolation-as-a-Service: An Isolation Mechanism to Proactively Defend Cross-Slice Attacks in 5G-Advanced 
+ - Breaking the Myth of Four-Tier Stacked Transistors for Logic: an Investigation from Process to Device and Bloc
+ - Addressable transversal CCZ gates on almost good quantum LDPC codes and nearly optimal magic state protocols
+GitHub repos: 15
+ - 24-blog/solf | star 0 | Sexual Offenses and Logical Fallacies
+ - hugoricardo4/fallacy-forge-arena | star 55 | Interactive Critical Thinking Trainer: Master Logical Fallacies 2026
+ - dttk23100/Logical-fallacy | star 0 | 
+ - lacymorrow/ai-logical-fallacy-detector | star 0 | 
+ - s4sikdar/logical-fallacy-fake-news-model | star 0 | Codebase for model for thesis
+ - whats-grass/Logical_Fallacy_Detection | star 0 | 
+ - hissain/youtuber-debunked | star 1 | This project aims to automate the extraction of MP3 audio from a given YouTube video link,
+ - philstilwell/logfall | star 1 | Logical Fallacies Repository and Generator of Fallacies in Recent News
+ - KristinaBekker/conjunction-fallacy-predictor | star 0 | Predicting and interpreting human logical fallacies using GroupKFold cross-validation, PCA
+ - mutomorro/moresapien | star 0 | Free knowledge base for cognitive biases, logical fallacies, and critical thinking
+ - sunilshahid/Project- | star 0 | It's a vault for notes and full end to end and also secure with skeptical things like logi
+ - Indexasp74/criticalthought | star 0 | CriticalThought is a small tool to learn about and practice critical thinking: a searchabl
+ - Ritwik82/Perspectra | star 1 | A ragebait/clickbait post Analyser which detect logical fallacies and help you improve you
+ - shayandevani1-max/shayandevani.github.io | star 1 | Built GOAT Court, a sports trivia and philosophy web game for friends and classmates to te
+ - Sambit-Saha/rethinkers-journal | star 0 | Science. Logic. Action. A community of clear thinkers dedicated to identifying the logical
+S2: 429 rate-limited
