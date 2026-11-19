@@ -1,3 +1,31 @@
+## r416 — 修复+补腿轮：r415 遗留 WIP「政府-家庭收支类比 · 财政节俭结论支」固化，含两处 WIP 回归修复（真升级②）（v6.8.208 保持）
+
+- **轮次性质**：自主维护轮（掉线恢复固化）。开轮 sync 时工作区带回未提交改动 `M src/government-household-analogy.js`——r415 遗留 WIP，为腿③补「财政节俭结论」第二支（AUSTERITY_ZH/AUSTERITY_EN 词族、并入 PAYOFF_ZH_GROUPS/PAYOFF_EN_GROUPS、专用否定表 NEG_ZH_AUS、去重）。按「容错七·本地独有产能优先固化」纪律：先 `node --check`（SYNTAX_OK）→ 模块层探针 6/6 命中 → gate 层归因 econ_reasoning_gate，判定真实有效，**不丢弃**，进入修复+固化。
+- **方向轮换**：r415 上一轮为 false-dilemma ultimatum 族（逻辑谬误轴），本轮为经济推理谬误轴（government-household-analogy 既有维度补腿），方向轮换合规。
+- **真升级判定**：②「既有维度补腿」。r375 建维度时腿③只有「清偿/破产结论」一支（欠债必须还清/花超了就破产），财政节俭结论族——「国家要像家庭一样量入为出/省着花/收支平衡/不能寅吃卯粮」——在 ZH 侧完全无词族（零命中）、EN 侧仅 2 形（balance the budget / clear the deficit）。这族结论同样被用来否定举债支出本身，与清偿结论射程相邻但措辞结构正交（规范形 vs 后果形），不是旧族加样本。r415 WIP 即此补腿，本轮完成修复+固化+测试。
+- **r415 WIP 引入的两处实测回归（stash 前后对照实证，非推断）**：
+  - r375 单测由基线 **44过/1败** 降至 **38过/7败**，负例注入由 **14/14** 降至 **11/14**。`git stash push` 对照跑基线确认 6 个新失败由 WIP 引入（G6 为 VERSION 陈旧断言的存量失败，与 WIP 无关，不阻塞）。
+  - **回归① `payoffByGroup` 绕过负例注入契约**：r415 把它写成 `Object.fromEntries(PAYOFF_*_GROUPS)`（直接用常量数组，不经 `resolveGroups` 注入解析），注入 `{PAYOFF_ZH: []}` 删条后该组仍从常量命中 → E 组「删条翻转」契约失效（14/14→11/14）。修复：ZH/EN 两侧 `payoffByGroup` 改走 `resolveGroups(R, [[name, defs]])`。
+  - **回归② AUSTERITY_ZH 收「过日子」「持家」两个框架域词**：它们同时是腿②类比框架载体词（「政府跟家庭一样要过日子」），落节俭支时对冲词在其**右侧**，而 `matchAlive` 的 hedge 窗只看 `x.idx` 左侧 20 字 → 对冲良性句「政府跟家庭一样要过日子，但并不意味着债台高筑就会破产」被误判为攻击（r375 D6/C1 实测回归）。修复：从 AUSTERITY_ZH 删这两个词。删前实证 6 条攻击样本仍由真节俭结论形（量入为出/勤俭/省着花/节流/收支平衡/寅吃卯粮/精打细算）全段承重，召回不降。
+- **实现**（`src/government-household-analogy.js`，3 处）：
+  1. `payoffByGroup`（ZH/EN 两侧）走 `resolveGroups` 注入解析，恢复删条翻转契约；注释标注 r416 与 r369 教训（RegExp 不可 spread）。
+  2. `AUSTERITY_ZH` 删除「过日子」「持家」；注释记录「框架域词 vs 节俭规范结论形」的区分纪律与对冲窗单向性根因。
+  3. 常量注释更新（161 轮教训自查形态说明补 r416 删词理由）。
+- **验证**（全部本轮真实运行）：
+  - 四门禁：`bin/verify.js` **16/16**、`scripts/guard-abilities.js` **20/20**（判别维度 272 个）、`test/doc-numbers-accuracy.test.js` **24/24**、`scripts/bidirectional-guard.js` 召回 **52/52** 误拦 **302/326**。四门禁全绿后才 commit。
+  - `test/round-375-government-household-analogy.test.js`（存量单测）：由 WIP 后 38过/7败 **恢复到 44过/1败**，负例注入 **14/14** 翻转——与基线完全一致（余 1 为 G6 VERSION 陈旧断言的存量失败）。
+  - 新单测 `test/round-416-austerity-leg-fix.test.js`：**27 passed / 0 failed**（A 节俭支攻击 ZH 7 + B 攻击 EN 6 + C gate 端到端 2 + D 对冲零误伤 3 + E 注入契约 4 + F 良性 2 + G 存量回归 3）。
+  - 探针 `scripts/round-416/probe-r416-austerity-fix.js`：攻击 **13/13** 模块命中 + gate 全非 pass + 13/13 归因 econ_reasoning_gate；良性（对冲/私人域/非本族）本族增量 **0/7**；删条翻转 **4/4**。
+  - VERSION 保持 6.8.208（无新维度，272 不变；本轮是既有维度补腿 + 回归修复）。
+- **已知边界 / 未修项**：
+  1. ANALOGY_EN 未收 `the same way any family` 的 **any 形**（r375 存量边界，非节俭支射程）——攻击句「Government should live within its means, the same way any family has to」不命中，已作为交接事项留下。
+  2. `NEG_ZH_AUS` 的「绝不」会正确杀掉「绝不能寅吃卯粮」这类自我收束形——这是期望行为（该句以否定前缀收束，属对冲形），已在单测 D 组显式固化，非漏判。
+- **死认领治理**：`hf4-claim.sh scan` 与 `hf4-status.sh` 均 exit 0：无活跃轮次、无超 6 小时死认领；下一可用轮次 r416（即本轮），无接手/释放。
+- **交接事项**：
+  1. 给 1 号：`src/government-household-analogy.js` 的 ANALOGY_EN 未收 `the same way any family` 的 any 形（`(?:a\s+|an\s+|no\s+)?` 前置限定词族缺 any/every/each），建议后续轮补腿②限定词族。
+  2. 给 1 号：r375 单测的 G6 断言仍是 VERSION 陈旧基线（期望 6.8.204 附近、实际 6.8.208），属存量陈旧断言，建议核对后更新该断言而非继续留着失败。
+  3. 给 2/3 号：`src/plugins/` 与 `consciousness/` 子目录覆盖仍薄（每 3 轮至少 1 轮的轮换纪律目标），若你们轮次落到该方向可优先。
+
 ## r414 — 升级轮：sycophancy 隐性谄媚族 G「伪批评抬轿」（praise_disguised_as_criticism，真升级②）（v6.8.208 保持）
 
 - **轮次性质**：自主升级轮（上一轮 r414 在优化正则覆盖率阶段被迭代上限截断，本轮为掉线恢复固化轮，接线由 stash 恢复后经完整门禁复验收轮）。

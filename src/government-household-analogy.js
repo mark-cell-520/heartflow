@@ -30,9 +30,14 @@
  *       「政府和企业一样」（框架词 14 字内命中等价提示，双向均收）；
  *       works just like a household budget / no different from a family /
  *       is like a family maxing out its credit cards；
- *   腿③ PAYOFF 清偿/破产结论在场——破产/崩盘/倒闭/连本带利/全额偿还/
- *       还清/赤字清零/拆东墙补西墙/迟早是要还的；bankrupt / insolvency /
- *       pay off the debt / paid off in full；
+ *   腿③ PAYOFF 清偿/破产/节俭结论在场——破产/崩盘/倒闭/连本带利/全额偿还/
+ *       还清/赤字清零/拆东墙补西墙/迟早是要还的；量入为出/勤俭持家/省着花/
+ *       收支平衡/花完就没了/节流（r415 新增节俭支：EN 侧 r375 原有
+ *       balance the budget / clear the deficit，但 cannot spend more than
+ *       it earns / live within its means / must cut spending 等形漏收）；
+ *       bankrupt / insolvency / pay off the debt / paid off in full /
+ *       cannot spend more than it earns / live within its means /
+ *       tighten its belt / must cut spending；
  *   三腿近距共现，缺一不判。
  *
  * 为什么良性边界因此干净（关键设计）：
@@ -58,8 +63,9 @@
  *   ① 腿① SOV 主权主体在场；
  *   ② 腿② ANALOGY 私人收支框架 × 等价提示共现（框架词 14 字 / 90 字符内
  *      命中等价提示，方向不限）；
- *   ③ 腿③ PAYOFF 清偿/破产结论在场（受否定守卫：「并不意味着会破产」
- *      「does not mean it will go bankrupt」是对冲形）；
+ *   ③ 腿③ PAYOFF/AUSTERITY 清偿·破产·节俭结论在场（两支并联：清偿结论 OR
+ *      财政节俭结论，受否定守卫——「并不意味着会破产」「does not mean it
+ *      will go bankrupt」是对冲形）；
  *   ④ 腿①与腿②邻近（ZH 60 字 / EN 200 字符），腿②与腿③邻近（ZH 50 字 /
  *      EN 160 字符），方向不限；
  *   ⑤ 豁免 A 概念教学（类比/谬误/窠臼/误区/混淆/误用 与框架词共现）；
@@ -90,7 +96,9 @@ const SOV_EN_GROUPS = [['SOV_EN', [SOV_EN]]];
 
 // ─── 腿② ANALOGY 私人收支框架 × 等价提示共现 ────────────
 // 框架词：家庭/居家过日子/普通人/个人/信用卡/房贷/企业/公司/私人 等。
-const FRAME_WORDS_ZH = '(?:家庭|居家|过日子|普通人|个人|信用卡|房贷|存折|零花钱|私房钱|企业|公司|私人)';
+// r415：腿②框架词补「存款/积蓄/钱包/工资/私房钱」——「国库就像家里的存款」
+// 是最常见的财政节俭类比载体，r375 词表未收（实测穿透）。
+const FRAME_WORDS_ZH = '(?:家庭|居家|过日子|普通人|个人|信用卡|房贷|存折|零花钱|私房钱|存款|积蓄|钱包|工资|企业|公司|私人)';
 // 等价提示（向后共现——「家庭账本是一个道理」「一个道理」「普通人借钱一样」）。
 const CUE_AFTER_ZH = '(?:是一个道理|一个道理|一回事|一个样|没区别|一样)';
 // 等价提示（向前共现——「就像居家过日子一样」「好比个人透支信用卡」）。
@@ -108,19 +116,42 @@ const ANALOGY_EN = new RegExp(
   + '|\\b(?:as\\s+if|as\\s+though)\\s+(?:it\\s+were|they\\s+were|it\\s+was)\\s+(?:a\\s+)?(?:household|family)\\b'
   + '|\\bno\\s+different\\s+from\\s+(?:a\\s+)?(?:household|family)\\b'
   + '|\\bsame\\s+(?:way\\s+)?as\\s+(?:a\\s+|any\\s+|no\\s+)?(?:household|family)\\b'
-  + '|\\bjust\\s+as\\s+(?:no\\s+|any\\s+)?(?:household|family)\\b',
+  + '|\\bjust\\s+as\\s+(?:no\\s+|any\\s+)?(?:household|family)\\b'
+  // r415：裸「like a family / like a household」形——「A country, like a
+  // family, cannot spend more than it earns」是最常见的节俭类比载体，r375
+  // 的等价提示词表只收 just like / works like，漏掉裸 like（实测穿透）。
+  + '|\\b(?:country|state|nation|government)\\b[^.!?;\\n]{0,24}\\blike\\s+(?:a\\s+|an\\s+)?(?:household|family)\\b',
   'i'
 );
 
 const ANALOGY_ZH_GROUPS = [['ANALOGY_ZH', [ANALOGY_ZH]]];
 const ANALOGY_EN_GROUPS = [['ANALOGY_EN', [ANALOGY_EN]]];
 
-// ─── 腿③ PAYOFF 清偿/破产结论在场 ─────────────────────
+// ─── 腿③ PAYOFF 清偿/破产/节俭结论在场 ─────────────────
+// r415 新增腿③第二支 AUSTERITY（财政节俭结论）：把私人预算约束平移到主权
+//   财政，除推出清偿/破产结论外，还有一整族「财政必须像家庭一样节俭/量入
+//   为出/收支平衡」的规范结论。EN 侧 r375 原有 balance(s) the budget /
+//   clear the deficit / zero the deficit 已部分覆盖该形，但「cannot spend
+//   more than it earns / live within its means」等更常见的节俭形漏收；ZH 侧
+//   完全无对应词族，实测穿透 7/9（scripts/round-415 探针）。腿③两支并联：
+//   清偿结论 OR 节俭结论，缺整支不判。
 const PAYOFF_ZH = /(?:破产|崩盘|倒闭|连本带利|全额偿还|资不抵债|财政破产|拆东墙补西墙|赤字清零|清零|败家|入不敷出|还清|要还的|清偿)/;
-const PAYOFF_EN = /\b(?:bankrupt\w*|insolven\w+|default\w*|collapse[sd]?|pays?\s+(?:off|back)|paid\s+(?:off|back)|paying\s+(?:off|back)|repay\w*|clear\w*\s+(?:the\s+)?deficit|zero\w*\s+(?:the\s+)?deficit|balance[sd]?\s+(?:the\s+|its\s+)?budget)\b/i;
+// r415 腿③节俭支：量入为出/勤俭持家/省着花/收支平衡/花完就没了/不能乱花。
+// 161 轮教训自查：每条都自查「同族词去掉后缀是否仍命中」——裸名词形态
+// （量入为出/收支平衡/勤俭持家）本身就是完整成语，无需后缀；动词形
+// （省着花/省钱/节流/收紧开支/少花钱）覆盖口语与书面两档。
+// r416：删「过日子」「持家」两个框架域词——它们同时是腿②类比框架的载体词
+// （「政府跟家庭一样要过日子」），落在节俭支时会绕过腿③对冲守卫（对冲词在
+// 其右侧，matchAlive 的 hedge 窗只看左侧 20 字），把对冲良性句误判为攻击
+// （r375 D6/C1 实测回归 6 条）。节俭结论的真规范形（量入为出/勤俭/节俭/
+// 省着花/节流/收支平衡/寅吃卯粮…）攻击样本全段承重，删后召回不降。
+const AUSTERITY_ZH = /(?:量入为出|勤俭|节俭|省着花|省钱|收支[^。！？；\n]{0,4}平衡|收支平衡|收支相抵|花完就没了|不能乱花|没法乱花|不该乱花|节流|收紧开支|少花钱|勒紧|按预算花钱|坐吃山空|精打细算|量力而行|细水长流|寅吃卯粮)/;
+const PAYOFF_EN = /\b(?:bankrupt\w*|insolven\w+|default\w*|collapse[sd]?|pays?\s+(?:off|back)|paid\s+(?:off|back)|paying\s+(?:off|back)|repay\w*|clear\w*\s+(?:the\s+)?deficit|zero\w*\s+(?:the\s+)?deficit|balance[sd]?\s+(?:the\s+|its\s+)?budget|max(?:ed|ing)?\s+out\s+(?:its|their|our)\s+(?:credit\s+cards?|credit\s+card|cards?)|run\s+out\s+of\s+(?:money|cash|credit))\b/i;
+const AUSTERITY_EN = /\b(?:cannot|can'?t|must\s+not|should\s+not|shouldn'?t)\s+(?:afford\s+to\s+)?(?:spend|be\s+spending)\s+more\s+than\s+(?:it|we|they)\s+(?:earn\w*|take\s+in|bring\s+in|collect\w*)\b|\blive\s+within\s+(?:its|their|our)\s+(?:means|budget)\b|\btighten\w*\s+(?:its|their|our)\s+belt\b|\b(?:must|should|has\s+to|have\s+to)\s+(?:cut|reduce|trim|slash)\w*\s+(?:back\s+)?(?:on\s+)?(?:spending|outlays|expenditure\w*)\b|\b(?:must|should)\s+(?:save|be\s+frugal|practise\s+austerity|practice\s+austerity|live\s+within\s+its\s+means)\b|\bcannot\s+keep\s+(?:borrowing|spending)\b/i;
 
-const PAYOFF_ZH_GROUPS = [['PAYOFF_ZH', [PAYOFF_ZH]]];
-const PAYOFF_EN_GROUPS = [['PAYOFF_EN', [PAYOFF_EN]]];
+// 腿③组：清偿支 + 节俭支并联（任一命中即腿③在场）
+const PAYOFF_ZH_GROUPS = [['PAYOFF_ZH', [PAYOFF_ZH]], ['AUSTERITY_ZH', [AUSTERITY_ZH]]];
+const PAYOFF_EN_GROUPS = [['PAYOFF_EN', [PAYOFF_EN]], ['AUSTERITY_EN', [AUSTERITY_EN]]];
 
 // ─── 邻近窗 ───────────────────────────────────────────
 const PAIR_SOV_ZH = 60;   // 腿① × 腿②
@@ -167,13 +198,25 @@ const NEG_EN = /\b(?:not|never|hardly|cannot|can'?t|doesn'?t|don'?t|isn'?t|aren'
 const HEDGE_ZH = /(?:并不|并非|未必|不一|没有|没|不)[^。！？\n]{0,3}(?:意味着|代表|说明|表示|证明)/;
 const HEDGE_EN = /\b(?:does\s+not|doesn'?t|do\s+not|don'?t|is\s+not|isn'?t|not)\s+(?:mean|imply|suggest|indicate|entail)\b|\b(?:no|little)\s+(?:reason|evidence|basis)\s+to\s+(?:believe|expect|conclude)\b/i;
 
+// r415：腿③节俭支专用否定表。r375 的 NEG_ZH 含「不能/无法」，而节俭支自身
+// 就带否定形（「不能乱花」「没法乱花」「不该乱花」），re.test(x.raw) 会把
+// 攻击句整条误杀（实测：「没钱就不能乱花」在 r375 下漏判）。节俭支只保留
+// 真对冲形（并非/未必/不一定/不必然/不至于/不见得/不会 与其后 6 字窗），
+// 「不能/无法/难以」留给腿③前窗判定，避免吞掉自身。
+const NEG_ZH_AUS = /(?:并不|并非|未必|不一定|不必然|不至于|不见得|不会|绝不|尚不|谈不上)/;
+
 function matchAlive(text, x, opts, R) {
   opts = opts || {};
   if (opts.neg) {
-    const negZh = (R && R.NEG_ZH !== undefined) ? R.NEG_ZH : NEG_ZH;
-    const negEn = (R && R.NEG_EN !== undefined) ? R.NEG_EN : NEG_EN;
+    // r415：opts.neg 可为 RegExp / RegExp[]（节俭支专用否定表），此时直接采用；
+    // 仍为 true 时才回落到 R 注入或全局 NEG_ZH/NEG_EN（负例注入契约不变）。
+    const useCustom = opts.neg instanceof RegExp || Array.isArray(opts.neg);
+    const negZh = useCustom ? opts.neg
+      : ((R && R.NEG_ZH !== undefined) ? R.NEG_ZH : NEG_ZH);
+    const negEn = useCustom ? null
+      : ((R && R.NEG_EN !== undefined) ? R.NEG_EN : NEG_EN);
     const negZhList = Array.isArray(negZh) ? negZh : [negZh];
-    const negEnList = Array.isArray(negEn) ? negEn : [negEn];
+    const negEnList = negEn == null ? [] : (Array.isArray(negEn) ? negEn : [negEn]);
     const beforeZh = text.slice(Math.max(0, x.idx - 6), x.idx);
     const beforeEn = text.slice(Math.max(0, x.idx - 12), x.idx);
     for (const re of negZhList) { if (re && re.test && (re.test(x.raw) || re.test(beforeZh))) return false; }
@@ -241,6 +284,13 @@ function findSignatures(text, R) {
       sov: resolveGroups(R, SOV_ZH_GROUPS),
       analogy: resolveGroups(R, ANALOGY_ZH_GROUPS),
       payoff: resolveGroups(R, PAYOFF_ZH_GROUPS),
+      payoffGroups: PAYOFF_ZH_GROUPS.map(g => g[0]),
+      // r416：payoffByGroup 必须走 resolveGroups 注入解析——直接
+      // Object.fromEntries(常量) 会绕过负例注入契约（E 组删条测试：
+      // 注入 PAYOFF_ZH=[] 后该组仍从常量数组命中，守卫不翻转）。
+      payoffByGroup: Object.fromEntries(
+        PAYOFF_ZH_GROUPS.map(([name]) => [name, resolveGroups(R, [[name, PAYOFF_ZH_GROUPS.find(g => g[0] === name)[1]]])])
+      ),
       wSov: R.PAIR_SOV_ZH != null ? R.PAIR_SOV_ZH : PAIR_SOV_ZH,
       wPay: R.PAIR_PAY_ZH != null ? R.PAIR_PAY_ZH : PAIR_PAY_ZH,
       lang: 'zh',
@@ -249,6 +299,11 @@ function findSignatures(text, R) {
       sov: resolveGroups(R, SOV_EN_GROUPS),
       analogy: resolveGroups(R, ANALOGY_EN_GROUPS),
       payoff: resolveGroups(R, PAYOFF_EN_GROUPS),
+      payoffGroups: PAYOFF_EN_GROUPS.map(g => g[0]),
+      // r416：同 ZH 侧——payoffByGroup 走注入解析，守住删条翻转契约。
+      payoffByGroup: Object.fromEntries(
+        PAYOFF_EN_GROUPS.map(([name]) => [name, resolveGroups(R, [[name, PAYOFF_EN_GROUPS.find(g => g[0] === name)[1]]])])
+      ),
       wSov: R.PAIR_SOV_EN != null ? R.PAIR_SOV_EN : PAIR_SOV_EN,
       wPay: R.PAIR_PAY_EN != null ? R.PAIR_PAY_EN : PAIR_PAY_EN,
       lang: 'en',
@@ -260,12 +315,25 @@ function findSignatures(text, R) {
     const analogyM = collect(text, L.analogy);
     if (analogyM.length === 0) continue;
     // 腿③受否定 + 对冲双守卫（对冲形：「并不意味着会破产」「does not mean」）
-    const payoffM = collect(text, L.payoff, { neg: true, hedge: true }, R);
-    if (payoffM.length === 0) continue;
+    // r415：拆两趟收集——清偿支（PAYOFF）沿用全局 NEG_ZH（破产结论前的
+    //   「并不意味着会破产」必须杀掉），节俭支（AUSTERITY）换用 NEG_ZH_AUS，
+    //   因为节俭支自身带否定形「不能/没法/不该乱花」，全局 NEG_ZH 的
+    //   「不能/无法」会 re.test(x.raw) 把攻击句整条误杀（实测漏判）。
+    const negFor = (grp) => (grp === 'AUSTERITY_ZH' || grp === 'AUSTERITY_EN')
+      ? { neg: NEG_ZH_AUS, hedge: true }
+      : { neg: true, hedge: true };
+    const payoffM = [];
+    for (const grp of L.payoffGroups) {
+      const list = L.payoffByGroup[grp];
+      if (!list) continue;
+      payoffM.push(...collect(text, list, negFor(grp), R));
+    }
+    const payoffDedup = dedupeOverlap(payoffM);
+    if (payoffDedup.length === 0) continue;
     for (const s of sovM) {
       const a = analogyM.find(x => dist(x, s) <= L.wSov);
       if (!a) continue;
-      const p = payoffM.find(x => dist(x, a) <= L.wPay);
+      const p = payoffDedup.find(x => dist(x, a) <= L.wPay);
       if (!p) continue;
       sigs.push({ lang: L.lang, sov: s.raw, analogy: a.raw, payoff: p.raw });
     }
@@ -327,7 +395,7 @@ function detectGovernmentHouseholdAnalogy(text, inject) {
     details: s.lang === 'zh'
       ? '政府-家庭收支类比(' + sigs.length + '处: 主权「' + s.sov + '」被比作「' + s.analogy + '」并推出「' + s.payoff + '」，把家庭/企业的预算约束平移到主权财政)(zh)'
       : 'government-household-analogy(' + sigs.length + 'x: the sovereign "' + s.sov + '" is equated with a private budget "' + s.analogy + '" and driven to the insolvency conclusion "' + s.payoff + '", transferring the household budget constraint to public finance)(en)',
-    guidance: '政府-家庭收支类比（government-household budget analogy / sovereign solvency conflation）：主权政府与家庭、企业的收支约束在机制上不同——政府拥有税收权、发债权（主权货币政府还有货币发行权）与跨越代际的存续期，债务可以滚动续借，不存在家庭意义上「花超了就破产」的硬约束。谬误在于把私人预算约束平移到主权财政，由此推出「国家财政跟家庭账本是一个道理，欠的债必须连本带利还清，否则就是破产」「政府借钱和普通人借钱一样，花超了就是破产，所以财政赤字必须立刻清零」「政府和企业一样，赚不到钱就会破产倒闭」这类清偿结论，并在财政辩论中用来否定举债支出本身。正当做法是先把机制差异对齐再讨论财政：区分主权与私人预算（「政府预算不等于家庭账本，主权政府可以滚动发债」）、指出类比的混淆（「把国家财政比作家庭预算是常见的类比谬误」）、或就事论事分析债务可持续性（「过度举债会推高利息负担，赤字合理性取决于债务结构与增长前景」）。私人域的正当陈述（「家庭预算要量入为出，个人借贷过度会导致债务危机」）、无清偿结论的类比提及（「有人认为政府跟家庭一样」）、对冲形（「跟家庭一样，但并不意味着会破产」）不在本族射程。',
+    guidance: '政府-家庭收支类比（government-household budget analogy / sovereign solvency conflation）：主权政府与家庭、企业的收支约束在机制上不同——政府拥有税收权、发债权（主权货币政府还有货币发行权）与跨越代际的存续期，债务可以滚动续借，不存在家庭意义上「花超了就破产」的硬约束。谬误在于把私人预算约束平移到主权财政，由此推出两类结论：①清偿/破产结论（「国家财政跟家庭账本是一个道理，欠的债必须连本带利还清，否则就是破产」「政府借钱和普通人借钱一样，花超了就是破产，所以财政赤字必须立刻清零」「政府和企业一样，赚不到钱就会破产倒闭」）；②财政节俭结论（r415 补入：「政府跟家庭一样，钱花光了就得省着花」「国家就像一个家庭，收支必须平衡，量入为出才是正道」「国库就像家里的存款，花完就没了，所以必须勤俭持家」「政府不能像家庭一样乱花钱，必须节流」「the government cannot spend more than it earns」「a country, like a family, must live within its means」）。两种结论都在财政辩论中用来否定举债支出本身。正当做法是先把机制差异对齐再讨论财政：区分主权与私人预算（「政府预算不等于家庭账本，主权政府可以滚动发债」）、指出类比的混淆（「把国家财政比作家庭预算是常见的类比谬误」）、或就事论事分析债务可持续性（「过度举债会推高利息负担，赤字合理性取决于债务结构与增长前景」）。私人域的正当陈述（「家庭预算要量入为出，个人借贷过度会导致债务危机」）、无结论的类比提及（「有人认为政府跟家庭一样」）、对冲形（「跟家庭一样，但并不意味着会破产」）不在本族射程。',
     tags: ['economics', 'fiscal', 'sovereign-debt', 'analogy', 'budget-constraint', 'public-finance'],
   };
 }
@@ -336,6 +404,7 @@ module.exports = {
   detectGovernmentHouseholdAnalogy,
   __internals: () => ({
     SOV_ZH, SOV_EN, ANALOGY_ZH, ANALOGY_EN, PAYOFF_ZH, PAYOFF_EN,
+    AUSTERITY_ZH, AUSTERITY_EN, NEG_ZH, NEG_EN, HEDGE_ZH, HEDGE_EN, NEG_ZH_AUS,
     SOV_ZH_GROUPS, SOV_EN_GROUPS,
     ANALOGY_ZH_GROUPS, ANALOGY_EN_GROUPS,
     PAYOFF_ZH_GROUPS, PAYOFF_EN_GROUPS,
