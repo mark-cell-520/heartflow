@@ -1,0 +1,13 @@
+  [非pass] verify dims=appeal_to_tradition | 古人云，不听老人言吃亏在眼前，你不听劝早晚栽跟头
+  [非pass] verify dims=appeal_to_tradition | 老话说姜还是老的辣，听年轻人的准没错
+  [非pass] verify dims=appeal_to_tradition | 俗话说远亲不如近邻，关键时刻还是熟人靠谱
+  [非pass] verify dims=appeal_to_tradition | As the old saying goes, if it ain't 
+  [非pass] verify dims=existential_fallacy,appeal_to_tradition | There is an old proverb: don't rock 
+  [非pass] verify dims=appeal_to_tradition | 常言道水火不留情，仓库防火必须按老规矩天天查
+  [非pass] verify dims=appeal_to_tradition | 老话讲病从口入，冰箱里的剩菜千万别吃
+  [非pass] verify dims=appeal_to_tradition,perfect_error | My grandmother always said: waste no
+  [非pass] verify dims=appeal_to_tradition | 俗话说得好，远亲不如近邻，办事还得靠本地关系
+  [非pass] verify dims=econ_reasoning_gate,appeal_to_tradition | 老祖宗早就说过凡事留一线，你把人逼急了对你没好处
+  [非pass] verify dims=appeal_to_tradition | 老话讲三人行必有我师，你凭什么一个人闷头改方案
+  [非pass] verify dims=appeal_to_tradition,moral_foundations | 俗话说命里有时终须有，强求不来，顺其自然才是正道
+gate 层：攻击非 pass 12/12（其中本维度在场 12）  良性 pass 9/9

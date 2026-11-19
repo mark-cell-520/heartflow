@@ -91,6 +91,31 @@
  *     存续形可独立到达路由（旧早退条件 !tradOld && !tradNew 会把「传了五百年，
  *     能不好吃吗」直接放行——该类样本新旧腿①皆不命中）；与路由④/⑤ 互不
  *     交叉配对（同 r291/r407 纪律）。
+ *
+ * [r409 扩展·真升级②] 4 号探针（coordination/agent4/probes/r409-probe-pool.js）
+ * 逻辑谬误家族轮续：四家族同池定拨——F3「古训俗语权威族」以 9/12 穿透 + 0/9
+ * 误伤 + 模块层直查 0/12（真零命中）定选（F4 false_dilemma 排除中项他法族
+ * 8/10+1/8、F5 straw_man 夸大后果反问族 6/10+0/7、F6 tu_quoque 3/6+1/5
+ * 留库未落地）。补入内容：
+ *   · 腿①俗语权威载体新族 ZH p1 口语载体形（老话说/老话讲/俗话说/常言道/
+ *     常言说/俗话道/俗语说——旧判据 TRADITION_ZH 只收「老规矩/老办法」等
+ *     规矩名词与 t5「古人云」窄形，「老话说姜还是老的辣」的俗语引述标记
+ *     整族射程外）；p2 古语引述形（古语有云/古语云）；EN pe1 old saying/
+ *     old proverb 形（as the old saying goes / there's an old proverb）；
+ *     pe2 长辈口训形（my grandmother always said / as my … used to say）；
+ *   · 腿②俗语结论新族 ZH pc1 吃亏警示结论（早晚/迟早+栽跟头/吃亏/吃苦头/
+ *     后悔；逼急X对你没好处）、pc2 担保结论（还是熟人靠谱/准能/保管）、
+ *     pc3 服从指令（必须按老规矩/听人劝/一句顶一万句）、pc4 禁忌指令
+ *     （千万/切切+别/不能+吃/喝/碰/试/信/改/动）、pc5 依仗结论（办事还得靠）、
+ *     pc6 资格收束（你凭什么一个人闷头）、pc7 宿命结论（强求不来/顺其自然
+ *     才是正道）；EN pc8 维持/禁止指令（so stop / keep things as they are /
+ *     don't bother / never ask）；
+ *   · 新路由⑦：（腿① ∪ 俗语载体）×（俗语结论新族），句级共现 + 零重叠配对
+ *     + 沿用 concessive-debate/证据在场/META 豁免；新增 PROVERB_META 豁免
+ *     （俗语/谚语引述 × 谬误/局限/研究/母题/原文/经验总结共现——在评析俗语
+ *     本身不是以俗语置换论证，仅作用于路由⑦）；p1/pe1/pe2 并入 tradBranches
+ *     使纯俗语载体形（无传统名词）可到达路由；与路由④/⑤/⑥ 腿表互不交叉
+ *     （同 r291/r407/r408 纪律）。
  */
 
 'use strict';
@@ -350,6 +375,74 @@ const SURVCONCL_EN_BRANCHES = {
   sc3_proves_worth: /\bthat\s+alone\s+proves\b|\bproves\s+(?:its|their)\s+(?:worth|value|effectiveness|quality)\b|\bmust\s+be\s+doing\s+something\s+right\b|\bsurvived?\s+for\s+a\s+reason\b|\b(?:has|have)\s+(?:lasted|endured|survived)\s+for\s+(?:a\s+)?reason\b/i,
 };
 
+// ═══════════════════════════════════════════════════════════════════
+// [r409] 古训俗语权威族分支表（俗语载体 × 俗语结论，逐支可注入）
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── 腿①俗语权威载体新族（中文）─────────────────────────────
+// 「老话说姜还是老的辣」「俗话说远亲不如近邻」——旧判据 TRADITION_ZH 只收
+// 「老规矩/老办法/约定俗成」等规矩名词与 t5_sages 的「古人云」窄形，俗语
+// 引述标记（老话说/俗话说/常言道）整族射程外。铁律同 r257：首支不带前导 `|`。
+const PROVERB_ZH_BRANCHES = {
+  // p1 口语载体形（老话说/俗话说/常言道 家族）
+  p1_colloquial: /老话说|老话讲|老话道|俗话说|俗话说得好|常言道|常言说|俗话道|俗语说|老俗话说/,
+  // p2 古语引述形（古语有云——t5_sages 已收「古人云」，不收窄形防交叉）
+  p2_classical: /古语有云|古语云|古谚(?:有|日)?云/,
+};
+
+// ─── 腿①俗语权威载体新族（英文）─────────────────────────────
+// as the old saying goes / there's an old proverb / my grandmother always said
+// ——旧判据只收 tradition/custom/the old ways 等名词形，俗语引述标记与
+// 长辈口训标记整族射程外。
+const PROVERB_EN_BRANCHES = {
+  // pe1 old saying / old proverb 引述形
+  pe1_saying: /\bas the old saying (?:goes|says)\b|\bthe old saying (?:goes|says)\b|\bthere'?s an old proverb\b|\ban old proverb\b|\bold proverb\b|\bas the proverb (?:goes|says)\b/i,
+  // pe2 长辈口训形（my grandmother always said / as my father used to say）
+  pe2_elder: /\bmy (?:grandmother|grandma|grandpa|grandfather) always said\b|\bas my \w+ (?:always )?(?:said|used to say|would say)\b/i,
+};
+
+// ─── 腿②俗语结论新族（中文）：俗语当论据推出的结论/指令 ─────────
+// 与路由④（SUPP 压制改变）/⑤（CONCL 质量担保）/⑥（SURVCONCL 时间检验）
+// 的腿表互不交叉：这些结论形是「俗语内容直接推出的行动/警示/担保」，
+// 旧三张表均不收（逐形核对无交叉，同 r291/r407/r408 纪律）。
+const PCONCL_ZH_BRANCHES = {
+  // pc1 吃亏警示结论（早晚栽跟头/逼急了没好处）
+  pc1_warning: /(?:早晚|迟早|总有一天|今后|往后)(?:要|会|得|该|必定|一定)?(?:栽跟头|吃亏|吃苦头|摔跟头|后悔|遭报应|付代价|挨收拾)|(?:逼急|惹急|得罪)[^。]{0,8}(?:对你|对大家|对别人|对谁)(?:没|没有)(?:好处|益处)/,
+  // pc2 担保结论（还是熟人靠谱/准能/保管）——不与 c1_reliable 交叉：
+  // c1 要求 肯定/一定/准 等副词前缀，「还是熟人靠谱」「保管没错」不在其射程
+  pc2_guarantee: /(?:还是|到底还是|说到底还是|终究还是)[^。]{0,6}(?:靠谱|管用|有效|灵验|厉害|了不起)|(?:准能|准保|保管|保准)(?:有|能|会|成|没错|对)/,
+  // pc3 服从指令（必须按老规矩/听人劝/一句顶一万句）——旧 SUPP_ZH 的
+  // 「必须+继续/保持/执行」系列不收「必须按老规矩」形（按不在动词表）
+  pc3_obey: /(?:必须|就得|应当|应该|千万|切切|总不能|总得)(?:得)?(?:按|照|依|循|听|守)[^。]{0,8}(?:老|古|祖|先人|传统|规矩|俗话|老人|老话)|听人劝|老人言不可不听|一句顶一万句|照老话(?:说|讲)?的?(?:做|办|执行)/,
+  // pc4 禁忌指令（千万/切切 + 别/不能 + 吃/喝/碰/试/信/改/动）——s10_dont_mess
+  // 只收「别瞎折腾/别动它」形，「千万别吃」整族射程外
+  pc4_prohibition: /(?:千万|切切|决不能|千万别|切记|切勿)(?:别|不能|不要|莫)?(?:吃|喝|碰|试|信|改|动|去|赌|借|招惹)/,
+  // pc5 依仗结论（办事还得靠本地关系）
+  pc5_rely: /(?:办事|做事|处理|解决问题)(?:还|也)?(?:得|要)?(?:靠|依仗|仰仗)/,
+  // pc6 资格收束（你凭什么一个人闷头改方案）——SINGLE_OUT_ZH 的「凭什么+
+  // 例外/特殊/反对」系列不收「一个人/闷头」形
+  pc6_qualification: /你(?:凭什么|为什么|怎能|怎么能够)(?:一个人|独自|闷头|一手|自顾自)[^。]{0,12}/,
+  // pc7 宿命结论（强求不来/顺其自然才是正道）
+  pc7_conclusion: /(?:强求|争强好胜)(?:也)?(?:不来|白争|没用)|顺其自然(?:才是|就是)(?:正道|福气|智慧|真理)/,
+};
+
+// ─── 腿②俗语结论新族（英文）：维持/禁止指令形 ─────────────────
+// so stop / keep things as they are / don't bother / never ask——旧 e10 只收
+// do not/never + change/alter/modify，e15 只收 keep X as it has always been，
+// 「so stop redesigning」「keep things as they are」整族射程外。
+const PCONCL_EN_BRANCHES = {
+  // pc8 维持/禁止指令
+  pc8_directive: /\b(?:so |thus )?stop\b|\bkeep things as they (?:are|were)\b|\bdon'?t bother\b|\bwe should keep\b|\bnever (?:ask|question|try|change)\b/i,
+};
+
+// ─── [r409] PROVERB_META 豁免（仅作用于新路由⑦）──────────────
+// 判据边界：句中在**评析俗语本身**（传播路径/文学母题/时代局限/原文引用/
+// 经验总结）而不是拿俗语当论据——同 r259/r277 META 铁律。载体词 × 评析词
+// 共现才豁免，单有载体词不豁免（「老话说姜还是老的辣，听年轻人的准没错」
+// 不在豁免射程）。
+const PROVERB_META_ZH = /(?:俗语|谚语|古训|老人言|老话|俗话|古人云|常言道)[^。]{0,20}(?:谬误|局限|研究对象|研究课题|传播路径|文学母题|原文引用|经验总结|学科|民俗学|语言学)/;
+const PROVERB_META_EN = /\b(?:proverb|saying|adage|old wisdom)\b[^.]{0,40}\b(?:fallacy|limitation|research|subject of|folklore|literary motif|quoted from|summarized? (?:as|from))\b/i;
+
 // 合并版（兼容旧读方；路由实际逐分支走，便于负例逐支注入）
 function _combine(branches, flags) {
   const parts = Object.keys(branches).map(k => '(?:' + branches[k].source + ')');
@@ -451,7 +544,11 @@ function checkAppealToTradition(text, inject) {
     // [r408] 存续时段分支并入 tradBranches：使纯存续形（「传了五百年」）
     // 能通过 tradNew 早退门到达路由，并在 tradSpans 中承重
     .concat(_branchList(R.SURVIVE_ZH_BRANCHES, SURVIVE_ZH_BRANCHES))
-    .concat(_branchList(R.SURVIVE_EN_BRANCHES, SURVIVE_EN_BRANCHES));
+    .concat(_branchList(R.SURVIVE_EN_BRANCHES, SURVIVE_EN_BRANCHES))
+    // [r409] 俗语载体分支并入 tradBranches：使纯俗语引述形（「俗话说…」，
+    // 无传统名词）能通过 tradNew 早退门到达路由⑦
+    .concat(_branchList(R.PROVERB_ZH_BRANCHES, PROVERB_ZH_BRANCHES))
+    .concat(_branchList(R.PROVERB_EN_BRANCHES, PROVERB_EN_BRANCHES));
   const suppBranches = _branchList(R.SUPP_ZH_BRANCHES, SUPP_ZH_BRANCHES)
     .concat(_branchList(R.SUPP_EN_BRANCHES, SUPP_EN_BRANCHES));
   const conclBranches = _branchList(R.CONCL_ZH_BRANCHES, CONCL_ZH_BRANCHES)
@@ -459,6 +556,12 @@ function checkAppealToTradition(text, inject) {
   // [r408] 时间检验结论分支（路由⑥ 腿②）
   const survConclBranches = _branchList(R.SURVCONCL_ZH_BRANCHES, SURVCONCL_ZH_BRANCHES)
     .concat(_branchList(R.SURVCONCL_EN_BRANCHES, SURVCONCL_EN_BRANCHES));
+  // [r409] 俗语结论分支（路由⑦ 腿②）
+  const provConclBranches = _branchList(R.PCONCL_ZH_BRANCHES, PCONCL_ZH_BRANCHES)
+    .concat(_branchList(R.PCONCL_EN_BRANCHES, PCONCL_EN_BRANCHES));
+  // [r409] PROVERB_META 豁免（评析俗语本身，仅作用路由⑦）
+  const provMetaZh = R.PROVERB_META_ZH || PROVERB_META_ZH;
+  const provMetaEn = R.PROVERB_META_EN || PROVERB_META_EN;
 
   const tradOld = TRAD_ZH_.test(text) || TRAD_EN_.test(text);
   // [r259] 新腿①分支也要能独立支撑到达新路由——旧判据的 `!trad` 早退
@@ -544,6 +647,21 @@ function checkAppealToTradition(text, inject) {
         detail: zhText ? '诉诸传统·存续时段×时间检验结论(zh)' : 'appeal to tradition·time-survival warrant(en)',
       };
     }
+
+    // 路由⑦：[r409] 腿①（∪ 俗语载体）× 腿②俗语结论
+    // （古人云/老话说/俗话说 引述 × 由俗语直接推出的吃亏警示/担保/服从/
+    // 禁忌/依仗/资格/宿命结论——旧路由④/⑤/⑥ 的腿表均不收俗语引述标记与
+    // 这批结论形，整族射程外；与旧三路由腿表互不交叉配对）。PROVERB_META
+    // 豁免仅作用本路由：在评析俗语本身（传播路径/母题/原文引用）不是运用它。
+    if (!provMetaZh.test(sent) && !provMetaEn.test(sent)) {
+      const provConclSpans = [].concat(...provConclBranches.map(b => _collect(b, sent)));
+      if (provConclSpans.length > 0 && _paired(tradSpans, provConclSpans)) {
+        return {
+          hit: true, score: 0.4, count: 1,
+          detail: zhText ? '诉诸传统·古训俗语权威(俗语引述×俗语结论)(zh)' : 'appeal to tradition·proverb-as-authority(en)',
+        };
+      }
+    }
   }
 
   return { hit: false, score: 0, detail: '', count: 0 };
@@ -557,6 +675,8 @@ module.exports = {
     TRAD_ZH_BRANCHES, TRAD_EN_BRANCHES, SUPP_ZH_BRANCHES, SUPP_EN_BRANCHES,
     CONCL_ZH_BRANCHES, CONCL_EN_BRANCHES,
     SURVIVE_ZH_BRANCHES, SURVIVE_EN_BRANCHES, SURVCONCL_ZH_BRANCHES, SURVCONCL_EN_BRANCHES,
+    PROVERB_ZH_BRANCHES, PROVERB_EN_BRANCHES, PCONCL_ZH_BRANCHES, PCONCL_EN_BRANCHES,
+    PROVERB_META_ZH, PROVERB_META_EN,
     TRAD_ZH_EXT, TRAD_EN_EXT, SUPP_ZH_EXT, SUPP_EN_EXT, CONCL_ZH_EXT, CONCL_EN_EXT,
     HEDGE_CONCESSION_ZH, HEDGE_EVAL_ZH, HEDGE_CONCESSION_EN, HEDGE_EVAL_EN,
   }),
