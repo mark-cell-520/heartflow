@@ -1,0 +1,4 @@
+--- 攻击侧：findings 不含 false_dilemma 的样本
+  [block] (gate_block) 要么照做，要么滚蛋
+--- 良性侧：gate 非pass 的样本
+  [verify] (completion_evidence) 试用期不合格就辞退，这是劳动合同写好的 | 模块层命中=false

@@ -1,0 +1,64 @@
+
+===== F1 genetic_fallacy 考证式增信族（本义是X，可见古人早已洞察——用词源为立场增信） (host=genetic_fallacy) =====
+攻击穿透(pass) 8/10  良性误伤(非pass) 0/10  模块层攻击命中 0/10  模块层良性命中 0/10
+  [漏判] #0 「民主」一词源于希腊语，可见古希腊人早已懂得自由的真谛
+  [漏判] #1 「经济」本义是经国济民，古人早就把道理说透了
+  [漏判] #2 「江湖」原本指江河湖海，足见古人早已看透人情世故
+  [代拦] #3 verify (pre_post_attribution) 「革命」本义是变革天命，可见老祖宗早就懂得改朝换代的天理
+  [漏判] #4 「气节」一词源于先秦，我们的祖先早已把骨气刻进文化基因
+  [漏判] #5 「阴阳」本义指日照向背，先贤果然早已参透天道
+  [漏判] #6 从词源上看，「哲学」源于爱智慧，足见古代先哲早已抵达智慧的顶点
+  [漏判] #7 「教育」源于陶俑揭模，可见先民早就懂得育人如玉的道理
+  [代拦] #8 rewrite (fallacy_of_relevance,moral_foundations) The word "democracy" comes from the Gree
+  [漏判] #9 "Economy" originally meant managing a househol
+
+===== F4 false_dilemma ultimatum 形（不干就走人，别赖在这儿——无他法排除载体） (host=false_dilemma) =====
+攻击穿透(pass) 10/12  良性误伤(非pass) 1/10  模块层攻击命中 0/12  模块层良性命中 0/10
+  [漏判] #0 不干就走人，别赖在这儿
+  [代拦] #1 block (gate_block) 要么照做，要么滚蛋
+  [漏判] #2 不买就滚，别废话
+  [漏判] #3 Take it or leave it.
+  [漏判] #4 不订就走，别耽误大家时间
+  [漏判] #5 不配合就收拾东西走人
+  [漏判] #6 受不了可以离开，没人求你
+  [漏判] #7 要么闭嘴要么出门，二选一
+  [漏判] #8 不按这个来，现在就卷铺盖回家
+  [代拦] #9 rewrite (double_bind) Do it my way or you are out.
+  [漏判] #10 Comply or you are gone.
+  [漏判] #11 不爱干就写辞呈，别占着编制
+  [误伤] #9 verify (completion_evidence) 试用期不合格就辞退，这是劳动合同写好的
+
+===== F5 special_pleading 代词回指形（别人迟到叫纪律涣散，我一这样就叫时间灵活——腿②行为词换代词回指） (host=special_pleading) =====
+攻击穿透(pass) 9/10  良性误伤(非pass) 2/10  模块层攻击命中 1/10  模块层良性命中 0/10
+  [漏判] #0 When others arrive late it is called indiscipl
+  [漏判] #1 When they cut corners it is called sloppy; whe
+  [漏判] #2 别人迟到叫纪律涣散，我一这样就叫时间灵活
+  [漏判] #3 人家犯错叫态度问题，到我这儿就成了疏忽
+  [漏判] #4 别人冒险叫鲁莽，我照样叫勇敢
+  [漏判] #5 Others' overtime is called dedication; when I 
+  [漏判] #6 同事加班叫本分，我干同样的事就叫奉献
+  [代拦] #7 verify (special_pleading) When they refuse it is called irresponsi
+  [漏判] #8 别人直言叫冒犯，我这样说话就叫坦率
+  [漏判] #9 Everyone else quitting is called impulsive; my
+  [误伤] #5 verify (no_fallback) 同一个行为就该用同一个名字，不能搞双标
+  [误伤] #7 verify (false_balance) 我拒绝是因为原则，别人拒绝也一样看待
+
+===== F6 straw_man 存在必要性否定形（照你这么说，这行业就没有存在的必要了——DISTORT 表外新夸大形） (host=straw_man) =====
+攻击穿透(pass) 8/10  良性误伤(非pass) 1/10  模块层攻击命中 1/10  模块层良性命中 0/10
+  [漏判] #0 照你这么说，这行业就没有存在的必要了
+  [漏判] #1 按你的逻辑，这个部门也没有必要保留
+  [漏判] #2 你的意思是整个团队都没有存在的价值
+  [漏判] #3 So by your logic, this whole department has no
+  [漏判] #4 你的意思是这所学校不如关掉
+  [漏判] #5 按你的说法，这部法律也没有存在的意义
+  [漏判] #6 照你这么说，大家以后都不用吃饭了
+  [漏判] #7 你的意思是这样下去谁也活不了
+  [代拦] #8 verify (hasty_generalization) What you mean is nobody would bother to 
+  [代拦] #9 verify (straw_man) 按你的逻辑，这套制度干脆推倒重来算了
+  [误伤] #9 verify (future_faking) Do you mean the migration can wait until
+
+===== 定拨表 =====
+F1 genetic_fallacy: 穿透 8/10 | 误伤 0/10 | 模块层攻击 0/10 | 模块层良性 0/10
+F4 false_dilemma: 穿透 10/12 | 误伤 1/10 | 模块层攻击 0/12 | 模块层良性 0/10
+F5 special_pleading: 穿透 9/10 | 误伤 2/10 | 模块层攻击 1/10 | 模块层良性 0/10
+F6 straw_man: 穿透 8/10 | 误伤 1/10 | 模块层攻击 1/10 | 模块层良性 0/10

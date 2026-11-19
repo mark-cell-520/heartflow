@@ -43,6 +43,16 @@
  *     路由⑪单独形命中 + 事实/排期/技术依据三重豁免（「只有这两条路
  *     可走，因为主干道都在施工」「the protocol specifies one
  *     algorithm」是真实约束陈述，不判）。
+ *   · [r415] 最后通牒（ultimatum，无要么-frame 的胁迫二选）：不干
+ *     就走人 / 要么照做要么滚蛋 / Take it or leave it / 受不了可以
+ *     离开，没人求你——句中**没有**要么A要么B的完整 frame（或只有
+ *     单边要么）、没有「不支持就是反对」定性等式、没有他法排除载体，
+ *     靠「离场指令」把局面压成「照办或出局」两个选项。池化探针 r415
+ *     （coordination/agent4/probes/r415-probe-pool.js）实测 10/12 穿
+ *     透存量判据（四家族同池最高）、良性 0 误伤、模块层真零命中。
+ *     路由⑫单独形命中 + 制度依据豁免（「连续三次不达标就走人，这是
+ *     公司规定」是制度陈述，不判）。真升级②：既有第 65 维全新措辞
+ *     家族，维度计数不变、src/index.js 零改动。
  *
  * 为什么现有 64 维拦不住：
  *   · double_bind 管权威关系下的双重束缚（亲子/上下级两难指令），
@@ -260,6 +270,52 @@ const REASON_EN = /\b(?:the )?(?:protocol|specification|spec|standard|algorithm|
 const EXALT_GUARD_ZH = /(?:还|也|仍)(?:可以|能|有)(?:一起|一块|共同|各自|再)?(?:想|商量|讨论|谋划|尝试|努力|应对|解决|考虑|找)|(?:我们|大家|咱们|你|你们|诸位)?(?:一定|能够?|可以)?(?:一起|一块|共同)(?:想|商量|讨论|谋划|应对|解决|努力|想办法)|(?:还有|也有|仍有|能找到|觅到|另寻)(?:别的|其他|新的|解决)?(?:办法|路子|出路|方法|方向)|(?:另|重新)(?:想|找|辟)(?:办法|路子|出路|方法)|(?:继续|再)(?:讨论|商议|评审|评估|沟通|对接)|不妨|(?:改期|延期|顺延)(?:再|后)?(?:议|谈|讨论)/;
 const EXALT_GUARD_EN = /\b(?:we|you|they)\s+(?:can|could|still)\s+(?:still\s+)?(?:figure|find|work|try|think|improvise)\b|\bthere (?:is|are)\s+(?:still\s+)?(?:a|another|other)\s+(?:way|option|approach)\b|\bwork(?:around)?\b|\bwe can still\b|\bstill have (?:options|a chance|room)\b/i;
 
+// ─── [r415] 最后通牒族常量（ultimatum：不X就走人形胁迫二选）──────────
+// 池化探针 r415（coordination/agent4/probes/r415-probe-pool.js）实测：
+// false_dilemma 10/12 新措辞穿透（四家族同池最高）。穿透样本落在全部
+// 既有判据射程外——没有要么A要么B完整 frame、没有「不支持就是反对」
+// 定性等式、没有他法排除载体，靠**离场指令**把局面压成「照办或出局」：
+//   「不干就走人，别赖在这儿」「要么照做，要么滚蛋」
+//   「不配合就收拾东西走人」「受不了可以离开，没人求你」
+//   "Take it or leave it." "Comply or you are gone."
+// 与路由⑦（要么-frame×威胁后果）的分工：那边有完整要么 frame、Y 是
+// 泛威胁后果（出事别来找我）；本族 Y 是**离场指令**（走人/滚蛋/卷铺
+// 盖/out），frame 可以只有一个否定条件支（不X就Y）。
+//
+// 腿①a ULTIM_ZH：否定条件 × 离场后果（不干就走人）。Y 表刻意不收
+// 「辞退/开除/解雇」等第三人称后果词（「不努力就被辞退」多为制度性
+// 条件陈述，且常带规定/合同依据，归 ULTIM_REASON 豁免层兜底）；
+// ultimatum 的 Y 必须是说话人指向听话人的离场指令。亦不收裸「走」
+// （「没写完就走」类平叙条件句），裸走形由腿①b 带嘲讽尾巴承重。
+const ULTIM_ZH = /(?:不|没|甭|别再?)[^。！？；\n]{0,8}(?:就|便|都)(?:走人|滚蛋|滚开|滚出去|卷铺盖|收拾东西|写辞呈|辞呈|不送|出门|出去|离开|回家)/;
+
+// 腿①b ULTIM_BARE_ZH：否定条件 × 裸离场动词 + 定向嘲讽尾巴（「不订就
+// 走，别耽误大家时间」「不买就滚，别废话」）。尾巴表限定「对听话人的
+// 逐客令」——「没写完就走」式平叙条件句与「别等他」式顺带交代均无此
+// 类尾巴，天然豁免。
+const ULTIM_BARE_ZH = /(?:不|没|甭)[^。！？；\n]{0,6}(?:就|便|都)(?:走|离开|出去|出门|滚)(?:吧|了)?[，,。！？]?[^。！？；\n]{0,4}(?:别废话|别啰嗦|少废话|别耽误|别赖|赖着|不送|没人求你|没人拦你|请自便|悉听尊便|趁早|哪儿凉快|凉快哪儿)/;
+
+// 腿①c ULTIM_EITHER_ZH：单边要么-frame × 离场后果（要么照做要么滚蛋 /
+// 要么闭嘴要么出门）。完整要么A要么B frame 无离场词时不判（「要么
+// 签字要么违约」是程序二选，由 FACTUAL/SCHEDULE 与双因子交叉覆盖）。
+const ULTIM_EITHER_ZH = /要么[^。！？；\n]{0,14}(?:就)?(?:滚蛋|滚开|滚出去|走人|卷铺盖|收拾东西|出门|出去|离开)/;
+
+// 腿①d DISMISS_ZH：许可离开 × 嘲讽收尾（受不了可以离开，没人求你）。
+// 收尾词限定（没人求你/没人拦/不送/趁早/请自便）——「也可以先找朋友
+// 聊聊」式提供出路的表述无收尾词，天然豁免。
+const DISMISS_ZH = /(?:可以|尽管|想|愿意)[^。！？；\n]{0,6}(?:离开|走人|辞职|退出|撂挑子)[^。！？；\n]{0,8}(?:没人求你|没人拦|没人挽留|不送|请自便|悉听尊便|趁早)/;
+
+// 腿①e ULTIM_EN：take it or leave it / my way or the highway /
+// comply or you're out / do it … or you're out(gone/fired)。
+const ULTIM_EN = /\b(?:take\s+it\s+or\s+leave\s+it|like\s+it\s+or\s+(?:leave|lump)\s+it|my\s+way\s+or\s+the\s+highway)\b|(?:comply|do\s+it|shape\s+up)\b[^.!?;]{0,40}?\bor\s+(?:you(?:'re| are)\s+)?(?:out|gone|fired|finished|done)\b/i;
+
+// 豁免：制度依据在场——「连续三次不达标就走人，这是公司规定」「试用期
+// 不合格就辞退，这是劳动合同写好的」是制度/合同陈述，不是当面对听话
+// 人发出的离场通牒（与路由⑪ REASON 同设计：只收制度/合同类依据标记，
+// 不收泛化 because——防攻击句借空理由穿透）。
+const ULTIM_REASON_ZH = /(?:公司|员工手册|劳动合同|规章制度|内部)(?:的)?(?:制度|规章|规定|约定|手册|合同|协议)?[^。！？；\n]{0,4}(?:规定|约定|明确|写明)|(?:这是|按)(?:公司|劳动合同|规章制度|员工手册)|白纸黑字|明文(?:规定|写)/;
+const ULTIM_REASON_EN = /\b(?:the )?(?:contract|policy|handbook|handbook|agreement|hr)\s+(?:says|states|specifies|requires|mandates)\b|\b(?:it'?s|this is|both terms are) (?:in the )?(?:contract|policy|handbook|agreement)\b|\b(?:documented|spelled out|written|set out|stated)\s+in\s+the\s+(?:contract|policy|handbook|agreement)\b|\bper (?:the )?(?:contract|policy|handbook)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以自定义正则替换指定常量
@@ -413,6 +469,26 @@ function checkFalseDilemma(text, inject) {
     return { hit: true, score: 0.74, detail: '他法排除(没有别的办法/别无他法)' };
   }
 
+  // ─── [r415] 新路由⑫：最后通牒族（不X就走人 / 要么X要么滚 /
+  // take it or leave it / 受不了可以离开没人求你）────────────────
+  // 池化探针 r415（coordination/agent4/probes/r415-probe-pool.js）实测
+  // 10/12 穿透（四家族同池最高）、模块层真零命中 0/12、良性 0/10。
+  // 与路由⑦（要么-frame×泛威胁）分工：本族 Y 是离场指令，frame 可以
+  // 只有一个否定条件支。单独形命中 + 制度依据豁免（与路由⑪ REASON 同
+  // 设计）。union 语义：存量路由命中走存量，本路由兜住其射程外的
+  // ultimatum 形。真升级②：既有第 65 维全新措辞家族，src/index.js
+  // 零改动、dimMap 键数不变。
+  const ultimZh = (R.ULTIM_ZH || ULTIM_ZH).test(text);
+  const ultimBareZh = (R.ULTIM_BARE_ZH || ULTIM_BARE_ZH).test(text);
+  const ultimEitherZh = (R.ULTIM_EITHER_ZH || ULTIM_EITHER_ZH).test(text);
+  const dismissZh = (R.DISMISS_ZH || DISMISS_ZH).test(text);
+  const ultimEn = (R.ULTIM_EN || ULTIM_EN).test(text);
+  if ((ultimZh || ultimBareZh || ultimEitherZh || dismissZh || ultimEn)
+    && !(R.ULTIM_REASON_ZH || ULTIM_REASON_ZH).test(text)
+    && !(R.ULTIM_REASON_EN || ULTIM_REASON_EN).test(text)) {
+    return { hit: true, score: 0.76, detail: '最后通牒(不X就走人/要么X要么滚)' };
+  }
+
   const dsf = disjunctiveFallacy.detect(text, R.DSF || null);
   if (dsf.hit) {
     return { hit: true, score: dsf.score, detail: dsf.details };
@@ -433,5 +509,7 @@ module.exports = {
     NOTWITH_EN, EITHER_DEROG_EN,
     EXALT_ZH, EXALT_EN, REASON_ZH, REASON_EN,
     EXALT_GUARD_ZH, EXALT_GUARD_EN,
+    ULTIM_ZH, ULTIM_BARE_ZH, ULTIM_EITHER_ZH, DISMISS_ZH, ULTIM_EN,
+    ULTIM_REASON_ZH, ULTIM_REASON_EN,
   }),
 };
