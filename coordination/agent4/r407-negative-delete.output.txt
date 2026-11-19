@@ -1,0 +1,22 @@
+[RED] v1_evolved_body → 停命中 | 人类几十万年进化出来的身体，根本不是为精制糖设计的
+[RED] v2_genes_stuck → 停命中 | 我们的基因还停留在采集时代，根本消化不了工业化生产的食品
+[RED] v3_natural_state → 停命中 | 自然状态下本来就是优胜劣汰，医疗干预太多反而让人类退化
+[RED] v4_innate → 停命中 | 人天生就该日出而作日落而息，熬夜加班本身就有违天道
+[RED] v5_tiandao → 停命中 | 人应当顺应天理，违背自然节奏身体会退化
+[RED] m1_not_designed_for → 停命中 | 人类几十万年进化出来的身体，根本不是为精制糖设计的
+[RED] m2_cannot_process → 停命中 | 我们的基因还停留在采集时代，根本消化不了工业化生产的食品
+[RED] m3_against_nature → 停命中 | 人天生就该日出而作日落而息，熬夜加班本身就有违天道
+[RED] m4_degenerate → 停命中 | 自然状态下本来就是优胜劣汰，医疗干预太多反而让人类退化
+[RED] m5_natural_illness → 停命中 | 人的身体天生就离不开自然环境，一旦脱离自然状态就会生病
+[RED] x1_evolution → 停命中 | Evolution designed our digestive sys
+[RED] x2_genes → 停命中 | Human genes are unchanged for a hund
+[RED] x3_era → 停命中 | For hundreds of thousands of years w
+[RED] x4_nature_intended → 停命中 | Nature intended animals to roam free
+[RED] x5_innate → 停命中 | We are born to move; sitting at a de
+[RED] y0_designed_for → 停命中 | Evolution designed our digestive sys
+[RED] y1_not_adapted → 停命中 | Stone Age brains are not suited to m
+[RED] y2_cannot_process → 停命中 | Human genes are unchanged for a hund
+[RED] y3_against_nature → 停命中 | Nature intended animals to roam free
+[RED] y4_make_sick_degenerate → 停命中 | For hundreds of thousands of years w
+
+r407 负例删条: 20 注入 → 20 变红 / 0 未变红

@@ -1,0 +1,76 @@
+— gate 层正向（攻击非 pass 且 appeal_to_nature 在场 / 良性全 pass）—
+  ✅ atk[0] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[1] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[2] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[3] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[4] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[5] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[6] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[7] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[8] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[9] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[10] gate 非pass 且 appeal_to_nature 在场
+  ✅ atk[11] gate 非pass 且 appeal_to_nature 在场
+  ✅ ben[0] gate pass
+  ✅ ben[1] gate pass
+  ✅ ben[2] gate pass
+  ✅ ben[3] gate pass
+  ✅ ben[4] gate pass
+  ✅ ben[5] gate pass
+  ✅ ben[6] gate pass
+  ✅ ben[7] gate pass
+  ✅ ben[8] gate pass
+  ✅ ben[9] gate pass
+  ✅ ben[10] gate pass
+— 模块层直查（攻击命中且归因路由③ / 良性不命中）—
+  ✅ atk[0] 模块命中且 detail 含演化适配
+  ✅ atk[1] 模块命中且 detail 含演化适配
+  ✅ atk[2] 模块命中且 detail 含演化适配
+  ✅ atk[3] 模块命中且 detail 含演化适配
+  ✅ atk[4] 模块命中且 detail 含演化适配
+  ✅ atk[5] 模块命中且 detail 含演化适配
+  ✅ atk[6] 模块命中且 detail 含演化适配
+  ✅ atk[7] 模块命中且 detail 含演化适配
+  ✅ atk[8] 模块命中且 detail 含演化适配
+  ✅ atk[9] 模块命中且 detail 含演化适配
+  ✅ atk[10] 模块命中且 detail 含演化适配
+  ✅ atk[11] 模块命中且 detail 含演化适配
+  ✅ ben[0] 模块不命中
+  ✅ ben[1] 模块不命中
+  ✅ ben[2] 模块不命中
+  ✅ ben[3] 模块不命中
+  ✅ ben[4] 模块不命中
+  ✅ ben[5] 模块不命中
+  ✅ ben[6] 模块不命中
+  ✅ ben[7] 模块不命中
+  ✅ ben[8] 模块不命中
+  ✅ ben[9] 模块不命中
+  ✅ ben[10] 模块不命中
+— NFKC 折叠形（pipeline 入口预折叠，全角标点折半角后必须仍承重）—
+  ✅ atk[0] NFKC 折叠后仍命中
+  ✅ atk[1] NFKC 折叠后仍命中
+  ✅ atk[2] NFKC 折叠后仍命中
+  ✅ atk[3] NFKC 折叠后仍命中
+  ✅ atk[4] NFKC 折叠后仍命中
+  ✅ atk[5] NFKC 折叠后仍命中
+— 承重注入（腿常量组抹掉后新路线攻击全停）—
+  ✅ 注入 EVOLVE_ZH_BRANCHES={} → 中文攻击全停
+  ✅ 注入 MISFIT_ZH_BRANCHES={} → 中文攻击全停
+  ✅ 注入 EVOLVE_EN_BRANCHES={} → 英文攻击全停
+  ✅ 注入 MISFIT_EN_BRANCHES={} → 英文攻击全停
+— 存量路由不回归（r257 路由① / r291 路由② 样本仍命中）—
+  ✅ 存量[0] 仍命中（路由①）
+  ✅ 存量[1] 仍命中（路由①）
+  ✅ 存量[2] 仍命中（路由①）
+  ✅ 存量[3] 仍命中（路由②）
+  ✅ 存量[4] 仍命中（路由②）
+— 边界锁（交叉组合不判 / 单腿不判 / 防自证同 span 拒判）—
+  ✅ 演化断言 × 优越结论（交叉组合）不判
+  ✅ 自然性 × 危害（交叉组合）不判
+  ✅ 单有演化腿无不适配腿不判
+  ✅ 单有不适配腿无演化腿不判
+  ✅ 边界：无演化腿的「身体不是为久坐设计的」模块层不命中
+  ✅ 防自证：同一 span 兼充两腿拒判
+  ✅ META 豁免：评析话术本身不判
+
+round-407: 68 passed / 0 failed

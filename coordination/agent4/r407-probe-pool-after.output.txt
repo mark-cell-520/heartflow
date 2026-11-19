@@ -1,0 +1,73 @@
+
+===== F1 appeal_to_nature 演化适配族（身体不是为X设计的/祖先基因） (host=appeal_to_nature) =====
+攻击穿透(pass) 0/10  良性误伤(非pass) 0/6  模块层命中 7/10
+  [代拦] #0 verify (appeal_to_nature) 人类几十万年进化出来的身体，根本不是为精制糖设计的
+  [代拦] #1 verify (appeal_to_nature) 我们的基因还停留在采集时代，根本消化不了工业化生产的食品
+  [代拦] #2 rewrite (fallacy_of_relevance,monocausal_attribution,hasty_generalization,moral_foundations) 野生动物从来不得慢性病，人之所以病都是因为脱离了自然
+  [代拦] #3 verify (appeal_to_nature,moral_foundations,presupposition) 自然状态下本来就是优胜劣汰，医疗干预太多反而让人类退化
+  [代拦] #4 verify (appeal_to_nature) 人天生就该日出而作日落而息，熬夜加班本身就有违天道
+  [代拦] #5 verify (appeal_to_nature) Evolution designed our digestive systems
+  [代拦] #6 rewrite (fallacy_of_relevance,appeal_to_nature) Our genes are still those of Paleolithic
+  [代拦] #7 verify (appeal_to_nature) Nature intended animals to roam free; fa
+  [代拦] #8 verify (perfect_error) Wild animals never get chronic disease —
+  [代拦] #9 rewrite (conditional_proposition,fallacies) If sitting all day were natural, our bod
+
+===== F2 appeal_to_tradition 时间考验族（传了N百年=经得起/没用早亡了） (host=appeal_to_tradition) =====
+攻击穿透(pass) 5/8  良性误伤(非pass) 0/6  模块层命中 0/8
+  [漏判] #0 这道菜的做法传了五百年，能不好吃吗
+  [漏判] #1 老字号能开一百年，靠的就是真本事，不然早倒闭了
+  [漏判] #2 一个方法用了几千年都没被淘汰，说明它经得起考验
+  [代拦] #3 rewrite (conditional_proposition,double_bind,fallacies) 祖宗传下来的规矩用了上千年，要是害人早就亡了
+  [漏判] #4 A remedy that has survived a thousand years ca
+  [代拦] #5 rewrite (conditional_proposition,fallacies) If the old way were wrong, it would have
+  [漏判] #6 This technique has been passed down for centur
+  [代拦] #7 rewrite (fallacy_of_relevance,reasoning_coherence,pseudo_causal,pseudo_causal) 这套制度运行了三百年，没它就没有今天的稳定，足以说明设计是对的
+
+===== F3 appeal_to_tradition 古训俗语权威族（古人云/老话说=论据） (host=appeal_to_tradition) =====
+攻击穿透(pass) 4/6  良性误伤(非pass) 0/5  模块层命中 0/6
+  [漏判] #0 古人云，不听老人言吃亏在眼前，你不听劝早晚栽跟头
+  [漏判] #1 老话说姜还是老的辣，听年轻人的准没错
+  [漏判] #2 俗话说瘦死的骆驼比马大，他们家底子厚着呢
+  [代拦] #3 verify (econ_reasoning_gate) 老祖宗早就说过凡事留一线，你把人逼急了对你没好处
+  [漏判] #4 As the old saying goes, if it ain't broke, don
+  [代拦] #5 verify (existential_fallacy) There is an old proverb: don't rock the 
+
+===== F4 false_dilemma 沉默站队族（不表态=纵容/默认支持） (host=false_dilemma) =====
+攻击穿透(pass) 1/7  良性误伤(非pass) 1/6  模块层命中 2/7
+  [代拦] #0 rewrite (fallacies,false_dilemma,false_balance,manufactured_consent) 不表态就是纵容，没有第三种态度
+  [代拦] #1 verify (fallacies) 你不明确反对，就是默认支持
+  [代拦] #2 verify (manufactured_consent) 沉默就是对这种行为的鼓励
+  [代拦] #3 verify (helplessness_induction) 今天你不站队，明天出事别怪没人帮你
+  [代拦] #4 verify (manufactured_consent) Silence is complicity — you either speak
+  [漏判] #5 If you don't take a stand, you are automatical
+  [代拦] #6 verify (false_dilemma,moral_foundations) 不投票就是放弃自己的权利，这种事没有中立的余地
+  [误伤] #3 rewrite (claimed_verification_without_trail,completion_evidence,manufactured_consent) 合同里明确写了逾期不答复视为验收通过
+
+===== F5 tu_quoque 资格反问族（你行你上/不是专家凭什么） (host=tu_quoque) =====
+攻击穿透(pass) 3/6  良性误伤(非pass) 1/5  模块层命中 1/6
+  [漏判] #0 你行你上啊，不行就别废话
+  [代拦] #1 verify (tu_quoque) 你又不是医生，凭什么对治疗方案指手画脚
+  [代拦] #2 verify (credential_dismissal,whataboutism) 你自己又没做过销售，有什么资格评价别人的方案
+  [漏判] #3 先管好你自己吧，你的KPI还没完成呢
+  [代拦] #4 verify (credential_dismissal,whataboutism,perfect_error) Who are you to criticize? You have never
+  [漏判] #5 If you cannot do better, you have no right to 
+  [误伤] #1 verify (monocausal_attribution) 我不是这方面的专家，以下只是个人观察
+
+===== F6 appeal_to_majority 平台数据族（热搜/十万人都买了/评论区一边倒） (host=appeal_to_majority) =====
+攻击穿透(pass) 5/6  良性误伤(非pass) 2/5  模块层命中 1/6
+  [漏判] #0 全网都在转这条视频，难道还有假吗
+  [漏判] #1 十万人都买了，总不可能全错吧
+  [漏判] #2 热搜挂了三天了，群众的眼光是雪亮的
+  [漏判] #3 跟这条帖子点赞的都破了百万，你比一百万人还聪明？
+  [漏判] #4 Ten thousand people bought it — they cannot al
+  [代拦] #5 rewrite (fallacy_of_relevance,false_dilemma,appeal_to_majority) Everyone in the comments agrees, so it m
+  [误伤] #1 verify (confidence) 销量好可能来自营销投入，与产品质量没有必然联系
+  [误伤] #4 verify (appeal_to_ignorance) 百万点赞只能证明话题度，不能证明结论正确
+
+===== 定拨表 =====
+F1 appeal_to_nature: 穿透 0/10 | 误伤 0/6
+F2 appeal_to_tradition: 穿透 5/8 | 误伤 0/6
+F3 appeal_to_tradition: 穿透 4/6 | 误伤 0/5
+F4 false_dilemma: 穿透 1/7 | 误伤 1/6
+F5 tu_quoque: 穿透 3/6 | 误伤 1/5
+F6 appeal_to_majority: 穿透 5/6 | 误伤 2/5
