@@ -1,6 +1,16 @@
 /**
  * src/appeal-to-nature.js — 「诉诸自然谬误」检测器（第 139 个判别维度）
- * [r706 立项] decision 本体在 138 维引擎上选出（/tmp/decide-run-706.js 读
+ * [r407 扩展·真升级②] 4 号探针（coordination/agent4/probes/r407-probe-pool.js，
+  * 六候选家族同池定拨）在既有两条路由上补**全新措辞家族**——「演化适配族」
+  * （路由③）：腿①不宣称某物「纯天然/未经加工」（路由①），而宣称**演化历史
+  * 本身就是自然性的证明**（几十万年进化出来的身体/基因停留在采集时代/天生
+  * 就该如此/自然状态下本来如此）；腿②随之换成**不适配结论**（不是为X设计的/
+  * 消化不了/违背自然规律/导致退化），而非优越结论。r407 探针实测：攻击穿透
+  * 6/10、良性误伤 0/6、模块层直查 0/10（真零命中）；落地后穿透 0/10。
+  * 三条路由**互不交叉配对**（同 r291 纪律——交叉组合改变论证形状）。
+  * 已接线（src/index.js require + 计算点），扩族 live 生效，维度计数不变。
+  *
+  * [r706 立项] decision 本体在 138 维引擎上选出（/tmp/decide-run-706.js 读
  * /tmp/decide-opts-706.json，composite_score 0.92 / confidence 0.9 /
  * identity alignment 100%，无拒选）。轮前探针 /tmp/r705-preprobe.js 复量
  * （样本集与 r704/r705 完全一致，跨轮可比）：攻击 10 条漏判 8/10、
@@ -361,6 +371,75 @@ const HARM_EN_BRANCHES = {
   i2_will_harm: /\b(?:will|would|can|may) (?:eventually )?(?:harm|hurt|damage|poison)\b|\b(?:harms?|hurts?|damages?) [^.]{0,24}\bover time\b/i,
 };
 
+// ─── [r407] 路由③腿①''：演化/天性自然性断言（「演化适配族」）─────────────
+// 新措辞家族：腿①不宣称某物「纯天然/未经加工」（那是路由①），而宣称
+// **演化历史本身就是自然性的证明**——身体/基因是几十万年进化出来的、
+// 还停留在采集时代、天生就该如此。腿②''随之换成**不适配结论**（不是
+// 为X设计的/消化不了/违背自然规律/导致退化），而不是优越结论。
+// 三条路由不交叉配对：演化断言×优越是另话（「祖先的方法就是好」归
+// 路由①），自然性×不适配是安全警告（「野菜吃多了伤肝」归路由②'）。
+const EVOLVE_ZH_BRANCHES = {
+  // v1 进化/演化 + 出来/成 + 身体/基因（「几十万年进化出来的身体」）
+  v1_evolved_body: /(?:几十万|几百万|上百万|百万|千万|数万)?年?(?:的)?(?:进化|演化|发展)(?:出来|出|成|过来)(?:的)?(?:身体|身躯|躯体|机体|消化系统|消化器官|肠胃|基因|大脑)/,
+  // v2 基因 + 停留/属于 + 时代（「基因还停留在采集时代」）
+  v2_genes_stuck: /基因(?:还|仍然|依旧|至今)?(?:停留|还处在|属于|还是|留着)/,
+  // v3 自然状态/法则/规律 作为规范来源（「自然状态下本来就是优胜劣汰」；
+  //    **刻意不收「自然选择」**——生物学专名，教学/论文语境高频，
+  //    防误伤；收 状态下/法则/规律/秩序 等规范用法）
+  v3_natural_state: /自然(?:状态|法则|规律|秩序)(?:下|中|里|之)/,
+  // v4 天生/天性 规范断言（「人天生就该日出而作」）
+  v4_innate: /天生(?:就|该|是|如此|如此)|天性(?:如此|本该|本该)|本能地?/,
+  // v5 天道/天理/造物（「有违天道」）
+  v5_tiandao: /天道|天理|造物(?:主)?的?(?:安排|设计|意志)/,
+};
+
+// ─── [r407] 路由③腿②''：不适配/违背自然结论 ────────────────────────
+const MISFIT_ZH_BRANCHES = {
+  // m1 不是为X设计的/打造的（「人体不是为久坐设计的」——强调前缀可选，
+  //    但必须与腿①''共现，单有形如「工具不是为新手设计的」不判）
+  m1_not_designed_for: /(?:根本不?|从来|本就|天生|本身|压根|压根儿|完全|绝对)?(?:就)?(?:是)?(?:不|没)(?:是)?(?:为|给)[^。，,；;！!？?]{0,16}(?:设计|打造|准备|制造|打算)的?/,
+  // m2 消化不了/适应不了/受不了（「根本消化不了工业化生产的食品」）
+  m2_cannot_process: /(?:消化|适应|代谢|耐受|吸收|处理|受)(?:不|了)(?:了|了)?|无法(?:消化|适应|代谢|耐受|吸收|处理)/,
+  // m3 违背/有违/不合 自然/天性/天道/规律（「熬夜加班有违天道」）
+  m3_against_nature: /(?:违背|有违|违反|不合|背离|逆|忤逆)[^。，,；;！!？?]{0,6}(?:自然|天性|天道|天理|自然规律|客观规律)/,
+  // m4 退化（「医疗干预太多反而让人类退化」）
+  m4_degenerate: /退化/,
+  // m5 就会/才会 + 生病/得病/出问题（与路由②'h2 分工：h2 收「必然出
+  //    问题」的工业/化学腿，本支收「离开自然就生病」的演化腿）
+  m5_natural_illness: /(?:离开|脱离|丢掉|失去)[^。，,；;！!？?]{0,10}(?:自然|天性)[^。，,；;！!？?]{0,12}(?:就|才会|必然|一定)?(?:生病|得病|致病|闹病|出问题)|(?:工业化|现代|文明)[^。，,；;！!？?]{0,8}(?:病|不治之症)/,
+};
+
+// ─── [r407] 路由③腿①''（英文）────────────────────────────────────
+const EVOLVE_EN_BRANCHES = {
+  // x1 evolution 一词在场（**腿②''必须共现**——单有「进化论是生物学
+  //    核心理论」不判）
+  x1_evolution: /\bevolution(?:ary)?\b|\bnatural selection\b/i,
+  // x2 our/human genes/genome/DNA/ancestors（「Our genes are still…」）
+  x2_genes: /\b(?:our|the human|human) (?:genes|genome|DNA|ancestors|ancestry)\b/i,
+  // x3 演化时代名（Paleolithic / hunter-gatherers / Stone Age…）
+  x3_era: /\bPaleolithic\b|\bhunter[- ]gatherers?\b|\bStone Age\b|\bpre[- ]?agricultural\b|\bfor (?:millennia|hundreds of thousands of years)\b/i,
+  // x4 nature intended/designed/meant/equipped（「Nature intended animals…」）
+  x4_nature_intended: /\bnature (?:intended|designed|meant|equipped|programmed|shaped)\b/i,
+  // x5 innately / by (our) very nature / born to
+  x5_innate: /\binnate(?:ly)?\b|\bby (?:our |its )?very nature\b|\bborn to\b/i,
+};
+
+// ─── [r407] 路由③腿②''（英文）────────────────────────────────────
+const MISFIT_EN_BRANCHES = {
+  // y0 designed/meant/built … for（「Evolution designed our digestive
+  //    systems for whole foods, not processed snacks」——远距 for 形；
+  //    与 x1「Evolution」零重叠，防自证守卫放行）
+  y0_designed_for: /\b(?:designed|meant|intended|built|equipped|evolved|adapted|made) (?:our|the human|human|your)? ?[^.]{0,40}\bfor\b/i,
+  // y1 isn't designed/meant/adapted/evolved for/to
+  y1_not_adapted: /\b(?:are|is|were|was)n'?t (?:designed|meant|made|adapted|evolved|equipped|built|suited)\b[^.]{0,24}\b(?:for|to)\b|\bnot (?:designed|meant|adapted|evolved|suited) (?:for|to)\b/i,
+  // y2 can't digest/handle/process/tolerate/metabolize
+  y2_cannot_process: /\b(?:can'?t|cannot|couldn'?t) (?:digest|handle|process|tolerate|metabolize|break down|cope with)\b|\bunable to (?:digest|handle|process|metabolize|tolerate)\b/i,
+  // y3 goes/violates against (our) nature/design/biology
+  y3_against_nature: /\b(?:goes?|going|runs?|running) (?:directly )?(?:against|contrary to) (?:our |their |its )?(?:nature|design|biology|instincts?|evolution)\b|\bviolates? (?:our |their )?(?:nature|biology|design)\b|\bcontrary to (?:our |their )?nature\b/i,
+  // y4 makes us/them sick / degenerates the species
+  y4_make_sick_degenerate: /\bmakes? (?:us|them|people|humans|you) (?:sick|ill|unwell|fat|weak)\b|\bmake (?:us|them|people|humans|you) (?:sick|ill|unwell|fat|weak)\b|\b(?:degenerat|weaken|devolve|regress)(?:e|es|ed|ing|ion)?\b[^.]{0,24}\b(?:our |the )?(?:species|bodies|health|gene pool)\b/i,
+};
+
 // 合并版（兼容旧读方；路由实际逐分支走，便于负例逐支注入）
 function _combine(branches, flags) {
   const parts = Object.keys(branches).map(k => '(?:' + branches[k].source + ')');
@@ -488,11 +567,25 @@ function checkAppealToNature(text, inject) {
     ..._branchList(R.HARM_EN_BRANCHES, HARM_EN_BRANCHES).map(b => _collect(b, text))
   );
 
+  // [r407] 路由③：「演化适配族」——腿①''演化/天性自然性断言（身体是几十万
+  // 年进化出来的/基因停留在采集时代/天生就该如此）× 腿②''不适配结论
+  // （不是为X设计的/消化不了/违背自然规律/导致退化）。**三条路由互不
+  // 交叉配对**（同 r291 纪律：交叉组合改变论证形状，不判）。
+  const evolveSpans = [].concat(
+    ..._branchList(R.EVOLVE_ZH_BRANCHES, EVOLVE_ZH_BRANCHES).map(b => _collect(b, text)),
+    ..._branchList(R.EVOLVE_EN_BRANCHES, EVOLVE_EN_BRANCHES).map(b => _collect(b, text))
+  );
+  const misfitSpans = [].concat(
+    ..._branchList(R.MISFIT_ZH_BRANCHES, MISFIT_ZH_BRANCHES).map(b => _collect(b, text)),
+    ..._branchList(R.MISFIT_EN_BRANCHES, MISFIT_EN_BRANCHES).map(b => _collect(b, text))
+  );
+
   // [r257] 防自证守卫：必须存在一对**零重叠**的匹配——同族自称不构成论证。
   const disjoint = (a, b) => a.end <= b.start || a.start >= b.end;
   const routeNatSup = natureSpans.some(n => superiorSpans.some(s => disjoint(n, s)));
   const routeUnnatHarm = unnaturalSpans.some(u => harmSpans.some(s => disjoint(u, s)));
-  if (!routeNatSup && !routeUnnatHarm) {
+  const routeEvolveMisfit = evolveSpans.some(e => misfitSpans.some(s => disjoint(e, s)));
+  if (!routeNatSup && !routeUnnatHarm && !routeEvolveMisfit) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
@@ -503,7 +596,9 @@ function checkAppealToNature(text, inject) {
     count: 1,
     detail: routeNatSup
       ? (isZh ? '诉诸自然谬误×自然性断言×优越/安全结论(zh)' : 'appeal to nature×naturalness-claim×superiority/safety-conclusion(en)')
-      : (isZh ? '诉诸自然谬误×非自然即有害(zh)' : 'appeal to nature×unnatural-as-harm(en)'),
+      : routeUnnatHarm
+        ? (isZh ? '诉诸自然谬误×非自然即有害(zh)' : 'appeal to nature×unnatural-as-harm(en)')
+        : (isZh ? '诉诸自然谬误×演化适配断言×不适配结论(zh)' : 'appeal to nature×evolutionary-mismatch(en)'),
   };
 }
 
@@ -514,6 +609,7 @@ module.exports = {
     SUPERIOR_ZH, SUPERIOR_ZH_EXT, SUPERIOR_EN, SUPERIOR_EN_EXT,
     NAT_ZH_BRANCHES, NAT_EN_BRANCHES, SUP_ZH_BRANCHES, SUP_EN_BRANCHES,
     UNNAT_ZH_BRANCHES, UNNAT_EN_BRANCHES, HARM_ZH_BRANCHES, HARM_EN_BRANCHES,
+    EVOLVE_ZH_BRANCHES, EVOLVE_EN_BRANCHES, MISFIT_ZH_BRANCHES, MISFIT_EN_BRANCHES,
     META_EXEMPT_ZH, META_EXEMPT_EN, HEDGE_ZH, HEDGE_EN,
   }),
 };
