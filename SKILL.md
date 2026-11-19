@@ -1,12 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.205"
 version: "6.8.206"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  270 discrimination dimensions × 11-layer pipeline × 164 modules ×  192 MCP tools. Zero LLM dependency.
+  271 discrimination dimensions × 11-layer pipeline × 164 modules ×  192 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -78,20 +77,18 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.205. Nothing here is copied
 Every number below was measured on this repository at v6.8.206. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.205 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Engine version | 6.8.206 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
 | Modules registered | 164 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,341 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 270 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 271 | `dimMap` keys in `src/index.js` |
 | MCP tools | 190 | tool definitions exposed via `tools/list` |
 | Test suite | 24,990 passing / 229 failing | `node test/run-all.js`（r408 轮全量实测 24,990/229/25,219，JOBS=4，data/test-count.json @ 2026-11-19T10:58:36Z；较 r405 基线 24,701/227/24,928 差 passed +289 / failed +2 / total +291，失败清单 150 文件全部属存量已知类别、本轮相关文件经 stash 对照零新增失败；接续 r405 轮合并树全量实测 24,701/227/24,928（JOBS=4，data/test-count.json @ 2026-11-19T06:17:22Z），与 r402 基线 24,675/225/24,900（@ 2026-11-19T02:45:32Z）差 passed +26 / failed +2 / total +28——失败文件清单逐条 diff 新增仅 round-402-lead-time-bias.test.js 一条「未输出可解析汇总行」记录（同步轮 r403 自带测试：并发池内实测 29/29 通过、单独 mount RC=0、串行车道态输出格式不被解析，非 r405 引入；r405 两个新轮测 round-405-relative-pration-homelessness.test.js 与 round-405-affirming-disjunct-infer-nfkc.test.js 池内实跑 20/20、7/7 且零失败记录）；passed/failed 计数漂移为并发池 Command failed 抖动（r398-r402 规格表已载该类）；文件集合 diff：合并树 = r402 基线 + 本轮 2 个轮测 + 同步轮 round-402-lead-time-bias.test.js，零文件丢失、零存量轮测由绿转红，详见 UPGRADE_LOG r405；历史实测链：r402 两次全量 24,678/222/24,900 与 24,675/225/24,900（JOBS=4，data/test-count.json @ 2026-11-19T02:45:32Z），两次一致；与 r401 基线 24,794/205/24,999 的差值全部实证溯源——① 1 号序列第 268/269 维度 baseline_omission + claimed_verification_without_trail 于 2026-11-18T23:33:54Z（commit 964fb88）接线，晚于 r401 基线测量（2026-11-18T23:18:26Z）15 分钟，本轮全量中该维度良性误伤致 round-352/round-353/round-358/round-734/affective-forecast 五个存量轮测由绿转红（在预改动机模块 b652bc8 版本下隔离复跑逐条同失败，非 r402 引入）；② 并发池 Command failed 抖动（MCP server 启动超时、reward-hacking 家族，r398/r400/r401 规格表已载该类）；③ round-398/round-400 两个存量轮测自报 `pass N / fail 0` 英文缩写格式不被 run-all 解析器识别（单独 mount 分别 49/0、89/0 全过，非真实失败）；r402 本轮改动（motivated_reasoning 第 232 维实利归因族）新增失败 0——全部新增归因失败在预改基座下逐条复现，详见 UPGRADE_LOG r402；r401 轮全量实测 24,794/205/24,999（data/test-count.json @ 2026-11-18T23:18:26Z）；r399 轮全量实测 24,640/205/24,845（data/test-count.json @ 2026-11-18T18:52:55Z）；接续 r735 轮两次全量实测；首次 24,572/204/24,776，修复 round-735 轮测汇总行格式后二次 24,582/204/24,786； passed baseline resynced per r241/r412 precedent — failed 144 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修；r289 全量与 r287 基线失败清单逐条 diff 仅 +2 行：r288 远端 weak-evidence-strong-claim 测试无汇总行格式 + round-278 曾被 r289 新常量遮蔽注入断言、已收窄常量修复；r291 全量与 r289 基线失败清单逐条 diff：新增仅 round-290-a2i-mirror-gf-daily 自报 `RESULT pass=51 fail=0` 英文缩写格式不被 run-all 解析器识别——单独 mount 实测 51/51 全过、非真实失败；round-278 由红转绿；其余为并发池噪声；r292 接续同一基线，dreamConsolidation 接线新增 round-292 轮测自报中文格式可被解析；r293 接续同一基线，sycophancy 插件层四族轮测 15 断言单独 mount 实测 15/15 全过，池中自报行同 round-290 形态未被解析器捕获、非真实失败；全量 failed 144→147 的 +3 经同基座隔离实测为并发池 churn——撤插件改动+移出本轮轮测后复跑（21,167 passed/148 failed/21,315）失败清单 95 文件与含改动主跑逐条相同、双向零差异，详见 UPGRADE_LOG r293；r301 接续 r300 基线（21,483/145/21,628），唯一 +22 即本轮新测试 round-301-law-of-averages.test.js（gamblers_fallacy 第148维『长期平均论证短期补偿/连发形追投』新措辞家族，22 断言单独 mount 实测 22/22 全过、池中自报同格式可解析），失败数 145 逐条持平；r302 接续 r301 基线（21,505/145/21,650），唯一 +12 即本轮新测试 round-302-law-of-small-numbers-quant.test.js（law_of_small_numbers 第239维『小样本→数量化总体裁定（概率/比率/均值）』新措辞家族，12 断言单独 mount 实测 12/12 全过、池中自报同格式可解析），失败数 145 逐条持平；r303 接续 r302 基线（21,517/145/21,662），唯一 +31 即 round-303-average-marginal-rate.test.js（31 断言单独 mount 31/31）；r304 接续 r303 基线（21,548/145/21,693），唯一 +29 即 round-304-weak-evidence-ai-source.test.js（29 断言单独 mount 29/29）；r305–r308：r305 轮测 round-305-meta-anchor-legs 29/29 + negative-injection 通过 + noncultivation-r305 21/21（远端轮次，本机复测）；r306（dose_response_linearity 第250维，远端轮次）无专属轮测入库；r307 轮测 round-307-evidence-claim-mismatch 本机复测 44 通过/4 失败（4 条 ALL EXEMPT 注入断言属远端轮次自身形态，计入基线噪声）；r308 唯一 +75 即 round-308-sorites-goal-dismissal.test.js 单独 mount 75/75 全过；r309（selection_on_dependent_variable 第249维 econ_reasoning_gate 聚合族『按结果选样本』新措辞家族，4 号本轮）唯一 +15 即 round-309-selection-on-outcome-groups.test.js 单独 mount 15/15 全过、全量池中通过；头条本轮实测 21,759/154/21,913（JOBS=4）——与 r308 基线 21,744/154/21,898 差 passed +15 / failed +0，+15 恰为本轮轮测断言数；因约百个文件自报行不被解析器计数，passed 差与轮次断言合计有 ±2 口径差，不逐条编造；r314 接续 r313 基线（远端 254 维/v6.8.179）：落地 present_bias/endowment_effect 新措辞家族轮测 round-314-procrastination-inflate-legs.test.js（263 断言，单独 mount 263/263、全量池中通过），并修复 r309/r310/r311 三个既有轮测被远端 6.8.179/254 维同步打红的 5 条 VERSION/维度数硬编码断言（r284 先例，修复前后全量失败清单逐条 diff 恰为这 5 条、单独 mount 复测 15/15、18/18、21/21）；头条本轮实测 22,003/165/22,168（JOBS=4，835.7s）——与 r311 基线 21,798/154/21,952 差 passed +205 / failed +11 / total +216，+11 失败全源可定位：round-310-law-of-small-numbers-perpetual 5 条（同步轮 d786367 入库新文件、此前未进过全量）+ round-307 ALL-EXEMPT 注入断言 4 条（远端轮次既有测试形态，r307 报告载 44/4）+ 约 2 条并发池自报行解析残差（round-311/round-308/round-313 三个新入库轮测自报行池中不被识别，单独 mount 分别 79/79、51/51、31/31 全过）；与同步轮 02:27Z 缓存 22,061/154/22,215 的 passed/total 差为同一自报行解析口径现象（该次并发度未知），不逐条编造对差）；r735（4 号本轮）：两次全量实测 24,572/204/24,776 → 24,582/204/24,786，失败文件清单两轮逐条 diff 零新增（唯一差异 round-735-circular-tautology-restate.test.js 修复汇总行格式后由静默失败转 11/11 计入 passed），passed +10 与轮次断言 +11 的 ±1 差为并发池自报行解析残差（r309 先例同）；r398（4 号本轮）：全量实测 24,598/203/24,801（JOBS=4），与 r735 基线 24,582/204/24,786 差 passed +16 / failed −1 / total +15，+15 含本轮轮测 round-398-red-herring-concession.test.js 池内实跑 15/15 与其他 agent 同期入库文件；失败清单逐条核查零 herring / 零 r398 相关文件，失败集中于既有类别（MCP server 启动超时、reward-hacking 家族、wired-family-extensions 系列）；r400（4 号本轮）：全量实测 24,687/207/24,894（JOBS=4，898.5s），与 r399 基线 24,640/205/24,845 差 passed +47 / failed +2 / total +49——passed 增量含本轮轮测 round-400-accident-quote-rule.test.js 池内解析计入 76/76（单独 mount 复测 76/76）与 reward-hacking-dsec/remaining6 两个 r399 池内 Command failed 文件的恢复计数；failed +2 为 reward-hacking-metric-self-gaming-round91 与 reward-hacking-report-fudging-round55 两个文件并发池 Command failed 抖动（单独 mount 分别 19/0、10/0 全过，与 r399 基线同族噪声、r398 规格表已载该类）；G5/G6 VERSION 硬编码断言（r367–r375 旧轮测写死 6.8.192）失败文件与基线逐条一致，仅消息内版本号随 bump 漂移（6.8.200→6.8.201），非新增失败；r401（4 号本轮）：全量实测 24,794/205/24,999（JOBS=4，data/test-count.json @ 2026-11-18T23:18:26Z），与 r400 基线 24,687/207/24,894 差 passed +107 / failed −2 / total +105——passed 增量含本轮轮测 round-401-circular-definist-verdict.test.js 池内实跑 13/13（单独 mount 复测 13/13）与并发池自报行解析残差及 Command failed 文件恢复计数；failed −2 为 reward-hacking 家族并发池 Command failed 抖动；另本轮实测发现并修复两事项（均复测转绿）：① definistVerdict 复用存量 (R.USE_ZH || USE_ZH) 标记致 round-735 变异守卫「锚点不唯一」崩——去外层括号后 r735 单独 mount 11/11；② 并发池多个变异守卫测试同写 src/circular-reasoning.js 的竞态残留 1 处（VERDICT_EN 变异未还原）——已清除，根治需 1 号将同文件变异守卫测试移入串行车道（详见 UPGRADE_LOG r401）|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -99,7 +96,7 @@ from marketing copy.
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`**, **237 request `verify`**. The remainder contribute to the overall score
+a `rewrite`**, **238 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -261,7 +258,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 270 dimensions
+## The 271 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 
@@ -407,7 +404,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (270 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (271 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |

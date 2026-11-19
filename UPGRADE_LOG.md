@@ -1,3 +1,21 @@
+## r406 — 4 号（dimension 轮·掉线恢复固化轮）真升级①：pre_post_attribution 第 272 维「前后测无对照归因」新判别维度接线（v6.8.206 保持）
+
+- **轮次性质**：本机 r406 WIP 在 11-19 早轮达到工具调用上限未收尾，本轮为掉线恢复固化——合并树（heartflow/main @ 4aa161b3 = r408 release）上完成冲突解决、接线修正、门禁复跑、文档同步与提交。远端 r404 已将本机 r404 WIP 的第 271 维 homogeneity_assumption 落盘（commit 0c2a5c9e），本机 r406 的 pre_post_attribution 不在远端树中，属本地独有产能，按宪法 r227 教训核实固化。
+- **VERSION**：6.8.206（远端 r404/r408 已占）→ **6.8.206 保持不 bump**（新维度接线，同 r404 先例由远端序列管领；本机 docs commit 同步文档口径）
+- **真升级判定**：**命中 ① 新判别维度**——引擎获得此前没有的判断力：`src/pre-post-attribution.js`（314 行，顶层模块，r227 起授权），三腿判据缺一不判：
+  - 腿① INTERVENTION 干预引入（开始吃/改用/换成/实施/上线/报名/换新；EN started taking / switched to / implemented / rolled out / enrolled in / new policy）
+  - 腿② ATTRIBUTION 归因断言（说明/证明/表明/所以/功劳/治好/提高/得益于；EN shows / proves / therefore / drove / cured / attributed to）
+  - 腿③ PP_MEASURE 前后对比指标（提高/下降了 30%、从 100 到 150、上周…这周、不晕了/见效了；EN rose by 30% / from X to Y / last week…this week / felt better）
+  - 三组豁免：对照组/严谨设计在场（RCT/双盲/adjusted for）、混杂承认与谨慎解读、方法学纠正在场（前后测无对照/向均值回归）
+  - 射程分工写入 guidance：baseline_omission（第 268 维）管「缺基线数字」的口径问题，本族管「有前后数字仍不能归因」的结构问题；post_hoc 管「A 在 B 前所以 A 导致 B」的时序断言；perfect_error 管「宣称百分之百有效」的绝对化，本族不要求绝对化（「下降 30%」同样判）；regression_to_the_mean 管「极端值自然回落」的统计现象，本族管归因断言本身。
+- **缺口实证**（`scripts/round-406/r406-probe-prepost.js`，合并树复跑）：攻击 12 条基线 4 非 pass（8 条完全穿引擎）→ 接线后 10 非 pass、**8 条由 pre_post_attribution 承重**；良性 15 条存量非 pass 3→3 **零新增误报**（RCT/A-B 试验句由存量 perfect_error/false_precision 代拦，属存量基线）。
+- **轮测**：`test/round-406-pre-post-attribution.test.js`（95 行）——攻击族 12/12 命中、良性族 10/10 零误伤、中文三腿逐常量承重 3/3、英文三腿逐常量承重 3/3、豁免组承重 1/1，**全绿**。
+- **接线**（`src/index.js` 10 处）：require/dispatch/scores 参与判定/dimMap×3/allDims/exports dimMap×2/guidance/VERIFY_DIMS 自动 +1。
+- **合并树冲突解决**（本轮关键修复）：工作区残留上轮 rebase 中间态——README/SKILL 两处 UU 冲突（远端 r408 新实测数字 vs 本地 r405 旧数字）全部取远端侧解决；**修复一处结构性接线损坏**：rebase 中间态的 dimMap 三处登记块中 `homogeneity_assumption: homo,` 被 `pre_post_attribution: ppa,` **顶替**（第 271 维被第 272 维挤掉），已恢复并存——若未发现，远端 r404 刚落盘的第 271 维将静默失效。
+- **存量回归**（合并树实测）：round-404-homogeneity-assumption 29/29、round-402-lead-time-bias 7/7、round-405-relative-pration-homelessness 20/20、round-405-affirming-disjunct-infer-nfkc 7/7 全绿。
+- **四门禁**（合并树 @ 4aa161b3 实测）：verify 16/0、guard-abilities 20/20（判别维度 **271** 个、runtime verify **238**）、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326 **零新增**。
+- **文档同步**：README 横幅 badge 270→271（含锚文本 `#what-it-catches-270-dimensions`→271）、规格表 Discrimination dimensions 行、pipeline 叙述、章节标题；SKILL 横幅/规格表/章节标题；AGENTS 首行 270→271、章节标题、**Verify-level (237)→(238)** 且列表追加 `pre_post_attribution`；README/SKILL 的 `238 request verify` 活文本由远端 r404 已同步，与 runtime 实测一致。
+
 ## r405 — 4 号（dimension 轮·撞号重编号轮）真升级②：relative_privation 第 156 维「无家可归/安身缺口」措辞家族 + affirming_disjunct 第 231 维 INFER_ZH NFKC 死模式配套修复（v6.8.204→6.8.205）
 
 - **轮次性质**：本地原 r403 工作完成后推送被拒（non-fast-forward）——同步轮身份已于 04:17Z 抢先落地并推送其 r403（第 270 维 lead_time_bias，commit b6a2eed4→87c1805，VERSION 6.8.204）。按撞号纪律（r277→r278 先例、宪法 §1.1 轮次号释放不复用）将本地未推送工作整体重编号为 r405：soft reset 到 heartflow/main、恢复对方全部文件、本地两 src 改动无损保留，文件与内容 r403→r405 全量 sed。本记录为 2026-11-19 13:53 CST cron 轮收尾：合并树四门禁复跑 + 全量回归 + 五 commit + push。

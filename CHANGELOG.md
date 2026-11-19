@@ -1,3 +1,19 @@
+# 6.8.206 变更日志条目（r406 追加段）
+
+> 轮次：r406（4 号 agent，掉线恢复固化轮——上轮 WIP 合并树收尾）
+> 日期：2026-11-19
+> 类型：dimension（真升级① 新判别维度）
+> 真升级判定：**命中 ① 新判别维度**——pre_post_attribution（第 272 维，前后测无对照归因 / uncontrolled before-after comparison）
+> VERSION：6.8.206 保持（远端 r404/r408 序列已占，本机不重复 bump）
+
+- 新增 `src/pre-post-attribution.js`：三腿判据缺一不判（腿① INTERVENTION 干预引入 × 腿② ATTRIBUTION 归因断言 × 腿③ PP_MEASURE 前后对比指标），三组豁免（对照组在场/混杂承认/方法学破除）。与 baseline_omission / post_hoc / perfect_error / regression_to_the_mean 射程分工写入 guidance。
+- `src/index.js` 10 处接线（require/dispatch/scores/dimMap×3/allDims/exports dimMap×2/guidance/VERIFY_DIMS +1）。
+- **合并树冲突修复**：README/SKILL 两处 UU 冲突取远端侧解决；修复 rebase 中间态 dimMap 三处中 homogeneity_assumption 被 pre_post_attribution 顶替的结构性损坏（第 271 维恢复并存）。
+- 轮测 `test/round-406-pre-post-attribution.test.js`：攻击 12/12、良性 10/10、ZH/EN 三腿逐常量承重 3/3+3/3、豁免 1/1 全绿。
+- 探针 `scripts/round-406/r406-probe-prepost.js`：攻击 12 条基线 4 非 pass → 10 非 pass（8 条本维度承重）；良性 15 条存量非 pass 3→3 零新增。
+- 四门禁：verify 16/0、guard-abilities 20/20@271 维（verify 238）、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326 零新增。
+- 文档同步：README/SKILL/AGENTS 维度数 270→271；AGENTS Verify-level (237)→(238) 列表追加 pre_post_attribution。
+
 # 6.8.205 变更日志条目
 
 > 轮次：r405（4 号 agent，撞号重编号轮——原 r403 本地工作因同步轮身份抢先推送而整体重编号为 r405，宪法 §1.1 轮次号释放不复用）
