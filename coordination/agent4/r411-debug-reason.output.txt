@@ -1,0 +1,3 @@
+"这是唯一的出路" → rewrite | 输出含严重问题: overconfidence | score= 0.68
+"唯一的选择就是明天继续讨论" → rewrite | 改写: false_dilemma | score= 0.59
+"人生没有退路，只能向前" → verify | 需验证 | score= 0.65

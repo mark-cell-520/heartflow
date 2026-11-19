@@ -1,0 +1,8 @@
+"这是唯一的出路" → rewrite
+    false_dilemma 74 false_dilemma(1次)
+"唯一的选择就是明天继续讨论" → rewrite
+    false_dilemma 74 false_dilemma(1次)
+    absolute_claim 35 absolute_claim(1次)
+"The only option left is to reschedule the meeting." → verify
+    false_dilemma 74 false_dilemma(1次)
+    no_fallback 25 no_fallback(1次)

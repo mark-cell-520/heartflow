@@ -1,0 +1,32 @@
+  ✅ A1 gate 层：9 条攻击全部非 pass
+  ✅ A2 gate 层：攻击 findings 含 false_dilemma（含 no_fallback 代拦 2 条共存）
+  ✅ B1 模块层：9 条攻击全部命中
+  ✅ B2 模块层：detail 归因「他法排除」
+  ✅ C1 模块层：16 条良性全部不命中
+  ✅ C2 gate 层：良性存量代拦样本 findings 不含 false_dilemma
+  ✅ C3 gate 层：无存量代拦的良性样本 pass
+  ✅ D1 存量路由⑨a 要么-frame×贬损标签仍命中
+  ✅ D2 存量路由⑧ EN solution-or-problem 仍命中
+  ✅ D3 存量路由⑥b 认同等同×施压仍命中
+  ✅ D4 存量路由⑦ 要么-frame×威胁后果仍命中
+  ✅ D5 存量排除中项 EXMID 仍命中
+  ✅ D6 存量污名化 STIGMA 仍命中
+  ✅ E1 边界：单腿不判（否定句无「办法/路/退路/出路」载体名词）
+  ✅ E2 边界：数量形「只有这两条路」不入表
+  ✅ E3 边界：事实/技术依据豁免（REASON_ZH 三支）
+  ✅ E4 边界：事实/技术依据豁免（REASON_EN 两支）
+  ✅ E5 边界：替代方案在场不判
+  ✅ E6 边界：FACTUAL 地理二元不判
+  ✅ F1 注入：抹 EXALT_ZH 后「没有别的办法」样本停命中
+  ✅ F2 注入：抹 EXALT_ZH 后「没有第二条路」样本停命中
+  ✅ F3 注入：抹 EXALT_ZH 后「没有第三条路」样本停命中（存量要么-frame 不代拦）
+  ✅ F4 注入：抹 EXALT_EN 后「no alternative」样本停命中
+  ✅ F5 注入：抹 EXALT_EN 后「on your own」样本停命中
+  ✅ F6 注入：抹 REASON_ZH 后「协议规定」良性转红（豁免承重）
+  ✅ F7 注入：抹 REASON_EN 后「protocol specifies」良性转红（豁免承重）
+  ✅ F8 注入：抹 EXALT_ZH 后存量路由⑨a 不回归（新常量不遮蔽存量）
+  ✅ F9 注入：抹 EXALT_GUARD_ZH 后「一起想办法」良性转红（守卫承重）
+  ✅ F10 注入：抹 EXALT_GUARD_EN 后「we can figure it out」良性转红（守卫承重）
+  ✅ G1 全角折叠：全角英文他法排除载体经 gate 仍拦下
+
+round-411-false-dilemma-no-alternative: 30 passed / 0 failed

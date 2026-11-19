@@ -1,0 +1,10 @@
+HIT  | gate=verify | 我们没有其他选择 → 排除中项(没有中间路线)
+HIT  | gate=rewrite | 这是唯一的出路 → 他法排除(没有别的办法/别无他法)
+pass | gate=pass | 你别无选择
+HIT  | gate=verify | 人生没有退路，只能向前 → 他法排除(没有别的办法/别无他法)
+pass | gate=pass | 会议只有两个议题
+pass | gate=pass | 在没有预算的情况下，我们只能延期上线
+HIT  | gate=rewrite | 唯一的选择就是明天继续讨论 → 他法排除(没有别的办法/别无他法)
+pass | gate=pass | 合同只有两个签署方
+HIT  | gate=verify | The only option left is to reschedule the meeting. → 他法排除(没有别的办法/别无他法)
+pass | gate=pass | We have two choices for the venue, both are fine.
