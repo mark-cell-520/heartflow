@@ -1,0 +1,20 @@
+    [存量代拦] Many people break this rule, which is why enfo [vagueness]
+    [存量代拦] Many people break this rule, but that does not [vagueness]
+    [存量代拦] Cheating is widespread, so the exam board adde [fallacy_of_relevance,moral_foundations]
+  ✅ A: 攻击承重——模块层 21/21 命中且 detail 含「诉诸共惯」
+  ✅ B: gate 层 21/21 非 pass 且 tu_quoque 在场
+  ✅ C: 良性 17/17 模块层零命中
+  ✅ C2: 良性 gate 层——新族零命中（所有良性 findings 不含 tu_quoque）
+  ✅ D: 删条注入 6/6 变红
+  ✅ E: 存量路由①② 4/4 不回归
+  ✅ F1: 单腿不判——只有 PREVALENCE（无正当化推论）
+  ✅ F2: 单腿不判——只有 NORMALIZE（无普遍性宣告）
+  ✅ F3: 第三人称转述不判（无第一人称正当化）
+  ✅ F4: 反谬误对冲豁免（非注入路径）
+  ✅ F5: 概念分析/元话语豁免
+  ✅ F6: 失范表不收泛化词——加班/努力/犯错不判
+  ✅ F7: gate 层攻击样本 verify 级（不是 rewrite/block）
+  ✅ G1: __internals 暴露新常量（负例注入面）
+  ✅ G2: 运行时接线——dimensions.tu_quoque 键在、count>0、dimMap 静态登记不变
+  ✅ G3: 全角/半角归一化不逃逸（_dual 双喂）
+16 passed / 0 failed
