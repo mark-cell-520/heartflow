@@ -1,0 +1,70 @@
+=== 模块层攻击（checkMotivatedReasoning）===
+  [HIT ] 诉诸动机(zh/benefit+dismiss: 以「他说这话纯粹是为」推定言者处境替代对论点实质内容的回应，未审论点自 | 他说这话纯粹是为了卖课，你别信
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「不过是想多收」推定言者处境替代对论点实质内容的回应，未审论点 | 她坚持复查，不过是想多收一次费
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「only oppose the merger because | You only oppose the merger because you did not
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「only to bump up her bill」推定言者处 | She wants the extra scan only to bump up her b
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「just saying that to sell more  | He is just saying that to sell more books.
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「说到底是为」推定言者处境替代对论点实质内容的回应，未审论点自 | 专家建议收紧审批，说到底是为了保住自己的位子
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「只是想要提成」推定言者处境替代对论点实质内容的回应，未审论点 | 他反对新政只是想要提成
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「无非是图回扣」推定言者处境替代对论点实质内容的回应，未审论点 | 你质疑这个标准，无非是图回扣
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「纯粹是为了业绩」推定言者处境替代对论点实质内容的回应，未审论 | 他们鼓吹换设备，纯粹是为了业绩
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「only to drive traffic to his o | The critic pans every sequel only to drive tra
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「purely to inflate her consulti | She recommends the audit purely to inflate her
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「merely to boost commission」推定言 | The vendor pushes the upgrade merely to boost 
+  [HIT ] 诉诸动机(en/benefit-imputation: 以「motive attribution」推定言者处境替代对论点 | You support the merger just because it pads yo
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「无非是想多收点学费」推定言者处境替代对论点实质内容的回应，未 | 这番话无非是想多收点学费
+  [HIT ] 诉诸动机(zh/benefit-imputation: 以「一心想的是流量」推定言者处境替代对论点实质内容的回应，未审论 | 她组织这次测评，一心想的是流量
+模块层攻击命中 15/15
+=== 模块层良性 ===
+  [ok  ] | 我推荐这门课只是想把东西讲好，不图别的
+  [ok  ] | 医院鼓励复查，因为每次复查都有收益，这是机制设计问题
+  [ok  ] | 平台做信息流是为了流量，这是商业模式决定的
+  [ok  ] | 她坚持复查，是因为上次的指标有异常
+  [ok  ] | 他反对新政，是因为方案里第三条确实超预算了
+  [ok  ] | 他这么做只是为了老百姓的利益
+  [ok  ] | 这项改革纯粹是为了用户的权益
+  [ok  ] | 他是同行，但数据核对过没问题
+  [ok  ] | 他推荐这门课可能只是为了卖课，也许另有原因
+  [ok  ] | 他为什么推荐这门课？是为了卖课吗？
+  [ok  ] | 诉诸动机是一种循环论证变体，本节课分析它的结构
+  [ok  ] | bulverism is the fallacy of explaining away a 
+  [ok  ] | 他推荐这款产品是因为效果好
+  [ok  ] | 她要求复查是流程规定
+  [ok  ] | He recommends the book because it is well rese
+  [ok  ] | She requested a second opinion as standard pro
+模块层良性误伤 0/16
+=== gate 层攻击（checkOutput）===
+  [rewrite] motivated_reasoning | 他说这话纯粹是为了卖课，你别信
+  [rewrite] motivated_reasoning | 她坚持复查，不过是想多收一次费
+  [rewrite] motivated_reasoning | You only oppose the merger because you did not
+  [rewrite] motivated_reasoning | She wants the extra scan only to bump up her b
+  [rewrite] motivated_reasoning,mediator_confusion | He is just saying that to sell more books.
+  [rewrite] motivated_reasoning,monocausal_attribution | 专家建议收紧审批，说到底是为了保住自己的位子
+  [rewrite] motivated_reasoning,monocausal_attribution | 他反对新政只是想要提成
+  [rewrite] motivated_reasoning | 你质疑这个标准，无非是图回扣
+  [rewrite] motivated_reasoning | 他们鼓吹换设备，纯粹是为了业绩
+  [rewrite] motivated_reasoning | The critic pans every sequel only to drive tra
+  [rewrite] motivated_reasoning | She recommends the audit purely to inflate her
+  [rewrite] motivated_reasoning | The vendor pushes the upgrade merely to boost 
+  [rewrite] motivated_reasoning,monocausal_attribution | You support the merger just because it pads yo
+  [rewrite] motivated_reasoning | 这番话无非是想多收点学费
+  [rewrite] motivated_reasoning | 她组织这次测评，一心想的是流量
+gate 层攻击非 pass 15/15，motivated_reasoning 在场 15/15
+=== gate 层良性 ===
+  [FP! verify] monocausal_attribution | 我推荐这门课只是想把东西讲好，不图别的
+  [pass] | 医院鼓励复查，因为每次复查都有收益，这是机制设计问题
+  [pass] | 平台做信息流是为了流量，这是商业模式决定的
+  [pass] | 她坚持复查，是因为上次的指标有异常
+  [pass] | 他反对新政，是因为方案里第三条确实超预算了
+  [FP! verify] monocausal_attribution | 他这么做只是为了老百姓的利益
+  [pass] | 这项改革纯粹是为了用户的权益
+  [FP! verify] completion_evidence | 他是同行，但数据核对过没问题
+  [pass] | 他推荐这门课可能只是为了卖课，也许另有原因
+  [pass] | 他为什么推荐这门课？是为了卖课吗？
+  [pass] | 诉诸动机是一种循环论证变体，本节课分析它的结构
+  [pass] | bulverism is the fallacy of explaining away a 
+  [pass] | 他推荐这款产品是因为效果好
+  [pass] | 她要求复查是流程规定
+  [pass] | He recommends the book because it is well rese
+  [pass] | She requested a second opinion as standard pro
+gate 层良性误伤 3/16

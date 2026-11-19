@@ -1,0 +1,11 @@
+MOTIVE_B_ZH 实利名词组: exit=1 ✅ 变红
+MOTIVE_B_ZH 排他标记×实利动词跨: exit=1 ✅ 变红
+MOTIVE_B_EN 实利名词组: exit=1 ✅ 变红
+MOTIVE_B_EN only+动词+because 动词组: exit=1 ✅ 变红
+MOTIVE_B_EN 标记后置形动词组: exit=1 ✅ 变红
+PUBLIC_BENEFIT 公共利益主体组: exit=1 ✅ 变红
+claimRefZh 论点指代名词组: exit=1 ✅ 变红
+claimActZh 主语组: exit=1 ✅ 变红
+claimActEn 扩展动词尾: exit=1 ✅ 变红
+MOTIVE_A_ZH 半角逗号跨子句修正: exit=1 ✅ 变红
+结果: 13 通过, 0 失败, 共 13 个

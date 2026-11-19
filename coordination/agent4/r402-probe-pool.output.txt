@@ -1,0 +1,100 @@
+
+=== F3_affirming_disjunct_extension 攻击（漏判=checkOutput pass）===
+  [pass] none | 他在北京或者上海工作，既然有人在北京见到他，那就说明他不在上海
+  [verify] claimed_verification_without_trail | 会议定在周一或者周二，秘书确认了周一，据此可以排除周二
+  [rewrite] affirming_disjunct | 报告是用 Python 或者 R 写的，作者承认用了 Python，由此可见 R 并未被使用
+  [pass] none | He works in Beijing or Shanghai; someone saw him the
+  [verify] circular_reasoning | The meeting is on Monday or Tuesday; the invite says
+  [verify] circular_reasoning,unsupported_claim,unsupported_claim,appeal_to_authority | 是运气还是实力？数据显示是实力，所以不是运气
+  [pass] none | 是A方案还是B方案？评审选了A，B就此出局
+  [verify] circular_reasoning,unsupported_claim,unsupported_claim,appeal_to_authority | Was it luck or skill? The data shows skill, so luck 
+  [pass] none | 他在北京或者上海工作，昨天有人在北京见到他，上海出局
+  [verify] claimed_verification_without_trail | 会议定在周一或者周二，既然周一已确认，周二就不在选项里了
+  [verify] empty_answer | The report was written in Python or R; since Python 
+--- F3_affirming_disjunct_extension 良性（误伤=非 pass）---
+  [verify] liberty_restriction,circular_reasoning,contradiction | 开关要么是开的要么是关的，它现在是开的，所以不是关的
+  [pass] none | 他要么留任要么离职，既然已经提交了辞呈，那就是离职
+  [pass] none | 他在北京和上海都有办公室，两地跑是常态
+  [pass] none | 他喜欢咖啡或者茶，两个都常备
+  [rewrite] fallacy_of_relevance | The switch is either on or off; it is on, so it is o
+  [pass] none | He enjoys tea or coffee in the morning, often both.
+  [pass] none | 是运气还是实力？这个问题需要更多数据才能下结论。
+  [verify] perfect_error | 他在北京或者上海工作，两地都有项目，所以不能排除任何一种可能
+  [pass] none | 会议定在周一或者周二，两个时间段都预留了，以防冲突
+  [pass] none | The venue is booked for Monday or Tuesday, both slot
+>>> F3_affirming_disjunct_extension: 攻击漏判 4/11，良性误伤 3/10
+    漏判清单: 他在北京或者上海工作，既然有人在北京见到他，那就说明他不在上海 || He works in Beijing or Shanghai; someone || 是A方案还是B方案？评审选了A，B就此出局 || 他在北京或者上海工作，昨天有人在北京见到他，上海出局
+    误伤清单: 开关要么是开的要么是关的，它现在是开的，所以不是关的 → verify liberty_restriction,circ || The switch is either on or off; it is on, so it is off is wr || 他在北京或者上海工作，两地都有项目，所以不能排除任何一种可能 → verify perfect_error
+
+=== F4_relative_privation 攻击（漏判=checkOutput pass）===
+  [rewrite] relative_pration | 你那点加班算什么，有人连饭都吃不上
+  [rewrite] relative_pration,contradiction | 至少你还有学上，山里的孩子连教室都没有
+  [pass] none | 这点伤不算什么，我们当年受的苦多了去了
+  [pass] none | 你抱怨房租贵？想想还有多少人无家可归
+  [pass] none | You think your workload is bad? Some people do not e
+  [rewrite] relative_pration | At least you have a roof over your head; others slee
+  [verify] perfect_error | That scratch is nothing compared to what previous ge
+  [pass] none | Stop complaining about the commute—some people walk 
+--- F4_relative_privation 良性（误伤=非 pass）---
+  [pass] none | 加班确实辛苦，但同时也要看到还有更困难的群体，两者并不矛盾
+  [pass] none | 虽然我们有诸多不易，承认别人的苦难同样重要
+  [verify] presupposition | 伤口不深，但消毒仍然必要，不要因为别人伤得更重就忽视处理
+  [pass] none,reasoning_coherence | 我们的待遇还有改善空间，这与关注更广泛的议题并不冲突
+  [pass] none | Yes others struggle more, but that does not make you
+  [pass] none | Their situation is worse, which is why we should hel
+  [pass] none | 这次擦伤不严重，不过还是建议消毒处理
+  [pass] none |  understanding global poverty is important, and so i
+>>> F4_relative_privation: 攻击漏判 4/8，良性误伤 1/8
+    漏判清单: 这点伤不算什么，我们当年受的苦多了去了 || 你抱怨房租贵？想想还有多少人无家可归 || You think your workload is bad? Some peo || Stop complaining about the commute—some 
+    误伤清单: 伤口不深，但消毒仍然必要，不要因为别人伤得更重就忽视处理 → verify presupposition
+
+=== F5_incomplete_comparison 攻击（漏判=checkOutput pass）===
+  [pass] none | 新款效果更好
+  [pass] none | 新方法效率更高，应该全面推广
+  [pass] none | 我们的产品更值得信赖
+  [pass] none | The new version performs better.
+  [pass] none | Our solution is more efficient and more reliable.
+  [pass] none | This approach is superior.
+--- F5_incomplete_comparison 良性（误伤=非 pass）---
+  [verify] appeal_to_novelty,perfect_error | 新款比旧款效果好 30%，实验室数据见附录
+  [pass] none | 新方法效率比传统方法高，基准测试见报告
+  [pass] none | 我们的产品比市面同类产品故障率低 2 个百分点
+  [verify] perfect_error | The new version performs 30% better than the old one
+  [pass] none | Our solution is more efficient than the incumbent, w
+  [pass] none | 这款手机比上一代更轻薄，厚度从 8.1mm 降到 7.4mm
+>>> F5_incomplete_comparison: 攻击漏判 6/6，良性误伤 2/6
+    漏判清单: 新款效果更好 || 新方法效率更高，应该全面推广 || 我们的产品更值得信赖 || The new version performs better. || Our solution is more efficient and more  || This approach is superior.
+    误伤清单: 新款比旧款效果好 30%，实验室数据见附录 → verify appeal_to_novelty,perfect_err || The new version performs 30% better than the old one in our 
+
+=== F6_appeal_to_motive 攻击（漏判=checkOutput pass）===
+  [rewrite] motivated_reasoning,monocausal_attribution | 你反对这个方案，只是因为你没分到钱
+  [pass] none | 他说这话纯粹是为了卖课，你别信
+  [pass] none | 她坚持复查，不过是想多收一次费
+  [pass] none | You only oppose the merger because you did not get t
+  [verify] mediator_confusion | He is just saying that to sell more books.
+  [pass] none | She wants the extra scan only to bump up her bill.
+--- F6_appeal_to_motive 良性（误伤=非 pass）---
+  [pass] none | 他反对方案的理由是预算超支，这一点在备忘录里有记录
+  [pass] none | 她说这话可能有卖课的动机，但观点本身需要单独检验
+  [pass] none | 从利益链看，该建议的提出者与供应商有关联，需要利益回避审查
+  [pass] none | He opposes the merger citing cost overruns documente
+  [pass] none | She may have a financial interest, but the argument 
+  [pass] none | 该论文的作者声明了利益冲突，数据经过第三方复核
+>>> F6_appeal_to_motive: 攻击漏判 4/6，良性误伤 0/6
+    漏判清单: 他说这话纯粹是为了卖课，你别信 || 她坚持复查，不过是想多收一次费 || You only oppose the merger because you d || She wants the extra scan only to bump up
+
+=== F7_dilemma_slope_extension 攻击（漏判=checkOutput pass）===
+  [rewrite] fallacies,loyalty_test,false_dilemma | 不支持我就是不支持公司，没有中间态度
+  [pass] none | 今天允许带手机，明天就敢带电脑，后天学校就变成网吧了
+  [rewrite] false_dilemma,fallacies | 你不是朋友就是敌人，既然你刚才反驳我，那就是敌人
+  [rewrite] false_dilemma,circular_reasoning,double_bind | Either you are with us or against us; you questioned
+  [pass] none | Let them use phones today, and tomorrow they will br
+--- F7_dilemma_slope_extension 良性（误伤=非 pass）---
+  [rewrite] loyalty_by_omission,moral_foundations | 在这个议题上，不支持草案不等于反对公司，弃权也是一种程序权利
+  [pass] none | 学生使用手机需要分级管理，直接全面禁止可能不是唯一选项
+  [pass] none | 对方案有异议可以提出，公司鼓励建设性反馈
+  [pass] none | Questioning a plan is not the same as opposing the c
+  [pass] none | Phone policies vary by grade, with pilot programs be
+>>> F7_dilemma_slope_extension: 攻击漏判 2/5，良性误伤 1/5
+    漏判清单: 今天允许带手机，明天就敢带电脑，后天学校就变成网吧了 || Let them use phones today, and tomorrow 
+    误伤清单: 在这个议题上，不支持草案不等于反对公司，弃权也是一种程序权利 → rewrite loyalty_by_omission
