@@ -55,6 +55,14 @@
  *     词回填腿②，防「别人熬夜伤身，我十点就睡」式伪双标）。EN:
  *     "Everyone else who stays up late is being irresponsible; when
  *     I stay up late it is dedication."
+ *   · 路由五「同行为不同命名」（r413 新增）双腿共现：腿①他人同一行
+ *     为被贴的标签（别人迟到叫纪律涣散 × 我迟到叫时间灵活——同样的
+ *     行为，落在别人身上叫 A、落在自己身上叫 B）× 腿②自我同一行
+ *     为的标签，**两腿须含同一个行为词**（捕获回填，同路由四防伪
+ *     双标），**两腿标签文本相同则豁免**（别人加班叫奉献，我加班
+ *     也叫奉献——同名同标是标准一致不是双标）。EN: "When others
+ *     arrive late it is called indiscipline; when I arrive late it
+ *     is called flexibility."
  *   · 缺腿不判：只有规则他指（「公司有特批流程，符合条件的人可以
  *     申请例外」）是正当程序陈述；只有自我描述（「我情况确实比较
  *     特殊」）无例外主张，归 factual。
@@ -142,6 +150,20 @@ const SELF_POS_EN = /\bI\b[^.]{0,40}?%W%\w*[^.]{0,30}?\b(?:is|are|it'?s)\s+(?:(?
 const SYMMETRY_ZH = /(?:同一个标准|同一标准|一个标准|一视同仁|同等要求|同等对待|对谁都|对自己也|双方都|一样要求|同等标准)/;
 const SYMMETRY_EN = /(?:same\s+standard|the\s+same\s+rules?|apply\s+the\s+same|hold\s+(?:everyone|others)\s+to\s+the\s+same|equally\s+(?:to|for)\s+(?:all|everyone|both)|one\s+standard\s+for\s+(?:all|everyone))/i;
 
+// ─── [r413] 路由五：同行为不同命名 ─────────────────────────────
+// 腿①：他人同一行为被贴标签（捕获组 1 = 行为词，回填腿②；组 2 = 标签）。
+// 与路由四的分工：路由四裁「行为的性质」（伤身/有害 × 热爱/奉献，靠
+// 极性词表），本路由裁「行为的名字」（叫/称为 + 任意标签，靠标签文本
+// 对比）——「同事加班叫本分，我加班叫奉献」两类极性词表都不覆盖，
+// 但双标结构与路由四完全同构，故立新腿而非扩旧表。
+const OTHERS_LABEL_ZH = /(?:别人|他人|人家|其他人|大家|他们|同事|熟人|邻居|旁人)[^。；;，,]{0,10}(迟到|犯错|出错|冒险|拒绝|直言|加班|请假|妥协|让步|辞职|批评|抱怨|坚持|放弃|努力|拼命|熬夜|应酬|喝酒|抽烟|拼搏|奋斗|冲动|折腾|走关系|托关系|打游戏|刷手机|跳槽|早退|旷工|顶嘴|争论|吵架|拖延|摸鱼)[^。；;，,]{0,8}(?:叫|叫做|称为|称作|说是|骂作|谓之|戏称)([^。；;，,]{1,8})/;
+// 腿②模板：%W% 处由腿①捕获的行为词回填（同一行为才判双标）；捕获组 1 = 自我标签
+const SELF_LABEL_ZH = /我[^。；;，,]{0,10}%W%[^。；;，,]{0,8}(?:叫|叫做|称为|称作|说是|谓之|算作)([^。；;，,]{1,8})/;
+// EN 腿①：捕获组 1 = 行为词词干（arrive/cut/stay…），组 2 = 标签（1-3 词）
+const OTHERS_LABEL_EN = /\b(?:others?|other\s+people|everyone\s+else|they|them)\b[^.]{0,40}?\b(stay|smoke|drink|overwork|burn|game|gamble|slack|cut|risk|arrive|refus|quit|speak|leave|work)\w*\b[^.]{0,30}?\b(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,2})/i;
+// EN 腿②模板：%W% 处由腿①词干回填
+const SELF_LABEL_EN = /\bI\b[^.]{0,40}?%W%\w*[^.]{0,30}?\b(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,2})/i;
+
 /**
  * 路由四：同行为不同定性（别人做是透支/犯错，我做是热爱/奉献）。
  * 两腿须含同一行为词——捕获腿①行为词回填腿②模板，防止「别人熬夜
@@ -168,6 +190,41 @@ function checkSameValence(text, R, isZh) {
 }
 
 /**
+ * 路由五：同行为不同命名（别人X叫A，我X叫B）。
+ * 两腿须含同一行为词——捕获腿①行为词回填腿②模板，防「别人迟到叫
+ * 纪律涣散，我十点就睡」式伪双标；两腿标签文本相同则豁免（同名
+ * 同标是标准一致）；对称要求在场（一视同仁）同样豁免。
+ * @param {string} text
+ * @param {object} R 负例注入用
+ * @param {boolean} isZh
+ */
+function checkSameLabel(text, R, isZh) {
+  const othersLabel = isZh ? (R.OTHERS_LABEL_ZH || OTHERS_LABEL_ZH) : (R.OTHERS_LABEL_EN || OTHERS_LABEL_EN);
+  const selfTpl = isZh ? (R.SELF_LABEL_ZH || SELF_LABEL_ZH) : (R.SELF_LABEL_EN || SELF_LABEL_EN);
+  const symmetry = isZh ? (R.SYMMETRY_ZH || SYMMETRY_ZH) : (R.SYMMETRY_EN || SYMMETRY_EN);
+  const m = othersLabel.exec(text);
+  if (!m) return null;
+  const w = m[1];
+  if (!w) return null;
+  const src = selfTpl instanceof RegExp ? selfTpl.source : String(selfTpl);
+  if (!src || src === '(?:)') return null;
+  const selfRe = new RegExp(src.split('%W%').join(w), isZh ? '' : 'i');
+  const m2 = selfRe.exec(text);
+  if (!m2) return null;
+  const strip = isZh
+    ? (s) => s.replace(/[\u300c\u300d\u300e\u300f"'`\s]/g, '')
+    : (s) => s.replace(/["'`\u201c\u201d\u2018\u2019\s]/g, '').toLowerCase();
+  const labelOthers = strip(m[2] || '');
+  const labelSelf = strip(m2[1] || '');
+  if (!labelOthers || !labelSelf) return null;
+  // 同一行为同一个名字 → 主张标准一致，不是双标
+  if (labelOthers === labelSelf) return null;
+  // 对称要求在场 → 一视同仁的表述不是双标
+  if (symmetry.test(text)) return null;
+  return { route: (isZh ? 'zh' : 'en') + ':same-behavior×different-label(' + w + ')' };
+}
+
+/**
  * 中文路由：四条路由任一成立。
  * @param {string} text
  * @param {object} R 负例注入用：以空白正则替换指定常量
@@ -188,6 +245,9 @@ function checkZh(text, R) {
   // 路由四：同行为不同定性（同一行为词，他人负面 × 自我正面）
   const r4 = checkSameValence(text, R, true);
   if (r4) return r4;
+  // 路由五：同行为不同命名（同一行为词，他人叫A × 我叫B，标签不同）
+  const r5 = checkSameLabel(text, R, true);
+  if (r5) return r5;
   return null;
 }
 
@@ -202,6 +262,8 @@ function checkEn(text, R) {
   if (doubleStandard.test(text)) return { route: 'en:double-standard' };
   const r4 = checkSameValence(text, R, false);
   if (r4) return r4;
+  const r5 = checkSameLabel(text, R, false);
+  if (r5) return r5;
   return null;
 }
 
@@ -253,5 +315,6 @@ module.exports = {
     DOUBLE_STANDARD_EN, EVIDENCE_PRESENT, META_NOUN, STRICTER_PRESENT,
     OTHERS_NEG_ZH, SELF_POS_ZH, OTHERS_NEG_EN, SELF_POS_EN,
     SYMMETRY_ZH, SYMMETRY_EN,
+    OTHERS_LABEL_ZH, SELF_LABEL_ZH, OTHERS_LABEL_EN, SELF_LABEL_EN,
   }),
 };

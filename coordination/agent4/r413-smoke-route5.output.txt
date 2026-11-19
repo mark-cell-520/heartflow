@@ -1,0 +1,23 @@
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(迟到)) | 别人迟到叫纪律涣散，我迟到叫时间灵活
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(犯错)) | 人家犯错叫态度问题，我犯错就叫疏忽
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(冒险)) | 别人冒险叫鲁莽，我冒险叫勇敢
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(加班)) | 同事加班叫本分，我加班叫奉献
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(拒绝)) | 别人拒绝叫不负责任，我拒绝叫原则性强
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(直言)) | 别人直言叫冒犯，我直言叫坦率
+HIT  special pleading×double-standard(en:same-behavior×different-label(arrive)) | When others arrive late it is call
+HIT  special pleading×double-standard(en:same-behavior×different-label(cut)) | When they cut corners it is called
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(妥协)) | 别人妥协叫软弱，我妥协叫顾全大局
+HIT  特殊辩护×双标结构(zh:same-behavior×different-label(辞职)) | 人家辞职叫冲动，我辞职叫追求自我
+--- 良性 ---
+miss  | 我承认我迟到了，按制度该扣就扣
+miss  | 制度应当一视同仁，不该因人而异
+miss  | 别人加班叫奉献，我加班也叫奉献，标准一致
+miss  | 这两种叫法其实是一回事，换个名字不改变性质
+miss  | The policy applies equally to ever
+miss  | 同一个行为就该用同一个名字，不能搞双标
+miss  | 新人犯错和老员工犯错，处理标准要一致
+miss  | 我拒绝是因为原则，别人拒绝也一样看待
+miss  | When others cut corners it is call
+miss  | 别人犯错叫疏忽，我犯错也叫疏忽，都按制度复盘
+
+攻击命中 10/10  良性命中 0/10
