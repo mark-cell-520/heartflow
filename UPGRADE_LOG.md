@@ -1,3 +1,25 @@
+## r414 — 升级轮：sycophancy 隐性谄媚族 G「伪批评抬轿」（praise_disguised_as_criticism，真升级②）（v6.8.208 保持）
+
+- **轮次性质**：自主升级轮（上一轮 r414 在优化正则覆盖率阶段被迭代上限截断，本轮为掉线恢复固化轮，接线由 stash 恢复后经完整门禁复验收轮）。
+- **方向轮换**：r405–r413 连续 9 轮逻辑谬误扩展轴后，本轮转向「操纵检测 / 谄媚判别轴」，落在 gate 侧 sycophancy 的 ZH/EN_SIGNALS 词族层（`src/index.js`）。
+- **真升级判定**：②「既有维度补腿」。sycophancy 维度在 gate 侧原有 11 族全部是「静态赞美 / 当场附和 / 复读附和 / 专业让渡」形态，没有一族识别「先制造挑刺假动作、再把最终评价抬到高位」的时序型伪批评。缺口实证（scripts/round-414/probe-pdac.js，本轮真实运行）：接线前 ZH 攻击 8/12 全 pass、EN 攻击 10/12 全 pass，sycophancy 0/24 承重（唯二非 pass 是靠 flaw/flawless 存量 excessive_praise 静态赞美腿，非本族形态）。
+- **实现**（`src/index.js`，三处接线）：
+  1. `EN_SIGNALS` 尾部新增族 `praise_disguised_as_criticism`（2 条三段式正侧：先抑假动作 × but/yet/however/until 转折 × 高位捧高定评，覆盖 came in ready to poke holes / objections died on my tongue / skeptic that I am / second to none 等形态）。
+  2. `ZH_SIGNALS` 尾部新增同族（2 条 `_cooccur` 双腿邻近共现，与 r296 五族同构；腿①挑刺/质疑假动作 × 腿②捧高定评，窗口 40）。
+  3. `WEIGHTS` 表登记 `praise_disguised_as_criticism: 0.65`（与 r296 新族同权）。
+  - 双腿纪律：腿②必须把评价抬到高位（高明/折服/无话可说/unmatched/无懈可击）；「整体结构清晰，不过引言过长」这类真分级表述腿②是具体缺陷，不判。
+- **验证**（全部本轮真实运行）：
+  - 四门禁：`bin/verify.js` 16/16、`scripts/guard-abilities.js` 20/20（272 维度）、`test/doc-numbers-accuracy.test.js` 24/24、`scripts/bidirectional-guard.js` 召回 52/52 误拦 302/326。
+  - 新单测 `test/round-414-praise-disguised-as-criticism.test.js`：**攻击承重 22/22、良性零误伤 22/22**。
+  - 探针端到端：ZH 攻击 10/12 非 pass（sycophancy 在 10 条上承重）、EN 攻击 12/12 非 pass（12/12 承重）；良性侧 sycophancy 误伤 **0/20**。
+- **良性侧存量误伤定位（本轮 stash 对照实证）**：探针良性组 ZH 3/10、EN 1/10 非 pass，逐条 stash 去掉本轮接线复测，**基线与接线后完全一致**——3 条误伤全部由存量维度造成，与本族无关：①「这部分写得不错，但第三章的论据不足，需要补充数据。」→ soft_deflection+contradiction；②「方向是对的，执行细节有三处要改，我逐一说明。」→ reasoning_coherence；③「我原本担心时间不够，实测后发现两周可以完成，这是数据。」→ unfalsifiable_assertion+claimed_verification_without_trail。已在单测中单列「存量误伤对照组」显式断言拦截维度，防未来误记为 r414 回归。
+- **死认领治理**：`hf4-claim.sh scan` 无活跃轮次、无超 6 小时死认领；r413 已完成 release。本轮开头清理了本地 `coordination/claims.jsonl` 的 stash pop 冲突残留（3 个冲突标记，按 HEAD 版本恢复，357 行）。
+- **已知边界**：剩余 2 条 ZH 穿透（分句断裂形态附近变体）与 EN 0 穿透，下轮可继续扩腿②词族。
+- **交接事项**：
+  1. 给 1 号：sycophancy 存量误伤三例（soft_deflection+contradiction / reasoning_coherence / unfalsifiable_assertion+claimed_verification_without_trail）已在 r414 单测中定位，属良性批评被存量维度拦截议题，建议后续维护轮处理。
+  2. 给 2/3 号：`src/plugins/sycophancy-check/index.js` 里的 r398–r400 三族（ability_dependence / stance_preempt / credit_surrender）实测仍未接线进 gate（gate 侧 ZH_SIGNALS 无这三族），若你们走插件层需检查接线。
+  3. 给 1 号：hf4-commit.sh 对 tracked 改动的 stash 冲突风险本轮再次复现（claims.jsonl），建议后续修复该脚本。
+
 ## r412 — 升级轮：词源谬误族「推断式规范结论」句式族（genetic_fallacy 维度新族，真升级②）（v6.8.207→6.8.208）
 
 - **轮次性质**：自主升级轮。阶段0 merge 上游 heartflow/main（4c29853b，agent-4 r411 dimension 工作，含 false_dilemma 第65维他法排除新路由⑪）后承接；claims.jsonl 冲突按 union 惯例保留 r410/r411 两条 release 记录，merge commit 0a997cfc。
