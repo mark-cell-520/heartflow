@@ -57,12 +57,32 @@
  */
 'use strict';
 
+// ─── [r402 · 真升级②] 实利归因即驳回族 ────────────────────────────
+// 承接 r257 三腿骨架，新增「实利归因」措辞家族：
+//   腿①' MOTIVE_B_ZH/EN：排他归因标记（纯粹/说到底/不外乎/一心想/
+//       only/merely/just/simply/purely）× 实利动词（是为了/是想/意在/
+//       想要/图个/to sell/to bump）× 可计量物质收益名词（卖课/多收一次
+//       费/提成/回扣/流量/KPI/位子；EN bill/commission/promotion/quota）。
+//   腿②' claimRefZh/claimActZh/claimActEn：论点指代名词（这话/这套/此论）
+//       与言论/行动动词直陈形（她坚持复查/他反对新政/专家建议收紧审批；
+//       EN wants the extra scan / only oppose the merger）。
+//   腿③'：沿用既有显式 dismiss 通道 + 纯动机推定通道，另补「你别信/不足
+//       信/信不得」类驳回指令。
+//   豁免' PUBLIC_BENEFIT：受益方为公众/他人（老百姓的利益/用户的权益）时
+//       是正当动机陈述，实利名词语义被公共利益框架接管，不判。
+//   主语纪律：claimActZh 只收第二/三人称与角色人——第一人称（我/我们）
+//   是动机自陈披露，机构主体（医院/平台/公司）是制度激励分析，均不判。
+// 存量射程对本族 4/6 漏判（probe-pool 实测），本族补上后模块层 6/6。
+
 // ─── 腿①：动机推定段（把观点归因于言者处境）────────────────────────
 // 中文族 A：「(之所以)…(这么说/反对/支持)…是因为…」
 // r257 修正：原版 claimZh 只认「这么说/他的观点」，漏掉「之所以反对/支持」
 // 这类动词直接作论点的句子。修正后 motive 正则本身覆盖动词论点形态。
 const MOTIVE_A_ZH = [
-  /(之所?以)?[^，。；]{0,12}(这么|这样)?(说|讲|认为|觉得|支持|反对|坚持|声称|宣称|主张|批?评|怀疑|否认)[^，。；]{0,18}(是因?为|不过是?因为|无非是因?为|只不过因?为)/,
+  // [r402 修正] span 排除集加半角逗号/分号：pipeline NFKC 会把全角逗号
+  // 折成 ASCII，原先 `[^，。；]` 不拦半角逗号，「她坚持复查,是因为指标异常」
+  // 这类正当因果归因会被并进动机推定段（实测良性误伤，存量共有的边界漏洞）。
+  /(之所?以)?[^，。；,;]{0,12}(这么|这样)?(说|讲|认为|觉得|支持|反对|坚持|声称|宣称|主张|批?评|怀疑|否认)[^，。；,;]{0,18}(是因?为|不过是?因为|无非是因?为|只不过因?为)/,
   /(收[了到]?钱|被收买|拿了好处|既得利益|利益相关|屁股决定脑袋|动机不纯|别有用心|居心不良)/,
   /(无非|不过|只不过|只是)(想|是为?了?想|是为?了|出于)/,
   /(他是|她是|对方是|这些人?是|他自己|她自己)[^，。；]{0,12}(同行|对手|竞争|受益[方者]|获利[方者]|当事方|圈内人|自己人|既得利益[者者])/,
@@ -90,6 +110,40 @@ const MOTIVE_A_EN = [
   /\b(?:you|they|he|she)\s+(?:only\s+)?(?:think|believe|say)\s+(?:that|this|so)\s+only\s+because\b/i,
 ];
 
+// ─── 腿① 扩展：实利归因族（r402 · 真升级②）────────────────────────
+// Bulverism 的「实利」变体：把对方的观点/行动归因于**可计量的物质收益**
+// （卖课/多收费/提成/回扣/流量/KPI/位子；EN sell more / bump up her
+// bill / paid / commission / promotion），并以此替代对论点本身的检验。
+// 与存量 MOTIVE_A 族的分界（刻意错开，不重复建设）：
+//   · 存量族认**身份处境词**（同行/既得利益/被收买/屁股决定脑袋/biased/
+//     on the payroll），本族认**具体经济收益词**（多收一次费/卖课/提成）；
+//   · 存量族排他标记只认 无非/不过/只不过/只是，本族扩展到
+//     纯粹/说到底/不外乎/一心想/only to + benefit-verb 结构；
+//   · 存量腿②论点须是**观点名词或「之所以+动词」**，本族认**言论/行动
+//     动词直陈形**（她坚持复查/他反对新政）与**指代名词**（这话/这套）。
+// 探针实测（scripts/round-402/probe-pool.js，v6.8.202 基线）：
+// 存量射程对本族攻击 4/6 漏判、良性 0/6 误伤。
+const MOTIVE_B_ZH = [
+  // 排他标记 + 实利动词 + 实利名词（「纯粹是为了卖课」「不过是想多收一次费」）
+  // 排除集含半角逗号/分号：pipeline NFKC 会把全角逗号折成 ASCII，跨子句
+  // span 会把「她坚持复查,是因为指标异常」这类正当归因误并进动机段（r402 实测）。
+  // span 同时排除否定字（不/没/未/勿）：「纯粹不想挣钱」是否定陈述不是归因。
+  /(纯粹|说到底|归根到底|根本上|实质上|明摆着|不外乎|一心想|心心念念|满脑子|无非是|无非|不过是|只不过|只是|仅仅|就)[^。；，,;不没未勿]{0,8}(是为了|是想|意在|图的是|惦记的是|冲的是|冲着|想要|想|图|图个|谋求|贪图|为了|的是)[^。；，,;]{0,14}(卖课|售卖|多收|收费|收钱|提成|回扣|返点|奖金|钱财|生意|流量|名气|地位|升职|位子|业绩|绩效|学费|医药费|挂号费|检查费|手术费|教材费|会员费|佣金|报酬|外快|油水|钱|财|利)/,
+  // 「为了 + 实利名词」前置紧贴排他标记（「只是为了钱」「只是为了业绩」）
+  /(纯粹|说到底|归根到底|不外乎|一心想|无非是|无非|不过是|只不过|只是|仅仅)[^。；，,;不没未勿]{0,4}为了[^。；，,;]{0,8}(钱|财|利|提成|回扣|奖金|流量|业绩|绩效|位子|地位|名气|生意)/,
+];
+const MOTIVE_B_EN = [
+  // 排他标记 + (≤4 词) + to + 实利动词 + 实利名词
+  // 「only to bump up her bill」「purely to sell more books」「just to drive sales」
+  /\b(?:only|merely|just|simply|purely)\s+(?:\w+\s+){0,4}?to\s+(?:sell|boost|bump|pad|inflate|raise|drive|increase|profit|earn|collect|generate)\b[^.!?]{0,40}\b(?:sales?|bills?|commission|commissions?|money|profit|profits?|fees?|revenue|numbers?|quota|clicks?|traffic|bonus|premium|tuition|rating|rankings?|ads?|streams?|views?|books?|courses?|copies|enrollments?|sign-?ups?|subscriptions?)\b/i,
+  // 排他标记 + 言论/行动动词 + because + 物质收益
+  // 「only oppose the merger because you did not get the job」
+  /\b(?:only|merely|just|simply|purely)\s+(?:oppose|opposes|support|supports|want|wants|insist|insists|push|pushes|pushing|recommend|recommends|order|orders|request|requests|demand|demands|arrange|arranges|endorse|endorses|reject|rejects|criticize|criticizes|praise|praises)\b[^.!?]{0,60}\b(?:because|since|as)\b[^.!?]{0,60}\b(?:money|paid|pay|bills?|profit|commissions?|fees?|sales?|job|position|promotion|raise|bonus|quota|kickback|contract|deal|revenue|business)\b/i,
+  // 言论/行动动词 + 排他标记 + because + 物质收益（标记后置形）
+  // 「You support the merger just because it pads your own numbers.」
+  /\b(?:oppose|opposes|support|supports|want|wants|insist|insists|push|pushes|pushing|recommend|recommends|order|orders|request|requests|demand|demands|arrange|arranges|endorse|endorses|reject|rejects|criticize|criticizes|praise|praises|say|says|said|claim|claims|argue|argues)\b[^.!?]{0,40}\b(?:only|merely|just|simply|purely)\s+(?:because|since|as)\b[^.!?]{0,60}\b(?:money|paid|pay|bills?|profit|commissions?|fees?|sales?|job|position|promotion|raise|bonus|quota|kickback|contract|deal|revenue|business)\b/i,
+];
+
 // ─── 腿③：免除回应断言（据此取消实质回应）──────────────────────────
 const DISMISS_ZH = [
   /不值[一得]?驳/, /不必理会/, /不用理会/, /无须理会/, /不须理会/,
@@ -101,6 +155,9 @@ const DISMISS_ZH = [
   /论证(自然|肯定|必然|根本)?(无效|不成立|作废|破产)/,
   /据此(就)?(可以)?(否定|推翻|否决|拒绝)/,
   /(可以|应当|应|该)(直接)?(否定|推翻|否决|排除|拒绝)/,
+  // r402 实利归因族配套：直接对受话人发出的「别信」类驳回指令
+  /(你|你们)?(别|不要|甭|少)(信|上当|听|理会|理他|理她)/,
+  /不足(为?信|凭|取信)/, /信不得/, /不堪(一?信|采信)/,
 ];
 const DISMISS_EN = [
   /\b(?:can\s+be\s+)?dismiss(?:ed)?\b/i,
@@ -138,6 +195,15 @@ const PURE_MOTIVE_ZH = [
 ];
 const PURE_MOTIVE_EN = [
   /\b(?:only|merely|just|simply)\s+(?:say|says|said|claim|claims|think|believes?|argues?)\s+(?:that\s+)?\w+[^.!?]{0,40}\bbecause\b/i,
+];
+
+// ─── 豁免：公共利益框架（r402）───────────────────────────────────
+// 「只是为了老百姓的利益」「纯粹是为了用户的权益」——受益方是公众/他人
+// 而非言者自身物质收益，是正当动机陈述，不判。实利名词（利/钱）在此
+// 框架中被公共利益语义接管。
+const PUBLIC_BENEFIT = [
+  /(人民|群众|公众|大家|老百姓|消费者|用户|患者|学生|孩子|家人|社区|公共|集体|国家|社会|大局)[^。；，]{0,8}(的利益|权益|好处|福祉|利益)/,
+  /(大局|全局|整体|共同)[^。；，]{0,4}(利益|发展)/,
 ];
 
 // ─── 豁免：理由实质段（动机推定后给出可核查理由）───────────────────
@@ -187,7 +253,9 @@ function _MISS() {
 // 且英文特征词（dismiss/irrelevant/merit）出现即优先 en。
 function _lang(text) {
   for (const re of MOTIVE_A_ZH) if (re.test(text)) return 'zh';
+  for (const re of MOTIVE_B_ZH) if (re.test(text)) return 'zh';
   for (const re of MOTIVE_A_EN) if (re.test(text)) return 'en';
+  for (const re of MOTIVE_B_EN) if (re.test(text)) return 'en';
   // 未命中动机族时的兜底：英文特征词或拉丁占比优先
   if (/\b(?:dismiss(?:ed)?|irrelevant|without\s+merit|not\s+worth)\b/i.test(text)) return 'en';
   const zh = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
@@ -213,13 +281,15 @@ function checkMotivatedReasoning(text) {
   if (_hasAny(QUESTION, text)) return _MISS();
   if (_hasAny(REASON_GIVEN, text)) return _MISS();
   if (_hasAny(CONFLICT_DISCLOSE, text)) return _MISS();
+  if (_hasAny(PUBLIC_BENEFIT, text)) return _MISS();
 
   const lang = _lang(text);
 
-  // 腿①：动机推定段
-  const motiveZh = _hasAny(MOTIVE_A_ZH, text);
-  const motiveEn = _hasAny(MOTIVE_A_EN, text);
+  // 腿①：动机推定段（存量身份处境族 或 r402 实利归因族）
+  const motiveZh = _hasAny(MOTIVE_A_ZH, text) || _hasAny(MOTIVE_B_ZH, text);
+  const motiveEn = _hasAny(MOTIVE_A_EN, text) || _hasAny(MOTIVE_B_EN, text);
   if (!motiveZh && !motiveEn) return _MISS();
+  const viaBenefit = _hasAny(MOTIVE_B_ZH, text) || _hasAny(MOTIVE_B_EN, text);
 
   // 腿②：被归因的论点须可指认。
   // r257 二版修正：原实现要求句中出现「这么说/他的观点」这类观点名词，
@@ -233,10 +303,20 @@ function checkMotivatedReasoning(text) {
   // 要求紧邻导致漏判。改为允许 ≤8 字间隔。
   const claimZh = /(这么|这样)(说|讲|认为|支持|反对)|(这|那)(些|些话|种话)[^，。；]{0,8}(说|讲|法|观点|看法|想|是指)|(他的|她的|他们的|对方的|这套|这些|这份)?(观点|说法|论点|论证|立场|主张|意见|结论|判断|建议|提议|方案|报告|分析)/;
   const claimVerbZh = /(之所?以)[^，。；]{0,12}(说|讲|认为|觉得|支持|反对|坚持|声称|宣称|主张|批?评|怀疑|否认|投[赞反成]|持)/;
-  const claimEn = /\b(?:say|says|said|saying|claim|claims|argue|argues|argument|view|position|opinion|belief|believe|believes|think|thinks|objection|report|findings?|warning|advice|suggestion|proposal|analysis|conclusion|statement|assertion)\b/i;
+  // r402 腿②扩展：论点指代名词（「这话/这套/此论」直接作被归因的论点）
+  const claimRefZh = /(这话|这番|这种话|这套|这一套|此番|此论|该言论|这番言论|这种说法|那套|这一论)/;
+  // r402 腿②扩展：言论/行动动词直陈形（无「之所以」前缀）——「她坚持
+  // 复查」「他反对新政」「专家建议收紧审批」的论点就是动作本身。
+  // 主语限定为**第二/三人称或角色人**：第一人称（我/我们/本人）是
+  // 动机自陈披露而非 Bulverism，机构主体（医院/平台/公司/机制）是制度
+  // 激励分析而非人身归因，均刻意不收（良性边界锁见轮测 B7-B9）。
+  const claimActZh = /(你|您|他|她|他们|对方|此人|专家|作者|医生|老师|律师|老板|家长|会员|观众|读者|消费者|那位|某)[^，。；,;]{0,6}(反对|支持|赞成|抵制|主张|呼吁|建议|坚持|要求|推行|申请|提请|质疑|批评|否认|拒绝|号召|倡议|组织|发起|安排|鼓吹|推销|推荐|贩卖|安利|带货)/;
+  const claimEn = /\b(?:say|says|said|saying|claim|claims|argue|argues|argument|view|position|opinion|belief|believe|believes|think|thinks|objection|report|findings?|warning|advice|suggestion|proposal|analysis|conclusion|statement|assertion|wants?|insists?|requests?|demands?|pushes|opposes|supports|orders|arranges|objects?)\b/i;
+  // r402 腿②扩展（EN）：角色主语 + 言论/行动动词直陈形
+  const claimActEn = /\b(?:you|he|she|they|the\s+(?:author|doctor|expert|critic|teacher|lawyer|boss|seller|vendor|rep|representative))\b[^.!?]{0,30}\b(?:oppose|opposes|support|supports|endorse|endorses|reject|rejects|insist|insists|demand|demands|request|requests|urge|urges|push|pushes|promote|promotes|recommend|recommends|want|wants|order|orders|arrange|arranges|pans|slams|trashes|bashes|blasts|attacks|mocks|ridicules|knocks)\b/i;
   if (lang === 'zh'
-    ? !(claimZh.test(text) || claimVerbZh.test(text))
-    : !claimEn.test(text)) return _MISS();
+    ? !(claimZh.test(text) || claimVerbZh.test(text) || claimRefZh.test(text) || claimActZh.test(text))
+    : !(claimEn.test(text) || claimActEn.test(text))) return _MISS();
 
   // 腿③：免除回应断言（显式通道 或 纯动机推定通道）
   // r257 三版：显式 dismiss 词未命中时，若动机推定族已命中（腿①）且
@@ -248,7 +328,9 @@ function checkMotivatedReasoning(text) {
   const hasDismiss = _hasAny(dismissList, text);
   const hasPure = _hasAny(pureList, text) || (motiveZh || motiveEn);
   if (!hasDismiss && !hasPure) return _MISS();
-  const via = hasDismiss ? 'dismiss' : 'pure-motive';
+  const via = viaBenefit
+    ? (hasDismiss ? 'benefit+dismiss' : 'benefit-imputation')
+    : (hasDismiss ? 'dismiss' : 'pure-motive');
 
   // 定位动机表达用于 detail 描述
   let motiveDesc = '';
@@ -258,11 +340,19 @@ function checkMotivatedReasoning(text) {
     else {
       const m2 = text.match(/(之所?以)?[^，。；]{0,12}(这么|这样)?(说|讲|认为|觉得|支持|反对|坚持|声称|宣称|主张)[^，。；]{0,18}(是因?为|不过是?因为|无非是因?为|只不过因?为)/);
       if (m2) motiveDesc = m2[0].slice(0, 18);
+      // r402 实利归因族的动机描述
+      if (!motiveDesc) {
+        const m3 = text.match(/(纯粹|说到底|归根到底|不外乎|无非是|无非|不过是|只不过|只是|仅仅|一心想)[^。；，,;不没未勿]{0,10}(是为了|是想|意在|图的是|惦记的是|冲的是|冲着|想要|想|图|图个|谋求|贪图|为了|的是)[^。；，,;]{0,14}(卖课|多收|收费|提成|回扣|返点|奖金|钱财|生意|流量|名气|地位|升职|位子|业绩|绩效|学费|医药费|挂号费|检查费|手术费|教材费|会员费|佣金|报酬|外快|油水|钱|财|利)/);
+        if (m3) motiveDesc = m3[0].slice(0, 22);
+      }
     }
     if (!motiveDesc) motiveDesc = '动机推定';
   } else {
     const m = text.match(/\b(?:only|merely|just|simply)\s+(?:say|says|said|claim|claims|think|believes?|argues?)\b[^.!?]{0,40}\b(?:because|since)\b[^.!?]{0,30}/i)
-      || text.match(/\b(?:biased|paid|bought|on\s+the\s+payroll)\b[^.!?]{0,30}/i);
+      || text.match(/\b(?:biased|paid|bought|on\s+the\s+payroll)\b[^.!?]{0,30}/i)
+      // r402 实利归因族（EN）的动机描述
+      || text.match(/\b(?:only|merely|just|simply|purely)\s+(?:\w+\s+){0,4}?to\s+(?:sell|boost|bump|pad|inflate|raise|drive|increase|profit|earn|collect|generate)\b[^.!?]{0,40}/i)
+      || text.match(/\b(?:only|merely|just|simply|purely)\s+(?:oppose|opposes|support|supports|want|wants|insist|insists|push|pushes|recommend|recommends|order|orders|request|requests|demand|demands|arrange|arranges)\b[^.!?]{0,60}\b(?:because|since)\b[^.!?]{0,30}/i);
     motiveDesc = m ? m[0].slice(0, 46) : 'motive attribution';
   }
 
