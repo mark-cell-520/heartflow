@@ -268,5 +268,5 @@ t('G1 豁免变异守卫：抹掉 PROVERB_META_ZH 后「民俗学研究」样本
   assert.ok(r.hit, '抹掉 PROVERB_META_ZH 后未转红（豁免不承重）');
 });
 
-console.log('\nround-409-appeal-tradition-proverb-authority: pass=' + pass + ' fail=' + fail);
+console.log('\nround-409-appeal-tradition-proverb-authority: ' + pass + ' passed / ' + fail + ' failed');
 if (fail > 0) process.exit(1);

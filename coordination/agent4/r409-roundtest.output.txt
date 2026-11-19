@@ -1,18 +1,2 @@
-  ✅ A1 gate 层：攻击 19 条全部非 pass 且 appeal_to_tradition 在场
-  ✅ A2 gate 层：良性 16 条全部 pass
-  ✅ B1 模块层：攻击 19 条全部命中
-  ✅ B2 模块层：良性 16 条全部不命中
-  ✅ B3 模块层：路由⑦归因（detail 含古训俗语权威/proverb-as-authority）
-  ✅ C1 NFKC/全角折叠不逃（全角标点俗语样本仍命中）
-  ✅ D1 承重注入：12 组腿常量逐一抹掉后承重样本停命中
-  ✅ E1 存量路由：r259/r277/r408 样本仍命中（良性豁免样本仍不命中）
-  ✅ F1 边界锁：仅腿②（俗语结论）无载体不判
-  ✅ F2 边界锁：仅腿①（俗语载体）无结论不判
-  ✅ F3 边界锁：PROVERB_META 豁免（评析俗语本身不判）
-  ✅ F4 边界锁：让步×评估豁免（呈现争论不判）
-  ✅ F5 边界锁：证据在场豁免（数据论证不判）
-  ✅ F6 边界锁：META 诉诸传统豁免（评析谬误本身不判）
-  ✅ F7 边界锁：从众施压族零重叠配对守卫（两腿不得同源）
-  ✅ G1 豁免变异守卫：抹掉 PROVERB_META_ZH 后「民俗学研究」样本转红
 
-round-409-appeal-tradition-proverb-authority: pass=16 fail=0
+round-409-appeal-tradition-proverb-authority: 16 passed / 0 failed
