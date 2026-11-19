@@ -1,0 +1,43 @@
+
+===== F2 appeal_to_tradition 时间考验族（存续N年=经得起考验/没用早亡了） (host=appeal_to_tradition) =====
+攻击穿透(pass) 7/12  良性误伤(非pass) 0/8  模块层命中 0/12
+  [漏判] #0 这道菜的做法传了五百年，能不好吃吗
+  [漏判] #1 老字号能开一百年，靠的就是真本事，不然早倒闭了
+  [漏判] #2 一个方法用了几千年都没被淘汰，说明它经得起考验
+  [代拦] #3 rewrite (conditional_proposition,double_bind,fallacies) 祖宗传下来的规矩用了上千年，要是害人早就亡了
+  [漏判] #4 A remedy that has survived a thousand years ca
+  [代拦] #5 rewrite (conditional_proposition,fallacies) If the old way were wrong, it would have
+  [漏判] #6 This technique has been passed down for centur
+  [代拦] #7 rewrite (fallacy_of_relevance,reasoning_coherence,pseudo_causal,pseudo_causal) 这套制度运行了三百年，没它就没有今天的稳定，足以说明设计是对的
+  [代拦] #8 rewrite (conditional_proposition,double_bind,fallacies) 这套拳法流传了四百年，要是没用早就失传了
+  [漏判] #9 这个偏方用了两百年，附近几个村都靠它治病，能不管用吗
+  [代拦] #10 rewrite (conditional_proposition,fallacies) The temple has stood here for eight cent
+  [漏判] #11 这家中药店开了两百年，没疗效哪能撑到今天
+
+===== F3 appeal_to_tradition 古训俗语权威族（古人云/老话说=论据） (host=appeal_to_tradition) =====
+攻击穿透(pass) 7/10  良性误伤(非pass) 0/7  模块层命中 0/10
+  [漏判] #0 古人云，不听老人言吃亏在眼前，你不听劝早晚栽跟头
+  [漏判] #1 老话说姜还是老的辣，听年轻人的准没错
+  [漏判] #2 俗话说瘦死的骆驼比马大，他们家底子厚着呢
+  [代拦] #3 verify (econ_reasoning_gate) 老祖宗早就说过凡事留一线，你把人逼急了对你没好处
+  [漏判] #4 As the old saying goes, if it ain't broke, don
+  [代拦] #5 verify (existential_fallacy) There is an old proverb: don't rock the 
+  [漏判] #6 常言道水火不留情，仓库防火必须按老规矩天天查
+  [漏判] #7 老话讲病从口入，冰箱里的剩菜千万别吃
+  [代拦] #8 verify (perfect_error) My grandmother always said: waste not, w
+  [漏判] #9 俗话说得好，远亲不如近邻，办事还得靠本地关系
+
+===== F7 tu_quoque 资格反问族（你行你上/先管好你自己）对照 (host=tu_quoque) =====
+攻击穿透(pass) 3/6  良性误伤(非pass) 1/5  模块层命中 1/6
+  [漏判] #0 你行你上啊，不行就别废话
+  [漏判] #1 先管好你自己吧，你的KPI还没完成呢
+  [漏判] #2 If you cannot do better, you have no right to 
+  [代拦] #3 verify (tu_quoque) 你又不是医生，凭什么对治疗方案指手画脚
+  [代拦] #4 verify (credential_dismissal,whataboutism) 你自己又没做过销售，有什么资格评价别人的方案
+  [代拦] #5 verify (credential_dismissal,whataboutism,perfect_error) Who are you to criticize? You have never
+  [误伤] #1 verify (monocausal_attribution) 我不是这方面的专家，以下只是个人观察
+
+===== 定拨表 =====
+F2 appeal_to_tradition: 穿透 7/12 | 误伤 0/8
+F3 appeal_to_tradition: 穿透 7/10 | 误伤 0/7
+F7 tu_quoque: 穿透 3/6 | 误伤 1/5

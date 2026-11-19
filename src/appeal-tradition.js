@@ -68,8 +68,29 @@
  *     e15 keep X as it has always been；e3 扩「do not go fixing」；
  *   · 腿③新族 ZH c8 封闭反问错位形（还能有错？/不可能有问题）；
  *     EN c8 how could it be wrong；
- *   · 新分支全部走既有句级共现路由④/⑤与 concessive-debate 豁免，
- *     live 生效，维度计数不变、src/index.js 零改动。
+ *   · 新分支全部走既有句级共现路由④/⑤与 concessive-debate 豁免，live 生效，
+ *     维度计数不变、src/index.js 零改动。
+ *
+ * [r408 扩展·真升级②] 4 号探针（coordination/agent4/probes/r408-probe-pool.js）
+ * 逻辑谬误家族轮续：三家族同池定拨——F2「时间考验族」以 7/12 穿透 + 0/8 误伤
+ * + 模块层直查 0/12（真零命中）定选（F3 古训俗语权威族 7/10 + 0/7、F7
+ * tu_quoque 3/6 + 1/5 留库未落地）。补入内容：
+ *   · 腿①存续时段新族 ZH sv1「动词+时段」形（传了/流传了/开了/运行了/
+ *     用了/活了/立了 + [一二三四五六七八九十百千万几数两]+年——旧判据
+ *     TRADITION_ZH 只收「几百年/数百年/上千年」裸名词形，「传了五百年」
+ *     带动词前缀、「开一百年」无「了」字，整族射程外）；EN sv1
+ *     survived/endured/outlasted + 时段、sv2 has stood/lasted/been
+ *     around + 时段（数字类须收 a thousand/several hundred 合成数形）；
+ *   · 腿②时间检验结论新族 ZH sc1 反事实消亡结论（要是/如果/不然/果真 +
+ *     早就 + 倒闭/亡/失传/淘汰/垮/消失）、sc2 时间检验结论（经得起考验/
+ *     足以说明/能不好吃吗/岂是偶然/没X哪能撑到今天）；EN sc1 would have
+ *     disappeared/died out/collapsed、sc2 cannot be useless、sc3 that
+ *     alone proves its worth/must be doing something right；
+ *   · 新路由⑥：（腿① ∪ 存续时段）×（时间检验结论），句级共现 + 零重叠配对
+ *     + 沿用 concessive-debate/证据在场豁免；sv 分支并入 tradBranches 使纯
+ *     存续形可独立到达路由（旧早退条件 !tradOld && !tradNew 会把「传了五百年，
+ *     能不好吃吗」直接放行——该类样本新旧腿①皆不命中）；与路由④/⑤ 互不
+ *     交叉配对（同 r291/r407 纪律）。
  */
 
 'use strict';
@@ -282,6 +303,53 @@ const CONCL_EN_BRANCHES = {
   c8_how_wrong: /\bhow could (?:it|they|this|that) be wrong\b|\bimpossible for (?:it|this) to be flawed\b/i,
 };
 
+// ═══════════════════════════════════════════════════════════════════
+// [r408] 时间考验族分支表（存续时段 × 时间检验结论，逐支可注入）
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── 腿①存续时段新族（中文）：动词+时段 ────────────────────────────
+// 「传了五百年/运行了三百年/用了几千年/开一百年」——旧判据 TRADITION_ZH
+// 只收「几百年/数百年/上千年」裸名词形，动词前缀形与口语数字形整族射程外。
+// 数字类须含「几/数/两」（几千年/两百年）；「了」不设必填（「老字号能开
+// 一百年」无「了」字）；前缀可选「上/近/逾」。
+// **动词表刻意不收「立」**：「牌子立了上百年」是 t11_brand_age 的领地
+// （round-278 注入删条样本），sv1 收「立」会与 t11 交叉承重、使该注入
+// 不再变红（r408 实测踩中后收紧）。
+const SURVIVE_ZH_BRANCHES = {
+  sv1_survived: /(?:传|流传|开|经营|运行|运转|存在|用|活|延续|存活|传承)(?:了|过)?(?:有)?(?:上|近|逾|几乎|差不多)?[一二三四五六七八九十百千万几数两]+年/,
+};
+
+// ─── 腿①存续时段新族（英文）─────────────────────────────
+// 数字类须收「a thousand / several hundred」合成数形——只收裸 a/one..ten 时
+// 「survived a thousand years」整类射程外（r408 探针实测漏判后补）。
+const SURVIVE_EN_BRANCHES = {
+  // sv1 survived/endured/outlasted/lasted + 时段（"survived a thousand years"）
+  sv1_survived: /\b(?:survived|survives|endured|endures|outlasted|outlasts|lasted)\s+(?:for\s+)?(?:\d+|a|an|one|two|three|four|five|six|seven|eight|nine|ten|hundreds?\s+of|thousands?\s+of|a\s+(?:hundred|thousand|million)|several\s+(?:hundred|thousand))\s+(?:years?|centuries|generations|millennia|decades)\b/i,
+  // sv2 has stood/lasted/been around + 时段（"The temple has stood here for eight centuries"）
+  sv2_stood: /\b(?:has|have|had)\s+(?:stood|lasted|endured|been\s+(?:around|running|in\s+use|there))\b[^.;]{0,40}?\b(?:\d+|a|an|one|two|three|four|five|six|seven|eight|nine|ten|hundreds?\s+of|thousands?\s+of|a\s+(?:hundred|thousand|million)|several\s+(?:hundred|thousand))\s+(?:years?|centuries|generations|millennia|decades)\b/i,
+};
+
+// ─── 腿②时间检验结论新族（中文）────────────────────────────
+// 「要是有害早就亡了/不然早倒闭了」反事实消亡 +「经得起考验/足以说明/
+// 能不好吃吗」时间检验结论——旧腿③只收「肯定靠谱/自然有它的道理/几代人
+// 验证过」质量担保形，反事实消亡与口语反问整族射程外。
+const SURVCONCL_ZH_BRANCHES = {
+  // sc1 反事实消亡（要是/如果/不然/果真 + 早就 + 消亡词）
+  sc1_counterfactual_death: /(?:要是|如果|倘若|假如|当真|不然|果真)(?:真)?[^。]{0,12}(?:早就|早该|早)(?:倒闭|垮|亡|消亡|湮没|绝迹|失传|淘汰|灭亡|湮灭|消失)/,
+  // sc2 时间检验结论（经得起考验/足以说明/能不好吃吗/岂是偶然/没X哪能撑到今天）
+  sc2_proven_worth: /经得起(?:时间|岁月|实践)?(?:的)?(?:考验|检验|历练)|足以说明|足以证明|(?:能|岂能|怎能|哪能)(?:不|没)?(?:好吃|管用|好用|有用|靠谱|有效|灵验|实用|像话)(?:的)?吗|岂是偶然|并非偶然|不是没有道理|哪能(?:撑到|走到|活到|延续到)(?:今天|现在|今日)|(?:没|没有)[^。]{0,6}(?:早|早就)(?:倒闭|垮|亡|失传|淘汰|消失)/,
+};
+
+// ─── 腿②时间检验结论新族（英文）────────────────────────────
+const SURVCONCL_EN_BRANCHES = {
+  // sc1 反事实消亡（would/could have disappeared/died out/collapsed）
+  sc1_would_have: /\b(?:would|could|should)\s+have\s+(?:disappeared|died\s+out|collapsed|perished|vanished|been\s+forgotten|failed|fallen\s+apart|crumbled)\b/i,
+  // sc2 cannot be useless/wrong（直接否证不可能）
+  sc2_cannot_be: /\bcannot\s+be\s+(?:useless|wrong|bad|false|ineffective)\b|\bcan'?t\s+be\s+(?:useless|wrong|bad)\b/i,
+  // sc3 that alone proves its worth / must be doing something right
+  sc3_proves_worth: /\bthat\s+alone\s+proves\b|\bproves\s+(?:its|their)\s+(?:worth|value|effectiveness|quality)\b|\bmust\s+be\s+doing\s+something\s+right\b|\bsurvived?\s+for\s+a\s+reason\b|\b(?:has|have)\s+(?:lasted|endured|survived)\s+for\s+(?:a\s+)?reason\b/i,
+};
+
 // 合并版（兼容旧读方；路由实际逐分支走，便于负例逐支注入）
 function _combine(branches, flags) {
   const parts = Object.keys(branches).map(k => '(?:' + branches[k].source + ')');
@@ -379,11 +447,18 @@ function checkAppealToTradition(text, inject) {
   }
 
   const tradBranches = _branchList(R.TRAD_ZH_BRANCHES, TRAD_ZH_BRANCHES)
-    .concat(_branchList(R.TRAD_EN_BRANCHES, TRAD_EN_BRANCHES));
+    .concat(_branchList(R.TRAD_EN_BRANCHES, TRAD_EN_BRANCHES))
+    // [r408] 存续时段分支并入 tradBranches：使纯存续形（「传了五百年」）
+    // 能通过 tradNew 早退门到达路由，并在 tradSpans 中承重
+    .concat(_branchList(R.SURVIVE_ZH_BRANCHES, SURVIVE_ZH_BRANCHES))
+    .concat(_branchList(R.SURVIVE_EN_BRANCHES, SURVIVE_EN_BRANCHES));
   const suppBranches = _branchList(R.SUPP_ZH_BRANCHES, SUPP_ZH_BRANCHES)
     .concat(_branchList(R.SUPP_EN_BRANCHES, SUPP_EN_BRANCHES));
   const conclBranches = _branchList(R.CONCL_ZH_BRANCHES, CONCL_ZH_BRANCHES)
     .concat(_branchList(R.CONCL_EN_BRANCHES, CONCL_EN_BRANCHES));
+  // [r408] 时间检验结论分支（路由⑥ 腿②）
+  const survConclBranches = _branchList(R.SURVCONCL_ZH_BRANCHES, SURVCONCL_ZH_BRANCHES)
+    .concat(_branchList(R.SURVCONCL_EN_BRANCHES, SURVCONCL_EN_BRANCHES));
 
   const tradOld = TRAD_ZH_.test(text) || TRAD_EN_.test(text);
   // [r259] 新腿①分支也要能独立支撑到达新路由——旧判据的 `!trad` 早退
@@ -458,6 +533,17 @@ function checkAppealToTradition(text, inject) {
         detail: zhText ? '诉诸传统·传统在场×质量担保结论(zh)' : 'appeal to tradition·tradition-warrant conclusion(en)',
       };
     }
+
+    // 路由⑥：[r408] 腿①（∪ 存续时段）× 腿②时间检验结论
+    // （存续N年=经得起考验/没用早亡了——反事实消亡与口语反问结论形；
+    // 与路由④/⑤ 腿②不交叉，sv 腿①经 tradBranches 并入复用）
+    const survSpans = [].concat(...survConclBranches.map(b => _collect(b, sent)));
+    if (survSpans.length > 0 && _paired(tradSpans, survSpans)) {
+      return {
+        hit: true, score: 0.4, count: 1,
+        detail: zhText ? '诉诸传统·存续时段×时间检验结论(zh)' : 'appeal to tradition·time-survival warrant(en)',
+      };
+    }
   }
 
   return { hit: false, score: 0, detail: '', count: 0 };
@@ -470,6 +556,7 @@ module.exports = {
     SUPPRESS_ZH, SUPPRESS_EN, META_EXEMPT_ZH, META_EXEMPT_EN, QUALIFY_ZH, QUALIFY_EN,
     TRAD_ZH_BRANCHES, TRAD_EN_BRANCHES, SUPP_ZH_BRANCHES, SUPP_EN_BRANCHES,
     CONCL_ZH_BRANCHES, CONCL_EN_BRANCHES,
+    SURVIVE_ZH_BRANCHES, SURVIVE_EN_BRANCHES, SURVCONCL_ZH_BRANCHES, SURVCONCL_EN_BRANCHES,
     TRAD_ZH_EXT, TRAD_EN_EXT, SUPP_ZH_EXT, SUPP_EN_EXT, CONCL_ZH_EXT, CONCL_EN_EXT,
     HEDGE_CONCESSION_ZH, HEDGE_EVAL_ZH, HEDGE_CONCESSION_EN, HEDGE_EVAL_EN,
   }),
