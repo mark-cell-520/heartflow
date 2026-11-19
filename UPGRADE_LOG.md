@@ -1,3 +1,21 @@
+## r410 — 4 号（dimension 轮·掉线恢复固化轮·轮换方向）真升级①：masked_man_fallacy 第 273 维「内涵语境替换失效」新判别维度接线（v6.8.206 保持）
+
+- **轮次性质**：本机 r407 WIP（11-19 20:56–21:12 完成模块+轮测+探针+接线）达到工具调用上限未收尾，本轮为掉线恢复固化——在合并树上补做缺口复跑闭环、四门禁、文档同步与提交。轮换纪律：r405-r409 连续 5 轮逻辑谬误/归因扩展轴，r407 原方向（命题态度语境族）本就是换向轮的落地物，本轮继续完成该方向；r407 在远端被 appeal_to_nature 演化适配族占用（注释记载），本机该 WIP 从未提交，按宪法 §7 本地独有产能优先固化，不丢弃不重做。
+- **VERSION**：6.8.206 → **6.8.206 保持不 bump**（远端 r404/r408 已占该号，r406 同例先例；docs commit 同步文档口径）
+- **真升级判定**：**命中 ① 新判别维度**——引擎获得此前没有的判断力：`src/masked-man-fallacy.js`（313 行，顶层模块，r227 起授权），判据**三腿共现 + 邻近窗 + 四组豁免，缺一不判**：
+  - 腿① EPISTEMIC 命题态度（知道/认识/相信/意识到/认出/发现/听说；EN knows / believes / is aware / recognizes / realizes / is familiar with）
+  - 腿② COREFERENTIAL 共指桥接（A 就是 B / 和他是同一个 / 其实就是 / 真名是；EN is the same person as / is actually / turns out to be / one and the same / a.k.a.）
+  - 腿③ OPACITY_INFERENCE 不透明推断（所以我知道 B / 因此他认识 B / so he knows B / therefore she knows B）
+  - 四组豁免：①替换知识/同一性知识在场（知道他就是/早就知道他是/认识这位市长本人/拆穿了伪装；EN knows that he is / aware of the identity / knows the mayor personally / sees through the disguise）；②元陈述破除（masked-man fallacy/内涵语境/指称不透明/偷换概念/逻辑错误；EN masked-man / intensional context / referentially opaque / this is a fallacy / invalid substitution）；③疑问形与转述（整句问号收尾/难道他知道吗/是否认识；EN 句尾 ? / does he know）；④认识论谨慎（可能知道/如果他知道/未必一定知道；EN might know / unless he knows / not necessarily know）。
+  - 射程分工写入 guidance：illicit_conversion 管全称命题换位，本族不换位、管共指描述在命题态度语境的替换；equivocation_sense_shift 管一词多义漂移，本族每个词项词义不变、变的是指称透明度；undistributed_middle 管三段论中项不周延，本族三段论形式合法、失效发生在命题态度语境内部；affirming_the_consequent 管条件句后件肯定，本族没有条件句形式。
+- **缺口实证**（`scripts/round-407/probe-r407-gap.js`，stash 前后对照）：masked_man 攻击 7 条基线 **1/7 非 pass**（仅 1 条被存量 illicit_conversion 代拦，6 条完全穿引擎）→ 接线后 **6/7 非 pass 且全部由 masked_man_fallacy 承重**（第 7 条为教学反例句，命中豁免属正确行为）；对照组 fatalism 6/7→6/7、four_terms 7/7→7/7、traitor_critic 3/7→3/7、etymological 2/7→2/7 零变化，证明增量全部来自新维度。
+- **轮测**：`test/round-407-masked-man-fallacy.test.js`（171 行）——**18/18 全绿**（攻击族命中 + 良性族零误伤 + ZH/EN 逐常量承重 + 豁免组承重）。
+- **接线**（`src/index.js` 10 处）：require（815）/dispatch（2517）/scores（3300）/dimMap（3979）/guidance（4544）/allDims（6270）/scores 补（6761）/exports dimMap×2（6970/6972）/VERIFY_DIMS 自动 +1。dimMap 三处登记均为 `masked_man_fallacy: mmf`，无顶替既有维度（r406 rebase 顶替事故复检通过）。
+- **文档同步**（doc-numbers 门禁 FAIL→PASS 驱动）：AGENTS 横幅 271→272、章节标题 271→272、Verify-level (238)→(239) 且列表追加 `masked_man_fallacy`；README badge+锚文本 271→272、横幅 271→272、checkInput 表 271→272、pipeline 叙述 271→272、章节标题 271→272、规格表 271→272、action-tier verify 238→239；SKILL 横幅 271→272、规格表 271→272、章节标题 271→272、verify 238→239、dimensions 叙述 271→272。
+- **四门禁**（合并树实测）：verify 16/0 PASS、guard-abilities 20/20 PASS（判别维度 **272** 个、runtime verify **239**）、doc-numbers 24/24 PASS（修复后）、双向召回 52/52 PASS + 误拦 302/326 零新增。
+- **死认领治理**：开轮 scan 无新死认领（r405-r409 全部 completed release）。
+- **探针**：`scripts/round-407/probe-r407-gap-after.json` 补落盘（缺口实证闭环）。
+
 ## r406 — 4 号（dimension 轮·掉线恢复固化轮）真升级①：pre_post_attribution 第 272 维「前后测无对照归因」新判别维度接线（v6.8.206 保持）
 
 - **轮次性质**：本机 r406 WIP 在 11-19 早轮达到工具调用上限未收尾，本轮为掉线恢复固化——合并树（heartflow/main @ 4aa161b3 = r408 release）上完成冲突解决、接线修正、门禁复跑、文档同步与提交。远端 r404 已将本机 r404 WIP 的第 271 维 homogeneity_assumption 落盘（commit 0c2a5c9e），本机 r406 的 pre_post_attribution 不在远端树中，属本地独有产能，按宪法 r227 教训核实固化。
