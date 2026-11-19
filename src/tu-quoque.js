@@ -64,10 +64,25 @@
  *   · 路由② MIRROR × DISQUALIFY（你也曾经撒过谎 × 没资格讲诚信；
  *     你自己都做不到 × 凭什么要求我——剥夺资格形，批评隐含在
  *     对方声称的道德高标里）；
+ *   · [r417] 路由③「诉诸共惯」（appeal to common practice，比烂
+ *     正当化）：腿① PREVALENCE 普遍违规宣称（人人都/满大街/整个
+ *     行业 + 明确失范行为词；贪污的那么多；EN everyone/everybody/
+ *     most people/all my friends + 失范动词）× 腿② NORMALIZE 自我
+ *     正当化推论（我…算什么/怎么了/凭什么不能；光抓我什么意思；
+ *     我一个人…有什么用；我们不做就吃亏；EN so why can't I / why
+ *     should I follow / I might as well join in）。这是 tu quoque
+ *     的泛化形——被引用的「同样过错」从**批评者个人**扩到**普遍大
+ *     众**，用「大家都这样」把自己的失范行为正当化。与 what-
+ *     aboutism（转移话题，不指向自身行为正当化）、false_balance
+ *     （各打五十大板，引用对方具体过错而非普遍性）、normalization_
+ *     of_deviance（违规重复后被视作常态的**过程记述**，无「我…
+ *     算什么」式正当化推论）射程分工；反谬误对冲（普遍≠正确/并不
+ *     代表这样做是对的/does not make it right）在场不判。
  *   · 单有 MIRROR 不判（「你也太搞笑了，凭什么说我」无同样过错
  *     腿，是单纯否定不是诉诸伪善）；单有 DISQUALIFY 不判（「你
  *     凭什么管我」「你没资格决定我的事」是对越界控制的正当边界
- *     主张）。
+ *     主张）；单有 PREVALENCE 不判（「这种现象很普遍」是事实陈述，
+ *     无自我正当化推论）。
  *
  * 为什么取 VERIFY 级：单句可能是小说对白/偏见案例引述/逻辑课反面
  * 教材/心理咨询复盘中的转述（「当事人说：你也一样…」），
@@ -231,6 +246,72 @@ const DISQUALIFY_EN = new RegExp([
   "\\b(?:nobody|no\\s+one)\\s+who\\s+[^.]{0,30}\\b(?:has\\s+the\\s+right|is\\s+qualified)\\s+to\\s+(?:talk|judge|criticize)\\b",
 ].join('|'), 'i');
 
+// ─── [r417] 路由③：诉诸共惯（appeal to common practice）────────────
+// tu_quoque 的泛化形：被引用的「同样过错」从批评者个人扩到普遍大
+// 众——用「人人都这样/整个行业都这样」把自己的失范行为正当化。
+// 判据双腿共现（缺一不判）：
+//   腿① PREVALENCE 普遍违规宣称 = 普遍性标记 × 明确失范行为词。
+//     失范动词表刻意只收**不可歧义的违规行为**（作弊/插队/躺平/
+//     摸鱼/贪污/造假/污染/超速/酒驾/抄袭/逃税/走后门…），不收
+//     「加班/努力/犯错」类可能正当或泛化的词——「大家都在加
+//     班，我加会儿怎么了」不判（加班不是失范）。
+//   腿② NORMALIZE 自我正当化推论 = 第一人称 + 正当化标记（算什
+//     么/怎么了/凭什么不能/有什么用/不吃亏…）。
+//   反谬误对冲 NORM_HEDGE：明确指出「普遍≠正确」的句子（普遍不
+//     等于正确/并不代表这样做是对的/does not make it right）只有
+//     腿①＋对冲，是反谬误陈述不是运用，不判。
+// 池化探针 r417（coordination/agent4/probes/r417-probe-pool.js，
+// HEAD 6.8.208）：四家族同池定拨 F7——攻击穿透 11/11（全池最高）、
+// 模块层真零命中 0/11、良性 0/11 本族误伤（唯一 gate 层非 pass 属
+// 存量 vagueness 代拦，与本族无关）。真升级②：既有第 141 维的全
+// 新措辞家族，维度计数不变、src/index.js 零改动（同 r406-r415）。
+
+// 腿①（中文）：a 普遍性标记 + ≤8字 + 失范行为词；b 失范词 + 的
+// (那么|这么)(多|普遍|泛滥|常见)（贪污的那么多）。
+const PREVALENCE_ZH = new RegExp([
+  '(?:人人|所有人|大家|谁都|满大街|满世界|到处都是|全都|个个|大多数人|大部分人|身边人|全世界|全公司|整个行业|全国|那么多人|这么多人|太多人|谁不|如今谁不|现在谁不|别人|人家|其他人|当官的|当权者)[^。！？；]{0,8}(?:作弊|插队|加塞|躺平|摸鱼|贪污|受贿|贪|造假|掺假|注水|虚报|污染|超速|酒驾|醉驾|闯红灯|逆行|违章|迟到|抄袭|抄|逃税|偷税|漏税|耍滑|偷懒|走关系|托关系|塞红包|找关系|走后门|作假|说谎|骗人|旷工|缺勤|糊弄|混日子|占便宜|抄近路|乱来|动手脚)',
+  '(?:作弊|插队|加塞|躺平|摸鱼|贪污|受贿|贪|造假|掺假|注水|虚报|污染|超速|酒驾|醉驾|闯红灯|逆行|违章|迟到|抄袭|抄|逃税|偷税|漏税|耍滑|偷懒|走关系|托关系|塞红包|找关系|走后门|作假|说谎|骗人|旷工|缺勤|糊弄|混日子|占便宜|抄近路|乱来|动手脚)(?:的)?(?:那么|这么)(?:多|普遍|泛滥|常见|随处可见)',
+].join('|'));
+
+// 腿②（中文）：第一人称 + 正当化推论，五支。
+const NORMALIZE_ZH = new RegExp([
+  // a 我/我们 + ≤6字 + 算什么/怎么了/有何不可/理所当然/也无所谓
+  '(?:我|咱们|我们|咱)[^。！？；]{0,6}(?:算什么|怎么了|有什么关系|有何不可|理所当然|也很正常|也无所谓|不算什么|不算过分|情有可原|无可厚非|再正常不过|不算事)',
+  // b 我/我们 + 凭什么不能/凭什么只/凭什么光/凭什么不
+  '(?:我|咱们|我们)[^。！？；]{0,6}(?:凭什么不能|凭什么只|凭什么光|凭什么不)',
+  // c 光/只/偏偏/专门 + 抓/盯/批/说/管/挑 + 我（光抓我什么意思）
+  '(?:光|只|偏偏|专门|盯着)(?:抓|盯|批|说|管|挑|罚|处理|数落|指责)[^。！？；]{0,2}(?:我|咱们|我们|咱)',
+  // d 我/我一个人 + ≤10字 + 有什么用/管什么用/有意义吗（我一个人减排有什么用）
+  '(?:我|我一个人|咱们|我们)[^。！？；]{0,10}(?:有什么用|管什么用|顶什么用|有意义吗|不是白费|白费功夫|徒劳)',
+  // e 我们/我 + ≤8字 + 吃亏/傻（我们不做就吃亏）
+  '(?:我们|咱们|我)[^。！？；]{0,8}(?:不吃亏|就吃亏|吃亏|亏了|捡便宜|才是傻|才傻|太傻|傻不傻|亏不亏|才是亏|亏大了)',
+  // f 比烂格言裸形（大哥别说二哥/五十步笑百步/乌鸦别说猪黑/彼此彼此）
+  '(?:大哥|二哥)?(?:别说|焉知)(?:二哥|大哥|五十步|百步)|五十步(?:笑|焉知)百步|乌鸦(?:别说|也嫌)猪(?:黑|脏)|彼此彼此|一个(?:屌|吊)样',
+].join('|'));
+
+// 腿①（英文）：a 普遍性主语 + ≤30字符 + 失范动词；b 失范现象 +
+// is so common/widespread/rampant/the norm。
+const PREVALENCE_EN = new RegExp([
+  "\\b(?:everyone|everybody|most\\s+people|all\\s+(?:my|the)\\s+(?:friends|colleagues|coworkers|others)|all\\s+of\\s+(?:us|them)|no\\s+one|nobody)\\b[^.]{0,30}?\\b(?:cheat|speed|fudge|lie|cut\\s+corners?|skip|pollut|bribe|fake|exaggerate|bend|break|pad|steal|take\\s+bribes?|plagiariz|evade|embezzl)\\w*\\b",
+  "\\b(?:cheating|speeding|fudging|lying|cutting\\s+corners|pollution|bribery|fraud|embezzlement|plagiarism|kickbacks?)\\s+(?:is|are)\\s+(?:so\\s+)?(?:common|widespread|rampant|everywhere|the\\s+norm|standard\\s+practice)\\b",
+].join('|'), 'i');
+
+// 腿②（英文）：第一人称 + 正当化推论。
+const NORMALIZE_EN = new RegExp([
+  // a so why can't I / why should I follow / so what if I
+  "\\bso\\s+why\\s+(?:can'?t|couldn'?t|shouldn'?t|wouldn'?t)\\s+(?:i|we)\\b",
+  "\\bwhy\\s+should\\s+(?:i|we)\\s+(?:follow|comply|obey|bother|care|stop)\\b",
+  "\\bso\\s+what\\s+if\\s+(?:i|we)\\b",
+  // b I might as well (join in / do the same)
+  "\\b(?:i|we)\\s+(?:might|may)\\s+as\\s+well\\b",
+  // c what about me / how about me
+  "\\b(?:what|how)\\s+about\\s+(?:me|us)\\b",
+].join('|'), 'i');
+
+// ─── [r417] 路由③ 反谬误对冲：普遍≠正确 ─────────────────────────
+const NORM_HEDGE_ZH = /(?:不等于|不代表|不意味着|并非|不能说明)[^。！？；]{0,8}(?:正确|对的|合理|正当|应该|没问题|可以接受|没错)|不能(?:因为|以|拿|用)(?:普遍|大家都|人人都|别人都|那么多人|这么多人)[^。！？；]{0,10}(?:就|也|能|可以)?(?:正当|合理|正常|没错|没问题|接受)/;
+const NORM_HEDGE_EN = /\b(?:common|widespread|rampant|everyone|everybody|most\s+people|nobody|no\s+one)\b[^.]{0,30}?\b(?:does\s+not|doesn'?t|do\s+not|don'?t)\s+(?:make|mean|justify|excuse)\b[^.]{0,20}\b(?:right|ok|okay|correct|acceptable|justified|fine)\b/i;
+
 // ─── 豁免：真诚自省/互相改进/正当边界/保留语/概念分析 ──────────────
 const HEDGE_ZH = new RegExp([
   // 概念分析（诉诸伪善是一种常见的逻辑谬误）
@@ -258,6 +339,27 @@ const HEDGE_EN = new RegExp([
 ].join('|'), 'i');
 
 /**
+ * [r417] 路由③：诉诸共惯（appeal to common practice，比烂正当化）。
+ * 双腿共现：腿① PREVALENCE 普遍违规宣称 × 腿② NORMALIZE 自我正当
+ * 化推论；反谬误对冲（普遍≠正确）在场不判。与路由①②的 MIRROR
+ * 结构正交——本族无 你-based 主语，据以「同样」的是普遍大众。
+ * @param {string} text
+ * @param {object} R 负例注入用
+ * @param {boolean} isZh
+ */
+function checkAppealToCommon(text, R, isZh) {
+  const prev = isZh ? (R.PREVALENCE_ZH || PREVALENCE_ZH) : (R.PREVALENCE_EN || PREVALENCE_EN);
+  const norm = isZh ? (R.NORMALIZE_ZH || NORMALIZE_ZH) : (R.NORMALIZE_EN || NORMALIZE_EN);
+  const hedge = isZh ? (R.NORM_HEDGE_ZH || NORM_HEDGE_ZH) : (R.NORM_HEDGE_EN || NORM_HEDGE_EN);
+  // 明确指出「普遍≠正确」的反谬误陈述 → 不是运用它
+  if (hedge.test(text)) return null;
+  if (prev.test(text) && norm.test(text)) {
+    return { route: (isZh ? 'zh' : 'en') + ':appeal-to-common-practice×self-normalization' };
+  }
+  return null;
+}
+
+/**
  * @param {string} text 待判文本（_dual 会分别喂原文与归一化文本）
  * @param {object} [inject] 负例脚本注入用：以永不匹配串替换指定常量
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
@@ -280,6 +382,17 @@ function checkTuQuoque(text, inject) {
   }
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
+
+  // ─── [r417] 路由③：诉诸共惯（先于 MIRROR 早退——本族无 你-based 腿）──
+  const r3 = checkAppealToCommon(text, R, isZh);
+  if (r3) {
+    return {
+      hit: true,
+      score: 0.5,
+      count: 1,
+      detail: isZh ? '诉诸伪善×诉诸共惯×自我正当化(zh)' : 'tu_quoque×appeal-to-common-practice×self-normalization(en)',
+    };
+  }
 
   // 腿②-1 MIRROR：同样过错反噬（中英各判，两条路由的公共腿）
   const mirZh = MIR_ZH_.test(text);
@@ -326,5 +439,8 @@ module.exports = {
     MIRROR_ZH, MIRROR_EN,
     DISQUALIFY_ZH, DISQUALIFY_EN,
     HEDGE_ZH, HEDGE_EN,
+    PREVALENCE_ZH, PREVALENCE_EN,
+    NORMALIZE_ZH, NORMALIZE_EN,
+    NORM_HEDGE_ZH, NORM_HEDGE_EN,
   }),
 };

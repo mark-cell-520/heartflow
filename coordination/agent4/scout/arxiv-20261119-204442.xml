@@ -1,0 +1,475 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/EVH08RNYQ2KtQumvc2d5RogywC4</id>
+  <title>arXiv Query: search_query=all:fallacy OR all:classification OR all:rules OR all:benchmark&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-19T20:44:42Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:fallacy+OR+(all:classification+OR+(all:rules+OR+all:benchmark))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>352451</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24940v1</id>
+    <title>$Z$-sight: Unifying Vision-Language-Action and Latent World Modeling</title>
+    <updated>2026-11-18T18:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.24940v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24940v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce $Z$-sight, a unified robot foundation model that couples vision-language-action (VLA) and generative latent world modeling. Video-based world action models (WAMs) show the value of joint future-and-action generation for control, yet inherit the heavy cost of video generators. Recent latent-space policies avoid pixel generation, yet typically align intermediate features or rely on frozen target encoders, decoupling future prediction from the VLM's native feature space. $Z$-sight instead predicts the future directly in the visual token space in which its VLM perceives the present. Coupling a foresight expert and a continuous action expert with the VLM in a mixture-of-transformers, $Z$-sight jointly denoises future spatial tokens and actions at inference without pixel reconstruction or external encoders. Trained on human video and robot trajectories, $Z$-sight achieves 81.9% success on SIMPLE (+9.6 points over the strongest baseline) and 73.3% across six Unitree G1 tasks (+20.0 points) at 110 ms per chunk, while remaining competitive on tabletop benchmarks.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:59:38Z</published>
+    <arxiv:comment>Project page: https://junjieye.com/Z-sight/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Junjie Ye</name>
+    </author>
+    <author>
+      <name>Yiqi Zhao</name>
+    </author>
+    <author>
+      <name>Muchen Xu</name>
+    </author>
+    <author>
+      <name>Celina Shiyu Wang</name>
+    </author>
+    <author>
+      <name>Hao Dong</name>
+    </author>
+    <author>
+      <name>Ruohai Ge</name>
+    </author>
+    <author>
+      <name>Rong Xue</name>
+    </author>
+    <author>
+      <name>Benjamin J Kolligs</name>
+    </author>
+    <author>
+      <name>Aditya Dutt</name>
+    </author>
+    <author>
+      <name>Sasanka Nagavalli</name>
+    </author>
+    <author>
+      <name>Nassim A. Samad</name>
+    </author>
+    <author>
+      <name>Gaurav S. Sukhatme</name>
+    </author>
+    <author>
+      <name>Jyotirmoy V. Deshmukh</name>
+    </author>
+    <author>
+      <name>Yue Wang</name>
+    </author>
+    <author>
+      <name>Yuliang Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24938v1</id>
+    <title>Phoenix: Learning Scene Structure Representations for Generalizable World-Action Models</title>
+    <updated>2026-11-18T18:59:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.24938v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24938v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>World-action models jointly predict future observations and actions, yet reconstruction-oriented visual representations do not explicitly emphasize the spatial relationships and object-state changes needed for manipulation. We introduce Phoenix, which learns representations of scene structure for world-action modeling. Specifically, Phoenix Encoder enriches DINOv3's general visual semantics through dual-teacher distillation of geometric and spatiotemporal semantic knowledge. Next, CS-VAE causally aggregates and compresses Phoenix Encoder features into generative latents while preserving scene information and spatial layout. Finally, Phoenix jointly predicts these latents, complementary appearance latents, and robot actions, linking scene evolution with action generation. To study pretraining data efficiency, we curate approximately 39,000 hours of egocentric and robot manipulation data for representation learning and use the robot demonstration subset for WAM pretraining. Following benchmark-specific post-training, Phoenix achieves state-of-the-art performance across simulation and real-robot benchmarks spanning single-arm, bimanual, and dexterous manipulation. It demonstrates strong robustness to perturbations, achieving success rates of 94.8% on LIBERO-Plus and 72.4% on RoboTwin 2.0 C2R, alongside strong cross-embodiment transfer and real-world manipulation performance on Bench2Dex and RoboDojo-RealWorld, respectively. Pretraining-scale analysis shows larger performance gains from data scaling than a video-VAE-only baseline, indicating stronger scaling benefits and more effective data utilization. Moreover, Phoenix maintains high success rates when adapted with limited downstream demonstrations, demonstrating strong few-shot adaptation. Our code, pretraining data, and models are available on the project page to help the community reproduce our results.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:59:04Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yupeng Zheng</name>
+    </author>
+    <author>
+      <name>Chaoyue Li</name>
+    </author>
+    <author>
+      <name>Linbo Wang</name>
+    </author>
+    <author>
+      <name>Xiang Li</name>
+    </author>
+    <author>
+      <name>Yuhang Zheng</name>
+    </author>
+    <author>
+      <name>Xiaotong Su</name>
+    </author>
+    <author>
+      <name>Songen Gu</name>
+    </author>
+    <author>
+      <name>Yichen Zhang</name>
+    </author>
+    <author>
+      <name>Zebin Xing</name>
+    </author>
+    <author>
+      <name>Shuai Tian</name>
+    </author>
+    <author>
+      <name>Jingxiang Guo</name>
+    </author>
+    <author>
+      <name>Jing Li</name>
+    </author>
+    <author>
+      <name>Zhiyong Zhao</name>
+    </author>
+    <author>
+      <name>Zhongpu Xia</name>
+    </author>
+    <author>
+      <name>Qichao Zhang</name>
+    </author>
+    <author>
+      <name>Haoran Li</name>
+    </author>
+    <author>
+      <name>Shuicheng Yan</name>
+    </author>
+    <author>
+      <name>Dongbin Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24936v1</id>
+    <title>Jailbreak Detection on Large Language Models via Contrastive Prototype Structures</title>
+    <updated>2026-11-18T18:56:12Z</updated>
+    <link href="https://arxiv.org/abs/2611.24936v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24936v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Jailbreak attempts and harmful prompts remain a challenge for the safe deployment of large language models. We study whether contrastively learned representations can support safety detection without training an additional downstream classifier. We propose Jailbreak Detection with Prototype Inference (JDPI), which uses binary safety labels to construct harmful and benign prototypes and makes predictions from relative prototype distances. JDPI uses only binary safety labels for encoder adaptation, prototype construction, and validation. In our setup, it uses fewer labeled examples than the classifier baseline (Method A) by avoiding the separate split used to train the downstream classifier. Across four benchmarks covering different input formats, contrastive fine-tuning improves JDPI's detection accuracy by 9.1-18.0 percentage points. Using the same encoder, JDPI achieves slightly higher ROC-AUC on one benchmark and stays within 0.017 of the baseline across all four. With dataset-specific adaptation, JDPI exceeds the released Llama Guard 3-8B baseline by 0.173-0.310 in ROC-AUC across the four benchmarks. In multi-turn replay on TomGibbs, JDPI uses accumulated user history as the conversation unfolds, achieving higher conversation-level accuracy than when it uses the current turn alone. Across 12 directed transfers, JDPI outperforms the classifier by an average of 1.59 percentage points in accuracy, demonstrating stronger cross-dataset robustness.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:56:12Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yan Qiu</name>
+    </author>
+    <author>
+      <name>Yuanyuan Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24924v1</id>
+    <title>Agentic Harness Engineering Beta: Requirement-Centered Evolution of Agent Harnesses</title>
+    <updated>2026-11-18T18:52:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.24924v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24924v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Real-world harness engineering is driven by explicit and implicit user requirements, which guide development and validation. However, existing harness evolution methods often overlook implicit requirements and interaction needs, while using a single evolution agent to modify the harness and benchmark scores to select changes. This process often produces narrow patches and leads to benchmark-specific local optima. We introduce Agentic Harness Engineering Beta (AHE-Beta), a requirement-centered loop that brings real-world engineering practices into harness evolution. The loop consists of three steps: (1) User-driven evaluation lets simulated users raise their requirements as issues while they work with the harness over multiple turns. (2) Team-based modification implements those requirements as generalizable changes rather than task-specific patches. (3) Requirement-driven selection merges a change only when it resolves a verified requirement and passes review. Empirically, on held-out tasks, AHE-Beta raises pass@1 from 21.9% to 33.3% while using 40.8% fewer tokens than Base Harness, and achieves higher pass@1 than Claude Code, Meta-Harness, and AHE. In a blind human A/B test, real users prefer AHE-Beta in 31 of 48 valid pairs and rate it higher on all five dimensions, matching the directional preference of the user simulator. The human A/B results show that AHE-Beta achieves its goal of aligning harness evolution with real-world user requirements. Without further evolution, the gains transfer to GLM-5.3 and DeepSeek-V4.1-Flash with pass@1 improvements of 15.8% and 5.3% over Base Harness. Together, these results show that requirement-centered harness evolution is a more general method for improving agent capabilities.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:52:13Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Jiahang Lin</name>
+    </author>
+    <author>
+      <name>Jiahao Chen</name>
+    </author>
+    <author>
+      <name>Yiding Wang</name>
+    </author>
+    <author>
+      <name>Shichun Liu</name>
+    </author>
+    <author>
+      <name>Chengjun Pan</name>
+    </author>
+    <author>
+      <name>Shihan Dou</name>
+    </author>
+    <author>
+      <name>Honglin Guo</name>
+    </author>
+    <author>
+      <name>Yuyang Hu</name>
+    </author>
+    <author>
+      <name>Changhao Jiang</name>
+    </author>
+    <author>
+      <name>Zhenhua Han</name>
+    </author>
+    <author>
+      <name>Hang Yan</name>
+    </author>
+    <author>
+      <name>Qi Zhang</name>
+    </author>
+    <author>
+      <name>Tao Gui</name>
+    </author>
+    <author>
+      <name>Xuanjing Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24920v1</id>
+    <title>The Optimal Competitive Ratio for Subadditive Online Combinatorial Auctions is Less Than 1/2</title>
+    <updated>2026-11-18T18:49:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.24920v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24920v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We construct a four-buyer online combinatorial auction with independent subadditive valuations and a fixed, known arrival order in which every online rule earns strictly less than $1/2$ of the expected offline optimum. A common partition, revealed at the third arrival, gives the first three buyers one unit of welfare per item. If the rule uses three distinct partitions, either an item allocated early contributes zero or the fourth buyer's expected value for the remaining bundle is one less than its size. We compute the optimal online and offline welfare exactly and show that a $1/2$ guarantee always holds with at most three buyers.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:49:49Z</published>
+    <arxiv:comment>4 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Andrés Cristi</name>
+    </author>
+    <author>
+      <name>Jiechen Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24915v1</id>
+    <title>PrismRestore: A Compact Restoration Toolbox for Agentic Image Restoration</title>
+    <updated>2026-11-18T18:48:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.24915v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24915v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic image restoration composes operations to handle mixed degradations, yet its toolbox often requires storing multiple restoration networks. We propose PrismRestore, which constructs a compact bank of callable restoration actions from a single frozen all-in-one model. Our approach builds on task-dependent yet overlapping channel responses in the shared model. An offline task-prior search uses activation and gradient statistics to group channels with similar response profiles, then searches task-specific modulation coefficients over non-representative channels while leaving representative channels unmodulated. The resulting prior bank enables explicit action selection and composition without additional restoration backbones or task-specific adapter modules. A state-conditioned policy learns to compose these actions using Group Relative Policy Optimization. Its objective separately normalizes fidelity and perceptual feedback within groups of trajectories sampled for the same input, and combines terminal evaluation with return-to-go derived from stepwise quality changes. Experiments on synthetic composite-degradation and real-world multi-task benchmarks show improvements over the evaluated all-in-one baselines and restoration quality competitive with multi-model agents. PrismRestore achieves these results with a single restoration backbone and faster inference than the evaluated agentic baselines.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:48:01Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zhaocheng Yu</name>
+    </author>
+    <author>
+      <name>Kui Jiang</name>
+    </author>
+    <author>
+      <name>Jing Cao</name>
+    </author>
+    <author>
+      <name>Yiang Chen</name>
+    </author>
+    <author>
+      <name>Xiaocheng Feng</name>
+    </author>
+    <author>
+      <name>Junjun Jiang</name>
+    </author>
+    <author>
+      <name>Xianming Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24911v1</id>
+    <title>A Nonsecular Quantum Master Equation with Detailed Balance and Second-order Error Bound</title>
+    <updated>2026-11-18T18:46:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.24911v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24911v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An effective theory of open quantum systems should preserve the detailed balance structure inherited from microscopic reversibility and remain accurate throughout relaxation. Meeting both requirements is particularly challenging in quantum many-body systems, where dense spectra can invalidate the secular approximation even at weak coupling. Here we construct a nonsecular quantum master equation that satisfies time-reversal Kubo-Martin-Schwinger (TR-KMS) detailed balance. Under suitable conditions, we prove a time-uniform $O(λ^2)$ bound on the difference between the predicted and exact reduced density matrices, where $λ$ is the system-bath coupling strength. Our construction completes the Redfield generator by imposing detailed balance while matching its dissipative and coherent coefficients at resonance. In this approach, TR-KMS detailed balance is compatible with resonance matching, whereas its counterpart without time reversal is not. In a benchmark against the exact microscopic dynamics of two coupled oscillators, our equation maintains $O(λ^2)$ accuracy across secular and nonsecular regimes, outperforming the existing detailed-balance equations tested. These results provide a systematic route from microscopic models to thermodynamically consistent descriptions of open quantum dynamics beyond the secular approximation.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:46:37Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Ji-Hui Pei</name>
+    </author>
+    <author>
+      <name>Jin-Fu Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24904v1</id>
+    <title>ShadowTransfer: A Geographic Transfer Benchmark for Overhead Shadow Detection</title>
+    <updated>2026-11-18T18:41:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.24904v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24904v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Overhead aerial imagery feeds dense-prediction pipelines that are routinely trained in one geographic region and deployed in another, yet no benchmark measures how shadow detection models transfer across regions. Existing overhead shadow datasets either lack a geographic transfer protocol or rely on automatically generated labels. We introduce ShadowTransfer, a benchmark of 4,500 human-verified shadow masks across three U.S. cities at two native resolutions, paired with a leave-one-city-out evaluation protocol. Under vanilla training, holding out the test city costs 3.5 to 7.8 mIoU across four architectures, the gap remains significant when the training set grows from 225 to 900 images, and six of eight adaptation methods degrade more than vanilla training on average. We propose a three-probe framework that diagnoses where and how the transfer breaks: the failure operates in feature space, beyond the reach of pixel-histogram matching, shows up as a confidence collapse on shadow pixels while background confidence stays intact, and is recoverable by retraining different architectural components depending on the model: encoder for some, decoder for others. These findings replicate on INRIA building footprints, suggesting they describe geographic transfer beyond shadows. Guided by the diagnosis, we build Spectral Information Bottleneck (SIB), a plug-in module with one component per finding. Across the 9 (architecture, held-out city) cells, SIB has the smallest mean gap to the within-city upper bound of the ten methods we evaluate (6.42 mIoU), level with FDA. The benchmark, LOCO protocol, code, and trained models are released to support reproducible evaluation of geographic transfer in overhead dense prediction.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:41:54Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026, Track on Evaluations and Datasets. 53 pages. Project page: https://shagun8.github.io/shadowtransfer/ . Code: https://github.com/shagun8/shadowtransfer . Data: https://huggingface.co/datasets/shagunmittal/ShadowTransfer (DOI 10.57967/hf/11483)</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Shagun Mittal</name>
+    </author>
+    <author>
+      <name>Raymond A. Yeh</name>
+    </author>
+    <author>
+      <name>Satish Ukkusuri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24902v1</id>
+    <title>Mine Locally, Verify Globally: Exact Recovery, Compilation, and Distortion of Mined Temporal Rules</title>
+    <updated>2026-11-18T18:41:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.24902v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24902v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Specification mining extracts temporal rules that describe relationships between events in recorded system traces. Applying these rules in distributed monitoring systems is more difficult because observations come from different nodes, whose clocks may not be synchronized, and events may be lost or reordered during transmission. In this paper, we study how to aggregate the coverage of mined rules across observers, determine whether their temporal windows are needed during monitoring, and characterize their detection under event loss. Our evaluation uses IPv6 packet traces collected from 21 receivers across four continents. We show that local mining followed by global confirmation recovers centralized rule coverage under suitable conditions while substantially reducing communication overhead. In contrast, merging traces with unaligned clocks can distort coverage by introducing incorrect temporal matches. A window-gain criterion identifies rules that require temporal state, while our loss analysis and broker experiments demonstrate why contiguous losses can be more damaging than independent losses. The results identify separate requirements for aggregating observations, selecting monitor state, and handling event loss.</summary>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:41:11Z</published>
+    <arxiv:comment>Full version of a short paper accepted at the 28th International Conference on Distributed Computing and Networking (ICDCN 2027), Surathkal, India, January 4-7, 2027. 12 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.DC"/>
+    <author>
+      <name>Nikolaos Kekatos</name>
+    </author>
+    <author>
+      <name>Priyanka Sinha</name>
+    </author>
+    <author>
+      <name>Stylianos Basagiannis</name>
+    </author>
+    <author>
+      <name>Antonio Anastasio Bruto da Costa</name>
+    </author>
+    <author>
+      <name>Alexios Lekidis</name>
+    </author>
+    <author>
+      <name>Pabitra Mitra</name>
+    </author>
+    <author>
+      <name>Tom Nianios</name>
+    </author>
+    <arxiv:doi>10.1145/3861277.3861283</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3861277.3861283" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24892v1</id>
+    <title>On Evaluating User Simulators for Interactive Agents</title>
+    <updated>2026-11-18T18:34:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.24892v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24892v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>User simulators offer a scalable way to evaluate interactive agents, but how to assess their quality remains underexplored. In particular, it is unclear whether existing user simulator evaluation frameworks reliably detect meaningful failures in simulated user behavior. This uncertainty makes it difficult to interpret simulator evaluation. To understand what a high benchmark score tells us about simulator quality, we (meta-)evaluate the metrics themselves. To instantiate this meta-evaluation, we deliberately perturb simulated replays to induce failures such as altered goals, omitted constraints, premature stopping, and acceptance of broken work, then test whether the metrics penalize these failures. Evaluation methods from three prior studies detect only 5-6 of the 10 perturbations; their combined scores even favor populations instructed to accept broken work over unmodified controls. Motivated by these gaps, we propose a new evaluation suite that combines utility of user simulators for evaluating agents and two measures of fidelity to real users: population-level fidelity assesses collective interaction patterns, while trace-level fidelity assesses the preservation of individual users' goals, constraints, and persona. Under the same detection criterion, our evaluation suite detects all 10 perturbations. Evaluating six user simulators on 351 real multi-turn sessions in which 348 distinct users across 23 languages and agents work together to create and refine artifacts such as full-stack web apps, games, design assets, and automated workflows, we find that population-level measures can miss when a simulated user pursues the wrong goal, ignores a constraint, or behaves out of character, highlighting the need to assess fidelity at comprehensive granularities.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:34:23Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hengguang Zhou</name>
+    </author>
+    <author>
+      <name>I-Hung Hsu</name>
+    </author>
+    <author>
+      <name>Li Chen</name>
+    </author>
+    <author>
+      <name>Priyanshi Shrivastava</name>
+    </author>
+    <author>
+      <name>Anastasios Angelopoulos</name>
+    </author>
+    <author>
+      <name>Wei-Lin Chiang</name>
+    </author>
+    <author>
+      <name>Ion Stoica</name>
+    </author>
+    <author>
+      <name>Cho-Jui Hsieh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24889v1</id>
+    <title>Improved Asymptotic Approximation Guarantees for Continuous-Review Lost-Sales and Dual-Sourcing Inventory Models</title>
+    <updated>2026-11-18T18:32:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.24889v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24889v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study continuous-review inventory models with unit Poisson demand and deterministic lead times: single sourcing with lost sales and dual sourcing with backlogging. Xin [Operations Research. 70(1):111--128 (2022)] establishes an asymptotic approximation factor of 1.79 for each model in its proportional-growth regime. Under the same assumptions, we obtain a factor of 1.248977 for the better of base-stock and constant-order policies for lost sales and a factor of 1.599528 for the better of dual-index and tailored base-surge policies for dual sourcing. The benchmark is the optimal long-run average cost over all policies using only current and past information. For lost sales, lead time and the lost-sales penalty grow proportionally. For dual sourcing, the lead-time difference grows proportionally to the express premium, the extra unit cost of faster supply, while express lead time and backorder penalty remain fixed. For sufficiently large fixed backorder penalties, the dual-sourcing factor improves to 1.248977. The improvements follow from stronger lower bounds on the optimal cost. We retain intermediate constraints on mean inventory for lost sales and use events determined only by future demand to bound backlog costs for dual sourcing.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:32:30Z</published>
+    <arxiv:comment>38 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Weitian Tong</name>
+    </author>
+    <author>
+      <name>Yao Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24887v1</id>
+    <title>Ground, Iterate, Trace: Decomposing AI Research Ideation</title>
+    <updated>2026-11-18T18:31:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.24887v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24887v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models have been widely used to generate plausible research ideas, yet it remains unclear what makes automated ideation effective and how generated novel proposals arise from prior scientific work. We introduce the Creative AI Researcher (CAR), an agentic framework combining literature grounding, iterative development and explicit conceptual operators. CAR constructs a semantic knowledge graph from retrieved literature and equips an ideation agent with graph-retrieval tools and four operators: bisociation, analogy, exploration and elaboration. Each operator call is checked against structural acceptance conditions and recorded, producing a trace of intermediate transformations and declared literature sources. We evaluate CAR with two language-model backbones across 40 LiveIdeaBench research topics and two execution benchmarks. CAR achieves significantly higher methodological novelty (MN) than single-shot prompting and The AI Scientist. Its methodological novelty does not differ significantly from the Research Ideation Agent, while its feasibility scores are higher on both backbones. With a shared experiment executor, CAR achieves the highest pairwise win rate among the evaluated AI methods on FML-bench-Lite and BioXArena. In a ten-condition ablation study, MN point estimates favor CAR over one-step proposal on both backbones, but no MN contrast survives correction for multiple comparisons. The results do not establish a consistent quality benefit from explicit operators beyond free-form iteration. CAR makes the sequence of operations and declared literature sources inspectable, separating judged idea quality from procedural traceability.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:31:37Z</published>
+    <arxiv:comment>56 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Samson Yu</name>
+    </author>
+    <author>
+      <name>Qiran Zou</name>
+    </author>
+    <author>
+      <name>Jing Yu Lim</name>
+    </author>
+    <author>
+      <name>Rushi Shah</name>
+    </author>
+    <author>
+      <name>Anirudh Goyal</name>
+    </author>
+    <author>
+      <name>Dianbo Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24885v1</id>
+    <title>Quantum Simulation of First-Quantised Chemistry with a Sum-of-Squares Representation</title>
+    <updated>2026-11-18T18:29:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.24885v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24885v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Calculating molecular energies is expected to be an important application of quantum computers, but the most efficient algorithms to achieve this typically have significant space requirements. Scaling quantum processors to thousands of logical qubits is a daunting engineering challenge, so developing algorithms that run with reduced qubit requirements is of particular importance. Moreover, most algorithms are benchmarked on active spaces with about as many orbitals as electrons, missing dynamical correlation which is necessary to describe real chemistry. Capturing this correlation requires several times more orbitals than electrons, even in compact atomic-orbital basis sets. This low-filling regime favours first quantisation, where each electron is represented by a number of qubits that grows only logarithmically with the number of orbitals. Whether this approach translates into a practical advantage in orbital basis sets of realistic size, however, has been unclear. Here, we develop a first-quantised phase estimation algorithm for generic orbital basis sets, based on a non-convex sum-of-squares representation of the Hamiltonian and spectral-gap amplification. We compare it with the state-of-the-art second-quantised algorithm, compiling both with the same techniques at the logical level. For six molecules with 4 to 24 electrons in 5 to 14 times as many orbitals, our first-quantised method needs up to 16 times fewer Toffoli gates than the second-quantised algorithm in the low-qubit regime, where only a few hundred logical qubits are available. It stays cheaper up to between several hundred and about 1\,400 qubits, and its smallest qubit count is 1.4 to 2 times lower than in second quantisation. In the low-qubit and low-filling regime, our algorithm is therefore the method of choice for chemistry in orbital basis sets.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.chem-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:29:52Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Aleksei V. Ivanov</name>
+    </author>
+    <author>
+      <name>Christoph Sünderhauf</name>
+    </author>
+    <author>
+      <name>Jon Kunjummen</name>
+    </author>
+    <author>
+      <name>Nick S. Blunt</name>
+    </author>
+    <author>
+      <name>Róbert Izsák</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24877v1</id>
+    <title>Auditing black-box clinical prediction models with a large language model through queries alone: a blinded test with planted flaws</title>
+    <updated>2026-11-18T18:24:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.24877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are used to explain clinical prediction models, on the promise that they can say what a model computes, find its faults and even reveal new knowledge in it. We tested the three promises where the answers could be checked. From the International Stroke Trial we trained four kinds of model (logistic regression, explainable boosting machine, gradient-boosted trees, neural network) for two outcomes on patients randomised earlier, planted one flaw in each of 24 copies (an under-predicted subgroup, a reversed risk factor or an implausible step) and mixed them with the 8 clean models. GPT-6 Astra audited each model three times, blind, through a tool that only returned the model's predictions; the judging rules were committed before any run and applied by program. Its surrogate models, with a median of 128 terms, reproduced the audited models' log-odds with a mean $R^2$ of 0.976 (0.959 for an additive surrogate of 42 terms fitted by an analyst). It found the planted flaw in 69 of 72 runs (96%; 95% CI 80% to 99%); a script written for the purpose found all 24. It also reported many more problems: 60% of 1,089 checkable reports failed the pre-specified check against the model's average behaviour; post hoc, most of these were real but small steps, and 15% of the checkable reports were not found in the model. Of 601 unexpected relationships it read out of the clean models, 11% held in patients randomised later (random pairs 6%; a regression scan's shorter list of its strongest candidates, 28%); after a check on the training data, 33% against 30%. With query access alone, an LLM can describe a black-box model faithfully and find nearly every planted flaw, as a purpose-written script also did; its reports of problems must be checked on the model and its discoveries on data.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:24:54Z</published>
+    <arxiv:comment>15 pages, 2 figures, 6 tables. Models, prompts, replies with tool calls, and code: https://github.com/Chth1z/llm-black-box-model-audit</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zhiyu Liu</name>
+    </author>
+    <author>
+      <name>Xinyu Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.24874v1</id>
+    <title>Rotating black hole thermodynamics at NNLO in higher-curvature gravity</title>
+    <updated>2026-11-18T18:23:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.24874v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.24874v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate higher-curvature corrections to black-hole thermodynamics in quasitopological gravity using perturbative Euclidean-action methods. Static, spherically symmetric black holes provide a benchmark for the action expansion, while our main application concerns five-dimensional, asymptotically flat, rotating black holes with equal angular momenta. For Einstein gravity supplemented by Gauss--Bonnet and cubic quasitopological interactions, we compute the Gibbs free energy through next-to-next-to-leading order, retaining both quadratic and cubic corrections. The result retains the full dependence on the background spin parameter, without a slow-rotation expansion, and extends to arbitrary couplings of quadratic and cubic curvature invariants. We derive the corrected mass, entropy and angular momenta, and show how rotation affects the size and sign of the corrections.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-18T18:23:23Z</published>
+    <arxiv:comment>29 pages, 3 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Cristobal Laporte</name>
+    </author>
+  </entry>
+</feed>
