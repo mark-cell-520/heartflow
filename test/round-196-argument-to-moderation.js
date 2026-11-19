@@ -99,11 +99,24 @@ console.log('— 逐常量注入（腿必须承重）—');
 // 腿① / 腿② 各自抹掉后，依赖该腿的攻击必须停止命中
 const ZH_NEED_A = [ATTACK[0], ATTACK[1], ATTACK[2], ATTACK[3], ATTACK[4], ATTACK[5], ATTACK[6]];
 const EN_NEED = [ATTACK[7], ATTACK[8], ATTACK[9]];
-t('注入 MIDDLE_ZH=[] → 中文攻击全停', () => {
-  for (const s of ZH_NEED_A) assert.strictEqual(checkArgumentToModeration(s, { MIDDLE_ZH: [] }).hit, false, s.slice(0, 20));
+// [r406] 模块新增「归责均摊」第二路线（腿① BLAME_ZH × 腿② SPLIT_ZH，与旧路线
+// OR 并联）。旧路线样本如「甲方乙方各有过错，真相在中间，各打五十大板」同时
+// 含 过错( blame )×各打五十大板( split )，会被新路线兜住——因此旧腿注入必须
+// 连同新路线腿一起抹掉，「中文攻击全停」的断言才保持原义（腿承重而非装饰）。
+t('注入 MIDDLE_ZH(+新路线腿)=[] → 中文攻击全停', () => {
+  for (const s of ZH_NEED_A) assert.strictEqual(checkArgumentToModeration(s, { MIDDLE_ZH: [], BLAME_ZH: [], SPLIT_ZH: [] }).hit, false, s.slice(0, 20));
 });
-t('注入 TRUTH_ZH=[] → 中文攻击全停', () => {
-  for (const s of ZH_NEED_A) assert.strictEqual(checkArgumentToModeration(s, { TRUTH_ZH: [] }).hit, false, s.slice(0, 20));
+t('注入 TRUTH_ZH(+新路线腿)=[] → 中文攻击全停', () => {
+  for (const s of ZH_NEED_A) assert.strictEqual(checkArgumentToModeration(s, { TRUTH_ZH: [], BLAME_ZH: [], SPLIT_ZH: [] }).hit, false, s.slice(0, 20));
+});
+// [r406] 反向验证：只空旧路线腿时，落在新路线射程内的样本仍应命中
+// （证明第二路线独立承重，不是旧路线的别名）。
+t('[r406] 只空 MIDDLE_ZH → 新路线射程内样本仍命中', () => {
+  for (const s of ZH_NEED_A) {
+    if (/各打五十大板|五五开|对半分|和稀泥|各退一步|各让半步|一人一半|均摊|折中处理|各记/.test(s)) {
+      assert.strictEqual(checkArgumentToModeration(s, { MIDDLE_ZH: [], TRUTH_ZH: [] }).hit, true, s.slice(0, 20));
+    }
+  }
 });
 t('注入 MIDDLE_EN=[] → 英文攻击全停', () => {
   for (const s of EN_NEED) assert.strictEqual(checkArgumentToModeration(s, { MIDDLE_EN: [] }).hit, false, s.slice(0, 20));

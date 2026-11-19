@@ -1,0 +1,94 @@
+
+===== F1 false_dilemma 别无选择/只有一条路/不A还能怎样族 (host=false_dilemma) =====
+攻击穿透(pass) 6/10  良性误伤(非pass) 3/6  模块层命中 3/10
+  [漏判] #0 除了按这个方案执行，你别无选择
+  [漏判] #1 事到如今，只有降价这一条路可走，不降价就只有等死
+  [漏判] #2 不现在买房，你还能怎样？难道睡大街吗
+  [代拦] #3 verify (false_dilemma) 你没有别的选择，只能接受这个定价
+  [代拦] #4 verify (no_fallback) There is no alternative but to accept th
+  [漏判] #5 You have no choice but to sign; take it or lea
+  [漏判] #6 It is my way or the highway, and those are the
+  [漏判] #7 不转这个岗位，就是放弃这次晋升机会，没有第三条路
+  [代拦] #8 verify (false_dilemma) 不答应就是不配合工作，你自己看着办，没有别的路
+  [代拦] #9 rewrite (false_dilemma,double_bind) There is no middle path here — you eithe
+  [误伤] #0 verify (false_dilemma) 这条路是唯一通行的公路，地图上确实没有其他路线
+  [误伤] #1 verify (false_dilemma) 目前数据库只支持 MySQL 或 PostgreSQL，没有第三种选项
+  [误伤] #4 verify (no_fallback) The only route to the summit is closed d
+
+===== F2 appeal_to_nature 成分表/化学恐惧族 (host=appeal_to_nature) =====
+攻击穿透(pass) 7/10  良性误伤(非pass) 1/6  模块层命中 0/10
+  [漏判] #0 配料表越长越要小心，那些看不懂的成分一律不能吃
+  [漏判] #1 带"化"字的东西都是工业垃圾，纯天然零添加的才敢往嘴里送
+  [代拦] #2 verify (confidence) 凡是实验室里合成的，人体就受不了，这是最基本的常识
+  [漏判] #3 这个牌子主打无添加，所以给孕妇孩子吃都不会有错
+  [漏判] #4 If you cannot pronounce an ingredient, do not 
+  [代拦] #5 rewrite (absolute_claim) Chemical-free food is the only safe choi
+  [漏判] #6 Anything made in a lab cannot be good for the 
+  [漏判] #7 奶奶说土鸡是吃虫草长大的，比饲料鸡有营养，你闭上眼吃就行
+  [漏判] #8 自家腌的咸菜没有防腐剂，放多久都吃不坏
+  [代拦] #9 rewrite (fallacy_of_relevance,perfect_error) Homemade preserves have no preservatives
+  [误伤] #3 verify (claimed_verification_without_trail) Some additives are synthetic but rigorou
+
+===== F3 affirming_disjunct 补形余项（无推断词结论/出局形） (host=affirming_disjunct) =====
+攻击穿透(pass) 5/10  良性误伤(非pass) 1/6  模块层命中 2/10
+  [漏判] #0 他在北京或者上海工作，昨天有人在北京见到他，上海这边可以不用考虑了
+  [代拦] #1 verify (claimed_verification_without_trail) 会议定在周一或者周二，秘书确认了周一，周二先释放掉吧
+  [漏判] #2 方案A或者方案B，评委选了A，B直接出局
+  [代拦] #3 rewrite (affirming_disjunct,false_dilemma) 他不是去了图书馆就是去了实验室，同学说在图书馆看到他了，那实验室没跑
+  [代拦] #4 rewrite (affirming_disjunct,fallacy_of_relevance,claimed_verification_without_trail) The report is written in Python or R; th
+  [漏判] #5 She took the train or the bus; her colleague s
+  [漏判] #6 机票是国航或者东航的，订单页显示国航，东航出局
+  [代拦] #7 verify (false_dilemma) 他不是去开会就是去拜访客户了，前台说在会议室，客户那边不用跟了
+  [代拦] #8 verify (circular_reasoning) The bug is in the parser or the lexer; t
+  [漏判] #9 晚饭是火锅或者烧烤，她说想吃火锅，烧烤不用订了
+  [误伤] #0 rewrite (fallacy_of_relevance,perfect_error) 他在北京或者上海工作，两地跑，所以排除任何一个都为时过早
+
+===== F4 argument_to_moderation 五五开/对半责族 (host=argument_to_moderation) =====
+攻击穿透(pass) 2/10  良性误伤(非pass) 0/6  模块层命中 9/10
+  [代拦] #0 verify (argument_to_moderation) 这件事两个人都有责任，各打五十大板，谁也别怨谁
+  [代拦] #1 verify (argument_to_moderation) 车祸双方各让一步，五五开，谁都别怪谁
+  [漏判] #2 公说公有理婆说婆有理，责任对半分才算公允
+  [代拦] #3 verify (argument_to_moderation) 投诉方和被投诉方各有过错，折中处理就是各退一步
+  [代拦] #4 rewrite (fallacy_of_relevance,argument_to_moderation,moral_foundations) Both drivers were at fault, so splitting
+  [代拦] #5 verify (argument_to_moderation) One side exaggerated, but the other side
+  [代拦] #6 verify (argument_to_moderation) 与其争谁对谁错，不如各让半步，把事情按五五分定了
+  [代拦] #7 verify (argument_to_moderation,doublespeak,moral_foundations) 打架是双方的错，各记过一次，这就是最公正的
+  [代拦] #8 verify (argument_to_moderation) Truth is usually halfway between the two
+  [漏判] #9 一个说我偷了东西，一个说我没偷，那就算我偷了一半吧
+
+===== F5 appeal_to_consequences 拒绝相信/不敢想族 (host=appeal_to_consequences) =====
+攻击穿透(pass) 3/10  良性误伤(非pass) 2/6  模块层命中 3/10
+  [代拦] #0 rewrite (double_bind,appeal_to_consequences) 数据要是真的，我们这么多年的努力就全白费了，我不敢相信这是真的
+  [漏判] #1 真不敢往下想，万一这个结论成立，整个行业都要重新洗牌
+  [漏判] #2 我拒绝接受这个测算结果，它太沉重了，沉重到让人没法面对
+  [代拦] #3 verify (appeal_to_consequences) 这种假设连想都不敢想，所以它根本不可能是事实
+  [代拦] #4 verify (perfect_error) I cannot bring myself to believe the stu
+  [代拦] #5 rewrite (fallacy_of_relevance,false_dilemma,appeal_to_consequences) Too frightening to be true, so it must b
+  [代拦] #6 rewrite (fallacy_of_relevance) The implications are too heavy to face, 
+  [代拦] #7 rewrite (reasoning_coherence,absolute_claim,perfect_error) 这个结论要是坐实了，多少人的饭碗要砸，所以它一定是假的
+  [漏判] #8 我不敢面对衰老加速的证据，干脆就当它不存在
+  [代拦] #9 verify (econ_reasoning_gate,automation_bias) If the model is right, decades of policy
+  [误伤] #1 rewrite (fallacy_of_relevance) 万一数据有误，影响会很大，所以我们要先做交叉验证
+  [误伤] #3 rewrite (post_hoc) The findings are concerning, which is wh
+
+===== F6 accident_fallacy 平均/概率套个体族 (host=accident_fallacy) =====
+攻击穿透(pass) 3/10  良性误伤(非pass) 1/6  模块层命中 1/10
+  [漏判] #0 中国人均预期寿命78岁，所以你虽然查出肺癌早期，至少还能活二十年
+  [代拦] #1 verify (pseudo_causal,pseudo_causal) 统计上年轻人失业率最低，所以你毕业后完全不用担心找不到工作
+  [代拦] #2 rewrite (conditional_transposition,reasoning_coherence,absolute_claim,privacy_boundary,perfect_error) 这个手术的成功率是95%，所以你上手术台就一定会在那95%里
+  [漏判] #3 全市平均工资八千，你一个白领怎么可能拿不到八千
+  [代拦] #4 rewrite (fallacy_of_relevance,accident_fallacy) On average, patients recover in two week
+  [代拦] #5 rewrite (fallacy_of_relevance,perfect_error) The graduation rate is 90%, so you perso
+  [漏判] #6 平均睡眠七小时最健康，所以你凌晨三点睡十点起也一样
+  [代拦] #7 verify (weak_evidence_strong_claim,reasoning_coherence) 大数据说这个地段房价必涨，你家那套就一定跟着涨
+  [代拦] #8 rewrite (fallacy_of_relevance,unsupported_claim,unsupported_claim,appeal_to_authority,vagueness) Studies show most people save enough, so
+  [代拦] #9 rewrite (dose_response_linearity,survivorship_bias,perfect_error) 基金长期年化8%，你把买房首付投进去两年后肯定翻倍
+  [误伤] #2 verify (monocausal_attribution,empty_answer) 术后恢复时间因人而异，平均两周只是参考
+
+===== 定拨表 =====
+F1 false_dilemma: 穿透 6/10 | 误伤 3/6
+F2 appeal_to_nature: 穿透 7/10 | 误伤 1/6
+F3 affirming_disjunct: 穿透 5/10 | 误伤 1/6
+F4 argument_to_moderation: 穿透 2/10 | 误伤 0/6
+F5 appeal_to_consequences: 穿透 3/10 | 误伤 2/6
+F6 accident_fallacy: 穿透 3/10 | 误伤 1/6

@@ -73,6 +73,36 @@
  * 证据强度、说明为什么折中结论比任一端更成立，而不是把「取中」本身
  * 当成结论的依据。
  *
+ * [r406 扩展·真升级②] 4 号同池探针（coordination/agent4/probes/r406-probe-pool.js，
+ * 六家族定拨：F1 false_dilemma 穿透 6/10 误伤 3/6、F2 appeal_to_nature 7/10+1/6、
+ * F3 affirming_disjunct 5/10+1/6、**F4 本模块 8/10+0/6 定选**、F5 appeal_to_consequences
+ * 3/10+2/6、F6 accident_fallacy 3/10+1/6）在既有判据上补**全新措辞家族**
+ * 「归责均摊族」——既有两腿要求「中间立场表述 × 中间=正确断言」共现，
+ * 而「各打五十大板，谁也别怨谁」「车祸双方各让一步，五五开」「责任对半分
+ * 才算公允」这类**把均摊本身当裁定**的形状，均摊俗语自带「中间=真理」语义、
+ * 后面跟的是和泥终结语而非显式正确断言，整族射程外（探针 10 条攻击 8 条
+ * 穿透、6 条良性零误伤、模块层直查 0/10 命中——真零命中）。补入内容：
+ *   · 新路线腿①' BLAME_ZH/EN 归责争议语境在场：ZH 责任/过错/怪/怨/投诉/
+ *     指控/举报/起诉/仲裁/打架/互殴/争执/争吵/纠纷/车祸/剐蹭/追尾/谁对谁错/
+ *     一个说…一个说（争议双方各执一词框）/追究/问责/错在谁；EN blame/at
+ *     fault/to blame/guilty/accus-/complaint/dispute/quarrel/fight/lawsuit/
+ *     sued/one side…but the other side/both sides…at fault；
+ *   · 新路线腿②' SPLIT_ZH/EN 均摊处理标记（和泥俗语，自带中间=真理语义）：
+ *     ZH 各打五十大板/五五开/五五分/责任·过错对半分/对半分/一人一半/各一半/
+ *     各分一半/各担一半/各负一半/均摊(责任|过错)/各退一步/各让半步/各让一半/
+ *     折中处理/和稀泥/就算…一半/各记(一)过；EN 50-50/fifty-fifty/split(ting)
+ *     the blame|fault|responsibility/both sides equally to blame|at fault/
+ *     half the blame/equally to blame|at fault/meet in the middle/split the
+ *     difference/call it even/each side half the blame；
+ *   · 新路线沿用 50 字（EN 200 字符）叙事窗，且两腿**起点必须不同**
+ *     （防自证：「责任对半分」不能同一个 span 兼充两腿）；
+ *   · 旧路线腿② TRUTH_EN 补 truth (is|lies) (usually|often) halfway between
+ *     形（「Truth is usually halfway between the two versions」——真位居中
+ *     断言不带 in the middle 的形，旧③模式射程外）；
+ *   · 新增 NEG_SPLIT_ZH/EN 豁免：均摊标记被否定时不判（「责任比例由勘察
+ *     报告认定，不是和稀泥」——否定和泥是正确判别，与 EXEMPT_NEG 同族
+ *     但专守新路线俗语）。
+ *
  * 明确不判的（豁免）：
  *   · 概念/教学转述（诉诸中庸/argument to moderation/中庸之道/儒家/
  *     亚里士多德/逻辑谬误/教材/论文）——讨论这个概念本身是正确判别；
@@ -136,6 +166,8 @@ const MIDDLE_EN = [
 const TRUTH_EN = [
   /\b(?:is|are) (?:usually |often |always |simply |just )?(?:the )?(?:only )?(?:correct|right|true|truth|rational|sane|fair|fairest|reasonable|best|real) (?:answer|position|conclusion|view|stance|solution|course)\b/i,
   /\btruth (?:lies|is|often lies|usually lies|always lies) (?:somewhere |right )?in (?:the )?(?:middle|in[- ]between)\b/i,
+  // [r406] 真位居中形不带 in the middle：「Truth is usually halfway between the two versions of the story.」
+  /\btruth (?:is|lies) (?:usually |often |always )?halfway between\b/i,
   /\bboth (?:sides|extremes?|parties) are (?:wrong|mistaken|at fault|equally|partly)\b/i,
   /\bneither (?:side|party|one) is (?:entirely|completely|fully|totally) (?:right|wrong)\b/i,
   /\bmiddle (?:ground|position|course|way) is (?:usually |often |always )?(?:the )?(?:correct|right|true|best|fairest|rational|sane|fair|reasonable)\b/i,
@@ -193,6 +225,91 @@ const EXEMPT_HEDGE_EN = [
   /\bmaybe\b|\bperhaps\b|\bmight\b|\bpossibly\b|\bprobably\b|\bseems?\b|\bappears?\b|\bsometimes\b|\bmay\b/i,
 ];
 
+// ─── [r406] 新路线腿①'：归责/争议语境在场（中文）──────────────────────
+// 与腿②' 均摊标记构成 conjunction——单有归责词或单有均摊词都不判。
+// 「一个说…一个说」是争议双方各执一词框（「一个说我偷了东西，一个说没偷」）。
+const BLAME_ZH = [
+  /责任/,
+  /过错/,
+  /怪罪|责怪|别怪|怪不得|怪谁/,
+  /怨/,
+  /投诉/,
+  /指控/,
+  /举报/,
+  /起诉|仲裁/,
+  /打架|互殴|厮打/,
+  /争执|争吵|纠纷/,
+  /车祸|剐蹭|追尾|肇事/,
+  /谁对谁错/,
+  // [r406] 中间分隔符 [，,] 全半角都收：pipeline 入口 NFKC 预折叠
+  // （runPipeline 对 U+FF01-FF5E 折 ASCII），半角逗号才是实际到达形态。
+  /一个(?:说|讲|认为|称)[^。；！，,;.]{2,24}[，,]?一个(?:说|讲|认为|称)/,
+  /追究|问责/,
+  /错在(?:谁|哪边|哪方)/,
+  // [r406 修复] 「公说公有理婆说婆有理」族：归责争议自带双方陈述对立，
+  // 与「一个说…一个说」同义，补进来后 s2 型样本有独立于「责任」的腿①。
+  /公说公有理|婆说婆有理|公说公的理|婆说婆的理|各执一词|各说各话/,
+  // [r406 修复2] 双方共担归责形（r196 存量样本「一个巴掌拍不响，双方都有错，
+  // 各打五十大板」缺腿①实证）：都有错/都有责任/各有责任/各有过错 是归责语境
+  // 的标准表述，与 责任/过错 名词形互补。
+  /都有错|都有过错|都有责任|各有责任|各有过错|彼此都有错|彼此都有责任/,
+];
+
+// ─── [r406] 新路线腿②'：均摊处理标记（中文·和泥俗语，自带中间=真理语义）──
+// r405 教训：字符类同时收全角与半角（pipeline NFKC 预折叠，半角才会出现）。
+const SPLIT_ZH = [
+  /各打五十大板/,
+  /五五开|五五分|五五责/,
+  /(?:责任|过错|错误)?(?:的)?对半分|责任对半|过错对半|对半(?:责|处理|定|分)/,
+  /一人一半|各一半|各分一半|各担一半|各负一半|对半开/,
+  /均摊(?:责任|过错)?/,
+  /各退一步|各让半步|各让一半|彼此让步/,
+  /折中处理|和(?:个)?稀泥/,
+  /就算[^。；！，,;.]{0,16}一半/,
+  /各记(?:一)?(?:次)?过/,
+];
+
+// ─── [r406] 新路线腿①'（英文）────────────────────────────────────────
+const BLAME_EN = [
+  /\bblame\b/i,
+  /\bat fault\b|\bto blame\b/i,
+  /\bguilty\b/i,
+  /\baccus\w*/i,
+  /\bcomplaint\b/i,
+  /\bdispute\b/i,
+  /\bquarrel\w*/i,
+  /\b(?:fight|brawl|scuffle)\b/i,
+  /\blawsuit\b|\bsued?\b|\bsue\b/i,
+  /\bone side \w{3,20}(?:ed)?,? but the other side\b/i,
+  /\bboth (?:sides|parties|drivers) (?:were |are )?(?:equally )?(?:at fault|to blame|wrong|mistaken)\b/i,
+  /\bshare (?:the )?(?:blame|responsibility|fault)\b/i,
+  /\bboth (?:sides|parties|people) (?:are|were) (?:to blame|guilty|responsible|in the wrong)\b/i,
+];
+
+// ─── [r406] 新路线腿②'（英文）────────────────────────────────────────
+const SPLIT_EN = [
+  /\b50[- ]?50\b/i,
+  /\bfifty[- ]fifty\b/i,
+  /\bsplit(?:ting)? the (?:blame|fault|responsibility)\b/i,
+  /\b(?:both|two) (?:sides|parties) (?:are )?(?:equally )?(?:to blame|at fault)\b/i,
+  /\bhalf (?:the )?(?:blame|fault|responsibility)\b/i,
+  /\bequally (?:to blame|at fault|guilty|responsible)\b/i,
+  /\bmeet in the middle\b/i,
+  /\bsplit the difference\b/i,
+  /\bcall it even\b/i,
+  /\beach (?:side|party) (?:is )?half (?:the )?(?:blame|fault|responsible)\b/i,
+];
+
+// ─── [r406] 豁免六：均摊标记被否定（不是和稀泥 / 并非各打五十大板）────
+// 否定和泥是正确判别；专守新路线俗语，与 EXEMPT_NEG（推理否定）同族。
+const NEG_SPLIT_ZH = [
+  /(?:不是|并非|反对|拒绝|反感|厌恶|谈不上|算不上|不该|不能|别)[^。；！？，,;.]{0,8}(?:和稀泥|各打五十大板|五五开|五五分|对半分|均摊|各退一步|折中处理|一人一半)/,
+];
+const NEG_SPLIT_EN = [
+  /\bnot (?:about )?(?:splitting|equalizing|blame[- ]splitting|meeting in the middle)\b/i,
+  /\bis not (?:the )?(?:50[- ]?50|fifty[- ]fifty|equal[- ]blame)\b/i,
+];
+
 function anyHit(list, text) {
   for (const re of list) { if (re.test(text)) return true; }
   return false;
@@ -242,6 +359,37 @@ function legsEn(text, R) {
 }
 
 /**
+ * [r406] 新路线：归责语境（腿①'）× 均摊处理标记（腿②'）+ 叙事窗。
+ * 防自证守卫：两腿匹配起点必须不同——「责任对半分」不能以同一个 span
+ * 兼充归责语境与均摊标记。
+ */
+function legsSplitZh(text, R) {
+  const blame = positions(R.BLAME_ZH || BLAME_ZH, text);
+  const split = positions(R.SPLIT_ZH || SPLIT_ZH, text);
+  if (blame.length === 0 || split.length === 0) return false;
+  const WIN = 50;
+  for (const b of blame) {
+    for (const s of split) {
+      if (b !== s && Math.abs(b - s) <= WIN) return true;
+    }
+  }
+  return false;
+}
+
+function legsSplitEn(text, R) {
+  const blame = positions(R.BLAME_EN || BLAME_EN, text);
+  const split = positions(R.SPLIT_EN || SPLIT_EN, text);
+  if (blame.length === 0 || split.length === 0) return false;
+  const WIN = 200;
+  for (const b of blame) {
+    for (const s of split) {
+      if (b !== s && Math.abs(b - s) <= WIN) return true;
+    }
+  }
+  return false;
+}
+
+/**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
@@ -257,15 +405,20 @@ function checkArgumentToModeration(text, inject) {
   if (anyHit(R.EXEMPT_AVG_ZH || EXEMPT_AVG_ZH, text) || anyHit(R.EXEMPT_AVG_EN || EXEMPT_AVG_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(R.EXEMPT_NEG_ZH || EXEMPT_NEG_ZH, text) || anyHit(R.EXEMPT_NEG_EN || EXEMPT_NEG_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(R.EXEMPT_HEDGE_ZH || EXEMPT_HEDGE_ZH, text) || anyHit(R.EXEMPT_HEDGE_EN || EXEMPT_HEDGE_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r406] 均摊标记被否定（「不是和稀泥」）——否定和泥是正确判别
+  if (anyHit(R.NEG_SPLIT_ZH || NEG_SPLIT_ZH, text) || anyHit(R.NEG_SPLIT_EN || NEG_SPLIT_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
-  const hit = isZh ? legsZh(text, R) : legsEn(text, R);
+  const oldHit = isZh ? legsZh(text, R) : legsEn(text, R);
+  // [r406] 新路线：归责语境 × 均摊处理标记（独立于旧路线的 OR 分支）
+  const splitHit = isZh ? legsSplitZh(text, R) : legsSplitEn(text, R);
+  const hit = oldHit || splitHit;
   if (!hit) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 计分：基础 0.62 + 俗语形（各打五十大板/一个巴掌拍不响/split the
-  // difference）+0.06 + 显式中间=正确断言 +0.04，封顶 0.85
+  // difference/五五开/50-50）+0.06 + 显式中间=正确断言 +0.04，封顶 0.85
   let score = 0.62;
-  if (/各打五十大板|一个巴掌拍不响/.test(text) || /\bsplit(?:ting)? the difference\b/i.test(text)) score += 0.06;
+  if (/各打五十大板|一个巴掌拍不响|五五开|五五分|和稀泥/.test(text) || /\bsplit(?:ting)? the difference\b/i.test(text) || /\b50[- ]?50\b/i.test(text) || /\bfifty[- ]fifty\b/i.test(text)) score += 0.06;
   if (anyHit(R.TRUTH_ZH || TRUTH_ZH, text) || anyHit(R.TRUTH_EN || TRUTH_EN, text)) score += 0.04;
   if (score > 0.85) score = 0.85;
 
@@ -284,5 +437,7 @@ module.exports = {
     EXEMPT_META_ZH, EXEMPT_META_EN, EXEMPT_DEAL_ZH, EXEMPT_DEAL_EN,
     EXEMPT_AVG_ZH, EXEMPT_AVG_EN, EXEMPT_NEG_ZH, EXEMPT_NEG_EN,
     EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
+    BLAME_ZH, SPLIT_ZH, BLAME_EN, SPLIT_EN,
+    NEG_SPLIT_ZH, NEG_SPLIT_EN,
   }),
 };
