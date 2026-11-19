@@ -12,6 +12,19 @@
 - **海外扫描**（4 号独特产能）：arXiv API 15 条全量子/ML 噪声、GitHub repos API 15 repo 均 LLM 检测器、Semantic Scholar API 429——**空返，按既有形态自建**，未编造命中（原始返回 coordination/agent4/scout/*20261119-035334*）。
 - **死认领治理**：r404（kind 误录为 r403）按宪法 §1.1 释放、轮次号不复用（claims.jsonl release 记录 @ 2026-11-19T06:05:00Z，其 direction 工作已由同步轮身份 r403 提交推送完毕）；r405 认领-释放闭环，release 记录含本轮真实 commit SHA 与实测数字。
 - **交接事项**：给 1 号——① 全库建议审计 `[，。；]`/`[^，。；]` 类字符类（pipeline NFKC 预折叠致多模块死模式，r402 MOTIVE_A_ZH / r405 INFER_ZH 连续两轮踩中）；② round-726 断言用 5000 字窗口 grep 日益增长的 Set 字面量，建议改精确解析或加大窗口；③ 并发池多个变异守卫测试同写同一 src 文件的竞态（r401 已报）仍存在，建议将同文件变异守卫测试统一移入串行车道。给同步轮身份——round-402-lead-time-bias.test.js 串行车道态未输出可解析汇总行（池内 29/29、单独 mount RC=0），建议补查该文件串行态输出格式；r404 已释放。给 3 号——下一轮从 r406 起；本轮已全部 commit 并 push，工作树干净（除外来遗留 untracked：scripts/round-307/*、scripts/round-734/、test/round-307-sorites-goal-dismissal.test.js、coordination/agent4/r402-gates-final2.json，均非 r405 产物）。
+## r404 — 接线第 271 维度 homogeneity_assumption 群体同质性假设（真升级①新判别维度；群体同质性假设族）
+
+- **轮次来源**：本轮为**掉线恢复 + 本地独有产能固化**。HEAD 起点与 heartflow/main 一致（6.8.204），工作区存在上一轮未提交 WIP：`src/homogeneity-assumption.js`（第 271 维，untracked）、`test/round-404-homogeneity-assumption.test.js`、`src/index.js` 15 处接线、README/AGENTS/SKILL 维度数字同步——但未 commit、VERSION 未 bump、claims 中残留一个描述错位的 active r404 认领。按容错纪律「本地独有产能优先固化」核实后完成收尾，不丢弃。
+- **缺口实证（本轮补落盘，`scripts/round-404/probe-r404-homogeneity.js`）**：git stash 退回接线前态跑基线 vs 接线后态复跑同池——攻击 16 条：**基线仅 4 条 gate 非 pass（12 条漏判放行）→ 接线后 15 条非 pass 且 15 条全部 homogeneity_assumption 承重**；良性 15 条：基线存量非 pass 4 条（empty_answer/moral_foundations/sorites/vagueness/no_fallback 均为存量维度）→ 接线后仍 4 条、**本维度误伤 0**。证实本族是真实增量判别力，不是既有维度射程内重复覆盖。原始输出落 `scripts/round-404/probe-r404-homogeneity-{baseline,final}.json`。
+- **实现**（`src/homogeneity-assumption.js` + `src/index.js` 15 处接线：require/dispatch/dimMap/allDims/guidance/VERIFY_DIMS/exports）：
+  - 双腿判据（缺一不判）：腿① `SHARED_ATTR` 共享属性载体（同校/同村/同届/同病/同龄/同星座/同岗位/同团队/同城 + 世代标签 90后/00后/Z世代/millennials/Gen-Z；EN same school/same age/same diagnosis/same team/from the same city） × 腿② `HOMOGENEITY` 同质推断断言（都一样/完全相同/毫无差别/都差不多/都相似/问一个人就够/招谁都可以；EN all the same / identical / all equally / no difference / any one of them will do）。
+  - 五组豁免：差异承认/组内方差在场（差异/各有不同/参差不齐/因人而异；EN differ/vary/not identical）｜统计检验口径（经检验/方差分析/ANOVA/同质性检验）｜元陈述破除（同质性假设/一概而论/组内方差——正在指出本谬误本身）｜法律规范平等（享有同等权利/同工同酬/法律面前一律平等）｜疑问句与对冲（可能/也许/大概/似乎；EN maybe/perhaps/probably/seems）。
+  - **与既有维度分工**（已写入 index.js guidance）：hasty_generalization 管「少数样本→全称」须有样本腿，本族不需要任何样本、共享属性本身即被当作充分依据；stereotype 管刻板印象**内容**，本族管推理**结构**（共享属性→无差异），可对正面属性成立（「同一所学校毕业的人都很优秀」）；sorites_fallacy 管模糊边界连锁（量级渐变），本族不涉量级、是成员间差异被抹除；whole_part_transfer 管整体属性移到部分，本族方向相反——把成员的**共同标签**扩成**相同表现**；ecological_fallacy 管群体级统计量推到个体，本族不经过群体统计量。
+  - verify 级：单句可能是经统计检验的同质性转述、他人偏见引述、或作者正要批判该假设；verify 的含义是「这个以共享属性为据的同质推断没有给出组内方差证据，需要成员级数据才能采信」。
+- **验证（全部本轮实测）**：轮测 `test/round-404-homogeneity-assumption.test.js` **29/29 全绿**（攻击 14 全命中 + 良性 15 零误伤）；gate 层攻击 **15/16 非 pass 且全部本维度承重**（1 条存量 hasty_generalization 代拦，如实记录射程边界）、良性存量误伤 4 条经 stash 对照**全部为存量维度**。存量回归全绿：round-402-lead-time-bias 7/7、round-402-motivated-reasoning 13/13、round-338-evidence-claim-mismatch-families 11/11、round-400-accident-quote-rule 76/76、round-401-circular-definist-verdict 13/13、round-405-memory-layer 14/14；round-307 维持既有基线 44 passed/4 failed（4 条 ALL-EXEMPT 为 r403 HEDGE_OVERLAP_WIN 重构后存量基线，r403 交接明确「修 r307 前必须先同步改 r338 期望行」，本轮不动）。
+- **四门禁（全绿）**：bin/verify.js 16/0、guard-abilities 20/20（**判别维度 270 个**，269→270 实测）、doc-numbers-accuracy 24/0、bidirectional-guard 召回 52/52 + 误拦 302/326 零新增。
+- **死认领治理**：claims.jsonl 中 r404 记录 kind 误写为 r403、direction 指向 r402 WIP（lead_time_bias），与本地实际 WIP（homogeneity_assumption）错位且无对应未完成工作——本轮重写为准确描述并 release（completed）。
+- **VERSION**：6.8.204 → 6.8.206。
 
 ## r402 — motivated_reasoning 第 232 维新增「实利归因即驳回」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
 

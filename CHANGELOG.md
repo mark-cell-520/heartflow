@@ -53,6 +53,21 @@
 `hf4-scout.sh "logical fallacies homelessness relative privation rhetoric"`：arXiv API 15 条全量子/ML 噪声、GitHub repos API 15 repo 均 LLM 检测器、Semantic Scholar API 429——**空返，按既有形态自建**，未编造命中。原始返回落库 `coordination/agent4/scout/*20261119-035334*`。
 
 
+# 6.8.206 变更日志条目
+
+## [6.8.206] - 2026-11-19
+
+### r404 掉线恢复固化：接线第 271 维度 homogeneity_assumption 群体同质性假设（真升级①新判别维度）
+
+- `src/homogeneity-assumption.js`（新模块，r403 起草）+ `src/index.js` 15 处接线（require/dispatch/dimMap/allDims/guidance/VERIFY_DIMS/exports）：双腿判据缺一不判——腿① SHARED_ATTR 共享属性载体（同校/同村/同届/同病/同龄/同星座/同岗位/同团队/同城 + 世代标签 90后/00后/Z世代/millennials/Gen-Z；EN same school/same age/same diagnosis/same team/from the same city）× 腿② HOMOGENEITY 同质推断断言（都一样/完全相同/毫无差别/都差不多/都相似/问一个人就够/招谁都可以；EN all the same / identical / all equally / no difference / any one of them will do）
+- 五组豁免：差异承认/组内方差在场｜统计检验口径（方差分析/ANOVA/同质性检验）｜元陈述破除（同质性假设/一概而论/组内方差）｜法律规范平等（享有同等权利/同工同酬）｜疑问句与对冲
+- 与既有维度分工（写入 guidance）：hasty_generalization 须有样本腿本族不需要；stereotype 管内容本族管推理结构；sorites 管量级渐变本族不涉量级；whole_part_transfer 方向相反（共同标签→相同表现）；ecological_fallacy 经过群体统计量本族不经过
+- **缺口实证**（scripts/round-404/probe-r404-homogeneity.js，stash 前后对照）：攻击 16 条基线 4 条非 pass（12 漏判）→ 接线后 15 条非 pass 且全部本维度承重；良性 15 条存量非 pass 4→4、本维度误伤 0
+- 轮测 test/round-404-homogeneity-assumption.test.js 29/29 全绿（攻击 14 + 良性 15）；存量回归 round-402-lead-time-bias 7/7、round-402-motivated 13/13、round-338 11/11、round-400 76/76、round-401 13/13、round-405 14/14 全绿；round-307 维持存量基线 44/4
+- 四门禁全绿：verify 16/0、guard-abilities 20/20（判别维度 270 个，269→270）、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零新增
+- VERSION 6.8.204→6.8.206
+
+# 6.8.203 变更日志条目
 
 ## [6.8.203] - 2026-11-19
 

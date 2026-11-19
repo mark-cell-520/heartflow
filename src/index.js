@@ -797,6 +797,14 @@ const { checkClaimedVerificationWithoutTrail } = require('./claimed-verification
 // Verification/Lead-time 五候选族同池实测后定拨本族）。变量名 ltb——
 // lead time bias 缩写，grep 0 命中。
 const { checkLeadTimeBias } = require('./lead-time-bias.js');
+// [r404 接线] 第 271 维度 homogeneity_assumption（群体同质性假设：以单一
+// 共享属性——同年龄/同校/同村/同城/同病/同星座/同岗位/同届/同乡——为由，
+// 推断群体所有成员在某一维度上无差异，不承认组内结构性差异）require。
+// 缺口实证：scripts/round-404/probe-r404-multi.js（8 候选族同池）+ probe-r404-H.js
+// （15 变体）——存量维度对同质性假设族穿透 11/15、零专门覆盖；与
+// hasty_generalization（需样本腿）/stereotype（管内容）/ecological_fallacy
+// （管群体统计量）/sorites（管量级渐变）射程均不重叠。变量名 homo。
+const { checkHomogeneityAssumption } = require('./homogeneity-assumption.js');
 // [r367 接线] 第 260 维度 package_deal（一揽子谬误：把多个独立命题打包成
 // 不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制单条独立判断）require。
 // 缺口实证见 scripts/round-367/probe-package-deal.js（11 条攻击样本 8 条穿透
@@ -2483,6 +2491,11 @@ function discriminate(text, evidence = [], contentMode) {
   // longer.」等），零维度承重。本行让「领先时间偏误」以独立维度名进入
   // findings/scores/dimMap。
   const ltb = _applyPedagogyRelaxation(checkLeadTimeBias(_normText), "lead_time_bias", pedagogyRelaxation);
+  // [r404 接线] 第 271 维度 homogeneity_assumption（群体同质性假设）独立
+  // dispatch。模块本轮新建（src/homogeneity-assumption.js）——探针实证 gate
+  // 层穿透 11/15（存量零维度承重），本行让「共享属性 × 同质推断」以独立
+  // 维度名进入 findings/scores/dimMap。
+  const homo = _applyPedagogyRelaxation(checkHomogeneityAssumption(_normText), "homogeneity_assumption", pedagogyRelaxation);
   // [r367 接线] 第 260 维度 package_deal（一揽子谬误）独立 dispatch。探针
   // 实证 gate 层穿透（8/11 漏判），本行让「打包绑定 × 全有或全无」以独立
   // 维度名进入 findings/scores/dimMap。
@@ -3257,6 +3270,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r402 接线] 第 270 维度 lead_time_bias 参与判定（领先时间偏误：筛查
     // 提前确诊时点≠延长寿命）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: ltb.score, name:'lead_time_bias'},
+    // [r404 接线] 第 271 维度 homogeneity_assumption 参与判定（群体同质性
+    // 假设：共享属性 × 同质推断）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: homo.score, name:'homogeneity_assumption'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -3929,6 +3945,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误：筛查提前确诊
     // 时点造成的生存期假性延长）dimMap 登记。ltb——lead time bias 缩写。
     lead_time_bias: ltb,
+    // [r404 接线] 第 271 维度 homogeneity_assumption（群体同质性假设：
+    // 共享属性 × 同质推断）dimMap 登记。homo——homogeneity 缩写。
+    homogeneity_assumption: homo,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
     // 全无）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4483,6 +4502,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r400 接线] 第 269 维度 claimed_verification_without_trail（空核验
     // 宣称）guidance。cvw——claimed verification without trail 缩写。
     'claimed_verification_without_trail': "不得**宣称一次核验已经完成却不给出任何核验轨迹**——空核验宣称（claimed verification without trail）是文本说「我验证过了/团队核实了/已实测」，却不提供来源、数据、复现路径或方法学标记，把「核验动作在场」本身当成结论可靠的依据。样本形状：「我们团队核实过这个数据。」「经过实测，这款产品确实更好用。」「实测有效，效果看得见。」「我已亲自验证，这个方案没问题。」「I verified it myself and it works.」「We tested it thoroughly and it passed.」「Tested and it works.」（样本形状与负例见 test/round-400-claimed-verification-without-trail.test.js）。为什么这本身就是问题：在「模型只提议；确定性工具逐条核验，只有通过核验的才成为事实」（reverify 纪律）的标准下，一次没有轨迹的核验宣称不可复核、不可复现、不可追责——它把本应可审计的过程压缩成一句无法检验的断言，让读者无从区分「真的验过」与「口头说验过」。正当做法是**补上核验轨迹**（附上复现脚本/原始数据/来源编号/方法说明），或**把空核验降级为待验证假设**（声称有效但尚未提供可复核证据，需要独立测试）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① VERIFY_CLAIM 核验完成宣称——第一人称/机构主语（我/本人/我们/团队/小组/实验室；EN I/we/the team/our lab）× 核验动词（验证/核实/核查/实测/亲测/测试过/确认过/检验/复测/复现过/调研过；EN verified/checked/confirmed/tested/validated/cross-checked/reproduced）× 完成体（了/过/已经/亲自/反复/实测/亲测等光杆完成形；EN 核验动词过去式自身即完成体）；主语允许缺失（汉语广告语「实测有效」省略主语，r736 实测整族穿透的第三主因），但第三方主语（他说/据称/据报道/专家声称）在场时核验归属他人、本族不判。腿② TRAIL_ABSENT 无核验轨迹——反向判定而非词表：腿①命中后全句无来源/出处/编号/链接/DOI/数据集/样本量/方法论/实验设计/对照组/复现/可复现/日志/存档/同行评审/第三方检测/公示等可供第三方复核的载体即判。缺腿不判——「已验证（复现脚本与原始数据见附录 A）」有轨迹、是正当披露；「我们反复核验」中的「核验」是腿①核验动词而非轨迹动作。边界：confidence 只管确定性措辞（无疑/必然/百分之百），不关心「谁验过」；unsupported_claim 管没有依据的断言，本族断言**自称有核验**、错在轨迹缺失而非依据整体缺失；evidence_claim_mismatch 管断言超出所引证据的覆盖范围，本族根本没有可引用的证据、只有一句「已经验过了」；weak_evidence_strong_claim 管证据强度与结论强度不匹配，本族不涉及任何证据；anonymous_source_claim 管来源不可指认，本族的来源在场（我/团队/实验室）、缺的是核验轨迹而非来源身份；completion_evidence 管「已完成」的宣称缺完成证据，本族特指**核验/验证类完成宣称**（verify/checked/tested），射程更窄更深。verify 级——单句可能是合规披露转述、他人宣传话术引述、或作者正要批判该空核验宣称；verify 的含义是「这个核验宣称没有轨迹，需要补上来源/数据/复现路径才能采信」，调用方应要求补核验轨迹，而不是把『说验过了』当『验过了』。明确不判（豁免）：①轨迹纪律语言在场（句中带来源/数据/方法/复现路径——见腿②载体清单；EN source/raw data/dataset/methodology/control group/reproducible/logs/peer review/third party/disclosure）；②核验动作被质疑/待补的元陈述（尚未核验/无法验证/没法证实/需要验证/数据存疑/待确认/没有数据支撑；EN not yet verified/lacks verification/awaiting confirmation/still pending/remains unproven——作者正在指出缺口）；③核验/验证概念的教学转述（可证伪/可复现性/科学方法/方法论/核验流程/验证实验设计/同行评审/双盲/假设检验；EN falsifiability/scientific method/methodology/controlled experiment/peer review/textbook/lecture——概念讨论本身不是运用它）。",
+    // [r404 接线] 第 271 维度 homogeneity_assumption（群体同质性假设）
+    // guidance。homo——homogeneity 缩写。模块本轮新建（探针穿透 11/15）。
+    'homogeneity_assumption': "不得**以一个群体共享的单一属性为由，断定其所有成员在某维度上毫无差别**——群体同质性假设（homogeneity assumption / within-group variance neglect）：同一年龄、同一所学校、同一个村、同一个病、同一个星座只说明成员共享一个分类坐标，不说明他们在结果变量上收敛；拿标签抹平组内差异，是用分类学代替经验测量。样本形状：「90后都喜欢这样消费，因为他们是同龄人。」「这批患者都是同一个病，所以治疗方案完全一样。」「同一个学校的毕业生水平都一样，看学校就知道。」「同一个星座的人性格都相似。」「这条村的村民想法都差不多，问一个人就够了。」「All Gen-Z consumers behave the same way since they share the same age.」「Patients with the same diagnosis require identical treatment.」「People from the same city all share similar values.」「Graduates from that university are all equally qualified.」（样本形状与负例见 test/round-404-homogeneity-assumption.test.js）。判据**双腿共现 + 邻近窗 + 五组豁免，缺一不判**：腿① SHARED_ATTR 共享属性载体——群体标签（同校/同村/同届/同病/同龄/同星座/同岗位/同团队/同城；EN same school / same age / same diagnosis / same team / from the same city）或世代标签（90后/00后/Z世代/millennials/Gen-Z）；腿② HOMOGENEITY 同质推断断言——都一样/完全相同/毫无差别/都差不多/都相似/问一个人就够/招谁都可以；EN all the same / identical / all equally / no difference / any one of them will do。缺腿不判——只有共享属性无同质断言（「他们都是同一个班的」）是中性陈述；只有同质断言无共享属性（「人的能力都差不多」）是泛化断言归 hasty_generalization。边界：hasty_generalization（第5族）管「少数样本→全称」，必须有样本腿，本族不需要任何样本、共享属性本身即被当作充分依据；stereotype（第61维）管刻板印象**内容**（对群体的固定描摹），本族管推理**结构**（共享属性→无差异），可对正面属性成立（「同一所学校毕业的人都很优秀」）；sorites_fallacy（第212维）管模糊边界连锁（量级渐变），本族不涉及量级、是成员间差异被抹除；whole_part_transfer（第170维）管整体属性移到部分，本族方向相反——把成员的**共同标签**扩成**相同表现**；ecological_fallacy（第211维）管群体级统计量推到个体，本族是个体标签（同村/同校）直接推出成员间无差异、不经过群体统计量。verify 级——单句可能是经统计检验的同质性转述（方差分析支持）、他人偏见引述、或作者正要批判该假设；verify 的含义是「这个以共享属性为据的同质推断没有给出组内方差证据，需要成员级数据才能采信」，调用方应要求组内差异数据，而不是接受「同一个标签=同一种表现」。明确不判（豁免）：①差异承认/组内方差在场（差异/各有不同/参差不齐/因人而异/并非都/不一定都；EN differ / vary / not identical / individual differences——正在承认组内差异，是正确判别）；②统计检验口径（经检验/统计显著/方差分析/ANOVA/同质性检验；EN statistically significant / homogeneity test / ANOVA——有依据的同质陈述）；③元陈述破除（同质性假设/一概而论/组内方差/群体同质；EN homogeneity assumption / overgeneralization / within-group variance——正在指出本谬误本身）；④法律/规则明文的规范性平等（享有同等权利/同工同酬/法律面前一律平等；EN entitled to the same rights / equal pay for equal work——制度陈述不是经验推断）；⑤疑问句与对冲（可能/也许/或许/大概/似乎；EN maybe / perhaps / probably / seems）。",
     'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
@@ -6203,6 +6225,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 survivor_time_bias(226)/baseline_omission(268) 先例：本族是筛查
     // 效能宣称的口径误读（单句可能是正当的 RCT 结论转述），verify 级。
     'lead_time_bias',
+    // [r404 接线] 第 271 维度 homogeneity_assumption（群体同质性假设）进
+    // VERIFY_DIMS。同 stereotype(61)/hasty_generalization(5) 先例：本族是
+    // 推理结构谬误（单句可能是经检验的同质性转述），verify 级。
+    'homogeneity_assumption',
   ]);
   // pass：无问题通过
 
@@ -6683,6 +6709,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r402 接线] 第 270 维度 lead_time_bias 补登记（领先时间偏误：筛查
       // 提前确诊时点造成的生存期假性延长）。ltb——lead time bias 缩写。
       lead_time_bias: ltb,
+      // [r404 接线] 第 271 维度 homogeneity_assumption（群体同质性假设）补
+      // 登记。homo——homogeneity 缩写。
+      homogeneity_assumption: homo,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6883,6 +6912,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 另一议题顶替原议题以回避回应）。rhr——red herring 缩写。
     // 同上：九处一次接齐。
     red_herring: rhr,
+    // [r404 接线] 第 271 维度 homogeneity_assumption 补登记（群体同质性
+    // 假设：共享属性 × 同质推断）。homo——homogeneity 缩写。
+    homogeneity_assumption: homo,
     // [r309] 第 252 维度 vivid_case_availability 补登记（生动个案可得性
     // 偏差）。vca——vivid case availability 缩写。同上：九处一次接齐。
     vivid_case_availability: vca,
