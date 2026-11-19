@@ -29,7 +29,9 @@ function t(name, fn) {
   catch (e) { fail++; console.log('  ❌ ' + name + ' → ' + e.message); }
 }
 
-// ─── 攻击样本（与 r406 探针 F4 atk 同源，10 条）──────────────────────
+// ─── 攻击样本（r406 探针 F4 同源 10 条 + 逐模式承重扩样 22 条）─────────
+// 扩样规则：每个新模式至少一条样本在删掉它后停止命中（见
+// coordination/agent4/probes/r406-negative-delete.js，34/34 变红）。
 const ATTACK = [
   '这件事两个人都有责任，各打五十大板，谁也别怨谁',
   '车祸双方各让一步，五五开，谁都别怪谁',
@@ -41,6 +43,28 @@ const ATTACK = [
   '打架是双方的错，各记过一次，这就是最公正的',
   'Truth is usually halfway between the two versions of the story.',
   '一个说我偷了东西，一个说没偷，那就算我偷了一半吧',
+  '双方都有错，各打五十大板，这事就这么定',
+  '责任一人一半，谁也别怪谁',
+  '两家公司均摊责任，事情就算翻篇',
+  '双方责任各退一步，事情就算了结',
+  '责任问题折中处理，双方都接受这个方案',
+  'He accused her of starting it, so splitting the fault 50-50 is fair.',
+  'The complaint and the response both have merit; the fairest outcome is 50-50.',
+  'The dispute has two sides, so let us split the responsibility.',
+  'They quarreled about the bill, so they agreed to split it 50-50.',
+  'The fight was mutual, so splitting the blame evenly is fair.',
+  'The lawsuit could go either way, so splitting the fault fifty-fifty is reasonable.',
+  'Both parties were wrong, so the fairest outcome is 50-50.',
+  'Both sides share the responsibility, so a 50-50 split is only fair.',
+  'Both sides are responsible, so the split should be 50-50.',
+  'Both drivers were at fault, so 50-50 is the fair outcome.',
+  'Both drivers were at fault, so a fifty-fifty split is fair.',
+  'Both drivers were at fault, so we are splitting the blame.',
+  'Both sides are at fault, and that is the fairest reading.',
+  'One driver is to blame, the other is half the blame.',
+  'The two are equally to blame and equally responsible.',
+  'The dispute was mutual, so let us split the difference.',
+  'After the fight they decided to call it even.',
 ];
 
 // ─── 良性样本（与 r406 探针 F4 ben 同源，6 条）──────────────────────
@@ -95,10 +119,10 @@ for (const [i, s] of ATTACK.entries()) {
 }
 
 console.log('— 承重注入（腿常量抹掉后对应攻击必须停）—');
-const ZH_ATK = ATTACK.slice(0, 4).concat(ATTACK.slice(6, 8)).concat([ATTACK[9]]);
-// ATTACK[8]（Truth is usually halfway…）走旧路线 TRUTH_EN（r406 补的
-// halfway 形），不属新路线射程，不进 BLAME/SPLIT 注入集。
-const EN_ATK = [ATTACK[4], ATTACK[5]];
+// 新路线射程样本 = 全部攻击样本里除旧路线 TRUTH_EN halfway 形（ATTACK[8]）外的
+// 中/英文样本（negative-delete 探针已逐模式验证 34/34 承重）。
+const ZH_ATK = ATTACK.filter((s) => /[\u4e00-\u9fff]/.test(s));
+const EN_ATK = ATTACK.filter((s) => !/[\u4e00-\u9fff]/.test(s) && s !== ATTACK[8]);
 t('注入 BLAME_ZH=[] → 中文新路线攻击全停', () => {
   for (const s of ZH_ATK) assert.strictEqual(checkArgumentToModeration(s, { BLAME_ZH: [] }).hit, false, s.slice(0, 20));
 });

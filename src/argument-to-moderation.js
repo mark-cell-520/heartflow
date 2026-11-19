@@ -297,7 +297,11 @@ const SPLIT_EN = [
   /\bmeet in the middle\b/i,
   /\bsplit the difference\b/i,
   /\bcall it even\b/i,
-  /\beach (?:side|party) (?:is )?half (?:the )?(?:blame|fault|responsible)\b/i,
+  // [r406] 不收 each (?:side|party) (?:is )?half (?:the )?(?:blame|fault|responsible)
+  // 形——「each side is half the blame」的承重组「half the blame」已被
+  // /\bhalf (?:the )?(?:blame|fault|responsibility)\b/ 覆盖，each-side 前缀不
+  // 增加判别力（腿①归责语境本来就要求在场），r406 删条实测该模式对任何样本
+  // 都不承重（恒被 half-the-blame 形兜住），按「不留装饰模式」删除。
 ];
 
 // ─── [r406] 豁免六：均摊标记被否定（不是和稀泥 / 并非各打五十大板）────

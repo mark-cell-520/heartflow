@@ -1,0 +1,38 @@
+攻击样本数: 32 基线未命中: 0
+  ✅ BLAME_ZH[15] 删条变红 ← 公说公有理婆说婆有理，责任对半分才算公允
+  ✅ BLAME_ZH[16] 删条变红 ← 双方都有错，各打五十大板，这事就这么定
+  ✅ SPLIT_ZH[0] 删条变红 ← 这件事两个人都有责任，各打五十大板，谁也别怨谁
+  ✅ SPLIT_ZH[1] 删条变红 ← 车祸双方各让一步，五五开，谁都别怪谁
+  ✅ SPLIT_ZH[2] 删条变红 ← 公说公有理婆说婆有理，责任对半分才算公允
+  ✅ SPLIT_ZH[3] 删条变红 ← 责任一人一半，谁也别怪谁
+  ✅ SPLIT_ZH[4] 删条变红 ← 两家公司均摊责任，事情就算翻篇
+  ✅ SPLIT_ZH[5] 删条变红 ← 双方责任各退一步，事情就算了结
+  ✅ SPLIT_ZH[6] 删条变红 ← 责任问题折中处理，双方都接受这个方案
+  ✅ SPLIT_ZH[7] 删条变红 ← 一个说我偷了东西，一个说没偷，那就算我偷了一半吧
+  ✅ SPLIT_ZH[8] 删条变红 ← 打架是双方的错，各记过一次，这就是最公正的
+  ✅ BLAME_EN[3] 删条变红 ← He accused her of starting it, so splitt
+  ✅ BLAME_EN[4] 删条变红 ← The complaint and the response both have
+  ✅ BLAME_EN[5] 删条变红 ← The dispute has two sides, so let us spl
+  ✅ BLAME_EN[6] 删条变红 ← They quarreled about the bill, so they a
+  ✅ BLAME_EN[7] 删条变红 ← After the fight they decided to call it 
+  ✅ BLAME_EN[8] 删条变红 ← The lawsuit could go either way, so spli
+  ✅ BLAME_EN[9] 删条变红 ← One side exaggerated, but the other side
+  ✅ BLAME_EN[10] 删条变红 ← Both parties were wrong, so the fairest 
+  ✅ BLAME_EN[11] 删条变红 ← Both sides share the responsibility, so 
+  ✅ BLAME_EN[12] 删条变红 ← Both sides are responsible, so the split
+  ✅ SPLIT_EN[0] 删条变红 ← The complaint and the response both have
+  ✅ SPLIT_EN[1] 删条变红 ← Both drivers were at fault, so a fifty-f
+  ✅ SPLIT_EN[2] 删条变红 ← The dispute has two sides, so let us spl
+  ✅ SPLIT_EN[3] 删条变红 ← Both sides are at fault, and that is the
+  ✅ SPLIT_EN[4] 删条变红 ← One driver is to blame, the other is hal
+  ✅ SPLIT_EN[5] 删条变红 ← The two are equally to blame and equally
+  ✅ SPLIT_EN[6] 删条变红 ← One side exaggerated, but the other side
+  ✅ SPLIT_EN[7] 删条变红 ← The dispute was mutual, so let us split 
+  ✅ SPLIT_EN[8] 删条变红 ← After the fight they decided to call it 
+  ✅ NEG_SPLIT_ZH[0] 删条变红 ← 责任比例由保险勘察报告认定，不是和稀泥（豁免删条）
+  ✅ NEG_SPLIT_EN[0] 删条变红 ← This ruling is not about splitting the b
+  ✅ NEG_SPLIT_EN[1] 删条变红 ← Justice is not 50-50 when one side is cl
+  ✅ TRUTH_EN[2] 删条变红 ← Truth is usually halfway between the two
+
+删条负例：注入 34 个 → 34 个变红, 0 个未变红
+CLEANUP-OK
