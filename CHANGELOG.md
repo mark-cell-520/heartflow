@@ -1,4 +1,58 @@
-# 6.8.203 变更日志条目
+# 6.8.205 变更日志条目
+
+> 轮次：r405（4 号 agent，撞号重编号轮——原 r403 本地工作因同步轮身份抢先推送而整体重编号为 r405，宪法 §1.1 轮次号释放不复用）
+> 日期：2026-11-19
+> 类型：dimension（逻辑谬误家族扩展轴续）
+> 真升级判定：**命中 ② 已有维度的全新措辞家族**（另配套修存量 NFKC 死模式漏洞 1 处，非新族）
+> VERSION：6.8.204 → 6.8.205
+
+## 变更内容
+
+### relative_privation 第 156 维：新增「无家可归/安身缺口」措辞家族（真升级②）
+
+`src/relative-pration.js` 在双腿共现判据（sufferHit AND dismissHit，缺一不判）下新增安身缺口族：
+
+- **腿① RP_SUFFER_ZH +7**：无家可归、流离失所、居无定所、无处安身、上无片瓦、露宿街头、风餐露宿
+- **腿① RP_SUFFER_EN +4**：`do not even have a job|place`、`walk (for) N hours|miles`、`nowhere to sleep|live|stay`、`cannot (even) afford a place|home|house|room|bed`
+- **腿② RP_DISMISS_ZH/EN 反问式压制形（宾语锁）**：ZH `你+抱怨/喊/嫌/叫苦/叫累/哭/诉苦+？`；EN `you think|call|say + your|this|that|it + ?`——宾语锁对方诉求，「You think the housing crisis is serious?」类议题提问不误伤
+
+立项依据（同池探针定拨，r402 交接 F3 relative_privation 复探）：改前攻击穿透 5/8——「你抱怨房租贵？想想还有多少人无家可归」「At least you have a bed to sleep in; some people have nowhere to sleep at night.」「You think your workload is bad? Some people do not even have a job.」「Stop complaining about the commute—some people walk for hours…」「You call this exhausting? Plenty of people cannot even afford a place to stay.」均 gate=pass。落地后模块层攻击 14/14 新族承重、良性 14/14 模块层零误伤；gate 层攻击 14/14 非 pass 且 relative_privation 在场，良性 gate 层存量误伤经 stash 对照证实与新增零相关。
+
+延续「不收抽象 worse off」的既有防误伤设计，只收具体安身处境短语；「无家可归是城市治理的重要议题」类政策讨论无腿②压制标记，模块层零命中。
+
+### 配套修存量漏洞：affirming_disjunct 第 231 维 INFER_ZH NFKC 死模式（非新族）
+
+`src/affirming-disjunct.js` INFER_ZH 的 `/[，。；]那/` 是 pipeline NFKC 死模式——`src/pipeline.js` runPipeline 对含全角标点的输入先做 NFKC 折叠（，→, 。→ . ；→ ;），判别模块收到的文本里全角逗号/句号/分号已不存在，该字符类永远匹配不到，「既然…见到他，那就说明…」形整族在 checkOutput 路径上静默漏判。修复：字符类补半角三兄弟 `/[，。；,;.]那/`，修复后实测转 rewrite。与 r402 MOTIVE_A_ZH 同族病害（全库建议审计同类字符类）。
+
+备查：EXCLUSIVE_FORM 的 `/要么[^，。；]{0,20}要么/` 同受折叠影响（半角逗号不再截断 span），属豁免放宽方向（显式排他形本应豁免），语义正确、不引入攻击面。
+
+## 轮测
+
+- `test/round-405-relative-pration-homelessness.test.js` **20/20**：A 攻击 14 条全部新族承重（模块层）+ B 良性 14 条零误伤（政策讨论/议题提问边界锁）+ C 边界锁（双腿共现承重/豁免）+ D 存量家族不回归 + E gate 层攻击 14/14 非 pass 且 relative_privation 在场/E2 良性存量误伤 stash 对照零相关 + F 变异守卫 13 锚点逐一作废全部变红、还原后 PASS
+- `test/round-405-affirming-disjunct-infer-nfkc.test.js` **7/7**：A 修复后「既然…那就说明」形 gate 层 rewrite 且归因 affirming_disjunct + B NFKC 半角形与全角形同样命中 + C 良性不回归 + D 存量 r256 家族攻击仍命中 + E 变异守卫（字符类还原为 `/[，。；]那/` 必须变红）
+
+## 门禁与回归（合并树——含同步轮 r403 第 270 维 lead_time_bias）
+
+- `node bin/verify.js` **16/0 PASS**
+- `node scripts/guard-abilities.js` **20/20 PASS**（269 维）
+- `node test/doc-numbers-accuracy.test.js`：docs commit 前 21/24（3 项失败全部为待补 6.8.205 文档条目：README/SKILL 口径版本戳 + README changelog 缺 6.8.205 行）→ docs commit 后复测 **24/24 PASS**
+- `node scripts/bidirectional-guard.js` **52/52 PASS**，误拦 302/326 零新增
+- 合并树全量回归 `node test/run-all.js`：**24,701 passing / 227 failing / 24,928 total**（JOBS=4，data/test-count.json @ 2026-11-19T06:17:22Z）；与 r402 基线 24,675/225/24,900 失败文件清单逐条 diff 新增仅 round-402-lead-time-bias.test.js 一条「未输出可解析汇总行」记录（同步轮 r403 自带测试，池内 29/29 通过、单独 mount RC=0，非本轮引入）
+- 存量轮测：round-726「VERIFY_DIMS 5000 字窗口」红为 HEAD 既有失败（stash 对照实证）；对方 round-402-lead-time-bias / round-338（11/0）/ round-398（12/0）均不回归
+
+## commit
+
+- feat 591e1d8（src/relative-pration.js +50）
+- fix 0898857（src/affirming-disjunct.js +14/-1）
+- test 24617f2（两个轮测 +432）
+- evidence 4b3e816（探针/门禁/轮测/scout 原始输出）
+- docs（README/SKILL/CHANGELOG/UPGRADE_LOG/VERSION/test-count/claims 同步）
+
+## 海外扫描（4 号独特产能）
+
+`hf4-scout.sh "logical fallacies homelessness relative privation rhetoric"`：arXiv API 15 条全量子/ML 噪声、GitHub repos API 15 repo 均 LLM 检测器、Semantic Scholar API 429——**空返，按既有形态自建**，未编造命中。原始返回落库 `coordination/agent4/scout/*20261119-035334*`。
+
+
 
 ## [6.8.203] - 2026-11-19
 
