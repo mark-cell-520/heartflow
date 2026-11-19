@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,341 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 272 | `dimMap` keys in `src/index.js` |
 | MCP tools | 192 | tool definitions exposed via `tools/list` |
-| Test suite | 25,306 passing / 228 failing | `node test/run-all.js`（r415 轮全量实测 25,306/228/25,534（852 文件，data/test-count.json @ 2026-11-19T19:39:35Z；较 r413 基线 25,134/228/25,362 差 passed +172 / failed +0 / total +172——passed 增量为本轮轮测 round-415-false-dilemma-ultimatum.test.js 100 断言与 r414 轮测 round-414-praise-disguised-as-criticism.test.js 补 run-all 汇总行口径后入列 72 断言（该文件原无可解析计数行、子进程跑完断言仍被计 1 失败，本轮按 r413 先例补「N passed / M failed」行修复）；失败清单 151 文件与 r413 基线逐条 diff **零新增零减少**））
+| Test suite | 25,352 passing / 225 failing | `node test/run-all.js`（r417 轮全量实测 25,352/225/25,577（854 文件，data/test-count.json @ 2026-11-19T21:15:18Z；较 r415 基线 25,306/228/25,534 差 passed +46 / failed -3 / total +43——其中 +16 为本轮轮测 round-417-tu-quoque-common-practice.test.js 16 断言（run-all 计数层已正确解析其「16 passed / 0 failed」汇总行，日志显示层因只滤中文关键词行而显示「(无输出)」，属显示层现象非漏计）；其余差值为 r416 fix 于基线测量后落地（存量单测 round-375-government-household-analogy 38过/7败→43过/1败）与磁盘外来未跟踪测试文件 test/round-307-sorites-goal-dismissal.test.js 进入测量及并发池输出归属噪声；**失败清单 151 文件与 r415 基线逐条 diff 零新增零减少**，比对实录 coordination/agent4/probes/r417-runall.log））|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
