@@ -25,12 +25,24 @@
  *       not with us, you're against us / either you join … or you
  *       are dead weight。良性二元陈述无定性等式，双因子交叉豁免
  *   · [r393] 析取消去谬误（推理层补腿）：排除一支确证另一支——你要么
- *       支持这个政策，要么你就是不爱国 / 方案没成功，说明执行的人
- *       能力不行。选项集未必穷尽，否定一支不等于确证另一支。判据、
- *       豁免、守卫在 src/disjunctive-fallacy.js（双腿 + 双豁免 + 对冲
- *       守卫），经路由⑩接入——与本模块路由①-⑨的框架层射程（选项集
- *       压缩/站队胁迫）互补；r393 立项实证 18 条攻击 14/18 穿透存量
- *       维度（scripts/round-393/probe-takeover.js，合并树 188954e）。
+ *     支持这个政策，要么你就是不爱国 / 方案没成功，说明执行的人
+ *     能力不行。选项集未必穷尽，否定一支不等于确证另一支。判据、
+ *     豁免、守卫在 src/disjunctive-fallacy.js（双腿 + 双豁免 + 对冲
+ *     守卫），经路由⑩接入——与本模块路由①-⑨的框架层射程（选项集
+ *     压缩/站队胁迫）互补；r393 立项实证 18 条攻击 14/18 穿透存量
+ *     维度（scripts/round-393/probe-takeover.js，合并树 HEAD 188954e）。
+ *   · [r411] 他法排除（无显式二元连接词）：没有别的办法 / 别无他法 /
+ *     没有第二条路 / 没有任何退路 / 只剩这一条路 / 唯一的出路 / 没有
+ *     第三条路；EN no other way / no alternative / only way / no choice
+ *     but / you're on your own——句中**没有**要么-frame、没有「不支持
+ *     就是反对」的定性等式、也没有「没有中间路线」的排除中项形，靠
+ *     「替代方案被清零」这一个动作把多元局面压成单选项（「除此之外，
+ *     没有别的办法，只能这么办」「We have no alternative but to
+ *     comply.」「It's either my way or you're on your own.」）。池化
+ *     探针 r411 实测 8/10 穿透存量判据、良性 0 误伤、模块层真零命中。
+ *     路由⑪单独形命中 + 事实/排期/技术依据三重豁免（「只有这两条路
+ *     可走，因为主干道都在施工」「the protocol specifies one
+ *     algorithm」是真实约束陈述，不判）。
  *
  * 为什么现有 64 维拦不住：
  *   · double_bind 管权威关系下的双重束缚（亲子/上下级两难指令），
@@ -44,6 +56,11 @@
  *   C2 领域压迫 —— 选择被迫（你选一个/必须表态/必须站队）/ 一侧污名化
  *       （不X就是Y/不支持就是反对/否则就是）——把另一侧定性为立场问题
  *   → verify 级：须列出被压掉的第三选项与各自代价，再要求表态。
+ * [r411] 他法排除单独形：排除替代方案的载体（没有别的办法/别无他法/
+ *       没有第二条路/没有任何退路/只剩这一条路；EN no other way / no
+ *       alternative / only way / no choice but / you're on your own）
+ *       单独即命中——与 EXMID「没有中间路线」同设计：排除替代方案本身
+ *       就是伪二选一的定义句。事实/排期/技术依据在场豁免。
  *
  * 明确不判的（豁免——这些是真实二元或程序性二选）：
  *   · 地理/物理事实性二元：路口只能左转或右转，直行是封闭的
@@ -215,6 +232,34 @@ const NOTWITH_EN = /\bif\s+you(?:'re| are)\s+not\s+(?:with|for)\s+(?:us|me|him|h
 // you join … or you are dead weight" 的 join/commit 类动词不收。
 const EITHER_DEROG_EN = /\beither\s+you\s+[^.!?;]{2,50}?\s+or\s+you(?:'re| are)\s+(?:a\s+|an\s+|the\s+)?(?:dead\s+weight|deadweight|holding\s+(?:us|the\s+team|everyone)\s+back|dragging\s+(?:us|the\s+team)\s+down|part\s+of\s+the\s+problem|in\s+the\s+way|against\s+us|the\s+enemy|not\s+one\s+of\s+us|a\s+liability|ball\s+and\s+chain)\b/i;
 
+// ─── [r411] 他法排除族常量 ─────────────────────────────────────
+// 腿① 他法排除载体（中文）：没有别的/其他/任何 + 办法/方法/路/退路/
+// 出路；别无他法；只剩/只有这一条路；唯一的出路；没有第三条路。
+// 边界：不收「别无选择」——DILEMMA_ZH 的 C1 已收该形（防注入删条
+// 被存量路由遮蔽）；「只有这两条路」的数量形刻意不入表（良性排期
+// 陈述「目前只有这两条路可走，因为主干道都在施工」常用）。
+const EXALT_ZH = /(?:没有|无|毫无)(?:别的|其他|任何|第二种?|第二条?)(?:办法|方法|路|路子|选择|选项|退路|出路)|别无(?:他法|退路|出路)|(?:只剩|只有|仅有)(?:这|那)?(?:一条|一种|一个)(?:路|办法|方法|选择|选项|退路|出路)|(?:唯一|惟一)(?:的)?(?:出路|活路|选择|办法)|不二法门|没有第三条路|没有任何退路|没有退路/;
+
+// 腿① 他法排除载体（英文）：no other way/alternative/option；only
+// way/option/choice；no choice but；no plan B；you're on your own
+// （ ultimatum 收尾形，覆盖 "It's either my way or you're on your
+// own."——不收 my way or 裸形，防 "we can try my way or yours" 误伤）。
+const EXALT_EN = /\bno other (?:way|option|choice|alternative|recourse|course of action)\b|\bno alternative\b|\bno choice but\b|\bhave no choice\b|\bno plan b\b|\bonly (?:way|option|choice|recourse|course|alternative)\b|\byou'?re on your own\b/i;
+
+// 豁免：事实/技术依据在场——「没有别的办法，因为主干道都在施工」
+// 「the protocol specifies one algorithm」是真实约束陈述，不是选项
+// 压缩。只收事实性依据标记，不收泛化 because/since（防攻击句借
+// 「因为我老板」类空理由穿透）。
+const REASON_ZH = /协议规定|规范要求|规范|协议|物理|工程|条件限制|资源限制|预算|工期|人力|客观(?:上|条件)?|(?:因为|由于|鉴于)[^。！？；]{0,14}(?:施工|封闭|禁行|物理|工程|协议|规范|规定|标准|限制|约束|不够|不足)/;
+const REASON_EN = /\b(?:the )?(?:protocol|specification|spec|standard|algorithm|documentation|manual)\s+(?:specifies|requires|defines|dictates|mandates|allows)\b|\b(?:physically|technically|practically|logically)\s+(?:impossible|no other)\b|\bconstraint|limited by|given the (?:budget|timeline|resources)\b|\bbecause of (?:the )?(?:protocol|spec|standard|constraint)/i;
+
+// 守卫：替代方案/积极应对在场——「我们没有任何退路，但大家可以一起
+// 想办法」是问题解决陈述，不是选项压缩（承认无退路的同时给出行动
+// 框架）。注意分支 C 的「还有办法」必须带 还/也/仍 前缀——裸形
+// 「有别的办法」会命中「没有别的办法」的攻击句内部，把攻击误豁免。
+const EXALT_GUARD_ZH = /(?:还|也|仍)(?:可以|能|有)(?:一起|一块|共同|各自|再)?(?:想|商量|讨论|谋划|尝试|努力|应对|解决|考虑|找)|(?:我们|大家|咱们|你|你们|诸位)?(?:一定|能够?|可以)?(?:一起|一块|共同)(?:想|商量|讨论|谋划|应对|解决|努力|想办法)|(?:还有|也有|仍有|能找到|觅到|另寻)(?:别的|其他|新的|解决)?(?:办法|路子|出路|方法|方向)|(?:另|重新)(?:想|找|辟)(?:办法|路子|出路|方法)|不妨/;
+const EXALT_GUARD_EN = /\b(?:we|you|they)\s+(?:can|could|still)\s+(?:still\s+)?(?:figure|find|work|try|think|improvise)\b|\bthere (?:is|are)\s+(?:still\s+)?(?:a|another|other)\s+(?:way|option|approach)\b|\bwork(?:around)?\b|\bwe can still\b|\bstill have (?:options|a chance|room)\b/i;
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以自定义正则替换指定常量
@@ -345,6 +390,29 @@ function checkFalseDilemma(text, inject) {
   // （scripts/round-393/probe-takeover.js，合并树 HEAD 188954e）。
   // inject：R.DSF 命名空间透传给模块 detect（键名与模块 DSF_CONSTS
   // 对应），避免与 false-dilemma 自身常量（同名 FACTUAL_ZH 等）碰撞。
+  // ─── [r411] 新路由⑪：他法排除族（没有别的办法/别无他法/没有第二条路）──
+  // 池化探针 r411（coordination/agent4/probes/r411-probe-pool.js）实测：
+  // false_dilemma 8/10 新措辞穿透（五家族同池最高），穿透样本全部落在
+  // 既有判据射程外——没有「要么A要么B」「不支持就是反对」「没有中间
+  // 路线」的显式二元标记，靠他法排除载体把多元局面压成单选项：
+  //   「除此之外，没有别的办法，只能这么办」
+  //   「事到如今，我们已经没有第二条路可走」
+  //   "We have no alternative but to comply."
+  //   "It's either my way or you're on your own."
+  // 判据：他法排除载体单独形 + 事实/排期/技术依据豁免（与 EXMID 同
+  // 设计——排除替代方案本身就是伪二选一的定义句）。良性「只有这两条
+  // 路可走，因为主干道都在施工」「the protocol specifies one algorithm」
+  // 由 REASON 豁免 + 数量形不入表双重拦截。真升级②：既有第 65 维
+  // 全新措辞家族，维度计数不变、src/index.js 零改动。
+  const exalt = (R.EXALT_ZH || EXALT_ZH).test(text) || (R.EXALT_EN || EXALT_EN).test(text);
+  if (exalt && !factual && !scheduled
+    && !(R.REASON_ZH || REASON_ZH).test(text)
+    && !(R.REASON_EN || REASON_EN).test(text)
+    && !(R.EXALT_GUARD_ZH || EXALT_GUARD_ZH).test(text)
+    && !(R.EXALT_GUARD_EN || EXALT_GUARD_EN).test(text)) {
+    return { hit: true, score: 0.74, detail: '他法排除(没有别的办法/别无他法)' };
+  }
+
   const dsf = disjunctiveFallacy.detect(text, R.DSF || null);
   if (dsf.hit) {
     return { hit: true, score: dsf.score, detail: dsf.details };
@@ -363,5 +431,7 @@ module.exports = {
     ALIGN_THREAT_ZH, ALIGN_THREAT_EN,
     DEROG_ZH, DEROG_FRAME_ZH, NEG_EQ_FRAME_ZH, NEGACT_SUBJ_ZH,
     NOTWITH_EN, EITHER_DEROG_EN,
+    EXALT_ZH, EXALT_EN, REASON_ZH, REASON_EN,
+    EXALT_GUARD_ZH, EXALT_GUARD_EN,
   }),
 };

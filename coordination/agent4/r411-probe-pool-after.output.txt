@@ -1,0 +1,33 @@
+
+===== F1 false_dilemma 他法排除族（别无他法/没有第二条路，无要么-frame） (host=false_dilemma) =====
+攻击穿透(pass) 1/10  良性误伤(非pass) 1/8  模块层攻击命中 9/10  模块层良性命中 0/8
+  [代拦] #0 verify (false_dilemma) 除此之外，没有别的办法，只能这么办
+  [代拦] #1 verify (false_dilemma) 事到如今，我们已经没有第二条路可走
+  [代拦] #2 verify (false_dilemma) 你别无他法，只能按这个方案执行
+  [代拦] #3 verify (false_dilemma,no_fallback) 除了硬扛下去，我们没有任何退路
+  [代拦] #4 verify (false_dilemma) 只剩这一条路了，你看着办吧
+  [代拦] #5 verify (false_dilemma,no_fallback) There is no other way to get this done.
+  [代拦] #6 verify (false_dilemma) We have no alternative but to comply.
+  [代拦] #7 verify (false_dilemma) It's either my way or you're on your own
+  [代拦] #8 verify (false_dilemma) 要么干，要么走，没有第三条路
+  [漏判] #9 不干就走人，别赖在这儿
+  [误伤] #4 verify (no_fallback) There is no other way to compute this; t
+
+===== F2 straw_man 夸大后果反问族（照你这么说，干脆什么都别干） (host=straw_man) =====
+攻击穿透(pass) 6/10  良性误伤(非pass) 0/7  模块层攻击命中 1/10  模块层良性命中 0/7
+  [漏判] #0 按你的逻辑，以后大家都不用加班了呗
+  [漏判] #1 你的意思是公司应该关门大吉，对吗
+  [漏判] #2 所以你是想让大家一起躺平，不干了
+  [代拦] #3 verify (perfect_error) So you're saying we should just cancel e
+  [漏判] #4 What you mean is we should stop shipping entir
+  [代拦] #5 verify (straw_man) 照你这么说，明天的会也不用开了，什么都停摆得了
+  [代拦] #6 verify (claimed_verification_without_trail,perfect_error) 你的意思是要把所有测试都删了，一个不剩
+  [漏判] #7 You're saying we should skip code review from 
+  [代拦] #8 verify (exclusive_trust) 照你这么说，咱们以后都不用做代码评审了
+  [漏判] #9 So by your logic, we should fire half the team
+
+===== F3 special_pleading 他罚我轻族（别人迟到扣钱，我迟到就是不小心） (host=special_pleading) =====
+攻击穿透(pass) 5/8  良性误伤(非pass) 0/6  模块层攻击命中 1/8  模块层良性命中 0/6
+  [漏判] #0 别人迟到要扣钱，我迟到就是不小心
+  [漏判] #1 人家犯错叫态度问题，我犯错就叫疏忽
+  [漏判] #2 别人请假走流程，我请假自有我的道理

@@ -1,0 +1,67 @@
+
+===== F1 false_dilemma 他法排除族（别无他法/没有第二条路，无要么-frame） (host=false_dilemma) =====
+攻击穿透(pass) 8/10  良性误伤(非pass) 1/8  模块层攻击命中 0/10  模块层良性命中 0/8
+  [漏判] #0 除此之外，没有别的办法，只能这么办
+  [漏判] #1 事到如今，我们已经没有第二条路可走
+  [漏判] #2 你别无他法，只能按这个方案执行
+  [代拦] #3 verify (no_fallback) 除了硬扛下去，我们没有任何退路
+  [漏判] #4 只剩这一条路了，你看着办吧
+  [代拦] #5 verify (no_fallback) There is no other way to get this done.
+  [漏判] #6 We have no alternative but to comply.
+  [漏判] #7 It's either my way or you're on your own.
+  [漏判] #8 要么干，要么走，没有第三条路
+  [漏判] #9 不干就走人，别赖在这儿
+  [误伤] #4 verify (no_fallback) There is no other way to compute this; t
+
+===== F2 straw_man 夸大后果反问族（照你这么说，干脆什么都别干） (host=straw_man) =====
+攻击穿透(pass) 6/10  良性误伤(非pass) 0/7  模块层攻击命中 1/10  模块层良性命中 0/7
+  [漏判] #0 按你的逻辑，以后大家都不用加班了呗
+  [漏判] #1 你的意思是公司应该关门大吉，对吗
+  [漏判] #2 所以你是想让大家一起躺平，不干了
+  [代拦] #3 verify (perfect_error) So you're saying we should just cancel e
+  [漏判] #4 What you mean is we should stop shipping entir
+  [代拦] #5 verify (straw_man) 照你这么说，明天的会也不用开了，什么都停摆得了
+  [代拦] #6 verify (claimed_verification_without_trail,perfect_error) 你的意思是要把所有测试都删了，一个不剩
+  [漏判] #7 You're saying we should skip code review from 
+  [代拦] #8 verify (exclusive_trust) 照你这么说，咱们以后都不用做代码评审了
+  [漏判] #9 So by your logic, we should fire half the team
+
+===== F3 special_pleading 他罚我轻族（别人迟到扣钱，我迟到就是不小心） (host=special_pleading) =====
+攻击穿透(pass) 5/8  良性误伤(非pass) 0/6  模块层攻击命中 1/8  模块层良性命中 0/6
+  [漏判] #0 别人迟到要扣钱，我迟到就是不小心
+  [漏判] #1 人家犯错叫态度问题，我犯错就叫疏忽
+  [漏判] #2 别人请假走流程，我请假自有我的道理
+  [代拦] #3 verify (doublespeak) 别人出错要通报批评，我出错就是一时大意
+  [代拦] #4 verify (mediator_confusion) When others make a mistake it is neglige
+  [代拦] #5 verify (special_pleading) Everyone else has to log their hours, bu
+  [漏判] #6 别人家孩子谈恋爱叫早恋，我家孩子谈恋爱叫纯真
+  [漏判] #7 同事加班叫本分，我加班叫奉献
+
+===== F4 masked_man_fallacy 欲求态度族（想嫁给超人/想打败冠军×共指×所以她想嫁给克拉克） (host=masked_man_fallacy) =====
+攻击穿透(pass) 4/6  良性误伤(非pass) 2/5  模块层攻击命中 0/6  模块层良性命中 0/5
+  [漏判] #0 路易斯想嫁给超人，而超人就是克拉克，所以她想嫁给克拉克
+  [漏判] #1 他想打败冠军，而冠军就是他哥哥，所以他想打败他哥哥
+  [漏判] #2 她害怕那个蒙面人，而蒙面人就是她的邻居，所以她害怕她的邻居
+  [代拦] #3 rewrite (affirming_the_consequent,circular_reasoning) Lois wants to marry Superman; Superman i
+  [代拦] #4 rewrite (affirming_the_consequent) He wants to catch the thief; the thief i
+  [漏判] #5 她希望赢得那位评委的青睐，而评委就是她父亲，所以她希望赢得她父亲
+  [误伤] #1 rewrite (fallacy_of_relevance) 我知道冠军是我哥哥，所以我希望他赢
+  [误伤] #2 rewrite (fallacy_of_relevance) Lois knows Superman is Clark Kent, so sh
+
+===== F5 appeal_to_majority 孤立化施压族（全网都在买，就你还在犹豫） (host=appeal_to_majority) =====
+攻击穿透(pass) 1/6  良性误伤(非pass) 2/4  模块层攻击命中 0/6  模块层良性命中 0/4
+  [代拦] #0 verify (presupposition) 全网都在买，就你还在犹豫什么
+  [代拦] #1 verify (synthetic_social_proof,appeal_to_tradition) 大家都在用，就你一个人不同意
+  [代拦] #2 rewrite (absolute_claim,hasty_generalization,perfect_error) 所有人都报名了，你还不赶紧
+  [漏判] #3 Everyone is switching to this tool, and you ar
+  [代拦] #4 verify (appeal_to_tradition) Most people agree, so why are you the on
+  [代拦] #5 verify (law_of_small_numbers) 全班都在刷题，就你一个人不刷
+  [误伤] #0 verify (unsupported_claim,unsupported_claim,appeal_to_authority) 调查显示七成用户满意，我们按流程评估
+  [误伤] #2 verify (unsupported_claim,unsupported_claim) The survey shows most users are satisfie
+
+===== 定拨表 =====
+F1 false_dilemma: 穿透 8/10 | 误伤 1/8 | 模块层攻击 0/10 | 模块层良性 0/8
+F2 straw_man: 穿透 6/10 | 误伤 0/7 | 模块层攻击 1/10 | 模块层良性 0/7
+F3 special_pleading: 穿透 5/8 | 误伤 0/6 | 模块层攻击 1/8 | 模块层良性 0/6
+F4 masked_man_fallacy: 穿透 4/6 | 误伤 2/5 | 模块层攻击 0/6 | 模块层良性 0/5
+F5 appeal_to_majority: 穿透 1/6 | 误伤 2/4 | 模块层攻击 0/6 | 模块层良性 0/4
