@@ -1,3 +1,19 @@
+## r402 — motivated_reasoning 第 232 维新增「实利归因即驳回」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
+
+**缺口实证与立项**：同池探针七家族定拨——F1 circular 存量五链穿透 6/7（r401 已落地）；F2 affirming_disjunct 补形 4/11 但误伤 3/10（Y=A∧B 正确交集被误拆，不落地）；F3 relative_privation 4/8 但误伤 1/8（不落地）；F4 incomplete_comparison 6/6 但误伤 2/6（未定量比较句误收，不落地）；F5 appeal_to_motive 实利归因族漏判 4/6、误伤 0/6（**定选**）；F6 dilemma_slope 混合族穿透低（不落地）。海外扫描：arXiv 15 条 triage 后无可落地措辞族、GitHub 0 repo、S2 API 429——**空返，按既有形态自建**（未编造命中）。
+
+**落地形态**（`src/motivated-reasoning.js`，union 与存量 motiveA/motiveB/dismiss/claim 四路由互补）：
+- 腿① `MOTIVE_B_ZH/EN`：排他归因标记（纯粹/说到底/归根到底/不外乎/一心想/无非/只是/仅仅/就；EN only/merely/just/simply/purely）× 实利动词（是为了/是想/意在/图的是/惦记的是/冲的是/冲着/想要/想/图/图个/谋求/贪图/为了/的是；EN to sell/boost/bump/pad/drive）× 可计量物质收益名词（卖课/多收/提成/回扣/返点/流量/KPI/位子/业绩；EN bill/commission/promotion/quota/bonus/traffic）
+- 腿② `claimRefZh`（这话/这番/此论）+ `claimActZh`（她坚持复查/专家建议，主语锁第二/三人称与角色人）+ `claimActEn`（pans/slams/attacks 等），补「论点可指认」射程
+- 腿③：沿用既有 dismiss / 纯动机推定通道，`DISMISS_ZH` 配套扩展（你别信/不足信/信不得）
+- 配套修正存量漏洞：`MOTIVE_A_ZH` pattern1 与全部新族的 span 排除集补半角逗号/分号——pipeline NFKC 把全角逗号折成 ASCII，原先 `[^，。；]` 不拦半角逗号，「她坚持复查,是因为指标异常」这类正当因果归因会被误并进动机推定段（本轮实测踩中并修复）
+- 新增 `PUBLIC_BENEFIT` 公共利益豁免（老百姓的利益/用户的权益）
+- **src/index.js 零改动**、dimMap 键数不变（仍 268）
+
+**验证结果**（全部本轮实测）：模块层攻击 **15/15 命中**（全部 benefit 新族承重）、良性 **17/17 零误伤**；gate 层攻击 **15/15 非 pass 且 motivated_reasoning 全部在场**；3 条良性 gate 层非 pass 经 `git stash` 对照证实**全部为存量维度**（monocausal_attribution ×2 / completion_evidence ×1），本族误伤 0。轮测 `test/round-402-motivated-reasoning-benefit-imputation.test.js` **13 断言全绿**（A1 攻击 15 + B1 良性 17 + C1-C7 边界锁 + D1/D2 存量回归 + E1/E2 gate 归因 + F 变异守卫 10/10 锚点逐一作废全部变红、还原后 PASS）。存量回归：5 条 MOTIVE_A 样本（模块+gate 层）改动前后逐条一致（stash 对照）。基线四门禁 6.8.202 全绿（维度 268）；改动后四门禁复跑全绿（verify 16/0、guard-abilities 20/20@266、doc-numbers 24/0、双向召回 52/52、误拦 302/326 零新增）。
+
+**全量回归与差值溯源**（两轮 JOBS=4 全量实测一致）：24,678/222/24,900 与 24,675/225/24,900（data/test-count.json @ 2026-11-19T02:45:32Z），与 r401 基线 24,794/205/24,999（@ 2026-11-18T23:18:26Z）的差值全部实证溯源——① **1 号序列第 268/269 维度 baseline_omission + claimed_verification_without_trail 于 2026-11-18T23:33:54Z（commit 964fb88）接线，晚于 r401 基线测量 15 分钟**：本轮全量中该维度良性误伤致 round-352/round-353/round-358/round-734/affective-forecast 五个存量轮测由绿转红（"Screening identified many more infections…"、"这条路的红灯配时我实测过…"、"等测试全部通过再开香槟"等良性句被 claimed_verification_without_trail 判 verify；在预改动机模块 b652bc8 版本下隔离复跑逐条同失败，**非 r402 引入**）；② 并发池 Command failed 抖动（MCP server 启动超时、reward-hacking 家族，r398/r400/r401 规格表已载该类）；③ round-398/round-400 两个存量轮测自报 `pass N / fail 0` 英文缩写格式不被 run-all 解析器识别（单独 mount 分别 49/0、89/0 全过，非真实失败）。**r402 本轮改动新增失败 0**——全部新增归因失败（含 gate 层良性误伤与 Command failed 两类）在预改基座下逐条复现。另本轮实测复现 r401 已记录事项：并发池多个变异守卫测试同写同一模块文件的竞态风险（r401 circular-reasoning、r402 motivated-reasoning 均踩中），根治需 1 号将同文件变异守卫测试移入串行车道。
+
 ## r401 — circular_reasoning 第 136 维新增「诉诸定义裁决族」措辞家族（真升级②：既有维度全新措辞家族；逻辑谬误家族扩展轴续）
 
 - **轮次**：4 号 r401（dimension）。HEAD 起点 9f82aa1（VERSION 6.8.201，与 heartflow/main 一致），收尾 6.8.202。基线四门禁全绿后动手。

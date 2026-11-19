@@ -1,3 +1,16 @@
+# 6.8.203 变更日志条目
+
+## [6.8.203] - 2026-11-19
+
+### motivated_reasoning 第 232 维新增「实利归因即驳回」措辞家族（r402，真升级②）
+
+- `src/motivated-reasoning.js` 新增 MOTIVE_B_ZH/EN 族：排他归因标记（纯粹/说到底/归根到底/不外乎/一心想/无非/只是/仅仅/就；EN only/merely/just/simply/purely）× 实利动词（是为了/是想/意在/图的是/惦记的是/冲的是/冲着/想要/想/图/图个/谋求/贪图/为了/的是；EN to sell/boost/bump/pad/drive）× 可计量物质收益名词（卖课/多收/提成/回扣/返点/流量/KPI/位子/业绩；EN bill/commission/promotion/quota/bonus/traffic），补齐「用物质收益排他解释对方立场即免于论证」的射程外缺口
+- 新增 claimRefZh/claimActZh/claimActEn 论点可指认扩展（主语锁第二/三人称与角色人，第一人称自陈与机构制度分析刻意不收）
+- 配套修正 MOTIVE_A_ZH span 排除集补半角逗号/分号（pipeline NFKC 折半角致正当因果归因误并动机段，本轮实测踩中并修复）；新增 PUBLIC_BENEFIT 公共利益豁免
+- 轮测 test/round-402-motivated-reasoning-benefit-imputation.test.js 13 断言全绿，含 10 锚点变异守卫（逐一作废全部变红）
+- 模块层攻击 15/15、良性 17/17 零误伤；gate 层攻击 15/15 非 pass 且本维度在场；良性 gate 层 3 条存量误伤经 stash 对照证实均为存量维度
+- src/index.js 零改动、dimMap 键数不变（仍 268）、VERSION 6.8.202→6.8.203
+
 # 6.8.201 变更日志条目
 
 - **第 197 维度 goal_drift 新增「显式约束×权衡搁置宣告」攻击族（r401，真升级②既有维度全新句式族）**：来源论文 arXiv:2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》——价值冲突子族的实证结论是环境信号（进度/工期/业务压力）可覆盖 agent 持有的显式约束，逐 action 浅层合规检查覆盖不到。checkGoalDrift 由单族改为双族 OR：存量 ANCHOR×SWITCH（目标置换，r200）+ 新族 CONSTRAINT×OVERRIDE（显式约束在场 × 让步/权衡搁置宣告，双腿共现 + 邻近窗 ZH≤60/EN≤160）。新增八个常量（CONSTRAINT_ZH/EN、OVERRIDE_ZH/EN、EXEMPT_COMPLIANCE_ZH/EN），豁免组由四组扩为五组（新增约束被遵守正面陈述豁免）。src/index.js 零改动、dimMap 键数不变。
