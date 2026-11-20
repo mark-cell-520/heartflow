@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.210**. Not marketing copy.
+Measured on this repository at **v6.8.211**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -212,8 +212,8 @@ Measured on this repository at **v6.8.210**. Not marketing copy.
 | Module init errors | 0 |
 | Dispatch routes | 1,363 |
 | Discrimination dimensions | 273 |
-|| MCP tools | 195 | tool definitions exposed via `tools/list` |
-|| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424（straw_man 存在必要性否定形，+19 断言）与本地掉线产出 r424 SelfVerifier 接线（+8 断言，test/round-424-self-verifier-wiring.test.js）合流；failed 净增 2 = round-423-inference-chain-wiring.test.js（node:test TAP 不可解析，存量）+ round-424-straw-man-necessity-negation.test.js 单文件硬失败项，根因均为 run-all 解析缺口非接线引入，修复决策交 1 号）|
+| MCP tools | 195 | tool definitions exposed via `tools/list` |
+| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424（straw_man 存在必要性否定形，+19 断言）与本地掉线产出 r424 SelfVerifier 接线（+8 断言，test/round-424-self-verifier-wiring.test.js）合流；failed 净增 2 = round-423-inference-chain-wiring.test.js（node:test TAP 不可解析，存量）+ round-424-straw-man-necessity-negation.test.js 单文件硬失败项，根因均为 run-all 解析缺口非接线引入，修复决策交 1 号）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.211 | 2026-11-20 | **接线轮（r424，真升级③）：SelfVerifier 推理交叉验证器接入路由与 MCP** — 341 行 v5.17.12 的 `this.verify` 实例一直存活但从未注册 `_modules`：routes() 零命中、dispatch 全拒、MCP 无工具入口。本轮挂载 `_modules`（路由由 engine-dispatcher 自动生成）+ `src/mcp-server.js` 新增 handleSelfVerifierTool 与 HANDLERS 项 + `src/mcp/tools-registry.js` 新增 heartflow_self_verifier 定义；selfVerifier 路由 0→3（verify/getStats/getRecentIssues），总路由 1,360→1,363，MCP 工具 194→195，模块 166→167，维度 273 不变。来源为内部路径（外部三层搜索无可用纯规则自我验证方案）。验证：verify 16/0、guard-abilities 20/20@273、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零退化；新测试 `test/round-424-self-verifier-wiring.test.js` 8/8。VERSION bump 6.8.210→6.8.211。 |
 | 6.8.210 | 2026-11-20 | **第 274 维度 calibration_mismatch（断言语气强度超出证据等级）新维度接线（r421，真升级①）** — 新模块 `src/calibration-mismatch.js`（276 行）：两腿判据缺一不判——腿① CERTAINTY 高强度确定性断言（毫无疑问/毋庸置疑/绝对/必然/铁定/万无一失/百分百；EN undoubtedly / absolutely / definitely / bound to / 100%，全部带 i 标志修句首大写族），腿② EVIDENCE_DEFICIT 证据缺陷三形任一（a 证据空转「大家都这么说/口碑爆棚/业界公认」、b 主观体验担保「放心吧/包在我身上/信我」、c 无来源强断言——句子级属性不经邻近窗）。六组豁免：证据等级匹配（同句有来源/数据/检验词）、对冲限定、元陈述破除、疑问形、引述转述、非字符串入口守卫。射程分工写入 guidance：confidence 管确定性词本身出现（有依据时仍判）、absolute_claim 管绝对化形式、unsupported_claim 管单腿无依据、weak_evidence_strong_claim 管弱证据→强结论（证据在场），本族管**证据缺位→强断言**与后者互补。缺口实证 `scripts/round-421/probe-r421-gap.js`（v6.8.209 基线，stash 前后真实对照）：基线态攻击 12 条中 4 条 gate=pass 穿引擎（其余 8 条被存量维度代拦但无一命中 calibration 语义），接线态 0/12 穿引擎、11/12 本维度承重；良性族 stash 前后逐条 gate.action 完全一致，零新增误伤。轮测 `test/round-421-calibration-mismatch.test.js` **12/12**（攻击 16 + 良性 20 + 负例注入 5 组 + 豁免逐组 + 引擎接入 4 项）。五门禁：verify 16/0、guard-abilities 20/20@273、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326（零变化）。VERSION bump 6.8.209→6.8.210，维度 272→273，VERIFY 239→240，模块 164 不变（顶层新模块不走 `_modules` 注册）。 |
 | 6.8.209 | 2026-11-20 | **接线轮（r417/r420，真升级③）：execution.verify 断链修复** — 570 行 ExecutionVerifier 早已实例化为 `this.execution` 但从未 dispatch：MCP 工具 `heartflow_execution_verify` 三处全断（`_modules` 未注册 execution 键 / `ALLOWED_ROUTES` 零 execution.* 路由 / tools-registry schema 缺 action·expected 参数），调用即失败、实际零能力。本轮接通：`src/core/heartflow.js` 注册 3 条 execution.* 路由并挂载 `_modules['execution']`；`src/core/execution-verifier.js` 新增 `getHistory`/`getStats`；`src/mcp/tools-registry.js` 补全 action/result/expected schema；`src/mcp-server.js` 修复 handleExecutionVerifyTool 参数适配（按 verify(result, context) 契约拆包）。执行验证六查（成功标志/预期结果/动作覆盖/结构/时序/副作用）+ 错误分类 + 重试策略 + 加权评分真实可达。轮测 `test/round-418-execution-wiring.test.js` **27/27**。VERSION bump 6.8.208→6.8.209，路由 1,341→1,343。 |
 | 6.8.208 | 2026-11-19 | **genetic_fallacy 第 131 维词源谬误族新增「推断式规范结论」句式族（r412，真升级②：已有维度的全新句式族，非样本扩容）** — 存量 r399 词源路由只收定义/规范直陈（才算/不配叫/是误用/违背本义），漏「所以现在……其实是在……」的推断形：探针实证 4 条攻击句中 2 条 gate=pass 穿引擎（「原本指贵妇人，所以说别人是 lady 就是在抬高对方」「本义是尺子，所以今天拿它当标准就是在偷换概念」）。`src/genetic-fallacy.js` 新增腿② `ETYM_NORM2_ZH`（三支：a 实是在裁定、b 本质裁定「说到底/本质上/骨子里/无非是」、c 立场裁定「就是在为……背书/站台/正名」＋ d 裸形「就是在＋裁定动词」分支——161 轮教训自查，首版漏两条缺裁定副词的推断句，补裸形分支后 6/6 全命中）与 `ETYM_NORM2_EN`，新增 `ETYM_HEDGE_ZH/EN` 反谬误对冲豁免组（词义会随时代演变/本义不等于当下用法）。路由判据双腿共现：腿①词源/本义标记 × 腿②推断式规范结论，META 豁免（评析话术本身）先于判定。轮测 `test/round-412-etymological-inference-norm.js` **45/45**（攻击 15 + 良性 10 + META 豁免 3 + 逐常量负例注入 6 组含 ZH/EN 双腿置空与对冲置空、META 置空承重验证 + 存量回归 4 + 共现纪律 3）。五门禁：verify 16/0、guard-abilities 20/20@272、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326（与基线 diff 零新增）。变体矩阵 gate 层攻击 6/6 非 pass 且 genetic_fallacy 承重（v1 裸名词/v2 带修饰/v3 倒装/v4 长句/v5 英文/v6 混合），良性 4/5 pass（b1「但词义会随时代演变」verify 经 stash 对照确认为存量维度 monocausal_attribution 既有基线误伤，非本轮引入）。方向轮换：r405–r411 连续 7 轮逻辑谬误轴后本轮转向证据充分性/幻觉检测方向，海外三层搜索（HN Algolia/Semantic Scholar/GitHub）无可用纯规则方案（UQLM 等均 LLM 依赖型，S2 空返），转内部缺口实证。上游 merge 4c29853b（agent-4 r411 dimension，false_dilemma 第65维新路由⑪）已并入。VERSION bump 6.8.207→6.8.208。 |

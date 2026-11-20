@@ -77,20 +77,20 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.210. Nothing here is copied
+Every number below was measured on this repository at v6.8.211. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.210 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.211 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
 | Modules registered | 167 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,363 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 273 | `dimMap` keys in `src/index.js` |
-|| MCP tools | 195 | tool definitions exposed via `tools/list` |
-|| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424 straw_man 扩族（+19 断言）与本地掉线产出 SelfVerifier 接线（+8 断言）合流；failed 净增 2 = round-423-inference-chain-wiring + round-424-straw-man-necessity-negation 两项 run-all 解析缺口，存量非接线引入）|
+| MCP tools | 195 | tool definitions exposed via `tools/list` |
+| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424 straw_man 扩族（+19 断言）与本地掉线产出 SelfVerifier 接线（+8 断言）合流；failed 净增 2 = round-423-inference-chain-wiring + round-424-straw-man-necessity-negation 两项 run-all 解析缺口，存量非接线引入）|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
