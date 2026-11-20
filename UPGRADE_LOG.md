@@ -1,3 +1,24 @@
+## r424 — 接线复活轮：SelfVerifier 推理交叉验证器接入路由与 MCP（真升级③，v6.8.211）
+
+- **轮次性质**：真升级③（接线一个已加载但从未 dispatch 的能力）。延续 r421 `calibration_mismatch`（第 273 维度，不确定性量化轴）与 r423 `inferenceChain`/`causalInference`（因果与反事实推理轴）所在的「自我验证与纠错」轴线。
+- **来源**：内部路径。阶段 1 三层外部搜索均无可用结果——HN Algolia（`self-verification reasoning`）唯一命中为无关项目 `asklokesh/claudeskill-loki-mode`（3 points）；Semantic Scholar 两次查询第二次返回空响应（`total: undefined data: 0`，疑限流）；GitHub API（`self verification reasoning logic`）无高星纯规则方案。心虫自身已有 341 行 v5.17.12 实现且含 4 项规则检查，内部质量高于外部移植候选，故走内部路径。
+- **撞墙检测修正目标**：交接建议的下一目标 `confidenceCalibrator` 经运行时探针证实**已完工**——`confidence` 前缀已有 26 条路由（r421 同域闭环由前序轮完成）。改攻运行时零 dispatch 的 `selfVerifier`（`cognitiveProtocol`/`errorHandler` 同为 0 条，留待后续轮次轮换）。
+- **实现内容**：
+  - `src/core/heartflow.js`（L1791 已有实例 `this.verify = new SelfVerifier(...)` 一直存活但从未挂载）——r424 在其后新增注册块，把 SelfVerifier 实例接入 `_modules`，路由由 `engine-dispatcher.js` 从 `_modules` 原型链公开方法自动生成，**不手写 `ALLOWED_ROUTES`**（排除 `_` 前缀私有方法）。
+  - `src/mcp-server.js`——新增 `handleSelfVerifierTool`（暴露 `verify(reasoning, conclusion)` / `getStats` / `getRecentIssues`，复刻 r423 `handleInferenceChainTool` 三段式范式），HANDLERS 表新增 `heartflow_self_verifier: handleSelfVerifierTool`。纯只读无写操作，不做权限收口。
+  - `src/mcp/tools-registry.js`——新增 `heartflow_self_verifier` 工具定义（name/description/inputSchema），MCP 客户端可发现与调用。
+  - `test/round-424-self-verifier-wiring.test.js`（新增，8 个用例）——固化防回归：实例非 null 且 `_modules.selfVerifier === hf.verify`、3 条公开路由自动生成且可 dispatch、MCP 三处同步（HANDLERS + 工具函数 + tools-registry）、四项检查逐常量承重（reverseConsistency/logicalChain/counterfactual/coverageCheck 各一个攻击族用例）、良性样本 5 条全绿、中英双语攻击族命中。
+- **验证数据**：
+  - 五门禁：`bin/verify.js` **16 passed / 0 failed**；`guard-abilities.js` **20/20**（维度 273 不变）；`doc-numbers-accuracy.test.js` **24/24**（同步 README/SKILL/AGENTS 三处数字：MCP tools 194→195、modules 166→167、routes 1360→1363）；`bidirectional-guard.js` **召回 52/52（100%）、误拦 302/326（92.6%）——与基线完全一致，零退化**。
+  - 路由实证：改前 `selfVerifier` 前缀 **0 条路由**；改后 **3 条公开路由**（`selfVerifier.verify` / `selfVerifier.getStats` / `selfVerifier.getRecentIssues`），总路由 1360→1363。dispatch 实测 `verify('因为今天下雨了，路上堵车，开会要迟到，所以我没来。','下雨导致会议取消')` 真实返回 `{passed:false, checks:{reverseConsistency:false, logicalChain:true, counterfactual:false, coverageCheck:true}, issues:['结论与推理逻辑不匹配','未考虑替代推理路径'], confidence:0.5, authenticity:0.6}`；`getStats` 真实返回 `{totalVerified:7472, passes:23, fails:7449, passRate:0.0031, recentIssueCount:20}`。
+  - 变体矩阵（测试内 8/8 全绿）：攻击族 4 腿各 1 + 中英双语 2 + 良性 5 + 接线 3。真实探针记录（`/tmp/hf-scout/r424-probe*.js`）确认每个断言对应模块真实返回，无篡改断言适配。
+- **已知边界（如实记录，非本轮引入，均为 v5.17.12 旧实现词表边界）**：
+  1. `coverageCheck` 对「纯粹是因为/单纯因为」这类中文单因过度归因**恒 true**——其腿是「出现『因为/由于/because』或长度≥5 即判已覆盖」，不识别「纯粹是因为」的排他语气。修它属新句式族增强，是下一轮真升级候选。
+  2. `counterfactual` 对无条件词/限定词/替代词（如果/除非/可能/也许/大概/if/unless/maybe/otherwise/else…）的正常陈述句**恒 false`，会把不含限定词的正常陈述判为「未考虑替代路径」；且 `nothing else` 中的 `\belse\b` 会被当作显式替代词而误放行。
+  3. `reverseConsistency` 在推理含蕴含词（因为/由于/since/because…）时，要求结论至少有一个 ≥2 字中文词（或 ≥3 字母英文词）在推理中出现，否则判「结论与推理逻辑不匹配」——结论换述（如推理说「复现了该效应」、结论说「该结果可能真实」）会被误判。
+  4. 四项检查均为字符串词表级启发式，非语义推理；`logicalChain` 仅识别显式假设词（理所当然/assume/显然…）且要求全文无连接词，覆盖窄。
+- **下轮可继续**：① 上述边界 1（coverageCheck 中文单因族）与边界 2（counterfactual 条件词表 + else 误伤）是**新句式族增强**的真升级候选，贴合「自我验证与纠错」轴；② `cognitiveProtocol` / `errorHandler` 仍为 0 条路由（`error.*` 11 条属 self-healing，非 errorHandler），是下一接线轮候选。
+
 ## r423 — 离线恢复固化轮：inferenceChain + causalInference 两模块接线复活（真升级③，v6.8.210 不变）
 
 - **轮次性质**：真升级③（新门禁/护栏不适用——本轮是**接线复活**：两个已存在、能力完整、加载多年的模块此前一条路由也 dispatch 不到）。无新判别维度、无新族，dimMap 键数不变 273，VERSION 6.8.210 不变。

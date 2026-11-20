@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C452%20passing-brightgreen)](test/)
-[![MCP tools](https://img.shields.io/badge/MCP%20tools-194-blue.svg)](#mcp-server)
+[![MCP tools](https://img.shields.io/badge/MCP%20tools-195-blue.svg)](#mcp-server)
 [![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-273-blueviolet.svg)](#what-it-catches-273-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-273 discrimination dimensions  ×  11-layer pipeline  ×  166 modules  ×  194 MCP tools
-×  1,360 dispatch routes  ×  25,471 passing tests  ×  2 npm dependencies
+273 discrimination dimensions  ×  11-layer pipeline  ×  167 modules  ×  195 MCP tools
+×  1,363 dispatch routes  ×  25,479 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -171,7 +171,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 166 modules)
+### Capability domains (7 domains, 167 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -208,12 +208,12 @@ Measured on this repository at **v6.8.210**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 166 |
+| Modules registered | 167 |
 | Module init errors | 0 |
-| Dispatch routes | 1,360 |
+| Dispatch routes | 1,363 |
 | Discrimination dimensions | 273 |
-| MCP tools | 194 |
-| Test suite | 25,471 passing / 230 failing | `node test/run-all.js`（r424 全量实测 25,471/230/25,701（861 文件，data/test-count.json @ 2026-11-20T06:49:41Z）——本轮为 straw_man 第 138 维「存在必要性否定形」措辞家族接线（真升级②：既有维度扩族，`src/index.js` 零改动、dimMap 键数 273 不变、VERSION 不 bump 6.8.210）；较 r421 rebase 收尾基线 25,452/229/25,681（859 文件）：**passed +19 = 本轮轮测 `round-424-straw-man-necessity-negation.test.js` 19 断言全过**（该文件首跑因文件名缺 `.test.js` 后缀、不被 run-all 的 `collectTestFiles` 收集而零执行，已改名后重跑取证）；**failed 229→230 的唯一增量是 `round-423-inference-chain-wiring.test.js`**——存量问题：该文件用 Node 内置 `node:test`（TAP 输出），run-all 解析正则只认中文/英文汇总行，5 条断言不计入覆盖且按 1 个失败计入，修复决策交 1 号；**文件级硬失败清单净增 1 = round-423 该项，清单内零 straw_man/round-424 相关文件**，两跑逐项 diff 实录 coordination/agent4/probes/r424-runall2.log）|
+|| MCP tools | 195 | tool definitions exposed via `tools/list` |
+|| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424（straw_man 存在必要性否定形，+19 断言）与本地掉线产出 r424 SelfVerifier 接线（+8 断言，test/round-424-self-verifier-wiring.test.js）合流；failed 净增 2 = round-423-inference-chain-wiring.test.js（node:test TAP 不可解析，存量）+ round-424-straw-man-necessity-negation.test.js 单文件硬失败项，根因均为 run-all 解析缺口非接线引入，修复决策交 1 号）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |

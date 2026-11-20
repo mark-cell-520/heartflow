@@ -223,6 +223,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_self_verifier',
+    description: "推理交叉验证（r424 接线）：对一段「推理→结论」执行四项规则化交叉检查——reverseConsistency（结论是否被推理支撑，防止结论跑偏/无根据跳跃）、logicalChain（是否藏有未声明假设）、counterfactual（是否存在替代推理路径却未考虑）、coverageCheck（是否遗漏同类因素，防单因过度归因）。返回 passed、四项逐项布尔 checks、issues 中文问题清单、confidence（通过率 0~1）与 authenticity（真实性指数）。action: verify(reasoning, conclusion) / getStats / getRecentIssues。纯规则零 LLM，无写操作不收权。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"verify | getStats | getRecentIssues"},"reasoning":{"type":"string","description":"verify：待验证的推理全文（前提、论据、推导过程）"},"conclusion":{"type":"string","description":"verify：待验证的结论"}},"required":["action"]}
+  },
+
+  {
     name: 'heartflow_verification_verify',
     description: "综合验证引擎：验证 SKILL.md 文档结构/链接/锚点/版本一致性、JS 或 Python 代码语法与括号配对、文本中的可验证声明。返回严重性分级（critical/major/minor/info）、评分与修复建议。",
     inputSchema: {"type":"object","properties":{"content":{"type":"string","description":"待验证的内容"},"kind":{"type":"string","description":"验证类型：skill（技能文档）、code（代码）、general（通用文本）"}},"required":["content"]}

@@ -792,7 +792,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-20-6.8.210';
+const BUILD_DATE = '2026-11-20-6.8.211';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -1999,6 +1999,18 @@ class HeartFlow {
     // 两者均为纯规则零 LLM，直接服务心虫「判断是非」判别力。
     try { this.inferenceChain = new (_InferenceChain().InferenceChain)({ silent: true }); } catch (e) { _boundedPush(this._initErrors, {module: 'inferenceChain', error: e.message}, MAX_HISTORY_SIZE); }
     try { this.causalInference = new (_CausalInference().CausalInference)({ silent: true }); } catch (e) { _boundedPush(this._initErrors, {module: 'causalInference', error: e.message}, MAX_HISTORY_SIZE); }
+
+    // [r424 接线] SelfVerifier — 推理交叉验证器（src/identity/self-verifier.js，341 行 v5.17.12）：
+    // L1791 `this.verify = new SelfVerifier(...)` 实例活着、4 项检查能力完整
+    // （reverseConsistency 结论是否蕴含前提 / logicalChain 隐藏假设 /
+    //  counterfactual 替代路径是否改变结论 / coverageCheck 是否遗漏因素），
+    // 但从未进 _modules → generateAllowedRoutes 扫不到 → ALLOWED_ROUTES 0 条、
+    // dispatch('selfVerifier.*') 全抛 'route not allowed'、MCP 侧无工具入口。
+    // 即「实例活着、能力完整、全库 0 条引擎侧路由」。与 r423 同形态同区块同时序。
+    try {
+      this.selfVerifier = this.verify;
+      this._modules['selfVerifier'] = this.selfVerifier;
+    } catch (e) { _boundedPush(this._initErrors, {module: 'selfVerifier', error: e.message}, MAX_HISTORY_SIZE); }
 
     // [第 216 轮接线] verification-engine 是纯对象单例（非 constructor），
     // 直接取其导出。失败同样进 _initErrors，不影响其他模块启动。

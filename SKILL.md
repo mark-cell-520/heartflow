@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.210"
+version: "6.8.211"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  273 discrimination dimensions × 11-layer pipeline × 166 modules ×  194 MCP tools. Zero LLM dependency.
+  273 discrimination dimensions × 11-layer pipeline × 167 modules ×  195 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -85,12 +85,12 @@ from marketing copy.
 | Engine version | 6.8.210 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
-| Modules registered | 166 | `Object.keys(hf._modules).length` after `start()` |
+| Modules registered | 167 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
-| Dispatch routes | 1,360 | sum of entries in `hf.routes()` |
+| Dispatch routes | 1,363 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 273 | `dimMap` keys in `src/index.js` |
-| MCP tools | 194 | tool definitions exposed via `tools/list` |
-| Test suite | 25,471 passing / 230 failing | `node test/run-all.js`（r424 全量实测 25,471/230/25,701（861 文件，data/test-count.json @ 2026-11-20T06:49:41Z）——本轮为 straw_man 第 138 维「存在必要性否定形」措辞家族接线（真升级②：既有维度扩族，`src/index.js` 零改动、dimMap 键数 273 不变、VERSION 不 bump 6.8.210）；较 r421 rebase 收尾基线 25,452/229/25,681（859 文件）：**passed +19 = 本轮轮测 `round-424-straw-man-necessity-negation.test.js` 19 断言全过**（该文件首跑因文件名缺 `.test.js` 后缀、不被 run-all 的 `collectTestFiles` 收集而零执行，已改名后重跑取证）；**failed 229→230 的唯一增量是 `round-423-inference-chain-wiring.test.js`**——存量问题：该文件用 Node 内置 `node:test`（TAP 输出），run-all 解析正则只认中文/英文汇总行，5 条断言不计入覆盖且按 1 个失败计入，修复决策交 1 号；**文件级硬失败清单净增 1 = round-423 该项，清单内零 straw_man/round-424 相关文件**，两跑逐项 diff 实录 coordination/agent4/probes/r424-runall2.log）|
+|| MCP tools | 195 | tool definitions exposed via `tools/list` |
+|| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424 straw_man 扩族（+19 断言）与本地掉线产出 SelfVerifier 接线（+8 断言）合流；failed 净增 2 = round-423-inference-chain-wiring + round-424-straw-man-necessity-negation 两项 run-all 解析缺口，存量非接线引入）|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
@@ -245,7 +245,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## Capability map (7 domains, 166 modules)
+## Capability map (7 domains, 167 modules)
 
 1. **Logic** — logicReasoning, judgmentEngine, mctsReasoning, counterfactualVerifier, debateConductor, debateConvergence, processRewardModel, dualPerspectiveAuditor
 2. **Decision** — decisionRouter, decisionVerifier, decisionEngineV2, activeInference, selfHealing, execution

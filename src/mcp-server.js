@@ -3251,9 +3251,36 @@ function handleExecutionVerifyTool(args) {
        case 'getStats': return safeDispatch(R + 'getStats');
        case 'clear': return safeDispatch(R + 'clear');
        default: return { error: `未知 action: ${action}` };
-     }
-   } catch (err) { return { error: err.message }; }
- }
+       }
+       } catch (err) { return { error: err.message }; }
+       }
+
+       /** [r424 接线] 推理交叉验证工具：暴露 SelfVerifier（src/identity/self-verifier.js，341 行）
+       * 的 verify/getStats/getRecentIssues 三个公开方法。
+       * 与 r423 同形态：L1791 `this.verify = new SelfVerifier(...)` 实例活着、4 项检查能力完整
+       * （reverseConsistency 结论是否蕴含前提 / logicalChain 隐藏假设 /
+       *  counterfactual 替代路径是否改变结论 / coverageCheck 是否遗漏因素），
+       * 但从未进 _modules → 路由零命中、dispatch 全抛 'route not allowed'、MCP 侧无工具入口。
+       * 本工具是心虫「自我验证与纠错」轴的首个对外入口：调用方给一段 reasoning + conclusion，
+       * 引擎返回四项逐项布尔、issues 清单、confidence（通过率）与 authenticity（真实性指数）。
+       * 纯规则零 LLM，无写操作（仅 _persist 自身统计文件），不需要权限收口。 */
+       function handleSelfVerifierTool(args) {
+       const { action, reasoning, conclusion } = args || {};
+       if (!action) return { error: 'action 是必填参数（verify|getStats|getRecentIssues）' };
+       const R = 'selfVerifier.';
+       try {
+       switch (action) {
+       case 'verify': {
+         if (typeof reasoning !== 'string' || !reasoning) return { error: 'reasoning 是必填参数（待验证的推理全文）' };
+         if (typeof conclusion !== 'string' || !conclusion) return { error: 'conclusion 是必填参数（待验证的结论）' };
+         return safeDispatch(R + 'verify', reasoning, conclusion);
+       }
+       case 'getStats': return safeDispatch(R + 'getStats');
+       case 'getRecentIssues': return safeDispatch(R + 'getRecentIssues');
+       default: return { error: `未知 action: ${action}（应为 verify|getStats|getRecentIssues）` };
+       }
+       } catch (err) { return { error: err.message }; }
+       }
 
  /** [第 216 轮] 综合验证引擎（verification-engine 接线）
  * 注意：与 handleExecutionVerifyTool 是两回事 —— 那个走 dispatch('execution.verify')
@@ -3487,6 +3514,7 @@ const HANDLERS = {
   heartflow_execution_verify: handleExecutionVerifyTool,
   heartflow_inference_chain: handleInferenceChainTool,
   heartflow_causal_inference: handleCausalInferenceTool,
+  heartflow_self_verifier: handleSelfVerifierTool,
   heartflow_verification_verify: handleVerificationVerifyTool,
   heartflow_formula_bridge: handleFormulaBridge,
   heartflow_formula_calc: handleFormulaCalc,
