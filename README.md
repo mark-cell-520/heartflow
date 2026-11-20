@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 273 discrimination dimensions  ×  11-layer pipeline  ×  166 modules  ×  194 MCP tools
-×  1,360 dispatch routes  ×  25,452 passing tests  ×  2 npm dependencies
+×  1,360 dispatch routes  ×  25,471 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.210**. Not marketing copy.
 | Dispatch routes | 1,360 |
 | Discrimination dimensions | 273 |
 | MCP tools | 194 |
-| Test suite | 25,452 passing / 229 failing | `node test/run-all.js`（r421 rebase 收尾轮全量实测 25,452/229/25,681（859 文件，data/test-count.json @ 2026-11-20T04:34:11Z）——本轮把 r421 五链 rebase 叠上远端 r422 第 274 维 calibration_mismatch 接线（VERSION 6.8.210，859 = 858 + r422 轮测文件 1 个）；较 rebase 前 25,437/232/25,669（858 文件）：passed +15 / failed -3 / total +12——total +12 = +12 r422 轮测 round-421-calibration-mismatch.test.js（12 断言全过，单跑复验 12/12）；passed +15 与 failed -3 的余量为 MCP 服务类抖动文件两次回归间的净变化（run-all 设计注释即注明 reported totals used to vary between runs）；**文件级硬失败清单较 rebase 前 +1（ai-writing-tell.test.js）**——根因：calibration_mismatch 以 severity 55 占据 findings[0]，把 ai_writing_tell（severity 44）挤至第 1 位，该测试断言 findings[0].dimension==='ai_writing_tell' 翻红（实证 coordination/agent4/probes/r421-probe-aiwt-order.output.txt；系 rebase 并入 r422 接线的真实行为变化，非 special_pleading 本族引入，修复决策交 1 号/属主）；零文件转绿；存量 round-363/364/366 claims 格式红（r420 sync 把紧凑形 `{"round":"r363"…}` 重写为空格形，git 取证 7c16911→4c0026f，非本轮引入）等 152 项不动；清单内零 special_pleading/round-421-self-first 相关文件，比对实录 coordination/agent4/r421-rebase-runall.log）|
+| Test suite | 25,471 passing / 230 failing | `node test/run-all.js`（r424 全量实测 25,471/230/25,701（861 文件，data/test-count.json @ 2026-11-20T06:49:41Z）——本轮为 straw_man 第 138 维「存在必要性否定形」措辞家族接线（真升级②：既有维度扩族，`src/index.js` 零改动、dimMap 键数 273 不变、VERSION 不 bump 6.8.210）；较 r421 rebase 收尾基线 25,452/229/25,681（859 文件）：**passed +19 = 本轮轮测 `round-424-straw-man-necessity-negation.test.js` 19 断言全过**（该文件首跑因文件名缺 `.test.js` 后缀、不被 run-all 的 `collectTestFiles` 收集而零执行，已改名后重跑取证）；**failed 229→230 的唯一增量是 `round-423-inference-chain-wiring.test.js`**——存量问题：该文件用 Node 内置 `node:test`（TAP 输出），run-all 解析正则只认中文/英文汇总行，5 条断言不计入覆盖且按 1 个失败计入，修复决策交 1 号；**文件级硬失败清单净增 1 = round-423 该项，清单内零 straw_man/round-424 相关文件**，两跑逐项 diff 实录 coordination/agent4/probes/r424-runall2.log）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
