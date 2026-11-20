@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,363 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 273 | `dimMap` keys in `src/index.js` |
 | MCP tools | 195 | tool definitions exposed via `tools/list` |
-| Test suite | 25,518 passing / 232 failing | `node test/run-all.js`（r428 全量实测 25,518/232/25,750（865 文件）——较 r426 终值基线 passed +26 其中 23 为本轮 23 条断言、另 3 条为基线失败项波动恢复，failed -2 零新增；文件级硬失败清单 172 项与基线 170 项 diff 仅 +1：同步轮 186b32e 的 round-425-metric-gaming.test.js 在飞工作，非本轮引入）|
+| Test suite | 25,536 passing / 232 failing | `node test/run-all.js`（r429 全量实测 25,536/232/25,768（866 文件）——较 r428 终值基线 passed +18 全部为本轮 18 条断言组、failed 零新增；文件级硬失败清单 172 项与基线逐项相同零退化）|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |

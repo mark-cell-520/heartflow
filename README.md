@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 273 discrimination dimensions  ×  11-layer pipeline  ×  167 modules  ×  195 MCP tools
-×  1,363 dispatch routes  ×  25,518 passing tests  ×  2 npm dependencies
+×  1,363 dispatch routes  ×  25,536 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.211**. Not marketing copy.
 | Dispatch routes | 1,363 |
 | Discrimination dimensions | 273 |
 | MCP tools | 195 | tool definitions exposed via `tools/list` |
-| Test suite | 25,518 passing / 232 failing | `node test/run-all.js`（r428 全量实测 25,518/232/25,750（865 文件）——较 r426 终值基线（863 文件 25,492/234/25,726）passed +26 其中 23 为本轮 test/round-428-broken-window-no-break-no-build.test.js 的 23 条断言、另 3 条为基线失败项的波动恢复，failed -2 零新增；文件级硬失败清单 172 项与本轮开工基线 170 项 diff 仅 +1：同步轮 186b32e 的 test/round-425-metric-gaming.test.js（在飞工作，其接线/VERSION/文档提交未到，非本轮引入））|
+| Test suite | 25,536 passing / 232 failing | `node test/run-all.js`（r429 全量实测 25,536/232/25,768（866 文件）——较 r428 终值基线（865 文件 25,518/232/25,750）passed +18 全部为本轮 test/round-429-opportunity-cost-wait-free-ride.test.js 的 18 条断言组、failed 零新增；文件级硬失败清单 172 项与基线逐项相同零退化）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
