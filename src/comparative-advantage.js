@@ -83,16 +83,77 @@ const ADV_ZH_F4 = /每[^。！？，；]{0,4}(?:一项|个|件|方面|道|步|�
 // ADV5 效率/生产率领先形：效率/生产率/产能/技术/工艺 + (都/全/远/显著/明显) + 高于/领先/更高/占优
 const ADV_ZH_F5 = /(?:效率|生产率|产能|技术|工艺|水平|机械化)[^。！？，；]{0,6}(?:都|全|远|显著|明显|全面)?[^。！？，；]{0,4}(?:高于|优于|领先|更高|占优|更强|更先进)/;
 
-// EN 腿①五形。
-const ADV_EN_F1 = /\b(?:produces?|makes?|manufactures?|grows?|builds?)\s+(?:both|all|every)\b[^.]{0,60}\bmore\s+efficien\w+/i;
+// ADV6 全面劣势形：所有/每一项/一切 + 商品/产品/任务/方面/环节 + (都/全/均) + 低于/劣于/不如/落后于/逊于/差于
+// （r426 新增族：优势前提的反向形——现有 ADV1-5 只收「高于/优于/领先」，
+// 「在所有商品的生产效率都低于别国」整族此前漏判，是 161 轮裸名词教训的
+// 同族镜像：只收一种极性。）
+// r430：属性名词窗 0,10 → 0,16（「每一项工业品的成本都高于我们」类
+// 「量词+名词+的+属性+都+极性」形，中间层「工业品的成本」6 字+都 1 字+
+// 极性前缓冲，原窗 10 吃不下；放宽后仍不收裸名词形如「产品价格下降」）。
+// r431：补「技术/工艺/服务/项目/业务」入名词表（「各方面的技术都落后于海外」
+// ——「技术」不在原表，腿①零命中；属性名词窗同步 0,16 吃「的技术」3字）。
+// r431 续：全称量词补「各方面/哪方面/事事」（「各方面的技术都落后于海外」的
+// 「各方面」原只在 ADV7 分支词表中，ADV6 前缀不收）。
+const ADV_ZH_F6 = /(?:所有|每一项|每样|各项|一切|任何|随便每一|无一|各方面|哪方面|处处)[^。！？，；]{0,12}(?:商品|产品|任务|方面|领域|环节|工序|零件|工作|指标|门类|品类|产线|技术|工艺|服务|项目|业务)[^。！？，；]{0,16}(?:都|全|均)[^。！？，；]{0,8}(?:低于|劣于|不如|落后于|逊于|差于)/;
+// ADV7 都比X差形：每一项/什么都/各方面都 + 比…差/弱/不如/逊/糟
+// r431：量词表补「每一件/每个/每条/每一类/任意一种/随便一件」（原表只有
+// 「每一项/每样/各项/所有/全部/任何」——「每一件产品都比国外同类差一截」
+// 的「每一件」不在表，腿①零命中）。
+const ADV_ZH_F7 = /(?:每一项|每一件|每一样|每样|每一项|各项|每一个|每个|每一条|每条|每一类|每一款|所有|全部|任何|任意一种)[^。！？，；]{0,10}(?:都|全)?[^。！？，；]{0,6}(?:比)[^。！？，；]{0,14}(?:差|弱|糟|不如|逊)|(?:什么都|干啥都|哪方面都|各方面都|处处都|件件都|个个都)[^。！？，；]{0,8}(?:比)[^。！？，；]{0,12}(?:差|弱|不如|逊|糟)/;
+// ADV8 成本劣势形（ZH，r430）：量词/全称 + 成本/价格/费用/支出 + (都/全/均) + 高于/更贵/贵于/超过
+// （r426 ADV6 的漏判补充：「每一项工业品的成本都高于我们」——「工业品」「成本」
+// 均不在 ADV6 名词表、且「高于」不在其极性表。此形经济含义明确：成本更高=竞争劣势，
+// 与「销量/产量更高」的优势形不混——只用成本类名词锚，不用裸名词。
+// r430 补：劳动力/人工/工时/工资类名词（「劳动力成本都高于国内」）+ 高出 X 形；
+// 量词放宽为「每+单字量词」（每项/每类/每件），不再限死「每一项」；
+// 主语代词形（他们/我们/对方 + 成本类名词 + 都高于/更贵），不限死量词。)
+const ADV_ZH_F8 = /(?:每[一某每各]?[项种类件条部个面环节步骤]|各类|各项|每一类)[^。！？，；]{0,14}(?:成本|价格|费用|支出|开销|造价|投入|工资|薪资|工时|人工|劳动力|花销)[^。！？，；]{0,8}(?:都|全|均|也|还)[^。！？，；]{0,6}(?:高于|贵于|更贵|超过|高出|胜出)|(?:所有|全部|任何|随便|无一)[^。！？，；]{0,14}(?:成本|价格|费用|支出|开销|造价|投入|工资|薪资|工时|人工|劳动力|花销)[^。！？，；]{0,8}(?:都|全|均|也|还)[^。！？，；]{0,6}(?:高于|贵于|更贵|超过|高出|胜出)|(?:他们|她们|它们|我们|对方|对手|别国|外国|海外|国外)[^。！？，；]{0,10}(?:成本|价格|费用|支出|工资|薪资|工时|人工|劳动力|开销)[^。！？，；]{0,6}(?:都|全|均|也|还)[^。！？，；]{0,4}(?:高于|贵于|更贵|超过|高出)/;
+
+// ADV9 无一项/没有一样 全称劣势形（ZH，r431 新增族）：
+// 「(没有|没|无) + 任何/哪/一样/一项 + 经济名词 + 比/比得上/能比 + 极性」。
+// ADV1-8 只收「更好/更快/更便宜/成本更高」等极性前置或成本名词形，
+// 「没有任何一项产品比我们有优势」「没有一样东西比得上我们」这类
+// **否定全称 + 极性后置**的族整句零命中（r431 探针实证：
+// L1「小国没有任何一项产品比我们有优势」在 ADV1-8 全部 blasting 下仍 MISS，
+// 根因是无常量命中其前半句）。本族是全新句式族，不是旧族样本扩充。
+// 名词表只收经济/生产语义名词（产品/商品/货物/产出/服务/工艺/工种/技术/业务/东西/活儿），
+// 不收「政策/指标/方面」等泛名词（防「没有一项政策比B国宽松」类良性误报）。
+const ADV_ZH_F9 = /(?:没有|没|无)(?:任何|哪|一样|哪样|一项|哪项|一件)?[^。！？，；]{0,10}(?:产品|商品|货物|产出|服务|产能|工艺|工序|任务|环节|工种|技术|岗位|业务|东西)[^。！？，；]{0,16}(?:比得上|比得过|能比|能和|能与|可比|胜不过|比不了)[^。！？，；]{0,10}|(?:没有|没|无)(?:任何|哪|一样|哪样|一项|哪项|一件)?[^。！？，；]{0,10}(?:产品|商品|货物|产出|服务|产能|工艺|工序|任务|环节|工种|技术|岗位|业务|东西)[^。！？，；]{0,10}(?:比)[^。！？，；]{0,14}(?:好|强|优|厉害|领先|快|便宜|高|胜过|超过|竞争力|差|弱|逊|逊色|高明|出色|漂亮|利索)|(?:没有|没|无)(?:任何|哪|一样|哪样|一项|哪项|一件)?[^。！？，；]{0,12}(?:干得|做得|种得|造得|搞得|办得|生产得|研发得)[^。！？，；]{0,8}(?:好|强|优|快|便宜|高明|出色|漂亮|利索|棒|慢|差|糟|烂|逊)|任何一件[^。！？，；]{0,12}(?:都)?(?:胜不过|比不过|比不上|比不了)|(?:没有|没|无)(?:任何|哪|一样|哪样|一项|哪项|一件)?[^。！？，；]{0,6}(?:方面|领域|环节|维度|行业)[^。！？，；]{0,8}(?:比)[^。！？，；]{0,12}(?:强|优|厉害|领先|胜过|超过|好|差|弱|逊)|(?:没有|没|无)(?:任何|哪|一样|哪样|一项|哪项|一件)?[^。！？，；]{0,6}(?:工艺|手艺|技法|做工)[^。！？，；]{0,8}(?:比)[^。！？，；]{0,12}(?:成熟|精湛|地道|精良|过硬|扎实)|(?:没有|没|无)(?:任何|哪|一样|哪样|一项|哪项|一件)?[^。！？，；]{0,4}(?:活|活儿)[^。！？，；]{0,6}(?:比)[^。！？，；]{0,14}(?:细致|精心|漂亮|快|好|利索|地道|扎实)/;
+
+// EN 腿①六形。
+// r431 修复：原 `(?:both|all|every)\b` 的 `\b` 使 `everything/everything else` 匹配失败
+// （`every` 后跟 `thing` 时 `\b` 不成立）——「We produce everything more efficiently」
+// 整族漏判。改为 `\w*` 吃 everything/everything else；后半段 more efficien 保留不变，
+// 防「we produce everything locally」类裸产出形误伤。
+const ADV_EN_F1 = /\b(?:produces?|makes?|manufactures?|grows?|builds?)\s+(?:both|all|every)\w*[^.]{0,60}\bmore\s+efficien\w+/i;
 const ADV_EN_F2 = /\bmore\s+efficien\w+\s+(?:at|in)\s+(?:everything|all|both|every|anything)\b/i;
 const ADV_EN_F3 = /\b(?:better|faster|cheaper|stronger|more\s+productive)\s+at\s+(?:everything|all|every|anything)\b/i;
 const ADV_EN_F4 = /\babsolute\s+advantage\s+in\s+(?:all|both|every)\b|\b(?:outproduces?|outperforms?|beats?)\b[^.]{0,40}\bin\s+(?:every|all)\b/i;
 const ADV_EN_F5 = /\bfaster\s+at\s+every\s+task\b|\b(?:every|each)\s+task\b[^.]{0,30}\b(?:faster|better|quicker)\s+than\b|\bno\s+(?:one|competitor|rival|country|firm|company|other\s+\w+)\s+can\s+(?:match|beat|outperform|rival)\s+(?:us|our\s+\w+)\s+in\s+(?:anything|everything)\b/i;
+// ADV6 全面劣势形（EN）：worse/less efficient/less productive + at everything/all/anything/both
+// （r426 新增族：ADV_EN_F1-F5 只收 better/faster/more efficient 极性，
+// 「worse at everything」整族此前零命中——同 161 轮裸名词教训的反极性镜像。）
+const ADV_EN_F6 = /\b(?:worse|weaker|slower|inferior|less\s+efficien\w*|less\s+productive)\s+at\s+(?:everything|every\s+\w+|all\s+\w*|anything|both)\b/i;
+// ADV7 than X at everything 形（EN）：worse than … at/in/on everything/every/all/anything/both
+const ADV_EN_F7 = /\b(?:worse|weaker|slower|inferior|less\s+efficien\w*|less\s+productive)\s+than\b[^.]{0,50}\b(?:at|in|on)\s+(?:everything|every|all|anything|both)\b/i;
+// ADV8 成本劣势形（EN，r430）：成本/价格 + higher/more expensive than
+// r431 补：「costs/cost + more than」形（原只收 higher/more expensive + than，
+// 「Every product costs more than the import」整族漏判）+ beats/outperforms +
+// every/all rival(s)/competitor(s) 形（「Our plants beat every rival」——
+// F5 只收 no one can match 否定形，不收肯定 beat 形）。
+const ADV_EN_F8 = /\b(?:cost|costs|price|prices|wage|wages|expense|expenses|overhead)\b[^.]{0,40}\b(?:higher|greater|larger|more\s+expensive)\s+than\b|\b(?:higher|more\s+expensive|greater)\s+(?:cost|costs|price|prices|wage|wages)\s+than\b|\b(?:cost|costs|price|prices)\s+more\s+than\b|\b(?:beats?|outperforms?|outproduces?|tops?)\s+(?:every|all|each)\s+(?:rival|competitor|opponent|firm|company|player|producer|supplier)s?\b/i;
 
 // ─── 腿② NOGAIN 无获益结论在场 ───────────────────────────
 // NG1 没必要/无须/不必 + 贸易/交易/分工/合作/进口/外包/交换/专业化
-const NOGAIN_ZH_F1 = /(?:根本|完全)?(?:没必要|无须|不必|不需要|用不着|犯不着)[^。！？，；]{0,10}(?:贸易|交易|分工|合作|进口|外包|往来|交换|专业化|买卖)/;
+// NG1 没必要/无须/不必 + 贸易/交易/分工/合作/进口/外包/交换/专业化/买卖
+// r430 补「竞争/竞标/采购/合资/协作/联手」类名词（「没必要和他们竞争」：
+// 「竞争」不在原名词表，导致腿②零命中——r426 反极性族两腿共现时整句 pass。)
+// r431：情态词补插入变体——原表只有「没必要」连写形，文本高频形「没有必要」
+// （「所以没有必要和他们贸易」）因「有」字插入整句漏判。改为 `没?有必要?`
+// 结构同时吃 没必要/没有必要/有必要(否定由前缀「不/无须」承担)。
+// r431 续：补「外购/自产/自制/自给」类（「外购是更好的选择」「没必要自己生产」
+// ——「外购」「自己生产」均不在原名词表，腿②零命中导致双腿共现失败）。
+const NOGAIN_ZH_F1 = /(?:根本|完全|其实|说到底)?[^。！？，；]{0,2}(?:没?有?必要|无须|不必需|不需要|用不着|犯不着)[^。！？，；]{0,10}(?:贸易|交易|分工|合作|进口|外包|往来|交换|专业化|买卖|竞争|竞标|采购|合资|协作|联手|合伙|购买|外购|自产|自制|自给|自己生产|自己造)/;
 // NG2 毫无/没有 + 意义/价值/用处/益处/裨益；或 是(纯粹/单纯)浪费/白费/徒劳
 const NOGAIN_ZH_F2 = /(?:毫无|没有|全无|半点|缺乏)[^。！？，；]{0,6}(?:意义|价值|用处|益处|裨益|收益)|(?:纯粹|单纯|完全|根本)?[^。！？，；]{0,4}(?:是)?[^。！？，；]{0,2}(?:浪费|白费|徒劳|无用功|多此一举)/;
 // NG3 不划算/划不来；只会/注定/必然 + 吃亏/受损/更糟/不利；吃亏/无利可图/得不偿失
@@ -105,6 +166,32 @@ const NOGAIN_EN_F1 = /\bno\s+(?:way|reason|point|benefit|gain)\b[^.]{0,40}\b(?:t
 const NOGAIN_EN_F2 = /\b(?:trade|trading|specialization|specialisation|division\s+of\s+labor|division\s+of\s+labour|outsourcing|exchang\w+|cooperat\w+|import\w*|merger|integration)\b[^.]{0,50}\b(?:pointless|useless|a\s+waste|no\s+benefit|no\s+gain|cannot\s+benefit|can'?t\s+benefit|meaningless)\b/i;
 const NOGAIN_EN_F3 = /\b(?:only|just)\s+(?:makes?|leaves?|puts?)\b[^.]{0,30}\b(?:worse\s+off|lose|loser|harmed|hurt|at\s+a\s+disadvantage)\b|\bmakes?\s+\w+\s+worse\s+off\b|\bgains?\s+nothing\b|\bno\s+gain\s+from\b/i;
 const NOGAIN_EN_F4 = /\b(?:cannot|can'?t|unable\s+to|no\s+way\s+to)\s+(?:benefit|gain|profit)\b[^.]{0,30}\b(?:from|by)\b[^.]{0,20}\b(?:trad\w+|specializ\w+|exchang\w+|cooperat\w+)\b|\bpointless\s+to\s+(?:trade|specialize|specialise)\b/i;
+// NG5 劣势结论新族（ZH，r426）：没法/无法/不能/难以/无从/不得 + 获益/受益/得益/得到好处
+// （NG1-4 的获益腿要求「获益」紧跟情态词 6 字内，「没法从贸易中获益」因中间
+// 插入「从贸易中」整句漏判；同时收裸「获益/受益」名词形态。）
+// r430：获益名词窗 0,8 → 0,12，并补「得到/获得/拿到…收益/利益」形
+// （「进口国无从获得比较优势收益」：情态+「获得」2 字+「比较优势」4 字+
+// 「收益」，原窗 8 吃不下）。
+const NOGAIN_ZH_F5 = /(?:没法|无法|不能|难以|无从|不得|无从)[^。！？，；]{0,12}(?:获益|受益|得益|获利|好处|收益|利益)/;
+// NG6 得不到/换不来 + 任何好处族（ZH，r431 新增族）：
+// NG1-5 的情态腿只收「没法/无法/不能/难以/无从 + 获益」与「没/毫无 + 好处」，
+// 「贸易对他们来说得不到任何好处」「谈判换不来任何好处」「获得不了任何利益」
+// 这类**动词+不了/不到+任何+好处**的族整句零命中（r431 探针实证：
+// NOGAIN_ZH_F5 对「得不到任何好处」形式返回 false，NEG/HEDGE 守卫亦不拦）。
+// 本族是全新句式族：动词短语 + 补语任何 + 获益名词。
+const NOGAIN_ZH_F6 = /(?:得不到|换不来|获得不了|带来不了|争不来|挣不来|谋不到|捞不到|换得回|换不回)[^。！？，；]{0,6}(?:任何|一点|半点)?[^。！？，；]{0,4}(?:好处|益处|裨益|利益|收益|实惠|便宜)/;
+// NG7 谈不上/称不上/谈不上任何 + 收益族（ZH，r431 新增族）：
+// 「这种分工合作谈不上什么收益」「进口谈不上任何益处」——NG1-6 都不收
+// 「谈不上」系动词形。这是独立句式族（系词否定 + 获益名词）。
+const NOGAIN_ZH_F7 = /(?:谈不上|称不上|算不上|谈不上任何|并无|没有)[^。！？，；]{0,6}(?:什么|任何|半点)?[^。！？，；]{0,4}(?:收益|益处|裨益|好处|利益|实惠|价值|意义)/;
+// NG8 「X 是更好的选择」替代形（ZH，r431 新增族）：
+// 「外购是更好的选择」「自产才是更好的选择」——NG1 只收「没必要+外购」，
+// 这种**正面推荐替代方案**形（is the better choice）零命中。经济含义：
+// 主张用外部替代 = 否定现有分工/自产的价值。
+const NOGAIN_ZH_F8 = /(?:外购|外采|外判|自产|自制|自给|进口|外包|代工|自己生产|自己造|向外采购)[^。！？，；]{0,6}(?:才是|方为|是|应是|最好是)(?:更好|更优|更明智|更划算|更理性|更合适)(?:的)?(?:选择|方案|办法|做法)/;
+// NG5 劣势结论新族（EN，r426）：no point/reason/way/sense + 竞争/贸易/外包/合作 类动词；
+// X makes no sense / is pointless；nothing to gain；cannot benefit … from
+const NOGAIN_EN_F5 = /\b(?:no\s+(?:point|reason|way|sense|benefit|gain))\b[^.]{0,60}\b(?:compet\w+|trad\w+|outsourc\w+|specializ\w+|specialis\w+|cooperat\w+|exchang\w+|import\w*|hir\w+|partner\w+|delegat\w+)\b|\b(?:compet\w+|trad\w+|outsourc\w+|specializ\w+|specialis\w+|cooperat\w+|exchang\w+|hir\w+|partner\w+|delegat\w+)\b[^.]{0,60}\b(?:makes?\s+no\s+sense|is\s+pointless|is\s+useless|a\s+waste)\b|\bnothing\s+to\s+(?:gain|learn|benefit)\b|\b(?:cannot|can'?t|unable\s+to|won'?t)\s+(?:possibly\s+)?(?:benefit|gain|profit)\b[^.]{0,40}\b(?:from|by)\b/i;
 
 // ─── 距离窗（腿②为锚，腿①须落窗内）─────────────────
 const WINDOW_ZH = 45;
@@ -213,12 +300,20 @@ function findSignatures(text, R) {
         ['ADV_ZH_F3', [ADV_ZH_F3]],
         ['ADV_ZH_F4', [ADV_ZH_F4]],
         ['ADV_ZH_F5', [ADV_ZH_F5]],
+        ['ADV_ZH_F6', [ADV_ZH_F6]],
+        ['ADV_ZH_F7', [ADV_ZH_F7]],
+        ['ADV_ZH_F8', [ADV_ZH_F8]],
+        ['ADV_ZH_F9', [ADV_ZH_F9]],
       ]),
       nogain: resolveGroups(R, [
         ['NOGAIN_ZH_F1', [NOGAIN_ZH_F1]],
         ['NOGAIN_ZH_F2', [NOGAIN_ZH_F2]],
         ['NOGAIN_ZH_F3', [NOGAIN_ZH_F3]],
         ['NOGAIN_ZH_F4', [NOGAIN_ZH_F4]],
+        ['NOGAIN_ZH_F5', [NOGAIN_ZH_F5]],
+        ['NOGAIN_ZH_F6', [NOGAIN_ZH_F6]],
+        ['NOGAIN_ZH_F7', [NOGAIN_ZH_F7]],
+        ['NOGAIN_ZH_F8', [NOGAIN_ZH_F8]],
       ]),
       win: R.WINDOW_ZH != null ? R.WINDOW_ZH : WINDOW_ZH, lang: 'zh',
     },
@@ -229,12 +324,16 @@ function findSignatures(text, R) {
         ['ADV_EN_F3', [ADV_EN_F3]],
         ['ADV_EN_F4', [ADV_EN_F4]],
         ['ADV_EN_F5', [ADV_EN_F5]],
+        ['ADV_EN_F6', [ADV_EN_F6]],
+        ['ADV_EN_F7', [ADV_EN_F7]],
+        ['ADV_EN_F8', [ADV_EN_F8]],
       ]),
       nogain: resolveGroups(R, [
         ['NOGAIN_EN_F1', [NOGAIN_EN_F1]],
         ['NOGAIN_EN_F2', [NOGAIN_EN_F2]],
         ['NOGAIN_EN_F3', [NOGAIN_EN_F3]],
         ['NOGAIN_EN_F4', [NOGAIN_EN_F4]],
+        ['NOGAIN_EN_F5', [NOGAIN_EN_F5]],
       ]),
       win: R.WINDOW_EN != null ? R.WINDOW_EN : WINDOW_EN, lang: 'en',
     },
@@ -315,10 +414,10 @@ function detectComparativeAdvantage(text, inject) {
 module.exports = {
   detectComparativeAdvantage,
   __internals: () => ({
-    ADV_ZH_F1, ADV_ZH_F2, ADV_ZH_F3, ADV_ZH_F4, ADV_ZH_F5,
-    ADV_EN_F1, ADV_EN_F2, ADV_EN_F3, ADV_EN_F4, ADV_EN_F5,
-    NOGAIN_ZH_F1, NOGAIN_ZH_F2, NOGAIN_ZH_F3, NOGAIN_ZH_F4,
-    NOGAIN_EN_F1, NOGAIN_EN_F2, NOGAIN_EN_F3, NOGAIN_EN_F4,
+    ADV_ZH_F1, ADV_ZH_F2, ADV_ZH_F3, ADV_ZH_F4, ADV_ZH_F5, ADV_ZH_F6, ADV_ZH_F7, ADV_ZH_F8, ADV_ZH_F9,
+    ADV_EN_F1, ADV_EN_F2, ADV_EN_F3, ADV_EN_F4, ADV_EN_F5, ADV_EN_F6, ADV_EN_F7, ADV_EN_F8,
+    NOGAIN_ZH_F1, NOGAIN_ZH_F2, NOGAIN_ZH_F3, NOGAIN_ZH_F4, NOGAIN_ZH_F5, NOGAIN_ZH_F6, NOGAIN_ZH_F7, NOGAIN_ZH_F8,
+    NOGAIN_EN_F1, NOGAIN_EN_F2, NOGAIN_EN_F3, NOGAIN_EN_F4, NOGAIN_EN_F5,
     WINDOW_ZH, WINDOW_EN,
     CONCEPT_ZH, CONCEPT_EN, CORRECT_ZH, CORRECT_EN,
     NEG_ZH, NEG_EN, HEDGE_ZH, HEDGE_EN,
