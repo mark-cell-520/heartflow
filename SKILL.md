@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.209"
+version: "6.8.210"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  272 discrimination dimensions × 11-layer pipeline × 164 modules ×  192 MCP tools. Zero LLM dependency.
+  273 discrimination dimensions × 11-layer pipeline × 164 modules ×  192 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -77,18 +77,18 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.209. Nothing here is copied
+Every number below was measured on this repository at v6.8.210. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.209 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.210 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
 | Modules registered | 164 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,343 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 272 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 273 | `dimMap` keys in `src/index.js` |
 | MCP tools | 192 | tool definitions exposed via `tools/list` |
 | Test suite | 25,392 passing / 225 failing | `node test/run-all.js`（r419 轮全量实测 25,392/225/25,617（856 文件，data/test-count.json @ 2026-11-20T00:29:07Z；较 r418 基线 25,373/225/25,598 差 passed +19 / failed 0 / total +19——全部 +19 为本轮轮测 round-419-special-pleading-pronoun.test.js 19 断言；**硬失败清单与基线零新增零减少**（failed 断言数与 r418 基线逐项相同 225；文件级清单 87 硬失败 + 63「未输出汇总行」= 150 唯一文件，r418 报告为 149，+1 为环境抖动的 run-all-no-silent-skip（单独重跑 exit 0）与记账口径差，清单内零 special_pleading/round-419 相关文件，比对实录 coordination/agent4/probes/r419-run-all.log））|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -96,7 +96,7 @@ from marketing copy.
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`**, **239 request `verify`**. The remainder contribute to the overall score
+a `rewrite`**, **240 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -258,7 +258,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 272 dimensions
+## The 273 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 
@@ -404,7 +404,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (272 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (273 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |

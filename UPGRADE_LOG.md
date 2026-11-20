@@ -1,3 +1,24 @@
+## r421 — 第 274 维度 calibration_mismatch（断言语气强度超出证据等级）新维度接线（真升级①，v6.8.210 落地）
+
+- **轮次性质**：真升级①（新判别维度——dimMap 新键，独立命中一个新攻击族）。VERSION 6.8.209→**6.8.210**，维度 272→**273**，VERIFY 239→**240**，模块 **164 不变**（顶层新模块不走 _modules 注册，与 masked_man_fallacy/homogeneity_assumption 同例），路由/工具数不变。
+- **缺口实证**（scripts/round-421/probe-r421-gap.js，v6.8.209 基线，**stash 前后真实对照**）：基线态攻击族 12 条中 **4 条 gate.action=pass 完全穿引擎**（其余 8 条被存量维度代拦至 verify/rewrite，但无一命中 calibration 语义——基线态本维度承重 0/12）；接线态攻击族 **0/12 穿引擎**，**11/12 由 calibration_mismatch 承重**（1 条 "Rest assured, I guarantee it will absolutely work." 被存量 perfect_error 代拦，本族未命中——属射程外样本，非漏判）。良性族 12 条：stash 前后逐条 gate.action **完全一致**（10 条存量非 pass、2 条 pass），本族零新增误伤。272 个已接线维度无 calibration 键。决策：本体 `heartflow_philosophy_decision` 裁决 **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书）。
+- **研究来源**：外部三层搜索（HN Algolia / Semantic Scholar / GitHub）——HN 命中 arXiv 2305.14975「Just Ask for Calibration」（verbalized LLM 校准），S2 API 持续 429、GitHub 无高星纯规则方案。方向为「不确定性量化 × 证据充分性」，取纯规则实现（不引 LLM 依赖，符合心虫宪法）。
+- **实现**（新文件 `src/calibration-mismatch.js`，**276 行**）：两腿判据 + 邻近窗 + 六组豁免。
+  - 腿① CERTAINTY 高强度确定性断言（ZH：毫无疑问/毋庸置疑/绝对/必然/铁定/万无一失/百分百/一定；EN：undoubtedly/without a doubt/absolutely/definitely/bound to/100%/the only+best，**全部带 i 标志**）；
+  - 腿② EVIDENCE_DEFICIT 证据缺陷三形：a 证据空转（大家都这么说/群众的眼睛是雪亮的/口碑爆棚/业界公认/EN everyone says/it's obvious/common sense）、b 主观体验担保（放心吧/包在我身上/保证；EN rest assured/trust me/guaranteed）、c **无来源强断言**（句中无来源词/无数据词/无检验动词——句子级属性，不经邻近窗）；
+  - 六组豁免：证据等级匹配（同句有来源/数据/检验词→合法推断）、对冲限定（可能/也许/大概；EN may/might/possibly）、元陈述破除（校准/过度自信/是一种谬误）、疑问形、引述转述（广告里说/报告称；EN the ad says）；
+  - **r421 修复**：初版 CERTAINTY_EN 漏 i 标志导致句首大写 "Without a doubt" 整族不命中（JS 正则默认区分大小写，`\b` 不解决），补 i 后 12/12 攻击变体全承重。
+- **接线九处**（src/index.js，仿 r407 masked_man_fallacy 范式）：require（818 行注释块）、计算点 `const cal = _applyPedagogyRelaxation(checkCalibrationMismatch(_normText), ...)`、score 行、allDims、VERIFY_DIMS（同数组 ~6285）、dimMap×3（3993/6780/6992）、DIM_GUIDANCE 长文案、module.exports 导出 `checkCalibrationMismatch`。
+- **射程分工**（写入 guidance）：confidence 管确定性词本身出现（不要求证据缺陷腿在场——「数据表明有效率95%，绝对安全」有依据时 confidence 仍判，本族明确不判）；absolute_claim 管绝对化措辞形式（唯一/完全/所有）；unsupported_claim 管单腿无依据；weak_evidence_strong_claim 管弱证据类型→强结论（证据在场只是类型弱）——本族管**证据缺位→强断言**，与后者在证据是否在场上互补。
+- **为什么 VERIFY 级**：单句可能是营销文案转述、对他人过度自信的批评或修辞教学案例。verify 含义 = 「确定性语气超出自身给出的证据等级，需先补匹配等级的证据再评估」，调用方应要求补证据而非直接否定结论。
+- **验证**：
+  - 轮测 `test/round-421-calibration-mismatch.test.js` **12/12**（攻击族 16 条全命中 + 良性族 20 条全不命中 + 逐常量负例注入 5 组证伪两腿各自承重 + 豁免逐组 + 引擎接入 4 项）；
+  - 五门禁：bin/verify.js **16/0**、guard-abilities **20/20@273**、doc-numbers **24/0**、双向 guard 召回 **52/52** + 误拦 **302/326**（与基线零变化）；
+  - 变体矩阵（真实 gate 层）：攻击 **12/12 全部非 pass 且全部 calibration_mismatch 承重**（v1 中文裸名词 / v2 带修饰长句 / v3 倒装 / v4 百分百裸形 / v5 绝对+裸名词 / v6-v9 英文各形 / v10 句首大写 Without a doubt / v11 铁定 / v12 必然+证明）；良性 **10/10 本族零承重**（b1 正确多因陈述 / b2 证据在场 / b3 对冲 / b4 元陈述 / b5 疑问 / b6 引述 / b7-b10 英文对冲/元陈述/有来源）；
+  - 文档同步：AGENTS.md（横幅+标题+层级计数 269→270+Verify 列举追加）、README.md（badge+锚点+规格表+段落 239→240）、SKILL.md（横幅+标题+规格表+段落）三处口径，doc-numbers 硬天花板 24/0。
+- **已知边界**：① 腿①腿②限同句或相邻分句（邻近窗 ZH 60 字 / EN 200 字符），跨段形保守不收（spin 形）；② c 形（无来源强断言）是句子级属性不经窗口，跨句引用前文来源的情形不判；③ 证据等级匹配豁免只认显式证据词（实验/数据/统计/研究/试验/对照/样本/测量/记录；EN study/data/trial/measurement），不认隐式支撑；④ 存量维度 monocausal_attribution 对「战争是多因共同造成的」误判 verify 属既有基线行为，本轮不动存量（独立议题）。
+- **r422 固化补记（本轮为离线恢复补提交，非新轮次）**：r421 的磁盘产物在上一轮中断时只落了 src + test + 文档，探针文件 `scripts/round-421/probe-r421-gap.js` 从未生成（UPGRADE_LOG 引用了不存在的文件，正是 r227 审计点名的引用纪律问题）。本轮重建该探针（读磁盘当前代码、stash 前后真实对照）并跑出上表实测数字，同时修正 UPGRADE_LOG 中三处不实数字（模块行数 294→276、缺口实证 11 条穿引擎→实测 4 条穿引擎、探针引用由虚变实）。另修复 doc-numbers 门禁 3 项 FAIL（README/SKILL 规格表版本戳 v6.8.209→v6.8.210、README Version history 补 6.8.210 行）——这些 FAIL 在 r421 原轮次未被发现，属文档戳落后而非数字错误。
+
 ## r420 — 掉线恢复固化轮：r417 执行验证接线 WIP 固化（真升级③）+ r418/r419 UPGRADE_LOG 缺失段补录 + sync UU 冲突收尾（v6.8.209 落地）
 
 - **轮次性质**：本地独有产能优先固化（宪法 §7）。本轮无新维度/新族——固化的是 r417 轮已全绿但未 commit 的接线产能。

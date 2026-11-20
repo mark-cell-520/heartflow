@@ -818,6 +818,12 @@ const { checkPrePostAttribution } = require('./pre-post-attribution.js');
 // 引擎（gate.action=pass）；illicit_conversion 管全称换位，本族管共指描述
 // 在命题态度语境的无效替换。变量名 mmf。
 const { checkMaskedManFallacy } = require('./masked-man-fallacy.js');
+
+// [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
+// 等级：确定性断言 × 证据缺陷信号两腿共现，与 confidence 只管确定性词
+// 出现、weak_evidence_strong_claim 管弱证据在场互补）。模块本轮新建
+// （src/calibration-mismatch.js）。变量名 cal——calibration 缩写。
+const { checkCalibrationMismatch } = require('./calibration-mismatch.js');
 // [r367 接线] 第 260 维度 package_deal（一揽子谬误：把多个独立命题打包成
 // 不可拆分的整体，用「要么全盘接受要么全盘拒绝」压制单条独立判断）require。
 // 缺口实证见 scripts/round-367/probe-package-deal.js（11 条攻击样本 8 条穿透
@@ -2519,6 +2525,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 层穿透 6/7（存量仅 illicit_conversion 代拦 1 条），本行让「命题态度
   // × 共指桥接 × 不透明推断」族以独立维度名进入 findings/scores/dimMap。
   const mmf = _applyPedagogyRelaxation(checkMaskedManFallacy(_normText), "masked_man_fallacy", pedagogyRelaxation);
+
+  // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
+  // 等级）独立 dispatch。变量名 cal——calibration 缩写（cc 已被
+  // confidence 读数占用）。探针实证见 scripts/round-421/probe-r421-gap.js。
+  const cal = _applyPedagogyRelaxation(checkCalibrationMismatch(_normText), "calibration_mismatch", pedagogyRelaxation);
   // [r367 接线] 第 260 维度 package_deal（一揽子谬误）独立 dispatch。探针
   // 实证 gate 层穿透（8/11 漏判），本行让「打包绑定 × 全有或全无」以独立
   // 维度名进入 findings/scores/dimMap。
@@ -3298,6 +3309,7 @@ function discriminate(text, evidence = [], contentMode) {
     {score: homo.score, name:'homogeneity_assumption'},
     {score: ppa.score, name:'pre_post_attribution'},
     {score: mmf.score, name:'masked_man_fallacy'},
+    {score: cal.score, name:'calibration_mismatch'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -3979,6 +3991,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r407 接线] 第 273 维度 masked_man_fallacy（内涵语境替换失效）dimMap
     // 登记。mmf——masked-man fallacy 缩写。
     masked_man_fallacy: mmf,
+    // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
+    // 等级）dimMap 登记。cal——calibration 缩写。
+    calibration_mismatch: cal,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
     // 全无）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4542,6 +4557,7 @@ function discriminate(text, evidence = [], contentMode) {
     // test/round-406-pre-post-attribution.test.js。
     'pre_post_attribution': "不得**把「干预前后同一个体或群体的两项指标变化」直接当成「干预有效」的证据**——前后测无对照归因（pre-post attribution fallacy / uncontrolled before-after comparison）：给出 before X, after Y 的指标对比，却没有对照组、没有基线校准、没有排除同期混杂因素，就用「变了」冒充「干预导致的」。样本形状：「我上周开始吃这个保健品，这周头不晕了，说明这个保健品治好了我的头晕。」「去年销量 100 万，今年改用新营销方案后销量 150 万，所以新方案让销量涨了 50%。」「实施新政后交通事故下降了 30%，证明新政有效。」「孩子上了补习班，期末成绩提高了 20 分，都是补习班的功劳。」「Policy changed in January and crime fell, so the policy reduced crime.」「She switched brands and felt better, so the new brand works.」（样本形状与负例见 test/round-406-pre-post-attribution.test.js）。判据**三腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① INTERVENTION 干预引入（开始吃/改用/换成/实施/上线/报名/换新；EN started taking / switched to / implemented / rolled out / enrolled in / new policy）；腿② ATTRIBUTION 归因断言（说明/证明/表明/所以/功劳/治好/提高/得益于；EN shows / proves / therefore / drove / cured / attributed to）；腿③ PP_MEASURE 前后对比指标（提高/下降了 30%、从 100 到 150、上周…这周、不晕了/见效了；EN rose by 30% / from X to Y / last week…this week / felt better）。缺腿不判——只有干预无指标变化是计划陈述；只有指标变化无干预是自然波动描述。边界：baseline_omission（第268维）管「缺基线数字」的口径问题，本族管「有前后数字仍不能归因」的结构问题（有完整 before/after 数字照样判）；post_hoc 管「A 发生在 B 前所以 A 导致 B」的时序断言，本族管「同一对象前后测量值对比 → 期间干预」的前后测设计缺陷；perfect_error 管「宣称百分之百有效」的绝对化，本族不要求绝对化——「下降 30%」同样是无对照归因；regression_to_the_mean 管「极端值自然回落」的统计现象，本族管归因断言本身（该现象正是本族漏判的机制之一）。verify 级——单句可能是对他人前后测数据的转述、或作者正要批判该设计；verify 的含义是「这个前后对比没有给出对照组或混杂排除，变化不能单独归因于干预」，调用方应要求对照组/校准数据，而不是接受「前后变了=干预有效」。明确不判（豁免）：①对照组/严谨设计在场（随机对照/对照组/双盲/RCT/倾向得分/扣除季节趋势；EN randomized / control group / placebo / adjusted for / controlling for——有对照就不是本族）；②混杂承认与谨慎解读（可能有关/不能完全归因/需要排除混杂/同期也在好转/多种因素共同作用；EN may be due / cannot attribute / confounding / multiple factors——承认混杂就是正确判别）；③方法学纠正在场（前后测无对照/缺少对照/向均值回归/不能作为证据；EN pre-post design / no control / regression to the mean / cannot establish——正在破除本谬误）；疑问句整句不收尾即不判（同 lead_time_bias 口径）。",
     'masked_man_fallacy': "不得**把「主体对 A 的认知态度直接套到 A 的共指描述 B 上**——内涵语境替换失效（masked-man fallacy / intensional fallacy / failure of substitutivity in referentially opaque contexts）：认知主体知道/认识某个对象的指称对象（用名称 A 识别），句中给出 X 的另一个共指描述 B（A = B，同一对象），却在**主体不知道 A 与 B 是同一对象**的情况下，把「主体知道 A」直接替换成「主体知道 B」。替换后命题为假而原命题为真——经典的 morning star = evening star / Superman = Clark Kent 结构。样本形状：「我知道我的邻居是张三，而张三就是市长，所以我知道市长是谁。」「小明知道领奖台上的是冠军，而冠军就是小刚，所以小明知道领奖台上的是小刚。」「The morning star is the evening star, so whoever knows the morning star knows the evening star.」「Lois knows Superman can fly; Clark Kent is Superman, so Lois knows Clark Kent can fly.」「我认识那个戴面具的人，而他就是新来的总裁，所以我认识总裁。」（样本形状与负例见 test/round-407-masked-man-fallacy.test.js）。判据**三腿共现 + 邻近窗 + 四组豁免，缺一不判**：腿① EPISTEMIC 命题态度（知道/认识/相信/意识到/认出/发现/听说；EN knows / believes / is aware / recognizes / realizes / is familiar with）；腿② COREFERENTIAL 共指桥接（A 就是 B / 和他是同一个 / 其实就是 / 真名是；EN is the same person as / is actually / turns out to be / one and the same / a.k.a.）；腿③ OPACITY_INFERENCE 不透明推断（所以我知道 B / 因此他认识 B / so he knows B / therefore she knows B）。缺腿不判——只有命题态度无共指桥接是普通认知陈述；只有共指桥接无态度腿是身份揭示叙事。边界：illicit_conversion 管全称命题换位，本族不换位、管共指描述在命题态度语境的替换；equivocation_sense_shift 管一词多义漂移，本族每个词项词义不变、变的是指称透明度；undistributed_middle 管三段论中项不周延，本族三段论形式合法、失效发生在命题态度语境内部；affirming_the_consequent 管条件句后件肯定，本族没有条件句形式。verify 级——单句可能是逻辑教学反例（「这是 masked-man fallacy」正是本族要教的判别动作）、身份误会的小说叙事、对他人推理的转述批评；verify 的含义是「这个把命题态度跨共指描述传递的推断需要主体对 A=B 同一性的认知作前提，否则替换无效」，调用方应要求补上「主体是否知道 A 与 B 是同一对象」，而不是接受无效替换的结论。明确不判（豁免）：①替换知识/同一性知识在场（知道他就是/早就知道他是/知道他的真名/认识这位市长本人/拆穿了伪装；EN knows that he is / aware of the identity / knows his real name / knows the mayor personally / sees through the disguise——主体已知 A=B 时替换合法）；②元陈述破除（masked-man fallacy/内涵语境/指称不透明/偷换概念/逻辑错误；EN masked-man / intensional context / referentially opaque / this is a fallacy / invalid substitution——正在破除本谬误）；③疑问形与转述（整句问号收尾/难道他知道吗/是否认识；EN 句尾 ? / does he know——探询不是断言）；④认识论谨慎（可能知道/如果他知道/未必一定知道；EN might know / unless he knows / not necessarily know——概率限定不是无效替换断言）。已知边界：① 反事实条件句中的替换（「如果我知道他就是市长，我会…」）依赖 if 从句显式在场，if 被省略的裸条件句不判；② 信念归因的间接引语（「他说他知道」）若无共指桥接腿共现不判；③ 邻近窗 100 字（EN 320 字符）外的跨段共现不判。",
+    'calibration_mismatch': "不得**让「断言的确定性语气超出它自己给出的证据等级」——断言语气强度超出证据等级（calibration mismatch / overconfidence relative to evidence）：文本对某个命题给出**高强度确定性断言**（毫无疑问/毋庸置疑/绝对/必然/铁定/百分百/百分之百/一定；EN undoubtedly / absolutely / certainly / definitely / bound to / 100%），但**同一句或相邻分句中没有任何证据等级与之匹配的支撑**（无来源、无数据、无样本量、无对照、无检验动作，或只给出「大家都这么说」这类不可核验的群体印象）。语气强度与证据支撑度之间的**落差本身**就是可判别的认知缺陷，与「有没有依据」「依据是否有效」是两个正交的攻击面。样本形状：「毫无疑问，这款产品是市面上最好的，用户用了都说好。」「这绝对是革命性的突破，没有任何竞争对手能比。」「放心吧，这个方法百分百有效，你完全不用担心副作用。」「铁定没问题，大家都这么说，口碑爆棚。」「It is undoubtedly the best product on the market, everyone loves it.」「This is absolutely a breakthrough, no competitor can compare.」「It is 100% effective, rest assured, everyone says so.」（样本形状与负例见 test/round-421-calibration-mismatch.test.js）。判据**两腿共现 + 邻近窗 + 六组豁免，缺一不判**：腿① CERTAINTY 高强度确定性断言（含裸名词形「百分百」「绝对」不带后缀也命中）；腿② EVIDENCE_DEFICIT 证据缺陷三形任一——a 证据空转（大家都这么说/群众的眼睛是雪亮的/口碑爆棚/销量说明一切；EN everyone says / everyone knows / it's obvious / common sense）、b 主观体验担保（放心吧/包在我身上/保证；EN rest assured / trust me / guarantee）、c 无来源强断言（腿①命中且同句无来源词/数据词/检验动词）。边界与射程分工：confidence 管确定性词本身的**出现**（「数据表明有效率 95%，绝对安全」有依据时 confidence 仍判，本族明确不判）；absolute_claim 管绝对化措辞的**形式**（唯一/完全/所有/根本），本族管语气与证据的**落差**；unsupported_claim 管断言无依据（单腿），本族要求「高强度断言 × 证据缺陷」两腿共现；bullshit 管不顾真假的陈述，本族不涉及真值、只涉及语气与证据的匹配；weak_evidence_strong_claim 管**弱证据类型→强结论**（证据在场只是类型弱），本族管**证据缺位→强断言**，两族在证据是否在场上互补而非重叠。verify 级——单句可能是营销文案转述、对他人过度自信表述的批评、或修辞教学案例；verify 的含义是「这段文本的确定性语气超出了它自己给出的证据等级，需要先补上匹配等级的证据（来源/数据/检验）再评估该断言」，调用方应要求补证据而不是直接否定结论——结论仍可能为真，只是当前陈述没有提供与之匹配的支撑。明确不判（豁免）：①证据等级匹配（同句有来源/数据/检验词：根据/据/引自/实验/试验/研究/数据/统计/调查/测量/样本/对照/双盲/随机/元分析/p值/置信区间/标准差/样本量；EN study/trial/data/experiment/measurement/randomized/blind/meta-analysis/p</confidence interval/n=——证据在场时不判落差）；②对冲限定（可能/也许/未必/不一定/有待/仍需；EN may/might/could/possibly/probably/likely——结论被概率化时不是强断言）；③元陈述破除（校准/过度自信/认知偏差/置信度/是一种谬误；EN calibration/overconfidence/miscalibrated/this is a fallacy——正在破除本现象）；④疑问形（句尾问号/难道/凭什么；EN 句尾 ? / isn't it——探询不是断言）；⑤引述转述（他说/广告说/报告写道；EN he says / the ad claims——转述他人主张不是自己断言）。已知边界：① 腿①腿②限同句或相邻分句（邻近窗 60 字 / EN 200 字符），跨段形本轮保守不收；② 腿② 的「无来源」判定基于同句词面，跨句引用前文来源的情形不判；③ 证据等级匹配豁免只认显式证据词，不认隐式支撑。",
     'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
@@ -6272,6 +6288,7 @@ function discriminate(text, evidence = [], contentMode) {
     // 无效替换（单句可能是逻辑教学反例、身份误会叙事或他人推理转述），
     // verify 级。
     'masked_man_fallacy',
+    'calibration_mismatch',
   ]);
   // pass：无问题通过
 
@@ -6761,6 +6778,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r407 接线] 第 273 维度 masked_man_fallacy（内涵语境替换失效）补
       // 登记。mmf——masked-man fallacy 缩写。
       masked_man_fallacy: mmf,
+    // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
+    // 等级）dimMap 登记。cal——calibration 缩写。
+    calibration_mismatch: cal,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -6970,6 +6990,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r407 接线] 第 273 维度 masked_man_fallacy 补登记（内涵语境替换失效）。
     // mmf——masked-man fallacy 缩写。
     masked_man_fallacy: mmf,
+    // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
+    // 等级）dimMap 登记。cal——calibration 缩写。
+    calibration_mismatch: cal,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性
     // 偏差）。vca——vivid case availability 缩写。同上：九处一次接齐。
     vivid_case_availability: vca,
@@ -17898,6 +17921,7 @@ module.exports = {
   checkVagueness,
   checkFallacies,
   checkConfidenceCalibration,
+  checkCalibrationMismatch,
   checkPresupposition,
   checkEmotionalManipulation,
   checkDoubleBind,
