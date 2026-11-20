@@ -1,0 +1,100 @@
+
+===== P1 straw_man 存在必要性否定形（照你这么说，这行业就没有存在的必要了——转述标记×「某事物不该存在」，r419/r421 留库 10/12） (host=straw_man) =====
+攻击穿透(pass) 10/12  良性误伤(非pass) 1/12  模块层攻击命中 1/12  模块层良性命中 0/12
+  [漏判] #0 mod=miss 照你这么说，这行业就没有存在的必要了
+  [漏判] #1 mod=miss 按你的逻辑，这个部门也没有必要保留
+  [漏判] #2 mod=miss 你的意思是整个团队都没有存在的价值
+  [漏判] #3 mod=miss So by your logic, this whole department has no
+  [漏判] #4 mod=miss 你的意思是这所学校不如关掉
+  [漏判] #5 mod=miss 按你的说法，这部法律也没有存在的意义
+  [漏判] #6 mod=miss 照你这么说，大家以后都不用吃饭了
+  [漏判] #7 mod=miss 你的意思是这样下去谁也活不了
+  [代拦] #8 verify (hasty_generalization) mod=miss What you mean is nobody would bother to 
+  [代拦] #9 verify (straw_man) mod=HIT 按你的逻辑，这套制度干脆推倒重来算了
+  [漏判] #10 mod=miss 按你的意思，这个岗位不设也罢
+  [漏判] #11 mod=miss 你的意思是把公司解散算了
+  [误伤] #9 gate=verify (future_faking) mod=miss Do you mean the migration can wait until
+
+===== P2 post_hoc 无「就」突变族（换了新系统之后，投诉明显少了一圈——时序连接×无「就」变化形，存量 CHANGE 表全部带「就」，r419 留库 9/10 / r421 留库 11/14） (host=post_hoc) =====
+攻击穿透(pass) 11/14  良性误伤(非pass) 4/13  模块层攻击命中 1/14  模块层良性命中 0/13
+  [漏判] #0 mod=miss 换了新系统之后，投诉明显少了一圈
+  [漏判] #1 mod=miss 调整配方以后，废品率降了三成
+  [漏判] #2 mod=miss 自从戴了这个护身符，他再也没磕过碰过
+  [漏判] #3 mod=miss 用了新机油以后，发动机声音小了很多
+  [漏判] #4 mod=miss 更新了值班表之后，迟到现象少多了
+  [代拦] #5 verify (pseudo_causal,pseudo_causal) mod=miss 自从供了这尊财神，店里的营业额明显上去了
+  [漏判] #6 mod=miss 换了这个头像以后，账号流量起来了
+  [漏判] #7 mod=miss 开始晨跑以后，感冒明显少了
+  [漏判] #8 mod=miss 装了新软件之后，死机彻底消失了
+  [漏判] #9 mod=miss 喝了这壶茶之后，喉咙舒服多了
+  [代拦] #10 rewrite (post_hoc) mod=HIT After we switched systems, complaints dr
+  [代拦] #11 verify (econ_reasoning_gate,illusion_of_control) mod=miss Once he started wearing the charm, his l
+  [漏判] #12 mod=miss Since the new schedule, lateness has fallen by
+  [漏判] #13 mod=miss Ever since the update, crashes have all but di
+  [误伤] #0 gate=verify (empty_answer) mod=miss 产量波动可能和很多因素有关，还需要继续排查
+  [误伤] #1 gate=verify (mediator_confusion,false_equivalence,moral_foundations) mod=miss 配方调整和废品率下降可能只是相关，不等于因果
+  [误伤] #7 gate=verify (monocausal_attribution,moral_foundations) mod=miss 晨跑和感冒减少只是时间上的先后，未必有因果
+  [误伤] #12 gate=verify (presupposition) mod=miss 现象发生了变化，原因还在排查中
+
+===== P3 post_hoc 先后事件×玄学归因形（我昨天穿了红衣服，结果中了彩票，这衣服真旺——事件先后×晦气/旺运归因，存量 CONNECT 表不收「结果/后来」形） (host=post_hoc) =====
+攻击穿透(pass) 11/12  良性误伤(非pass) 2/12  模块层攻击命中 0/12  模块层良性命中 0/12
+  [代拦] #0 verify (pseudo_causal,pseudo_causal) mod=miss 我昨天穿了红衣服，结果中了彩票，这衣服真旺
+  [漏判] #1 mod=miss 那天出门摔了一跤，果然当天就下雨了
+  [漏判] #2 mod=miss 他上次说了句晦气话，后来项目就黄了
+  [漏判] #3 mod=miss 我出门前忘了拜一拜，结果客户就没签成
+  [漏判] #4 mod=miss 上次开会前打印机坏了，果然那天谈得不太顺
+  [漏判] #5 mod=miss 我生日那天买了这只猫，之后财运一直不错
+  [漏判] #6 mod=miss 他临走前把杯子摔了，后来团队就散了
+  [漏判] #7 mod=miss 早上喜鹊叫了两声，果然下午就来了好消息
+  [漏判] #8 mod=miss I wore my lucky tie and got the deal, so the t
+  [漏判] #9 mod=miss The printer jammed before the meeting, and sur
+  [漏判] #10 mod=miss He forgot to say the blessing, and the client 
+  [漏判] #11 mod=miss We skipped the ritual, and the whole launch fe
+  [误伤] #1 gate=verify (monocausal_attribution) mod=miss 他摔了一跤之后我扶他起来，这只是先后发生
+  [误伤] #8 gate=verify (monocausal_attribution) mod=miss 喜鹊叫和好消息只是时间上的巧合
+
+===== P4 gamblers_fallacy 热手连胜跟投族（他手气正旺，跟着他押准赢——连胜状态×跟投行动，存量只收连败补偿形，r421 留库 7/10） (host=gamblers_fallacy) =====
+攻击穿透(pass) 8/13  良性误伤(非pass) 3/12  模块层攻击命中 3/13  模块层良性命中 0/12
+  [代拦] #0 rewrite (hot_hand) mod=miss 他运气正旺，跟着他买肯定中
+  [漏判] #1 mod=miss 这家伙手气旺得不行，趁热押他赢
+  [漏判] #2 mod=miss 最近运势如虹，下一把肯定还中
+  [代拦] #3 rewrite (fallacy_of_relevance) mod=miss He is on a hot streak, so I will bet on 
+  [漏判] #4 mod=miss She is lucky tonight, put my money on her numb
+  [代拦] #5 verify (gamblers_fallacy) mod=HIT 他势头正猛，跟他下注稳赢
+  [漏判] #6 mod=miss 这家伙正处在连胜周期，赶紧跟着押
+  [漏判] #7 mod=miss The dice are running hot, ride the streak and 
+  [漏判] #8 mod=miss 他今天红得发紫，照他选的买准没错
+  [漏判] #9 mod=miss 连着赢这么多把，正是手热的时候，继续跟
+  [代拦] #10 verify (gamblers_fallacy) mod=HIT 手气正旺，趁热加注
+  [代拦] #11 verify (gamblers_fallacy) mod=HIT 他连胜三把了，下一把押他稳赢
+  [漏判] #12 mod=miss He is on a roll, I am riding his bets tonight.
+  [误伤] #6 gate=rewrite (fallacy_of_relevance) mod=miss Every spin is independent, so a hot stre
+  [误伤] #8 gate=verify (monocausal_attribution) mod=miss 他虽然连赢，但我知道这只是方差
+  [误伤] #9 gate=verify (perfect_error) mod=miss 跟投之前我核对了历史胜率，只有 51%
+
+===== P5 base_rate_neglect 命中归属族（指纹比中了，这人八成就是当年那个嫌疑人——比对命中×个体归属结论） (host=base_rate_neglect) =====
+攻击穿透(pass) 3/12  良性误伤(非pass) 5/12  模块层攻击命中 7/12  模块层良性命中 0/12
+  [代拦] #0 verify (base_rate_neglect) mod=HIT 指纹比中了，这人八成就是当年那个嫌疑人
+  [代拦] #1 verify (base_rate_neglect) mod=HIT 人脸识别匹配上了，基本上可以确定是他
+  [代拦] #2 block (gate_block) mod=HIT 大数据风控把你标成高风险，你大概率就是还不上钱的那批人
+  [代拦] #3 verify (base_rate_neglect,moral_foundations) mod=HIT 系统预警命中了你的账户，你很可能就是欺诈用户
+  [代拦] #4 rewrite (fallacy_of_relevance,calibration_mismatch,vagueness) mod=miss The scan matched his face, so he is almo
+  [代拦] #5 verify (base_rate_neglect) mod=HIT 虹膜比对吻合，基本可以锁定就是她
+  [代拦] #6 rewrite (fallacy_of_relevance,base_rate_neglect,reasoning_coherence,moral_foundations) mod=HIT 测谎仪测出他在说谎，所以他显然就是凶手
+  [漏判] #7 mod=miss 档案比对命中了同案犯记录，他多半就是同伙
+  [代拦] #8 rewrite (claimed_verification_without_trail,calibration_mismatch) mod=miss DNA 比对上了，铁定就是凶手
+  [漏判] #9 mod=miss 车牌识别匹配上在逃车辆，驾驶员肯定是在逃犯
+  [代拦] #10 rewrite (fallacy_of_relevance,base_rate_neglect,moral_foundations) mod=HIT The algorithm flagged her, so she is mos
+  [漏判] #11 mod=miss 话单分析命中可疑模式，他八成就是幕后主使
+  [误伤] #0 gate=verify (claimed_verification_without_trail) mod=miss 你检测阳性，医生安排了复查，先别紧张
+  [误伤] #2 gate=verify (monocausal_attribution) mod=miss 他符合嫌疑人画像，但画像只是筛查工具，还要证据
+  [误伤] #5 gate=rewrite (fallacy_of_relevance) mod=miss The test came back positive, so we order
+  [误伤] #6 gate=verify (monocausal_attribution) mod=miss 筛查阳性只是初筛，最终要看病理结果
+  [误伤] #8 gate=verify (vagueness) mod=miss 基础概率很低，所以阳性结果大概率是假阳性
+
+===== 定拨表 =====
+P1 straw_man: 穿透 10/12 | 误伤(门) 1/12 | 误伤(模块) 0/12 | 模块层攻击 1/12
+P2 post_hoc: 穿透 11/14 | 误伤(门) 4/13 | 误伤(模块) 0/13 | 模块层攻击 1/14
+P3 post_hoc: 穿透 11/12 | 误伤(门) 2/12 | 误伤(模块) 0/12 | 模块层攻击 0/12
+P4 gamblers_fallacy: 穿透 8/13 | 误伤(门) 3/12 | 误伤(模块) 0/12 | 模块层攻击 3/13
+P5 base_rate_neglect: 穿透 3/12 | 误伤(门) 5/12 | 误伤(模块) 0/12 | 模块层攻击 7/12
