@@ -73,6 +73,18 @@
  *     "Their mistakes are called incompetence; mine are called
  *     learning curves."；ZH：「别人迟到叫纪律涣散，我这样就叫时间
  *     灵活」。
+ *   · 路由七「自他语序/人称形 × possessive/copula 标签形」（r421 新增）
+ *     双腿共现：语序颠倒（先说我这叫A，再说他们那叫B）+ 标签动词不是
+ *     called 的形—— possessive/copula（My mistakes are learning
+ *     curves; their mistakes are incompetence，两腿行为名词须同一）、
+ *     mine/theirs 回指（Mine get called X; theirs get called Y /
+ *     Mine counts as X）、主动态（When I do it, they call it vision;
+ *     when others do it, they call it recklessness）；ZH 人称形
+ *     （我这叫A，他们那叫B / 到我这儿就叫A / 我这是A，他们那就是B），
+ *     腿①不再重复行为词。**两腿标签文本不同**才判，同名同标与对称
+ *     要求在场同样豁免。EN: "My lateness is called flexibility;
+ *     their lateness is called indiscipline."；ZH：「同样迟到，
+ *     我这叫时间灵活，他们那叫纪律涣散」。
  *   · 缺腿不判：只有规则他指（「公司有特批流程，符合条件的人可以
  *     申请例外」）是正当程序陈述；只有自我描述（「我情况确实比较
  *     特殊」）无例外主张，归 factual。
@@ -203,9 +215,60 @@ const OTHERS_LABEL_PRONE_EN = /\b(?:others?|other\s+people|everyone\s+else|they|
 const SELF_LABEL_PRONE_EN = /\bwhen\s+I\s+do\s+(?:it|the\s+same(?:\s+thing)?)\b[^.]{0,30}?\b(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as|seen\s+as|viewed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})|\bmy\s+doing\s+(?:it|the\s+same(?:\s+thing)?)\s+(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})|\bmine\s+(?:are|is)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})/i;
 
 // 腿②（ZH，路由六专用）：代词回指 + 自我标签（我这样（就）叫/称为…）。
-// 回指标记（这样/这么干/这么做/也如此）必填——防「我叫什么」类疑问
+// 回指标记（这样/这么干/这么做/也如此/照这样）必填——防「我叫什么」类疑问
 // 与普通自称句误入；标签后不经行为词回填。
 const SELF_LABEL_PRONE_ZH = /我(?:们)?(?:这样|这么干|这么做|也如此|照这样)(?:就|也|又|便)?[^。；;，,]{0,4}(?:叫|叫做|称为|称作|说是|算作|骂作|谓之)([^。；;，,]{1,8})/;
+
+// ─── [r421] 路由七：自他语序/人称形 × possessive/copula 标签形 ──────────
+// 池化探针 r421（coordination/agent4/probes/r421-probe-pool.js，HEAD
+// 6.8.209）六家族同池定选 F5 special_pleading EN 回指变体：攻击穿透
+// 11/12（全池最高比率）、模块层直查真零命中 0/12、良性本族误伤 0/12。
+// 穿透根因：路由六只管「他人标签 × 我这样叫」的**他-自语序**与
+// when-I-do-it/my-doing-it/mine-are 三支回指形，而口语双标还有——
+//   ① 自他语序颠倒（先说我怎么叫，再说他们怎么叫）；
+//   ② possessive/copula 标签形（My mistakes are learning curves; theirs
+//      are incompetence / Mine get called X / Mine counts as X / My
+//      lateness is called flexibility）——标签动词不是 called 而是
+//      系词或 get/counts as；
+//   ③ 主动态（they call it vision）与 when-I-<动词短语> it is called；
+//   ④ ZH 人称形（我这叫A，他们那叫B / 到我这儿就叫A / 我这是A，他们那就是B）
+//      ——腿②回指标记白名单（这样/这么干…）之外的人称形，且腿①不再
+//      重复行为词（同样迟到，我这叫X，他们那叫Y 的行为词在句首共享）。
+// 真升级②：既有第 150 维的全新措辞家族，维度计数不变、src/index.js
+// 零改动（同 r406-r420 扩族先例）。
+//
+// 判据：自方标签腿 × 他方标签腿共现（语序不限），**两腿标签文本不同**
+// 才判（同名同标是标准一致，同路由五六铁律），对称要求在场（一视同仁）
+// 同样豁免。EN 侧 copula 形（my/their + 行为名词 + 系词）带**同行为
+// 名词约束**——两腿都捕获到行为名词时须同一名词（mistakes×mistakes），
+// 防「my overtime is called commitment; their delays are called slack」
+// 式不同行为伪双标；mine/theirs 回指腿无名词，靠回指承担同一性。
+
+// EN 行为名词表（copula 形的同一性锚点）
+const BEHAVIOR_NOUNS_EN = '(?:mistakes?|errors?|failures?|faults?|lateness|tardiness|delays?|absences?|complaints?|refusals?|overtime|overwork|shortcomings?|lapses?|slips?)';
+// EN 自方 copula 形：my <行为名词> (is|are) [(just|also)] [called…] X
+const SELF_COPULA_EN = new RegExp('\\bmy\\s+(' + BEHAVIOR_NOUNS_EN + ')\\s+(?:is|are)\\s+(?:just\\s+|also\\s+)?(?:(?:called|labeled|labelled|termed|branded|known\\s+as|dismissed\\s+as|seen\\s+as|viewed\\s+as)\\s+)?([a-z]+(?:[\\s-][a-z]+){0,3})', 'i');
+// EN 他方 copula 形：their/theirs/others… <行为名词> (is|are) […] X
+const OTHERS_COPULA_EN = new RegExp('\\b(?:their|theirs|others?|other\\s+people|everyone\\s+else|they|them|those\\s+who|people\\s+who)\\s+(' + BEHAVIOR_NOUNS_EN + ')\\s+(?:is|are)\\s+(?:just\\s+|also\\s+)?(?:(?:called|labeled|labelled|termed|branded|known\\s+as|dismissed\\s+as|seen\\s+as|viewed\\s+as)\\s+)?([a-z]+(?:[\\s-][a-z]+){0,3})', 'i');
+// EN 自方 mine 回指形：mine (get|gets|are|is|counts|count) [as|called…] X
+const SELF_MINE_EN = /\bmine\s+(?:get|gets|are|is|counts?|count)\s+(?:as\s+|called\s+|labeled\s+|labelled\s+|termed\s+|branded\s+|dismissed\s+as\s+|seen\s+as\s+|viewed\s+as\s+)?(?:just\s+)?([a-z]+(?:[\s-][a-z]+){0,3})/i;
+// EN 他方 theirs 回指形：theirs (get|gets|are|is|counts|count) [as|called…] X
+const OTHERS_THEIRS_EN = /\btheirs\s+(?:get|gets|are|is|counts?|count)\s+(?:as\s+|called\s+|labeled\s+|labelled\s+|termed\s+|branded\s+|dismissed\s+as\s+|seen\s+as\s+|viewed\s+as\s+)?(?:just\s+)?([a-z]+(?:[\s-][a-z]+){0,3})/i;
+// EN 自方主动/动词短语形：when I do it, they call it X ｜ when I <短语> it is called X
+const SELF_ACTIVE_EN = /\bwhen\s+I\s+do\s+(?:it|the\s+same(?:\s+thing)?),?\s+they\s+call\s+(?:it|that)\s+([a-z]+(?:[\s-][a-z]+){0,3})|\bwhen\s+I\s+[a-z]+(?:\s+[a-z]+){0,3}\s+(?:it\s+)?(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})/i;
+// EN 他方主动/动词短语形：when others do it, they call it X ｜ when others do it is called X
+const OTHERS_ACTIVE_EN = /\bwhen\s+(?:others?|other\s+people|everyone\s+else|they)\s+do\s+(?:it|the\s+same(?:\s+thing)?),?\s+they\s+call\s+(?:it|that)\s+([a-z]+(?:[\s-][a-z]+){0,3})|\bwhen\s+(?:others?|other\s+people|everyone\s+else|they)\s+do\s+(?:it|the\s+same(?:\s+thing)?)\s+(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})/i;
+
+// ZH 自方标签腿（路由七专用，三支，捕获组 1/2/3 各为一支的标签）：
+// a 回指标记形（我这样（就）叫/称为/说成…，动词表比路由六宽）；
+// b 人称处所形（(到)我(们)(这儿|那里|那边)（就）叫/称为/算是/就是/是…）；
+// c 指示代词形（我(们)(这|那)（就）是/就是/叫/称为/说成/当成/算是…）。
+const SELF_FIRST_ZH = /我(?:们)?(?:这样|这么干|这么做|也如此|照这样)(?:就|也|又|便)?(?:叫|叫做|称为|称作|说是|算作|骂作|谓之|说成|当成|看作是|当成是)([^。；;，,]{1,8})|(?:到)?我(?:们)?(?:这儿|这里|那儿|那里|那边|这边)(?:就|也|又|便)?(?:叫|叫做|称为|称作|说是|算作|骂作|谓之|说成|当成|看作是|当成是|算是|就是|就成了|是)([^。；;，,]{1,8})|我(?:们)?(?:这|那)(?:就|也|又|便)?(?:是|就是|就叫|叫|叫做|称为|称作|说是|算作|骂作|谓之|说成|当成|看作是|当成是|就算是|算是)([^。；;，,]{1,8})/;
+// ZH 他方标签腿（路由七专用，三支）：
+// a 远指形（他们(那样|那就|那)（就）叫/称为/说成/算是…）；
+// b 裸动词形（他们/别人（就）叫/称为/说成/当成…，行为词不重复）；
+// c 指示系词形（他们(这|那)（就）是/那就是/也就是/便是/叫…）。
+const OTHERS_FIRST_ZH = /(?:别人|他人|人家|其他人|大家|他们|同事|熟人|邻居|旁人)(?:那样|那样儿|那就|那便|那|也如此|照这样)(?:就|又|也|便)?(?:叫|叫做|称为|称作|说是|算作|骂作|谓之|说成|当成|看作是|当成是|算是)([^。；;，,]{1,8})|(?:别人|他人|人家|其他人|大家|他们|同事|熟人|邻居|旁人)(?:就|又|也|便)?(?:叫|叫做|称为|称作|说是|算作|骂作|谓之|说成|当成|看作是|当成是|算是)([^。；;，,]{1,8})|(?:别人|他人|人家|其他人|大家|他们|同事|熟人|邻居|旁人)(?:这|那)(?:就|又|也|便)?(?:是|就是|那就是|也就是|便是|就叫|叫|叫做|称为|称作|说是|算作|骂作|谓之|说成|当成|看作是|当成是|算是)([^。；;，,]{1,8})/;
 
 /**
  * 路由四：同行为不同定性（别人做是透支/犯错，我做是热爱/奉献）。
@@ -304,7 +367,65 @@ function checkPronounLabel(text, R, isZh) {
 }
 
 /**
- * 中文路由：六条路由任一成立。
+ * 路由七[r421]：自他语序/人称形 × possessive/copula 标签形。
+ * 自方标签腿 × 他方标签腿共现（语序不限），标签文本不同才判，对称
+ * 要求在场豁免。EN copula 形两腿都带行为名词时须同一名词（不同行为
+ * 不判）；mine/theirs 回指腿无名词，靠回指承担同一性。
+ * @param {string} text
+ * @param {object} R 负例注入用
+ * @param {boolean} isZh
+ */
+function checkSelfFirstLabel(text, R, isZh) {
+  const symmetry = isZh ? (R.SYMMETRY_ZH || SYMMETRY_ZH) : (R.SYMMETRY_EN || SYMMETRY_EN);
+  const strip = isZh
+    ? (s) => s.replace(/[\u300c\u300d\u300e\u300f"'`\s]/g, '')
+    : (s) => s.replace(/["'`\u201c\u201d\u2018\u2019]/g, '')
+        .replace(/\s+/g, ' ').trim()
+        .replace(/(?:^|\s)(?:too|also|as well)$/i, '')
+        .replace(/\s+/g, '').toLowerCase();
+  const normNoun = (n) => n.toLowerCase().replace(/s$/, '');
+  // 取一条腿的匹配：最后一个非空捕获组 = 标签；仅 copula 腿另带名词（组 1）
+  const leg = (re) => {
+    const m = re.exec(text);
+    if (!m) return null;
+    const groups = [];
+    for (let i = 1; i < m.length; i++) if (m[i]) groups.push(m[i]);
+    if (!groups.length) return null;
+    return { noun: groups.length > 1 ? groups[0] : null, label: groups[groups.length - 1] };
+  };
+  const selfLegs = isZh ? [(R.SELF_FIRST_ZH || SELF_FIRST_ZH)] : [
+    (R.SELF_COPULA_EN || SELF_COPULA_EN),
+    (R.SELF_MINE_EN || SELF_MINE_EN),
+    (R.SELF_ACTIVE_EN || SELF_ACTIVE_EN),
+  ];
+  const othersLegs = isZh ? [(R.OTHERS_FIRST_ZH || OTHERS_FIRST_ZH)] : [
+    (R.OTHERS_COPULA_EN || OTHERS_COPULA_EN),
+    (R.OTHERS_THEIRS_EN || OTHERS_THEIRS_EN),
+    (R.OTHERS_ACTIVE_EN || OTHERS_ACTIVE_EN),
+  ];
+  for (const sre of selfLegs) {
+    const s = leg(sre);
+    if (!s) continue;
+    for (const ore of othersLegs) {
+      const o = leg(ore);
+      if (!o) continue;
+      const labelSelf = strip(s.label);
+      const labelOthers = strip(o.label);
+      if (!labelSelf || !labelOthers) continue;
+      // 同一行为同一个名字 → 主张标准一致，不是双标
+      if (labelOthers === labelSelf) continue;
+      // 同行为约束：两腿都捕获到行为名词时须同一名词
+      if (s.noun && o.noun && normNoun(s.noun) !== normNoun(o.noun)) continue;
+      // 对称要求在场 → 一视同仁的表述不是双标
+      if (symmetry.test(text)) return null;
+      return { route: (isZh ? 'zh' : 'en') + ':self-first-order×different-label(' + labelOthers + '×' + labelSelf + ')' };
+    }
+  }
+  return null;
+}
+
+/**
+ * 中文路由：七条路由任一成立。
  * @param {string} text
  * @param {object} R 负例注入用：以空白正则替换指定常量
  */
@@ -330,6 +451,9 @@ function checkZh(text, R) {
   // 路由六：代词回指形（同一行为用代词回指，他人叫A × 我这样叫B）
   const r6 = checkPronounLabel(text, R, true);
   if (r6) return r6;
+  // 路由七：自他语序/人称形 × possessive/copula 标签形（我这叫A × 他们那叫B）
+  const r7 = checkSelfFirstLabel(text, R, true);
+  if (r7) return r7;
   return null;
 }
 
@@ -349,6 +473,9 @@ function checkEn(text, R) {
   // 路由六（EN）：代词回指形（when I do it / my doing it / mine are）
   const r6 = checkPronounLabel(text, R, false);
   if (r6) return r6;
+  // 路由七（EN）：自他语序/人称形 × possessive/copula 标签形
+  const r7 = checkSelfFirstLabel(text, R, false);
+  if (r7) return r7;
   return null;
 }
 
@@ -402,5 +529,8 @@ module.exports = {
     SYMMETRY_ZH, SYMMETRY_EN,
     OTHERS_LABEL_ZH, SELF_LABEL_ZH, OTHERS_LABEL_EN, SELF_LABEL_EN,
     OTHERS_LABEL_PRONE_EN, SELF_LABEL_PRONE_EN, SELF_LABEL_PRONE_ZH,
+    BEHAVIOR_NOUNS_EN, SELF_COPULA_EN, OTHERS_COPULA_EN,
+    SELF_MINE_EN, OTHERS_THEIRS_EN, SELF_ACTIVE_EN, OTHERS_ACTIVE_EN,
+    SELF_FIRST_ZH, OTHERS_FIRST_ZH,
   }),
 };
