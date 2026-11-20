@@ -89,6 +89,36 @@
  *     两成——不作为有真实后果陈述）；
  *   · 近邻维度领地（zero_price_effect 零价格需求失真、omission_bias
  *     责任评判不对称、sunk_cost_coercion 沉没成本绑架）。
+ *
+ * [r429 扩展 · 真升级②：观望/拖延免单族的全新措辞家族]
+ * r429 池化探针（coordination/agent4/probes/r429-probe-pool.js，基线
+ * HEAD 6.8.211 实测）：四候选定拨，本族攻击 10/12 穿透居首（P1
+ * appeal_to_tradition 口语时段×反问免检族 9/12、P2 base_rate_neglect
+ * 准确率×确诊族 1/12 已被 false_precision/calibration_mismatch 存量
+ * 代拦、P4 anecdote_as_proof 亲测族 4/12 已被 claimed_verification_
+ * without_trail 存量代拦），模块层攻击 1/12（存量 INACTION_DELAY_ZH
+ * 「拖着」× ZEROCOST_NOLOSS_ZH 承重）、模块层良性 0/12 真零误伤。
+ * 穿透根因是两条腿的词表都停在「正式/重语族」：
+ *   · 腿①新族 INACTION_DELAY_ZH_R429：观望拖延的口语软化形（再观望
+ *     观望/缓一缓/先放放/暂缓/搁置/拖一拖/往后拖/等一等/看看再说/
+ *     从长计议）——存量 DELAY 只收 先拖/拖着/按兵不动/维持现状 四个
+ *     硬形，「缓一缓」「放放」「暂缓」全部穿透；EN 对应族
+ *     INACTION_DELAY_EN_R429：sit on this decision / hold off on
+ *     hiring / keep the money idle / postpone the migration（存量
+ *     SKIP_EN 的 postpone 只接 maintenance/repairs/investment/
+ *     spending 四个名词，「postpone the migration」整族穿透）/
+ *     defer / put off / wait and see / let it ride / drag our feet；
+ *   · 腿②新族 ZEROCOST_MISS_ZH_R429：「错过不了/错失不了/耽误不了」
+ *     可能补语族与「不会耽误任何事/也不会有任何影响/也不会掉队」族
+ *     ——存量 NOLOSS 只收 损失/亏损/代价/成本/风险 名词，「错过」
+ *     「耽误」「影响」「掉队」全部穿透；EN 对应族 ZEROCOST_MISS_EN_
+ *     R429：will not cost us anything / will not hurt us / nothing
+ *     will be lost by waiting / changes nothing / makes no
+ *     difference——存量 NOCOST/LOSE 只收 costs nothing / loses
+ *     nothing 现在时直形，「not cost us anything」的代词与 anything
+ *     间隔、「will not hurt」「changes nothing」全部穿透。
+ * 新族常量独立成组（不进存量表），inject 可整族摘除；存量三组豁免
+ * （制度规则/概念教学/纠正句）原样覆盖新族。
  */
 'use strict';
 
@@ -107,13 +137,24 @@ const INACTION_DELAY_ZH = /(?:先拖|拖着|拖(?:着|下去|一时)|按兵不�
 // A4 时间/注意力不投入族（时间不用来/不拿来/精力不花在）
 const INACTION_TIME_ZH = /(?:时间|精力|心思|注意力)[^。，！？；\n]{0,6}(?:不用来|不拿来|不花在|没花在|未投入|不投入|不用于)/;
 
+// A5 [r429 新增] 观望/拖延口语软化族——存量 DELAY 只收先拖/拖着/按兵
+//    不动/维持现状四个硬形，「再观望观望」「缓一缓」「先放放」「暂缓」
+//    这类把拖延包装成从容决策的口语软化形整族穿透（r429 探针实测
+//    10/12 穿透居首）。轻化动词不带否定词，否定守卫仍只查强否定前缀
+//    （「并非暂缓」= 其实推进了 → 失配）；不收裸「推迟/延迟」（「推迟
+//    迁移有风险，合规截止日前必须完成」是良性句，腿①单 hit 不判但
+//    宁缺勿滥）。
+const INACTION_DELAY_ZH_R429 = /(?:再|又|暂且|姑且|先|且先)?(?:观望|看看再说|等一等|缓一缓|放一放|放放|暂缓|搁置|从长计议|拖一拖|往后拖)/;
+
 const INACTION_ZH_GROUPS = [
   ['INACTION_NEG_VERB_ZH', [INACTION_NEG_VERB_ZH]],
   ['INACTION_IDLE_ZH', [INACTION_IDLE_ZH]],
   ['INACTION_DELAY_ZH', [INACTION_DELAY_ZH]],
   ['INACTION_TIME_ZH', [INACTION_TIME_ZH]],
+  // [r429] 新族独立成组——inject 置空本组即可整族摘除（负例注入用）
+  ['INACTION_DELAY_ZH_R429', [INACTION_DELAY_ZH_R429]],
 ];
-const INACTION_ZH = [INACTION_NEG_VERB_ZH, INACTION_IDLE_ZH, INACTION_DELAY_ZH, INACTION_TIME_ZH];
+const INACTION_ZH = [INACTION_NEG_VERB_ZH, INACTION_IDLE_ZH, INACTION_DELAY_ZH, INACTION_TIME_ZH, INACTION_DELAY_ZH_R429];
 
 // E1 not investing / not spending / no maintenance 族
 // r336 攻防期补 not spent 形：「Time not spent learning costs you nothing」
@@ -125,14 +166,24 @@ const INACTION_IDLE_EN = /\b(?:sitting\s+idle|sit\s+idle|left\s+unused|left\s+va
 const INACTION_SKIP_EN = /\b(?:doing\s+nothing|skip(?:ping|ped)?\s+(?:maintenance|servicing|updates?|training|inspection|repairs?|the\s+repair)|postpon(?:e|ing)\s+(?:maintenance|repairs?|investment|spending)|defer(?:ring)?\s+(?:maintenance|investment|spending)|let(?:ting)?\s+it\s+(?:sit|be))\b/i;
 // E4 not renting / not fixing / not investing in 介词族
 const INACTION_NOTIN_EN = /\bnot\s+(?:renting|leasing|fixing|repairing|servicing|replacing|upgrading|checking|monitoring|maintaining|optimizing)\b/i;
+// E5 [r429 新增] 观望/拖延口语软化族（EN）——存量 SKIP_EN 的 postpone
+//    只接 maintenance/repairs/investment/spending 四个名词，「postpone
+//    the migration」整族穿透；sit on this decision / hold off on hiring /
+//    keep the money idle / defer / put off / wait and see / let it ride /
+//    drag our feet 全部不在存量四族。注意 postpon 只收 e/ing 词尾
+//    （postponed 过去式不收——「We postponed because the vendor...」
+//    良性样本，腿①单 hit 不判但宁缺勿滥）。
+const INACTION_DELAY_EN_R429 = /\b(?:sit(?:ting)?\s+on|hold(?:ing)?\s+off(?:\s+on)?|skip(?:ping|ped)?\s+(?:the|this|that|our|a|an)\s+[a-z]+|keep(?:ing)?\s+(?:the\s+|our\s+|this\s+)?(?:money|cash|funds?|assets?|equipment|decision|project|plan|hiring|investment)\s+(?:idle|on\s+hold|in\s+limbo|frozen)|postpon(?:e|ing)\s+(?:the|this|that|our|a|an)?\s*[a-z]+|defer(?:ring)?\s+(?:the|this|that|our)\s+[a-z]+|delay(?:ing)?\s+(?:the|this|that|our|a|an)\s+[a-z]+|put(?:ting)?\s+off|wait(?:ing)?\s+and\s+see|let(?:ting)?\s+(?:it|things)\s+(?:ride|sit|slide)|drag(?:ging)?\s+(?:our|the)\s+feet)\b/i;
 
 const INACTION_EN_GROUPS = [
   ['INACTION_NOT_EN', [INACTION_NOT_EN]],
   ['INACTION_IDLE_EN', [INACTION_IDLE_EN]],
   ['INACTION_SKIP_EN', [INACTION_SKIP_EN]],
   ['INACTION_NOTIN_EN', [INACTION_NOTIN_EN]],
+  // [r429] 新族独立成组——inject 置空本组即可整族摘除（负例注入用）
+  ['INACTION_DELAY_EN_R429', [INACTION_DELAY_EN_R429]],
 ];
-const INACTION_EN = [INACTION_NOT_EN, INACTION_IDLE_EN, INACTION_SKIP_EN, INACTION_NOTIN_EN];
+const INACTION_EN = [INACTION_NOT_EN, INACTION_IDLE_EN, INACTION_SKIP_EN, INACTION_NOTIN_EN, INACTION_DELAY_EN_R429];
 
 // ─── 腿② ZEROCOST 零成本幻觉断言 ────────────────────────────────
 // Z1 没有任何损失族（没有任何损失/没有损失/没损失/毫无损失/不会有任何
@@ -149,6 +200,16 @@ const ZEROCOST_FREEWIN_ZH = /(?:稳赚不亏|只赚不亏|不亏|亏不了|白�
 const ZEROCOST_SAVE_ZH = /(?:就是省钱|等于省钱|净省|省下(?:的)?(?:就是|全是|等于)(?:利润|赚到|白得)|何乐不为|何乐而为|不拿白不拿|不用白不用)/;
 // Z5 最划算/最稳妥族（最划算/最省/最稳妥的选择/零风险的选择）
 const ZEROCOST_BEST_ZH = /(?:最划算|最省(?:钱|事)?|最为稳妥|最稳妥|零风险|没有任何风险|毫无风险)/;
+// Z6 [r429 新增] 错过/耽误免单族——存量 NOLOSS 只收 损失/亏损/代价/
+//    成本/风险 名词，「错过不了什么」「错失不了几个钱」「不会耽误任何
+//    事」「也不会有任何影响」「也不会掉队」这类把「被放弃的替代用途」
+//    直接记为零的口语形整族穿透（r429 探针实测）。两支：
+//    Z6a 可能补语族（错过不了/错失不了/耽误不了/影响不了）；
+//    Z6b 不会+泛指后果族（不会耽误任何事/也不会有任何影响/也不会掉队）。
+const ZEROCOST_MISS_ZH_R429 = new RegExp([
+  '(?:错过|错失|耽误|影响|波及)(?:不了|不到|不掉|不住)',
+  '(?:不会|也不会|绝不会|不可能会|不大可能会)[^。，！？；\\n]{0,6}(?:任何)?(?:影响|差别|变化|进度|事|事情|损失|掉队)',
+].join('|'));
 
 const ZEROCOST_ZH_GROUPS = [
   ['ZEROCOST_NOLOSS_ZH', [ZEROCOST_NOLOSS_ZH]],
@@ -156,8 +217,10 @@ const ZEROCOST_ZH_GROUPS = [
   ['ZEROCOST_FREEWIN_ZH', [ZEROCOST_FREEWIN_ZH]],
   ['ZEROCOST_SAVE_ZH', [ZEROCOST_SAVE_ZH]],
   ['ZEROCOST_BEST_ZH', [ZEROCOST_BEST_ZH]],
+  // [r429] 新族独立成组——inject 置空本组即可整族摘除（负例注入用）
+  ['ZEROCOST_MISS_ZH_R429', [ZEROCOST_MISS_ZH_R429]],
 ];
-const ZEROCOST_ZH = [ZEROCOST_NOLOSS_ZH, ZEROCOST_ZERO_ZH, ZEROCOST_FREEWIN_ZH, ZEROCOST_SAVE_ZH, ZEROCOST_BEST_ZH];
+const ZEROCOST_ZH = [ZEROCOST_NOLOSS_ZH, ZEROCOST_ZERO_ZH, ZEROCOST_FREEWIN_ZH, ZEROCOST_SAVE_ZH, ZEROCOST_BEST_ZH, ZEROCOST_MISS_ZH_R429];
 
 // ZE1 costs nothing / carries no cost 族
 // r336 攻防期补 costing nothing 形（概念教学/纠正句承重样本用）。
@@ -169,7 +232,21 @@ const ZEROCOST_LOSE_EN = /\b(?:loses?\s+(?:nothing|us\s+nothing|you\s+nothing|no
 // ZE4 saves money at no cost / pure savings 族
 const ZEROCOST_SAVE_EN = /\b(?:saves?\s+(?:us\s+|them\s+|the\s+company\s+)?money\s+(?:at\s+)?(?:for\s+)?(?:zero|no)\s+cost|pure\s+savings?|costs?\s+nothing\s+to\s+(?:keep|hold|leave)|free\s+to\s+(?:keep|hold|leave)|a\s+freebie|money\s+for\s+nothing)\b/i;
 // ZE5 the safest bet / safest choice 族
-const ZEROCOST_SAFE_EN = /\b(?:the\s+safest\s+(?:bet|choice|option|course)|safest\s+thing\s+to\s+do|no\s+downside\s+(?:at\s+all|whatsoever)|totally\s+risk[\s-]free)\b/i;
+const ZEROCOST_SAFE_EN = /\b(?:the\s+safest\s+(?:bet|choice|option|course)|safest\s+thing\s+to\s+do|no\s+downside\s+(?:at\s+all|whatsoever)|totally\s+risk[-\s]free)\b/i;
+// ZE6 [r429 新增] 拖延免单族（EN）——存量 NOCOST/LOSE 只收 costs
+//     nothing / loses nothing 现在时直形，「waiting will not cost us
+//     anything」的代词+anything 间隔、「will not hurt us」的 hurt 动词、
+//     「nothing will be lost by waiting」的将来时被动、「changes
+//     nothing / makes no difference」的零差异断言全部穿透（r429 探针
+//     实测）。五支：not cost/hurt/harm us anything / nothing will be
+//     lost / lost by waiting / changes nothing / makes no difference。
+const ZEROCOST_MISS_EN_R429 = new RegExp([
+  "(?:will\\s+not|won'?t|would\\s+not|wouldn'?t|does\\s+not|doesn'?t|do\\s+not|don'?t|cannot|can'?t|not)\\s+(?:cost|hurt|harm|bother|set)\\s+(?:us|you|them|anyone|anybody|the\\s+[a-z]+)?(?:\\s+(?:anything|a\\s+thing|anything\\s+at\\s+all|back))?",
+  '(?:nothing|little|not\\s+much|nothing\\s+much)\\s+(?:will\\s+be|is|gets?|to\\s+be)\\s+lost',
+  'lost\\s+by\\s+(?:waiting|delaying|holding\\s+off|postponing|sitting\\s+idle)',
+  'changes?\\s+(?:nothing|very\\s+little|little)',
+  'makes?\\s+(?:no|not\\s+much|little)\\s+difference',
+].join('|'), 'i');
 
 const ZEROCOST_EN_GROUPS = [
   ['ZEROCOST_NOCOST_EN', [ZEROCOST_NOCOST_EN]],
@@ -177,8 +254,10 @@ const ZEROCOST_EN_GROUPS = [
   ['ZEROCOST_LOSE_EN', [ZEROCOST_LOSE_EN]],
   ['ZEROCOST_SAVE_EN', [ZEROCOST_SAVE_EN]],
   ['ZEROCOST_SAFE_EN', [ZEROCOST_SAFE_EN]],
+  // [r429] 新族独立成组——inject 置空本组即可整族摘除（负例注入用）
+  ['ZEROCOST_MISS_EN_R429', [ZEROCOST_MISS_EN_R429]],
 ];
-const ZEROCOST_EN = [ZEROCOST_NOCOST_EN, ZEROCOST_FREE_EN, ZEROCOST_LOSE_EN, ZEROCOST_SAVE_EN, ZEROCOST_SAFE_EN];
+const ZEROCOST_EN = [ZEROCOST_NOCOST_EN, ZEROCOST_FREE_EN, ZEROCOST_LOSE_EN, ZEROCOST_SAVE_EN, ZEROCOST_SAFE_EN, ZEROCOST_MISS_EN_R429];
 
 // ─── 距离窗（不作为 × 零成本幻觉）───────────────────────────────
 const PAIR_ZH = 60;
@@ -358,6 +437,8 @@ module.exports = {
     ZEROCOST_NOCOST_EN, ZEROCOST_FREE_EN, ZEROCOST_LOSE_EN, ZEROCOST_SAVE_EN, ZEROCOST_SAFE_EN,
     INACTION_ZH, INACTION_EN, ZEROCOST_ZH, ZEROCOST_EN,
     INACTION_ZH_GROUPS, INACTION_EN_GROUPS, ZEROCOST_ZH_GROUPS, ZEROCOST_EN_GROUPS,
+    // [r429] 新族常量（负例注入整族摘除用）
+    INACTION_DELAY_ZH_R429, INACTION_DELAY_EN_R429, ZEROCOST_MISS_ZH_R429, ZEROCOST_MISS_EN_R429,
     PAIR_ZH, PAIR_EN,
     RULE_ZH, RULE_EN, CONCEPT_ZH, CONCEPT_EN, CORRECT_ZH, CORRECT_EN,
     STRONG_NEG_ZH, STRONG_NEG_EN, ADVERSATIVE_ZH,
