@@ -792,7 +792,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-19-6.8.208';
+const BUILD_DATE = '2026-11-20-6.8.209';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -1103,6 +1103,13 @@ class HeartFlow {
     'graph.addNode', 'graph.search',
     // slots
     'slots.get', 'slots.set', 'slots.delete',
+    // [r417 接线] 执行验证引擎（execution-verifier.js，570 行，v11.1.0）：
+    // this.execution 自 r? 起已实例化但从未注册进 _modules、ALLOWED_ROUTES
+    // 零 execution.* 路由 —— MCP 工具 heartflow_execution_verify 三处全断
+    // （schema 缺 action/expected + 路由未注册 + 子系统未挂载），调用即失败，
+    // 实际零能力。本轮接通：六查（成功标志/预期结果/动作覆盖/结构/时序/副作用）
+    // + 错误分类 + 重试策略 + 加权评分，dispatch('execution.verify') 可达。
+    'execution.verify', 'execution.getHistory', 'execution.getStats',
     // [第 216 轮接线] 综合验证引擎（SKILL.md 结构 / 代码语法 / 声明可信度）
     'verification.verifySkill', 'verification.verifyCode', 'verification.healthCheck',
   ]);
@@ -1968,6 +1975,12 @@ class HeartFlow {
     try { this.stability = new (_StabilityGuard().StabilityGuard)(); } catch (e) { _boundedPush(this._initErrors, {module: 'stability', error: e.message}, MAX_HISTORY_SIZE); }
 
     try { this.execution = new (_ExecutionVerifier().ExecutionVerifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'execution', error: e.message}, MAX_HISTORY_SIZE); }
+    // [r417 接线] 注册进 _modules —— 使 execution.* 走 dispatch 路由可达。
+    // 此前（r416 及以前）this.execution 实例活着但 _modules 无 execution 键，
+    // ALLOWED_ROUTES 也无 execution.* 路由，MCP heartflow_execution_verify
+    // 三处全断（schema/路由/挂载）实际零能力。心虫铁律：有真实能力的引擎
+    // 必须暴露可调用入口，否则等于没接。
+    if (this.execution) { this._modules['execution'] = this.execution; }
 
     // [第 216 轮接线] verification-engine 是纯对象单例（非 constructor），
     // 直接取其导出。失败同样进 _initErrors，不影响其他模块启动。

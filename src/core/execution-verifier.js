@@ -167,6 +167,40 @@ class ExecutionVerifier {
   }
 
   /**
+   * [r417 接线] 取最近 N 条验证历史（dispatch('execution.getHistory') 用）
+   * 不修改任何状态，纯读取；缺省返回全部（上限 maxHistorySize）。
+   */
+  getHistory(limit) {
+    const n = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : this.verificationHistory.length;
+    return this.verificationHistory.slice(-n);
+  }
+
+  /**
+   * [r417 接线] 验证统计聚合（dispatch('execution.getStats') 用）：
+   * 总数 / 成功率 / 平均分 / 按状态分布。历史为空时 successRate 为 0
+   * （不返回 NaN——调用方（MCP 层）会把它当数值透出）。
+   */
+  getStats() {
+    const h = this.verificationHistory;
+    const total = h.length;
+    const byStatus = {};
+    let scoreSum = 0;
+    for (const v of h) {
+      byStatus[v.status] = (byStatus[v.status] || 0) + 1;
+      scoreSum += (Number.isFinite(v.score) ? v.score : 0);
+    }
+    const successCount = byStatus[ResultStatus.SUCCESS] || 0;
+    return {
+      total,
+      successCount,
+      successRate: total > 0 ? Number((successCount / total).toFixed(4)) : 0,
+      avgScore: total > 0 ? Number((scoreSum / total).toFixed(4)) : 0,
+      byStatus,
+      maxHistorySize: this.maxHistorySize,
+    };
+  }
+
+  /**
    * Check if the execution success flag is present
    */
   checkSuccessFlag(result) {

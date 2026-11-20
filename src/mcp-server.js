@@ -3157,7 +3157,17 @@ function handleMemoryConsolidateTool(args) {
 function handleExecutionVerifyTool(args) {
   const { action, result, expected } = args || {};
   if (!action) return { error: 'action 是必填参数' };
-  return safeDispatch('execution.verify', { action, result: result || null, expected: expected || null });
+  // [r417 接线修复] 参数适配到 ExecutionVerifier.verify(result, context) 真实签名：
+  // 旧代码把 {action, result, expected} 整个对象当 result 传，六查全跑在错误
+  // 形态上（checkSuccessFlag 看 result.success——对象无 success 恒真；expected
+  // 永远不进 context.expectedOutcome，checkExpectedOutcome 恒空转）。现按
+  // verify() 契约拆包：文本 result 包成 { output: text } 对象；action 进
+  // plan.actions 使 checkActionCoverage 可追溯；expected 进 expectedOutcome。
+  const resultText = typeof result === 'string' ? result : (result == null ? '' : JSON.stringify(result));
+  const resultObj = (result && typeof result === 'object' && !Array.isArray(result)) ? result : { output: resultText };
+  const plan = { actions: [action] };
+  const ctx = { plan, expectedOutcome: expected || '' };
+  return safeDispatch('execution.verify', resultObj, ctx);
 }
 
 /**

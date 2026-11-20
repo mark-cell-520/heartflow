@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 272 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
-×  1,341 dispatch routes  ×  25,392 passing tests  ×  2 npm dependencies
+×  1,343 dispatch routes  ×  25,392 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -204,13 +204,13 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.208**. Not marketing copy.
+Measured on this repository at **v6.8.209**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 164 |
 | Module init errors | 0 |
-| Dispatch routes | 1,341 |
+| Dispatch routes | 1,343 |
 | Discrimination dimensions | 272 |
 | MCP tools | 192 |
 | Test suite | 25,392 passing / 225 failing | `node test/run-all.js`（r419 轮全量实测 25,392/225/25,617（856 文件，data/test-count.json @ 2026-11-20T00:29:07Z；较 r418 基线 25,373/225/25,598 差 passed +19 / failed 0 / total +19——全部 +19 为本轮轮测 round-419-special-pleading-pronoun.test.js 19 断言；**硬失败清单与基线零新增零减少**（failed 断言数与 r418 基线逐项相同 225；文件级清单 87 硬失败 + 63「未输出汇总行」= 150 唯一文件，r418 报告为 149，+1 为环境抖动的 run-all-no-silent-skip（单独重跑 exit 0）与记账口径差，清单内零 special_pleading/round-419 相关文件，比对实录 coordination/agent4/probes/r419-run-all.log））|
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.209 | 2026-11-20 | **接线轮（r417/r420，真升级③）：execution.verify 断链修复** — 570 行 ExecutionVerifier 早已实例化为 `this.execution` 但从未 dispatch：MCP 工具 `heartflow_execution_verify` 三处全断（`_modules` 未注册 execution 键 / `ALLOWED_ROUTES` 零 execution.* 路由 / tools-registry schema 缺 action·expected 参数），调用即失败、实际零能力。本轮接通：`src/core/heartflow.js` 注册 3 条 execution.* 路由并挂载 `_modules['execution']`；`src/core/execution-verifier.js` 新增 `getHistory`/`getStats`；`src/mcp/tools-registry.js` 补全 action/result/expected schema；`src/mcp-server.js` 修复 handleExecutionVerifyTool 参数适配（按 verify(result, context) 契约拆包）。执行验证六查（成功标志/预期结果/动作覆盖/结构/时序/副作用）+ 错误分类 + 重试策略 + 加权评分真实可达。轮测 `test/round-418-execution-wiring.test.js` **27/27**。VERSION bump 6.8.208→6.8.209，路由 1,341→1,343。 |
 | 6.8.208 | 2026-11-19 | **genetic_fallacy 第 131 维词源谬误族新增「推断式规范结论」句式族（r412，真升级②：已有维度的全新句式族，非样本扩容）** — 存量 r399 词源路由只收定义/规范直陈（才算/不配叫/是误用/违背本义），漏「所以现在……其实是在……」的推断形：探针实证 4 条攻击句中 2 条 gate=pass 穿引擎（「原本指贵妇人，所以说别人是 lady 就是在抬高对方」「本义是尺子，所以今天拿它当标准就是在偷换概念」）。`src/genetic-fallacy.js` 新增腿② `ETYM_NORM2_ZH`（三支：a 实是在裁定、b 本质裁定「说到底/本质上/骨子里/无非是」、c 立场裁定「就是在为……背书/站台/正名」＋ d 裸形「就是在＋裁定动词」分支——161 轮教训自查，首版漏两条缺裁定副词的推断句，补裸形分支后 6/6 全命中）与 `ETYM_NORM2_EN`，新增 `ETYM_HEDGE_ZH/EN` 反谬误对冲豁免组（词义会随时代演变/本义不等于当下用法）。路由判据双腿共现：腿①词源/本义标记 × 腿②推断式规范结论，META 豁免（评析话术本身）先于判定。轮测 `test/round-412-etymological-inference-norm.js` **45/45**（攻击 15 + 良性 10 + META 豁免 3 + 逐常量负例注入 6 组含 ZH/EN 双腿置空与对冲置空、META 置空承重验证 + 存量回归 4 + 共现纪律 3）。五门禁：verify 16/0、guard-abilities 20/20@272、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326（与基线 diff 零新增）。变体矩阵 gate 层攻击 6/6 非 pass 且 genetic_fallacy 承重（v1 裸名词/v2 带修饰/v3 倒装/v4 长句/v5 英文/v6 混合），良性 4/5 pass（b1「但词义会随时代演变」verify 经 stash 对照确认为存量维度 monocausal_attribution 既有基线误伤，非本轮引入）。方向轮换：r405–r411 连续 7 轮逻辑谬误轴后本轮转向证据充分性/幻觉检测方向，海外三层搜索（HN Algolia/Semantic Scholar/GitHub）无可用纯规则方案（UQLM 等均 LLM 依赖型，S2 空返），转内部缺口实证。上游 merge 4c29853b（agent-4 r411 dimension，false_dilemma 第65维新路由⑪）已并入。VERSION bump 6.8.207→6.8.208。 |
 | 6.8.207 | 2026-11-19 | **每日审计·修复轮（r411，非升级轮）：homogeneity_assumption 第 271 维豁免组①否定剥离表补口语缩合形（P1 真功能失效）+ README badge 口径漂移（P2）** — 审计对象为过去 24h 升级产出（r404/r406/r410 三个新维度接线），全程亲自跑验证未采信自报告。P1 根因：`src/homogeneity-assumption.js` 源码注释要求豁免组①「先做否定前缀剥离，只对正向承认语境生效」，但 `_DIFF_NEG_ZH` 只收「毫无/没有/并无」+名词，漏「没区别/没差别/没什么两样」这类谓语后置口语缩合否定——后果是「同村的人都没区别，想法一样。」整句走 `exempt:diff-ack` 被误放（gate=pass），把「否认差异」的同质攻击句当成「承认差异」的良性句，方向判反。修复三处：① 剥离表补 `没` 裸形 + 可选「的/什么」中缀 + 「并无二致」（与既有「毫无二致」同族）；② 腿② `HOMOGENEITY_ZH` 补「一个脾气/一个性格」名词宾语形与「性格没什么两样」族（原「全都一个脾气」因「脾气」不在谓语表内 miss，属漏判族）；③ 腿① `SHARED_ATTR_ZH` 补「这个村子里的人」形（原 `村` 后要求 `(?:的|里)?(?:人|村民)`，「村子里」构词三处均不匹配）。反向防御：「不无差别」（=有差别，正向承认）**不**入剥离表，单测固化。实证（stash 前后对照）：修复前「同村的人都没区别，想法一样。」→ `exempt:diff-ack` 误放；修复后 → hit=true 承重；「同一届毕业生能力都没差别。」「同班同学性格都没什么两样。」exempt → hit；增量不伤存量——r404 自带探针前后逐条一致（攻击 15/16，A9 为既有豁免反例）、良性存量零新增非 pass；`test/round-404-homogeneity-assumption.test.js` 29/0 全绿；`audit-2210-attack.js` 14 样本修复前 12 pass/2 fail → 修复后 13 pass/1 fail，唯一剩余 FAIL 经 stash 前后各 3 次复跑实证**稳定为 verify、与本次修复无关**（存量维度基线误伤）。轮测 `test/round-411-diff-ack-negation.test.js` **11/11 全绿**（缩合否定形承重 4、正向差异承认仍豁免 3 含「不无差别」不得被剥、腿②名词族 2、远距两腿不判 1、EN 不崩溃 1）。P2 修复：README badge `MCP tools-185` → 192（实测）、`test suite-24,640` → 24,995（measure-claimed-numbers.js 实测）；SKILL.md/AGENTS.md 口径复核一致无需改。P2 记录未修（非代码缺陷）：MCP 运行态 version 报 6.8.201 vs 磁盘 6.8.207——mcp-server 进程已运行 15h43m 启动于旧版，VERSION bump 不热重载，心跳实测 running:true/164 模块，下一轮升级任务重启后自然对齐。四门禁（合并树实测）：verify 16/0、guard-abilities 20/20@272、doc-numbers 24/0、双向召回 52/52（100%）+ 误拦 302/326 pass（92.6%）。VERSION bump 6.8.206→6.8.207。 |
 | 6.8.205 | 2026-11-19 | **relative_privation 第 156 维新增「无家可归/安身缺口」措辞家族（r405，真升级②：已有维度全新措辞家族）** — 腿① RP_SUFFER_ZH +7 / RP_SUFFER_EN +4（无家可归/流离失所/居无定所/无处安身/上无片瓦/露宿街头/风餐露宿；do not even have a job\|place / walk (for) N hours\|miles / nowhere to sleep\|live\|stay / cannot (even) afford a place\|home\|house\|room\|bed）、腿② RP_DISMISS_ZH/EN 反问式压制形宾语锁（你+抱怨/喊/嫌/叫苦/叫累/哭/诉苦+？；EN you think\|call\|say + your\|this\|that\|it + ？），同池探针定拨改前攻击穿透 5/8、落地后 14/14 gate 非 pass、模块层良性 14 条零误伤；配套修存量漏洞：affirming_disjunct 第 231 维 INFER_ZH NFKC 死模式（`/[，。；]那/` 字符类补半角三兄弟，与 r402 MOTIVE_A_ZH 同族病害——pipeline NFKC 预折叠使全角形永远匹配不到，「既然…见到他，那就说明…」形整族在 checkOutput 路径静默漏判）。轮测 `test/round-405-relative-pration-homelessness.test.js` **20/20**（含 13 锚点变异守卫）+ `test/round-405-affirming-disjunct-infer-nfkc.test.js` **7/7**。合并树（含同步轮 r403 lead_time_bias）四门禁复跑：verify 16/0、guard-abilities 20/20@269、双向召回 52/52 + 误拦 302/326 不升；doc-numbers 本轮 docs commit 修复 3 项待补条目后复测 24/24。合并树全量实测 24,701/227/24,928（data/test-count.json @ 2026-11-19T06:17:22Z，与 r402 基线失败清单逐条 diff 零新增，详见规格表 Test suite 行）。VERSION bump 6.8.204→6.8.205。 |

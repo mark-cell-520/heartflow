@@ -206,8 +206,8 @@ const TOOLS = [
 
   {
     name: 'heartflow_execution_verify',
-    description: "执行验证：验证执行结果。",
-    inputSchema: {"type":"object","properties":{"result":{"type":"string","description":"输入参数"}}}
+    description: "执行验证：验证执行结果是否达成预期（六查：成功标志/预期结果/动作覆盖/结构/时序/副作用），返回状态、问题列表、错误分类、重试策略与加权评分。用于 agent 执行动作后的效果核验。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"被执行的动作描述"},"result":{"type":"string","description":"执行结果（文本形式）"},"expected":{"type":"string","description":"预期结果描述（可选）"}},"required":["action"]}
   },
 
   {

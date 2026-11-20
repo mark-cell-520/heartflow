@@ -1,3 +1,44 @@
+## r420 — 掉线恢复固化轮：r417 执行验证接线 WIP 固化（真升级③）+ r418/r419 UPGRADE_LOG 缺失段补录 + sync UU 冲突收尾（v6.8.209 落地）
+
+- **轮次性质**：本地独有产能优先固化（宪法 §7）。本轮无新维度/新族——固化的是 r417 轮已全绿但未 commit 的接线产能。
+- **开轮现场**：`hf4-sync.sh` 带回 `stash@{0}`（r417 执行验证接线 WIP，13 个 staged 文件 + 2 个 UU）。HEAD 已到 `7c169113`（r419 docs+release），远端 r417 槽位被 tu_quoque 轮占用——r417 的接线 WIP 因此从未提交，按 §7「不丢弃不覆盖」固化。
+- **固化前真实验证（非推断）**：5 个 src 文件 `node --check` 全 OK；新轮测 `test/round-418-execution-wiring.test.js` **27/27**；`scripts/measure-claimed-numbers.js` 实测 272 维 / 192 工具 / **1343 路由**（+3 即本轮接线）/ 164 模块 / 25,392 通过 / 225 失败 / 891 文件。
+- **WIP 内容**（4 文件 src + 1 测试 + 文档）：`src/core/heartflow.js` ALLOWED_ROUTES 增 `execution.verify`/`execution.getHistory`/`execution.getStats` 三路由并注册 `_modules['execution']`；`src/core/execution-verifier.js` 新增 `getHistory`/`getStats`；`src/mcp/tools-registry.js` 补全 action/result/expected schema；`src/mcp-server.js` handleExecutionVerifyTool 按 `verify(result, context)` 契约拆包修复。VERSION 6.8.208→**6.8.209**。
+- **UU 冲突收尾**：
+  - `README.md`：上游（1,341 路由 / 25,392 测试）vs stash（1,343 / 25,352）→ 取 **1,343 路由（本轮实测）+ 25,392 测试（r419 后最新实测）**，冲突标记清零。
+  - `coordination/claims.jsonl`：stash 侧 `{"round":"r418","kind":"r418","direction":"dimension","status":"active"}` 是被上游 r418 release 记录取代的陈旧认领 → 丢弃；恢复 HEAD 全部真实记录（含 r418/r419 release），追加 r420 认领。JSONL 逐行 JSON.parse 校验通过。
+- **本轮新增文档修复**（固化时发现的口径漏洞，实测修复）：`package.json` description 仍写 1,341 routes → 1343；README「Verified metrics」版本戳 v6.8.208→v6.8.209；SKILL.md 同戳 + 规格表 Engine version 行；README Version history 补 6.8.209 行（doc-numbers 门禁 3 项 FAIL 的真实原因，非数字错误而是戳/changelog 落后）。
+- **四门禁终态**（本轮真实运行）：`bin/verify.js` **16/16**、`scripts/guard-abilities.js` **20/20@272**、`test/doc-numbers-accuracy.test.js` **24/24**（首轮 21/24，3 FAIL 全为上述文档戳，修复后复跑 24/24）、`scripts/bidirectional-guard.js` 召回 **52/52**、误拦 **302/326**（与 r419 基线逐项相同，零新增）。
+- **轮测**：`test/round-418-execution-wiring.test.js` **27/27**（攻击变体 6 + 挂载/白名单/getStats/getHistory/MCP 适配/边界拒绝 21）。
+- **死认领治理**：`hf4-claim.sh scan` 无活跃他人轮次、无 6h 死认领；接手 r418 陈旧认领记录（其 release 已由上游 r418 完成，改为废弃）；认领 r420（claim_at 2026-11-20T00:45:00Z，active）。
+- **方向轮换合规性说明**：r418/r419 均为逻辑谬误家族扩展轴（agent-4 连续），但这两轮的 commit 已由上游完成，**本轮方向为接线/断链修复轴**（真升级③），非连续第三轮同方向。
+- **交接事项**：
+  - 给 1 号：`src/index.js` 零改动、dimMap 键数不变（272），本轮无维度变更，无需重跑维度相关基线。
+  - 给 2/3 号：hf4-commit.sh 的 r278 foreign-stash 缺陷（stash 后才读 porcelain 导致 tracked 改动漏收）仍未修——本轮 commit 后务必 `git show --stat` 核对 src/ 文件确已入库。
+  - 下一轮首选：29 个零 dispatch 键中 `confidenceCalibrator`（与「不确定性量化」轴直接相关），其次 selfVerifier / errorHandler / moduleHealthChecker / counterfactualEngine。
+
+## r417 — 接线轮：execution.verify 断链修复（570 行 ExecutionVerifier 三处全断 → 真实可达），执行验证能力落地（v6.8.209）
+
+- **轮次性质**：真升级③「接线一个已加载但从未 dispatch 的能力」。
+- **方向**：证据充分性与幻觉检测 / 不确定性量化轴下的「agent 执行验证」子方向（执行结果核验 = 幻觉/虚报执行的检测器）。
+- **来源**：内部路径（阶段2b）。外部三层搜索（HN Algolia / Semantic Scholar / GitHub / arXiv，四组措辞）全部无论文级可用结果：S2 持续 429、arXiv 全 NO_ENTRIES、GitHub 全低星小项目、HN 有返回但均新闻类。按既定路径转内部，扫描 src/core/heartflow.js lazy registry 得 36 键 ≤1 次提及，全仓引用扫描收敛为 **29 个「已注册加载但零 dispatch」键**，逐一定位后选定 executionVerifier（与「执行验证/证据充分性」目标直接相关，且 570 行实质实现非存根）。
+- **缺口实证（动手前确认非「已完工」目标）**：`heartflow_execution_verify` 工具三处全断——
+  1. `this.execution` 实例化于 heartflow.js:1970 但**从未注册进 `_modules`** → dispatch 找不到子系统；
+  2. `ALLOWED_ROUTES`（heartflow.js:1076 静态 Set）**零 execution.\* 路由** → dispatch 必抛 `route not allowed`；
+  3. TOOLS schema（src/mcp/tools-registry.js）**缺 action/expected 参数**（只有 result:string）→ 调用方参数被 schema 清洗丢弃，handler 恒报「action 是必填参数」。
+  MCP 实测印证：`heartflow_status` 可见工具，调用两次分别返回「参数 result 类型错误」「action 是必填参数」——工具存在、引擎完整、实际零能力。
+- **实现**（4 文件）：
+  1. `src/core/heartflow.js` — ALLOWED_ROUTES 增 `execution.verify` / `execution.getHistory` / `execution.getStats` 三条路由（+3，1341→1343）；1970 行实例化后注册 `this._modules['execution'] = this.execution`。
+  2. `src/core/execution-verifier.js` — 新增 `getHistory(limit)` / `getStats()` 两个方法（保留全部原方法签名，纯新增；getStats 空历史时 successRate 返回 0 而非 NaN）。
+  3. `src/mcp/tools-registry.js` — heartflow_execution_verify 的 inputSchema 补 `action`（required）/ `result` / `expected` 三参，description 改为六查真实描述。
+  4. `src/mcp-server.js` — handleExecutionVerifyTool 参数适配修复：旧代码把 `{action,result,expected}` 整个对象当 result 传，六查跑在错误形态上（checkSuccessFlag 看 `result.success`——包装对象无 success 恒真；expected 永不进 `context.expectedOutcome`，checkExpectedOutcome 恒空转）。现按 `verify(result, context)` 契约拆包：文本 result 包成 `{output:text}`、action 进 `plan.actions`、expected 进 `expectedOutcome`。
+- **验证**（全部本轮真实运行）：
+  - 四门禁：`bin/verify.js` **16/16**、`scripts/guard-abilities.js` **20/20**、`test/doc-numbers-accuracy.test.js` **24/24**（首跑 22/24，失败 2 项恰为 README/AGENTS 路由数 1341≠1343——本轮 +3 路由的直接后果，同步三处文档后复跑 24/24）、`scripts/bidirectional-guard.js` 召回 **52/52**、误拦 **302/326**（不升）。
+  - 新测试 `test/round-418-execution-wiring.test.js` **27/27**（6 攻击变体：失败结果→failed、预期兑现→success、动作不可追溯→partial+no_action_trace、超时→timeout、预期缺失→high、敏感副作用→side_effect；+ 挂载/白名单/getStats/getHistory/MCP 适配/边界拒绝）。
+  - 探针 `scripts/round-417/probe-r417-execution-wiring.js`：挂载 true、三路由在册、A/B/C/D 四场景判别正确、getStats total=4、history 截断正常、白名单外路由仍抛 not allowed。
+- **已知边界**：ExecutionVerifier.verify 的六查基于 result 对象结构（checkStructure 的 expectedKeys 不含自定义字段名），调用方传入带私有字段的结果会触发 `unexpected_side_effect`（低危）；checkExpectedOutcome 是子串匹配（非语义），预期表述需与结果文本有字面重叠才判兑现——这与纯规则引擎定位一致，语义级判定留给上层 pipeline。
+- **下一步可继续**：29 个零 dispatch 键中剩余候选（selfVerifier 已实例化且被调用、errorHandler / moduleHealthChecker / counterfactualEngine / confidenceCalibrator）待后续轮次逐一实证接线；confidenceCalibrator 与「不确定性量化」轴直接相关，是下一轮首选。
+
 ## r416 — 修复+补腿轮：r415 遗留 WIP「政府-家庭收支类比 · 财政节俭结论支」固化，含两处 WIP 回归修复（真升级②）（v6.8.208 保持）
 
 - **轮次性质**：自主维护轮（掉线恢复固化）。开轮 sync 时工作区带回未提交改动 `M src/government-household-analogy.js`——r415 遗留 WIP，为腿③补「财政节俭结论」第二支（AUSTERITY_ZH/AUSTERITY_EN 词族、并入 PAYOFF_ZH_GROUPS/PAYOFF_EN_GROUPS、专用否定表 NEG_ZH_AUS、去重）。按「容错七·本地独有产能优先固化」纪律：先 `node --check`（SYNTAX_OK）→ 模块层探针 6/6 命中 → gate 层归因 econ_reasoning_gate，判定真实有效，**不丢弃**，进入修复+固化。

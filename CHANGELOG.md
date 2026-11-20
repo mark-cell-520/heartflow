@@ -1,3 +1,7 @@
+## 6.8.209 (2026-11-20)
+
+- 接线轮（真升级③）：execution.verify 断链修复——570 行 ExecutionVerifier 早已实例化为 `this.execution` 但三处全断（_modules 未注册 / ALLOWED_ROUTES 零 execution.* 路由 / TOOLS schema 缺 action·expected 参数），MCP 工具 heartflow_execution_verify 实际零能力。本轮接通：`src/core/heartflow.js` 增 3 条 execution.* 路由并注册 `_modules['execution']`；`src/core/execution-verifier.js` 新增 getHistory/getStats；`src/mcp/tools-registry.js` 补全 action/result/expected schema；`src/mcp-server.js` handleExecutionVerifyTool 修复参数适配（按 verify(result, context) 契约拆包）。执行验证六查（成功标志/预期结果/动作覆盖/结构/时序/副作用）+ 错误分类 + 重试策略 + 加权评分真实可达。验证：四门禁 16/16、20/20、24/24、52/52+302/326，新测试 round-418-execution-wiring 27/27。
+
 ## 6.8.208 (2026-11-19)
 
 - genetic_fallacy（第 131 维度）词源谬误族新增「推断式规范结论」句式族（真升级②：已有维度的全新句式族，非样本扩容）：`src/genetic-fallacy.js` 新增 `ETYM_NORM2_ZH/EN`（三支：实是在裁定/本质裁定/立场裁定，另含裸形「就是在＋裁定动词」分支）与 `ETYM_HEDGE_ZH/EN` 反谬误对冲豁免组；路由判据为腿①词源/本义标记 × 腿②推断式规范结论共现，META 豁免先于判定。实证：存量路由漏判 4 条攻击句中 2 条 gate=pass 穿引擎，新路由补齐后攻击 6/6 非 pass 且维度承重、良性 5 例中 4 pass（1 例为存量维度既有基线误伤，stash 对照零新增）。测试 `test/round-412-etymological-inference-norm.js` 45/45 含逐常量负例注入（ZH/EN 双腿置空 + 对冲置空 + META 置空均验证承重）。
