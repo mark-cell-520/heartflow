@@ -65,6 +65,19 @@
  *     结论推广到全体（代表全体/适用于所有人/人人都有效/大多能
  *     成功）。r169 实测缺口：12 条攻击 6 条零命中（含 EN 双语），
  *     selection_bias 的幸存者豁免把本族整体让出，故在此接住。
+ * · [r430 新增族] SUCCESS_SET × PRESCRIPTION（成功案例研究 ×
+ *     处方化推广）——成功学处方形：从成功案例集合提取「共同点/
+ *     秘诀」再处方化推广（百年企业的共同点，照着做就能活下来/
+ *     研究赚到钱的人的特质，就能复制成功/做到你也能成功；Look at
+ *     what the surviving companies have in common and copy it. /
+ *     The winners all share these traits — adopt these traits and
+ *     you win too.）。与存量三族射程分工：主判据 SURVIVOR×GENERALIZE
+ *     锚**成功结果词**（首富/痊愈/retired early）不收集合名词形；
+ *     r170 SURV_SAMPLE 要**「只/仅」取样标记**；r270 SURV_ATTRIB 要
+ *     **全数词**（都/个个/all/every）+ 归因结论动词；本族**不要
+ *     任何显式排他或全数标记**——样本框的幸存者过滤内嵌在集合
+ *     名词本身（百年企业=活过百年的样本）。r430 同池探针实证：
+ *     改前 12 条攻击 9 条整句穿透 gate、模块层 0/12。
  * · 单有成功结果不判：「他考上了清华，这是他个人多年努力的
  *     结果」是个案归因陈述，无推及腿；「这位演员为角色减重二十斤」
  *     是无推及的事实陈述。
@@ -298,6 +311,82 @@ const SURV_CONCL_NEG_EN = new RegExp(
   + '[^.]{0,40}(?:prove|proves|proved|show|shows|demonstrate|demonstrates|mean|means|suggest|suggests)'
   + '[^.]{0,30}(?:does not matter|do not matter|is not necessary|is unnecessary|are unnecessary|no need|not needed|unimportant)', 'i')
 
+// ─── [r430 新族] 腿①「成功案例集合」（幸存者集合名词）──────────────
+// 缺口实证（scripts/round-430 同池探针 r430-probe-pool.js，v6.8.213
+// 改前）：「看看那些百年企业的共同点，照着做就能活下来。」「研究
+// 这些赚到钱的人有什么特质，就能复制成功。」「The winners all
+// share these traits — adopt these traits and you win too.」
+// 整族穿过——存量主判据 SURVIVOR_ZH 锚成功结果词（首富/痊愈/
+// retired early）不收集合名词形；r170 SURV_SAMPLE 要「只」取样
+// 标记；r270 SURV_ATTRIB 要全数词（都/个个）；本族**不要任何显式
+// 排他标记**——「研究成功者的共同点→照做就能成功」的成功学处方形，
+// 样本框的幸存者过滤内嵌在集合名词本身（百年企业=活过百年的样本）。
+const SUCCESS_SET_ZH_R430 = new RegExp([
+  '(?:百年企业|百年老店|老字号|活得好的公司|活得最好的公司|活得最久|屹立不倒|长盛不衰|基业长青|常青树|常青)',
+  '(?:成功者|成功人士|成功企业|成功公司|成功案例|赢家|行业龙头|头部企业|头部公司|独角兽)',
+  '(?:赚到钱的人|赚到大钱的人|活到老的人|百岁老人|长寿老人|没被淘汰|没被裁掉|活下来的公司|存活下来)',
+].join('|'));
+
+// [r430 新族] 同族英文成功案例集合形。
+const SUCCESS_SET_EN_R430 = new RegExp([
+  '\\b(?:surviving companies|companies that (?:made it|survived|lasted|endured)|who lived past \\d+|people who lived to \\d+|the (?:winners|successful ones|ones who made it)|those who (?:made it|won|succeeded)|the ones still standing|still in business|long-lived brands|century-old (?:companies|businesses)|the top performers|who made it (?:big|to the top))\\b',
+].join('|'), 'i');
+
+// ─── [r430 新族] 腿②「处方化推广」（模仿动作 × 同一结果）────────────
+// 中文：照做/照这个经验做/复制成功/抄作业/有样学样/如法炮制/
+// 学过来/学它们就不会被淘汰/做到你也能/用到自己公司。刻意不收
+// 裸「值得学习/可以借鉴」——那是中性建议；不收裸「复制」无对象
+// 形（「复制这段代码」是工程动作）。
+const PRESCRIPTION_ZH_R430 = new RegExp([
+  '照(?:着)?(?:这个|这样|这么|它|其|他们|它们)?做',
+  '照(?:着)?(?:这个|这样|这些|它们|其)?(?:经验|做法|方法|路子|模式|路径|秘诀|套路|方子|办法)(?:做|干|来|走|搬|套)?',
+  '复制(?:他们|它们|这种|这个)?的?(?:经验|做法|模式|路径|方法|套路|秘诀|方子|成功|答案)',
+  '抄(?:过来|作业|他们的|它们的|它的)',
+  '有样学样|如法炮制|依葫芦画瓢',
+  '学过来',
+  '学(?:它们|他们|人家)[^。！？!?]{0,6}(?:就)?(?:不会|也能|照样|一定|肯定)[^。！？!?]{0,6}(?:淘汰|失败|倒|垮|成功|赢|活|长青|出事)',
+  '做到你?也?能|你?也?能(?:成功|赢|活下来|长青|长盛|发财|赚钱)',
+  '用到自己(?:的)?(?:公司|企业|店|身上|团队|项目)',
+  '拿过来(?:就)?(?:能|直接)?用',
+].join('|'));
+
+// [r430 新族] 同族英文处方化推广形。copy their playbook / do what
+// the winners did / adopt these traits / replicate / emulate /
+// model yourself on / you win too。
+const PRESCRIPTION_EN_R430 = new RegExp([
+  'copy (?:their|them|his|her) (?:\\w+ ){0,2}(?:playbook|approach|model|formula|strateg(?:y|ies)|secrets?|routine|habits?|traits?|ways?|methods?)',
+  'copy (?:this|that|these) (?:playbook|approach|model|formula|strateg(?:y|ies))',
+  'do what (?:the winners|they|the survivors|the successful) did',
+  'follow (?:their|the same) (?:playbook|approach|model|path|formula|strateg(?:y|ies))',
+  'adopt (?:their|these) (?:traits|habits|practices|ways|methods)',
+  'replicate (?:their|this)',
+  'emulate (?:them|the winners|the survivors|the successful)',
+  'model (?:yourself|your business|your team|your company) (?:on|after)',
+  'apply (?:their|these) (?:lessons|habits|playbook|methods)',
+  'you (?:can|could|will) (?:too|do the same|win|succeed|make it|get there)',
+].join('|'), 'i');
+
+// ─── [r430 新族] 腿①「成功案例集合」× 腿②「处方化推广」─────────────
+// 与存量家族射程分工：主判据 SURVIVOR×GENERALIZE 锚成功结果词
+// （首富/痊愈/retired early）+ 推及听者（你也能/读书没用）；
+// r170 SURV_SAMPLE 要「只/仅」取样标记；r270 SURV_ATTRIB 要全数词
+// （都/个个/all/every）+ 归因结论动词；本族不要任何显式排他或
+// 全数标记——成功学处方形（研究赢家共性→照做就能赢）。
+// 豁免与 r270 族同口径（SURV_NEW_EXEMPT：样本框自陈/反驳本族/
+// 只听见好评）；SURV_EXEMPT（假设条件/否定前置/疑问）在函数前段
+// 已全局早退，对本族同样生效。
+function checkSuccessPrescriptionZh(text, R) {
+  const set = R.SUCCESS_SET_ZH_R430 || SUCCESS_SET_ZH_R430;
+  const presc = R.PRESCRIPTION_ZH_R430 || PRESCRIPTION_ZH_R430;
+  return set.test(text) && presc.test(text);
+}
+
+function checkSuccessPrescriptionEn(text, R) {
+  const set = R.SUCCESS_SET_EN_R430 || SUCCESS_SET_EN_R430;
+  const presc = R.PRESCRIPTION_EN_R430 || PRESCRIPTION_EN_R430;
+  return set.test(text) && presc.test(text);
+}
+
 // ① 假设条件形（如果只统计活下来的用户，结果就会偏乐观——在阐述
 //    偏差而非犯偏差）；② 否定前置（不是只采访幸存者）；③ 反驳
 //    本族（结论不能反映全体/不足以推广）；④ 疑问句。
@@ -450,6 +539,19 @@ function checkSurvivorshipBias(text, inject) {
     }
   }
 
+  // ─── [r430 新族] 成功案例研究 × 处方化推广 ───────────────────────
+  // 豁免先于判定（同 r270 口径）；SURV_EXEMPT 已在函数前段全局早退。
+  if (!(SURV_NEW_EXEMPT_ZH.test(text) || SURV_NEW_EXEMPT_EN.test(text))) {
+    if (checkSuccessPrescriptionZh(text, R) || checkSuccessPrescriptionEn(text, R)) {
+      return {
+        hit: true,
+        score: 0.6,
+        count: 1,
+        detail: isZh ? '成功案例研究×处方化推广(zh)' : 'success-study-prescription(en)',
+      };
+    }
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
@@ -460,5 +562,6 @@ module.exports = {
     SURV_GEN_ZH_A, SURV_GEN_ZH_B, SURV_GEN_EN_A, SURV_GEN_EN_B, SURV_EXEMPT_ZH, SURV_EXEMPT_EN,
     SURV_FILTER_ZH, SURV_ALL_ZH, SURV_ATTRIB_ZH, SURV_FILTER_EN, SURV_ALL_EN, SURV_ATTRIB_VERB_EN,
     SURV_ATTRIB_ZH_SUP, SURV_ATTRIB_ZH_ACT, SURV_ATTRIB_EN, SURV_ATTRIB_EN_ONLY, SURV_ONLY_ZH, SURV_ONLY_EN,
-    SURV_NEW_EXEMPT_ZH, SURV_NEW_EXEMPT_EN, SURV_GEN_ONLY_ZH, SURV_CONCL_NEG_ZH, SURV_CONCL_NEG_EN }),
+    SURV_NEW_EXEMPT_ZH, SURV_NEW_EXEMPT_EN, SURV_GEN_ONLY_ZH, SURV_CONCL_NEG_ZH, SURV_CONCL_NEG_EN,
+    SUCCESS_SET_ZH_R430, SUCCESS_SET_EN_R430, PRESCRIPTION_ZH_R430, PRESCRIPTION_EN_R430 }),
 };
