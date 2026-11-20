@@ -229,6 +229,18 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_cognitive_protocol',
+    description: "认知协议（r428 接线）：心虫「agent 执行验证」轴对外入口。任务复杂度分级（analyzeTaskLevel）、先理解再行动（understand）、检查点存取（createCheckpoint/getCheckpointHistory）、问题库与模式识别（addProblem/getUnresolvedProblems/detectProblemPatterns）、卡点暂停恢复（pauseTask/continueTask/getPausedTasks）、状态查询（getStatus）。底层 1515 行 CognitiveProtocol，实例多年活着但此前零路由零工具，r428 首次接入。纯规则零 LLM。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"analyzeTaskLevel | understand | createCheckpoint | getCheckpointHistory | addProblem | getUnresolvedProblems | detectProblemPatterns | pauseTask | continueTask | getPausedTasks | getStatus"},"task":{"type":"string","description":"analyzeTaskLevel/understand/createCheckpoint：任务描述文本"},"summary":{"type":"string","description":"createCheckpoint：检查点摘要"},"problem":{"type":"string","description":"addProblem：问题描述"},"rootCause":{"type":"string","description":"addProblem：根因（可选）"},"stuckPoint":{"type":"string","description":"pauseTask：卡点描述"},"nextStep":{"type":"string","description":"pauseTask：下一步（可选）"},"checkpointId":{"type":"string","description":"continueTask：要恢复的检查点/任务 ID（可选）"}},"required":["action"]}
+  },
+
+  {
+    name: 'heartflow_error_handler',
+    description: "错误处理中枢（r428 接线）：心虫「自我纠错」轴对外入口。错误分类（classifyError，返回类型/严重度/是否可重试）、恢复建议（getRecoverySuggestion）、错误历史（getHistory）、统计（getStats）、重置（resetAll）。底层 1493 行 ErrorHandler（含去重、限流、震荡检测、关联分析、重试计划），实例多年活着但此前零路由零工具，r428 首次接入。纯规则零 LLM。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"classifyError | getRecoverySuggestion | getHistory | getStats | resetAll"},"error":{"type":"string","description":"classifyError：错误消息文本"},"errorType":{"type":"string","description":"getRecoverySuggestion：错误类型"},"count":{"type":"number","description":"getHistory：返回条数，默认 10"}},"required":["action"]}
+  },
+
+  {
     name: 'heartflow_verification_verify',
     description: "综合验证引擎：验证 SKILL.md 文档结构/链接/锚点/版本一致性、JS 或 Python 代码语法与括号配对、文本中的可验证声明。返回严重性分级（critical/major/minor/info）、评分与修复建议。",
     inputSchema: {"type":"object","properties":{"content":{"type":"string","description":"待验证的内容"},"kind":{"type":"string","description":"验证类型：skill（技能文档）、code（代码）、general（通用文本）"}},"required":["content"]}

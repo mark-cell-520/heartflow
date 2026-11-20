@@ -1,3 +1,61 @@
+## r428 — 双模块接线：CognitiveProtocol + ErrorHandler 接入路由与 MCP（真升级③，v6.8.212 → v6.8.213）
+
+**方向**：agent 执行验证 / 自我纠错（轮换自 r426/r427 的因果与度量博弈轴）。
+
+**来源**：内部路径。外部三层搜索（HN Algolia / Semantic Scholar / GitHub API）无可集成的纯规则 agent 执行验证方案——本轮目标本就是接线本地已存在但零 dispatch 的能力，非引入外部方案。
+
+**问题实证**：`src/core/cognitive-protocol.js`（1515 行）与 `src/core/error-handler.js`（1493 行）两个实例在 `heartflow.js` 中长期存活（L1519 `this.cognitive = new CognitiveProtocol(...)`、L2098 `this.error = _ErrorHandler()`），能力完整：CognitiveProtocol 有 analyzeTaskLevel / understand / 检查点 / 问题库 / 模式识别 / 卡点暂停恢复；ErrorHandler 有 capture / classifyError / 恢复建议 / 重试计划 / 关联分析 / 历史统计。但两者从未注册进 `_modules` → `generateAllowedRoutes` 扫不到 → routes() 零命中、dispatch('*.*') 全抛 `route not allowed`、MCP 侧无工具入口，全库 0 条可用路由。与 r423/r424 同形态。
+
+**实现**：
+1. `src/core/heartflow.js`：try/catch 内注册 `_modules['cognitiveProtocol']`（L1519 实例化后）与 `_modules['errorHandler']`（L2098 实例化后），各带 `[r428 接线]` 注释块说明实例存活/能力完整/零路由形态。
+2. `src/mcp-server.js`：新增 `handleCognitiveProtocolTool`（11 动作：analyzeTaskLevel / understand / createCheckpoint / getCheckpointHistory / addProblem / getUnresolvedProblems / detectProblemPatterns / pauseTask / continueTask / getPausedTasks / getStatus）+ `handleErrorHandlerTool`（5 动作：classifyError / getRecoverySuggestion / getHistory / getStats / resetAll），并注册进 HANDLERS 表。
+3. `src/mcp/tools-registry.js`：新增 `heartflow_cognitive_protocol` 与 `heartflow_error_handler` 两个工具定义（含完整 inputSchema）。
+4. `test/round-428-cognitive-errorhandler-wiring.test.js`：15 条测试，五层锁死——挂载层（实例非 null + _modules 注册 + 同一实例引用）/ 路由生成层（19 + 8 条路由逐名断言）/ dispatch 可达层（不再抛 route not allowed）/ 能力承重层（同族变体矩阵，防恒真空实现）/ MCP 三处同步层（handler + HANDLERS + tools-registry + WRITE_TOOLS 未误收）。
+
+**接线中发现并锁定的真实签名**（写入测试注释，防后人误用）：
+- `classifyError(error)` 收 **Error 对象**（读 `error.message`）——传字符串恒返回 'unknown'；MCP handler 外部接口仍收字符串，内部包装 `new Error(error)`。
+- `isRetryable` / `getRetryPlan` 在 `_retry` 子模块上（顶层 errorHandler 只暴露 capture/classify 等 8 条）。
+- 源码判定顺序 syntax 分支先于 json 分支：含 `SyntaxError` 的消息即使带 JSON 也判 syntax；纯 JSON 语法错误判 json。
+- `getRetryPlan` 真实返回 `{"shouldRetry":true,"delayMs":827,"attempt":1}`（带抖动指数退避），不是 maxRetries/delay 字段。
+
+**验证数据**：
+- `bin/verify.js`：16 passed / 0 failed
+- `scripts/guard-abilities.js`：20/20 能力完好
+- `test/doc-numbers-accuracy.test.js`：24/24（同步 README/SKILL/AGENTS 三处数字：工具 195→197、模块 167→169、路由 1363→1390、版本戳 6.8.212→6.8.213）
+- `scripts/bidirectional-guard.js`：召回 52/52、误拦 302/326 零退化
+- `scripts/measure-claimed-numbers.js`：274 维度（BLOCK 11 / REWRITE 19 / VERIFY 242）/ 197 工具 / 1390 路由 / 169 模块 / 测试 25492 通过 234 失败（与基线一致，零回归）
+- 新测试 `test/round-428-cognitive-errorhandler-wiring.test.js`：15/15
+- 能力实测矩阵（非只靠自检）：errorHandler.classifyError 7 个同族变体（ECONNREFUSED / connection reset / ETIMEDOUT / heap OOM / SyntaxError / JSON token / ENOENT）→ network/network/timeout/memory/syntax/json/file_not_found 全部分型正确；isRetryable 6 型 → timeout/network/memory 可重试，syntax/json/fs 不可重试；cognitiveProtocol.analyzeTaskLevel 4 梯度 → implementation×3 + module×1（大重构判 module，分级有区分度）。
+- `node --check` 三个改动文件全过。
+
+**路由计数口径说明**：文档口径为 `HeartFlow.ALLOWED_ROUTES.size`（1390，静态生成的允许路由全集，含未注册标注）；运行时 `hf.routes()` 过滤 `[未注册]` 后可注册路由 1376。两口径差值 14 为注册 `_modules` 后 CognitiveProtocol 带出的子模块路由。文档同步按 measure-claimed-numbers 与 doc-numbers 口径（1390）。
+
+**心虫裁决**：`heartflow_philosophy_decision` → accelerate，confidence 0.7，priority 40。rationale 中 cognitiveLoad / uncertainty 为字符串 `unknown`（引擎未实测到这两个模块的运行时开销）——如实标注，不作实质背书。
+
+**已知边界 / 下次可继续**：
+- CognitiveProtocol 的 19 条路由中 MCP 侧只暴露 11 个动作（getStartupContext/printStartupContext/shouldSummarize/completeCheckpoint/getPrioritizedProblems/resolveProblem/searchProblems/stats 未暴露）——为控制工具面收敛，留待后续按需开放。
+- ErrorHandler 的 `capture` / `logError` 未在 MCP handler 暴露（属内部写路径，无外部调用场景）。
+- 两工具均未进 WRITE_TOOLS（纯读 + 自身 JSON 状态写），与 r424 selfVerifier 同判；若未来新增跨调用方写语义，须同步 AGENTS.md 要求的三处。
+- 模块数 167→169 是 `_modules` 注册数变化，dimMap 274 维度不变（接线不增维度）。
+
+
+## r427 — 本地独有产能优先固化：metric_gaming 第 275 维接线（真升级①，v6.8.212）
+
+- **轮次性质**：真升级①（新判别维度——Goodhart 指标博弈族）。宪法 §7「本地独有产能优先固化」：同步后发现工作区有未提交产出（r425 之后 90 步耗尽中断遗留），先核实真实性（门禁 + 单测 + stash 前后对照）再补提交，不丢弃不覆盖。
+- **来源**：内部路径（本地 WIP）。上游语义依据为 Goodhart's law（"When a measure becomes a target, it ceases to be a good measure"），英文侧为经济学/计量学标准族。
+- **撞墙检测修正目标**：无撞墙。开轮 sync ahead=0 behind=0；claim scan 无活跃认领；r425 已在 claims.jsonl 有 release 记录（r425 本体是 `unsupported_claim` 补族，与本地这套 WIP 无关，WIP 是其后未提交产出）。故本轮定 **r427**（r426 已被 SelfVerifier? 不，r426 是 post-hoc 预兆归因，已提交在 HEAD cf3eec4e）。
+- **实现内容**：
+  - `src/metric-gaming.js`（新增，392 行）——两腿共现判据缺一不判：腿① TARGET（指标被立为目标：成为/当成/设为/纳入 + KPI|考核|绩效|目标|指标；EN became/was made/turned into/set as the target|metric|KPI）与腿② GAMED（度量失效或被博弈：刷/注水/拆分/规避/拒绝受理/不再反映/没人再管；EN gamed|optimized for the number|no longer reflects|stopped being a good measure）须同句且落在邻近窗内（ZH 40 字 / EN 90 字符）。COND/CONN 连接词桥接。五组豁免：主动分离（明确声明指标≠真目标）、修复在场（同句有修正/评估/补偿语义）、对冲限定、概念转述（教材/理论/历史案例语境）、疑问句。
+  - `src/index.js`——接线：require + dispatch + scores + guidance + VERIFY_DIMS（241→242）+ dimMap 两处 + exports。维度 273→274。
+  - `test/round-425-metric-gaming.test.js`（新增，12 项，12/12）——攻击族 6（ZH 3 + EN 3）+ 良性族 4 + 豁免逐组 + 负例注入逐常量删条翻转（4 组）——test 12 首版失败根因是负例注入测试句自身缺腿②（GAMED 语义），属**测试造句缺陷**而非模块缺陷，补「没人再管」后 12/12 全绿。
+- **射程分工**（写入 guidance）：`proxy_metric_goal`（第187维）管正向形「拿读数宣称目标达成」；`goal_drift`（第197维）管目标锚点置换；`reward_hacking`（block 级）管 agent 内部钻奖励函数空子。本族管**外部度量被立为目标后行为被扭曲**这一中间态。
+- **验证数据（全部来自本轮真实运行）**：
+  - stash 前后对照（`scripts/round-425/probe-r425-engine.js`）：攻击族基线 **1/13 非 pass**（仅存量维度偶然代拦 1 条）→ 接线态 **13/13 全非 pass**、本维度全族承重；良性族基线 13/16（FP=3）→ 接线态 13/16（FP=3），FP 逐条相同（`baseline_omission` / `monocausal_attribution` / `claimed_verification_without_trail`，均为存量维度对度量数字的固有行为）——**零新增误伤**。
+  - gate 层端到端探针（从 `src/gate.js` 导入 `checkOutput`/`gate`）：攻击 6/6 → `verify` 且 findings 挂 `metric_gaming`；良性全 pass。
+  - 四门禁：`bin/verify.js` **16 passed / 0 failed**；`guard-abilities.js` **20/20**（维度 274）；`doc-numbers-accuracy.test.js` **24/0**；`bidirectional-guard.js` **召回 52/52、误拦 302/326**。
+- **文档同步（诚实数字原则 #5）**：AGENTS.md / README.md / SKILL.md 三份——维度 273→274、verify 列举 240→242（差额 = r421 `calibration_mismatch` 接线时文档未更新的欠账 + 本轮 `metric_gaming`）、README changelog 补 6.8.212 行、README/SKILL 规格表口径版本戳 6.8.211→6.8.212。VERSION 三处同步（VERSION / package.json / src/core/version.js 兜底）。
+- **已知边界**：两腿均为词表级启发式，非语义推理；邻近窗固定 40 字/90 字符，跨句长程因果（"公司把上线次数定为核心 KPI，一年后代码质量崩了"）不判。隐喻化度量博弈（"把点赞当成饭钱"）不在词表内。
+- **下轮可继续**：① 跨句长程 Goodhart 因果族（前瞻窗扩展）是新句式族增强候选；② `cognitiveProtocol` / `errorHandler` 仍为 0 条路由（r424 已记录），是下一接线轮候选；③ r424 记录的 `coverageCheck` 中文单因族与 `counterfactual` 条件词表两条边界仍在。
 ## r424 — 接线复活轮：SelfVerifier 推理交叉验证器接入路由与 MCP（真升级③，v6.8.211）
 
 - **轮次性质**：真升级③（接线一个已加载但从未 dispatch 的能力）。延续 r421 `calibration_mismatch`（第 273 维度，不确定性量化轴）与 r423 `inferenceChain`/`causalInference`（因果与反事实推理轴）所在的「自我验证与纠错」轴线。

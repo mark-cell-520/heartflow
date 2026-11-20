@@ -792,7 +792,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-20-6.8.211';
+const BUILD_DATE = '2026-11-20-6.8.213';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -1520,6 +1520,21 @@ class HeartFlow {
 
     this.cognitive.printStartupContext();
 
+    // [r428 接线] CognitiveProtocol — 认知协议（src/core/cognitive-protocol.js，1515 行）：
+    // 实例自 v5 起一直活着（上面 L1519），但从未注册进 _modules →
+    // generateAllowedRoutes 扫不到 → ALLOWED_ROUTES 0 条 cognitiveProtocol.*、
+    // dispatch('cognitiveProtocol.*') 全抛 'route not allowed'、MCP 侧无工具入口。
+    // 即「实例活着、能力完整、全库 0 条引擎侧路由」。与 r423/r424 同形态。
+    // 能力：analyzeTaskLevel（任务复杂度分级）/ understand（先理解再行动）/
+    //   createCheckpoint + getCheckpointHistory + completeCheckpoint（检查点）/
+    //   addProblem + getPrioritizedProblems + detectProblemPatterns +
+    //   getUnresolvedProblems + searchProblems（问题库与模式识别）/
+    //   pauseTask + continueTask + getPausedTasks（卡点暂停恢复）。
+    try {
+      this.cognitiveProtocol = this.cognitive;
+      this._modules['cognitiveProtocol'] = this.cognitiveProtocol;
+    } catch (e) { _boundedPush(this._initErrors, {module: 'cognitiveProtocol', error: e.message}, MAX_HISTORY_SIZE); }
+
 
     // Memory
 
@@ -2096,6 +2111,21 @@ class HeartFlow {
     this.snapshot = _StateSnapshot();
 
     this.error = _ErrorHandler();
+
+    // [r428 接线] ErrorHandler — 错误处理中枢（src/core/error-handler.js，1493 行）：
+    // 实例一直活着（上面 `this.error = _ErrorHandler()`），但从未注册进 _modules →
+    // generateAllowedRoutes 扫不到 → ALLOWED_ROUTES 0 条 errorHandler.*、
+    // dispatch('errorHandler.*') 全抛 'route not allowed'、MCP 侧无工具入口。
+    // 即「实例活着、能力完整、全库 0 条引擎侧路由」。与 r423/r424 同形态。
+    // 能力：capture（捕获并去重/限流/震荡检测/关联分析）/
+    //   classifyError + isRetryable + getRetryPlan（错误分类与重试计划）/
+    //   getRecoverySuggestion（恢复建议）/ findRelated（关联错误）/
+    //   getHistory + getStats（历史与统计）/ logError。
+    // 注意：`error.*` 前缀的 11 条路由属 self-healing 子系统，非本模块。
+    try {
+      this.errorHandler = this.error;
+      this._modules['errorHandler'] = this.errorHandler;
+    } catch (e) { _boundedPush(this._initErrors, {module: 'errorHandler', error: e.message}, MAX_HISTORY_SIZE); }
 
 
     // ★ Smart Routing 启发：平台适配器 + 能力抽象层

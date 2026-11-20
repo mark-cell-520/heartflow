@@ -3282,6 +3282,86 @@ function handleExecutionVerifyTool(args) {
        } catch (err) { return { error: err.message }; }
        }
 
+       /** [r428 接线] 认知协议工具：暴露 CognitiveProtocol（src/core/cognitive-protocol.js，1515 行）
+        * 的公开路由中的 11 个动作（analyzeTaskLevel / understand / createCheckpoint /
+        * getCheckpointHistory / addProblem / getUnresolvedProblems / detectProblemPatterns /
+        * pauseTask / continueTask / getPausedTasks / getStatus）。
+        * 实例 L1519 `this.cognitive = new CognitiveProtocol(...)` 一直活着、能力完整
+        * （任务复杂度分级 / 先理解再行动 / 检查点 / 问题库与模式识别 / 卡点暂停恢复），
+        * 但从未进 _modules → 路由零命中、dispatch 全抛 'route not allowed'、MCP 侧无工具入口。
+        * 本工具是心虫「agent 执行验证」轴的首个对外入口：调用方给一段任务描述，
+        * 引擎返回复杂度分级与分步建议；也可存取检查点与问题库。
+        * 纯规则零 LLM。createCheckpoint/addProblem/pauseTask 写自身 JSON 状态文件，
+        * 非跨调用方写操作，不需要权限收口（与 r424 selfVerifier 同判）。 */
+       function handleCognitiveProtocolTool(args) {
+       const { action, task, checkpointId, problem, rootCause, summary, stuckPoint, nextStep } = args || {};
+       if (!action) return { error: 'action 是必填参数（analyzeTaskLevel|understand|createCheckpoint|getCheckpointHistory|addProblem|getUnresolvedProblems|detectProblemPatterns|pauseTask|continueTask|getPausedTasks|getStatus）' };
+       const R = 'cognitiveProtocol.';
+       try {
+       switch (action) {
+       case 'analyzeTaskLevel': {
+         if (typeof task !== 'string' || !task) return { error: 'task 是必填参数（任务描述文本）' };
+         return safeDispatch(R + 'analyzeTaskLevel', task);
+       }
+       case 'understand': {
+         if (typeof task !== 'string' || !task) return { error: 'task 是必填参数（任务描述文本）' };
+         return safeDispatch(R + 'understand', task);
+       }
+       case 'createCheckpoint': {
+         if (typeof summary !== 'string' || !summary) return { error: 'summary 是必填参数（检查点摘要）' };
+         return safeDispatch(R + 'createCheckpoint', summary, { task: task || null });
+       }
+       case 'getCheckpointHistory': return safeDispatch(R + 'getCheckpointHistory');
+       case 'addProblem': {
+         if (typeof problem !== 'string' || !problem) return { error: 'problem 是必填参数（问题描述）' };
+         return safeDispatch(R + 'addProblem', problem, rootCause || null);
+       }
+       case 'getUnresolvedProblems': return safeDispatch(R + 'getUnresolvedProblems');
+       case 'detectProblemPatterns': return safeDispatch(R + 'detectProblemPatterns');
+       case 'pauseTask': {
+         if (typeof stuckPoint !== 'string' || !stuckPoint) return { error: 'stuckPoint 是必填参数（卡点描述）' };
+         return safeDispatch(R + 'pauseTask', stuckPoint, nextStep || null);
+       }
+       case 'continueTask': return safeDispatch(R + 'continueTask', checkpointId || null);
+       case 'getPausedTasks': return safeDispatch(R + 'getPausedTasks');
+       case 'getStatus': return safeDispatch(R + 'getStatus');
+       default: return { error: `未知 action: ${action}（应为 analyzeTaskLevel|understand|createCheckpoint|getCheckpointHistory|addProblem|getUnresolvedProblems|detectProblemPatterns|pauseTask|continueTask|getPausedTasks|getStatus）` };
+       }
+       } catch (err) { return { error: err.message }; }
+       }
+
+       /** [r428 接线] 错误处理中枢工具：暴露 ErrorHandler（src/core/error-handler.js，1493 行）
+        * 的 classifyError / getRecoverySuggestion / getHistory / getStats / resetAll。
+        * 实例 `this.error = _ErrorHandler()` 一直活着、能力完整（错误分类 / 恢复建议 /
+        * 重试计划 / 关联分析 / 历史统计），但从未进 _modules → 路由零命中、
+        * dispatch 全抛 'route not allowed'、MCP 侧无工具入口。
+        * 本工具是心虫「自我纠错」轴的对外入口：调用方给一段错误消息或类型，
+        * 引擎返回分类、严重度、是否可重试与恢复建议。
+        * 纯规则零 LLM，只读为主；resetAll 清空自身内存统计，非跨调用方写操作，
+        * 不需要权限收口（与 r424 selfVerifier 同判）。 */
+       function handleErrorHandlerTool(args) {
+       const { action, error, errorType, count } = args || {};
+       if (!action) return { error: 'action 是必填参数（classifyError|getRecoverySuggestion|getHistory|getStats|resetAll）' };
+       const R = 'errorHandler.';
+       try {
+       switch (action) {
+       case 'classifyError': {
+         if (typeof error !== 'string' || !error) return { error: 'error 是必填参数（错误消息文本）' };
+         // classifyError 签名是 (Error) 读 error.message；外部接口收字符串，此处包装
+         return safeDispatch(R + 'classifyError', new Error(error));
+       }
+       case 'getRecoverySuggestion': {
+         if (typeof errorType !== 'string' || !errorType) return { error: 'errorType 是必填参数（错误类型）' };
+         return safeDispatch(R + 'getRecoverySuggestion', errorType, new Error(errorType));
+       }
+       case 'getHistory': return safeDispatch(R + 'getHistory', typeof count === 'number' ? count : 10);
+       case 'getStats': return safeDispatch(R + 'getStats');
+       case 'resetAll': return safeDispatch(R + 'resetAll');
+       default: return { error: `未知 action: ${action}（应为 classifyError|getRecoverySuggestion|getHistory|getStats|resetAll）` };
+       }
+       } catch (err) { return { error: err.message }; }
+       }
+
  /** [第 216 轮] 综合验证引擎（verification-engine 接线）
  * 注意：与 handleExecutionVerifyTool 是两回事 —— 那个走 dispatch('execution.verify')
  * 校验单次动作的效果；本工具验证「内容本身」（SKILL.md 结构 / 代码语法 / 声明可信度），
@@ -3515,6 +3595,8 @@ const HANDLERS = {
   heartflow_inference_chain: handleInferenceChainTool,
   heartflow_causal_inference: handleCausalInferenceTool,
   heartflow_self_verifier: handleSelfVerifierTool,
+  heartflow_cognitive_protocol: handleCognitiveProtocolTool,
+  heartflow_error_handler: handleErrorHandlerTool,
   heartflow_verification_verify: handleVerificationVerifyTool,
   heartflow_formula_bridge: handleFormulaBridge,
   heartflow_formula_calc: handleFormulaCalc,

@@ -1,3 +1,7 @@
+## 6.8.213 (2026-11-20)
+
+- **r428 双模块接线（真升级③）**：CognitiveProtocol（1515 行）与 ErrorHandler（1493 行）注册进 `_modules`，路由 1363→1390（cognitiveProtocol 19 条 + errorHandler 8 条可注册），MCP 新增 `heartflow_cognitive_protocol`（11 动作）与 `heartflow_error_handler`（5 动作）两个工具；模块 167→169，工具 195→197，维度 274 不变。
+
 ## 6.8.211 (2026-11-20)
 
 - 接线轮（真升级③）：SelfVerifier 推理交叉验证器接入路由与 MCP——341 行 v5.17.12 实现的 `this.verify` 实例（src/core/heartflow.js L1791）一直存活、4 项检查（reverseConsistency/logicalChain/counterfactual/coverageCheck）能力完整，但从未注册进 `_modules`，routes() 零命中、dispatch 全拒、MCP 无工具入口。r424 将其挂载 `_modules`（路由由 engine-dispatcher 自动生成，不手写 ALLOWED_ROUTES）+ mcp-server 新增 handleSelfVerifierTool 与 HANDLERS 项 + tools-registry 新增 heartflow_self_verifier 定义。来源为内部路径（HN/S2/GitHub 三层外部搜索均无可用纯规则自我验证方案）；交接建议的 confidenceCalibrator 经运行时探针证实已完工（confidence 前缀已有 26 条路由）。改后 selfVerifier 从 0 条路由增至 3 条（verify/getStats/getRecentIssues），总路由 1360→1363，MCP 工具 194→195，模块 166→167，维度 273 不变。验证：verify 16/0、guard 20/20、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326（与基线一致零退化）、新增 test/round-424-self-verifier-wiring.test.js 8/8 全绿。dispatch 实测返回四项 checks + issues + confidence 0.5 + authenticity 0.6。已知边界（v5.17.12 词表边界，非本轮引入，下轮增强候选）：coverageCheck 对中文单因族恒 true、counterfactual 对无条件词正常陈述恒 false 且 nothing else 的 \belse\b 误放行、reverseConsistency 结论换述被误判、logicalChain 仅认显式假设词。

@@ -6,8 +6,8 @@
 [![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C452%20passing-brightgreen)](test/)
-[![MCP tools](https://img.shields.io/badge/MCP%20tools-195-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-273-blueviolet.svg)](#what-it-catches-273-dimensions)
+[![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-274-blueviolet.svg)](#what-it-catches-274-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-273 discrimination dimensions  ×  11-layer pipeline  ×  167 modules  ×  195 MCP tools
-×  1,363 dispatch routes  ×  25,536 passing tests  ×  2 npm dependencies
+274 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
+×  1,390 dispatch routes  ×  25,536 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 273 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 274 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (273 dimensions) -> gate
+scope-check -> premise-check -> discriminate (274 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -171,7 +171,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 167 modules)
+### Capability domains (7 domains, 169 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (273 dimensions)
+## What it catches (274 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **240 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **242 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,15 +204,15 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.211**. Not marketing copy.
+Measured on this repository at **v6.8.213**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 167 |
+| Modules registered | 169 |
 | Module init errors | 0 |
-| Dispatch routes | 1,363 |
-| Discrimination dimensions | 273 |
-| MCP tools | 195 | tool definitions exposed via `tools/list` |
+| Dispatch routes | 1,390 |
+| Discrimination dimensions | 274 |
+| MCP tools | 197 | tool definitions exposed via `tools/list` |
 | Test suite | 25,536 passing / 232 failing | `node test/run-all.js`（r429 全量实测 25,536/232/25,768（866 文件）——较 r428 终值基线（865 文件 25,518/232/25,750）passed +18 全部为本轮 test/round-429-opportunity-cost-wait-free-ride.test.js 的 18 条断言组、failed 零新增；文件级硬失败清单 172 项与基线逐项相同零退化）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
@@ -382,6 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.213 | 2026-11-20 | **双模块接线轮（r428，真升级③）：CognitiveProtocol + ErrorHandler 接入路由与 MCP** — `src/core/cognitive-protocol.js`（1515 行）与 `src/core/error-handler.js`（1493 行）两个实例在 `heartflow.js`（L1519 `this.cognitive` / L2098 `this.error`）自 v5 起一直活着、能力完整（任务复杂度分级/先理解再行动/检查点/问题库与模式识别/卡点暂停恢复；错误分类/恢复建议/重试计划/关联分析/历史统计），但从未注册进 `_modules`：`generateAllowedRoutes` 扫不到 → routes() 零命中、dispatch 全抛 `route not allowed`、MCP 侧无工具入口，全库 0 条可用路由。本轮挂载 `_modules['cognitiveProtocol']` 与 `_modules['errorHandler']`（try/catch 内注册，路由由 engine-dispatcher 自动生成）+ `src/mcp-server.js` 新增 `handleCognitiveProtocolTool`（11 动作）/`handleErrorHandlerTool`（5 动作）与 HANDLERS 两项 + `src/mcp/tools-registry.js` 新增 `heartflow_cognitive_protocol` / `heartflow_error_handler` 两个工具定义。实测 cognitiveProtocol 19 条 + errorHandler 8 条路由生成，总路由 1,363→1,390，MCP 工具 195→197，模块 167→169，维度 274 不变。接线中发现并锁定真实签名：`classifyError(error)` 收 Error 对象（读 `error.message`，传字符串恒 unknown）、`isRetryable`/`getRetryPlan` 在 `_retry` 子模块（真实返回 `{"shouldRetry":true,"delayMs":827,"attempt":1}`）、源码判定顺序 syntax 分支先于 json。来源为内部路径（外部三层搜索 HN Algolia/Semantic Scholar/GitHub 无可集成的纯规则 agent 执行验证方案）。验证：verify 16/0、guard-abilities 20/20、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零退化；新测试 `test/round-428-cognitive-errorhandler-wiring.test.js` 15/15（挂载/路由生成/dispatch 可达/能力承重同族变体矩阵/MCP 三处同步五层）。VERSION bump 6.8.212→6.8.213。 |
+| 6.8.212 | 2026-11-20 | **接线轮（r427，真升级①）：metric_gaming 第 275 维——Goodhart 指标博弈族** — 392 行 `src/metric-gaming.js` 顶层模块：两腿共现判据（腿① TARGET 指标被立为目标：成为/当成/设为/纳入 KPI|考核|绩效|目标 + 被测得的量，EN became/was made/turned into/set as the target/metric/KPI；腿② GAMED 度量失效或被博弈：刷/注水/拆分/规避/拒绝受理/不再反映/没人再管，EN gamed/optimized for the number/no longer reflects/stopped being a good measure）× 邻近窗（ZH 40 字 / EN 90 字符）× COND/CONN 连接 × 五组豁免（主动分离/修复在场/对冲/概念转述/疑问句）。与 proxy_metric_goal（第187维，正向形「拿读数宣称目标达成」）、goal_drift（第197维，目标锚点置换）、reward_hacking（agent 内部钻奖励函数空子）射程互补。缺口实证：stash 前后对照攻击族 1/13 非 pass → 13/13 全族承重、良性族 13/16 → 13/16 FP 逐条相同（baseline_omission/monocausal_attribution/claimed_verification_without_trail 存量维度）零新增误伤。轮测 `test/round-425-metric-gaming.test.js` 12/12（含 4 组负例注入逐常量删条翻转）。四门禁 16/0 + 20/20@274 + 24/0 + 52/52 误拦 302/326 全绿。文档同步 273→274、verify 列举 240→242（含补 r421 calibration_mismatch 欠账）。VERSION bump 6.8.211→6.8.212。 |
 | 6.8.211 | 2026-11-20 | **接线轮（r424，真升级③）：SelfVerifier 推理交叉验证器接入路由与 MCP** — 341 行 v5.17.12 的 `this.verify` 实例一直存活但从未注册 `_modules`：routes() 零命中、dispatch 全拒、MCP 无工具入口。本轮挂载 `_modules`（路由由 engine-dispatcher 自动生成）+ `src/mcp-server.js` 新增 handleSelfVerifierTool 与 HANDLERS 项 + `src/mcp/tools-registry.js` 新增 heartflow_self_verifier 定义；selfVerifier 路由 0→3（verify/getStats/getRecentIssues），总路由 1,360→1,363，MCP 工具 194→195，模块 166→167，维度 273 不变。来源为内部路径（外部三层搜索无可用纯规则自我验证方案）。验证：verify 16/0、guard-abilities 20/20@273、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零退化；新测试 `test/round-424-self-verifier-wiring.test.js` 8/8。VERSION bump 6.8.210→6.8.211。 |
 | 6.8.210 | 2026-11-20 | **第 274 维度 calibration_mismatch（断言语气强度超出证据等级）新维度接线（r421，真升级①）** — 新模块 `src/calibration-mismatch.js`（276 行）：两腿判据缺一不判——腿① CERTAINTY 高强度确定性断言（毫无疑问/毋庸置疑/绝对/必然/铁定/万无一失/百分百；EN undoubtedly / absolutely / definitely / bound to / 100%，全部带 i 标志修句首大写族），腿② EVIDENCE_DEFICIT 证据缺陷三形任一（a 证据空转「大家都这么说/口碑爆棚/业界公认」、b 主观体验担保「放心吧/包在我身上/信我」、c 无来源强断言——句子级属性不经邻近窗）。六组豁免：证据等级匹配（同句有来源/数据/检验词）、对冲限定、元陈述破除、疑问形、引述转述、非字符串入口守卫。射程分工写入 guidance：confidence 管确定性词本身出现（有依据时仍判）、absolute_claim 管绝对化形式、unsupported_claim 管单腿无依据、weak_evidence_strong_claim 管弱证据→强结论（证据在场），本族管**证据缺位→强断言**与后者互补。缺口实证 `scripts/round-421/probe-r421-gap.js`（v6.8.209 基线，stash 前后真实对照）：基线态攻击 12 条中 4 条 gate=pass 穿引擎（其余 8 条被存量维度代拦但无一命中 calibration 语义），接线态 0/12 穿引擎、11/12 本维度承重；良性族 stash 前后逐条 gate.action 完全一致，零新增误伤。轮测 `test/round-421-calibration-mismatch.test.js` **12/12**（攻击 16 + 良性 20 + 负例注入 5 组 + 豁免逐组 + 引擎接入 4 项）。五门禁：verify 16/0、guard-abilities 20/20@273、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326（零变化）。VERSION bump 6.8.209→6.8.210，维度 272→273，VERIFY 239→240，模块 164 不变（顶层新模块不走 `_modules` 注册）。 |
 | 6.8.209 | 2026-11-20 | **接线轮（r417/r420，真升级③）：execution.verify 断链修复** — 570 行 ExecutionVerifier 早已实例化为 `this.execution` 但从未 dispatch：MCP 工具 `heartflow_execution_verify` 三处全断（`_modules` 未注册 execution 键 / `ALLOWED_ROUTES` 零 execution.* 路由 / tools-registry schema 缺 action·expected 参数），调用即失败、实际零能力。本轮接通：`src/core/heartflow.js` 注册 3 条 execution.* 路由并挂载 `_modules['execution']`；`src/core/execution-verifier.js` 新增 `getHistory`/`getStats`；`src/mcp/tools-registry.js` 补全 action/result/expected schema；`src/mcp-server.js` 修复 handleExecutionVerifyTool 参数适配（按 verify(result, context) 契约拆包）。执行验证六查（成功标志/预期结果/动作覆盖/结构/时序/副作用）+ 错误分类 + 重试策略 + 加权评分真实可达。轮测 `test/round-418-execution-wiring.test.js` **27/27**。VERSION bump 6.8.208→6.8.209，路由 1,341→1,343。 |
