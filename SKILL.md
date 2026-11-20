@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,341 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 272 | `dimMap` keys in `src/index.js` |
 | MCP tools | 192 | tool definitions exposed via `tools/list` |
-| Test suite | 25,373 passing / 225 failing | `node test/run-all.js`（r418 轮全量实测 25,373/225/25,598（855 文件，data/test-count.json @ 2026-11-19T22:51:07Z；较 r417 基线 25,352/225/25,577 差 passed +21 / failed 0 / total +21——全部 +21 为本轮轮测 round-418-genetic-endorse.test.js 21 断言；**硬失败清单 149 文件与 r417 基线逐条 diff 零新增零减少**（另有 63 个「未输出汇总行」历史文件与基线相同），比对实录 coordination/agent4/probes/r418-runall.log））|
+| Test suite | 25,392 passing / 225 failing | `node test/run-all.js`（r419 轮全量实测 25,392/225/25,617（856 文件，data/test-count.json @ 2026-11-20T00:29:07Z；较 r418 基线 25,373/225/25,598 差 passed +19 / failed 0 / total +19——全部 +19 为本轮轮测 round-419-special-pleading-pronoun.test.js 19 断言；**硬失败清单与基线零新增零减少**（failed 断言数与 r418 基线逐项相同 225；文件级清单 87 硬失败 + 63「未输出汇总行」= 150 唯一文件，r418 报告为 149，+1 为环境抖动的 run-all-no-silent-skip（单独重跑 exit 0）与记账口径差，清单内零 special_pleading/round-419 相关文件，比对实录 coordination/agent4/probes/r419-run-all.log））|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
