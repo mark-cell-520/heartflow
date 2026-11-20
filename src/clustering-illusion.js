@@ -116,6 +116,34 @@
  *   ——新闻聚集×风险结论是 availability_bias 家族形态，且「看来×高危期」
  *   在公共卫生文本中误伤面大（"看来疫情进入高发期"为正当分析），不造
  *   第三条判别路径。
+ *
+ * [r432] 全新措辞家族扩展（真升级②，live 生效，维度计数不变）：
+ * r432 池化探针（coordination/agent4/probes/r432-probe-pool.js +
+ * r432-probe-round2-clustering.js + r432-probe-round3-leg1.js，v6.8.213
+ * gate() 全量 findings 实测）：本维度是统计素养候选池（gamblers_fallacy /
+ * base_rate_neglect / clustering_illusion / law_of_small_numbers /
+ * regression_to_the_mean / count_rate_conflation）里扩展最少的模块（r173
+ * 立项 + r265 赌博族），14 条「聚集×超自然凶地/邪异归因」新措辞攻击
+ * **14/14 整句穿透**（gate.action=pass 且零维度承重）、模块层 0/14、
+ * 同池其余三家族穿透均低于本族（P2 regression 1/5、P3 gamblers 2/4、
+ * P4 缘分聚合 1/3），良性基线 12 条零新增误伤——定选 P1 落地。
+ * 新族为**独立腿②路由**（不并入存量数组——round-265 登记断言
+ * SIGNIF_ANOM_ZH.length===2 / SIGNIF_ANOM_EN.length===2 等 length 锁），
+ * 与 R1-R5 并联：
+ *   · 腿②新族 SIGNIF_CURSE_ZH：场所诅咒组（凶地/凶宅/凶气/煞气/
+ *     不祥之地/晦气之地）、附体行动组（中邪/中了邪/招煞/邪祟/沾煞）、
+ *     邪异氛围组（邪乎/邪性/邪劲儿/透着邪/一股邪/邪得慌）；
+ *   · SIGNIF_CURSE_EN：jinxed / hexed / haunted 裸形 + unlucky
+ *     ground/place/venue/stadium 场所限定形（cursed 存量 MYST_EN 已收，
+ *     实测不属本族缺口，不收）。
+ * 腿①不扩展：攻击集 10 条（7 ZH + 3 EN）逐样本实测腿①经存量表
+ * CONC/COUNT/SAME_SRC × EVENT 路线已燃（round-3 leg① 探针逐条核对）；
+ * 腿①断链样本（每逢大赛掉链子/接连出问题/crashed three times/
+ * eliminated three years in a row）不纳入攻击集，如实记录窄口。
+ * 路由位置：对冲豁免之后、R2-R5 之侧——「恐怕是中了邪」类对冲句按
+ * 模块惯例豁免；词表自身不含对冲词，无 R1「绝不可能」自吞问题。
+ * 已知窄口：「每逢周一就出事，老师傅说中了邪」被 EXEMPT_CONCEPT_ZH
+ * 的「老师」吃掉（教学转述豁免保护面更大，刻意不动共享豁免）。
  */
 'use strict';
 
@@ -239,6 +267,56 @@ const SIGNIF_LAW_EN = [
 ];
 const SIGNIF_CYCLE_EN = [
   /\b(?:every|whenever|each\s+time|always)\b[^.]{0,25}\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|week|month|year|full\s+moon|13th)\b[^.]{0,25}\b(?:something|it|things|we|they|there)\b[^.]{0,20}\b(?:happens?|goes\s+wrong|breaks?|fails?|crashes?)\b/i,
+];
+
+// ─── [r432 新增] 腿② SIGNIF R6 超自然凶地/邪异归因（中文）──────────────────
+// r432 池化探针（coordination/agent4/probes/r432-probe-pool.js +
+// r432-probe-round2-clustering.js + r432-probe-round3-leg1.js，v6.8.213
+// gate() 全量 findings 实测）：clustering_illusion 是候选池里扩展最少的
+// 模块（r173 立项 + r265 赌博族后未再动），14 条「聚集×超自然归因」新措辞
+// 攻击 **14/14 整句穿透**（gate=pass 且零维度承重）、模块层 0/14、良性
+// 基线 12 条零新增误伤（3 条存量 verify/rewrite 逐项 stash 对照与本族
+// 无关——contradiction/fallacy_of_relevance/claimed_verification 领地）。
+// 穿透根因是腿②五形词表全停在「书面经典形」：
+//   · R3 MYST 只收 幕后黑手/天意/魔咒/宿命/风水 等经典神秘归因词，
+//     不收场所诅咒口语（凶地/凶宅/凶气/煞气）；
+//   · R2 ANOM 的「邪门」要求前置断言模态（显然/肯定/一定…×邪门），
+//     裸「邪乎/邪性/邪劲儿」氛围形整族漏；
+//   · 中邪/招煞/邪祟 等附体行动形五形均无。
+// 本族三小组平行独立路由（不并入存量数组——round-265 登记断言
+// SIGNIF_ANOM_ZH.length===2 等五条 length 锁），与 R1-R5 并联，命中即 hit：
+//   · 场所诅咒组（凶地/凶宅/凶气/煞气）：把随机聚集的场所读成不祥之地；
+//   · 附体行动组（中邪/招煞/邪祟/沾煞）：把聚集读成超自然力量的作用；
+//   · 邪异氛围组（邪乎/邪性/邪劲/透着邪）：无断言模态的裸邪异断言。
+// 置于对冲豁免之后（与 R2-R5 同级）——「恐怕是中了邪」类对冲句按模块
+// 惯例豁免；本族词表自身不含对冲词，无 R1 的「绝不可能」自吞问题。
+// 与既有五形的射程分工：R2 ANOM 管断言模态×异常特异性词（蹊跷/反常/
+// 有猫腻/邪门），R3 MYST 管经典神秘力量词（天意/魔咒/风水/冥冥），
+// 本族管场所诅咒×附体行动×裸邪异氛围——同属「聚集被赋予超自然意义」
+// 的不同措辞出口。已知窄口（本轮实测不收）：「每逢周一就出事，老师傅说
+// 中了邪」被 EXEMPT_CONCEPT_ZH 的「老师」吃掉（教学转述豁免保护面更大，
+// 刻意不动共享豁免）；「掉链子/出问题/eliminated」类事件名词不在 EVENT
+// 表，腿①断链的样本（每逢大赛掉链子、crashed three times、eliminated
+// three years in a row）本轮不纳入攻击集，腿①扩展不在本族射程。
+const SIGNIF_CURSE_ZH = [
+  // 场所诅咒族：凶地/凶宅/凶气/煞气——聚集发生的场所被读成不祥之地
+  /(?:凶地|凶宅|凶煞|凶气|煞气|不祥之地|晦气之地|邪地|带着煞|一股煞)/,
+  // 附体行动族：中邪/招煞/邪祟——聚集被读成超自然力量的作用
+  /(?:中邪|中了邪|招煞|招了什么煞|邪祟|沾了煞|惹了煞|犯煞)/,
+  // 邪异氛围族：邪乎/邪性/邪劲/透着邪——无断言模态的裸邪异断言形
+  /(?:邪乎|邪性|邪劲儿|邪劲|透着邪|一股邪|邪得慌|说不出的邪)/,
+];
+
+// ─── [r432 新增] 腿② SIGNIF R6 超自然凶地/邪异归因（英文）──────────────────
+// jinxed / hexed / haunted 裸形 + unlucky ground/place 场所限定形。
+// 与既有 SIGNIF_MYST_EN（cursed/doomed/ghosts/spirits/omen…）分工：存量
+// MYST_EN 已收 cursed/doomed 等经典形（实测「the street is said to be
+// cursed」经存量表即命中，不属本族缺口），本族只收存量表没有的
+// jinxed/hexed/haunted 口语形与 unlucky+场所名词限定形（benign
+// "an unlucky run of injuries" 无场所名词不触发）。
+const SIGNIF_CURSE_EN = [
+  /\b(?:jinxed|hexed|haunted)\b/i,
+  /\bunlucky\s+(?:ground|place|spot|venue|stadium|building|street|road|room)\b/i,
 ];
 
 // ─── 豁免一：显式随机性/统计处理（中文）──────────────────────────────
@@ -375,6 +453,18 @@ function checkClusteringIllusion(text, inject) {
   // 对冲豁免（R1 未命中才适用）
   if (anyHit(R.EXEMPT_HEDGE_ZH || EXEMPT_HEDGE_ZH, text) || anyHit(R.EXEMPT_HEDGE_EN || EXEMPT_HEDGE_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
 
+  // [r432 新族] 超自然凶地/邪异归因（R3 神秘归因的全新措辞家族）：凶地/凶宅/
+  // 中邪/招煞/邪乎/邪性 + EN jinxed/hexed/haunted/unlucky ground。与 R2-R5
+  // 同级置于对冲豁免之后——「恐怕是中了邪」类对冲句按模块惯例豁免；词表
+  // 自身不含对冲词，无 R1 的「绝不可能」自吞问题。
+  if (isZh) {
+    if (anyHit(R.SIGNIF_CURSE_ZH || SIGNIF_CURSE_ZH, text)) {
+      return { hit: true, score: 0.58, count: 1, detail: '集群错觉×超自然凶地/邪异归因(zh)' };
+    }
+  } else if (anyHit(R.SIGNIF_CURSE_EN || SIGNIF_CURSE_EN, text)) {
+    return { hit: true, score: 0.58, count: 1, detail: 'clustering illusion×supernatural jinx/haunted attribution(en)' };
+  }
+
   // R2 异常断言 / R3 神秘归因 / R4 定律化 / R5 周期迷信
   const signif = isZh
     ? anyHit(R.SIGNIF_ANOM_ZH || SIGNIF_ANOM_ZH, text)
@@ -402,6 +492,8 @@ module.exports = {
     SIGNIF_NEG_ZH, SIGNIF_ANOM_ZH, SIGNIF_MYST_ZH, SIGNIF_LAW_ZH, SIGNIF_CYCLE_ZH,
     CONC_EN, COUNT_EN, SAME_SRC_EN, EVENT_EN,
     SIGNIF_NEG_EN, SIGNIF_ANOM_EN, SIGNIF_MYST_EN, SIGNIF_LAW_EN, SIGNIF_CYCLE_EN,
+    // [r432] 超自然凶地/邪异归因新族常量（负例注入承重目标）
+    SIGNIF_CURSE_ZH, SIGNIF_CURSE_EN,
     EXEMPT_RAND_ZH, EXEMPT_RAND_EN, EXEMPT_NEG_ZH, EXEMPT_NEG_EN,
     EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN, EXEMPT_CONCEPT_ZH, EXEMPT_CONCEPT_EN,
   }),
