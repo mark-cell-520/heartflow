@@ -64,6 +64,22 @@
  *     to horses / hire nobody / ban all / on the spot…）共现。「全部取消」
  *     类可能正当的动作优化不入表（保精度）。池化探针 r394 实测攻击
  *     穿透 10/16、良性含转述标记零本族误伤。
+ *   · [r424] 路由④ 存在必要性否定形（转述标记 × 「某事物不该存在」）：
+ *     「照你这么说，这行业就没有存在的必要了」「按你的逻辑，这个部门
+ *     也没有必要保留」「你的意思是这所学校不如关掉」「按你的逻辑，这套
+ *     制度干脆推倒重来算了」「照你这么说，大家以后都不用吃饭了」；
+ *     EN: So by your logic, this whole department has no reason to exist. /
+ *     You might as well shut the whole thing down. / What you mean is
+ *     nobody would bother to work anymore. —— 把对方「改一点」的立场
+ *     夸成「全盘取消/不该存在」，句中既无反驳尾巴也无绝对化负面归述，
+ *     更无 DISTORT 要求的不可歧义荒诞，整族射程外（池化探针 r424 实测
+ *     攻击穿透 10/12、模块层真零命中 1/12、良性含转述标记零误伤 0/12）。
+ *     判据：转述标记（强/弱/意图/推断任一）× NEEDLESS 存在必要性否定
+ *     五支（没有存在的必要/意义/价值/理由；不如干脆关停解散；不设也罢；
+ *     环形极端化「大家以后都不用吃饭了」「谁也活不了」；限带强化前缀的
+ *     推倒重来）。转述标记是安全腿——无转述时「这个岗位不设也罢」是正当
+ *     方案讨论，单腿不判；动作形刻意只收不如/干脆/索性前缀形，「要推翻
+ *     重来」这类可能正当的动作重构不入表（r346 教训：后缀缺省加负向断言）。
  *
  * 为什么取 VERIFY 级：单句可能是正常的强烈反驳（「按你的逻辑，这
  * 个方案第三步推不出来」是具体推演质疑）、文学对白引述、谬误
@@ -220,6 +236,60 @@ const DISTORT_ZH = /(?:等着|只能等着|注定|势必|必将|干脆|只会)[^
 // 腿③-B 极端化歪曲内容标记（英文）。
 const DISTORT_EN = /\bgo back to (?:horses|the stone age|scratch|square one|zero)\b|\bban all\b|\b(?:hire|employ) (?:nobody|no one)\b|\babolish the (?:entire|whole)\b|\bnever (?:plan|work|do anything|try|meet|ship)\b|\bstart (?:from|at) (?:zero|scratch|square one)\b|\bscrap the (?:whole|entire)\b|\bon the spot\b/i;
 
+// ─── [r424] 腿④ 存在必要性否定形（把对方立场歪曲成「某事物不该存在」）──────
+// 池化探针 r424（coordination/agent4/probes/r424-probe-pool.js，HEAD 6.8.210）
+// 实测：既有路由①-③的判别腿是「反驳尾巴 REFUTE / 绝对化负面归述
+// ABSOLUTE_NEG / 荒诞 caricature DISTORT」，而「照你这么说，这行业就没有
+// 存在的必要了」「按你的逻辑，这个部门也没有必要保留」「你的意思是这所
+// 学校不如关掉」这一族稻草人**只靠「某事物不该存在/没有必要保留」这个
+// 歪曲内容**承载谬误——把对方「改一点」的立场夸成「全盘取消」，句中既
+// 无反驳尾巴也无「全都错」式绝对化归述，更无 DISTORT 要求的不可歧义
+// 荒诞（倒闭/刀耕火种/活该穷），整族射程外：攻击穿透 10/12。
+// 真升级②：既有第 138 维的全新措辞家族，维度计数不变、src/index.js 零改动。
+//
+// 判据：转述标记（强 ATTRIB_STRONG / 弱 ATTRIB_WEAK / 意图 ATTRIB_WANT /
+// 推断 ATTRIB_INFER 任一）× 存在必要性否定（NEEDLESS）共现。转述标记
+// 是必要的安全腿——同样的否定动作没有转述标记时是正当的方案讨论
+// （「这个岗位可以考虑不设」），不判。
+//
+// 边界（实测良性含转述标记零本族误伤 0/12）：
+//   · 「你的意思是需要先跑测试再上线吗」「按你的逻辑，第三步推不出来」
+//     是正当澄清/具体推演质疑，句中无「不该存在」内容，双腿交叉天然豁免；
+//   · 「行业要不要保留，取决于它是否还有真实需求」无转述标记，单腿不判；
+//   · 动作形刻意只收**不如/干脆/索性 前缀 + 否定性动作**（关掉/解散/
+//     推倒重来）——「要推翻重来」这类可能正当的动作重构不入表（r346 教
+//     训：名词后缀缺省时加负向断言），保精度。
+
+// 腿④-B 存在必要性否定内容标记（中文）——五支：必要性否定 / 不如干脆关停 /
+// 不设也罢 / 环形极端化（不用活了）/ 推倒重来（限带强化前缀形）。
+const NEEDLESS_ZH = new RegExp(
+  // a 没有存在的必要/意义/价值/理由（含「没有任何」加强形）
+  '(?:没有|毫无|没啥)(?:任何)?(?:存在|保留|设立|开设|继续|办下去|活下去)的?(?:必要|意义|价值|理由|资格|依据)' +
+  // a2 动词后置形：没有必要保留/没有必要存在/没有必要开设
+  '|(?:没有|毫无|没啥)(?:任何)?必要(?:再|去|加以|继续)?(?:保留|存在|设立|开设|办下去|维持|留存|养护|运行|运转)' +
+  // b 不如/干脆/索性 + 关停解散类否定动作（收否定性动作，不收正当方案裁剪）
+  '|(?:不如|还不如|倒不如|干脆|索性|早早)(?:把|将)?(?:它|这|那)?(?:关掉|关停|关闭|歇业|解散|撤掉|撤消|取消|废除|废掉|取缔|停掉|停了|拆掉|砸掉|推倒重来|推翻重来|连锅端|一刀切)' +
+  // c 不设也罢 / 关了算了
+  '|(?:不设|不要|不开|不办|不干|不弄)(?:也罢|也好|就算了)' +
+  '|(?:关掉|关了|解散|撤掉|取消)(?:算了|得了|拉倒)' +
+  // d 环形极端化：大家以后都不用X了 / 谁也活不了
+  '|(?:大家|谁|人们|所有人|咱们|各位)(?:以后|今后)?(?:都|全)?不用(?:吃饭|干活|工作|活了|过了|出门|上班|上学|努力)' +
+  '|(?:谁也|谁都|大家|全都)(?:活不了|没法活|不用活了|活不下去|别想活|完了)'
+);
+
+// 腿④-B 存在必要性否定内容标记（英文）。
+const NEEDLESS_EN = new RegExp(
+  "\\b(?:has|have) no (?:reason|right|business) to exist\\b" +
+  "|\\bno (?:reason|right|need|point) (?:to|in) (?:exist|keep it|keeping|continue|continuing|survive)\\b" +
+  "|\\bmight as well (?:just )?(?:shut|close|abolish|scrap|disband|tear|ditch|drop|get rid of|fire|eliminate)\\b" +
+  "|\\b(?:should|ought to) (?:just )?(?:be (?:shut|closed|abolished|scrapped|disbanded|torn down|eliminated|done away with)|shut down|close up)\\b" +
+  "|\\b(?:get rid of|do away with|tear down|abolish) the (?:whole|entire)\\b" +
+  "|\\bno point in (?:keeping|having|maintaining|funding|continuing)\\b" +
+  "|\\bnobody would (?:bother(?: to)? |ever |)(?:work|care|try|show up|stay|continue|do anything|make an effort)(?: anymore| any more| at all| again)?\\b" +
+  "|\\bwhy (?:keep|bother with) (?:it|them|this|that) at all\\b",
+  'i'
+);
+
 // ─── 豁免：评析这套话术本身 / 概念分析 ────────────────────────────
 const META_EXEMPT_ZH = new RegExp(
   '(?:这|那就是|这就是|这正是|那正是|属于|属于一种|就是|犯了|这是)(?:一种|典型的|常见的|经典的|明显的|标准的)?(?:稻草人|稻草人谬误|稻草人论证|稻草人谬说)' +
@@ -253,6 +323,8 @@ function checkStrawMan(text, inject) {
   const INFER_ZH_ = R.ATTRIB_INFER_ZH || ATTRIB_INFER_ZH;
   const DISTORT_ZH_ = R.DISTORT_ZH || DISTORT_ZH;
   const DISTORT_EN_ = R.DISTORT_EN || DISTORT_EN;
+  const NEEDLESS_ZH_ = R.NEEDLESS_ZH || NEEDLESS_ZH;
+  const NEEDLESS_EN_ = R.NEEDLESS_EN || NEEDLESS_EN;
 
   // 在评析这套话术 → 不是运用它
   if (META_ZH_.test(text) || META_EN_.test(text)) {
@@ -301,10 +373,27 @@ function checkStrawMan(text, inject) {
     };
   }
 
+  // ─── [r424] 路由④：存在必要性否定形 ────────────────────────
+  // (转述标记 强/弱/意图/推断任一) × 存在必要性否定共现。
+  // 复用既有 ATTRIB_STRONG/WEAK/WANT/INFER（含 EN），新增 NEEDLESS（中英）。
+  // 与路由①②③ union，仅在它们未命中时补判；META 豁免已在函数顶部先行
+  // 返回，天然继承。转述标记作安全腿：无转述时「这个岗位不设也罢」是
+  // 正当的方案讨论，单腿不判。
+  const needZh = NEEDLESS_ZH_.test(text);
+  const needEn = NEEDLESS_EN_.test(text);
+  if ((needZh || needEn) && (strong || weak || wantZh || inferZh)) {
+    return {
+      hit: true,
+      score: 0.57,
+      count: 1,
+      detail: needZh ? '稻草人谬误×存在必要性否定(把对方立场歪曲成「某事物不该存在」)' : 'straw man×necessity-of-existence negation(en)',
+    };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
   checkStrawMan,
-  __internals: () => ({ ATTRIB_STRONG_ZH, ATTRIB_WEAK_ZH, ATTRIB_STRONG_EN, ATTRIB_WEAK_EN, REFUTE_ZH, REFUTE_EN, ABSOLUTE_NEG_ZH, ABSOLUTE_NEG_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ATTRIB_WANT_ZH, ATTRIB_INFER_ZH, DISTORT_ZH, DISTORT_EN }),
+  __internals: () => ({ ATTRIB_STRONG_ZH, ATTRIB_WEAK_ZH, ATTRIB_STRONG_EN, ATTRIB_WEAK_EN, REFUTE_ZH, REFUTE_EN, ABSOLUTE_NEG_ZH, ABSOLUTE_NEG_EN, META_EXEMPT_ZH, META_EXEMPT_EN, ATTRIB_WANT_ZH, ATTRIB_INFER_ZH, DISTORT_ZH, DISTORT_EN, NEEDLESS_ZH, NEEDLESS_EN }),
 };
