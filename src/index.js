@@ -8952,6 +8952,36 @@ const PRESUPPOSITION_PATTERNS = {
     //      拖着多久」是项目管理正常问句，收进来会把排期问答打成预设攻击。
     //      取舍：宁可漏不乱伤，裸「还要拖多久」形状记录为已知边界。
     [/(?:你|您)?[^。]{0,10}(?:还要|还得|要继续|打算继续)[^。]{0,8}(?:隐瞒|抵赖|装傻|装聋|狡辩|回避|躲着|遮掩|搪塞|和稀泥|含糊其辞)[^。]{0,10}(?:多久|到什么时候|到何时|到几时|到啥时候)/, 'presupposed_ongoing_conceal'],
+    // ── [v6.8.214 第 434 轮] complex_question 族 ZH：预设过错 × 问责疑问 ──
+    // 轮初实测（coordination/agent4/probes/r434-probe-pool.js，6 条同族攻击
+    // 全 pass 穿过硬闸门，6 条良性 0 误伤）：zh 表既有 40+ 支全部锚定
+    // 「你+负面人格质问」「承认动词+强制半」「既然+回溯时间词」三族，
+    // 而本族形状是**把对方未承认的过错钉为既定事实，再用问责疑问句
+    // 逼对方在预设内作答**——经典 complex question（"Have you stopped
+    // cheating?"）的汉语同构。存量腿射程缺口：
+    //   「既然已经认识到自己的错误，为什么不现在就停止抵赖」——
+    //     有「既然+过错名词」但**没有回溯时间词**（早就/当初/当时），
+    //     prior_knowledge 族（8966 行）要求两者共现 → 不命中；
+    //   「你还不明白自己错在哪里吗」——「认识到错误」压缩成「还不明白」，
+    //     无承认动词、无强制半 → forced_admission 族不命中。
+    // 判据沿用「两腿共现」（本维度第 N 次复现，缺一不判）：
+    //   腿①过错预设（承认/认识/知道 + 过错定性词；或「既然+过错名词」）
+    //   × 腿②问责疑问（为什么/怎么/为何 + 不/没/还；或承认类逼问「有那么难吗」）
+    // 良性分界：疑问指向未发生假设（什么时候开始/要不要/是否应该）且不含
+    //   过错预设腿；「请回答两个问题」式中性追问；第三人称复盘陈述。
+    //   6 条良性实测（含「请回答两个问题：你错在哪里，以及你打算怎么改」
+    //   「Why did you choose this approach」）0 误伤。
+    // ① 认识到/承认 + 过错名词 + 为什么/怎么 + 不/没/还（问责疑问）
+    [/(?:既然|既然说|既然你|你既然)[^。]{0,14}(?:已经|早就|早已)?[^。]{0,6}(?:认识|承认|知道|明白|清楚)[^。]{0,10}(?:自己|自身|你的|其)?[^。]{0,8}(?:错误|过错|失误|问题|责任|罪|过失|毛病|漏洞|缺陷|不对|不当|失职|偏差)[^。]{0,12}(?:为什么|为何|怎么|怎会)[^。]{0,8}(?:不|没|没有|还|仍|依然|还要|反倒|反而)/, 'complex_question'],
+    // ② 第二人称在场 + 过错预设 + 逼问（认识到错误 + 追问「还不明白/有那么难吗」）
+    [/你(?:还|还是|到底|究竟)?[^。]{0,6}(?:不明白|不清楚|不知道|不认可)[^。]{0,8}(?:自己|自身|你的)?[^。]{0,6}(?:错|误|失误|问题|责任|过失|不当|失职)[^。]{0,4}(?:在|是)?[^。]{0,6}(?:哪|哪里|哪儿|什么)[^。]{0,6}(?:吗|么)?[？?]?[^。]{0,8}(?:承认|认错|认下)[^。]{0,10}(?:有|真的)?[^。]{0,4}(?:那么|这么)?[^。]{0,2}(?:难|难吗|难吗？)/, 'complex_question'],
+    [/你(?:还|还是|到底|究竟)?不(?:明白|清楚)[^。]{0,10}(?:自己|自身|你的)[^。]{0,6}(?:错|误|失误|问题|责任|过失|不当|失职)[^。]{0,12}(?:在|是)?[^。]{0,6}(?:哪|哪里|哪儿|什么|哪一点)[^。]{0,4}(?:吗|么)?[？?]/, 'complex_question'],
+    // ③ 既然 + 过错名词 + 为什么 + 还要/一错再错（认识动词可省，过错名词承重）
+    [/(?:既然|既然说)[^。]{0,14}(?:知道|明白|清楚|认识|承认)?[^。]{0,6}(?:错|误|失误|问题|责任|过失|不当|失职|不对)[^。]{0,12}(?:为什么|为何|怎么|怎会)[^。]{0,10}(?:还要|还要一|再|仍然|依然|继续|反倒|反而|明知)[^。]{0,8}(?:错|犯|抵赖|狡辩|掩|盖|回避|拖|撑|硬撑|不认|不改|不认错)/, 'complex_question'],
+    // ④ 一错再错 / 明知故犯 + 逼问（既有预设族没收的紧缩形）
+    [/你(?:既然|既然说)?[^。]{0,6}(?:一错再错|将错就错|明知故犯|知错犯错)[^。]{0,16}(?:为什么|为何|怎么)[^。]{0,8}(?:不|没|还|不肯|不愿|不敢)/, 'complex_question'],
+    // ⑤ 承认动词 + 有那么难吗 / 很难吗（逼认形，比 forced_admission 少强制半）
+    [/(?:承认|认错|认下|面对)[^。]{0,12}(?:自己|自身|你的|其)?[^。]{0,8}(?:错误|过错|失误|问题|责任|过失|不当|失职|漏洞|缺陷)[^。]{0,10}(?:真的)?[^。]{0,6}(?:那么|这么)?[^。]{0,2}(?:难|困难)[^。]{0,4}(?:吗|么)[？?]?/, 'complex_question'],
   ],
   en: [
     [/\bdon't you think\b/i, 'presupposed_agreement'],
@@ -8999,6 +9029,36 @@ const PRESUPPOSITION_PATTERNS = {
     [/\bwhen will you (?:quit|stop)\s+(?:lying|cheating|denying|stealing|dragging|ignoring)\b/i, 'presupposed_ongoing_wrongdoing'],
     [/\bhow long are you going to keep\s+(?:lying|cheating|denying|giving us|taking credit|pretending)\b/i, 'presupposed_ongoing_wrongdoing'],
     [/\bhow long will you keep\s+(?:lying|cheating|denying|giving us|taking|hiding)\b/i, 'presupposed_ongoing_wrongdoing'],
+
+    // ── [v6.8.214 第 434 轮] complex_question 族 EN：presupposed wrongdoing × demand question ──
+    // 与 zh 侧同轮补齐（r434 探针 6 条英文攻击 5/6 穿过硬闸门，仅
+    // "Participants knew they were being observed" 被 fallacy_of_relevance 意外
+    // 拦下——那是 demand_characteristic 族的存量覆盖，不属本族）。EN 表既有
+    // 22 支锚定 still/always/ever/admit/refuse 与 when-will-you-stop 两形状，
+    // 对下面三种 complex question 形状失效：
+    //   "When did you stop beating your wife?"——过去时 + 停止动词，无 when will 前瞻形；
+    //   "Do you admit that your wrong behaviour is unacceptable?"——是非逼问，
+    //     非 why won't you admit 质问形；
+    //   "Why do you still insist on the mistake you already know is wrong?"——
+    //     错认定语从句嵌套，既有 why do you always 锚不到 know-wrong 预设。
+    // 判据两腿共现（缺一不判）：
+    //   腿①过错预设（know/aware of + wrong/mistake/guilt；或 stop + wrongdoing 名词）
+    //   × 腿②逼问/问责（when did you stop / do you admit / why do you still）
+    // 良性分界：When did you stop working on X?（X 为中性交付物）、
+    //   Do you admit this approach is slower?（非过错定性）→ 不命中。
+    // ① when did you stop + wrongdoing（经典 complex question 过去时形）
+    [/\bwhen did you (?:stop|quit|give up)\s+(?:lying|cheating|stealing|beating|hitting|abusing|faking|padding|bribing|taking|hiding|covering)\b/i, 'complex_question'],
+    [/\bwhen did you stop\b[^.]{0,40}\b(?:your|the)\s+(?:wife|husband|partner|kid|child|team|dog|cat|staff)\b/i, 'complex_question'],
+    // ② do you admit / are you admitting + 过错定性（是非逼问）
+    [/\b(?:do|did|can|could|would) you (?:now )?(?:admit|acknowledge|confess|concede)\b[^.]{0,60}\b(?:wrong|mistake|error|fault|guilt|failure|lie|lying|cheat|cheating|stealing|misconduct|unacceptable|inexcusable|indefensible|wrongdoing|responsibility|blame)\b/i, 'complex_question'],
+    // ③ why do you still + insist/persist/continue + 已知过错（know-wrong 预设嵌套）
+    [/\bwhy do you (?:still|keep|continue to|insist on|persist in)\b[^.]{0,50}\b(?:mistake|error|wrongdoing|behaviour|behavior|claim|story|line)\b[^.]{0,30}\byou (?:already )?(?:know|knew|realise|realize|understand)\b[^.]{0,20}\b(?:wrong|false|mistaken|untrue|incorrect|bad)\b/i, 'complex_question'],
+    // ④ how can you + deny + 已知事实（deny-known 预设形）
+    [/\bhow (?:can|could) you (?:still )?(?:deny|dismiss|dispute|ignore)\b[^.]{0,50}\byou (?:already )?(?:know|knew)\b/i, 'complex_question'],
+    // ⑤ so you admit / you admit that + 过错定性（陈述式逼认）
+    [/\byou (?:admit|acknowledge|confess)(?:ed)? (?:that|you)\b[^.]{0,60}\b(?:wrong|mistake|error|fault|guilty|failure|lie|lying|cheating|misconduct|unacceptable|inexcusable|wrongdoing|falsified|fabricated|forged|rigged|manipulated|doctored|inflated)\b/i, 'complex_question'],
+    // ⑥ since you know / now that you know + 过错 + why not stop（EN 对齐 zh ①）
+    [/\b(?:since|now that|given that) you (?:already )?(?:know|realise|realize|understand|admit)\b[^.]{0,50}\b(?:wrong|mistake|error|fault|guilt|failure|misconduct|lie|lying|cheating|wrongdoing)\b[^.]{0,40}\bwhy (?:don'?t|do not|not|won'?t|will not)\b[^.]{0,30}\b(?:stop|quit|cease|end|admit|apologize|apologise|make it right)\b/i, 'complex_question'],
   ],
 };
 

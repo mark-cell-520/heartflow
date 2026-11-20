@@ -1,3 +1,7 @@
+## 6.8.214 (2026-11-21)
+
+- **r434 presupposition 新句式族 complex_question（真升级②）**：`src/index.js` `PRESUPPOSITION_PATTERNS` 表追加 zh 5 支 + en 6 支，把对方未承认的过错钉为既定事实再用问责疑问逼答的攻击族纳入第 67 维 presupposition 射程（两腿共现：过错预设 × 问责疑问，含裸名词形与逼问形）。轮初探针 6/6 攻击零覆盖 → 6/6 命中，良性 0 误伤；轮测 30/30、四门禁全绿；维度 275 不变。
+
 ## 6.8.213 (2026-11-20)
 
 - **r428 双模块接线（真升级③）**：CognitiveProtocol（1515 行）与 ErrorHandler（1493 行）注册进 `_modules`，路由 1363→1390（cognitiveProtocol 19 条 + errorHandler 8 条可注册），MCP 新增 `heartflow_cognitive_protocol`（11 动作）与 `heartflow_error_handler`（5 动作）两个工具；模块 167→169，工具 195→197，维度 274 不变。

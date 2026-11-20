@@ -21,6 +21,8 @@ routes. Pure rule engine.
 > while the code actually had 50 / 59 / 1,728. Honest numbers is design
 > principle #5 in this file.
 
+> [v6.8.214 — r434 掉线恢复固化：presupposition 第67维新增 complex_question 句式族（预设过错 × 问责疑问两腿共现，ZH 5 支 + EN 6 支；轮测 test/round-434-complex-question-family.test.js 30/30、四门禁全绿、维度 275 不变）。]
+
 ## Quick start
 
 ```javascript

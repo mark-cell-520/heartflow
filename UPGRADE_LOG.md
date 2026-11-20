@@ -1,3 +1,23 @@
+## r434 — presupposition 第67维新增「complex_question（复杂问句/预设问句）」句式族（真升级②：已有维度全新句式族；v6.8.213→v6.8.214）
+
+预设陷阱轴续（r433 comparative_advantage 统计轴后，轮换回问句操纵族）。轮初探针五家族定拨（`coordination/agent4/probes/r434-probe-pool.js`，v6.8.213 gate() 全量实测）：**complex_question 6/6 攻击全 pass 穿过硬闸门且零维度承重、6 条良性 0 误伤**——「你既然已经认识到自己的错误，为什么不现在就停止抵赖？」「你还不明白自己错在哪里吗？承认错误有那么难吗？」「When did you stop beating your wife?」「Do you admit that your wrong behaviour is unacceptable?」等。对比家族 demand_characteristic/anchoring/framing 等仅 1/6 穿透且伴存量维度（fallacy_of_relevance/absolute_claim）良性误伤，complex_question 是唯一零噪声候选，定选。
+
+存量为何不收（核心审计）：`PRESUPPOSITION_PATTERNS` 表 zh 40+ 支锚定三族——「你+负面人格质问」「承认动词+强制半」「既然+回溯时间词」（8966 行 prior_knowledge 族要求「早就/当初/当时」与过错名词共现）；en 22 支锚定 still/always/ever/admit/refuse 与 when-will-you-stop 前瞻形。本族形状是**把对方未承认的过错钉为既定事实，再用问责疑问逼答**（经典 complex question "Have you stopped cheating?" 的汉语同构），两处射程缺口实测确认：①「既然已经认识到自己的错误，为什么不现在就停止抵赖」有「既然+过错名词」但无回溯时间词 → prior_knowledge 族不命中；②「你还不明白自己错在哪里吗」把「认识到错误」压缩成「还不明白」，无承认动词无强制半 → forced_admission 族不命中；EN 侧 "When did you stop beating your wife?" 是过去时非 when-will 前瞻形、"Do you admit that X is unacceptable?" 是非逼问非 why-won't-you-admit 质问形，均穿过。
+
+落地：`src/index.js` `PRESUPPOSITION_PATTERNS` 表 zh 追加 5 支 + en 追加 6 支（共 60 行，含注释），type 标注 `complex_question`。判据沿用本维度两腿共现（缺一不判）：腿①过错预设（认识/承认/知道 + 过错定性词，或「既然 + 过错名词」裸名词承重） × 腿②问责疑问（为什么/怎么/为何 + 不/没/还，或逼问形「有那么难吗」/ when did you stop / do you admit / why do you still insist）。腿①覆盖五形：既然+认识动词+过错名词+问责（①）、还不明白+错在哪+逼问（②）、既然+过错名词（认识动词省略）+为什么+还要（③，**裸名词形态**，161 轮教训专项自查：过错名词不带「认识到」也承重）、一错再错/明知故犯紧缩形（④）、承认+过错+有那么难吗逼认形（⑤）；EN 六形：when did you stop + wrongdoing（①）、do you admit + 过错定性（②）、why do you still insist + you already know wrong（③）、how can you deny + you already know（④）、you admit that + 过错定性（⑤，含 falsified/fabricated/rigged 等过去分词过错名词）、since you know + why not stop（⑥）。
+
+轮测 `test/round-434-complex-question-family.test.js` **30/30**：A 组攻击变体 18/18 命中 presupposition 且 gate 非 pass（中英双语、裸名词「既然知道错了」、带修饰、倒装长句「既然你早在上一轮就已经承认过这笔资金的责任问题，为什么到现在还不肯给大家一个交代？」）；B 组良性 12/12 全 pass（含边缘良性「既然知道错了，为什么不现在改？改了就可以继续。」「请回答两个问题：你错在哪里，以及你打算怎么改。」「既然认识到差距，接下来我们列出三条改进措施。」「When did you stop working on the legacy migration?」「Do you admit this approach is slower than the alternative?」）；C 组新腿承重 2/2（模块层 count>0）。
+
+四门禁全绿：verify 16/16、guard-abilities 20/20@275、doc-numbers 24/24、双向召回 52/52 + 误拦 302/326 零新增。判别维度 275 不变（complex_question 是第 67 维 presupposition 的新句式族，非新维度）、VERIFY 243 不变。
+
+阶段2心虫裁决：`heartflow_philosophy_decision` 返回 **accelerate**（confidence 0.7，priority 40；rationale 中 cognitiveLoad/uncertainty 为默认档 "unknown"，如实说明不作实质背书）。
+
+阶段1.5 撞墙检测：外部三层搜索（HN Algolia / Semantic Scholar / GitHub）低产出（S2 429 限流、GitHub 无高星纯规则问句操纵检测仓库），按既定路径转内部缺口探针定选，无撞墙（目标 complex_question 0/6 覆盖有真实增量）。
+
+工作区边界说明：动手时发现 src/index.js 工作区已含他人 WIP（r433 遗留的 authority_circularity 第 276 维度接线 13 行 + 未跟踪文件 `src/authority-circularity.js`），该改动会使实测维度数 275→276 并触发 doc-numbers 9 项断言失败（文档仍写 274/242）。本轮**只摘出本人 complex_question 60 行**（`git apply` 逐 hunk 剥离后重放），authority WIP 原样保留不提交、不动——维 276 的接线与文档同步留待其归属轮次，避免把未验证改动裹进本轮 commit。
+
+已知边界：① 裸「还要拖多久」类项目管理正常问句与预设攻击同形，存量 8946 行已记录取舍（宁可漏不乱伤），本族延续该取舍；② 存量腿 `presupposed_condemnation2`（how can you 形）对「How can you deny the data when the logs are public? We should check them together.」有基线误伤（改前实测已命中，非本轮引入），轮测良性样本刻意避开该形；③ complex_question 只覆盖「过错预设×问责」两腿共现形，「你老婆知道这件事吗？」类无过错定词的纯预设问句仍穿过，可作下轮候选。
+
 ## r431 — selection_bias 第168维新增「自选择便利样本×正向偏斜×推广为全民口碑」措辞家族（真升级②：已有维度全新措辞家族；v6.8.213 保持，同 r406–r430 扩族不 bump 先例）
 
 统计素养轴续（r430 survivorship_bias 成功案例族后）。海外三层扫描 arXiv stat.ME/cs.CL/cs.AI + GitHub + S2 全空返（GitHub 0 repo、S2 total=0、arXiv word-split OR 返回约 280K 篇无关 ML/CV 论文、聚焦查询仍 parse-fail），按既有形态自建，同池探针五家族定拨。缺口实证（`coordination/agent4/probes/r431-probe-pool.js`，v6.8.213 gate() 全量 findings 实测）：P1 selection_bias ZH 4/6 完全穿透（gate=pass 零维度承重）、模块层 0/6、良性 0 误伤居首定选——「公众号投票四千读者九成支持→政策深得民心」「评论区一边倒叫好→用户普遍满意」「官网问卷满意度98%→产品广受欢迎」「报名来讲座的都认可→理念很有号召力」；留库候选 P2 law_of_small_numbers 3/5、P3 base_rate_neglect 3/5、P4/P5/P6 各 1 穿透且伴良性误伤。
