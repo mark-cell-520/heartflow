@@ -1,3 +1,26 @@
+## r435 — 第 276 维 authority_circularity（权威互引洗白 / credential laundering / citation cartel）接线闭环（真升级①：新判别维度；v6.8.214→v6.8.215）
+
+接手 r433 掉线未完成的 authority_circularity 维度（r433 报告原话「工具调用额度已尽」：模块已写、未接线、未单测、门禁未重跑，故未 commit）。UPGRADE_LOG r434 段解开了「接线为何丢失」之谜——r434 轮明确记录「只摘出本人 complex_question 60 行，authority WIP 原样保留不提交」，即接线是被有意剥离留给归属轮次，非 rebase 事故。本仓库纪律「本地独有产能优先固化（r227 审计教训）：不丢弃不覆盖，先核实真实性再补提交」直接适用。
+
+三腿判据（缺一不判）：腿① BACKING 权威互引动作 × 腿② CLOSURE 闭环关联（核心是回指同一性 anaphoric identity） × 腿③ CREDIBILITY 可信性收束（含 transferMode「权威传递即收束」变体）。射程：把「圈内互引/背书循环」洗成「结论可靠」的 credential laundering 族——诺奖互引、实验室同行评议、课题组审稿、福布斯早期投资者、智库理事单位、评级机构资助、师承链、学派传承，均不指涉外部证据而指涉权威间互相担保。
+
+本轮固化内容：
+1. `src/index.js` 八处接线（require 侧注释块 + dispatch `const auc = _applyPedagogyRelaxation(checkAuthorityCircularity(_normText), "authority_circularity", pedagogyRelaxation);` + score 参与判定 `{score: auc.score, name:'authority_circularity'},` + dimMap×3 + DIM_GUIDANCE 豁免串 + VERIFY_DIMS + module.exports 导出）。metric_gaming 模板作业：`metric_gaming: mtg,` 三处匹配、`'metric_gaming',` 两处匹配均用 r425 注释上下文与 `]);` 精准 patch，不用 replace_all。变量名 `auc`。
+2. **口径修复（r433 遗留未决风险，本轮定位根因）**：r433 报告标记「gate action 落 rewrite 而非预期 verify，模块 level/severity 设计需复核（未修）」。实测定位根因是模块 score 口径错误——`src/authority-circularity.js` 返回整数 `score: 65`，而同族模板 metric-gaming.js 用 0-1 小数（bestScore 0.72/0.62）。index.js 聚合层 `findings.push({... severity: Math.round(d.score * 100)})` 按 0-1 口径折算，整数 65 被放大成 severity 6500，越过 rewrite 阈值（`overallScore<0.5 && findings[0].severity>=60`，L6392），使本应落 verify 的族实际落 rewrite。已改为 `score: 0.65`（带 [r435 口径修复] 注释说明放大链路）。修复后实测：纯 authority_circularity 承重样本落 **verify**；含强断言共现样本（「结论毋庸置疑」）仍落 rewrite 属 calibration_mismatch/confidence 既有维度合法命中，非本族问题。
+3. 新单测 `test/round-435-authority-circularity.js`（134 行，文件名用 r435 接手轮次非 r433）：A 模块层攻击/良性、B 模块层良性零误伤、C gate 端到端攻击、D gate 端到端良性、E 接线完整性。首轮 77/78，唯一失败为 VERIFY_DIMS 断言——诊断确认 VERIFY_DIMS 是 index.js 内部 pipeline 作用域 const、**非顶层导出**（`hf.VERIFY_DIMS` 为 undefined，连 metric_gaming 都取不到），断言写错导出路径而非接线问题；改为可观测行为断言（导出函数存在 + discriminate 含维度键 + 纯承重样本 gate action 落 verify，锁定口径修复不回归）。终态 **78/0**。
+4. 文档三层同步（接线触发 doc-numbers 9 项 FAIL，逐项修复）：AGENTS.md/README.md/SKILL.md 维度总数 274→275、README action-tier verify 242→243、SKILL.md 同、AGENTS.md Verify-level 列举追加 authority_circularity 并把 242→243。README 剩余 274 均属历史 changelog 行（描述当时轮次真实状态）不改。VERSION 6.8.214→6.8.215 四处同步（VERSION / package.json / src/core/version.js 兜底 / SKILL.md 两处），runtime `hf.version` 实测确认。
+5. 探针沿用 r433 落盘的 `scripts/round-433/probe-r433.js` + `module-check.js`。缺口实证复跑：未接线时 15 条攻击穿透 12/15；模块层 15/15 命中且良性 0/15 误伤。probe-r433.js gate 层 6/15 与模块层 15/15 的差异判定为样本集不完整（EN 截断短句缺腿③），以模块层真实口径为准，非接线失败——该探针样本形状问题已记入交接事项。
+
+四门禁（接线后重跑，实跑数字）：PASS `bin/verify.js` 16/0；PASS `scripts/guard-abilities.js` 20/20 且判别维度 275；PASS `test/doc-numbers-accuracy.test.js` 24/0；PASS `scripts/bidirectional-guard.js` 召回 52/52、误拦 302/326（与基线一致零新增误拦）。
+
+负例/正例（本回合真实运行）：攻击样本（诺奖互引/实验室同行评议/课题组审稿/评级机构资助/师承链/学派传承 + EN）模块层 15/15 命中，gate 端到端 authority_circularity 全部承重；良性样本模块层 0/15 误伤，gate 端到端本维度零误伤（既有维度合法命中不计）。
+
+存量基线说明：`measure-claimed-numbers.js` 实测测试用例 25672 通过 / 233 失败——用 `git stash push src/index.js` 剥离本维度接线后复测仍为 233 失败、维度 274，实证 233 属既有基线与本轮改动无关（恢复接线后 275、233 不变）。
+
+阶段1.5 撞墙检测：本方向承接 r433 与仓库内探针缺口，未触发外部搜索，无撞墙。轮换纪律：本轮承接 r433 同方向属「接手未完成轮次」，固化后主体须换方向。
+
+已知边界：① probe-r433.js 的 gate 层样本集不完整（EN 截断短句缺腿③），下轮可补全样本或改以 module-check 为口径；② 单腿样本按设计必漏（三腿共现判据），红队样本必须双腿/三腿共现才有效；③ 深度嵌套自引（A引B引A隔三层以上）的 anaphoric identity 回指仍可能穿过，可作下轮候选。
+
 ## r434 — presupposition 第67维新增「complex_question（复杂问句/预设问句）」句式族（真升级②：已有维度全新句式族；v6.8.213→v6.8.214）
 
 预设陷阱轴续（r433 comparative_advantage 统计轴后，轮换回问句操纵族）。轮初探针五家族定拨（`coordination/agent4/probes/r434-probe-pool.js`，v6.8.213 gate() 全量实测）：**complex_question 6/6 攻击全 pass 穿过硬闸门且零维度承重、6 条良性 0 误伤**——「你既然已经认识到自己的错误，为什么不现在就停止抵赖？」「你还不明白自己错在哪里吗？承认错误有那么难吗？」「When did you stop beating your wife?」「Do you admit that your wrong behaviour is unacceptable?」等。对比家族 demand_characteristic/anchoring/framing 等仅 1/6 穿透且伴存量维度（fallacy_of_relevance/absolute_claim）良性误伤，complex_question 是唯一零噪声候选，定选。
