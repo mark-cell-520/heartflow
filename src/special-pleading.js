@@ -250,8 +250,11 @@ const BEHAVIOR_NOUNS_EN = '(?:mistakes?|errors?|failures?|faults?|lateness|tardi
 const SELF_COPULA_EN = new RegExp('\\bmy\\s+(' + BEHAVIOR_NOUNS_EN + ')\\s+(?:is|are)\\s+(?:just\\s+|also\\s+)?(?:(?:called|labeled|labelled|termed|branded|known\\s+as|dismissed\\s+as|seen\\s+as|viewed\\s+as)\\s+)?([a-z]+(?:[\\s-][a-z]+){0,3})', 'i');
 // EN 他方 copula 形：their/theirs/others… <行为名词> (is|are) […] X
 const OTHERS_COPULA_EN = new RegExp('\\b(?:their|theirs|others?|other\\s+people|everyone\\s+else|they|them|those\\s+who|people\\s+who)\\s+(' + BEHAVIOR_NOUNS_EN + ')\\s+(?:is|are)\\s+(?:just\\s+|also\\s+)?(?:(?:called|labeled|labelled|termed|branded|known\\s+as|dismissed\\s+as|seen\\s+as|viewed\\s+as)\\s+)?([a-z]+(?:[\\s-][a-z]+){0,3})', 'i');
-// EN 自方 mine 回指形：mine (get|gets|are|is|counts|count) [as|called…] X
-const SELF_MINE_EN = /\bmine\s+(?:get|gets|are|is|counts?|count)\s+(?:as\s+|called\s+|labeled\s+|labelled\s+|termed\s+|branded\s+|dismissed\s+as\s+|seen\s+as\s+|viewed\s+as\s+)?(?:just\s+)?([a-z]+(?:[\s-][a-z]+){0,3})/i;
+// EN 自方 mine 回指形：mine (get|gets|counts|count) [as|called…] X ｜
+// mine (are|is) [just] X（裸系词，负向断言排除 called/termed 等标签动词形
+// ——「mine are called X」归 r419 路由六 en-c 支，防双腿互抢致 r419 删条
+// 注入失效）
+const SELF_MINE_EN = /\bmine\s+(?:get|gets|counts?|count)\s+(?:as\s+|called\s+|labeled\s+|labelled\s+|termed\s+|branded\s+|dismissed\s+as\s+|seen\s+as\s+|viewed\s+as\s+)?(?:just\s+)?([a-z]+(?:[\s-][a-z]+){0,3})|\bmine\s+(?:are|is)\s+(?!called\b|labeled\b|labelled\b|termed\b|branded\b|known\s+as\b|dismissed\s+as\b|seen\s+as\b|viewed\s+as\b)(?:just\s+)?([a-z]+(?:[\s-][a-z]+){0,3})/i;
 // EN 他方 theirs 回指形：theirs (get|gets|are|is|counts|count) [as|called…] X
 const OTHERS_THEIRS_EN = /\btheirs\s+(?:get|gets|are|is|counts?|count)\s+(?:as\s+|called\s+|labeled\s+|labelled\s+|termed\s+|branded\s+|dismissed\s+as\s+|seen\s+as\s+|viewed\s+as\s+)?(?:just\s+)?([a-z]+(?:[\s-][a-z]+){0,3})/i;
 // EN 自方主动/动词短语形：when I do it, they call it X ｜ when I <短语> it is called X
