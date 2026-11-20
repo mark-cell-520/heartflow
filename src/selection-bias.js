@@ -206,6 +206,65 @@ const PUB_EN_RE2 = /\b(?:the\s+)?(?:published\s+|peer-reviewed\s+)?literature\b[
 // 腿② EN：普效/定论断言
 const PUB_CLAIM_EN = /\b(?:proven|proves|effective|works|worked|established|conclusive|conclusively|settled|settles|definitive|solid|reliable|trustworthy|can\s+trust|adopt|safe|clear|valid|sound)\b/i;
 
+// ═══════════════════════════════════════════════════════════════════
+// [r431] 自选择便利样本 × 正向偏斜反馈 × 推广为全民口碑 新措辞家族
+// 平行常量 + 专属路由，存量 RESTRICT/SOURCE/GEN/PUB 腿一字不动。
+// 负例注入-删条逐常量置空用（_allIdx 走 R.X || X）。
+//
+// 缺口实证（coordination/agent4/probes/r431-probe-pool.js，v6.8.213 gate()
+// 全量 findings 实测）：ZH 4/6 完全穿透（gate=pass 零维度承重）、模块层
+// 0/6、良性 0 误伤：
+//   「我们公众号做了投票，参与的四千读者九成支持，说明这项政策深得民心。」
+//   「评论区一边倒地叫好，看来用户对这个新功能普遍满意。」
+//   「官网问卷收回三万份，满意度 98%，产品显然广受欢迎。」
+//   「报名来讲座的都是认可这个理念的人，现场气氛正说明理念很有号召力。」
+// 存量为何不收：腿① RESTRICTION 要求「只/仅」限定标记或已知受限来源词 ×
+//   取样动词共现；腿② GENERALIZATION 要求特定推广动词（代表/说明/足以…）
+//   接总体范围词（全体/全民/普遍…）。本族的自选择渠道（公众号读者/评论区/
+//   官网问卷/报名者）不带显式「只」标记，正向偏斜用高比例形（九成/98%/
+//   一边倒/都认可），推广结论用民心/口碑/号召力形（深得民心/普遍满意/广受
+//   欢迎/很有号召力），三处措辞均不在存量表，故整族穿透。这正是 selection_bias
+//   「自选择的来源取证却推广到全体」语义在网络民调/评论区/报名现场的延伸。
+// ═══════════════════════════════════════════════════════════════════
+
+// 腿① SELF_SOURCE：自选择/便利取样渠道（受访者自我选择进入，天然正向偏斜）
+const SELF_SOURCE_ZH = ['公众号', '订阅号', '投票', '评论区', '留言区', '弹幕', '官网', '报名', '报名者', '报名来', '自愿报', '现场', '海选', '路演', '打call', '应援', '群访', '座谈会', '宣讲会', '众筹', '有奖征集'];
+const SELF_SOURCE_EN = ['poll', 'vote', 'voting', 'ballot', 'subscribers', 'followers', 'comment section', 'live chat', 'newsletter', 'sign-ups', 'signups', 'opt-in', 'attendees', 'launch event', 'crowdfunding', 'registered users'];
+
+// 腿② POSI_EVID：正向偏斜证据（自选择样本天然正向偏斜的高比例正面反馈）
+const POSI_EVID_ZH = ['九成', '九成九', '九成八', '八成', '绝大多数', '一边倒', '一致好评', '好评如潮', '交口称赞', '赞不绝口', '座无虚席', '清一色', '百分百', '98%', '95%', '都认可', '都赞同', '都支持', '都是认可', '都是赞同', '都是支持', '全都认可', '全是认可', '全部认可', '一致认可', '无一不认', '无一不支持', '无一反对', '零差评'];
+const POSI_EVID_EN = ['overwhelmingly', 'near-unanimous', 'near unanimous', 'unanimous', 'vast majority', 'nine in ten', 'nine out of ten', '95%', '98%', '99%', 'rave reviews', 'glowing reviews', 'sold out', 'sold-out', 'universal acclaim', 'all agreed', 'everyone agreed'];
+
+// 腿③ POP_GEN：推广为全民/市场口碑的结论形（不在存量 GEN_VERB/GEN_SCOPE 表）
+const POP_GEN_ZH = ['深得民心', '深得人心', '民心', '群众基础', '深入人心', '普遍满意', '广受欢迎', '大受欢迎', '备受欢迎', '深受欢迎', '很受欢迎', '颇受欢迎', '很有号召力', '有号召力', '口碑爆棚', '人气爆棚', '人气高涨', '圈粉无数', '备受追捧', '广受追捧', '颇受追捧', '深受用户', '深受观众', '深受读者'];
+const POP_GEN_EN = ['wildly popular', 'hugely popular', 'immensely popular', 'broadly popular', 'deeply popular', 'widely loved', 'well-loved', 'well loved', 'the public loves', 'the public backs', 'backed by the public', 'resonates with', 'struck a chord', 'won over', 'mass appeal', 'broad appeal', 'widespread acclaim', 'universal acclaim'];
+
+// 豁免：自选择/便利样本概念教学与纠正语境（全句生效）
+const SELF_META_ZH = ['自选择偏差', '自选择样本', '自选择效应', '便利样本', '方便样本', '志愿者偏差', '自愿者偏差'];
+const SELF_META_EN = ['self-selection', 'self-selected', 'convenience sample', 'volunteer bias', 'opt-in bias', 'self selection'];
+
+function _allIdx(list, text) {
+  const out = [];
+  for (const w of list) {
+    let from = 0, idx;
+    while ((idx = text.indexOf(w, from)) >= 0) { out.push(idx); from = idx + 1; }
+  }
+  return out;
+}
+
+// 三腿邻近链：self-source × posi-evid × pop-gen 两两在窗内成链（缺一不判）
+function _selfPollRoute(text, isEN, R) {
+  const src = isEN ? _allIdx(R.SELF_SOURCE_EN || SELF_SOURCE_EN, text) : _allIdx(R.SELF_SOURCE_ZH || SELF_SOURCE_ZH, text);
+  const posi = isEN ? _allIdx(R.POSI_EVID_EN || POSI_EVID_EN, text) : _allIdx(R.POSI_EVID_ZH || POSI_EVID_ZH, text);
+  const pop = isEN ? _allIdx(R.POP_GEN_EN || POP_GEN_EN, text) : _allIdx(R.POP_GEN_ZH || POP_GEN_ZH, text);
+  if (!src.length || !posi.length || !pop.length) return false;
+  const WIN = 60;
+  for (const s of src) for (const p of posi) for (const g of pop) {
+    if (Math.abs(s - p) <= WIN && Math.abs(p - g) <= WIN) return true;
+  }
+  return false;
+}
+
 const EN_STOP = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'of', 'to', 'and', 'or', 'in', 'on', 'at', 'for', 'with', 'by', 'that', 'this', 'it', 'its', 'as', 'if', 'then', 'so', 'who', 'which']);
 
 function _clauses(t) {
@@ -495,6 +554,9 @@ function checkSelectionBias(text, inject) {
   // [r342] 发表偏倚概念教学/纠正语境全句豁免（与 META_CONCEPT 同构）
   for (const m of (R.PUB_META_ZH || PUB_META_ZH)) { if (t.includes(m)) return _exempt('PUB_META', m); }
   for (const m of (R.PUB_META_EN || PUB_META_EN)) { if (t.toLowerCase().includes(m)) return _exempt('PUB_META', m); }
+  // [r431] 自选择便利样本概念教学/纠正语境全句豁免（与 META_CONCEPT 同构）
+  for (const m of (R.SELF_META_ZH || SELF_META_ZH)) { if (t.includes(m)) return _exempt('SELF_META', m); }
+  for (const m of (R.SELF_META_EN || SELF_META_EN)) { if (t.toLowerCase().includes(m)) return _exempt('SELF_META', m); }
   for (const m of TEACH) { if (t.includes(m)) return _exempt('TEACH', m); }
   for (const m of SURVIVOR_ZH) { if (t.includes(m)) return _exempt('SURVIVOR', m); }
   for (const m of SURVIVOR_EN) { if (t.toLowerCase().includes(m)) return _exempt('SURVIVOR', m); }
@@ -569,9 +631,17 @@ function checkSelectionBias(text, inject) {
     }
   }
 
+  // [r431] 自选择便利样本 × 正向偏斜 × 推广为全民口碑 平行路由（存量腿未命中时兜底）
+  if (!hits.length) {
+    const isEN = _isEN(t);
+    if (_selfPollRoute(isEN ? t.toLowerCase() : t, isEN, R)) {
+      hits.push({ sample: t.slice(0, 30), conclusion: '', type: isEN ? 'EN_SELFPOLL' : 'ZH_SELFPOLL', route: isEN ? 'EN_SELF' : 'ZH_SELF' });
+    }
+  }
+
   if (!hits.length) return _pass();
 
-  const baseScore = { RESTRICT: 76, SOURCE: 74, EN_RESTRICT: 74, EN_SOURCE: 72, PUB_ZH: 74, PUB_EN: 72 };
+  const baseScore = { RESTRICT: 76, SOURCE: 74, EN_RESTRICT: 74, EN_SOURCE: 72, PUB_ZH: 74, PUB_EN: 72, ZH_SELFPOLL: 74, EN_SELFPOLL: 72 };
   let score = 0;
   for (const h of hits) score = Math.max(score, baseScore[h.type] || 70);
   score += Math.min(3 * (hits.length - 1), 9);
@@ -580,8 +650,10 @@ function checkSelectionBias(text, inject) {
   const first = hits[0];
   const detail = (String(first.type).startsWith('PUB')
     ? '发表偏倚（只以已发表文献为取样框×普效断言）'
-    : '取样偏差（只从受限样本取证却推广到全体）') + hits.length + '处：取样来源「' + first.sample.slice(0, 22) +
-    '」受限/自选择，却据此推出「' + first.conclusion.slice(0, 20) + '」——取样来源与结论总体不匹配，证据效力被夸大';
+    : String(first.type).endsWith('SELFPOLL')
+      ? '自选择便利样本×正向偏斜×推广为全民口碑'
+      : '取样偏差（只从受限样本取证却推广到全体）') + hits.length + '处：取样来源「' + first.sample.slice(0, 22) +
+    '」受限/自选择，却据此推出「' + (first.conclusion ? first.conclusion.slice(0, 20) : '全民/市场级口碑') + '」——取样来源与结论总体不匹配，证据效力被夸大';
   return {
     score,
     verdict: score >= 70 ? 'unsupported' : 'pass',
@@ -608,5 +680,8 @@ module.exports = {
     PUB_QUANT_ZH, PUB_VERB_ZH, PUB_RES_ZH, PUB_BACK_ZH, PUB_TARGET_ZH,
     PUB_NEG_ZH, PUB_NEG_UNIT_ZH, PUB_NEG_RES_ZH, PUB_EVERY_ZH,
     PUB_CLAIM_ZH, PUB_EN_RE, PUB_EN_RE2, PUB_CLAIM_EN,
+    // [r431] 自选择便利样本×正向偏斜×全民口碑 新措辞家族（负例注入-删条用）
+    SELF_SOURCE_ZH, SELF_SOURCE_EN, POSI_EVID_ZH, POSI_EVID_EN,
+    POP_GEN_ZH, POP_GEN_EN, SELF_META_ZH, SELF_META_EN,
   },
 };
