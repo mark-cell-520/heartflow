@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,390 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 274 | `dimMap` keys in `src/index.js` |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
-| Test suite | 25,536 passing / 232 failing | `node test/run-all.js`（r429 全量实测 25,536/232/25,768（866 文件）——较 r428 终值基线 passed +18 全部为本轮 18 条断言组、failed 零新增；文件级硬失败清单 172 项与基线逐项相同零退化）|
+| Test suite | 25,598 passing / 233 failing | `node test/run-all.js`（r430 全量实测 25,598/233/25,831（868 文件）——较 r429 终值基线（866 文件 25,536/232/25,768）passed +62 全部为本轮 test/round-430-survivorship-success-prescription.test.js 的 62 条断言、failed +1 来自随 r428 同步进来的 test/round-428-cognitive-errorhandler-wiring.test.js 按 run-all 静默规则计 1（该文件跑了但无汇总行，非本轮引入；文件级硬失败清单 219→220 项唯一新增即该审计条目，其余逐项相同，46 项文件自报失败与 ✗ 失败行归一化后与基线逐项相同零退化））|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
