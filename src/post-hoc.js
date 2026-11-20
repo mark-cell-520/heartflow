@@ -27,6 +27,21 @@
  *   R4 到场×垮掉（EN 口语形）：腿①到场（sat/came/joined/arrived）× 腿②
  *      垮掉（we lost/everything fell apart/things went wrong）。
  *
+ * [r426 扩展·真升级②] 新增路由：
+ *   R5 事件先后×玄学归因：腿①事件先后标记（存量 CONNECT 之外补「结果/
+ *      后来/那天/当天/上次/早上/下午」等裸时序形，EN 补强时序词与
+ *      「…, and …」逗号并置形）× 腿②玄学归因标记（果然/果真；旺运财帛
+ *      族；晦气显灵财神菩萨开光辟邪符咒护身符手串等迷信物象；拜了拜/
+ *      上香/祈福/算卦等仪式动作；「杯子摔了」器物破损兆——宾语锁防
+ *      「摔了一跤」误入；EN luck/charm/blessing/ritual/jinx/cursed/
+ *      karma/feng shui 等 \b 词边界形）。存量四路由射程外：R1 的
+ *      CONNECT 表不收裸时序形（「后来项目就黄了」的「后来」与「就」
+ *      不相邻，'后来就' 子串匹配不到）、ASSERT 表只收晦气/玄学/显灵/
+ *      灵验/邪门 五窄形。豁免：沿用调查语境/测量报告豁免 + 新增 R5 否定
+ *      对冲（巧合/没有关系/只是先后/无关/需要对照数据——仅作用本路由）。
+ *      同池探针定拨 Q1：穿透 11/12、模块层良性 0/12、模块层攻击 0/12
+ *      真零命中（coordination/agent4/probes/r426-probe-pool.js）。
+ *
  * 豁免：调查语境（需要分析/需要排查/不等于因果/控制变量/回归分析/共同的
  * 原因/可能是/更多数据/需要证据/很多因素/归因；EN: need more data/
  * correlation/not necessarily/could be/need to investigate）——样本在
@@ -92,6 +107,69 @@ const ABSENCE_EN = ["didn't", 'did not'];
 const CALAMITY_EN = ['things went wrong', 'we lost', 'fell apart'];
 const AVOID_EN = ['never again', 'must'];
 
+// ═══════════════════════════════════════════════════════════════
+// [r426 扩展·真升级②] R5「事件先后 × 玄学归因」族分支表
+// （同池探针 coordination/agent4/probes/r426-probe-pool.js 定拨 Q1：
+//  穿透 11/12、模块层良性 0/12、模块层攻击 0/12 真零命中）
+// 形状：一件日常动作与后续结果先后相随，就把结果归给超自然/运势/
+// 仪式兆头（「那天出门摔了一跤，果然当天就下雨了」「临走前把杯子
+// 摔了，后来团队就散了」）。存量四路由全部射程外：R1 的 CONNECT 表
+// 不收「结果/后来/那天/上次」等裸时序形（「后来项目就黄了」中「后来」
+// 与「就」不相邻，'后来就' 子串匹配不到），ASSERT 表只收
+// 晦气/玄学/显灵/灵验/邪门 五个窄形，旺运/仪式/辟邪物整族不在场。
+// 判据：腿①事件先后标记 × 腿②玄学归因标记，句级共现 + 否定对冲豁免。
+// ═══════════════════════════════════════════════════════════════
+
+// R5 腿①：事件先后标记新族（ZH）——存量 CONNECT_ZH 之外的裸时序形。
+// 「结果」极常见故不作单腿判据，必须与腿②共现；不收「昨天/今天」
+// （太日常，无归因标记时纯叙事）。
+const SEQ_ZH_R5 = [
+  '结果', '后来', '那天', '当天', '上次', '次日', '临走前', '出门前', '开会前', '事前', '事后',
+  '早上', '上午', '下午', '晚上', '当晚', '那天起',
+];
+// R5 腿①（EN）——显式时序词 + 逗号-and 并置形（"…, and …"：
+// He forgot to say the blessing, and the client walked away.）。
+// 刻意不收裸 after/since/once（CONNECT_EN 已收，但过于日常，
+// 与 OMEN 共现会把 "After the ritual, the team felt confident."
+// 这类描述句误判——R5 的 EN 侧只要强时序形）。
+const SEQ_EN_R5 = [
+  'later that day', 'that day', 'the next day', 'sure enough', 'right afterward', 'right afterwards',
+];
+const JUXTAPOSE_EN = /,\s+(?:and|so)\b/;
+
+// R5 腿②：玄学归因标记（ZH）——把先后结果归给运势/兆头/仪式。
+// 与存量 ASSERT_ZH 的分工：晦气/玄学/显灵/灵验/邪门 已在 ASSERT 表
+// （R1 承重），本表补旺运财帛、仪式动作、器物破损兆与归因副词，
+// 两表可重叠共现但互不依赖（负例逐表删条各自有样本翻转）。
+const OMEN_ZH = [
+  // o1 归因副词（「果然」= 事后诸葛式确认）
+  '果然', '果真',
+  // o2 运势财帛（「旺」只收带后缀/主语形——裸「旺」会中「旺季」）
+  '真旺', '旺了起来', '旺起来', '旺我', '旺宅', '旺夫', '财运', '旺财', '招财', '进宝',
+  '转运', '开运', '运势', '气运', '命数', '天意',
+  // o3 迷信物象/仪式场域
+  '晦气', '显灵', '灵验', '邪门', '玄学', '风水', '财神', '菩萨', '保佑', '开光',
+  '辟邪', '符咒', '护身符', '手串', '佛珠', '八字', '相冲', '彩头', '讨彩', '吉利', '霉运',
+  // o4 仪式动作
+  '拜了拜', '拜一拜', '拜了', '上香', '烧香', '祈福', '求签', '算卦', '占卜', '念咒',
+  '犯了忌讳', '破了忌讳',
+];
+// o5 器物破损兆（「临走前把杯子摔了」——打碎东西不吉利；宾语锁防
+// 「摔了一跤」误入：腿形要求 杯子|碗|碟|花瓶|镜子|餐具|玉件 作宾语）
+const OMEN_BREAK_ZH = /(?:杯子|碗|碟|花瓶|镜子|餐具|玉件|镯子)(?:被)?摔(?:了|碎|破|坏)|打碎(?:了)?(?:杯子|碗|花瓶|镜子|碟)/;
+// R5 腿②（EN）——\b 词边界匹配（luck 不中 unlucky 内部的 luck——
+// 实际 \bluck\b 要求边界，unlucky 无边界故不中；charm 不中 charmed）
+const OMEN_EN = [
+  'luck', 'lucky', 'charm', 'blessing', 'ritual', 'sure enough', 'jinx',
+  'cursed', 'bad omen', 'omen', 'karma', 'feng shui', 'fate', 'voodoo',
+  'it works', 'superstition',
+];
+// R5 否定对冲豁免（仅作用路由⑤）——样本在否认先后因果或要求数据时，
+// 即使两腿在场也不判。与 EXEMPT（调查语境）分工：那条管「正在排查」
+// 的方法论陈述，这条管「明确否认因果」的叙事句。
+const R5_NEGATE_ZH = /巧合|没有(?:任何)?(?:关系|因果|证据|联系)|只是(?:先后|时间上|碰巧)|纯属|无关|不能只归因|需要(?:对照|数据|证据|更多|分析|排查|复盘)/;
+const R5_NEGATE_EN = /coincidence|unrelated|no (?:causal )?(?:relation|connection|evidence)|just (?:a )?(?:coincidence|sequence)|need (?:more )?(?:data|evidence)|not (?:necessarily|related)/i;
+
 // 调查语境豁免（ZH）
 const EXEMPT_ZH = [
   '需要分析', '需要排查', '不等于因果', '控制变量', '回归分析', '共同的原因',
@@ -110,12 +188,25 @@ const EXEMPT_EN = [
 /**
  * 后此谬误判定。
  * @param {string} text 规范化后的文本
+ * @param {object} [inject] [r426] 负例脚本注入用：以永不匹配串/自定义正则
+ *   替换 R5 新族常量（SEQ_ZH_R5/SEQ_EN_R5/JUXTAPOSE_EN/OMEN_ZH/
+ *   OMEN_BREAK_ZH/OMEN_EN/R5_NEGATE_ZH/R5_NEGATE_EN），存量四路由不受影响
  * @returns {{score:number,count:number,matches:Array,zeroHit:boolean,details:string}}
  */
-function checkPostHoc(text) {
+function checkPostHoc(text, inject) {
   if (typeof text !== 'string' || text.length === 0) {
     return { score: 0, count: 0, matches: [], zeroHit: false, details: '' };
   }
+
+  const R = inject || {};
+  const SEQ_ZH_R5_ = R.SEQ_ZH_R5 || SEQ_ZH_R5;
+  const SEQ_EN_R5_ = R.SEQ_EN_R5 || SEQ_EN_R5;
+  const JUXTAPOSE_EN_ = R.JUXTAPOSE_EN || JUXTAPOSE_EN;
+  const OMEN_ZH_ = R.OMEN_ZH || OMEN_ZH;
+  const OMEN_BREAK_ZH_ = R.OMEN_BREAK_ZH || OMEN_BREAK_ZH;
+  const OMEN_EN_ = R.OMEN_EN || OMEN_EN;
+  const R5_NEGATE_ZH_ = R.R5_NEGATE_ZH || R5_NEGATE_ZH;
+  const R5_NEGATE_EN_ = R.R5_NEGATE_EN || R5_NEGATE_EN;
 
   const lower = text.toLowerCase();
   const isZh = /[\u4e00-\u9fff]/.test(text);
@@ -201,6 +292,28 @@ function checkPostHoc(text) {
     matches.push({ route: 4, legA: '到场', legB: '垮掉' });
   }
 
+  // ═══ [r426] R5 事件先后 × 玄学归因 ═══
+  // 腿①事件先后标记（存量 CONNECT ∪ 新裸时序形）× 腿②玄学归因标记。
+  // EN 侧刻意不走裸 after/since/once（CONNECT_EN）——日常介词与 OMEN
+  // 共现会把 "After the ritual, the team felt confident." 这类描述句
+  // 误判，故只要强时序词或逗号-and 并置形。OMEN_EN 用词边界匹配
+  // （charm 不中 charmed、luck 不中 unlucky）。R5_NEGATE 只作用本路由。
+  const r5Negate = R5_NEGATE_ZH_.test(text) || R5_NEGATE_EN_.test(lower);
+  if (!r5Negate) {
+    const seqZh = has(SEQ_ZH_R5_, text);
+    const seqEn = hasWord(SEQ_EN_R5_, lower) || JUXTAPOSE_EN_.test(text);
+    const omenZh = has(OMEN_ZH_, text) || OMEN_BREAK_ZH_.test(text);
+    const omenEn = hasWord(OMEN_EN_, lower);
+    if ((has(CONNECT_ZH, text) || seqZh) && omenZh) {
+      routes.add(5);
+      matches.push({ route: 5, legA: '事件先后', legB: '玄学归因' });
+    }
+    if (seqEn && omenEn) {
+      routes.add(5);
+      matches.push({ route: 5, legA: 'sequence', legB: 'omen-attribution' });
+    }
+  }
+
   if (matches.length === 0) {
     return { score: 0, count: 0, matches: [], zeroHit: true, details: '' };
   }
@@ -213,4 +326,4 @@ function checkPostHoc(text) {
   return { score, count: matches.length, matches, zeroHit: false, details };
 }
 
-module.exports = { checkPostHoc, __internals: { CONNECT_ZH, ASSERT_ZH, INTERVENE_ZH, CHANGE_ZH, ABSENCE_ZH, CALAMITY_ZH, AVOID_ZH, CONNECT_EN, ASSERT_EN, INTERVENE_EN, CHANGE_EN, ABSENCE_EN, CALAMITY_EN, AVOID_EN, EXEMPT_ZH, EXEMPT_EN } };
+module.exports = { checkPostHoc, __internals: { CONNECT_ZH, ASSERT_ZH, INTERVENE_ZH, CHANGE_ZH, ABSENCE_ZH, CALAMITY_ZH, AVOID_ZH, CONNECT_EN, ASSERT_EN, INTERVENE_EN, CHANGE_EN, ABSENCE_EN, CALAMITY_EN, AVOID_EN, EXEMPT_ZH, EXEMPT_EN, SEQ_ZH_R5, SEQ_EN_R5, JUXTAPOSE_EN, OMEN_ZH, OMEN_BREAK_ZH, OMEN_EN, R5_NEGATE_ZH, R5_NEGATE_EN } };
