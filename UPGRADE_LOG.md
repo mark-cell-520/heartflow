@@ -1,3 +1,26 @@
+## r423 — 离线恢复固化轮：inferenceChain + causalInference 两模块接线复活（真升级③，v6.8.210 不变）
+
+- **轮次性质**：真升级③（新门禁/护栏不适用——本轮是**接线复活**：两个已存在、能力完整、加载多年的模块此前一条路由也 dispatch 不到）。无新判别维度、无新族，dimMap 键数不变 273，VERSION 6.8.210 不变。
+- **缺口实证**（本轮实测）：`src/reasoning/inference-chain.js`（InferenceChain，1017 行 v1.0.0）与 `src/reasoning/causal-inference.js`（CausalInference，423 行 v2.0.0）通过 lazy registry 正常加载、无 init error，但 `this.inferenceChain` / `this.causalInference` 两个实例字段**恒为 null**——`LATE_ADDITIONS` 循环按 `this[name]` 取值，null 被静默跳过，两个条目是**死条目**。r423 实测：`this.inferenceChain===null`、`hf.routes()` 零条 `inferenceChain.*` / `causalInference.*` 命中、ALLOWED_ROUTES 同零命中。即「模块加载着、能力完整、一条也 dispatch 不到」，MCP 侧也无对应工具（194 工具中无推理链/因果推理入口）。
+- **实现**（3 处接线 + 1 轮测 + 2 文档）：
+  - `src/core/heartflow.js`（+18 行）：在 verification-engine 实例化旁补两个 try/catch 实例化并注册 `_modules['inferenceChain']` / `_modules['causalInference']`，失败进 `_initErrors`（沿用 MAX_HISTORY_SIZE 有界推送，不阻塞启动）。
+  - `src/mcp-server.js`（+88 行）：新增 `handleInferenceChainTool` / `handleCausalInferenceTool` 两个 handler，按各方法真实签名拆包（inferenceChain 8 个 action、causalInference 9 个 action，含 type 枚举校验与必填校验），注册进 HANDLERS。
+  - `src/mcp/tools-registry.js`（+12 行）：新增 `heartflow_inference_chain` / `heartflow_causal_inference` 两个工具定义（name + description + inputSchema）。
+  - `test/round-423-inference-chain-wiring.test.js`（新建，77 行）：接线锁 + 路由锁 + dispatch 真实返回锁。**5/5 全过**。
+  - `README.md` / `SKILL.md` / `AGENTS.md`：实测口径回填——模块 164→**166**、路由 1,343→**1,360**、MCP 工具 192→**194**（badge、横幅、规格表、能力域标题同步）。
+- **为什么算真升级**：判定标准③「新门禁或护栏」的等价形态——此前引擎具备但**对外零可达**的两组能力（推理链形式合法性校验：演绎有效式/归纳强度/溯因解释力、步骤间跳跃 missing 概念差集、置信度沿链传播；因果图构建/因果链追踪/反事实验证）现在有真实可 dispatch 的路由（17 条）和真实可调用的 MCP 工具（2 个）。能力增量真实存在且本轮实测可达，不是文档宣称。
+- **验证**（本回合真实运行）：
+  - 轮测 `test/round-423-inference-chain-wiring.test.js` **5/5**（首跑 1 FAIL：测试误把 `hf.routes()` 当扁平数组用，实测返回「子系统名→路由数组」对象表，与 r578/r601/r603 轮测试法一致取 `table[moduleName]`；修测试后 5/5）。
+  - 四门禁终态全绿：`bin/verify.js` **16/0**、`guard-abilities` **20/20@273**、`doc-numbers` **24/0**、双向 guard 召回 **52/52** 误拦 **302/326**（与 r419/r422 基线逐项相同，零新增误伤）。
+  - 接线实证：`TOOLS.length === 194`，两个新工具名均在册；`hf.dispatch('inferenceChain.getStats')` / `hf.dispatch('causalInference.getStats')` 真实返回数字对象。
+  - 语法：`node --check` 对 test / mcp-server / heartflow / tools-registry 四文件全 OK。
+  - 冲突修复过程：`hf4-sync.sh` 带回 README/SKILL 两个 UU 冲突（远端 192 工具 vs 本地 194 工具口径），已按本轮实测取 194/1,360/166 解决；另修掉 README 头部一段重复的定位句（sync 产物残留）。
+- **doc-numbers 门禁 FAIL 记录（已修）**：首跑 3 FAIL 全为文档口径落后（MCP tools 192 vs 实测 194、Dispatch routes 1,343 vs 1,360、Modules 164 vs 166），修 README/SKILL/AGENTS 三处后复跑 24/0。
+- **交接事项**：
+  - 给 1 号：`src/index.js` 已 18,391 行超 14,000 阈值（doc-numbers 报警项，连续多轮），拆分时机值得人工评估；本轮未动 index.js 一行。
+  - 给 2/3 号：r423 接线文件为 `src/core/heartflow.js` + `src/mcp-server.js` + `src/mcp/tools-registry.js` 三个全局接入点，若你们仓库有同方向 WIP（如 29 个零 dispatch 键中的 confidenceCalibrator / selfVerifier / errorHandler / moduleHealthChecker / counterfactualEngine），注意别与本轮重复接线或冲突。
+  - 下一轮首选：29 个零 dispatch 键继续清（confidenceCalibrator 与「不确定性量化」轴直接相关，且与 r421 calibration_mismatch 同域可形成闭环），或按轮换纪律落到 `src/plugins/` / `src/tools/` / `src/core/psychology/` 薄覆盖子目录。
+
 ## r421 — 第 274 维度 calibration_mismatch（断言语气强度超出证据等级）新维度接线（真升级①，v6.8.210 落地）
 
 - **轮次性质**：真升级①（新判别维度——dimMap 新键，独立命中一个新攻击族）。VERSION 6.8.209→**6.8.210**，维度 272→**273**，VERIFY 239→**240**，模块 **164 不变**（顶层新模块不走 _modules 注册，与 masked_man_fallacy/homogeneity_assumption 同例），路由/工具数不变。

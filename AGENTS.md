@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-Zero LLM dependency. 273 dimensions, 164 modules, 192 MCP tools, 1,343 dispatch
+Zero LLM dependency. 273 dimensions, 166 modules, 194 MCP tools, 1,360 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` against the

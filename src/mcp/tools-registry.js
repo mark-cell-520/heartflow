@@ -211,6 +211,18 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_inference_chain',
+    description: "推理链校验（r423 接线）：把「前提→结论」构建为有序步骤链，逐环节判定推理形式合法性——检出肯定后件/否定前件等无效式、步骤间跳跃（missing 概念差集）、假设步显式折扣、置信度沿链传播（最弱前提×各步保留率）。action: createChain(question) / addStep(chainId,type,text; type=premise|inference|conclusion|assumption) / declareAssumption(chainId,stepId,text) / analyze(chainId 返回 valid/finalConfidence/jumps/fallacy) / expandChain(chainId 建议缺失中间步) / getChain / getStats / clear。纯规则零 LLM。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"createChain | addStep | declareAssumption | analyze | expandChain | getChain | getStats | clear"},"question":{"type":"string","description":"createChain：待校验的论证全文（含前提与结论）"},"chainId":{"type":"string","description":"链 ID（createChain 返回）"},"type":{"type":"string","description":"addStep 的步骤类型：premise(前提) | inference(推理步) | conclusion(结论) | assumption(假设)"},"text":{"type":"string","description":"addStep 的步骤文本 / declareAssumption 的假设说明"},"stepId":{"type":"string","description":"declareAssumption 的步骤 ID"}},"required":["action"]}
+  },
+
+  {
+    name: 'heartflow_causal_inference',
+    description: "因果推理（r423 接线）：从记忆/文本构建因果图，做因果链正向/反向追踪（带深度衰减）、反事实验证（移除某节点后哪些结论将不再成立）、因果检索与扩散激活。action: buildGraph(memories [{id,content}]) / trace(memoryId,direction,forward|backward,maxDepth) / getCauses / getEffects / counterfactual(memoryId,query) / searchByCausal(query,topK) / spreadingActivation(seedId,budget) / getStats / clear。纯规则零 LLM。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"buildGraph | trace | getCauses | getEffects | counterfactual | searchByCausal | spreadingActivation | getStats | clear"},"memories":{"type":"array","description":"buildGraph：记忆数组 [{id, content}]"},"memoryId":{"type":"string","description":"trace/getCauses/getEffects/counterfactual/spreadingActivation 的目标记忆 ID"},"direction":{"type":"string","description":"trace 方向：forward(下游影响) | backward(上游原因)，默认 forward"},"maxDepth":{"type":"number","description":"trace 最大深度，默认 5"},"query":{"type":"string","description":"counterfactual 的反事实设问 / searchByCausal 的检索词"},"topK":{"type":"number","description":"searchByCausal 返回条数，默认 10"},"seedId":{"type":"string","description":"spreadingActivation 的种子 ID"},"budget":{"type":"number","description":"spreadingActivation 激活预算，默认 100"}},"required":["action"]}
+  },
+
+  {
     name: 'heartflow_verification_verify',
     description: "综合验证引擎：验证 SKILL.md 文档结构/链接/锚点/版本一致性、JS 或 Python 代码语法与括号配对、文本中的可验证声明。返回严重性分级（critical/major/minor/info）、评分与修复建议。",
     inputSchema: {"type":"object","properties":{"content":{"type":"string","description":"待验证的内容"},"kind":{"type":"string","description":"验证类型：skill（技能文档）、code（代码）、general（通用文本）"}},"required":["content"]}

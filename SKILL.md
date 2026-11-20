@@ -5,7 +5,7 @@ version: "6.8.210"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  273 discrimination dimensions × 11-layer pipeline × 164 modules ×  192 MCP tools. Zero LLM dependency.
+  273 discrimination dimensions × 11-layer pipeline × 166 modules ×  194 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -85,11 +85,11 @@ from marketing copy.
 | Engine version | 6.8.210 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
-| Modules registered | 164 | `Object.keys(hf._modules).length` after `start()` |
+| Modules registered | 166 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
-| Dispatch routes | 1,343 | sum of entries in `hf.routes()` |
+| Dispatch routes | 1,360 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 273 | `dimMap` keys in `src/index.js` |
-| MCP tools | 192 | tool definitions exposed via `tools/list` |
+| MCP tools | 194 | tool definitions exposed via `tools/list` |
 | Test suite | 25,452 passing / 229 failing | `node test/run-all.js`（r421 rebase 收尾轮全量实测 25,452/229/25,681（859 文件，data/test-count.json @ 2026-11-20T04:34:11Z）——本轮把 r421 五链 rebase 叠上远端 r422 第 274 维 calibration_mismatch 接线（VERSION 6.8.210，859 = 858 + r422 轮测文件 1 个）；较 rebase 前 25,437/232/25,669（858 文件）：passed +15 / failed -3 / total +12——total +12 = +12 r422 轮测 round-421-calibration-mismatch.test.js（12 断言全过，单跑复验 12/12）；passed +15 与 failed -3 的余量为 MCP 服务类抖动文件两次回归间的净变化（run-all 设计注释即注明 reported totals used to vary between runs）；**文件级硬失败清单较 rebase 前 +1（ai-writing-tell.test.js）**——根因：calibration_mismatch 以 severity 55 占据 findings[0]，把 ai_writing_tell（severity 44）挤至第 1 位，该测试断言 findings[0].dimension==='ai_writing_tell' 翻红（实证 coordination/agent4/probes/r421-probe-aiwt-order.output.txt；系 rebase 并入 r422 接线的真实行为变化，非 special_pleading 本族引入，修复决策交 1 号/属主）；零文件转绿；存量 round-363/364/366 claims 格式红（r420 sync 把紧凑形 `{"round":"r363"…}` 重写为空格形，git 取证 7c16911→4c0026f，非本轮引入）等 152 项不动；清单内零 special_pleading/round-421-self-first 相关文件，比对实录 coordination/agent4/r421-rebase-runall.log）|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
@@ -245,7 +245,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## Capability map (7 domains, 164 modules)
+## Capability map (7 domains, 166 modules)
 
 1. **Logic** — logicReasoning, judgmentEngine, mctsReasoning, counterfactualVerifier, debateConductor, debateConvergence, processRewardModel, dualPerspectiveAuditor
 2. **Decision** — decisionRouter, decisionVerifier, decisionEngineV2, activeInference, selfHealing, execution

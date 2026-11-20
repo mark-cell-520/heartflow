@@ -3171,7 +3171,91 @@ function handleExecutionVerifyTool(args) {
 }
 
 /**
- * [第 216 轮] 综合验证引擎（verification-engine 接线）
+ /** [r423 接线] 推理链校验工具：把 InferenceChain（src/reasoning/inference-chain.js，1017 行）
+  * 的 createChain/addStep/analyze 等 8 个公开方法暴露为统一 action 入口。
+  * 此前该模块 lazy 加载多年但 this.inferenceChain 恒 null（LATE_ADDITIONS 死条目），
+  * ALLOWED_ROUTES 零条 inferenceChain.* 命中——模块加载着、能力完整、一条也 dispatch 不到。
+  * 本轮只补接线，不改模块本身逻辑；参数按各方法真实签名拆包。 */
+ function handleInferenceChainTool(args) {
+   const { action, question, chainId, type, text, stepId } = args || {};
+   if (!action) return { error: 'action 是必填参数' };
+   const R = 'inferenceChain.';
+   try {
+     switch (action) {
+       case 'createChain':
+         if (typeof question !== 'string' || !question) return { error: 'question 是必填参数（待校验的论证全文）' };
+         return safeDispatch(R + 'createChain', question);
+       case 'addStep': {
+         if (!chainId) return { error: 'chainId 是必填参数' };
+         const t = type || 'premise';
+         if (!['premise', 'inference', 'conclusion', 'assumption'].includes(t)) {
+           return { error: `type 非法: ${t}（应为 premise|inference|conclusion|assumption）` };
+         }
+         if (typeof text !== 'string' || !text) return { error: 'text 是必填参数（步骤文本）' };
+         return safeDispatch(R + 'addStep', chainId, { type: t, text });
+       }
+       case 'declareAssumption': {
+         if (!chainId || !stepId) return { error: 'chainId 与 stepId 均为必填参数' };
+         return safeDispatch(R + 'declareAssumption', chainId, stepId, text || '');
+       }
+       case 'analyze':
+         if (!chainId) return { error: 'chainId 是必填参数' };
+         return safeDispatch(R + 'analyze', chainId);
+       case 'expandChain':
+         if (!chainId) return { error: 'chainId 是必填参数' };
+         return safeDispatch(R + 'expandChain', chainId);
+       case 'getChain':
+         if (!chainId) return { error: 'chainId 是必填参数' };
+         return safeDispatch(R + 'getChain', chainId);
+       case 'getStats': return safeDispatch(R + 'getStats');
+       case 'clear': return safeDispatch(R + 'clear');
+       default: return { error: `未知 action: ${action}` };
+     }
+   } catch (err) { return { error: err.message }; }
+ }
+
+ /** [r423 接线] 因果推理工具：暴露 CausalInference（src/reasoning/causal-inference.js，423 行）
+  * 的 buildGraph/trace/counterfactual 等 9 个公开方法。
+  * 与 inferenceChain 同一缺陷：this.causalInference 恒 null，路由零命中。 */
+ function handleCausalInferenceTool(args) {
+   const { action, memories, memoryId, direction, maxDepth, query, topK, seedId, budget } = args || {};
+   if (!action) return { error: 'action 是必填参数' };
+   const R = 'causalInference.';
+   try {
+     switch (action) {
+       case 'buildGraph': {
+         if (!Array.isArray(memories) || memories.length === 0) return { error: 'memories 是必填参数（[{id, content}] 数组）' };
+         return safeDispatch(R + 'buildGraph', memories);
+       }
+       case 'trace':
+         if (!memoryId) return { error: 'memoryId 是必填参数' };
+         return safeDispatch(R + 'trace', memoryId, direction || 'forward', maxDepth || 5);
+       case 'getCauses':
+         if (!memoryId) return { error: 'memoryId 是必填参数' };
+         return safeDispatch(R + 'getCauses', memoryId);
+       case 'getEffects':
+         if (!memoryId) return { error: 'memoryId 是必填参数' };
+         return safeDispatch(R + 'getEffects', memoryId);
+       case 'counterfactual': {
+         if (!memoryId) return { error: 'memoryId 是必填参数' };
+         return safeDispatch(R + 'counterfactual', memoryId, query || '');
+       }
+       case 'searchByCausal': {
+         if (typeof query !== 'string' || !query) return { error: 'query 是必填参数' };
+         return safeDispatch(R + 'searchByCausal', query, topK || 10);
+       }
+       case 'spreadingActivation': {
+         if (!seedId) return { error: 'seedId 是必填参数' };
+         return safeDispatch(R + 'spreadingActivation', seedId, budget || 100);
+       }
+       case 'getStats': return safeDispatch(R + 'getStats');
+       case 'clear': return safeDispatch(R + 'clear');
+       default: return { error: `未知 action: ${action}` };
+     }
+   } catch (err) { return { error: err.message }; }
+ }
+
+ /** [第 216 轮] 综合验证引擎（verification-engine 接线）
  * 注意：与 handleExecutionVerifyTool 是两回事 —— 那个走 dispatch('execution.verify')
  * 校验单次动作的效果；本工具验证「内容本身」（SKILL.md 结构 / 代码语法 / 声明可信度），
  * 底层是 src/core/verification-engine.js 的对象单例（不是 constructor）。
@@ -3401,6 +3485,8 @@ const HANDLERS = {
   heartflow_decision_decide: handleDecisionDecideTool,
   heartflow_memory_consolidate: handleMemoryConsolidateTool,
   heartflow_execution_verify: handleExecutionVerifyTool,
+  heartflow_inference_chain: handleInferenceChainTool,
+  heartflow_causal_inference: handleCausalInferenceTool,
   heartflow_verification_verify: handleVerificationVerifyTool,
   heartflow_formula_bridge: handleFormulaBridge,
   heartflow_formula_calc: handleFormulaCalc,

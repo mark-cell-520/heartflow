@@ -1982,6 +1982,24 @@ class HeartFlow {
     // 必须暴露可调用入口，否则等于没接。
     if (this.execution) { this._modules['execution'] = this.execution; }
 
+    // [r423 接线] 推理链校验引擎（InferenceChain，src/reasoning/inference-chain.js，
+    // 1017 行 v1.0.0）与因果推理引擎（CausalInference，src/reasoning/causal-inference.js，
+    // 423 行 v2.0.0）：两模块 lazy 加载多年、LATE_ADDITIONS 名单里也有条目，但
+    // this.causalInference / this.inferenceChain 两个实例字段**恒为 null**——
+    // LATE_ADDITIONS 循环按 this[name] 取值，null 被跳过，条目是死条目
+    // （r423 实测：this.inferenceChain===null、ALLOWED_ROUTES 零条
+    // inferenceChain.*/causalInference.* 命中）。即「模块加载着、能力完整、
+    // 一条也 dispatch 不到」。本轮补实例化 + _modules 注册：
+    //   InferenceChain.createChain/addStep/declareAssumption/analyze/expandChain/
+    //     getChain/getStats/clear —— 把「前提→结论」拆成有序步骤，逐环节判定
+    //     推理形式合法性（演绎有效式/归纳强度/溯因解释力）、步骤间跳跃、置信度传播；
+    //   CausalInference.buildGraph/trace/getCauses/getEffects/counterfactual/
+    //     searchByCausal/spreadingActivation/getStats/clear —— 因果图构建、
+    //     因果链追踪与反事实验证。
+    // 两者均为纯规则零 LLM，直接服务心虫「判断是非」判别力。
+    try { this.inferenceChain = new (_InferenceChain().InferenceChain)({ silent: true }); } catch (e) { _boundedPush(this._initErrors, {module: 'inferenceChain', error: e.message}, MAX_HISTORY_SIZE); }
+    try { this.causalInference = new (_CausalInference().CausalInference)({ silent: true }); } catch (e) { _boundedPush(this._initErrors, {module: 'causalInference', error: e.message}, MAX_HISTORY_SIZE); }
+
     // [第 216 轮接线] verification-engine 是纯对象单例（非 constructor），
     // 直接取其导出。失败同样进 _initErrors，不影响其他模块启动。
     try { this.verification = _VerificationEngine().verificationEngine; } catch (e) { _boundedPush(this._initErrors, {module: 'verification', error: e.message}, MAX_HISTORY_SIZE); }

@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C452%20passing-brightgreen)](test/)
-[![MCP tools](https://img.shields.io/badge/MCP%20tools-192-blue.svg)](#mcp-server)
+[![MCP tools](https://img.shields.io/badge/MCP%20tools-194-blue.svg)](#mcp-server)
 [![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-273-blueviolet.svg)](#what-it-catches-273-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-273 discrimination dimensions  ×  11-layer pipeline  ×  164 modules  ×  192 MCP tools
-×  1,343 dispatch routes  ×  25,452 passing tests  ×  2 npm dependencies
+273 discrimination dimensions  ×  11-layer pipeline  ×  166 modules  ×  194 MCP tools
+×  1,360 dispatch routes  ×  25,452 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -171,7 +171,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 164 modules)
+### Capability domains (7 domains, 166 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -208,11 +208,11 @@ Measured on this repository at **v6.8.210**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 164 |
+| Modules registered | 166 |
 | Module init errors | 0 |
-| Dispatch routes | 1,343 |
+| Dispatch routes | 1,360 |
 | Discrimination dimensions | 273 |
-| MCP tools | 192 |
+| MCP tools | 194 |
 | Test suite | 25,452 passing / 229 failing | `node test/run-all.js`（r421 rebase 收尾轮全量实测 25,452/229/25,681（859 文件，data/test-count.json @ 2026-11-20T04:34:11Z）——本轮把 r421 五链 rebase 叠上远端 r422 第 274 维 calibration_mismatch 接线（VERSION 6.8.210，859 = 858 + r422 轮测文件 1 个）；较 rebase 前 25,437/232/25,669（858 文件）：passed +15 / failed -3 / total +12——total +12 = +12 r422 轮测 round-421-calibration-mismatch.test.js（12 断言全过，单跑复验 12/12）；passed +15 与 failed -3 的余量为 MCP 服务类抖动文件两次回归间的净变化（run-all 设计注释即注明 reported totals used to vary between runs）；**文件级硬失败清单较 rebase 前 +1（ai-writing-tell.test.js）**——根因：calibration_mismatch 以 severity 55 占据 findings[0]，把 ai_writing_tell（severity 44）挤至第 1 位，该测试断言 findings[0].dimension==='ai_writing_tell' 翻红（实证 coordination/agent4/probes/r421-probe-aiwt-order.output.txt；系 rebase 并入 r422 接线的真实行为变化，非 special_pleading 本族引入，修复决策交 1 号/属主）；零文件转绿；存量 round-363/364/366 claims 格式红（r420 sync 把紧凑形 `{"round":"r363"…}` 重写为空格形，git 取证 7c16911→4c0026f，非本轮引入）等 152 项不动；清单内零 special_pleading/round-421-self-first 相关文件，比对实录 coordination/agent4/r421-rebase-runall.log）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
