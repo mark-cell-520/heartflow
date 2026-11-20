@@ -1,3 +1,13 @@
+## r431 — selection_bias 第168维新增「自选择便利样本×正向偏斜×推广为全民口碑」措辞家族（真升级②：已有维度全新措辞家族；v6.8.213 保持，同 r406–r430 扩族不 bump 先例）
+
+统计素养轴续（r430 survivorship_bias 成功案例族后）。海外三层扫描 arXiv stat.ME/cs.CL/cs.AI + GitHub + S2 全空返（GitHub 0 repo、S2 total=0、arXiv word-split OR 返回约 280K 篇无关 ML/CV 论文、聚焦查询仍 parse-fail），按既有形态自建，同池探针五家族定拨。缺口实证（`coordination/agent4/probes/r431-probe-pool.js`，v6.8.213 gate() 全量 findings 实测）：P1 selection_bias ZH 4/6 完全穿透（gate=pass 零维度承重）、模块层 0/6、良性 0 误伤居首定选——「公众号投票四千读者九成支持→政策深得民心」「评论区一边倒叫好→用户普遍满意」「官网问卷满意度98%→产品广受欢迎」「报名来讲座的都认可→理念很有号召力」；留库候选 P2 law_of_small_numbers 3/5、P3 base_rate_neglect 3/5、P4/P5/P6 各 1 穿透且伴良性误伤。
+
+存量为何不收：`src/selection-bias.js` 腿① RESTRICTION 要求「只/仅」限定标记或已知受限来源词 × 取样动词共现；腿② GENERALIZATION 要求特定推广动词（代表/说明/足以…）接总体范围词（全体/全民/普遍…）。本族三处措辞——自选择渠道（公众号读者/评论区/官网问卷/报名者）、高比例正向偏斜（九成/98%/一边倒/都认可）、民心口碑号召力结论（深得民心/普遍满意/广受欢迎/很有号召力）——均不在存量表，故整族穿透。这正是 selection_bias「自选择的来源取证却推广到全体」语义在网络民调/评论区/报名现场的延伸。
+
+落地：三腿平行独立路由（不并入存量数组，保 round-265/r342 登记断言 length 不变）——腿① `SELF_SOURCE_ZH/EN`（公众号/订阅号/投票/评论区/弹幕/官网/报名/海选/路演/现场 + poll/subscribers/comment section/newsletter/opt-in/attendees）、腿② `POSI_EVID_ZH/EN`（九成/一边倒/一致好评/好评如潮/座无虚席/98%/都认可/都是认可 + overwhelmingly/near-unanimous/nine in ten/rave reviews）、腿③ `POP_GEN_ZH/EN`（深得民心/普遍满意/广受欢迎/很有号召力/口碑爆棚/圈粉无数 + hugely popular/the public backs/mass appeal/widespread acclaim），三腿邻近链成判（WIN=60）；`SELF_META_ZH/EN` 概念教学豁免全句生效。src/index.js 零改动、判别维度 274 不变（selection_bias 为既有第168维，未新增维度）、VERSION 不 bump。
+
+轮测 `test/round-431-selection-selfpoll-popularity.test.js` **74/74**：A 模块层中英 8 全命中；B 良性 8 零命中；C 精度边界七项（只有单腿不收、自选择源+推广但无正向偏斜不收、概念教学/充分取样/否定对冲豁免）；D 负例注入六常量逐组翻转（ZH 6/6+EN 2/2）+全族摘除 0/6 独立承重；E 存量腿/round-342 发表偏倚腿不回归；F gate 端到端 8 条非 pass 且 selection_bias 承重+8 良性不含本维度；G 接线零改动锁 + internals 八常量导出。四门禁：verify 16/0、guard-abilities 20/20@274、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零新增。全量实测 25,672/233/25,905（869 文件），passed +74 全为本轮断言、failed +0。
+
 ## r430 — 每日审计·修复轮（22:30 cron）：README badge 口径漂移修复（P2）+ UPGRADE_LOG r429 断档补录（P3）（v6.8.213 保持）
 
 **审计范围**：过去 24h 共 65 个 commit（最新 r428 接线 + r429 opportunity_cost_neglect 扩族）；本地未推送 0 条（22:45 推送脚本已兜底成功）。
