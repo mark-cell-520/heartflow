@@ -8,11 +8,22 @@
 // F gate 端到端（攻击非 pass 且 econ_reasoning_gate 承重）
 // G 接线零改动 + internals 新常量导出
 'use strict';
-const test = require('node:test');
-const assert = require('node:assert');
-const hf = require('../src/gate.js');
-const { detectOpportunityCostNeglect } = require('../src/opportunity-cost-neglect.js');
-const internals = require('../src/opportunity-cost-neglect.js').__internals();
+const assert = require('assert');
+const { checkOutput } = require('../src/gate.js');
+const { detectOpportunityCostNeglect, __internals } = require('../src/opportunity-cost-neglect.js');
+
+let passed = 0;
+let failed = 0;
+function check(name, fn) {
+  try {
+    fn();
+    passed++;
+    console.log(`  ✓ ${name}`);
+  } catch (e) {
+    failed++;
+    console.log(`  ✗ ${name}: ${e.message}`);
+  }
+}
 
 const ATK = [
   // 存量腿①「拖着」× 存量腿②「不会有什么损失」——新族注入均不翻（加性证明）
@@ -60,7 +71,8 @@ function hit(text, inject) {
   return detectOpportunityCostNeglect(text, inject).hit === true;
 }
 
-test('A 模块层攻击 12/12 全命中且 evidence 双腿归因', () => {
+// ═══ A: 模块层攻击 12/12 + evidence 双腿归因 ═══
+check('A 模块层攻击 12/12 全命中且 evidence 双腿归因', () => {
   for (const t of ATK) {
     const r = detectOpportunityCostNeglect(t);
     assert.strictEqual(r.hit, true, `攻击未命中: ${t}`);
@@ -70,45 +82,53 @@ test('A 模块层攻击 12/12 全命中且 evidence 双腿归因', () => {
   }
 });
 
-test('B 模块层良性 12/12 零命中；gate 良性不含 econ_reasoning_gate', () => {
+// ═══ B: 良性零误伤 ═══
+check('B 模块层良性 12/12 零命中；gate 良性不含 econ_reasoning_gate', () => {
   for (const t of BEN) {
     assert.strictEqual(hit(t), false, `良性命中模块层: ${t}`);
-    const g = hf.checkOutput(t);
+    const g = checkOutput(t);
     const dims = (g.findings || []).map((f) => f.dimension);
     assert.ok(!dims.includes('econ_reasoning_gate'), `良性 gate 含聚合维度: ${t} (${dims.join(',')})`);
   }
   // 存量 gate 误伤项与基线逐项相同（非本族引入）：推迟迁移句 completion_evidence、
   // Skipping maintenance 句 fallacy_of_relevance——模块层均 miss。
-  const g1 = hf.checkOutput('推迟迁移有风险，合规截止日前必须完成');
+  const g1 = checkOutput('推迟迁移有风险，合规截止日前必须完成');
   assert.ok((g1.findings || []).some((f) => f.dimension === 'completion_evidence'));
-  const g2 = hf.checkOutput('Skipping maintenance voids the warranty, so we scheduled it.');
+  const g2 = checkOutput('Skipping maintenance voids the warranty, so we scheduled it.');
   assert.ok((g2.findings || []).some((f) => f.dimension === 'fallacy_of_relevance'));
 });
 
-test('C 精度边界锁', () => {
-  // C1 裸「推迟/延迟」不收（「推迟迁移有风险」是良性句，腿①单 hit 不判）
+// ═══ C: 精度边界锁 ═══
+check('C1 裸「推迟/延迟」不收（腿①单 hit 不判）', () => {
   assert.strictEqual(hit('推迟迁移有风险，合规截止日前必须完成'), false);
-  // C2 EN postponed 过去式不收（「We postponed because the vendor...」良性）
+});
+check('C2 EN postponed 过去式不收', () => {
   assert.strictEqual(hit('We postponed because the vendor asked for two more weeks, at no extra cost.'), false);
-  // C3 裸 skip maintenance 无冠词不收（存量 SKIP_EN 只接无冠词形，良性保修句）
+});
+check('C3 裸 skip maintenance 无冠词不收（存量 SKIP_EN 只接无冠词形）', () => {
   assert.strictEqual(hit('Skipping maintenance voids the warranty, so we scheduled it.'), false);
-  // C4 制度规则豁免覆盖新族（预算到期作废在场，攻击形两腿齐备仍豁免）
+});
+check('C4 制度规则豁免覆盖新族', () => {
   assert.strictEqual(hit('系统迁移缓一缓，推迟半年不会耽误任何事，年度经费到期未使用即作废清零'), false);
-  // C5 概念教学豁免覆盖新族
+});
+check('C5 概念教学豁免覆盖新族', () => {
   assert.strictEqual(hit('机会成本忽视：再观望观望，现在不投入错过不了什么'), false);
-  // C6 纠正句豁免覆盖新族（指出不作为本身有成本）
+});
+check('C6 纠正句豁免覆盖新族', () => {
   assert.strictEqual(hit('再观望观望，资金占用本身就有成本'), false);
-  // C7 强否定前缀守卫（「并非暂缓」= 其实推进了 → 腿①失配）
+});
+check('C7 强否定前缀守卫（「并非暂缓」= 其实推进了 → 腿①失配）', () => {
   assert.strictEqual(hit('并非暂缓，项目一直在推进，耽误不了任何事'), false);
-  // C8 单腿不判（只有新族腿①无腿②）
+});
+check('C8 单腿不判（只有新族腿①无腿②）', () => {
   assert.strictEqual(hit('系统迁移缓一缓，推迟半年再评估'), false);
-  // C9 单腿不判（只有新族腿②无腿①）
+});
+check('C9 单腿不判（只有新族腿②无腿①）', () => {
   assert.strictEqual(hit('错过不了什么，一切都是最好的安排'), false);
 });
 
-test('D 负例注入四组：逐一整族摘除必须翻转', () => {
-  // D1 摘除 INACTION_DELAY_ZH_R429 → 新族中文腿①承重样本翻（#2/#3/#11），
-  //    存量腿①+新族腿②样本（#1/#4/#5）不翻，存量样本（#0）不翻
+// ═══ D: 负例注入四组 ═══
+check('D1 摘 INACTION_DELAY_ZH_R429 → 新族中文腿① 3 样本翻、存量腿① 3 样本与存量样本不翻', () => {
   const d1 = { INACTION_DELAY_ZH_R429: [] };
   assert.strictEqual(hit(ATK[2], d1), false, 'D1: 缓一缓样本应翻');
   assert.strictEqual(hit(ATK[3], d1), false, 'D1: 先放放样本应翻');
@@ -117,20 +137,22 @@ test('D 负例注入四组：逐一整族摘除必须翻转', () => {
   assert.strictEqual(hit(ATK[4], d1), true, 'D1: 存量腿①空着+新族腿②不应翻');
   assert.strictEqual(hit(ATK[5], d1), true, 'D1: 存量腿①按兵不动+新族腿②不应翻');
   assert.strictEqual(hit(ATK[0], d1), true, 'D1: 存量样本不应翻');
-  // D2 摘除 INACTION_DELAY_EN_R429 → 五个 EN 新族腿①样本全翻（#7 腿②是存量也翻）
+});
+check('D2 摘 INACTION_DELAY_EN_R429 → EN 新族腿① 5 样本全翻', () => {
   const d2 = { INACTION_DELAY_EN_R429: [] };
   for (const i of [6, 7, 8, 9, 10]) {
     assert.strictEqual(hit(ATK[i], d2), false, `D2: EN 样本 #${i} 应翻`);
   }
   assert.strictEqual(hit(ATK[0], d2), true, 'D2: 存量样本不应翻');
-  // D3 摘除 ZEROCOST_MISS_ZH_R429 → 六个中文新族腿②样本全翻（#2/#3/#11 腿①也是新的，摘腿②同样翻）
+});
+check('D3 摘 ZEROCOST_MISS_ZH_R429 → 中文新族腿② 6 样本全翻', () => {
   const d3 = { ZEROCOST_MISS_ZH_R429: [] };
   for (const i of [1, 2, 3, 4, 5, 11]) {
     assert.strictEqual(hit(ATK[i], d3), false, `D3: ZH 样本 #${i} 应翻`);
   }
   assert.strictEqual(hit(ATK[0], d3), true, 'D3: 存量样本不应翻');
-  // D4 摘除 ZEROCOST_MISS_EN_R429 → 四个 EN 新族腿②样本翻（#6/#8/#9/#10），
-  //    #7 腿②是存量 costs nothing → 不翻（存量腿②承重证明）
+});
+check('D4 摘 ZEROCOST_MISS_EN_R429 → EN 新族腿② 4 样本翻、存量 costs nothing 腿②不翻', () => {
   const d4 = { ZEROCOST_MISS_EN_R429: [] };
   for (const i of [6, 8, 9, 10]) {
     assert.strictEqual(hit(ATK[i], d4), false, `D4: EN 样本 #${i} 应翻`);
@@ -139,7 +161,8 @@ test('D 负例注入四组：逐一整族摘除必须翻转', () => {
   assert.strictEqual(hit(ATK[0], d4), true, 'D4: 存量样本不应翻');
 });
 
-test('E 存量攻击仍命中（存量路由不受新族影响）', () => {
+// ═══ E: 存量不回归 ═══
+check('E 存量攻击仍命中 + r336 注入断言在完整树下仍成立', () => {
   const stock = [
     '钱放在账户里不动又不会少，不投资就是零成本，稳赚不亏',
     '房子空着也是空着，不出租没有任何损失，白占着也不亏',
@@ -150,36 +173,38 @@ test('E 存量攻击仍命中（存量路由不受新族影响）', () => {
   for (const t of stock) {
     assert.strictEqual(hit(t), true, `存量攻击未命中: ${t}`);
   }
-  // 存量注入仍翻转（r336 轮测核心断言在完整树下仍成立）
   assert.strictEqual(hit('钱放在账户里不动，也不会有任何损失。', { ZEROCOST_NOLOSS_ZH: [] }), false);
 });
 
-test('F gate 端到端：攻击非 pass 且 econ_reasoning_gate 承重', () => {
+// ═══ F: gate 端到端 ═══
+check('F gate 端到端：攻击非 pass 且 econ_reasoning_gate 承重', () => {
   const probe = [ATK[2], ATK[11], ATK[6], ATK[10]];
   for (const t of probe) {
-    const g = hf.checkOutput(t);
+    const g = checkOutput(t);
     assert.notStrictEqual(g.gate.action, 'pass', `gate 放行攻击: ${t}`);
     const dims = (g.findings || []).map((f) => f.dimension);
     assert.ok(dims.includes('econ_reasoning_gate'), `gate 缺聚合维度: ${t} (${dims.join(',')})`);
   }
 });
 
-test('G 接线零改动 + internals 新常量导出', () => {
-  // 新族四常量可导出（守卫负例注入依赖）
+// ═══ G: 接线零改动 + 导出 ═══
+check('G 新族四常量独立成组可整族摘除 + 存量常量仍在导出集', () => {
+  const I = __internals();
   for (const k of ['INACTION_DELAY_ZH_R429', 'INACTION_DELAY_EN_R429', 'ZEROCOST_MISS_ZH_R429', 'ZEROCOST_MISS_EN_R429']) {
-    assert.ok(internals[k], `internals 缺 ${k}`);
-    assert.ok(internals[k] instanceof RegExp, `${k} 不是 RegExp`);
+    assert.ok(I[k] != null, `internals 缺 ${k}`);
+    assert.strictEqual(I[k] instanceof RegExp, true, `${k} 应为正则`);
   }
-  // 存量常量零改动仍在导出集中
   for (const k of ['INACTION_DELAY_ZH', 'ZEROCOST_NOLOSS_ZH', 'ZEROCOST_NOCOST_EN', 'INACTION_SKIP_EN']) {
-    assert.ok(internals[k], `internals 缺存量 ${k}`);
+    assert.ok(I[k] != null, `internals 缺存量 ${k}`);
   }
-  // 新族独立成组（inject 可整族摘除的前提）
-  const groups = internals.INACTION_ZH_GROUPS.concat(internals.INACTION_EN_GROUPS, internals.ZEROCOST_ZH_GROUPS, internals.ZEROCOST_EN_GROUPS);
+  const groups = I.INACTION_ZH_GROUPS.concat(I.INACTION_EN_GROUPS, I.ZEROCOST_ZH_GROUPS, I.ZEROCOST_EN_GROUPS);
   for (const k of ['INACTION_DELAY_ZH_R429', 'INACTION_DELAY_EN_R429', 'ZEROCOST_MISS_ZH_R429', 'ZEROCOST_MISS_EN_R429']) {
     assert.ok(groups.some((g) => g[0] === k), `${k} 未独立成组`);
   }
-  // 模块 dimension 字段仍是聚合子族名（不以独立维度 dispatch）
   const r = detectOpportunityCostNeglect(ATK[2]);
   assert.strictEqual(r.dimension, 'opportunity_cost_neglect');
 });
+
+console.log(`\nr429 轮测：${passed} 通过 / ${failed} 失败`);
+console.log(`测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+if (failed > 0) process.exit(1);
