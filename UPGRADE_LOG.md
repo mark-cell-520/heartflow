@@ -1,3 +1,47 @@
+## r430 — 每日审计·修复轮（22:30 cron）：README badge 口径漂移修复（P2）+ UPGRADE_LOG r429 断档补录（P3）（v6.8.213 保持）
+
+**审计范围**：过去 24h 共 65 个 commit（最新 r428 接线 + r429 opportunity_cost_neglect 扩族）；本地未推送 0 条（22:45 推送脚本已兜底成功）。
+
+**实测审计结果（不采信自报告，全部亲自跑）**：
+- `scripts/measure-claimed-numbers.js`：维度 274（BLOCK 11 / REWRITE 19 / VERIFY 242）、模块 169、工具 197、路由 1390、测试 25,536 passed / 232 failed（901 文件）、src JS 646 个
+- MCP 运行态 `heartflow_status`：version 6.8.213、running true、modules 169，与磁盘一致
+- r428 接线真实性：`engine.dispatch('cognitiveProtocol.analyzeTaskLevel')` 与 `engine.dispatch('errorHandler.classifyError')` 均返回真实结果（前者返回任务层级判定，后者对字符串恒 'unknown'——与 UPGRADE_LOG 记录的「classifyError 收 Error 对象」签名一致）；负对照 `noSuchModule.noSuchAction` 仍抛 route not allowed
+- r429 新族真实性：`gate()` 实测攻击样本（暂缓+免费/拖延+零成本/EN postpone+free）非 pass 命中 econ_reasoning_gate；良性样本（制度规则/概念教学/正常计划/推迟有理由）全 pass；轮测 `test/round-429-opportunity-cost-wait-free-ride.test.js` 18/18
+- 五门禁：`bin/verify.js` 16/0、`scripts/guard-abilities.js` 20/20、`test/doc-numbers-accuracy.test.js` 24/0、`scripts/bidirectional-guard.js` 召回 52/52 + 误拦 302/326（与基线逐项相同）
+
+**问题清单**：
+| 级别 | 问题 | 处理 |
+|---|---|---|
+| P2 | README badge 行测试数 25,452 与同文件正文横幅 25,536 不一致（badge 自 r424 后未随测试数增长同步，doc-numbers 守卫只校验正文横幅不校验 badge 行） | 已修：badge → 25,536 |
+| P3 | UPGRADE_LOG 簿子断档 r429–r446 共 18 轮未落簿（r447 轮遗留问题，跨轮累积） | 本轮只补最新一轮 r429 止血，不追补全部 18 轮（见下方） |
+| P3 | 22:07 升级轮遗留工作区未提交改动（`src/comparative-advantage.js`  comparative_advantage「全面劣势」新腿 ADV6-8/NOGAIN5，22:07 轮因良性误拦来源未查明而主动未提交） | 实测 stash 前后对照：新腿模块层攻击命中 2/9→4/9 真实增益、gate 层良性零新增误伤（stash 前后逐条一致），但按审计纪律不代替升级轮提交，留给 120min 升级轮接手 |
+
+**修复内容**：
+1. `README.md`：Test Suite badge 25,452 → 25,536（与正文横幅、data/test-count.json 实测值一致）
+2. `UPGRADE_LOG.md`：顶部追加本报告 + r429 条目补录（r429 commit 链 6 条全部核实存在：6b88510→3f2d1d8→f7d6f3a→0cd423a→01aaadd→a67238e）
+
+**未修项（留给升级轮）**：22:07 轮遗留的 comparative-advantage 新腿需升级轮补 `test/round-426-*` 轮测后随真升级提交，本审计轮不代提交（审计与升级职责分离）。
+
+**推送状态**：heartflow/main 与 HEAD 一致（待推 0 条，22:45 脚本兜底成功）。
+
+---
+
+## r429 — opportunity_cost_neglect 聚合族新增「观望/拖延免单」措辞家族（真升级②：既有维度全新句式族；v6.8.213 保持，同 r406–r428 扩族不 bump 先例）
+
+**方向**：经济学推理轴（econ-reasoning 族续）。
+
+**缺口实证**：`opportunity_cost_neglect`（第 336 轮接线维度）存量腿只收硬形不作为（先拖/拖着/按兵不动/维持现状）与直接免单（costs nothing/loses nothing），「再观望观望/缓一缓/先放放/暂缓/sit on this decision/hold off on hiring/postpone the migration」的不作为 + 「错过不了什么/不会耽误任何事/也不会有任何影响/也不会掉队/will not cost us anything/nothing will be lost by waiting/changes nothing」的免单整族零命中。
+
+**实现**（commit 链 6b88510→3f2d1d8→f7d6f3a→0cd423a→01aaadd→a67238e）：
+1. `src/opportunity-cost-neglect.js`：新增四常量独立成组——`INACTION_DELAY_ZH_R429` / `INACTION_DELAY_EN_R429`（腿①观望拖延形）、`ZEROCOST_MISS_ZH_R429` / `ZEROCOST_MISS_EN_R429`（腿②免单零损失形），inject 可整族摘除，存量三组豁免（制度规则/概念教学/纠正句）原样覆盖
+2. `src/opportunity-cost-neglect.js`：腿②中文摘除「损失」分支——「也不会有任何损失」是存量 `ZEROCOST_NOLOSS_ZH` 领地（r336 轮测注入断言被新族抢承重），新族只用 影响/事/事情/掉队/差别/变化 五个泛后果名词
+3. `src/index.js` 零改动，dimMap 键数 274 不变，VERSION 不 bump
+4. `test/round-429-opportunity-cost-wait-free-ride.test.js`：18 断言组全过（A 模块层攻击 12/12+双腿归因、B 良性 0/12、C 精度边界 9 项含推迟/延迟不收+postponed 过去式不收+强否定守卫+单腿不判×2、D 负例注入 4 组逐常量翻转、E 存量+r336 注入断言仍成立、F gate 端到端 econ_reasoning_gate 承重、G 独立成组接线锁）；轮测格式从 node:test 改为 run-all 可计数的 console.log 汇总行（上一版格式 run-all 无法解析）
+
+**审计轮实测复核（r430）**：gate() 攻击非 pass（verify/rewrite 命中 econ_reasoning_gate）、良性全 pass、轮测 18/18 复跑通过。
+
+---
+
 ## r428 — 双模块接线：CognitiveProtocol + ErrorHandler 接入路由与 MCP（真升级③，v6.8.212 → v6.8.213）
 
 **方向**：agent 执行验证 / 自我纠错（轮换自 r426/r427 的因果与度量博弈轴）。

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
-[![Test Suite](https://img.shields.io/badge/test%20suite-25%2C452%20passing-brightgreen)](test/)
+[![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
 [![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-274-blueviolet.svg)](#what-it-catches-274-dimensions)
 
