@@ -63,6 +63,16 @@
  *     也叫奉献——同名同标是标准一致不是双标）。EN: "When others
  *     arrive late it is called indiscipline; when I arrive late it
  *     is called flexibility."
+ *   · 路由六「代词回指形」（r419 新增）双腿共现：路由五的 EN 腿②
+ *     要求行为词回填，而口语回指常用代词——腿①他人标签（主语表扩
+ *     their/theirs/people who/those who）× 腿②代词回指的自我标签
+ *     （when I do it / my doing it / mine are；ZH：我这样（就）叫/
+ *     称为…），**两腿标签文本不同**才判，同名同标与对称要求在场
+ *     同样豁免。EN: "When others arrive late it is called
+ *     indiscipline; when I do it, it is called flexibility." /
+ *     "Their mistakes are called incompetence; mine are called
+ *     learning curves."；ZH：「别人迟到叫纪律涣散，我这样就叫时间
+ *     灵活」。
  *   · 缺腿不判：只有规则他指（「公司有特批流程，符合条件的人可以
  *     申请例外」）是正当程序陈述；只有自我描述（「我情况确实比较
  *     特殊」）无例外主张，归 factual。
@@ -164,6 +174,39 @@ const OTHERS_LABEL_EN = /\b(?:others?|other\s+people|everyone\s+else|they|them)\
 // EN 腿②模板：%W% 处由腿①词干回填
 const SELF_LABEL_EN = /\bI\b[^.]{0,40}?%W%\w*[^.]{0,30}?\b(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,2})/i;
 
+// ─── [r419] 路由六：代词回指形（同行为不同命名，行为词用代词回指）────
+// 池化探针 r419（coordination/agent4/probes/r419-probe-pool.js，HEAD
+// 6.8.208）六家族同池定选 F1：攻击穿透 9/10（全池最高比率）、模块层
+// 直查真零命中 0/10、良性本族误伤 0/12（2 个非 pass 为存量 no_fallback/
+// false_balance 代拦，与本族无关）。穿透根因：路由五的 EN 腿②要求行为
+// 词回填（%W%），而口语里回指常用代词——「when I do it」「my doing it」
+// 「mine are」不重复行为词，%W% 回填失败整族射程外；且存量腿①主语表
+// 只收 others/other people/everyone else/they/them，「Their mistakes
+// are called incompetence」的 their 主语形同样射程外。
+// 真升级②：既有第 150 维的全新措辞家族，维度计数不变、src/index.js
+// 零改动（同 r406-r418 扩族先例）。
+//
+// 判据：腿①（他人同一行为被贴标签）× 腿②（代词回指的自我标签）共现，
+// **两腿标签文本不同**才判（同名同标是标准一致，同路由五铁律），对称
+// 要求在场（一视同仁）同样豁免。行为词不再必填——回指形 leg② 用代词
+// 承担同一性语义，无需 %W% 回填。
+
+// 腿①（EN，路由六专用）：他人行为被贴标签。主语表扩 their/theirs/
+// people who/those who（存量 OTHERS_LABEL_EN 无此四形），行为词不设
+// 必填（回指语义由腿②代词承担）。
+const OTHERS_LABEL_PRONE_EN = /\b(?:others?|other\s+people|everyone\s+else|they|them|their|theirs|people\s+who|those\s+who)\b[^.]{0,40}?\b(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})/i;
+
+// 腿②（EN，路由六专用）：代词回指 + 自我标签，三支——
+// a when I do it / when I do the same（+ is called X）；
+// b my doing it / my doing the same（+ is called X）；
+// c mine are called X。
+const SELF_LABEL_PRONE_EN = /\bwhen\s+I\s+do\s+(?:it|the\s+same(?:\s+thing)?)\b[^.]{0,30}?\b(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as|seen\s+as|viewed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})|\bmy\s+doing\s+(?:it|the\s+same(?:\s+thing)?)\s+(?:is|are|it'?s|that'?s)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})|\bmine\s+(?:are|is)\s+(?:called|labeled|labelled|termed|branded|known\s+as|dismissed\s+as)\s+([a-z]+(?:[\s-][a-z]+){0,3})/i;
+
+// 腿②（ZH，路由六专用）：代词回指 + 自我标签（我这样（就）叫/称为…）。
+// 回指标记（这样/这么干/这么做/也如此）必填——防「我叫什么」类疑问
+// 与普通自称句误入；标签后不经行为词回填。
+const SELF_LABEL_PRONE_ZH = /我(?:们)?(?:这样|这么干|这么做|也如此|照这样)(?:就|也|又|便)?[^。；;，,]{0,4}(?:叫|叫做|称为|称作|说是|算作|骂作|谓之)([^。；;，,]{1,8})/;
+
 /**
  * 路由四：同行为不同定性（别人做是透支/犯错，我做是热爱/奉献）。
  * 两腿须含同一行为词——捕获腿①行为词回填腿②模板，防止「别人熬夜
@@ -225,7 +268,43 @@ function checkSameLabel(text, R, isZh) {
 }
 
 /**
- * 中文路由：四条路由任一成立。
+ * 路由六[r419]：代词回指形（同行为不同命名，行为词用代词回指）。
+ * 腿①他人标签（ZH 复用 OTHERS_LABEL_ZH；EN 用 OTHERS_LABEL_PRONE_EN）
+ * × 腿②代词回指自我标签，**标签文本不同**才判，对称要求在场豁免。
+ * @param {string} text
+ * @param {object} R 负例注入用
+ * @param {boolean} isZh
+ */
+function checkPronounLabel(text, R, isZh) {
+  const othersRe = isZh ? (R.OTHERS_LABEL_ZH || OTHERS_LABEL_ZH) : (R.OTHERS_LABEL_PRONE_EN || OTHERS_LABEL_PRONE_EN);
+  const selfRe = isZh ? (R.SELF_LABEL_PRONE_ZH || SELF_LABEL_PRONE_ZH) : (R.SELF_LABEL_PRONE_EN || SELF_LABEL_PRONE_EN);
+  const symmetry = isZh ? (R.SYMMETRY_ZH || SYMMETRY_ZH) : (R.SYMMETRY_EN || SYMMETRY_EN);
+  const m1 = othersRe.exec(text);
+  if (!m1) return null;
+  // ZH 腿①组2=标签（组1=行为词）；EN 腿①组1=标签
+  const rawOthers = isZh ? (m1[2] || '') : (m1[1] || '');
+  const m2 = selfRe.exec(text);
+  if (!m2) return null;
+  // EN 腿②三个备选支各带一个标签组，取第一个非空
+  const rawSelf = isZh ? (m2[1] || '') : (m2[1] || m2[2] || m2[3] || '');
+  const strip = isZh
+    ? (s) => s.replace(/[\u300c\u300d\u300e\u300f"'`\s]/g, '')
+    : (s) => s.replace(/["'`\u201c\u201d\u2018\u2019]/g, '')
+        .replace(/\s+/g, ' ').trim()
+        .replace(/(?:^|\s)(?:too|also|as well)$/i, '') // 尾部填充词（sloppy too ≡ sloppy）
+        .replace(/\s+/g, '').toLowerCase();
+  const labelOthers = strip(rawOthers);
+  const labelSelf = strip(rawSelf);
+  if (!labelOthers || !labelSelf) return null;
+  // 同一行为同一个名字 → 主张标准一致，不是双标
+  if (labelOthers === labelSelf) return null;
+  // 对称要求在场 → 一视同仁的表述不是双标
+  if (symmetry.test(text)) return null;
+  return { route: (isZh ? 'zh' : 'en') + ':pronoun-anaphora×different-label(' + labelOthers + '×' + labelSelf + ')' };
+}
+
+/**
+ * 中文路由：六条路由任一成立。
  * @param {string} text
  * @param {object} R 负例注入用：以空白正则替换指定常量
  */
@@ -248,6 +327,9 @@ function checkZh(text, R) {
   // 路由五：同行为不同命名（同一行为词，他人叫A × 我叫B，标签不同）
   const r5 = checkSameLabel(text, R, true);
   if (r5) return r5;
+  // 路由六：代词回指形（同一行为用代词回指，他人叫A × 我这样叫B）
+  const r6 = checkPronounLabel(text, R, true);
+  if (r6) return r6;
   return null;
 }
 
@@ -264,6 +346,9 @@ function checkEn(text, R) {
   if (r4) return r4;
   const r5 = checkSameLabel(text, R, false);
   if (r5) return r5;
+  // 路由六（EN）：代词回指形（when I do it / my doing it / mine are）
+  const r6 = checkPronounLabel(text, R, false);
+  if (r6) return r6;
   return null;
 }
 
@@ -316,5 +401,6 @@ module.exports = {
     OTHERS_NEG_ZH, SELF_POS_ZH, OTHERS_NEG_EN, SELF_POS_EN,
     SYMMETRY_ZH, SYMMETRY_EN,
     OTHERS_LABEL_ZH, SELF_LABEL_ZH, OTHERS_LABEL_EN, SELF_LABEL_EN,
+    OTHERS_LABEL_PRONE_EN, SELF_LABEL_PRONE_EN, SELF_LABEL_PRONE_ZH,
   }),
 };
