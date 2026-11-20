@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 273 discrimination dimensions  ×  11-layer pipeline  ×  167 modules  ×  195 MCP tools
-×  1,363 dispatch routes  ×  25,479 passing tests  ×  2 npm dependencies
+×  1,363 dispatch routes  ×  25,492 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.211**. Not marketing copy.
 | Dispatch routes | 1,363 |
 | Discrimination dimensions | 273 |
 | MCP tools | 195 | tool definitions exposed via `tools/list` |
-| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424（straw_man 存在必要性否定形，+19 断言）与本地掉线产出 r424 SelfVerifier 接线（+8 断言，test/round-424-self-verifier-wiring.test.js）合流；failed 净增 2 = round-423-inference-chain-wiring.test.js（node:test TAP 不可解析，存量）+ round-424-straw-man-necessity-negation.test.js 单文件硬失败项，根因均为 run-all 解析缺口非接线引入，修复决策交 1 号）|
+| Test suite | 25,492 passing / 234 failing | `node test/run-all.js`（r426 全量实测 25,492/234/25,726（863 文件）——较 r426 开工前基线（862 文件 25,468/234/25,702）passed +24 恰为本轮 test/round-426-post-hoc-omen-attribution.test.js 的 24 条断言；文件级硬失败清单 171 项与本轮基线逐条 diff 零新增）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |

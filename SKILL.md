@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,363 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 273 | `dimMap` keys in `src/index.js` |
 | MCP tools | 195 | tool definitions exposed via `tools/list` |
-| Test suite | 25,479 passing / 231 failing | `node test/run-all.js`（rebase 合并态全量实测 25,479/231/25,710（863 文件）——远端 r424 straw_man 扩族（+19 断言）与本地掉线产出 SelfVerifier 接线（+8 断言）合流；failed 净增 2 = round-423-inference-chain-wiring + round-424-straw-man-necessity-negation 两项 run-all 解析缺口，存量非接线引入）|
+| Test suite | 25,492 passing / 234 failing | `node test/run-all.js`（r426 全量实测 25,492/234/25,726（863 文件）——较开工前基线 passed +24 = 本轮 24 条断言；文件级硬失败清单 171 项与基线逐条 diff 零新增）|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
