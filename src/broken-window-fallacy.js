@@ -84,6 +84,37 @@
  *   · 破窗效应犯罪学理论（broken windows theory）——同名不同物；
  *   · 纯破坏陈述（无腿②天然不判）与一般经济表述（无腿①天然
  *     不判）。
+ *
+ * [r428 扩展·真升级②] 4 号探针（coordination/agent4/probes/r428-probe-pool.js，
+ * 基线 HEAD 6.8.211）四家族同池定拨：本族「不破不立/腾笼换鸟」新措辞
+ * 家族以穿透 10/12、模块层攻击 0/12 真零命中、模块层良性 0/12、良性
+ * 误伤 1/12（存量 contradiction 代拦，非本族承重）定选（post_hoc 医疗
+ * 养生无「就」族 10/12 留库、opportunity_cost 观望免单族 10/12 留库、
+ * appeal_to_tradition 过来人反问族 7/12 穿透不足留库）。补入内容——
+ * 把**破坏/报废/删除/推倒/崩塌**事件说成「因祸得福/倒逼进步/腾出
+ * 空间/轻装前行」的根据，破坏的红利叙事从灾害重建（拉动内需族）
+ * 扩展到工程与资产处置场域：
+ *   · 腿①破坏动词新族 ZH（推倒重来/推翻重来/搞瘫/全删/删光/清空/
+ *     格式化/一把火烧/烧掉/拆了/拆掉/推平/夷为平地）+ EN（torn
+ *     down/rot/collapse）；存量 DESTRUCT 表不变，新族经 concat 并入
+ *     配对（「设备提前报废」这类存量破坏词也可与新收益族配对）；
+ *   · 腿②收益断言新族 ZH（技术债出清/甩掉包袱/轻装前行/腾出来/
+ *     放开手脚/瓶颈顺势打破/租金跟着涨/不用再被…拖着走/破而后立/
+ *     不破不立/因祸得福/倒逼升级）+ EN（blessing in disguise/silver
+ *     lining/clearing the technical debt/frees up/forced the
+ *     migration/finally gets spent/justify the rebuild/clean slate/
+ *     makes room for）——全部是**价值毁灭被说成净收益**的评价性
+ *     措辞，与需求侧中性措辞（拉动内需）不同族；
+ *   · 腿③连接新族 ZH（不一定是坏事/未必是坏事/反倒是件好事/反而是
+ *     好事/因祸得福/塞翁失马）+ EN（is not all bad/blessing in
+ *     disguise/silver lining/lets … move-build-spend/will justify）
+ *     ——只收评价性连接形，不收「也好/倒也/正好」类日常连接（会把
+ *     「事故之后正好赶上更新换代」类中性叙述误判）；
+ *   · 新族常量独立导出（DESTRUCT_ZH_R428/DESTRUCT_EN_R428/GAIN_ZH_R428/
+ *     GAIN_EN_R428/LINK_ZH_R428/LINK_EN_R428），inject 可整族摘除，
+ *     存量三腿表与既有路由零改动；既有豁免（认识论纠正/双边分析/
+ *     犯罪学理论）原样覆盖新族。
+ *   同轮探针实录：穿透 10/12、模块层攻击 0/12、模块层良性 0/12。
  */
 'use strict';
 
@@ -148,6 +179,85 @@ const LINK_ZH = /但是|但|却|反而|反倒|势必|必然|由此|从而|进而
 // ─── 腿③ 破坏→收益的连接（英文）─────────────────────────────────────
 const LINK_EN = /\b(?:but|yet|however|leaving|forces?|that|which|means?|thus|thereby|surely|in turn|as \w+ as)\b|\bwill\b(?=\s+(?:\w+\s+){0,2}(?:stimulat|boost|spur|creat|drive|fuel|lift|restock|accelerat))|\b(?:good|great|boon)\s+for\s+the\s+economy\b|\b(?:post-?\w+|reconstruction|recovery|restocking|replacement)\s+(?:demand|spending|purchases?|boom|work|orders?)\b|\bcreat(?:e|es|ed|ing)\s+(?:\w+\s+){0,2}(?:thousands\s+of\s+)?jobs\b/i;
 
+// ═══════════════════════════════════════════════════════════════
+// [r428 扩展·真升级②] 「不破不立 / 腾笼换鸟」族新常量
+// （同池探针 coordination/agent4/probes/r428-probe-pool.js 定拨：
+//  穿透 10/12、模块层攻击 0/12 真零命中、模块层良性 0/12）
+// 形状：把**破坏/报废/删除/推倒/崩塌**事件说成「因祸得福/倒逼进步/
+// 腾出空间/轻装前行」的根据——破坏的红利叙事从灾害重建场域扩展到
+// 工程与资产处置场域（老代码推倒重来、旧设备提前报废、老厂区拆除、
+// 旧数据清空）。存量三腿表（DESTRUCT/STIMULUS/LINK）经 concat 并入
+// 本族新常量，存量路由零改动；负例注入可整族摘除。
+// ═══════════════════════════════════════════════════════════════
+
+// 腿①破坏动词新族（ZH）——工程/资产处置场域的毁灭动词。刻意不收裸
+// 「重构/重写/更新」（「重构这个模块」是正常工程活动，无价值毁灭义）。
+const DESTRUCT_ZH_R428 = [
+  /推倒重来/, /推翻重来/, /推倒重做/, /推翻了重做/,
+  /搞瘫/, /搞垮/, /搞崩/, /弄瘫/,
+  /全删/, /删光/, /清空/, /格式化/,
+  /一把火烧/, /烧掉/, /付之一炬/,
+  /拆了/, /拆掉/, /推平/, /夷为平地/,
+  /整个崩/, /全崩/, /塌了/,
+];
+
+// 腿①破坏动词新族（EN）
+const DESTRUCT_EN_R428 = [
+  /\btorn\s+down\b/i,
+  /\brot\b/i,
+  /\bcollaps(?:e|ed|es|ing)\b/i,
+];
+
+// 腿②收益断言新族（ZH）——价值毁灭被说成净收益的评价性措辞。
+// 与需求侧中性措辞（拉动内需/创造就业）不同族：本族措辞本身即
+// 「破坏是好事」的断言。注意词形精度：
+//   · 「出清」要求带出清对象（技术债/债务/坏账/包袱），不收裸出清
+//     （「季末库存出清」是正常商业表述）；
+//   · 「租金跟着涨」要求跟着/随之/纷纷/水涨船高共现，不收裸
+//     「租金上涨」（「租金上涨是市场供需结果」是中性陈述）；
+//   · 不收裸「产业升级」（存量 STIMULUS 已收，且「促进了产业
+//     升级」是计划性替换描述）——只收「倒逼升级」形。
+const GAIN_ZH_R428 = [
+  /(?:技术债|债务|坏账|历史包袱|包袱)(?:得以|终于|彻底|全部)?(?:出清|清零|清掉|卸下)/,
+  /甩掉(?:了)?(?:历史)?(?:包袱|负担|累赘|掣肘)/,
+  /轻装前行/, /无债一身轻/, /一身轻/,
+  /腾出(?:了)?(?:空间|地方|资源|产能|预算|资金|人手|精力)/, /腾出来/,
+  /放开手脚/,
+  /(?:瓶颈|枷锁|束缚|天花板)(?:顺势|就此|彻底|一下子)?(?:被)?打破/,
+  /(?:租金|房价|报价|行情|股价|身价)(?:跟着|也随之|纷纷|水涨船高)(?:涨|升|抬)/,
+  /不用再被[^。]{0,10}拖着走/, /不再被[^。]{0,10}拖着走/, /摆脱了[^。]{0,10}束缚/,
+  /破而后立/, /不破不立/, /因祸得福/, /塞翁失马/, /置之死地/,
+  /倒逼(?:出)?(?:了)?(?:升级|进步|重构|转型|革新)/,
+  /扫清(?:了)?(?:障碍|绊脚石)/,
+];
+
+// 腿②收益断言新族（EN）
+const GAIN_EN_R428 = [
+  /blessing in disguise/i,
+  /silver lining/i,
+  /clearing the technical debt/i,
+  /technical debt (?:is |gets? )?cleared/i,
+  /clean slate/i,
+  /(?:frees?|freed|freeing) up/i,
+  /lets? (?:the team|us|them) (?:move|build|ship|focus|invest) fast/i,
+  /forced the (?:\w+ )?(?:migration|upgrade|rebuild|rewrite|replacement|overhaul|refactor)/i,
+  /(?:forced|forces) (?:us|them|the team) to (?:\w+ )?(?:rebuild|rewrite|upgrade|migrate|replace)/i,
+  /finally (?:gets?|got) (?:spent|used|approved|unlocked)/i,
+  /justify the (?:\w+ )?(?:rebuild|rewrite|replacement|upgrade|overhaul|investment)/i,
+  /(?:room|capacity|budget|space) (?:is |gets? )?(?:freed|opened up)/i,
+  /makes? room for/i,
+  /paves? the way for/i,
+  /unblocks?/i,
+];
+
+// 腿③连接新族（ZH）——只收评价性连接形。刻意不收「也好/倒也/正好/
+// 干脆」类日常连接：「事故之后正好赶上设备更新换代」是中性叙述，
+// 收入连接腿会把该句误判（r428 设计取舍，探针良性集实测）。
+const LINK_ZH_R428 = /不一定是坏事|未必是坏事|不见得是坏事|反倒是件好事|反而是好事|倒也是好事|因祸得福|塞翁失马|焉知非福|祸兮福所倚|旧的不去/;
+
+// 腿③连接新族（EN）
+const LINK_EN_R428 = /is not all bad|not all bad|blessing in disguise|silver lining|\blets?\s+(?:\w+\s+){0,2}(?:move|build|rebuild|invest|spend|grow|expand|upgrade|focus)\b|\bwill\s+justif\w+/i;
+
 // 三腿共现的距离窗
 const WIN_PAIR_ZH = 80;
 const WIN_PAIR_EN = 200;
@@ -207,12 +317,16 @@ function allMatches(re, text) {
  * 窗口以破坏标记与收益断言的起止距离度量（ZH 80 字 / EN 200 字符）。
  */
 function findSignatures(text, R) {
-  const destruct = (R.DESTRUCT_ZH || DESTRUCT_ZH);
-  const destructEn = (R.DESTRUCT_EN || DESTRUCT_EN);
-  const stimulus = (R.STIMULUS_ZH || STIMULUS_ZH);
-  const stimulusEn = (R.STIMULUS_EN || STIMULUS_EN);
-  const linkZh = R.LINK_ZH || LINK_ZH;
-  const linkEn = R.LINK_EN || LINK_EN;
+  // [r428] 存量三腿表 ∪ 「不破不立/腾笼换鸟」新族常量（inject 可整族摘除：
+  //   DESTRUCT_ZH_R428/DESTRUCT_EN_R428/GAIN_ZH_R428/GAIN_EN_R428 传 []
+  //   、LINK_ZH_R428/LINK_EN_R428 传永假正则即只摘新族，存量路由不受影响）
+  const destruct = (R.DESTRUCT_ZH || DESTRUCT_ZH).concat(R.DESTRUCT_ZH_R428 || DESTRUCT_ZH_R428);
+  const destructEn = (R.DESTRUCT_EN || DESTRUCT_EN).concat(R.DESTRUCT_EN_R428 || DESTRUCT_EN_R428);
+  const stimulus = (R.STIMULUS_ZH || STIMULUS_ZH).concat(R.GAIN_ZH_R428 || GAIN_ZH_R428);
+  const stimulusEn = (R.STIMULUS_EN || STIMULUS_EN).concat(R.GAIN_EN_R428 || GAIN_EN_R428);
+  const mergeRe = (a, b) => new RegExp(a.source + '|' + b.source, a.flags);
+  const linkZh = mergeRe(R.LINK_ZH || LINK_ZH, R.LINK_ZH_R428 || LINK_ZH_R428);
+  const linkEn = mergeRe(R.LINK_EN || LINK_EN, R.LINK_EN_R428 || LINK_EN_R428);
 
   const sigs = [];
   const langs = [
@@ -285,5 +399,7 @@ module.exports = {
     DESTRUCT_ZH, DESTRUCT_EN, STIMULUS_ZH, STIMULUS_EN, LINK_ZH, LINK_EN,
     EXEMPT_CORRECT_ZH, EXEMPT_CORRECT_EN, EXEMPT_THEORY_ZH, EXEMPT_THEORY_EN,
     WIN_PAIR_ZH, WIN_PAIR_EN,
+    DESTRUCT_ZH_R428, DESTRUCT_EN_R428, GAIN_ZH_R428, GAIN_EN_R428,
+    LINK_ZH_R428, LINK_EN_R428,
   }),
 };
