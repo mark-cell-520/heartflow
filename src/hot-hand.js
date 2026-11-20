@@ -151,12 +151,16 @@ const STREAK_EACH_EN = /\b(?:scored|won|hit|made|netted|sunk)\s+(?:\w+\s+){0,3}i
 // ─── [r433 新增族] 腿②：势能延续行动词表（EN）─────────────────────────
 // 存量 CONTINUE_IMPLICIT_EN 收 keep feeding / do not change / ride it 等
 // 告诫形，不收「换人/续用」的行动面：strike while the iron is hot /
-// start him again / keep him in the lineup。
+// start him again / keep him in the lineup。竞技名词限定（lineup/game/
+// rotation）——不收裸 keep him in（会误收 keep her in mind / in the loop
+// 类良性转述）。
 const CONTINUE_ROUND_EN = [
   'strike while the iron is hot', 'start him again', 'start her again',
-  'keep him in', 'keep her in', 'leave him in', 'leave her in',
-  'stay with him', 'stay with her', 'keep this run going', 'ride this run',
-  'keep the run alive',
+  'keep him in the lineup', 'keep her in the lineup',
+  'keep him in the game', 'keep her in the game',
+  'keep him in the rotation', 'keep her in the rotation',
+  'leave him in the game', 'leave her in the game',
+  'keep this run going', 'ride this run', 'keep the run alive',
 ];
 
 // 豁免常量
