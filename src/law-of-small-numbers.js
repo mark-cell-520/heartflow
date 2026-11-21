@@ -118,6 +118,31 @@
  *     （样本越大越不准/被平均）、敷衍型（问几个人就行/调查那么多都是
  *     走形式）；EN trend-is-obvious / no need for a bigger dataset /
  *     small samples tell the truth。
+ *
+ * [r438 扩展 · 真升级②：短观察窗 × 属性泛化裁定的全新措辞家族]
+ * r438 池化探针（coordination/agent4/r438-probe-pool.js 与
+ * r438-probe-round3.js，v6.8.213 gate() 全量 findings 实测）：同池五家族
+ * 定拨——P1 base_rate 检测准确率族 0/6 穿透（存量已覆盖）、P3 gamblers
+ * 热手族 1/6、P5 regression 命名现象族 2/6 但良性 5/6 被存量代拦、
+ * **P2 本家族 ZH 10/10 完全穿透、模块层 0/10 全 miss、良性 0/6 误伤**，
+ * 双指标胜出。穿透根因：
+ *   · 腿①' WINDOW 短观察窗锚点整族缺失——口语默认说法「才试用了两天」
+ *     「试驾了一圈」「尝了一口」「考察了三天」「逛了半天」「住了两晚」
+ *     用的是**时间与场合量词**（天/晚/周/小时/分钟/圈/口/阵/会儿/下午/
+ *     上午/节课/遍），存量腿① SMALL_N 只收「数字+样本性量词」（三个
+ *     案例/五次实验/两把排位），时长量词形零覆盖。
+ *   · 腿②' STABLE 属性泛化裁定整族缺失——「已经很稳定了」「质量靠得住」
+ *     「水平挺高」「很好相处」「服务靠谱」是给对象属性下质量/能力/安全
+ *     泛化结论的口语形，存量腿②b UNIVERSAL 只收「铁律/肯定有效/都一个
+ *     样」式总体裁定、腿③ QUANT 只收数值化参数、腿④ PERPETUAL 只收永续
+ *     结论，三族射程均不覆盖属性泛化形。
+ * 新族两常量独立成组（不进存量数组，保 r246 基线 SMALL_N_ZH.slice(0,3)
+ * 注入断言与 r302/r303 的 QUANT/PERPETUAL 逐元素注入语义），路由
+ * kind='window' 与存量四路由平行。射程分工：存量四族判「小样本→总体
+ * 裁定/参数/永续规律」，本族判「短观察窗→属性泛化」——观察期时长
+ * （几天/一圈/一口）与属性结论（稳定/靠谱/水平高）的组合，正是小数
+ * 定律在消费与职场口语里的默认形态。不收「年/个月」（「产品经过三个
+ * 月的测试才上线，已经很稳定了」是足量观测的正当结论）。
  */
 'use strict';
 
@@ -331,6 +356,72 @@ const PERPETUAL_EN = [
   /\bno\s+exceptions?\b/i,
 ];
 
+// ─── [r438 新增] 腿①' 短观察窗锚点（时长量词 × 体验/观察动词）────────────
+// 第五出口族（真升级②）：腿① SMALL_N 只收「数字+样本性量词」（三个案例/
+// 五次实验/两把排位），**时长量词形**整族穿透——「才试用了两天没出问题」
+// 「试驾了一圈」「尝了一口」「考察了三天」「逛了半天」是口语里默认的
+// 小样本说法：天/晚/周/小时/分钟/圈/口/阵/会儿/下午/上午/节课/遍 这批
+// 时间与场合量词不在任何存量表。r438 探针（coordination/agent4/
+// r438-probe-pool.js / r438-probe-round3.js，v6.8.213 gate() 全量
+// findings 实测）：本族 10 条 ZH 攻击 **10/10 完全穿透**（gate.action=
+// pass 且零维度承重），模块层 0/10 全 miss，良性 6/6 零误伤。
+// 注：不收「年/个月」（「三个月的测试」是足量观测，r434 门禁教训），
+// 「半月」单独收（半个月仍是短窗）；「次/把/局」留在存量 SMALL_N。
+const WINDOW_ZH = [
+  // 动词 + 了/过 + 短时长：试用了两天/考察了三天/逛了半小时/尝了一口/
+  //   试驾了一圈/观察了三天/住了两晚/逛了半天
+  /(?:试用|试驾|试吃|试玩|体验|考察|观察|逛|练|玩|尝|听|看|问|住|开|采访|接触|了解|感受|体会|试|用|测|抽|查)[了过]?(?:才|只|仅仅|短短|刚)?(?:半|[一二两三四五六七八九十])(?:\s*个)?(?:\s*来)?\s*(?:小时|分钟|天|晚|周|星期|圈|口|阵|会儿|下午|上午|晚上|早上|节课|堂课|遍)/,
+  // 短时长前置形：才两天/短短三天/仅一周/就两天/前后三天
+  /(?:才|只|仅仅|短短|刚|前后|就)(?:半|[一二两三四五六七八九十])(?:\s*个)?(?:\s*来)?\s*(?:小时|分钟|天|晚|周|星期|圈|口|阵|会儿|下午|上午|节课|遍)/,
+  // 无数字短时长：半天/一会儿/一晚上/一上午/一下午/半月/片刻/半晌
+  /(?:半\s*天|半\s*个?\s*月|一\s*会\s*儿|一?\s*下\s*午|一?\s*上\s*午|一?\s*晚\s*上|一?\s*早\s*上|片\s*刻|半\s*晌)/,
+];
+const WINDOW_EN = [
+  // verb + for + short duration: tried it for two days / for a week / for an hour
+  /\b(?:tried|tried out|used|tested|sampled|checked|watched|observed|visited|stayed|played|drove|ate|looked|ran|worked|trialled?)\b[^.]{0,24}?\bfor\s+(?:a\s+|an\s+)?(?:few\s+|couple of\s+)?(?:hour|day|night|week|minute|second|moment|while|afternoon|morning|evening)s?\b/i,
+  // just/only + N + unit: just two days / only a week
+  /\b(?:just|only|merely)\s+(?:a\s+|an\s+)?(?:few\s+|couple of\s+)?(?:one|two|three|four|five|\d+)\s+(?:hour|day|night|week|minute|second)s?\b/i,
+  // N / a few / a couple of + 时长裸名词：two nights / a few days
+  /\b(?:one|two|three|four|five|a few|a couple of)\s+(?:nights?|days?|hours?|weeks?|minutes?)\b/i,
+  // his/her/their first N：his first three shots（存量 SMALL_N_EN 只收
+  //   「the first few/three」的定冠词形，物主代词的首次 N 次形穿透）
+  /\b(?:his|her|their|its|my)\s+first\s+(?:few|three|two|four|five|\d+)\b/i,
+  // sampled/tried/visited + a few/couple/several + 场合名词
+  /\b(?:sampled|tried|tested|visited|checked)\s+(?:a\s+few|a\s+couple of|several)\s+(?:classes?|sessions?|times|games?|matches?|rounds?|places|shops|stores)\b/i,
+];
+
+// ─── [r438 新增] 腿②' 属性泛化裁定（短观察 → 稳定/靠谱/水平高的属性结论）─
+// 腿②b UNIVERSAL 收「铁律/肯定有效/都一个样」式总体裁定、腿③ QUANT 收
+// 数值化参数、腿④ PERPETUAL 收永续结论，三族都不收**给对象属性下质量/
+// 能力/安全泛化结论**的口语形——「已经很稳定了」「质量靠得住」「水平
+// 挺高」「很好相处」「clearly has great service」。r438 探针同池实测：
+// 本族与存量三裁定腿射程不重叠（存量攻击样本零覆盖）。
+const STABLE_ZH = [
+  // 程度前缀 + 属性词裸形（须与锚点共现；含「已经很稳定了」完成态与
+  //   「说明/明显…很成熟」推导形的核心段——前缀语境由本形承揽）
+  /[很挺太十分](?:稳定|靠谱|可靠|安全|方便|好用|成熟|完善|顺手|理想|不错)/,
+  // 属性名词 × 肯定裁定：质量靠得住/性能过硬/口碑不低/水平很高/天赋挺高/胜率不差
+  /(?:质量|品质|品控|性能|稳定性|可靠性|安全性|流畅度|体验|服务|口碑|水平|天赋|胜率|评价|操控性|手感|交通)[^。，！？；\n]{0,4}(?:靠得住|靠谱|不低|不差|很高|挺高|不错|过硬|拔尖|很强|挺好|很好)/,
+  // 好X 属性形：好开/好吃/好用/好相处/好接近
+  /[很挺真太]?好(?:开|吃|用|使|听|看|相处|接近|玩|聊)/,
+  // 安全/稳定/靠谱/可靠 可选程度前缀裸形（须与锚点共现，X不X 形由路由层排除）
+  /[很挺太]?(?:安全|稳定|靠谱|可靠)/,
+];
+const STABLE_EN = [
+  // so it/this/that + is + (very) stable/reliable/solid
+  /\b(?:so|thus|therefore)\s+(?:it|this|that|the\s+\w+)\s+(?:is|seems|looks|has proven|proves)\s+(?:very\s+|really\s+|quite\s+|totally\s+|completely\s+)?(?:stable|reliable|solid|dependable|robust|safe|mature)\b/i,
+  // so the hotel clearly has great service
+  /\b(?:so|thus)\s+(?:it|this|that|the\s+\w+)\s+(?:clearly\s+|obviously\s+)?(?:has|have)\s+(?:great|excellent|solid|top|amazing)\s+(?:service|quality|performance|support|reliability)\b/i,
+  // (which) means/shows/proves/suggests + it is + quality
+  /\b(?:which\s+)?(?:means|shows|proves|suggests|indicates)\s+(?:it|this|the\s+\w+)\s+is\s+(?:very\s+|really\s+|quite\s+|clearly\s+)?(?:stable|reliable|solid|dependable|robust|safe|mature|good|great)\b/i,
+  // quality/reliability/service + is + high/great/solid
+  /\b(?:quality|reliability|stability|service|performance|satisfaction|skill|talent)\s+(?:is|must be)\s+(?:very\s+|really\s+|quite\s+|clearly\s+)?(?:high|great|solid|top|excellent|good)\b/i,
+  // he is obviously a great shooter
+  /\b(?:he|she|they|the\s+\w+)\s+(?:is|are)\s+(?:obviously|clearly|definitely|certainly)\s+(?:a\s+)?(?:great|top|excellent|world-class|natural)\s+\w+/i,
+  // the course is well received / widely liked
+  /\bthe\s+\w+\s+is\s+(?:well\s+received|well\s+liked|widely\s+liked)\b/i,
+];
+
 // ─── 距离窗（小样本锚点 × 总体性裁定）──────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -407,6 +498,8 @@ function findSignatures(text, R) {
       universal: R.UNIVERSAL_ZH || UNIVERSAL_ZH,
       quant: R.QUANT_ZH || QUANT_ZH,
       perpetual: R.PERPETUAL_ZH || PERPETUAL_ZH,
+      window: R.WINDOW_ZH || WINDOW_ZH,
+      stable: R.STABLE_ZH || STABLE_ZH,
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
@@ -415,6 +508,8 @@ function findSignatures(text, R) {
       universal: R.UNIVERSAL_EN || UNIVERSAL_EN,
       quant: R.QUANT_EN || QUANT_EN,
       perpetual: R.PERPETUAL_EN || PERPETUAL_EN,
+      window: R.WINDOW_EN || WINDOW_EN,
+      stable: R.STABLE_EN || STABLE_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -468,6 +563,35 @@ function findSignatures(text, R) {
       if (!p) continue;
       sigs.push({ lang: L.lang, kind: 'perpetual', small: s.raw, verdict: p.raw });
     }
+    // 腿①' × 腿②' 短观察窗 × 属性泛化裁定（r438）——与腿②b/腿③/腿④
+    //   平行路由：UNIVERSAL 判「总体定性裁定」、QUANT 判「数值化参数」、
+    //   PERPETUAL 判「永续规律」，本腿判「把几天/几次/一瞬的偶然体验
+    //   泛化成稳定属性」——已经很稳定了/质量靠得住/水平挺高/很好相处。
+    //   锚点池 = 腿①' 短观察窗 ∪ 腿① 存量小样本（后者排除「N个月/N年」
+    //   时长形——「产品经过三个月的测试才上线，已经很稳定了」是足量
+    //   观测的正当结论，不是小样本）。裁定词三重守卫：X不X 疑问对冲形
+    //   （稳定不稳定/好不好用不是裁定）、传闻/对冲前缀（据说/可能/
+    //   初步/只是）、存量三组全局豁免在入口已拦。
+    const windowM = collect(text, L.window, true);
+    const stableM = collect(text, L.stable, true);
+    const anchorPool = windowM.concat(smallM.filter(s =>
+      !/^\s*(?:个)?\s*(?:月|年)/.test(text.slice(s.end, s.end + 3))));
+    for (const s of anchorPool) {
+      const u = stableM.find(w => {
+        const d = dist(w, s);
+        if (d > L.win) return false;
+        if (d === 0 && w.idx === s.idx && w.end === s.end) return false; // 同一区间
+        // X不X 形：「稳定不稳定」「好不好用」是疑问/对冲，不是裁定
+        const after = text.slice(w.end, w.end + 1 + w.raw.length);
+        if (/^不/.test(after) && after.slice(1) === w.raw) return false;
+        // 传闻/对冲前缀：据说/听说/可能/也许/大概/似乎/或许/初步/只是/待验证
+        const before = text.slice(Math.max(0, w.idx - 16), w.idx);
+        if (/(?:据说|听说|传闻|可能|也许|大概|似乎|或许|好像|初步|只是|待定|待验证|未必|说不定)[^。；\n]{0,12}$/.test(before)) return false;
+        return true;
+      });
+      if (!u) continue;
+      sigs.push({ lang: L.lang, kind: 'window', small: s.raw, verdict: u.raw });
+    }
   }
   return sigs;
 }
@@ -510,6 +634,8 @@ function detectLawOfSmallNumbers(text, inject) {
         ? '小样本「' + x.small + '」× 数量化总体裁定「' + x.verdict + '」'
         : x.kind === 'perpetual'
         ? '小样本「' + x.small + '」× 永续全称结论「' + x.verdict + '」'
+        : x.kind === 'window'
+        ? '短观察窗「' + x.small + '」× 属性泛化裁定「' + x.verdict + '」'
         : '小样本「' + x.small + '」× 总体裁定「' + x.verdict + '」')
       : (x.kind === 'exempt'
         ? 'sample-size exemption claim "' + x.small + '"'
@@ -517,6 +643,8 @@ function detectLawOfSmallNumbers(text, inject) {
         ? 'small sample "' + x.small + '" x quantitative verdict "' + x.verdict + '"'
         : x.kind === 'perpetual'
         ? 'small sample "' + x.small + '" x perpetual verdict "' + x.verdict + '"'
+        : x.kind === 'window'
+        ? 'short observation window "' + x.small + '" x property generalization "' + x.verdict + '"'
         : 'small sample "' + x.small + '" x universal verdict "' + x.verdict + '"'))),
     details: s.lang === 'zh'
       ? '小数定律(' + sigs.length + '处: ' + (s.kind === 'exempt'
@@ -525,6 +653,8 @@ function detectLawOfSmallNumbers(text, inject) {
         ? '拿极小样本「' + s.small + '」给总体参数定下数值结论「' + s.verdict + '」，把小样本的偶然频率/均值当成总体的真实概率或比率'
         : s.kind === 'perpetual'
         ? '拿极小样本「' + s.small + '」推出无例外、无时间边界的永续结论「' + s.verdict + '」，把有限观测固化成永久成立的规律'
+        : s.kind === 'window'
+        ? '拿短观察窗「' + s.small + '」给对象属性下泛化结论「' + s.verdict + '」，把几天/几次/一瞬的偶然体验当成稳定不变的普遍属性'
         : '拿极小样本「' + s.small + '」给全体下结论「' + s.verdict + '」，把小样本的偶然波动当总体真实分布') + ')(zh)'
       : 'law of small numbers(' + sigs.length + 'x: ' + (s.kind === 'exempt'
         ? 'explicit small-sample defense "' + s.small + '" — smaller sample claimed more reliable'
@@ -532,8 +662,10 @@ function detectLawOfSmallNumbers(text, inject) {
         ? 'tiny sample "' + s.small + '" pinned to a numeric population parameter "' + s.verdict + '" — a small-sample frequency/mean read as the true probability or rate'
         : s.kind === 'perpetual'
         ? 'tiny sample "' + s.small + '" frozen into a perpetual verdict "' + s.verdict + '" — finite observations read as a permanently valid law'
+        : s.kind === 'window'
+        ? 'short observation window "' + s.small + '" generalized into a property verdict "' + s.verdict + '" — a few days of casual experience read as a stable attribute'
         : 'tiny sample "' + s.small + '" generalized to a universal verdict "' + s.verdict + '"') + ')(en)',
-    guidance: '小数定律指人们系统性地高估小样本对总体的代表性，把小样本的偶然波动当成总体真实分布——抛了三次硬币都是正面，这枚硬币明显是偏的 / 这个村出了三个百岁老人，这里的水土就是养人 / 我问了五个人，四个说支持，民意已经很清楚了 / 试了几次都不行，这个方法肯定有问题 / 样本小才真实，大样本都是注水注出来的 / three coin flips came up heads so this coin is clearly biased / I asked five colleagues and all of them agreed so the whole office feels this way / small samples are the honest ones and big surveys are all rigged。请补上论证：样本量决定结论能走多远，小样本的波动幅度大，只能给假设不能给结论；要下总体性结论需要足够大的随机样本或引用已有大样本证据；如果只是初步观察，请明确说这是待验证的假设，并说明还需要多少数据。「样本小才真实、大样本都是注水」是更隐蔽的变体——为样本不足辩护只会堵死补数据的路。承认样本不足、扩大样本、参考大样本证据、讨论样本量与代表性本身，都是正当做法；若这段话只是转述他人的谬误案例或统计教学，核实其主张再决定是否采信。',
+    guidance: '小数定律指人们系统性地高估小样本对总体的代表性，把小样本的偶然波动当成总体真实分布——抛了三次硬币都是正面，这枚硬币明显是偏的 / 这个村出了三个百岁老人，这里的水土就是养人 / 我问了五个人，四个说支持，民意已经很清楚了 / 试了几次都不行，这个方法肯定有问题 / 样本小才真实，大样本都是注水注出来的 / 才试用了两天没出问题，就断定这软件已经很稳定了 / 试驾了一圈就说这车操控性好 / three coin flips came up heads so this coin is clearly biased / I asked five colleagues and all of them agreed so the whole office feels this way / small samples are the honest ones and big surveys are all rigged / I tried it for two days with no issues, so it is stable now。请补上论证：样本量决定结论能走多远，小样本的波动幅度大，只能给假设不能给结论；要下总体性结论需要足够大的随机样本或引用已有大样本证据；如果只是初步观察，请明确说这是待验证的假设，并说明还需要多少数据。「样本小才真实、大样本都是注水」是更隐蔽的变体——为样本不足辩护只会堵死补数据的路。短观察窗（几天/几次/一圈/一口）得出的属性结论同样只能当假设——几天无故障不等于质量稳定，一圈试驾不等于操控性好。承认样本不足、扩大样本、参考大样本证据、讨论样本量与代表性本身，都是正当做法；若这段话只是转述他人的谬误案例或统计教学，核实其主张再决定是否采信。',
     tags: ['statistics', 'statistical-literacy', 'law-of-small-numbers', 'small-sample-fallacy', 'cognitive-bias', 'judgment-and-decision-making'],
   };
 }
@@ -546,6 +678,8 @@ module.exports = {
     UNIVERSAL_ZH, UNIVERSAL_EN,
     QUANT_ZH, QUANT_EN,
     PERPETUAL_ZH, PERPETUAL_EN,
+    WINDOW_ZH, WINDOW_EN,
+    STABLE_ZH, STABLE_EN,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,
