@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-276-blueviolet.svg)](#what-it-catches-276-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-277-blueviolet.svg)](#what-it-catches-277-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-276 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
+277 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
 ×  1,390 dispatch routes  ×  25,941 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 276 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 277 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (276 dimensions) -> gate
+scope-check -> premise-check -> discriminate (277 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (276 dimensions)
+## What it catches (277 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **244 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **245 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.216**. Not marketing copy.
+Measured on this repository at **v6.8.217**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 276 |
+| Discrimination dimensions | 277 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
 | Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.217 | 2026-11-21 | **第 278 维 intervention_effect_without_baseline（干预效果无对照宣告 / before-after claim without control）接线闭环轮（r437 掉线恢复，真升级①）** — 方向「因果与反事实推理 / agent 执行验证」。外部扫描：HN Algolia 故事 predicate-secure（post-execution verification：agent confidently claim 任务成功而实际点击的是 disabled button）+ GitHub factcircuit ★926（claim-and-evidence verification loop，immutable provenance）。定位缺口族：「做了干预动作 X，指标 Y 因此明显变好/变差」——句中无干预前基线、无对照组、无测量口径、无具体数值，效果变化的存在全靠叙述者断言。接手上一轮掉线 WIP（模块 263 行 + 单测 52/52 + index.js 八处接线已在工作区，四门禁未跑未 commit）。三腿判据（缺一不判）：腿① INTERVENTION 一次性干预动词族（上线/推行/部署/发布/实施/引进/开展/调整/更换/升级/优化/改革/采用/迁移；EN implemented/deployed/launched/shipped/introduced/rolled out/hired/switched to + new X system 形）× 腿② EFFECT_CHANGE 任意指标 × 评价性变化词（满意度/投诉/活跃/流失/留存/成本/误差/事故/故障/效率/积极性/负担/治安/获客/收入/交付/产量/质量/速度/体验/性能 × 明显/显著/大幅/急剧/持续 × 提升/提高/增长/下降/降低/减少/缓解/减轻/好转；EN satisfaction/churn/revenue/conversion/costs/errors/incidents/engagement/productivity × improved/increased/grew/dropped/reduced × noticeably/significantly/dramatically/markedly/sharply）× 腿③ CONNECTION 因果/时序连接（所以/因此/于是/从而/随之/随后/以后/进而/说明/证明/表明；EN so/therefore/thus/led to/resulted in/which shows，或「干预分句，效果分句」逗号/and 并置结构）。四组豁免：基线/对照纪律语言在场、多因破除/归因谨慎、对冲/疑问、统计教学/谬误分析转述。射程分工：baseline_omission 腿①必须是比例结果名词且腿②是疗效断言（本族腿①是干预动作、效果腿是任意指标变化）；activity_outcome_confusion 管活动量计数充成果；completion_evidence 管空完成宣称；pseudo_causal 管时间先后即因果的泛化结构；claimed_verification_without_trail 管空核验宣称；attribution_vacuum 管来源虚指。变体矩阵实测（真实 gate 层）：攻击 11/11 命中（裸名词形/带修饰形/倒装形/长句形/英文五种变体全部非 pass 且 iev 全部承重或共现），良性 8 条中 7 pass——唯一 verify 的「流失率从18%降到9%，HR台账可查」经 stash 前后对照确认是既有 perfect_error 基线行为（无 iev 时同样 verify），非本轮误伤。四门禁全绿：verify 16/0、guard 20/20（277 键实测）、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。新单测 `test/round-437-intervention-effect-without-baseline.test.js` 52/52。**文档修正**：上一轮把文档写成 278 dimensions 但 discriminate().dimensions 实测 277 键（VERIFY_DIMS 245 成员无孤儿），按「文档不许超前于代码」纪律回退 13 处（README/SKILL/AGENTS 含 badge/锚点/规格表/头部统计行）。VERSION bump 6.8.216→6.8.217（VERSION / package.json / src/core/version.js 兜底 / SKILL.md 四处）。 |
 | 6.8.216 | 2026-11-21 | **第 277 维 attribution_vacuum（溯源真空 / attribution vacuum）接线闭环轮（r436，真升级①）** — 切换方向至「证据充分性与幻觉检测 / 不确定性量化」。外部扫描 HN Algolia 6 条 + GitHub 三条高星（cvs-health/uqlm 1215★ JMLR 2026 / EdinburghNLP/awesome-hallucination-detection 1139★ / potsawee/selfcheckgpt 635★）+ S2 429 放弃不造假；评估 UQLM/SelfCheckGPT 为「生成侧自评」路线与心虫输入侧射程不同，转探针找漏判：16 条典型证据手势形态实测漏判 9/16，四族缺口——①英文无名数据宣称（There is data showing…）②来源有名无论文（中英：《自然》杂志刊登 / A study published in Nature）③多源一致宣称零列举 ④中文精确数字无锚（错误率从3.7%降到0.9%）。新模块 `src/attribution-vacuum.js`：核心立意「引用动作是真的，核路径是零」——来源手势在场但无可溯源锚点（题名/作者/年份/DOI/卷期/链接/数据集编号）。两腿判据：腿① SOURCE_GESTURE 来源手势四族 × 腿② NO_ANCHOR 无锚点；射程划界 unsupported_claim 管「无证据手势」、本维度管「有手势但无锚点」；action=verify；五组豁免（锚点在场/第一手自述/方法论转述/元陈述对冲/复现在场）+ 强否定条件语气守卫。修复过程：VAGUE_EN_BE 收现在分词形、VENUE_ZH 刊物名裸形分支、CONSENSUS_ZH 量词间隔、ANCHOR_EN 去裸年份、NEGATION_ZH「错误」限定技术名词、新增 REPLICATION 复现豁免。终态攻击 16/16 命中、良性 8/8 零误伤。新单测 `test/round-436-attribution-vacuum.test.js` 41 断言全绿（四族攻击 × 五组豁免 × 逐常量承重 × 射程划界回归锚）。`src/index.js` 八处接线。四门禁全绿：verify 16/0、guard 20/20@276、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。VERSION bump 6.8.215→6.8.216（VERSION / package.json / src/core/version.js 兜底 / SKILL.md 四处）。**本轮另并入远端分叉**：远端 agent-4 环境独立产出 r432 clustering_illusion 超自然凶地族 / r433 hot_hand 场次轮换势能族 / r434 count_rate_conflation 软件故障计数族 / r435 regression_to_the_mean 新秀墙魔咒族（均 v6.8.213 扩族不 bump），本地 r433 comparative_advantage 补腿 / r434 complex_question 句式族 / r435 authority_circularity 同轮号撞车——模块层零重叠，union 合并保留双方全部产出。 |
 | 6.8.215 | 2026-11-21 | **第 276 维 authority_circularity（权威互引洗白 / credential laundering / citation cartel）接线闭环轮（r435，真升级①）** — 接手 r433 掉线未完成的产出：r433 因工具额度耗尽，模块已写但未接线、未单测、门禁未重跑故未 commit；r434 轮记录「只摘出本人 complex_question 60 行，authority WIP 原样保留不提交」，即接线被有意剥离留给归属轮次（非 rebase 事故），本轮按「本地独有产能优先固化：不丢弃不覆盖，先核实真实性再补提交」补完。三腿判据（缺一不判）：腿① BACKING 权威互引动作 × 腿② CLOSURE 闭环关联（核心是回指同一性 anaphoric identity） × 腿③ CREDIBILITY 可信性收束（含 transferMode「权威传递即收束」变体）。射程为 credential laundering 族：诺奖互引/实验室同行评议/课题组审稿/智库理事单位/评级机构资助/师承链/学派传承——结论可靠性不指涉外部证据而指涉权威间互相担保。`src/index.js` 八处接线（require / dispatch 变量 `auc` / score 参与判定 / dimMap×3 / DIM_GUIDANCE / VERIFY_DIMS / exports）；`metric_gaming` 三处匹配、`'metric_gaming',` 两处匹配均用注释上下文与 `]);` 精准 patch。**r433 遗留未决风险根因定位并修复**：模块原返回整数 `score: 65`，聚合层按 0-1 口径 `severity = Math.round(d.score*100)` 放大成 6500，越过 rewrite 阈值（overallScore<0.5 && severity>=60），使本应 verify 的族落 rewrite；改 `score: 0.65` 对齐 metric-gaming（0.72/0.62）口径后纯承重样本实测落 verify。缺口实证复跑：未接线 15 条攻击穿透 12/15，模块层 15/15 命中且良性 0/15；probe-r433.js gate 层 6/15 与模块层差异判定为样本集不完整（EN 截断短句缺腿③）。新单测 `test/round-435-authority-circularity.js` 78/0（模块层攻击/良性 + gate 端到端 + 接线断言；VERIFY_DIMS 是 index.js 内部作用域 const 不导出，断言改为可观测行为）。文档三层同步（维度 274→275、verify 242→243、Verify 列举追加 authority_circularity、README 规格表版本戳与 changelog）。四门禁全绿：verify 16/0、guard 20/20@275、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。存量基线实证：测试 25672 通过 / 233 失败为既有基线——stash 剥离本维度接线后复测仍 233、维度 274，与本轮改动无关。VERSION bump 6.8.214→6.8.215（VERSION / package.json / src/core/version.js 兜底 / SKILL.md 四处一致，runtime hf.version 实测确认）。 |
 | 6.8.214 | 2026-11-21 | **句式族轮（r434，真升级②）：presupposition 第67维新增 complex_question（复杂问句/预设问句）族** — `src/index.js` `PRESUPPOSITION_PATTERNS` 表追加 zh 5 支 + en 6 支（共 60 行含注释）：把对方未承认的过错钉为既定事实再用问责疑问逼答的攻击族纳入射程。判据两腿共现（腿①过错预设：认识/承认/知道 + 过错定性词或「既然+过错名词」裸名词；腿②问责疑问：为什么/怎么/为何 + 不/没/还，或逼问形「有那么难吗」/ when did you stop / do you admit / why do you still insist）。存量 40+ 支锚定「你+人格质问」「承认动词+强制半」「既然+回溯时间词」三族，本族实测两处射程缺口：无回溯时间词的「既然认识到错误为何不停止抵赖」穿过 prior_knowledge 族；「还不明白自己错在哪里」压缩形穿过 forced_admission 族。轮初探针 6/6 攻击零覆盖 → 6/6 命中，良性 0 误伤；轮测 `test/round-434-complex-question-family.test.js` 30/30（18 攻击变体 + 12 良性）。四门禁全绿（verify 16/0、guard 20/20@275、doc 24/0、双向 52/52 + 误拦 302/326 零新增）。维度 275、VERIFY 243 不变。心虫裁决 accelerate。VERSION bump 6.8.213→6.8.214。 |
