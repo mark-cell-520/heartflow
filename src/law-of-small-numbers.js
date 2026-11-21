@@ -422,6 +422,67 @@ const STABLE_EN = [
   /\bthe\s+\w+\s+is\s+(?:well\s+received|well\s+liked|widely\s+liked)\b/i,
 ];
 
+// ─── [r440 新增] 腿①'' 大样本/大数据规模锚点 ────────────────────
+// 小数定律本模块五条存量路由（pair/quant/perpetual/exempt/window）全部
+// 围绕「小/短样本 → 结论」的**低估**方向。r440 同池探针（coordination/
+// agent4/probes/r440-probe-pool.js，v6.8.217 gate() 全量 findings 实测）：
+// 「大样本崇拜」族——把**样本量/数据规模大**当作**结论必然可靠、检验
+// 可以免**的充分条件——7 条攻击穿透 6/7（gate.action=pass 且零维度承重），
+// 良性 3/3 零误伤。这是同一族谬误的**反向**形态：小数定律低估小样本的
+// 代表性，本族高估大样本的充分性——量大不等于无偏（抽样框偏倚、测量
+// 误差、混淆变量不随 N 消失），全量数据也免不了检验。
+// 注：不收裸「万/亿」名词（人均年薪八万/平均房价三万不是规模声明），
+// 不收「大数据」概念词本身（CONCEPT 层另有豁免）。
+const BIGSAMPLE_ZH = [
+  // 规模数量级：一百万/数百万/上百万/千万/上千万/十万/数十万/一亿/几亿/
+  //   上亿/过亿/破亿/数以百万计/数以千万计/数以亿计
+  /(?:一百万|一百万份|数百万|上百万|千万|上千万|十万|数十万|几十万|上十万|一亿|几亿|上亿|过亿|破亿|数以亿计|数以千万计|数以百万计)/,
+  // PB/EB 级数据
+  /(?:PB|EB|Pb|Eb)\s*级/,
+  // 海量/全量/天量/巨量 + 数据/样本/记录
+  /(?:海量|全量|天量|巨量)(?:的)?(?:数据|样本|记录)/,
+];
+const BIGSAMPLE_EN = [
+  // hundred million / millions of / billions of / tens of millions / hundreds of thousands
+  /\b(?:hundreds? of millions?|hundred million|billions? of|millions of|tens of millions?|hundreds of thousands?)\b/i,
+  // PB/EB/petabyte/exabyte scale
+  /\b(?:PB|EB|petabyte|exabyte)s?\s*(?:scale|of data|level|s\b)/i,
+  // massive/huge/enormous + dataset/volume of data
+  /\b(?:massive|huge|enormous|whole|full)\s+(?:dataset|data set|volume of data|data volume)\b/i,
+  // every transaction/user/record/click/event（全量采集声明）
+  /\bevery (?:transaction|user|record|click|event)\b/i,
+];
+
+// ─── [r440 新增] 腿②'' 可靠性/充分性裁定（大样本 → 必然可靠的结论）──
+// 存量裁定族（UNIVERSAL/QUANT/PERPETUAL/STABLE）收「铁律/数值参数/永续/
+// 属性泛化」，均不覆盖「规模大 → 结论不可能错、检验可以免」的**充分性
+// 兑换**形。探针实测：本族与存量裁定腿射程不重叠。
+const CERTAINTY_ZH = [
+  // 结论/判断/结果/数字 不可能有错/不会有错/绝不会错/错不了
+  /(?:结论|判断|结果|看法|数字|数据|样本)(?:[^。，！？；\n]{0,8})?(?:不可能|不会|绝不会|不大可能)(?:会)?(?:有|出)错|错不了|出不了错/,
+  // 结论/判断/结果/看法 还会有错吗/还能有错吗/还会错/还能搞错吗（疑问反问形；
+  //   间隙排除「不」——「不可能有错」只归 [0]，防止双重匹配）
+  /(?:结论|判断|结果|看法|数字|数据)(?:[^。，！？；\n不]{0,8})?(?:还)?(?:能|会)?(?:有|出|搞|弄)错|(?:结论|判断|结果|看法)(?:[^。，！？；\n不]{0,8})?(?:还)?(?:能|会)错|(?:还)?(?:能|可以)(?:看|测|估)不准/,
+  // 检验/验证/统计/抽样 可以省/先省/免了；不需要检验/统计
+  /(?:检验|验证|统计|抽样)(?:那套|那一套)?[^。，！？；\n]{0,6}(?:可以|可以先|先|都)?(?:省|免)|不需要(?:检验|验证|统计|抽样)/,
+  // 数字/数据本身就能说明/证明/表明问题
+  /(?:这个|该|这)?(?:数字|数据|样本)(?:本身)?就(?:能|足以)(?:说明|证明|表明)/,
+  // 结论/判断/模型/算法 绝对/完全/百分百 可靠/可信/准确/靠谱
+  /(?:结论|判断|结果|模型|算法|系统)(?:[^。，！？；\n]{0,6})?(?:绝对|完全|百分百|板上钉钉)?(?:可靠|可信|准确|靠谱|站得住)/,
+];
+const CERTAINTY_EN = [
+  // (cannot|can't|couldn't|won't) be wrong/mistaken/in error
+  /\b(?:cannot|can'?t|couldn'?t|will not|won'?t)\s+(?:possibly\s+)?(?:be\s+)?(?:wrong|mistaken|in error)\b/i,
+  // do not need (sampling|statistical|significance|hypothesis) ...
+  /\b(?:do|does|did)\s+not\s+need\s+(?:for\s+)?(?:sampling|statistical|statistics|significance|hypothesis)/i,
+  // sampling/statistical theory is unnecessary/obsolete/overkill
+  /\b(?:sampling|statistical)\s+(?:theory|testing|rigor|significance)\s+(?:is\s+)?(?:unnecessary|obsolete|overkill|no longer)/i,
+  // the numbers/data alone speaks/settles/proves/shows/suffices
+  /\bthe\s+(?:numbers?|data)\s+(?:alone|itself)\s+(?:speaks?|settles?|proves?|shows?|suffices?)\b/i,
+  // conclusion/result/finding is certain/ironclad/beyond doubt
+  /\b(?:conclusion|result|finding|answer|judg(?:e?ment))\s+(?:is\s+)?(?:certain|certainly|definitely|ironclad|bulletproof|beyond doubt)\b/i,
+];
+
 // ─── 距离窗（小样本锚点 × 总体性裁定）──────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -483,6 +544,22 @@ function collect(text, list, useNeg) {
   return dedupeOverlap(m);
 }
 
+// 裁定词采集（大样本族专用，r440）：保留**前置**否定守卫（「这不能说明
+// 结论不可能有错」仍须被拦），但跳过 matchAlive 的 raw 内部否定检查——
+// 「不可能有错/不会错/错不了」自身就是确定性裁定形，其内部的「不可/
+// 不会」是断言的一部分，不是对冲。
+function collectVerdict(text, list) {
+  let m = [];
+  for (const re of list) for (const x of allMatches(re, text)) {
+    const before = text.slice(Math.max(0, x.idx - 12), x.idx);
+    if (NEG_BEFORE.test(before) || IMMEDIATE_NEG_ZH.test(before) || SHORT_NEG_ZH.test(before)) continue;
+    const beforeEn = text.slice(Math.max(0, x.idx - 45), x.idx);
+    if (NEG_BEFORE_EN.test(beforeEn)) continue;
+    m.push(x);
+  }
+  return dedupeOverlap(m);
+}
+
 function dist(a, b) {
   if (a.idx < b.end && b.idx < a.end) return 0;
   return Math.max(a.idx, b.idx) - Math.min(a.end, b.end);
@@ -500,6 +577,8 @@ function findSignatures(text, R) {
       perpetual: R.PERPETUAL_ZH || PERPETUAL_ZH,
       window: R.WINDOW_ZH || WINDOW_ZH,
       stable: R.STABLE_ZH || STABLE_ZH,
+      bigsample: R.BIGSAMPLE_ZH || BIGSAMPLE_ZH,
+      certainty: R.CERTAINTY_ZH || CERTAINTY_ZH,
       win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
     },
     {
@@ -510,6 +589,8 @@ function findSignatures(text, R) {
       perpetual: R.PERPETUAL_EN || PERPETUAL_EN,
       window: R.WINDOW_EN || WINDOW_EN,
       stable: R.STABLE_EN || STABLE_EN,
+      bigsample: R.BIGSAMPLE_EN || BIGSAMPLE_EN,
+      certainty: R.CERTAINTY_EN || CERTAINTY_EN,
       win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
     },
   ];
@@ -592,6 +673,29 @@ function findSignatures(text, R) {
       if (!u) continue;
       sigs.push({ lang: L.lang, kind: 'window', small: s.raw, verdict: u.raw });
     }
+    // 腿①'' × 腿②'' 大样本规模锚点 × 可靠性/充分性裁定（r440）——与前
+    //   五路由平行：pair/quant/perpetual/window 判「小/短样本 → 结论」的
+    //   低估方向，本腿判「规模大 → 结论必然可靠、检验可以免」的高估方向。
+    //   裁定词双重守卫：X不X 疑问对冲形（可靠不可靠/会不会错）、传闻/对冲
+    //   前缀（据说/可能/初步/只是/未必），与腿②' 同规格。
+    const bigM = collect(text, L.bigsample, true);
+    const certM = collectVerdict(text, L.certainty);
+    for (const s of bigM) {
+      const u = certM.find(w => {
+        const d = dist(w, s);
+        if (d > L.win) return false;
+        if (d === 0 && w.idx === s.idx && w.end === s.end) return false; // 同一区间
+        // X不X 形：「可靠不可靠」「会不会有错」是疑问/对冲，不是裁定
+        const after = text.slice(w.end, w.end + 1 + w.raw.length);
+        if (/^不/.test(after) && after.slice(1) === w.raw) return false;
+        // 传闻/对冲前缀：据说/听说/可能/也许/大概/似乎/或许/好像/初步/只是/待定/待验证/未必
+        const before = text.slice(Math.max(0, w.idx - 16), w.idx);
+        if (/(?:据说|听说|传闻|可能|也许|大概|似乎|或许|好像|初步|只是|待定|待验证|未必|说不定)[^。；\n]{0,12}$/.test(before)) return false;
+        return true;
+      });
+      if (!u) continue;
+      sigs.push({ lang: L.lang, kind: 'bigsample', small: s.raw, verdict: u.raw });
+    }
   }
   return sigs;
 }
@@ -636,6 +740,8 @@ function detectLawOfSmallNumbers(text, inject) {
         ? '小样本「' + x.small + '」× 永续全称结论「' + x.verdict + '」'
         : x.kind === 'window'
         ? '短观察窗「' + x.small + '」× 属性泛化裁定「' + x.verdict + '」'
+        : x.kind === 'bigsample'
+        ? '大样本规模「' + x.small + '」× 可靠性裁定「' + x.verdict + '」'
         : '小样本「' + x.small + '」× 总体裁定「' + x.verdict + '」')
       : (x.kind === 'exempt'
         ? 'sample-size exemption claim "' + x.small + '"'
@@ -645,6 +751,8 @@ function detectLawOfSmallNumbers(text, inject) {
         ? 'small sample "' + x.small + '" x perpetual verdict "' + x.verdict + '"'
         : x.kind === 'window'
         ? 'short observation window "' + x.small + '" x property generalization "' + x.verdict + '"'
+        : x.kind === 'bigsample'
+        ? 'big sample scale "' + x.small + '" x certainty verdict "' + x.verdict + '"'
         : 'small sample "' + x.small + '" x universal verdict "' + x.verdict + '"'))),
     details: s.lang === 'zh'
       ? '小数定律(' + sigs.length + '处: ' + (s.kind === 'exempt'
@@ -655,6 +763,8 @@ function detectLawOfSmallNumbers(text, inject) {
         ? '拿极小样本「' + s.small + '」推出无例外、无时间边界的永续结论「' + s.verdict + '」，把有限观测固化成永久成立的规律'
         : s.kind === 'window'
         ? '拿短观察窗「' + s.small + '」给对象属性下泛化结论「' + s.verdict + '」，把几天/几次/一瞬的偶然体验当成稳定不变的普遍属性'
+        : s.kind === 'bigsample'
+        ? '拿大样本规模「' + s.small + '」当结论必然可靠的充分条件「' + s.verdict + '」——量大不等于无偏，抽样框偏倚、测量误差与混淆变量不随 N 消失，全量数据也免不了检验'
         : '拿极小样本「' + s.small + '」给全体下结论「' + s.verdict + '」，把小样本的偶然波动当总体真实分布') + ')(zh)'
       : 'law of small numbers(' + sigs.length + 'x: ' + (s.kind === 'exempt'
         ? 'explicit small-sample defense "' + s.small + '" — smaller sample claimed more reliable'
@@ -664,8 +774,10 @@ function detectLawOfSmallNumbers(text, inject) {
         ? 'tiny sample "' + s.small + '" frozen into a perpetual verdict "' + s.verdict + '" — finite observations read as a permanently valid law'
         : s.kind === 'window'
         ? 'short observation window "' + s.small + '" generalized into a property verdict "' + s.verdict + '" — a few days of casual experience read as a stable attribute'
+        : s.kind === 'bigsample'
+        ? 'sample size / data scale "' + s.small + '" treated as sufficient grounds for certainty "' + s.verdict + '" — volume is not validity; frame bias, measurement error and confounding do not vanish with N, and full-population data still needs checking'
         : 'tiny sample "' + s.small + '" generalized to a universal verdict "' + s.verdict + '"') + ')(en)',
-    guidance: '小数定律指人们系统性地高估小样本对总体的代表性，把小样本的偶然波动当成总体真实分布——抛了三次硬币都是正面，这枚硬币明显是偏的 / 这个村出了三个百岁老人，这里的水土就是养人 / 我问了五个人，四个说支持，民意已经很清楚了 / 试了几次都不行，这个方法肯定有问题 / 样本小才真实，大样本都是注水注出来的 / 才试用了两天没出问题，就断定这软件已经很稳定了 / 试驾了一圈就说这车操控性好 / three coin flips came up heads so this coin is clearly biased / I asked five colleagues and all of them agreed so the whole office feels this way / small samples are the honest ones and big surveys are all rigged / I tried it for two days with no issues, so it is stable now。请补上论证：样本量决定结论能走多远，小样本的波动幅度大，只能给假设不能给结论；要下总体性结论需要足够大的随机样本或引用已有大样本证据；如果只是初步观察，请明确说这是待验证的假设，并说明还需要多少数据。「样本小才真实、大样本都是注水」是更隐蔽的变体——为样本不足辩护只会堵死补数据的路。短观察窗（几天/几次/一圈/一口）得出的属性结论同样只能当假设——几天无故障不等于质量稳定，一圈试驾不等于操控性好。承认样本不足、扩大样本、参考大样本证据、讨论样本量与代表性本身，都是正当做法；若这段话只是转述他人的谬误案例或统计教学，核实其主张再决定是否采信。',
+    guidance: '小数定律指人们系统性地高估小样本对总体的代表性，把小样本的偶然波动当成总体真实分布——抛了三次硬币都是正面，这枚硬币明显是偏的 / 这个村出了三个百岁老人，这里的水土就是养人 / 我问了五个人，四个说支持，民意已经很清楚了 / 试了几次都不行，这个方法肯定有问题 / 样本小才真实，大样本都是注水注出来的 / 才试用了两天没出问题，就断定这软件已经很稳定了 / 试驾了一圈就说这车操控性好 / three coin flips came up heads so this coin is clearly biased / I asked five colleagues and all of them agreed so the whole office feels this way / small samples are the honest ones and big surveys are all rigged / I tried it for two days with no issues, so it is stable now。请补上论证：样本量决定结论能走多远，小样本的波动幅度大，只能给假设不能给结论；要下总体性结论需要足够大的随机样本或引用已有大样本证据；如果只是初步观察，请明确说这是待验证的假设，并说明还需要多少数据。「样本小才真实、大样本都是注水」是更隐蔽的变体——为样本不足辩护只会堵死补数据的路。短观察窗（几天/几次/一圈/一口）得出的属性结论同样只能当假设——几天无故障不等于质量稳定，一圈试驾不等于操控性好。反方向同样要警惕——「大样本崇拜」：回收了一百万份问卷、数据到了 PB 级、装机量过亿，这些只说明随机误差小，不代表抽样框无偏、测量准确、没有混淆变量——「样本量这么大，结论不可能有错」「数据都全量了，统计检验可以省了」把规模当成了可靠性的充分条件（全量采集的交易数据照样可能系统性漏记某一类用户）。量与质是两个问题：大样本降的是随机误差，偏倚和混淆不随 N 消失；谈大数据时请一并说明抽样框怎么来的、测量误差多大、混淆变量怎么控制。射程分工：本维度判「样本量（无论大小）→ 结论可靠性」的兑换；statistical_misleading 判基数隐藏的比例变化；weak_evidence_strong_claim 判弱证据配强结论（本族前提恰恰是数据量大）；unsupported_claim 判无依据断言（本族有数据、错在充分性推理）。承认样本不足、扩大样本、参考大样本证据、讨论样本量与代表性本身，都是正当做法；若这段话只是转述他人的谬误案例或统计教学，核实其主张再决定是否采信。',
     tags: ['statistics', 'statistical-literacy', 'law-of-small-numbers', 'small-sample-fallacy', 'cognitive-bias', 'judgment-and-decision-making'],
   };
 }
@@ -680,6 +792,8 @@ module.exports = {
     PERPETUAL_ZH, PERPETUAL_EN,
     WINDOW_ZH, WINDOW_EN,
     STABLE_ZH, STABLE_EN,
+    BIGSAMPLE_ZH, BIGSAMPLE_EN,
+    CERTAINTY_ZH, CERTAINTY_EN,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,
