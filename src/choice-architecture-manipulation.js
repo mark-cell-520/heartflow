@@ -87,7 +87,12 @@ const MANEUVER_HIDE_EN = /\b(?:hidden|hide[sd]?|conceal(?:ed|s)?|not\s+(?:shown|
 // worded so/phrased so 转述形，不收这种捆绑陈述本身。
 // 补 grant permission / grant access 强迫形——「must grant permission
 // to continue」把权限授予设为继续前提（原表只到 share contacts）。
-const MANEUVER_DISGUISE_ZH = /(写成|写成[了着]?|设计成[了着]?|做[成做]?[了着]?「|措辞|话术|文案写|把.{0,12}(?:写成|设计成|做成|设成)|答案设[成置]|选项设[成置]|勾掉|取消勾选|选[「「]|不选|反选|无法(?:进入|继续|提交|通过)|点了也白点|按不下去|同意即|继续(?:即|就)?表示|看[了着]?即|勾选即|打勾即|点击即|注册即|默认同意|视为同意|推定同意|不(?:点|选|勾)(?:同)?意[拒])/;
+// [r443 审计修复] 去裸「话术/措辞/文案写」形——良性反诈/教学陈述
+// （「反诈宣传文案列举诱导信任话术」）整句三腿误触发。承重攻击族
+// （P1a/P1c/P2a 三条 confirm_shaming/trick_question）全部走「写成/设计
+// 成/设成」的**绑定形**（写成「…」、设计成「…」、答案设成「…」），
+// 不依赖裸名词。161 轮教训：同族词去修饰后仍须命中——绑定形在表。
+const MANEUVER_DISGUISE_ZH = /(写成|写成[了着]?|设计成[了着]?|做[成做]?[了着]?「|勾掉|取消勾选|选[「「]|不选|反选|无法(?:进入|继续|提交|通过)|点了也白点|按不下去|同意即|继续(?:即|就)?表示|看[了着]?即|勾选即|打勾即|点击即|注册即|默认同意|视为同意|推定同意|不(?:点|选|勾)(?:同)?意[拒]|把.{0,12}(?:写成|设计成|做成|设成)|答案设[成置]|选项设[成置])/;
 const MANEUVER_DISGUISE_EN = /\b(?:word(?:ed|ing)?\s+(?:so|as|to)|phrased\s+(?:so|as|to)|reads?\s+["“]|worded\s+["“]|cannot\s+(?:proceed|continue|submit|enter)|can'?t\s+(?:proceed|continue|submit|move)|uncheck(?:ing)?\s+(?:it\s+)?means|checking\s+(?:it\s+)?means|decline\s+(?:option|button)\s+(?:reads?|says?)|opt[\s-]?out\s+(?:means|is)|trick(?:s|ed|ing)?\b|by\s+continuing\s+you\s+agree|(?:clicking|pressing|tapping|continuing|signing\s+up|registering|scrolling)\s+(?:you\s+)?(?:means|implies|constitutes|counts\s+as|indicates)\s+(?:your\s+)?(?:acceptance|agreement|consent)|deemed\s+(?:to\s+have\s+)?(?:agreed|accepted|consented)|assumed\s+(?:to\s+have\s+)?(?:agreed|accepted)|silence\s+(?:means|implies|will\s+be\s+taken\s+as)|grant(?:s|ed|ing)?\s+(?:access|permission|permissions)|permission\s+(?:is\s+)?required\s+to|requires?\s+(?:you\s+to\s+)?(?:grant|give)\s+permission)\b/i;
 // M3 强迫行动（forced_action）：把不相关动作设为继续的前提。
 // [r438 收尾修复] 去掉裸「授权」形——医疗/法律合规陈述（「病历资料涉及隐私，
@@ -103,8 +108,12 @@ const MANEUVER_FORCE_EN = /\b(?:must|have\s+to|has\s+to|required\s+to|forced?\s+
 // [r438 修复] 裸形容词形补收：浅灰/做小/调暗（原只收「灰色小字」固定
 // 搭配，「按钮颜色做成浅灰，用户压根注意不到」漏判）。161 轮教训：
 // 同族词去修饰后仍须命中。
-const MANEUVER_OBSTRUCT_ZH = /(又大又亮|又大又醒目|缩小|缩[成小]|灰色小字|浅[灰蓝]|深[灰蓝]|做[成做]?[小暗浅淡]|调[成暗小]|颜色[做调]?[成浅暗]|不显眼|放在角落|藏[在到]角落|难以[找看]|找不到|要打客服|等[0-9一二三]个工作日|等[0-9一二三]天|流程比|比.{0,8}(?:长|麻烦|复杂)|绕[远圈]|多[步道])/;
-const MANEUVER_OBSTRUCT_EN = /\b(?:bright\s+(?:green|blue|orange)|tiny|small|gray|grey|hidden\s+in\s+the\s+corner|hard\s+to\s+find|difficult\s+to\s+(?:find|locate|cancel)|requires?\s+(?:a\s+)?phone\s+call|waiting\s+period|more\s+(?:steps|clicks|effort)|longer\s+than|obstruct(?:s|ed|ion)?|friction)/i;
+// [r443 审计修复] 去裸「比…长/麻烦/复杂」比较形——良性技术陈述
+// （「服务调用链路比较复杂」「退订流程比注册麻烦」）整句三腿误触发。
+// 攻击族（P6b/P9b）承重于具象显著性形（做小/调暗/角落/等N个工作日），
+// 不依赖裸比较形。161 轮教训：同族词去修饰后仍须命中——具象形在表。
+const MANEUVER_OBSTRUCT_ZH = /(又大又亮|又大又醒目|缩小|缩[成小]|灰色小字|浅[灰蓝]|深[灰蓝]|做[成做]?[小暗浅淡]|调[成暗小]|颜色[做调]?[成浅暗]|不显眼|放在角落|藏[在到]角落|难以[找看]|找不到|要打客服|等[0-9一二三]个工作日|等[0-9一二三]天|绕[远圈]|多[步道])/;
+const MANEUVER_OBSTRUCT_EN = /\b(?:bright\s+(?:green|blue|orange)|tiny|small|gray|grey|hidden\s+in\s+the\s+corner|hard\s+to\s+find|difficult\s+to\s+(?:find|locate|cancel)|requires?\s+(?:a\s+)?phone\s+call|waiting\s+period|more\s+(?:steps|clicks|effort))/i;
 // M5 伪造数据/假稀缺（social_proof_fabrication / false_countdown）：
 //    编造不存在的社会证明数字、不会真正归零的倒计时。
 // [r438 修复] 裸词形补收：写死（原只收「写死的」，「首页写死一个数字」漏判）。
