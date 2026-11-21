@@ -351,6 +351,64 @@ const NEG_EFFECT_EN = [
   /\b(?:backfired|boomeranged)\s+on\b/i,
 ];
 
+// ─── [r435 新族] 「新秀墙/魔咒」命名现象族（真升级②，独立三腿路由）──────
+// 回归均值的经典命名误归因：把「极端高位后的自然回落」说成「新秀墙/
+// 二年级滑坡/封面魔咒/第二专辑综合征」等诅咒性规律的应验。存量主判据
+// 要求 极端×回归×干预×归因 四腿邻近（落点是「把功劳归给干预」），本族
+// 落点是**无干预的宿命断言**（魔咒/诅咒/综合征 × 灵验/应验/躲不过），
+// 干预腿缺席整族穿透。r435 池化探针（scripts/round-435-probe-p3-depth.js，
+// v6.8.213 gate() 全量 findings 实测）：攻击 15 条中 10 条完全穿透
+// （gate=pass 零维度承重——其余 5 条由 hindsight_bias/post_hoc 等存量
+// 维度代拦），良性 8 条全为存量维度代拦且本维零承重。
+// 本族为**独立三腿路由**（不并入存量数组——EXTREME_LOW_ZH/REG_DOWN_ZH/
+// EXEMPT_NEG_ZH 等有登记断言 length===N，追加会打破 round-265 单测），
+// 与主判据/反馈族/负向族并行，命中即 hit。豁免（概念教学/实验证据/
+// 推理否定/对冲/疑问）在 checkRegressionToMean 入口统一先判，本族同享；
+// 另设族级否定守卫（魔咒断言前窗否定词/后窗反驳短语在场不判）。
+
+// 腿①' 高位极端（冠军/新人王/满分/巅峰/首专…）
+const JINX_EXT_ZH = [
+  /(?:拿了|拿下|夺得|卫冕|问鼎|摘得|得过|当上|是|为|成了|连拿)[^。；，]{0,4}(?:冠军|销冠|头名|榜首|第一|MVP|最佳新人|新人王|金奖|大奖)/,
+  /(?:考了|拿了|得了|获得)[^。；，]{0,2}(?:满分|第一)/,
+  /夺冠|卫冕成功|成功卫冕|登顶|问鼎|折桂|夺魁|破纪录|破了纪录|创新高|创了新高|拿了奖|获了奖|摘金|夺金/,
+  /巅峰|顶点|峰值|风头最盛|如日中天|最辉煌|最风光|风头正劲/,
+  /首张|首部|首专|首张专辑|处女作|处女秀|首演|首秀|成名作|代表作|第一部作品|首次创业|公司上市|挂牌上市|敲钟|上了封面|登上封面|封面/,
+];
+// 腿②' 自然回落（新秀墙/崩盘/远不如/一张不如一张…）
+const JINX_REG_ZH = [
+  /新秀墙|二年级墙|二墙|新秀赛季墙/,
+  /崩盘|崩塌|全垮|垮了|塌了|塌方|倒闭|破产|关张|歇业|滑坡|断崖[式性]?(?:下滑|下降|下跌)|直线下滑|直线下降|一落千丈|一蹶不振|大跌|暴跌|高开低走|扑街|黄了|凉了|糊了/,
+  /远不如|大不如前|一张不如一张|一部不如一部|不如从前|不如以往|相去甚远|判若两人/,
+  /(?:状态|成绩|表现|水准|水平|战绩|数据|销量|作品|质量|口碑|排名|名次|分数|人气|热度)[^。；，]{0,3}(?:下滑|下降|回落|退步|走低|缩水|滑坡)/,
+  /一路下滑|持续下滑|不断下滑|连连下滑|逐渐下滑|慢慢下滑|明显下滑|大幅下滑|严重下滑/,
+];
+// 腿③' 魔咒/诅咒断言（灵验/应验/屡试不爽/躲不过…）
+const JINX_NAME_ZH = [
+  /魔咒|诅咒|劫数|魔怔|邪门|灵验|应验|屡试不爽|综合征/,
+  /跑不掉|逃不掉|躲不过|逃不过|谁也逃|无人能逃|没人能逃|谁都无法逃/,
+];
+
+// 同族英文三腿
+const JINX_EXT_EN = [
+  /\b(?:won|win|wins|winning|captured|clinched|took|secured|earned|claimed)\s+(?:the\s+)?(?:championship|title|crown|gold|medal|trophy|cup|first\s+place|MVP|rookie\s+of\s+the\s+year|best\s+newcomer|award|prize)\b/i,
+  /\b(?:championship|champion|defending\s+champion|world\s+champion)\b/i,
+  /\b(?:rookie\s+of\s+the\s+year|best\s+newcomer|all[- ]star|record[- ]breaking|broke\s+the\s+record|perfect\s+score|straight\s+A'?s|top\s+of\s+the\s+class|valedictorian)\b/i,
+  /\b(?:peak|pinnacle|zenith|career\s+high|at\s+their\s+peak)\b/i,
+  /\b(?:debut\s+album|first\s+album|debut\s+season|debut\s+film|masterpiece|breakout\s+(?:season|year|role)|sensational\s+debut|stellar\s+debut)\b/i,
+];
+const JINX_REG_EN = [
+  /\b(?:sophomore\s+slump|sophomore\s+jinx|sophomore\s+curse|second\s+album\s+syndrome|cover\s+jinx|cover\s+curse|Madden\s+curse|SI\s+cover)\b/i,
+  /\b(?:collapsed|came\s+apart|fell\s+apart|fell\s+off|fell\s+away|flopped|flop|tanked|nosedived|plummeted|regressed|unraveled|disintegrated|faded\s+away|vanished|disappeared)\b/i,
+  /\b(?:sophomore|second)\s+(?:season|year|album|campaign)\s+(?:was|has\s+been)?\s*(?:much\s+)?(?:worse|weaker|poorer|disappointing|a\s+disaster)\b/i,
+  /\b(?:far|nowhere\s+near|not\s+remotely)\s+(?:as\s+good|as\s+successful|as\s+strong|as\s+acclaimed)\b/i,
+  /\b(?:fell|dropped|declined|sank|slipped)\s+(?:off\s+the\s+)?(?:cliff|precipice)\b/i,
+];
+const JINX_NAME_EN = [
+  /\b(?:jinx|curse|hex|hoodoo|voodoo|syndrome)\b/i,
+  /\b(?:never\s+fails?|strikes\s+again|struck\s+again|is\s+real|no\s+escape|nobody\s+escapes?|no\s+one\s+escapes?|can'?t\s+escape|cannot\s+escape|unavoidable|inevitable|always\s+hits|hits\s+everyone|doomed)\b/i,
+  /\b(?:cursed|jinxed|haunted)\b/i,
+];
+
 // ─── [r300 新族] 表扬/批评/奖惩「反馈干预」族（真升级②，独立路由）──────
 // Kahneman 经典回归均值陷阱：把极端表现后的自然回归，归功/归罪于同期施加的
 // 表扬/批评/责骂/奖励/惩罚/换下场/警告等「行为反馈干预」。存量 INTERVENE 表
@@ -610,6 +668,62 @@ function negEn(text, R) {
   return false;
 }
 
+// ─── [r435 新族] 「新秀墙/魔咒」命名现象族路由 ────────────────────────
+// 三腿邻近（叙事窗与主判据一致 ZH 40 / EN 120）：高位极端 × 自然回落 ×
+// 魔咒断言。族级否定守卫：
+//   · 前窗（断言前 8/24 字）：不能/并非/未必/难说/不见得/谈不上/算不上
+//     （ZH）；isn't/doesn't/can't 等（EN）——不收裸 not/no（「no player
+//     escapes the jinx」是攻击形，裸否定词会误杀）；
+//   · 后窗（断言后 16/32 字）：不是真的/没有依据/谈不上/迷信/无稽（ZH）；
+//     is not real / no evidence / just a myth（EN）——反驳断言形不判。
+function jinxZh(text, R) {
+  const ext = positions(R.JINX_EXT_ZH || JINX_EXT_ZH, text);
+  const reg = positions(R.JINX_REG_ZH || JINX_REG_ZH, text);
+  const jinx = positions(R.JINX_NAME_ZH || JINX_NAME_ZH, text);
+  if (ext.length === 0 || reg.length === 0 || jinx.length === 0) return false;
+  const WIN = 40;
+  const NEG_BEFORE = /(?:不能|并非|未必|难说|不见得|谈不上|算不上|说不成)[^。！？!?]{0,6}$/;
+  const NEG_AFTER = /^(?:[^。！？!?]{0,14})(?:不是真的|不是真|并无|没有(?:统计)?依据|没有依据|谈不上|算不上|迷信|无稽|子虚乌有|言过其实|说法而已|而已|是迷信|是谣传)/;
+  for (const e of ext) {
+    for (const r of reg) {
+      if (Math.abs(e - r) > WIN) continue;
+      for (const j of jinx) {
+        if (Math.min(Math.abs(j - e), Math.abs(j - r)) > WIN) continue;
+        const before = text.slice(Math.max(0, j - 8), j);
+        const after = text.slice(j, j + 20);
+        if (NEG_BEFORE.test(before)) continue;
+        if (NEG_AFTER.test(after)) continue;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function jinxEn(text, R) {
+  const ext = positions(R.JINX_EXT_EN || JINX_EXT_EN, text);
+  const reg = positions(R.JINX_REG_EN || JINX_REG_EN, text);
+  const jinx = positions(R.JINX_NAME_EN || JINX_NAME_EN, text);
+  if (ext.length === 0 || reg.length === 0 || jinx.length === 0) return false;
+  const WIN = 120;
+  const NEG_BEFORE = /\b(?:isn'?t|aren'?t|wasn'?t|weren'?t|doesn'?t|don'?t|cannot|can'?t|hardly|barely)\s+(?:\w+\s){0,3}$/i;
+  const NEG_AFTER = /\bis\s+(?:not|nothing)\s+(?:real|to\s+it)|no\s+(?:statistical\s+)?(?:evidence|basis|proof)|just\s+a\s+(?:myth|superstition|coincidence)|nothing\s+to\s+do\s+with/i;
+  for (const e of ext) {
+    for (const r of reg) {
+      if (Math.abs(e - r) > WIN) continue;
+      for (const j of jinx) {
+        if (Math.min(Math.abs(j - e), Math.abs(j - r)) > WIN) continue;
+        const before = text.slice(Math.max(0, j - 24), j);
+        const after = text.slice(j, j + 36);
+        if (NEG_BEFORE.test(before)) continue;
+        if (NEG_AFTER.test(after)) continue;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -632,7 +746,9 @@ function checkRegressionToMean(text, inject) {
   const fbHit = isZh ? feedbackZh(text, R) : feedbackEn(text, R);
   // [r302] 负向功效断言族（干预起了反作用/帮了倒忙）独立路由
   const negHit = isZh ? negZh(text, R) : negEn(text, R);
-  if (!hit && !fbHit && !negHit) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r435] 新秀墙/魔咒命名现象族（无干预宿命断言）独立路由
+  const jinxHit = isZh ? jinxZh(text, R) : jinxEn(text, R);
+  if (!hit && !fbHit && !negHit && !jinxHit) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 计分：基础 0.62 + 功劳归因形 0.06 + 显式干预动词形 0.04，封顶 0.85
   // [r300] 归因/干预腿计入反馈族 FB_ATTRIB / FB_INTERVENE（反馈族命中时主表不承重）
@@ -653,7 +769,11 @@ function checkRegressionToMean(text, inject) {
       ? (isZh
         ? '回归均值×干预负向功效误归因(zh)'
         : 'regression to the mean×intervention backfire misattribution(en)')
-      : (isZh
+      : (jinxHit && !hit)
+        ? (isZh
+          ? '回归均值×新秀墙/魔咒命名现象误归因(zh)'
+          : 'regression to the mean×sophomore slump/jinx named-phenomenon misattribution(en)')
+        : (isZh
         ? '回归均值误归因×极端基线后自然回归被当成干预功劳(zh)'
         : 'regression to the mean×natural rebound credited to intervention(en)');
 
@@ -673,5 +793,8 @@ module.exports = {
     FB_INTERVENE_ZH, FB_INTERVENE_EN, FB_ATTRIB_ZH, FB_ATTRIB_EN,
     // [r302] 负向功效断言族常量（负例注入承重目标）
     NEG_EFFECT_ZH, NEG_EFFECT_EN,
+    // [r435] 新秀墙/魔咒命名现象族常量（负例注入承重目标）
+    JINX_EXT_ZH, JINX_REG_ZH, JINX_NAME_ZH,
+    JINX_EXT_EN, JINX_REG_EN, JINX_NAME_EN,
   }),
 };
