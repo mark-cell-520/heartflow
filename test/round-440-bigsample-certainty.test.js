@@ -259,7 +259,10 @@ check('接线在位：src/index.js 维度键 law_of_small_numbers', () => {
 
 check('接线在位：VERSION 未被本族改动（扩族轮不 bump）', () => {
   const VERSION = fs.readFileSync(path.join(__dirname, '..', 'VERSION'), 'utf8').trim();
-  assert.equal(VERSION, '6.8.217', 'VERSION 实为 ' + VERSION + '——本扩族轮自身未 bump；rebase 到 main 后随 1 号 r437 新维度轮为 6.8.217');
+  // 扩族轮自身不 bump；后续新维度轮会继续推进版本号，故断言「不低于本轮基线」而非固定值
+  const base = '6.8.217';
+  const toNum = (v) => v.replace(/^v/, '').split('.').reduce((a, b) => a * 1000 + Number(b), 0);
+  assert.ok(toNum(VERSION) >= toNum(base), 'VERSION 实为 ' + VERSION + '——低于本扩族轮基线 ' + base + '；扩族轮自身不 bump，后续轮次应只增不减');
 });
 
 check('认领在位：claims.jsonl 含 r440 认领（agent-4）', () => {

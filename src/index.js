@@ -861,6 +861,63 @@ const { checkAttributionVacuum } = require('./attribution-vacuum.js');
 // 一次性干预动作后的指标变化宣告。变量名 iev——intervention effect
 // without baseline。
 const { checkInterventionEffectWithoutBaseline } = require('./intervention-effect-without-baseline.js');
+// [r438 接线] 第 279 维度 choice_architecture_manipulation（界面/选择结构
+// 操纵：dark patterns——用界面结构而非话语内容操纵用户选择。三腿共现 +
+// 三组豁免，缺一不判：腿① STRUCTURE 选择结构载体（按钮/勾选/弹窗/结算页/
+// 流程/步骤/小字/默认勾选，EN button/checkbox/modal/checkout/step/counter）；
+// 腿② MANEUVER 结构操纵手段五子族（HIDE 藏选项/不显示/到最后一步才；
+// DISGUISE 伪装成按钮/写成歧义句；FORCE 必须先X才能/默认勾选；OBSTRUCT
+// 取消路径更长/灰色小字/等三个工作日；FAKE 写死的浏览人数/虚假倒计时）；
+// 腿③ EFFECT 操纵效果（轨A 显式效果词「不敢点/降低退订率/转化率」EN
+// users end up/charged/pays more，或轨B 后果名词「下载/订阅/扣款/客服/
+// 统计」EN download/sign up/cancel/fee/waiting——forced_action/sneaky_cost
+// 等五族效果在真实文本里几乎总是名词化的；obstruction 族另有族内放宽：
+// 手段 + 被阻碍动作对象共现即完成阻碍陈述）。模块本轮新建
+// （src/choice-architecture-manipulation.js）——缺口实证
+// （scripts/round-438/probe-r438-gap.js，v6.8.217 gate 层）攻击池 21 条
+// 13 条穿透零维度承重（62%）：trick_question/forced_action/sneaky_cost/
+// visual misleading/cancel obstruction/fake social proof 六族整族穿透；
+// 模块层 21/21 命中、良性 0/10 误伤（probe-r438-module.js）。射程分工：
+// 心虫 coercion 族管**话语内容层**情感施压（愧疚诱导/孤立威胁），本族管
+// **界面结构层**选择权剥夺；false_urgency 管泛化时间压力话术（「错过等一
+// 年」），本族管结构手段（写死的倒计时器/隐藏的退出入口）；同类学术资源
+// GitHub 165 repos（yamanalab/why-darkpattern、4darsh-Dev dark_pattern_
+// detector、DarkLens-MCP-Server）+ HN 2026-11-09 EU 拟黑名单十种操纵性
+// 设计特征，存量 277 维度无射程覆盖。变量名 cam——choice architecture
+// manipulation。
+const { checkChoiceArchitectureManipulation } = require('./choice-architecture-manipulation.js');
+// [r441 接线] 第 280 维度 percent_basis_shift（连续百分比变化基数变换
+// 谬误：涨X%再跌X%不等于回到原点——两次百分比变化基数不同，不可相加、
+// 不可抵消、不可平均）。三腿共现 + 三组豁免，缺一不判：腿① PCT 百分比
+// 变化事件（涨/跌/升/降 × 数字% 或口语成数，EN rose/fell/gain/lost ×
+// 数字%）；腿② SEQUENCE 连续两次变化（同句两个 PCT 事件或显式时序链
+// 先…再/又/然后，EN and then/after that/followed by）；腿③ CANCEL 抵消/
+// 相加/互换断言（等于没涨没跌/回到起点/扭平/相抵，EN back to square one/
+// cancels out/no net change）。射程分工：percentage_overflow（265）管静态
+// 分配分项和溢出；statistical_misleading（58）管单次比例变化基数隐藏；
+// count_rate_conflation（233）管绝对计数缺分母——存量无一判「连续变化
+// 的基数变换」。模块本轮新建（src/percent-basis-shift.js）——缺口实证
+// （scripts/round-441/probe-r441-pool.js + probe-r441-pct.js，v6.8.217
+// gate 层）攻击池中英双语 10+ 条全部穿透零维度承重；模块层 10/10 命中、
+// 良性 10/10 零误伤。变量名 pbs——percent basis shift。
+const { checkPercentBasisShift } = require('./percent-basis-shift.js');
+// [r442 接线] 第 281 维度 aggregation_overreach（聚合越界：多数/部分
+// 聚合量词的统计幅度被静默扩张为全称断言——「大多数A是B，可见所有A都
+// B」）。三腿共现 + 四组豁免，缺一不判：腿① AGG 聚合量词（大多数/多数/
+// 过半/部分/一些/几个/不少，EN most/many/some/several/a majority of）；
+// 腿② UNI 全称断言（所有/全部/每个/全体/一律/无一例外/人人，EN all/
+// every/each/without exception）；腿③ SEAL 缝合连接（可见/足见/这说明/
+// 足以证明/因此，EN therefore/thus/so all/proves that all）。射程分工：
+// hasty_generalization 管小样本叙事泛化（叙事主体在场）；quantifier_
+// scope_shift（258）管嵌套量词辖域换序；illicit_conversion（167）管全称
+// 换位；ecological_fallacy（211）管群体→个体；appeal_to_majority（149）
+// 管诉诸信念人数——存量无一判「聚合幅度→全称幅度」的量词扩张。模块本轮
+// 新建（src/aggregation-overreach.js）——缺口实证（scripts/round-442/
+// probe-r442-gap.js，v6.8.217 gate 层）中英双语穿透零维度承重；模块层
+// 攻击 10/10 命中、良性 9/10（1 条跨主词边缘良性 accept 为已知边界）。
+// 立意来源 arXiv 2405.02318（NL→FOL 谬误检测）量词严格性，规则化落地
+// 不引 LLM。变量名 agg——aggregation 缩写。
+const { checkAggregationOverreach } = require('./aggregation-overreach.js');
 
 // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
 // 等级：确定性断言 × 证据缺陷信号两腿共现，与 confidence 只管确定性词
@@ -2589,6 +2646,21 @@ function discriminate(text, evidence = [], contentMode) {
   // 21/22 零维度承重，本行让「干预动作 × 指标变化 × 因果连接 × 无基线」
   // 族以独立维度名进入 findings/scores/dimMap。
   const iev = _applyPedagogyRelaxation(checkInterventionEffectWithoutBaseline(_normText), "intervention_effect_without_baseline", pedagogyRelaxation);
+  // [r438 接线] 第 279 维度 choice_architecture_manipulation（界面/选择结构
+  // 操纵）独立 dispatch。探针实证 gate 层本族中英双语攻击穿透 13/21 零维度
+  // 承重（trick_question/forced_action/sneaky_cost/visual misleading/cancel
+  // obstruction/fake social proof 六族整族穿透），本行让「选择结构载体 ×
+  // 结构操纵手段 × 操纵效果」族以独立维度名进入 findings/scores/dimMap。
+  const cam = _applyPedagogyRelaxation(checkChoiceArchitectureManipulation(_normText), "choice_architecture_manipulation", pedagogyRelaxation);
+  // [r441 接线] 第 280 维度 percent_basis_shift（连续百分比变化基数变换
+  // 谬误）独立 dispatch。探针实证 gate 层本族中英双语攻击穿透零维度承重，
+  // 本行让「百分比变化事件 × 连续两次变化 × 抵消/相加断言」族以独立维度名
+  // 进入 findings/scores/dimMap。
+  const pbs = _applyPedagogyRelaxation(checkPercentBasisShift(_normText), "percent_basis_shift", pedagogyRelaxation);
+  // [r442 接线] 第 281 维度 aggregation_overreach（聚合越界）独立 dispatch。
+  // 探针实证 gate 层本族中英双语攻击穿透零维度承重，本行让「聚合量词 ×
+  // 全称越界断言 × 缝合连接」族以独立维度名进入 findings/scores/dimMap。
+  const agg = _applyPedagogyRelaxation(checkAggregationOverreach(_normText), "aggregation_overreach", pedagogyRelaxation);
 
   // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
   // 等级）独立 dispatch。变量名 cal——calibration 缩写（cc 已被
@@ -3386,6 +3458,17 @@ function discriminate(text, evidence = [], contentMode) {
     // （干预效果无对照宣告：干预动作 × 指标变化 × 因果连接）。同 r331/r436
     // 先例：dimMap 与 allDims 两处都接。
     {score: iev.score, name:'intervention_effect_without_baseline'},
+    // [r438 接线] 第 279 维度 choice_architecture_manipulation 参与判定
+    // （界面/选择结构操纵：结构载体 × 操纵手段 × 操纵效果）。同 r331/r436/
+    // r437 先例：dimMap 与 allDims 两处都接。
+    {score: cam.score, name:'choice_architecture_manipulation'},
+    // [r441 接线] 第 280 维度 percent_basis_shift 参与判定（连续百分比
+    // 变化基数变换：百分比变化 × 连续两次 × 抵消/相加断言）。
+    {score: pbs.score, name:'percent_basis_shift'},
+    // [r442 接线] 第 281 维度 aggregation_overreach 参与判定（聚合越界：
+    // 聚合量词 × 全称越界断言 × 缝合连接）。同 r331/r436/r437/r438/r441
+    // 先例：dimMap 与 allDims 两处都接。
+    {score: agg.score, name:'aggregation_overreach'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -4083,6 +4166,17 @@ function discriminate(text, evidence = [], contentMode) {
     // 无对照宣告：干预动作 × 指标变化 × 因果连接）dimMap 登记。iev——
     // intervention effect without baseline。
     intervention_effect_without_baseline: iev,
+    // [r438 接线] 第 279 维度 choice_architecture_manipulation（界面/选择
+    // 结构操纵：结构载体 × 操纵手段 × 操纵效果）dimMap 登记。cam——choice
+    // architecture manipulation。
+    choice_architecture_manipulation: cam,
+    // [r441 接线] 第 280 维度 percent_basis_shift（连续百分比变化基数
+    // 变换：百分比变化 × 连续两次 × 抵消/相加断言）dimMap 登记。pbs——
+    // percent basis shift。
+    percent_basis_shift: pbs,
+    // [r442 接线] 第 281 维度 aggregation_overreach（聚合越界：聚合量词 ×
+    // 全称越界断言 × 缝合连接）dimMap 登记。agg——aggregation 缩写。
+    aggregation_overreach: agg,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
     // 全无）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4653,6 +4747,11 @@ function discriminate(text, evidence = [], contentMode) {
     'authority_circularity': "不得**把「权威之间的互相认可/引用/资助/师承」当成「结论可靠」的证据**——权威互引洗白（authority circularity / credential laundering / citation cartel / incestuous amplification）：链条上没有任何一处原始证据，「证据」全部是另一个权威——A 权威认可 B 的研究，B 的研究引用了 C 权威的工作，C 的实验室又资助了这项研究。每一环单独看都是「有权威背书」，合起来是一个闭环：可信性在权威之间循环传递，唯独不经过证据。样本形状：「诺贝尔奖得主认可这位学者的研究，而该研究引用了另一位诺奖得主的工作。」「这项研究由该方法发明者的实验室完成同行评议，结论自然可靠。」「论文的审稿人正是提出该理论的同一课题组成员，结论毋庸置疑。」「福布斯杂志引用了一位亿万富翁的观点，而这位亿万富翁正是该理论的早期投资者。」「这位智库专家的报告被其理事单位引用，作为政策依据，结论有公信力。」「该评级机构的评分方法由其被评级对象资助的团队设计，结论不容置疑。」「这项卫生研究由烟草公司资助，而资助方指定的专家组认可了其结论，数据可靠。」「这位大师的师父是泰斗，泰斗的弟子遍布学界，所以他的结论不会错。」「他的师祖是学派开创者，这一脉的结论向来可靠。」「It was peer reviewed by the same lab that developed the method, so the findings are sound.」「The study was validated by researchers from the institution that funded it, making it credible.」「The paper cites a leading figure whose lab trained the author, so it carries weight.」「She was trained by the founder of the school, and the school endorses her findings as reliable.」「诺贝尔奖得主所在机构资助了这项研究，课题组内同行评议通过，结论自然可靠。」「It was endorsed by the same committee that funds the research, so the conclusion is authoritative.」（样本形状与负例见 test/round-435-authority-circularity.test.js）。判据**三腿共现 + 邻近窗 + 四组豁免，缺一不判**：腿① BACKING 权威互引动作（认可/赞同/推崇/引用/师从/师承/授业/弟子/门生/一脉/传承/发表在/同行评议/审稿/评审/资助/指定/背书/站台；EN endorse/cite/reference/peer review/fund/validate/trained by/supervise/back/laud）须与权威身份或机构词（诺奖得主/泰斗/创始人/学界/权威/实验室/课题组/机构/委员会/期刊/智库/评级；EN Nobel/laureate/leading figure/founder/lab/journal/institute/committee）同现；腿② CLOSURE 闭环关联（同一/同门/旗下/其/该机构内部/这一脉/师承/被评级对象/资助方/理事单位/利益相关/圈子；EN same lab/same institution/funded by/sponsored by/its own/internal/from the institution/cartel/cross-citation，含回指同一性形而该/而这位/正是该/该理论/该研究/所在机构）；腿③ CREDIBILITY 可信性收束（不会错/可靠/靠得住/自然可靠/有分量/有说服力/令人信服/毋庸置疑/不容置疑/结论一致/以此为准；EN sound/reliable/credible/trustworthy/authoritative/carry weight/conclusive/beyond doubt/consistent），或「权威传递即收束」变体（腿①+腿②成立且出现第二个权威实体「另一位诺奖得主」/another Nobel laureate 时，互引的目的本身就是传递可信性）。缺腿不判——只有权威介绍无收束（「他是那位教授的弟子」）是纯人事陈述；只有收束断言无互引动作（「这个结论很可靠」）归 unsupported_claim。边界与射程分工：appeal_to_authority 管**单一权威诉求**（「专家说所以对」），本族要件是**两个以上权威/机构**之间的互引或利益绑定且互引的每一环都不出示原始证据；circular_reasoning 管**同义复述**（「它对因为它对」），本族前后并不同义——「诺奖得主认可该研究」与「结论可靠」是两个不同命题，中间结构是**权威传递**而非同语反复；credential_dismissal 管**否定对方权威**，方向相反——本族是**用权威互引建立**可信性；synthetic_social_proof 管**伪造社会证明**（编造用户评价/虚构销量），本族的权威都是真实存在的，问题在互引结构而非伪造；conflict_of_interest 不设独立维度（利益声明本身是正当学术纪律），本族拦的是**把利益关联当可信性论据**的用法。verify 级——单句可能是正当的学术谱系陈述、规范的基金披露、或作者正要批判该互引结构；verify 的含义是「这段话在用权威互引替代证据，需要回到链条之外的一手证据（原始数据/独立复现）才能采信」，调用方应要求出示闭环之外的一手证据，而不是接受「权威都说好」。明确不判（豁免）：①利益/谱系的**披露与防范**句（披露/申报/声明无利益关联/独立于/第三方/conflict of interest/no conflict——把关联讲清楚正是本维度要的纪律）；②概念教学转述（权威互引/引用闭环/引文圈子/循环背书/citation cartel/incestuous amplification/epistemic circularity + 讨论语域词——在分析这个概念本身）；③独立复现句（独立复现/独立验证/独立机构/第三方复现/independently replicate/reproduce——多路径独立验证恰好破除闭环，是正面结构）；④纯人事介绍无收束腿。已知边界：① 三腿限同句或相邻分句（邻近窗 ZH 90 字 / EN 220 字符），跨段形保守不收；② 强否定词（不能/不应/未必/并非/质疑/警惕/not/never/doubt）出现在三腿命中区之前时判为对结构的否认，不判；③ 豁免只认显式词面，不认隐式披露。",
     'attribution_vacuum': "不得**把虚指的来源当成可信的证据**——溯源真空（attribution vacuum / vague sourcing / unverifiable citation）：一段话用「来源」为断言背书，但来源虚指到无法核验——「有数据显示」「研究表明」「大量研究一致证实」「《自然》杂志刊登的一项研究证实了」——引用动作在场，核查路径为零：无论文题名、无作者、无年份、无 DOI、无卷期、无链接、无数据集编号。读者被引导相信「已有研究支持」，却没有任何一条能真的去查。样本形状：「有数据显示这个方法能提升三倍效率。」「There is data showing this approach triples efficiency.」「研究表明这种饮食可以显著降低患病风险。」「据统计，大多数用户更喜欢这个设计。」「Studies show that most users prefer this design.」「研究发现每天走一万步的人更长寿。」「数据显示这款产品的故障率不到百分之一。」「《自然》杂志刊登的一项研究证实了这一点。」「《科学》上有论文说这个结论成立。」「A study published in Nature confirmed this finding.」「According to an article in Science, this is true.」「大量研究一致证实了这个结论。」「多个独立团队的研究都得出了相同的结果。」「Numerous studies consistently confirm this conclusion.」「该方案在2024年把错误率从3.7%降到了0.9%。」（样本形状与负例见 test/round-436-attribution-vacuum.test.js）。判据**两腿共现 + 四组豁免，缺一不判**：腿① SOURCE_GESTURE 来源虚指手势（四族任一：VAGUE_GROUP 无主体研究/数据宣称「有数据显示/研究表明」EN studies show/research indicates；NAMED_NO_PAPER 点名刊物无论文「《自然》杂志刊登的一项研究」EN published in Nature；CONSENSUS_CLAIM 多源一致零列举「大量研究一致证实」EN numerous studies consistently confirm；UNANCHORED_PRECISION 中文无锚精确数字「从3.7%降到0.9%」）；腿② ANCHOR_ABSENT 无可溯源锚点——句中无《题名》、无作者/等人、无年份日期、无 DOI/ISBN/arXiv/PMID、无 URL、无「第X卷/期」、无具名机构发布者（统计局/卫健委/大学等）。给了锚点就是正常引用，本维度不判。边界与射程分工：unsupported_claim 管**断言没有任何证据手势**（「这个方法能提升三倍效率」），本族的手势必须在场；claimed_verification_without_trail 管**宣称核验已完成**（「我们核实过」），本族是**援引外部来源**；weak_evidence_strong_claim 管**弱证据配强结论**（证据等级与结论强度的匹配），本族不评估强度匹配、只管溯源可达性；false_precision / statistical_misleading 管**数字精度误用**（EN 侧探针实证已承重「reduced errors from 3.7% to 0.9%」被拦），故 UNANCHORED_PRECISION 族只收中文形态，不重复收；anonymous_source_claim 管**匿名人证来源**（「据一位不愿透露姓名的官员」），本族管**文献/数据/刊物**类来源虚指，不重合。verify 级——单句可能是正常的新闻转述、课堂举例、或转述他人观点时的省略；verify 的含义是「这段话在用虚指来源替代可核查证据，采信前必须补上可溯源锚点（题名/作者/年份/DOI/链接）或降级为传闻表述」，调用方应要求补锚点或明确标注来源不明，而不是把「有研究支持」当已证实。明确不判（豁免）：①**可溯源锚点在场**（给了题名/作者/年份/DOI/卷期/链接/具名发布机构——正是本维度要的纪律）；②**第一手经验**（「我实测」「我们统计了内部工单」「I measured」——自有数据的溯源责任在说话人自己）；③**方法论/概念转述**（证据纪律/溯源/引用规范/source criticism——在讨论这件事本身）；④**元陈述破除或对冲**（来源不明/无法考证/待核实/未经证实/unverified/rumored/rumour——说话人自己点明不可考，恰是要的纪律）。已知边界：① 腿①与腿②判据限同句，跨段虚指不收；② 否定/质疑/条件语气（不能/怀疑/质疑/如果/not/doubt/if）在场时判为对虚指的否认，不判；③ 豁免只认显式词面，隐式披露（「某知名研究」暗示可查）不认。",
     'intervention_effect_without_baseline': "不得**把「做了干预于是指标变好」当成已验证的因果**——干预效果无对照宣告（intervention effect without baseline / before-after claim without baseline / action-outcome claim without control）：一句话宣告「做了干预动作 X，指标 Y 因此明显变好/变差」，但句中没有任何干预前基线、没有对照组、没有测量口径、没有具体数值——效果变化的存在本身全靠叙述者的断言支撑，读者无法区分「真是干预的功劳」与「本来就会波动」。样本形状：「我们上线了新系统，客户满意度明显提升了。」「团队推行了弹性工作制，员工流失率显著下降了。」「公司做了组织架构调整，运营效率大幅改善了。」「新政策实施以后，治安状况明显好转了。」「学校开展了课后服务，家长负担明显减轻了。」「补丁已经部署到生产环境，故障率随之下降了。」「我们更换了供应商，原材料成本明显降低了。」「新版App发布以后，日活跃用户大幅增长了。」「我们调整了营销策略，获客成本显著下降了。」「引进了自动化设备，生产误差明显减少了。」「开展了安全生产培训，事故数量大幅下降了。」「实施了新的绩效考核，员工积极性明显提高了。」「We implemented the new CRM and sales performance improved dramatically.」「We introduced daily standups and delivery predictability improved markedly.」「The redesign was shipped and user engagement went up substantially.」「We hired a new ops lead and incident counts fell sharply.」（样本形状与负例见 test/round-437-intervention-effect-without-baseline.test.js）。判据**三腿共现 + 四组豁免，缺一不判**：腿① INTERVENTION 干预动作（一次性干预动词族：上线/推行/部署/发布/实施/引进/开展/调整/更换/升级/优化/改革/采用/迁移；EN implemented/deployed/launched/shipped/introduced/rolled out/hired/switched to + new X system/process/policy/strategy 形）；腿② EFFECT_CHANGE 效果变化宣告（任意指标名词 × 评价性变化词：满意度/投诉/活跃/流失/留存/成本/误差/事故/故障/效率/积极性/负担/治安/获客/收入/交付/产量/质量/速度/体验/性能 × 明显/显著/大幅/急剧/持续 × 提升/提高/增长/下降/降低/减少/缓解/减轻/好转；EN satisfaction/churn/revenue/conversion/costs/errors/incidents/engagement/productivity × improved/increased/grew/dropped/reduced × noticeably/significantly/dramatically/markedly/sharply）；腿③ CONNECTION 因果/时序连接（显式连接词「所以/因此/于是/从而/随之/随后/以后/进而/说明/证明/表明」EN so/therefore/thus/led to/resulted in/which shows，或「干预分句，效果分句」的逗号/and 并置结构——干预与效果两个分句的直接并置本身就是因果宣告）。给了基线/对照就是正确评估，本维度不判。边界与射程分工：baseline_omission（第268维）腿①必须是**比例结果名词**（治愈率/满意度/转化率）、腿②是疗效断言，本族腿①是**干预动作**、效果腿是**任意指标变化**（投诉量/活跃度/流失率/成本/误差/事故数多不在其词表——探针实证22条攻击21条穿透，唯一被其命中的1条仅因「满意度」恰在其词表，词表层即射程边界）；activity_outcome_confusion（第184维）管**活动/投入计数充成果**（开会/加班/代码行数），本族腿①是**一次性干预动作**（上线/推行/部署）不是活动量计数，且必须有指标变化腿；completion_evidence 管**空完成宣称**（已修复/已完成无证据），本族管「完成之后的效果宣告无对照」——动作完成只是腿①，承重的是效果腿；pseudo_causal 管**时间先后即因果**的泛化结构（A 在 B 前所以 A 导致 B），本族三腿更具体（干预动作 × 评价性变化 × 因果/时序连接词）；claimed_verification_without_trail 管**宣称核验已完成**（「我们核实过」），本族管「干预-效果宣告无测量基线」；attribution_vacuum（第277维）管**来源虚指无锚点**，本族不涉及外部来源援引，效果是叙述者第一手宣告。verify 级——单句可能是正常工作汇报的前置句、文学对白、或转述他人宣传；verify 的含义是「这个效果宣告没有干预前基线与对照，采信前必须补上前后数值/对照组/测量口径，或降级为『据说有改善』的传闻表述」，调用方应要求补上干预前后数值与对照口径，而不是把「上线了新系统所以满意度提升了」当已验证结论。明确不判（豁免）：①**基线/对照纪律语言在场**（给了干预前后数值「从80分提升到95分」、对照组/实验组、统计口径/测量口径/样本量、环比同比、仪表盘/台账可查——正是本维度要的纪律）；②**多因破除/归因谨慎**（多因/共同造成/不能只归功/混杂因素/季节因素/confounded/multiple factors/not solely/third variable——说话人自己点明不能单归因，恰是要的纪律）；③**对冲/疑问**（可能/也许/未必/不一定/待观察/吗/？/maybe/might/possibly/uncertain——概率化结论或提问不是效果宣告）；④**统计教学/谬误分析转述**（谬误/案例/反例/教学/举例/剖析/错在/fallacy/case study/for example/what's wrong with——在讨论这件事本身）。已知边界：① 判据限同句，跨段干预与效果的拼合不收；② 强度副词缺失时（「满意度提升了」无「明显/显著」）不判——纯事实变化陈述可能是中性的进度同步，只有配评价强度才是宣告归功；③ 豁免只认显式词面，隐式披露（「内部数据都有」暗示可查）不认。",
+    // [r438 接线] 第 279 维度 choice_architecture_manipulation（选择结构操纵 / dark patterns）guidance。
+    // cam——choice architecture manipulation 缩写。射程分工见 6464 行登记注释与模块头注释。
+    'percent_basis_shift': "不得**把连续百分比变化当加法或抵消处理**——百分比变化是乘法：涨50%后基数是1.5，再跌50%跌的是1.5的50%，净结果是0.75而不是1。样本形状：「股价先涨50%，又跌50%，一来一回等于没涨没跌。」「房价先涨20%再跌20%，算下来还是原价，没亏。」「这只股票周一涨10%，周二跌10%，两天扭平。」「先涨价一成再降价一成，价格回到了起点。」「工资先涨了三成又降了三成，一来一回等于原地踏步。」「The price rose 50% and then fell 50%, ending exactly where it started.」「It gained 20% yesterday and lost 20% today, so it is back to square one.」「The stock went up 10% and then dropped 10%, which cancels out completely.」（样本形状与负例见 test/round-441-percent-basis-shift.test.js）。判据**三腿共现 + 三组豁免，缺一不判**：腿① PCT 百分比变化事件（涨/涨/跌/降/升/回落/缩水 × 数字% 或口语「一/二/三…成」，EN rose/fell/gained/lost/dropped × 数字%——裸动词形亦收，161 轮教训）；腿② SEQUENCE 连续两次变化（同句两个 PCT 事件，或显式时序链 先…再/又/然后/随后/接着/一涨一跌/涨了又跌，EN and then/after that/followed by/first…then——单次百分比变化的句子天然缺此腿）；腿③ CANCEL 抵消/相加/互换断言（轨A 回到起点/净零：等于没涨没跌/还是原价/回到起点/扭平/打平/相抵/一来一回/不赚不亏；轨B 可加运算：加起来/平均一下/涨幅与跌幅；EN back to square one/cancels out/no net change/break even/back to where it started）。正确做法是给出逐段数值（「从100元起步最后只有75元」）或点明基数变换（「两次百分比不能直接相加」）。边界与射程分工：percentage_overflow（第 265 维）管**静态分配语境**分项百分比之和超过100（「A占60%、B占70%」），无连续时序语义；statistical_misleading（第 58 维）管**单次**比例变化不交代基数（「转化率提升了50%」不说从多少到多少）；count_rate_conflation（第 233 维）管绝对计数缺分母；perfect_error 的 METRIC_NOUNS 豁免会整体放过带度量名词的句子且会把正确复利陈述误拦，与本族射程相反不代管。verify 级——单句可能是对他人口误的转述、金融科普的反例、或作者正要指出基数问题的引子；verify 的含义是「这个抵消/相加结论忽略了百分比变化的乘法本质，采信前必须按复利逐段计算净变化（涨X%再跌X%的净结果是(1+X)(1-X)-1<0），而不是把两次变化相加或宣称互抵」。明确不判（豁免）：①**复利纪律语言在场**（给了逐段数值「从…到…再…」/最终数值、点明基数/复利/连乘/相乘/不是加法/不能相加/不能抵消、实际收益率/年化/几何平均——这正是本维度要的纪律陈述）；②**统计教学/谬误分析转述**（谬误/案例/反例/错误示范/教材/科普/常见误区——在讨论这个概念本身，不是在犯这个错）；③**对冲/疑问**（可能/也许/未必/不一定/似乎/估计/吗/呢/？——概率化结论或提问不是抵消宣告）。",
+    'aggregation_overreach': "不得**把聚合量词的统计幅度静默扩张为全称断言**——「大多数A是B」只支持统计性结论（多数、通常、一般而言），推不出「所有A都B」的全称有效性；中间没有抽样框、样本量、置信度就被「可见/足见/足以证明」一笔缝合，就是聚合越界。样本形状：「大多数网民支持这个政策，可见全体网民一致支持。」「过半网友点赞了这条视频，说明所有观众都喜欢它。」「我见过几个程序员都穿连帽衫，所以所有程序员都穿连帽衫。」「大部分调查对象点了同意，足以证明每个用户都认可条款。」「不少的哥都绕路了，可见所有司机都在宰客。」「Most voters support the bill, so all voters support it.」「I met some developers who wear hoodies, so all developers wear hoodies.」「Several fans caused trouble, therefore every fan is a thug.」「A few students skipped class, which proves that every student is lazy.」（样本形状与负例见 test/round-442-aggregation-overreach.test.js）。判据**三腿共现 + 四组豁免，缺一不判**：腿① AGG 聚合量词（大多数/多数/过半/五成以上/一部分/部分/一些/几个/不少/相当一部分，EN most/mostly/a majority of/many/some/several/a few/quite a few/plenty of/numerous/usually/typically——裸名词形亦收，161 轮教训）；腿② UNI 全称断言（所有/全部/每个/全体/统统/一律/无一例外/一个不落/清一色/人人/个个/百分百，EN all/every/each/everyone/without exception/no exceptions/100%/invariably——与腿①同句共域）；腿③ SEAL 缝合连接（可见/足见/这说明/足以证明/因此/推而广之/说到底，EN therefore/thus/hence/so all/proves that all/shows that all——**前提与结论之间的推论桥接**，没有缝合的两词共现不是推理句天然缺腿）。正确做法是把结论降级回聚合幅度（「多数网民支持」）或给出归纳桥梁（抽样框+样本量+置信区间）。边界与射程分工：hasty_generalization 管**小样本叙事泛化**（「我遇到三个人都这样所以世界就这样」——叙事主体与样本故事在场）；law_of_small_numbers（r440）管小样本的统计显著性错觉（连抛三次正面说明硬币均匀），不涉及量化幅度；quantifier_scope_shift（第 258 维）管**嵌套量词辖域换序**（「每个人都爱一个人」→「有一个人所有人都爱」——∀x∃y↔∃y∀x 换序）；illicit_conversion（第 167 维）管全称命题换位（所有A是B→所有B是A——主谓位置互换）；ecological_fallacy（第 211 维）管**群体统计→个体推断**（该地区平均收入高所以这个居民收入高——聚合层级下降，本族方向相反是层级上升）；appeal_to_majority（第 149 维）管**诉诸信念人数证真理**（多数人相信所以是真的——真理诉诸，本族是属性覆盖面诉诸）。verify 级——单句可能是对他人言论的转述、作者正要纠正的前提、或抽样框恰好覆盖全域的特例；verify 的含义是「结论的全称幅度超过了前提的聚合幅度，采信前必须给出抽样框与样本量，或把结论降级为统计表述」。明确不判（豁免）：①**纪律语言在场**（抽样/样本量/随机/置信/误差范围/调查显示/据统计/数据表明/不能推广/不足以/只能说明/仅代表/有局限——这正是本维度要的纪律陈述，EN sample/survey/poll/confidence interval/not representative/statistically/only shows）；②**统计教学/谬误分析转述**（谬误/案例/反例/教材/科普/常见误区/以偏概全——在讨论这个概念本身，不是在犯这个错，EN fallacy/case study/for example/what's wrong with/misconception）；③**对冲/疑问**（可能/也许/未必/不一定/似乎/估计/吗/呢/？——概率化结论或提问不是全称宣告，EN maybe/perhaps/might/could/probably/?）；④**定义/公理语境**（定义/公理/定理/顾名思义/换言之/也就是说——「所有人都会死」是公理性陈述不是越界，EN by definition/axiom/theorem/necessarily）。已知边界（诚实记录）：跨主词句「大多数人喜欢咖啡，所以所有咖啡馆都卖咖啡」中 AGG 主词是人、UNI 主词是咖啡馆（偷换主词而非聚合越界），当前腿间约束（同句共域间距≤40）拦不住，判为 verify 级误伤——接受为边缘良性记录在案，强化主词同一性判别留给后续轮次。",
+    'choice_architecture_manipulation': "不得**把「用界面结构剥夺用户选择权」当成正常的产品设计**——选择结构操纵（choice architecture manipulation / dark patterns）：不改变选项本身的价值主张，而是通过「结构」让用户做出本不会做出的选择——隐瞒成本、伪装选项、强迫行动、误导视觉、默认不利勾选、阻碍取消、伪造社会证明。样本形状：「把拒绝订阅的按钮做成灰色小字放在角落，用户就找不到，退订率立刻降下来了。」「把默认勾选预先打好，用户一路点到最后一步，顺手就订阅了会员。」「不共享通讯录就无法进入下一页，只能同意授权才能继续用。」「结算时最后一页才显示服务费，付款时才发现被多扣了钱。」「把取消订阅的入口藏起来，要打客服等三个工作日才能退。」「首页写死一个『今日已有8923人浏览』的数字，制造紧迫感，转化率明显提升。」「Make the decline button a tiny grey link so users cannot find it and cancellation rates drop.」「Pre-check the box by default and users get enrolled without noticing.」「Hide the real price until the final checkout step so buyers see the fee only after entering card details.」「Force users to share contacts before they can proceed to the next screen.」（样本形状与负例见 test/round-438-choice-architecture-manipulation.test.js）。判据**三腿共现 + 四组豁免，缺一不判**：腿① STRUCTURE 选择结构载体（按钮/选项/勾选框/弹窗/结算页/问卷/表单/注册/订阅/退订/流程/步骤/入口/小字/默认勾选/自动续费/倒计时；EN button/checkbox/modal/checkout/form/survey/subscription/unsubscribe/cancel/steps/decline/pre-checked/auto-renew/countdown/fine print）；腿② MANEUVER 结构操纵手段五子族（HIDE 隐瞒/不显示/最后一步才/默认勾选/自动续费；DISGUISE 伪装措辞/写成歧义句/无法进入；FORCE 必须先X才能/不…就无法；OBSTRUCT 灰色小字/放在角落/取消路径更长/等三个工作日；FAKE 写死的浏览人数/虚假倒计时/编造数字；EN hidden/not shown/pre-checked/auto-renewed/cannot proceed/tiny grey/more steps/fake counter）；腿③ EFFECT 操纵效果陈述（轨A 显式效果词：不敢点/降低退订率/无法进入/被扣款/制造紧迫感/转化率提升，EN users end up/charged/pays more/harder to cancel；轨B 后果名词：下载/订阅/扣款/客服/统计/续费，EN download/sign up/cancel/fee/waiting——forced_action/sneaky_cost 等族效果在真实文本里几乎总是名词化的；obstruction 族另有族内放宽：手段 + 被阻碍动作对象共现即完成阻碍陈述）。透明设计与善意优化就是正常 UX 工作，本维度不判。边界与射程分工：false_urgency（紧急时限维度）管**话术层泛化时间压力**（「仅限今天」「错过等一年」），不限界面结构，且不需腿①载体与腿③效果在场；本族管**界面结构层操纵**，时间压力只是其中一族（FAKE 假倒计时）的实现手段，必须三腿共现；instrumental_reasoning 管**把他人当工具**的一般推理，本族管「选择结构欺骗」这一具体手段族；guilt_induction/flattery_pressure/fear_projection 等十余个 coercion 族管**话语内容层情感施压**（羞辱/威胁/内疚话术），本族管**结构层选择权剥夺**——句子施压靠的是「按钮怎么摆、勾选怎么设、流程怎么绕」，不是话语内容的情感强度；confidence/perfect_error 等存量旁路命中是巧合承重，不占射程。verify 级——单句可能是正常的产品设计描述、UX 教学、监管报告或对他人设计的批评转述；verify 的含义是「这段话在描述用界面结构剥夺用户选择权的手段，采信前必须确认设计意图与透明度，或降级为对已知 dark pattern 的分析陈述」，调用方应要求补充设计意图说明与用户知情证据，而不是把「把拒绝按钮做成灰色小字」当已获认可的设计决策。明确不判（豁免）：①**善意优化/透明设计在场**（减少步骤、明码标价、金额一致、入口同样显眼、可跳过、真实有效、无障碍、对比度、文字标签——同构「流程×效果」句子但方向相反，是正常 UX 工作）；②**教学/批评/监管转述**（欧盟黑名单、dark pattern 批判、UX 教材、论文分析界面操纵现象、合规审查——在讨论这件事本身，不是在实施操纵）；③**疑问/假设/教学提问**（「如果按钮做得不显眼会怎样」是方法论提问，含吗/？/if/would）；④**无效果陈述的纯描述**（只说「按钮是灰色的」不说「所以用户就…」——缺腿③天然不判）。",
     'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
@@ -6422,6 +6521,27 @@ function discriminate(text, evidence = [], contentMode) {
     // verify 的含义是「这个效果宣告没有干预前基线与对照，采信前必须补上
     // 前后数值/对照组/测量口径，或降级为『据说有改善』的传闻表述」。
     'intervention_effect_without_baseline',
+    // [r438 接线] 第 279 维度 choice_architecture_manipulation（界面/选择
+    // 结构操纵：结构载体 × 操纵手段 × 操纵效果，用界面结构而非话语内容操纵
+    // 用户选择）登记。verify 级——单句可能是正常的产品设计描述、UX 教学
+    // 或对他人设计的批评转述；verify 的含义是「这段话在描述用界面结构
+    // 剥夺用户选择权的手段，采信前必须确认设计意图与透明度，或降级为
+    // 对已知 dark pattern 的分析陈述」。
+    'choice_architecture_manipulation',
+    // [r441 接线] 第 280 维度 percent_basis_shift（连续百分比变化基数变换
+    // 谬误：百分比变化事件 × 连续两次变化 × 抵消/相加/互换断言——涨X%再跌
+    // X%不回原点，两次变化基数不同不可加、不互抵）登记。verify 级——单句
+    // 可能是对他人口误的转述、金融科普反例或正要指出基数问题的引子；
+    // verify 的含义是「这个抵消/相加结论忽略百分比变化的乘法本质，采信前
+    // 必须按复利逐段计算净变化」。
+    'percent_basis_shift',
+    // [r442 接线] 第 281 维度 aggregation_overreach（聚合越界：聚合量词的
+    // 统计幅度被静默扩张为全称断言——「大多数A是B，可见所有A都B」——三腿
+    // 共现：AGG 聚合量词 × UNI 全称越界断言 × SEAL 缝合连接）登记。verify
+    // 级——单句可能是转述、作者正要纠正的前提或抽样框恰好覆盖全域的特例；
+    // verify 的含义是「结论的全称幅度超过前提的聚合幅度，采信前必须给出
+    // 抽样框与样本量，或把结论降级为统计表述」。
+    'aggregation_overreach',
   ]);
   // pass：无问题通过
 
@@ -6883,6 +7003,11 @@ function discriminate(text, evidence = [], contentMode) {
       // [r331 接线] 第 256 维度 illusion_of_control（控制幻觉）。ioc。
       // r239 起草只登记 econ-reasoning-gate FAMILIES，从未独立 dispatch。
       illusion_of_control: ioc,
+      // [r438 接线] 第 279 维度 choice_architecture_manipulation（选择结构操纵 /
+      // dark patterns：用界面结构而非话语内容剥夺用户选择权）。cam。模块本轮新建
+      // （212 行），探针实证 gate 层攻击穿透 13/21 零维度承重、模块层 21/21、
+      // 良性 0/10。
+      choice_architecture_manipulation: cam,
       // [r334 接线] 第 257 维度 coercive_affection（条件式情感绑定的付出
       // 要求）。coa。模块 r334 前已存在但从未 dispatch，本轮补齐接线。
       coercive_affection: coa,
@@ -7102,6 +7227,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 主观行为/仪式/投入当作能改变纯随机结果的因素）。ioc——illusion of
     // control 缩写。同上：九处一次接齐。
     illusion_of_control: ioc,
+    // [r438 接线] 第 279 维度 choice_architecture_manipulation 补登记（选择
+    // 结构操纵 / dark patterns：用界面结构而非话语内容剥夺用户选择权）。
+    // cam——choice architecture manipulation 缩写。同上：九处一次接齐。
+    choice_architecture_manipulation: cam,
     // [r334 接线] 第 257 维度 coercive_affection 补登记（条件式情感绑定的
     // 付出要求：把爱/关系存续设为对方当下付出或服从的条件）。coa——
     // coercive affection 缩写。同上：九处一次接齐。
@@ -7214,6 +7343,29 @@ function discriminate(text, evidence = [], contentMode) {
       unresolved_conflict: ucf,
       // [r645] 第 67 维度：一词多义在同一论证中被用于两个不同义位
       equivocation_sense_shift: eqs,
+      // [r442 补登记] 第 278 维度 intervention_effect_without_baseline
+      // （干预效果无对照宣告：干预动作 × 指标变化 × 因果/时序连接三腿共现
+      // + 邻近窗 + 四组豁免，缺一不判）。此前只接了 scores/dimMap/
+      // VERIFY_DIMS/DIM_GUIDANCE，未进本输出对象——读方（gate/MCP/panel/
+      // discriminate 调用方）一律当「未命中」（同 r556 先例：只接两处、
+      // 第三处漏登记）。本轮一次补齐 r437-r441 的漏登记 + r442 新维度。
+      intervention_effect_without_baseline: iev,
+      // [r442 补登记] 第 279 维度 choice_architecture_manipulation
+      // （界面/选择结构操纵：结构载体 × 操纵手段 × 操纵效果，同 r556 漏登记
+      // 先例补齐）。注意：HEAD 版 index.js 曾丢失本维度全部接线（工作树
+      // 15 处），r438 单测 36/36 验证工作树版本可用。
+      choice_architecture_manipulation: cam,
+      // [r442 补登记] 第 280 维度 percent_basis_shift（连续百分比变化
+      // 基数变换：百分比变化 × 连续两次 × 抵消/相加断言三腿共现 +
+      // 三组豁免，缺一不判；同 r556 漏登记先例补齐）。r441 原接线只到
+      // scores/dimMap/VERIFY_DIMS/DIM_GUIDANCE，本对象缺键导致
+      // discriminate().dimensions 读不到命中——r441 单测 31/31 只验证
+      // 模块层与 gate 层，未覆盖本输出对象，r442 补齐。
+      percent_basis_shift: pbs,
+      // [r442 接线] 第 281 维度 aggregation_overreach（聚合越界：聚合量词
+      // × 全称越界断言 × 缝合连接三腿共现 + 四组豁免，缺一不判）dimensions
+      // 输出对象登记——dimMap 新键不会自动流入本对象（r556 教训），须显式。
+      aggregation_overreach: agg,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
