@@ -270,6 +270,6 @@ check('引擎闸：攻击样本 gate 非 pass 且本维度承重', () => {
   }
 });
 
-console.log('\nround-436-window-stable-generalization: ' + passed + ' passed / ' + failed + ' failed');
+console.log('\nround-438-window-stable-generalization: ' + passed + ' passed / ' + failed + ' failed');
 if (failed > 0) process.exitCode = 1;
 // cleanup: none (pure in-memory checks)

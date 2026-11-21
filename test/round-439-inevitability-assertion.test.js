@@ -202,5 +202,5 @@ const indexSrc = fs.readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
 ok(/regression_to_the_mean/.test(indexSrc), 'H4 src/index.js 维度键在位（扩族轮零改动，仅登记核对）');
 
 console.log('');
-console.log('round-437-inevitability-assertion: ' + passed + ' passed / ' + failed + ' failed（注入 ' + INJ.length + ' 组：' + INJ.length + ' 组全翻转，0 组未变红）');
+console.log('round-439-inevitability-assertion: ' + passed + ' passed / ' + failed + ' failed（注入 ' + INJ.length + ' 组：' + INJ.length + ' 组全翻转，0 组未变红）');
 console.log('cleanup: none (pure in-memory checks)');
