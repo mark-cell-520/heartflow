@@ -1,3 +1,28 @@
+## r442 — 第 246 维 counterfactual_overclaim 新增否定形反事实句式族（真升级②：已有维度全新句式族；v6.8.218→v6.8.219）
+
+方向轮换：r441 基线比例切换（percent_basis_shift）→ 本轮切换至「因果与反事实推理」。阶段1 三层搜索落盘 `/tmp/hf-scout-r442.txt`：HN Algolia `cognitive bias detection` / `logical fallacy detection` 命中高价值故事「Translating natural language to first-order logic for logical fallacy detection」（258 pts）；GitHub API `logical fallacy detection` 最高仅 21★ 且均为 LLM 路线，与心虫纯规则引擎射程不符，不采用；Semantic Scholar 无有效返回。**外部方案不集成，走内部缺口路径**。
+
+内部缺口实证（阶段1.5 撞墙检测）：探针 `/tmp/probe-r442.js` 先查量词换位族（quantifier 移位/illicit major/minor）——14/14 被既有 `quantifier_scope_shift` 等维度覆盖，非缺口，放弃该方向；转写 `/tmp/probe-r442-b.js` 反事实族探针——发现真实漏判：攻击样本 4/10 MISS，集中在**否定形反事实**构式 `cf5/cf7/cf8/cf9`（「如果公司没有改革，去年肯定会倒闭」/「Without the merger, the company would surely have collapsed」/「既然如果当初改革就能成功，说明现在必须再改革一次」）。
+
+根因定位（读 `src/counterfactual-overclaim.js`）：① 存量 CN-A 腿的时点锚窗 `[^。，？！；\n]` 被逗号截断——否定动作在前、时点锚在逗号后的最高频构式（"if we had not…"）两腿判据均失配；② 存量 EN-A 要求 `if + 主语 + had`，`without/but for` 是否定性反事实介词框架，此前零覆盖；③ `if…had not + would` 显式否定形同样只被 EN-A 泛泛触达、无排他承重。
+
+实现内容（`src/counterfactual-overclaim.js`，+30 行）：新增四条腿 + 一条 CERT 词表扩展——
+- **CF_CN_C_RE**（CN-C 否定动作先行形）：连接词（如果/要是/倘若/设若/要不是/若非…）→ [≤14字] → 否定动作（没有/没/未曾/未/不曾/不）→ 逗号 → [≤10字] → 近期时点锚（去年/今年/现在/如今/今天/初期…）。窗口 14 容纳「公司/团队」主语 + 否定动作。
+- **CF_CN_D_RE**（CN-D 行动依据形）：反事实前件（如果…就能/便能/才可…）→ 逗号 → 说明/证明/表明/意味着/可见 → 行动要求（必须/应当/需要/务必/得）。把不可验证的反事实推断当下一步行动的论据。
+- **CF_EN_D_RE**（EN-D）：`without/but for` + would/should + CERT（覆盖 would certainly have / would surely have / would have certainly 三种语序），中间段允许逗号与冠词。
+- **CF_EN_E_RE**（EN-E）：`if…had not + would` 显式否定形。
+- **CERT_ZH_RE 扩展**：补「就能/便能」——CN-D 族确定性由前件侧承载，不加则 CN-D 两腿无法闭合。
+接线方式：inject 钩子解构 + 主循环或判 + matches 记录新标记，全部走既有 `checkCounterfactualOverclaim` 出口，不改函数签名。
+
+射程分工（已写入源码注释）：**刻意不收「早就/就不会/would have」裸形**——那是 conditional_proposition（第 160 维）的否定推断形射程；本族收确定性副词形（一定/肯定/铁定/certainly/surely/bound to），两族可同句共现但判定结构不同。`absolute_claim` 管无条件的泛化断言，本族必须有反事实条件框架在场。
+
+验证数据：
+- 单测 `test/round-442-counterfactual-negative-family.test.js` **28/28**：攻击变体矩阵 17/17 命中（CN-C×5 + CN-D×3 + EN-D×3 + EN-E×2 + 中英长句/带修饰×4，全部 gate.action 非 pass）；良性 7/7 pass（对冲形×3 / 概念转述 / 无 CERT 的 might have / 口语对冲过去锚）；负例注入承重验证 4/4——四条新腿逐条置空后对应攻击样本失配（证明排他承重，非样本扩容）；裸名词自查 3/3（161 轮教训：去修饰后仍命中）。
+- 探针前后对照：`/tmp/probe-r442-b.js` 攻击命中 **6/10 → 10/10**，且 cf5/cf7/cf8/cf9 改由 `counterfactual_overclaim` 本维度承重（此前被代拦或直接 MISS）。
+- 五门禁：`bin/verify.js` 16/0；`scripts/guard-abilities.js` 20/20；`test/doc-numbers-accuracy.test.js` 24/0；`scripts/bidirectional-guard.js` 召回 52/52 + 误拦 302/326（与基线完全一致，零新增误伤）。本轮未新增可计数项（维度数不变），三份文档无需同步。
+
+已知边界 / 下次可继续：① EN-E 的 `[a-z\s]{0,30}` 主语窗对含连字符主语（if the re-org had not…）覆盖有限；② CN-D 的「就能」CERT 词形若出现在非反事实流程陈述（「按时提交就能过审」）靠时点锚与框架规避，边界样本可再压；③ 本轮放弃的量词换位族 14/14 已覆盖结论基于有限样本，不能证明全空间无缺口；④ 工作区 `src/choice-architecture-manipulation.js` 有兄弟子代理 r443 的未提交 WIP（标注「[r443 审计修复]」），本轮未触碰、未提交，留给其所有者处理。
+
 ## r437 — 第 278 维 intervention_effect_without_baseline（干预效果无对照宣告）接线闭环（真升级①：新判别维度；v6.8.216→v6.8.217）
 
 方向轮换：r436 证据充分性与幻觉检测（attribution_vacuum）→ r437 切换至「因果与反事实推理 / agent 执行验证」。阶段1 三层搜索落盘 `/tmp/hf-scout-20261121-1310.txt`：HN Algolia `self-verification LLM agent` / `execution verification agent` 命中故事 `predicate-secure`（post-execution verification：agent confidently claim a task succeeded when it actually clicked a disabled button）；GitHub API `fact checking claim verification` 命中 `factcircuit` ★926（claim-and-evidence verification loop with immutable provenance）。

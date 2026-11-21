@@ -14,13 +14,30 @@
  *        → 过去时点锚（当初/当时/那年/一开始/早点…）
  *      · CN-B 锚先行形：过去时点锚 → [≤8字] → 连接词/否定动作
  *        （「当初要是听我的」「那时如果没停电」）
+ *      · CN-C 【r442 新族】否定动作先行形：连接词 → [≤14字] → 否定动作
+ *        （没有/没/未曾/不）→ 逗号 → [≤10字] → 近期时点锚（去年/今年/
+ *        现在/如今/今天/初期…）。CN-A/CN-B 的时点锚窗被逗号截断，
+ *        「如果公司没有改革，去年肯定会倒闭」整句失配——否定动作形
+ *        是商业与政策论述里最高频的反事实构式（"if we had not…"）。
+ *      · CN-D 【r442 新族】行动依据形：反事实前件（如果…就能…）→ 逗号 →
+ *        说明/证明/表明/意味着 → 行动要求（必须/应当/需要）。把反事实
+ *        推断本身当下一步行动的论据（「既然如果当初改革就能成功，说明
+ *        现在必须再改革一次」），确定性由前件侧「就能」承载。
  *      · EN-A if + 主语 + had + 过去分词；EN-B 倒装 had we/they + PP；
  *        EN-C if only + 主语 + had
+ *      · EN-D 【r442 新族】without/but for + would + CERT（含 would
+ *        certainly have / would surely have / would have certainly
+ *        三种语序）——「Without the merger, the company would surely
+ *        have collapsed」。EN-A 要求 if + had 形，without/but for
+ *        是否定性反事实介词框架，此前零覆盖。
+ *      · EN-E 【r442 新族】if…had not + would（「If the team had not
+ *        shipped, we would certainly have missed…」）——had not 显式
+ *        否定形，CERT 腿兜住确定性。
  *   腿② CERT 确定性断言——一定/肯定/必然/势必/注定/毫无疑问（EN
  *      certainly/definitely/bound to/undoubtedly/without a doubt/surely）。
  *      **刻意不收「早就/就不会/would have」**：那是 conditional_proposition
  *      （第160维）的否定推断形射程；本族收的是确定性副词形，两族可同句
- *      共现但判定结构不同。
+ *      共现但判定结构不同。CN-D 族额外收「就能/便能」形（前件确定性）。
  *
  * 与存量维度边界：
  *   · conditional_proposition（r729 第160维）管「假设条件句 × 否定推断」
@@ -64,6 +81,18 @@ const RE = {
   // [r275 新增族] 口语过去锚同步扩展（同 CN-A 口径）
   CF_CN_B_RE: /(?:当初|当时|那时|那年|当年|早年|一开始|最开始|早些时候|早点|最初|早先|那晚|那天|那阵子|彼时|那当口|早年间)[^。，？！；\n]{0,8}(?:如果|若|要是|假如|倘若|若是|没有|没|不)/,
 
+  // CN-C：【r442 新族】否定动作先行形——连接词 → [≤14字] → 否定动作 →
+  // 逗号 → [≤10字] → 近期时点锚。CN-A 的锚窗 [^。，？！；\n] 被逗号截断，
+  // 「如果公司没有改革，去年肯定会倒闭」（否定动作在前、时点锚在逗号后）
+  // 此前两腿判据均失配。窗口 14 容纳「公司/团队/我们」等主语 + 否定动作。
+  CF_CN_C_RE: /(?:如果|若|要是|假如|倘若|倘使|若是|设若|要不是|若非)[^。，？！；\n]{0,14}(?:没有|没|未曾|未|不曾|不)[^。，？！；\n]{0,6}[，,][^。，？！；\n]{0,10}(?:去年|今年|明年|前年|当年|那时|现在|如今|目前|当下|今天|上个月|上月|这个月|初期|中期|后期|早期|晚期|第一年|第二年|第三年|起初|起步阶段|早年间)/,
+
+  // CN-D：【r442 新族】行动依据形——反事实前件（如果…就能/便能…）→
+  // 逗号 → 说明/证明/表明/意味着 → 行动要求（必须/应当/需要/要/得）。
+  // 攻击结构：把不可验证的反事实推断当作下一步行动的论据。确定性由
+  // 前件侧「就能/便能」承载（CERT 腿同族词表已收，见 CERT_ZH_RE）。
+  CF_CN_D_RE: /(?:如果|若|要是|假如|倘若)[^。，？！；\n]{0,16}(?:就|则|便能|才能|才可)[^。，？！；\n]{0,12}[，,](?:说明|证明|表明|意味着|足以证明|可见|由此可见)[^。，？！；\n]{0,16}(?:必须|应当|应该|需要|要|务必|得)/,
+
   // EN-A：if + 主语 + had（if we had invested…）
   CF_EN_A_RE: /\bif\s+(?:we|i|you|they|he|she)\s+had\b/i,
 
@@ -91,11 +120,25 @@ const RE = {
   // EN-C：if only + 主语 + had（If only we had acted…）
   CF_EN_C_RE: /\bif\s+only\s+(?:we|i|you|they)\s+had\b/i,
 
+  // EN-D：【r442 新族】without/but for + would + CERT——否定性反事实介词
+  // 框架。EN-A 要求 if + had 形，「Without the merger, the company would
+  // surely have collapsed」此前零覆盖。中间段允许逗号/冠词（without the
+  // merger, the company would…），句末锚 CERT 词。覆盖三种语序：
+  // would certainly have / would surely have / would have certainly。
+  CF_EN_D_RE: /\b(?:without|but\s+for)\s+(?:the|a|an|our|their|its|his|her|this|that)?\s*[a-z][a-z\s,'-]{0,50}?\b(?:would|should)\b[^.]{0,20}\b(?:certainly|definitely|surely|undoubtedly|bound\s+to|guaranteed)\b/i,
+
+  // EN-E：【r442 新族】if…had not + would——显式否定形反事实条件句
+  // （「If the team had not shipped, we would certainly have missed the
+  // deadline」）。EN-A 只收 if + 主语 + had 而不问否定，had not 形经
+  // 此腿显式承重；CERT 腿兜住确定性（无 CERT 的 would have 形让位
+  // conditional_proposition）。
+  CF_EN_E_RE: /\bif\s+(?:the\s+)?[a-z\s]{0,30}?\bhad\s+not\s+[a-z]+[^.]{0,40}?\bwould\b/i,
+
   // 腿② CERT 确定性断言（不含早就/就不会/would have——conditional_proposition 射程）
   // [r275 新增族] 口语强确定词（铁定/准能/板上钉钉/百分百）——「今天铁定是
   // 另一番局面」「今天准能全身而退」；刻意不收「绝对」（义务警告形
   // 「不装风控系统绝对会崩」易误伤，按基线误拦纪律让位）。
-  CERT_ZH_RE: /(?:一定|肯定|必然|势必|必定|注定|毫无疑问|毋庸置疑|不容置疑|必将|必将会|铁定|铁板钉钉|板上钉钉|一准|准能|保管|百分百)/,
+  CERT_ZH_RE: /(?:一定|肯定|必然|势必|必定|注定|毫无疑问|毋庸置疑|不容置疑|必将|必将会|铁定|铁板钉钉|板上钉钉|一准|准能|保管|百分百|就能|便能)/,
   // [r275 新增族] EN 口语强确定词（guaranteed/certain to/for sure/destined to）
   // ——「success was guaranteed」「failure was certain to come」
   CERT_EN_RE: /\b(?:certainly|definitely|bound\s+to|undoubtedly|without\s+a\s+doubt|no\s+doubt|surely|guaranteed(?:\s+to)?|certain(?:\s+to)?|for\s+sure|destined\s+to|sure\s+to)\b/i,
@@ -140,9 +183,13 @@ function checkCounterfactualOverclaim(text, inject) {
   const R = inject || {};
   const CF_CN_A_RE = R.CF_CN_A_RE || RE.CF_CN_A_RE;
   const CF_CN_B_RE = R.CF_CN_B_RE || RE.CF_CN_B_RE;
+  const CF_CN_C_RE = R.CF_CN_C_RE || RE.CF_CN_C_RE;
+  const CF_CN_D_RE = R.CF_CN_D_RE || RE.CF_CN_D_RE;
   const CF_EN_A_RE = R.CF_EN_A_RE || RE.CF_EN_A_RE;
   const CF_EN_B_RE = R.CF_EN_B_RE || RE.CF_EN_B_RE;
   const CF_EN_C_RE = R.CF_EN_C_RE || RE.CF_EN_C_RE;
+  const CF_EN_D_RE = R.CF_EN_D_RE || RE.CF_EN_D_RE;
+  const CF_EN_E_RE = R.CF_EN_E_RE || RE.CF_EN_E_RE;
   const CERT_ZH_RE_ = R.CERT_ZH_RE || RE.CERT_ZH_RE;
   const CERT_EN_RE_ = R.CERT_EN_RE || RE.CERT_EN_RE;
   // 整篇豁免：对冲/拒绝推断/概念转述/结论侧否定不是运用该谬误
@@ -162,10 +209,14 @@ function checkCounterfactualOverclaim(text, inject) {
 
     const cfA = CF_CN_A_RE.test(sent);
     const cfB = CF_CN_B_RE.test(sent);
+    const cfC = CF_CN_C_RE.test(sent);
+    const cfD = CF_CN_D_RE.test(sent);
     const enA = CF_EN_A_RE.test(sent);
     const enB = CF_EN_B_RE.test(sent);
     const enC = CF_EN_C_RE.test(sent);
-    if (!(cfA || cfB || enA || enB || enC)) continue;
+    const enD = CF_EN_D_RE.test(sent);
+    const enE = CF_EN_E_RE.test(sent);
+    if (!(cfA || cfB || cfC || cfD || enA || enB || enC || enD || enE)) continue;
 
     const certZh = CERT_ZH_RE_.test(sent);
     const certEn = CERT_EN_RE_.test(sent);
@@ -173,7 +224,7 @@ function checkCounterfactualOverclaim(text, inject) {
 
     matches.push({
       sentence: sent.slice(0, 80),
-      cfA, cfB, enA, enB, enC, certZh, certEn,
+      cfA, cfB, cfC, cfD, enA, enB, enC, enD, enE, certZh, certEn,
     });
   }
 
