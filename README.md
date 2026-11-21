@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 276 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
-×  1,390 dispatch routes  ×  25,672 passing tests  ×  2 npm dependencies
+×  1,390 dispatch routes  ×  25,941 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.215**. Not marketing copy.
+Measured on this repository at **v6.8.216**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.215**. Not marketing copy.
 | Dispatch routes | 1,390 |
 | Discrimination dimensions | 276 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
-| Test suite | 25,672 passing / 233 failing | `node test/run-all.js`（r431 全量实测 25,672/233/25,905（869 文件）——较 r430 终值基线（868 文件 25,598/233/25,831）passed +74 全部为本轮 test/round-431-selection-selfpoll-popularity.test.js 的 74 条断言、failed +0 零新增（selection_bias 扩族不新增失败，文件级硬失败清单与基线逐项相同零退化））|
+| Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.216 | 2026-11-21 | **第 277 维 attribution_vacuum（溯源真空 / attribution vacuum）接线闭环轮（r436，真升级①）** — 切换方向至「证据充分性与幻觉检测 / 不确定性量化」。外部扫描 HN Algolia 6 条 + GitHub 三条高星（cvs-health/uqlm 1215★ JMLR 2026 / EdinburghNLP/awesome-hallucination-detection 1139★ / potsawee/selfcheckgpt 635★）+ S2 429 放弃不造假；评估 UQLM/SelfCheckGPT 为「生成侧自评」路线与心虫输入侧射程不同，转探针找漏判：16 条典型证据手势形态实测漏判 9/16，四族缺口——①英文无名数据宣称（There is data showing…）②来源有名无论文（中英：《自然》杂志刊登 / A study published in Nature）③多源一致宣称零列举 ④中文精确数字无锚（错误率从3.7%降到0.9%）。新模块 `src/attribution-vacuum.js`：核心立意「引用动作是真的，核路径是零」——来源手势在场但无可溯源锚点（题名/作者/年份/DOI/卷期/链接/数据集编号）。两腿判据：腿① SOURCE_GESTURE 来源手势四族 × 腿② NO_ANCHOR 无锚点；射程划界 unsupported_claim 管「无证据手势」、本维度管「有手势但无锚点」；action=verify；五组豁免（锚点在场/第一手自述/方法论转述/元陈述对冲/复现在场）+ 强否定条件语气守卫。修复过程：VAGUE_EN_BE 收现在分词形、VENUE_ZH 刊物名裸形分支、CONSENSUS_ZH 量词间隔、ANCHOR_EN 去裸年份、NEGATION_ZH「错误」限定技术名词、新增 REPLICATION 复现豁免。终态攻击 16/16 命中、良性 8/8 零误伤。新单测 `test/round-436-attribution-vacuum.test.js` 41 断言全绿（四族攻击 × 五组豁免 × 逐常量承重 × 射程划界回归锚）。`src/index.js` 八处接线。四门禁全绿：verify 16/0、guard 20/20@276、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。VERSION bump 6.8.215→6.8.216（VERSION / package.json / src/core/version.js 兜底 / SKILL.md 四处）。**本轮另并入远端分叉**：远端 agent-4 环境独立产出 r432 clustering_illusion 超自然凶地族 / r433 hot_hand 场次轮换势能族 / r434 count_rate_conflation 软件故障计数族 / r435 regression_to_the_mean 新秀墙魔咒族（均 v6.8.213 扩族不 bump），本地 r433 comparative_advantage 补腿 / r434 complex_question 句式族 / r435 authority_circularity 同轮号撞车——模块层零重叠，union 合并保留双方全部产出。 |
 | 6.8.215 | 2026-11-21 | **第 276 维 authority_circularity（权威互引洗白 / credential laundering / citation cartel）接线闭环轮（r435，真升级①）** — 接手 r433 掉线未完成的产出：r433 因工具额度耗尽，模块已写但未接线、未单测、门禁未重跑故未 commit；r434 轮记录「只摘出本人 complex_question 60 行，authority WIP 原样保留不提交」，即接线被有意剥离留给归属轮次（非 rebase 事故），本轮按「本地独有产能优先固化：不丢弃不覆盖，先核实真实性再补提交」补完。三腿判据（缺一不判）：腿① BACKING 权威互引动作 × 腿② CLOSURE 闭环关联（核心是回指同一性 anaphoric identity） × 腿③ CREDIBILITY 可信性收束（含 transferMode「权威传递即收束」变体）。射程为 credential laundering 族：诺奖互引/实验室同行评议/课题组审稿/智库理事单位/评级机构资助/师承链/学派传承——结论可靠性不指涉外部证据而指涉权威间互相担保。`src/index.js` 八处接线（require / dispatch 变量 `auc` / score 参与判定 / dimMap×3 / DIM_GUIDANCE / VERIFY_DIMS / exports）；`metric_gaming` 三处匹配、`'metric_gaming',` 两处匹配均用注释上下文与 `]);` 精准 patch。**r433 遗留未决风险根因定位并修复**：模块原返回整数 `score: 65`，聚合层按 0-1 口径 `severity = Math.round(d.score*100)` 放大成 6500，越过 rewrite 阈值（overallScore<0.5 && severity>=60），使本应 verify 的族落 rewrite；改 `score: 0.65` 对齐 metric-gaming（0.72/0.62）口径后纯承重样本实测落 verify。缺口实证复跑：未接线 15 条攻击穿透 12/15，模块层 15/15 命中且良性 0/15；probe-r433.js gate 层 6/15 与模块层差异判定为样本集不完整（EN 截断短句缺腿③）。新单测 `test/round-435-authority-circularity.js` 78/0（模块层攻击/良性 + gate 端到端 + 接线断言；VERIFY_DIMS 是 index.js 内部作用域 const 不导出，断言改为可观测行为）。文档三层同步（维度 274→275、verify 242→243、Verify 列举追加 authority_circularity、README 规格表版本戳与 changelog）。四门禁全绿：verify 16/0、guard 20/20@275、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。存量基线实证：测试 25672 通过 / 233 失败为既有基线——stash 剥离本维度接线后复测仍 233、维度 274，与本轮改动无关。VERSION bump 6.8.214→6.8.215（VERSION / package.json / src/core/version.js 兜底 / SKILL.md 四处一致，runtime hf.version 实测确认）。 |
 | 6.8.214 | 2026-11-21 | **句式族轮（r434，真升级②）：presupposition 第67维新增 complex_question（复杂问句/预设问句）族** — `src/index.js` `PRESUPPOSITION_PATTERNS` 表追加 zh 5 支 + en 6 支（共 60 行含注释）：把对方未承认的过错钉为既定事实再用问责疑问逼答的攻击族纳入射程。判据两腿共现（腿①过错预设：认识/承认/知道 + 过错定性词或「既然+过错名词」裸名词；腿②问责疑问：为什么/怎么/为何 + 不/没/还，或逼问形「有那么难吗」/ when did you stop / do you admit / why do you still insist）。存量 40+ 支锚定「你+人格质问」「承认动词+强制半」「既然+回溯时间词」三族，本族实测两处射程缺口：无回溯时间词的「既然认识到错误为何不停止抵赖」穿过 prior_knowledge 族；「还不明白自己错在哪里」压缩形穿过 forced_admission 族。轮初探针 6/6 攻击零覆盖 → 6/6 命中，良性 0 误伤；轮测 `test/round-434-complex-question-family.test.js` 30/30（18 攻击变体 + 12 良性）。四门禁全绿（verify 16/0、guard 20/20@275、doc 24/0、双向 52/52 + 误拦 302/326 零新增）。维度 275、VERIFY 243 不变。心虫裁决 accelerate。VERSION bump 6.8.213→6.8.214。 |
 | 6.8.213 | 2026-11-20 | **双模块接线轮（r428，真升级③）：CognitiveProtocol + ErrorHandler 接入路由与 MCP** — `src/core/cognitive-protocol.js`（1515 行）与 `src/core/error-handler.js`（1493 行）两个实例在 `heartflow.js`（L1519 `this.cognitive` / L2098 `this.error`）自 v5 起一直活着、能力完整（任务复杂度分级/先理解再行动/检查点/问题库与模式识别/卡点暂停恢复；错误分类/恢复建议/重试计划/关联分析/历史统计），但从未注册进 `_modules`：`generateAllowedRoutes` 扫不到 → routes() 零命中、dispatch 全抛 `route not allowed`、MCP 侧无工具入口，全库 0 条可用路由。本轮挂载 `_modules['cognitiveProtocol']` 与 `_modules['errorHandler']`（try/catch 内注册，路由由 engine-dispatcher 自动生成）+ `src/mcp-server.js` 新增 `handleCognitiveProtocolTool`（11 动作）/`handleErrorHandlerTool`（5 动作）与 HANDLERS 两项 + `src/mcp/tools-registry.js` 新增 `heartflow_cognitive_protocol` / `heartflow_error_handler` 两个工具定义。实测 cognitiveProtocol 19 条 + errorHandler 8 条路由生成，总路由 1,363→1,390，MCP 工具 195→197，模块 167→169，维度 274 不变。接线中发现并锁定真实签名：`classifyError(error)` 收 Error 对象（读 `error.message`，传字符串恒 unknown）、`isRetryable`/`getRetryPlan` 在 `_retry` 子模块（真实返回 `{"shouldRetry":true,"delayMs":827,"attempt":1}`）、源码判定顺序 syntax 分支先于 json。来源为内部路径（外部三层搜索 HN Algolia/Semantic Scholar/GitHub 无可集成的纯规则 agent 执行验证方案）。验证：verify 16/0、guard-abilities 20/20、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326 零退化；新测试 `test/round-428-cognitive-errorhandler-wiring.test.js` 15/15（挂载/路由生成/dispatch 可达/能力承重同族变体矩阵/MCP 三处同步五层）。VERSION bump 6.8.212→6.8.213。 |

@@ -36,6 +36,32 @@
  * 0.81 打平弃权——诚实行为，补真实可区分判据后第二轮选中 A，composite
  * 0.83 / confidence 0.8 / identity alignment 0.8）。r722 探测器实测：
  * 攻击漏判 11/15（73%）、真零命中 11/11、误伤 0/8。
+ *
+ * [r433 新增族 · 真升级②：场次轮换×势能延续行动措辞家族]
+ * r433 池化探针（coordination/agent4/probes/r433-probe-pool.js，v6.8.213
+ * 实测）：本族 7 条新措辞攻击 **4 条完全穿透**（gate.action=pass 且零维度
+ * 承重，六家族同池最高；模块层 0/7），良性 4 条零误伤（1 条存量
+ * fallacy_of_relevance/moral_foundations 代拦，stash 前后逐项相同，与本族
+ * 无关）。穿透根因是两条腿的表都停在旧形：
+ *   · ZH 腿② CONTINUE_IMPLICIT_ZH 只收「下一把继续/下一局继续/下一场继续」
+ *     紧邻逐字形与固定告诫词（别改打法/收手就亏），收不住「下一局趁热打铁
+ *     继续用他」「下一轮还是他先手」「第四场乘胜追击还得靠他」这类
+ *     **场次轮换词（下一轮/第四场/第五局…）× 势能延续行动**、中间隔着
+ *     成语或对象短语的间隔形；
+ *   · EN 腿① STREAK_EN_COUNT_RE 要求动词紧邻数字+成功名词（hit his last
+ *     five shots），不收 "has scored in each of the last four games" 的
+ *     **分布式连发形**（in each of the last N games）；腿②
+ *     CONTINUE_IMPLICIT_EN 无 "strike while the iron is hot" /
+ *     "start him again" / "keep him in the lineup" 势能延续行动形。
+ * 新族三常量独立成组（不进存量数组——存量 __internals 七键 length>0 断言
+ * 与 round-722 轮测天然兼容），两条新路由与存量 R1/R2 并行：
+ *   · R3 中文：存量腿①（STREAK_ZH/STREAK_ZH_RE）× 新腿②
+ *     CONTINUE_ROUND_ZH（轮换场次词×势能行动词，间隔 ≤10 字）；
+ *   · R4 英文：（存量腿一 ∪ 新 STREAK_EACH_EN 分布式连发）×（存量腿二
+ *     ∪ 新 CONTINUE_ROUND_EN 势能延续行动词表）。
+ * 射程分工不变：本族仍管 momentum 方向（连胜势头会延续），与
+ * gamblers_fallacy 第148维 due 方向（连胜之后该反转）互补；r270 告诫形
+ * （继续保持/别改打法/收手就亏）与本族轮换行动形同族不同形。
  */
 'use strict';
 
@@ -107,6 +133,36 @@ const CONTINUE_EN = [
   'on my side', 'next one will', 'keep riding', 'ride the momentum',
 ];
 
+// ─── [r433 新增族] 腿②：场次轮换词 × 势能延续行动（中文，间隔形）────────
+// 存量 CONTINUE_IMPLICIT_ZH 只收「下一把继续/下一局继续/下一场继续」紧邻
+// 逐字形（词表元素必须整串连续出现），收不住轮换场次词与行动词之间隔着
+// 成语或对象短语的自然句：「下一局趁热打铁继续用他」「下一轮还是他
+// 先手」「第四场乘胜追击还得靠他」。本正则：轮换词起头，≤10 字窗内出现
+// 任一势能延续行动词。轮换词表刻意不含「第二天/下周」等日历词（那是
+// 赛程安排陈述，非局间势头断言）。
+const CONTINUE_ROUND_ZH = /(?:下一轮|下一场|下一局|下一把|这一轮|这一场|这一局|这一把|第[一二三四五六七八九十\d]+[场局轮把站]|这场之后|这局之后|本轮|接下来)[^。！？!?]{0,10}(?:趁热打铁|乘胜追击|继续用|继续让|继续派|还得靠|接着上|照旧|还是他|延续|接着打|接着投|接着押|接着干|原班人马)/;
+
+// ─── [r433 新增族] 腿①：分布式连发形（EN）────────────────────────────
+// 存量 STREAK_EN_COUNT_RE 要求动词紧邻「数字+成功名词」（hit his last
+// five shots），不收 "has scored in each of the last four games" / "has
+// won each of the last three matches" 这种分布式每场连发形。
+const STREAK_EACH_EN = /\b(?:scored|won|hit|made|netted|sunk)\s+(?:\w+\s+){0,3}in\s+each\s+of\s+the\s+last\s+(?:\d+|two|three|four|five|six|seven|eight|nine|ten)\s+(?:games?|matches?|rounds?|contests?)\b/i;
+
+// ─── [r433 新增族] 腿②：势能延续行动词表（EN）─────────────────────────
+// 存量 CONTINUE_IMPLICIT_EN 收 keep feeding / do not change / ride it 等
+// 告诫形，不收「换人/续用」的行动面：strike while the iron is hot /
+// start him again / keep him in the lineup。竞技名词限定（lineup/game/
+// rotation）——不收裸 keep him in（会误收 keep her in mind / in the loop
+// 类良性转述）。
+const CONTINUE_ROUND_EN = [
+  'strike while the iron is hot', 'start him again', 'start her again',
+  'keep him in the lineup', 'keep her in the lineup',
+  'keep him in the game', 'keep her in the game',
+  'keep him in the rotation', 'keep her in the rotation',
+  'leave him in the game', 'leave her in the game',
+  'keep this run going', 'ride this run', 'keep the run alive',
+];
+
 // 豁免常量
 const META_NOUN = [
   '热手谬误', '热手效应', 'hot hand fallacy', 'hot hand effect', 'hot hand',
@@ -157,9 +213,20 @@ function checkHotHand(text) {
     matches.push({ route: 1, legA: '势头/连胜', legB: '延续断言' });
   }
 
-  // R2 英文：hot streak/momentum × continuation assertion
-  if ((has(STREAK_EN, lower) || STREAK_EN_RE.test(lower) || has(STREAK_IMPLICIT_EN, lower) || STREAK_EN_COUNT_RE.test(lower))
-    && (has(CONTINUE_EN, lower) || has(CONTINUE_IMPLICIT_EN, lower))) {
+  // R3 [r433 新族] 中文：存量势头腿 × 新轮换场次×势能行动腿（间隔形）
+  if ((has(STREAK_ZH, text) || STREAK_ZH_RE.test(text)) && CONTINUE_ROUND_ZH.test(text)) {
+    routes.add(3);
+    matches.push({ route: 3, legA: '势头/连胜', legB: '轮换场次×势能延续行动' });
+  }
+
+  // R2 英文（存量）+ [r433 新族] R4：腿①扩分布式连发形
+  // （STREAK_EACH_EN），腿②扩势能延续行动词表（CONTINUE_ROUND_EN）。
+  const enLegA = has(STREAK_EN, lower) || STREAK_EN_RE.test(lower)
+    || has(STREAK_IMPLICIT_EN, lower) || STREAK_EN_COUNT_RE.test(lower)
+    || STREAK_EACH_EN.test(lower);
+  const enLegB = has(CONTINUE_EN, lower) || has(CONTINUE_IMPLICIT_EN, lower)
+    || has(CONTINUE_ROUND_EN, lower);
+  if (enLegA && enLegB) {
     routes.add(2);
     matches.push({ route: 2, legA: 'hot streak', legB: 'continuation' });
   }
@@ -211,4 +278,4 @@ class HotHand {
   }
 }
 
-module.exports = { HotHand, checkHotHand, __internals: { STREAK_ZH, STREAK_ZH_RE, STREAK_IMPLICIT_EN, STREAK_EN_COUNT_RE, CONTINUE_ZH, CONTINUE_IMPLICIT_ZH, CONTINUE_IMPLICIT_ZH_RE, CONTINUE_EN, CONTINUE_IMPLICIT_EN, STREAK_EN, STREAK_EN_RE, META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT } };
+module.exports = { HotHand, checkHotHand, __internals: { STREAK_ZH, STREAK_ZH_RE, STREAK_IMPLICIT_EN, STREAK_EN_COUNT_RE, CONTINUE_ZH, CONTINUE_IMPLICIT_ZH, CONTINUE_IMPLICIT_ZH_RE, CONTINUE_EN, CONTINUE_IMPLICIT_EN, STREAK_EN, STREAK_EN_RE, META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT, CONTINUE_ROUND_ZH, STREAK_EACH_EN, CONTINUE_ROUND_EN } };

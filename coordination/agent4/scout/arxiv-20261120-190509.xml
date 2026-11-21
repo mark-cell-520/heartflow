@@ -1,0 +1,390 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/0NQc2GewEz5jDTt/0i93jm7RRyg</id>
+  <title>arXiv Query: search_query=all:epistemic OR all:circularity OR all:authority&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-20T19:05:10Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:epistemic+OR+(all:circularity+OR+all:authority)&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>78985</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26595v1</id>
+    <title>Coda-DaVinci: Reimagining Video Generation with Code2Video</title>
+    <updated>2026-11-19T18:51:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.26595v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26595v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Code2Video uses agent-authored 3D proxies to guide video generation, enabling explicit control over structure and dynamics. However, how to construct proxies and prompts for optimal downstream quality remains underexplored, as do the capabilities and limitations of this paradigm. Through controlled experiments and blinded human evaluation, we study proxy granularity, physics simulation, and prompting. The results reveal task-dependent trade-offs: coarse proxies favor natural motion, while medium-grained proxies favor consistency. Physics simulation and proxy-aligned prompting further improve average quality. Guided by these findings, we introduce Coda-DaVinci, a task-adaptive agentic framework for Code2Video generation that selects between proxy-guided and direct generation, adapts modeling granularity to each entity, and coordinates simulation with proxy-grounded prompting. Its multi-agent harness preserves scene assets and guides repairs through visual inspection and independent review. Experiments demonstrate leading instruction following on VTR and scene consistency on R2M, improved physical plausibility over direct generation, and higher visual realism than the compared Code2Video baselines. Long-video evaluations further show gains in event structure and consistency across successive interactions, while revealing limitations in transition stability and adherence to scene settings.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:51:58Z</published>
+    <arxiv:comment>47 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yiyan Ji</name>
+    </author>
+    <author>
+      <name>Qixun Wang</name>
+    </author>
+    <author>
+      <name>Yang Shi</name>
+    </author>
+    <author>
+      <name>Zhuoran Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Xu</name>
+    </author>
+    <author>
+      <name>Tengfei Liu</name>
+    </author>
+    <author>
+      <name>Yuqi Tang</name>
+    </author>
+    <author>
+      <name>Xiaohan Zhang</name>
+    </author>
+    <author>
+      <name>Shujie Li</name>
+    </author>
+    <author>
+      <name>Jiafu Tang</name>
+    </author>
+    <author>
+      <name>Xuanyu Zhu</name>
+    </author>
+    <author>
+      <name>Xinyu Liu</name>
+    </author>
+    <author>
+      <name>Yan He</name>
+    </author>
+    <author>
+      <name>Yushuo Guan</name>
+    </author>
+    <author>
+      <name>Zihao Wang</name>
+    </author>
+    <author>
+      <name>Xianghua Ying</name>
+    </author>
+    <author>
+      <name>Shixuan Liu</name>
+    </author>
+    <author>
+      <name>Haotian Wang</name>
+    </author>
+    <author>
+      <name>Wenjing Yang</name>
+    </author>
+    <author>
+      <name>Zhaoxiang Zhang</name>
+    </author>
+    <author>
+      <name>Yuanxing Zhang</name>
+    </author>
+    <author>
+      <name>Pengfei Wan</name>
+    </author>
+    <author>
+      <name>Jiaheng Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26583v1</id>
+    <title>A Success Model at the End of Its Life Cycle: 30 Years of Regionalised Regional Rail in Germany</title>
+    <updated>2026-11-19T18:43:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.26583v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26583v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On 1 January 1996, Germany transferred responsibility for regional passenger rail services from the federal government to the states. Three decades later, passenger-kilometres have doubled and competitive tendering has lowered operating costs substantially, making regionalisation the most successful element of the German rail reform. Its organisational model, however, has reached the end of its life cycle: tenders now attract on average only 1.3 bids, 26 contracting authorities and some 60 transport associations maintain overlapping structures, rolling-stock procurement has repeatedly shifted risk onto passengers, and since the Court of Justice of the European Union struck down the German track-access charge cap in 2026, funding no longer covers the ordered service volume. This article reviews the motives and results of regionalisation, identifies three structural design flaws, and argues for a second reform: consolidating authorities, standardising rolling stock, deciding between a repaired market model and integrated public operation, and indexing funding to real infrastructure cost development. The submission contains an English translation followed by the German original.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:43:47Z</published>
+    <arxiv:comment>English translation followed by the German original (Erfolgsmodell am Lebenszyklusende: 30 Jahre Regionalisierung des Schienenpersonennahverkehrs). 15 pages, 6 figures. Extended version with full reference list of an article published in abridged form in BAHN-REPORT 5/2026. English translation prepared with AI assistance and reviewed by the author</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Lukas Iffländer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26578v1</id>
+    <title>Activity-driven motion and deformation of a circular membrane domain</title>
+    <updated>2026-11-19T18:42:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.26578v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26578v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Lipid bilayer membranes are nanometer-thin fluid interfaces characterized by both in-plane fluidity and lateral compositional heterogeneity. Cholesterol-rich liquid domains ("lipid rafts") are thought to regulate the spatial organization of membrane proteins and numerous cellular processes. While the passive diffusion and equilibrium shape fluctuations of membrane domains are well understood, much less is known about how the activity of molecular machines, such as protein pumps and enzymes, influences their mobility and deformation. Here, we analyze the dynamics of a membrane domain driven by an embedded molecular machine within the framework of two-dimensional Stokes flow. The molecular machine is modeled as a point singularity of the two-dimensional Stokes equations, including both rotational and irrotational singularities corresponding to force and source multipoles. We show that, despite being force-free, both force and source dipoles generate active flows that propel the membrane domain. For a force dipole undergoing rotational diffusion, the domain motion is diffusive at long times but exhibits a transient superdiffusive regime at intermediate times.</summary>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:42:52Z</published>
+    <arxiv:primary_category term="cond-mat.soft"/>
+    <author>
+      <name>Gonzalo Ferrandez Quinto</name>
+    </author>
+    <author>
+      <name>Sho Kawakami</name>
+    </author>
+    <author>
+      <name>Petia M. Vlahovska</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26513v1</id>
+    <title>Hypergraph Hajnal-Szemerédi</title>
+    <updated>2026-11-19T17:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.26513v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26513v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A seminal result of Hajnal and Szemerédi from 1970 asserts that every graph on $n$ vertices with $q\;|\;n$ and minimum degree at least $\Big(1-\frac{1}{q}\Big)n$ admits a $K_q$-factor (a collection of vertex-disjoint copies of $K_q$ spanning all vertices). There has been sustained interest in extending this result to hypergraph $K_q^r$-factors. For general $q$ and $r$, Lu and Székely in 2007 showed that every large enough, $r$-graph $G$ with $q\mid v(G)$ and $δ_{r-1}(G) \ge \left(1- \frac{c}{q^{r-1}}\right)v(G)$ admits a $K_q^r$-factor (where $c$ is a constant depending on $r$ but not $q$), and there have been various subsequent improvements to the constant (but not the order) of this bound over the ensuing decades. Meanwhile, results from codegree Turán theory show that $δ_{r-1}(G) \ge \left(1 - \frac{c \cdot \log q}{q^{r-1}} \right)v(G)$ is necessary.
+  Surprisingly, our main result shows that the order of this upper bound is not correct and, in fact, the codegree $K_q^r$-factor threshold is much closer to this codegree Turán theory bound. In particular, we show that $δ_{r-1}(G) \ge \left( 1-c\cdot \frac{\log^{1-1/(r-1)}q}{q^{r-1}}\right)v(G)$ suffices for the existence of a $K_q^r$-factor. Our key contribution is showing the same is true for the fractional threshold. Inspired by the first and fourth author's recent proof of the Nash-Williams' Conjecture, we accomplish this by combining a linear programming framework with ideas from discharging. Additionally, we establish a technical result about finding large independent sets in sparse, non-uniform hypergraphs, which may be of independent interest.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T17:58:38Z</published>
+    <arxiv:comment>26 pages plus references and appendix</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Michelle Delcourt</name>
+    </author>
+    <author>
+      <name>Cicely Henderson</name>
+    </author>
+    <author>
+      <name>Thomas Lesgourgues</name>
+    </author>
+    <author>
+      <name>Luke Postle</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26486v1</id>
+    <title>Lagrangian transport driven by travelling waves in a radially deforming circular cavity</title>
+    <updated>2026-11-19T17:42:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.26486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A travelling deformation of a circular cavity wall can carry particles with the wave or against it. For two counter-propagating waves of azimuthal order $m$ and amplitudes $a$ and $b$, the leading axisymmetric component of the total (Lagrangian) drift scales with the intensity difference $S_3=|a|^2-|b|^2$. We obtain the radial profile of the azimuthal drift in closed form in the viscous limit, where the Womersley number $\mathrm{Wo}$ tends to zero, and by quadrature for any finite $\mathrm{Wo}&gt;0$. The total drift is the sum of the Eulerian mean velocity and the Stokes drift. For radial wall motion with $m\ge2$ and unequal wave intensities, the total drift follows the stronger of the two waves throughout the interior in the viscous limit, although the Stokes drift changes sign with radius for all $\mathrm{Wo}$. For $m=2$ and large $\mathrm{Wo}$, the predicted total drift just inside a radially moving wall opposes the wave to leading order in wall amplitude. For the same travelling shape, the total drift there follows the wave when the wall material also moves tangentially to preserve local arc length to first order. For the radial wall at large $\mathrm{Wo}$, the near-wall profile consists of the planar Longuet-Higgins result and a closed-form curvature correction. At large $m$ the core rotation approaches Tuck's finite-Reynolds-number waving-sheet result. At $m=2$ and $\mathrm{Wo}^2=10$, moving-domain simulations recover the leading-order drift coefficients for both wall motions.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T17:42:40Z</published>
+    <arxiv:comment>Includes supplementary material</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Zijian Liu</name>
+    </author>
+    <author>
+      <name>Julian Olszewski</name>
+    </author>
+    <author>
+      <name>Jie Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26477v1</id>
+    <title>Nonlinear Fourier series</title>
+    <updated>2026-11-19T17:37:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.26477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We survey aspects of nonlinear Fourier series as presented in the 2026 Brouwer lecture by the second author. The fast nonlinear Fourier expansion mentioned in the lecture is further elaborated in joint work with the first author.</summary>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T17:37:23Z</published>
+    <arxiv:comment>10 pages with 3 figures, and another page of references</arxiv:comment>
+    <arxiv:primary_category term="math.CA"/>
+    <author>
+      <name>Michel Alexis</name>
+    </author>
+    <author>
+      <name>Christoph Thiele</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26394v1</id>
+    <title>Nonequilibrium Statistical Mechanics: Physical Concepts &amp; Mathematical Tools</title>
+    <updated>2026-11-19T16:46:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.26394v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26394v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As anything not in equilibrium is, by definition, nonequilibrium, there is no universally agreed-upon set of topics that can constitute an exhaustive presentation of nonequilibrium statistical mechanics. At the same time, nonequilibrium statistical mechanics has transcended traditional physics to become a powerful language for complex systems. Prompted by an enthusiastic curiosity about complex systems, these cursory lecture notes attempt to elucidate some introductory concepts and techniques used in classical nonequilibrium statistical mechanics, which find successful applications not only in foundational physics, but also across other fields such as biology, ecology, economics, and sociology. Except for the specific synthesis and presentation of the material, which assumes basic familiarity with equilibrium statistical mechanics, the author claims no originality.</summary>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.class-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T16:46:00Z</published>
+    <arxiv:comment>Lecture-notes of a one-semester course taken by advanced undergraduate and postgraduate physics students of IIT Kanpur, India. 115 pages, 18 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.stat-mech"/>
+    <author>
+      <name>Sagar Chakraborty</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26372v1</id>
+    <title>Lower-Mass Giants Can Spare Inner Planets during High-Eccentricity Migration</title>
+    <updated>2026-11-19T16:35:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.26372v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26372v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The survival of an inner planet next to a close-in giant is commonly used to argue against high-eccentricity migration (HEM), because the eccentric giant is expected to destabilize the inner system. Existing survival calculations have concentrated on Jupiter-mass migrants, although several Jupiter-sized close-in giants with nearby companions have sub-Jovian masses. We use dissipative three-body integrations to measure the collision-survival boundary at seven giant masses from $0.25$ to $1.0,M_{\rm Jup}$ and combine it with uncompressed equilibrium-tide circularization times. At fixed physical periapse, lower giant mass weakens the forcing of the inner orbit and shifts the survival boundary inward. It also shortens the circularization time for a common radius and tidal prescription. These dynamical and tidal limits enclose a viable HEM region in which a sub-Jovian giant can circularize within a system age while retaining an ultra-short-period companion. We screen known companion-hosting close-in giants and perform system-specific integrations of WASP-132; every current candidate lies outside the region. A future system inside it would show directly that HEM can produce a close-in giant while preserving an inner planet, converting companion survival into positive evidence for this formation channel.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T16:35:02Z</published>
+    <arxiv:comment>9 pages, 3 figures, 1 table; submitted to ApJL</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Qunfeng Jiang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26265v1</id>
+    <title>Oscillatory integral operators of arbitrary signature: beyond the universal estimates</title>
+    <updated>2026-11-19T15:35:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.26265v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26265v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider Hörmander oscillatory integral operators on $\mathbb{R}^n$. In particular, we are interested in proving bounds with dependence on the signature of the phase. The sharp universal range of $L^p\to L^p$ estimates was obtained for any given signature by the second author and Iliopoulou. Under the mild non-compression hypotheses on the phase introduced in Chen et al., we prove $L^p\to L^p$ estimates that go beyond this universal range in odd dimensions. We also obtain the sharp universal range of $L^p\to L^q$ estimates for odd $n$. The techniques are based on the breakthrough work of Wang--Wu on the Fourier restriction conjecture.</summary>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T15:35:21Z</published>
+    <arxiv:comment>42 pages</arxiv:comment>
+    <arxiv:primary_category term="math.CA"/>
+    <author>
+      <name>Fernando Ballesta-Yagüe</name>
+    </author>
+    <author>
+      <name>Jonathan Hickman</name>
+    </author>
+    <author>
+      <name>Hrit Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26229v1</id>
+    <title>Sharp topological overlap in every dimension</title>
+    <updated>2026-11-19T15:04:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.26229v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26229v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For a positive integer $d$ let $c_d^{\mathrm{top}}$ (resp. $c_d^{\mathrm{aff}}$) be the maximum $c$ such that, for every continuous (resp. affine) map from the $n$-dimensional simplex $Δ^n$ to $\mathbb{R}^d$, some point of $\mathbb{R}^d$ lies in the images of at least $(c-o(1))\binom{n+1}{d+1}$ of the $d$-dimensional faces, as $n\to\infty$. We show that \[
+  c_d^{\mathrm{top}}=c_d^{\mathrm{aff}}=\frac{(d+1)!}{(d+1)^{d+1}}. \] The second equality confirms a conjecture of Bukh, Matoušek, and Nivasch, who established the upper bound.
+  The proof was found by GPT-6 Astra, following the directions of the author.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T15:04:17Z</published>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Sergey Norin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26227v1</id>
+    <title>Federated Learning for Unmanned Aerial Systems: A Screened Bibliometric Census of an Emergent Sub-Literature</title>
+    <updated>2026-11-19T15:02:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.26227v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26227v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We census the literature at the intersection of federated learning (FL) and unmanned aerial systems (UAS) with a broad Scopus query that combines FL, UAV, and delivery/logistics terms (Computer Science and Engineering, 2022--2026). The export holds \textbf{14,965 records}, but only \textbf{7.9\%} of the 14,945 unique records mention both an FL term and a UAV term in title, abstract, or author keywords. That screen leaves \textbf{1,185 records}: 90 in 2022, 361 in 2025, and 332 already indexed for 2026. The screened share of each year's raw output stays near 7.5\%, so the growth is not an artefact of the screen. Term-definition, document-type, and complete-year checks leave the leading venue (\emph{IEEE Internet of Things Journal}, 111 papers, $h{=}30$) and the leading country (China, 628 affiliation instances) unchanged. A manual read of 30 records finds 14 of 26 full papers (54\%, 95\% CI 35--71\%) substantively about FL for UAVs, so the corpus counts keyword co-occurrence, not only focused work. Counting authors by Scopus ID gives 4,095 authors with Lotka exponent $n{=}3.15$ ($R^2{=}0.996$); name strings would merge distinct people and understate the author count by 31\%. An OpenAlex export under the same screen yields 147 records, 74\% of them in the Scopus corpus, but the two exports are not matched populations, so we do not read the volume gap as coverage alone. Finally, of 228 records with a delivery-adjacent term, only 5 (2.2\%) mention \emph{parcel}, \emph{last-mile}, or \emph{courier} (14, or 6.1\%, if \emph{package} counts); the rest reflect transportation, traffic, and generic-logistics idiom. Keyword screening alone therefore cannot isolate last-mile drone-delivery research from the surrounding UAV-networking literature.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T15:02:49Z</published>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Ameen Ur Rehman</name>
+    </author>
+    <author>
+      <name>Ali Nasir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26220v1</id>
+    <title>Spherical Tessellation of Circular Arrays for Massive MIMO: Favourable Propagation Conditions and Spectral Design</title>
+    <updated>2026-11-19T15:00:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.26220v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26220v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Upper-mid-band XL-MIMO can exploit line-of-sight propagation, but periodic uniform cylindrical arrays may produce grating ridges. We analyse a spherically tessellated concentric circular antenna array with non-separable facet orientations. Under fixed normalised chord spacing and ideal facet visibility, we prove that user channels become asymptotically orthogonal and matched-filter SINR approaches the single-user SNR. Simulations confirm interference decay and SINR convergence. A spectral comparison shows that facet-normal diversity prevents the full-amplitude grating ridges of the cylindrical baseline, with the inter-facet residual decaying with array size.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T15:00:07Z</published>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Geili T A El Sanousi</name>
+    </author>
+    <author>
+      <name>Tuan Anh Le</name>
+    </author>
+    <author>
+      <name>Raed A A Abd-Alhameed</name>
+    </author>
+    <author>
+      <name>Xin-She Yang</name>
+    </author>
+    <author>
+      <name>Huan X Nguyen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26216v1</id>
+    <title>Frontier models need only one text to unmask its human or AI author</title>
+    <updated>2026-11-19T14:56:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.26216v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26216v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Given a single text and a simple zero-shot prompt (no web access, tools, candidate lists, or writing samples), frontier models can answer "who wrote this?" at three increasingly specific levels: (1) whether an AI or human wrote it, (2) if an AI, which lab, and (3) if a human, often exactly who. The latest models (Claude Fable 5.2, GPT-6.1 Sol, Gemini 4 Carbon) match trained detectors like Pangram while also explaining their predictions in natural language, and Opus 5.5 names the correct lab for 98% of texts generated by models from Anthropic, OpenAI, and Google. Most strikingly, Fable 5.2 correctly names the author of 39% of public peer reviews published in Oct-Nov 2026 (78% on a subset of reviews from Nature), and identifies the username behind 69% of comments from active Redditors (with &gt;500 posts over the last year). Accuracy depends on exposure to an author's writing in pretraining data and on reasoning effort, and simply asking a model how familiar it is with someone predicts whether it can identify their writing. For anyone who has published enough writing online, frontier models present a greater threat to anonymity than commonly assumed, and defenses are limited.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T14:56:21Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Atrey Desai</name>
+    </author>
+    <author>
+      <name>Deniz Böloni-Turgut</name>
+    </author>
+    <author>
+      <name>Ty Brassington</name>
+    </author>
+    <author>
+      <name>Minjoon Choi</name>
+    </author>
+    <author>
+      <name>Jenna Russell</name>
+    </author>
+    <author>
+      <name>Rishanth Rajendhran</name>
+    </author>
+    <author>
+      <name>Bradley Emi</name>
+    </author>
+    <author>
+      <name>Hila Gonen</name>
+    </author>
+    <author>
+      <name>Hal Daumé</name>
+    </author>
+    <author>
+      <name>John Wieting</name>
+    </author>
+    <author>
+      <name>Marzena Karpinska</name>
+    </author>
+    <author>
+      <name>Mohit Iyyer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26138v1</id>
+    <title>Log-periodic radiation cores and light rings in pure quadratic bulk gravity</title>
+    <updated>2026-11-19T13:56:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.26138v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26138v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In the pure quadratic model of the Böhmer--Jensko bulk--boundary formulation of gravity, every static metric with a regular centre has vanishing central density and pressure, so no affine equation of state admits a regular non-vacuum star. We therefore study singular cores, in scale-invariant variables in which the isotropy condition is a single autonomous relation between two functions. Closures that keep the self-similar solutions as equilibria fix the stability of two vacuum lines but leave that of the matter-bearing equilibria undetermined, except at one unphysical point, so only an equation of state yields definite dynamics. For a linear equation of state the closed system has a focus, a saddle, and a vacuum point with nonzero bulk scalar that exchanges stability with the saddle in a transcritical bifurcation. At the radiation value the system is integrable, through the Tolman integral and scale invariance, and the focus becomes a nonlinear centre surrounded by log-periodic solutions. Radiation is also exactly where the line containing the matter-bearing equilibria of this closure coincides with the line of circular null orbits. Consequently every periodic radiation core with monotonic areal radius has exactly one stable and one unstable light ring per period, at radii forming two interlaced geometric progressions towards the centre with a common ratio tending to 2.165 for small oscillations. In the optical geometry the self-similar solution is a cylinder and each core a periodic tube, whose bulges and necks carry these rings. MIT bag-model configurations whose cores approach these orbits inherit this structure.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T13:56:11Z</published>
+    <arxiv:comment>20 pages, 8 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Sudan Hansraj</name>
+    </author>
+    <author>
+      <name>Rio Bissessur</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26052v1</id>
+    <title>Do Network Mechanisms in Science Vary Across Research Topics? Contextual Relational Hyperevent Models for Large-Scale Bibliometric Data</title>
+    <updated>2026-11-19T12:59:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.26052v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26052v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Collaboration and citation networks in science are shaped by well-documented mechanisms such as preferential attachment, gender homophily, and self-citation. Whether these mechanisms operate uniformly across research areas, however, is rarely tested, because statistical network models that estimate several mechanisms jointly are difficult to apply to large bibliometric data and to compare across subnetworks. We introduce contextual relational hyperevent models (C-RHEMs), which extend relational hyperevent models by allowing network effects to vary across research topics within a single model. C-RHEMs treat each publication as one event linking its authors to its references, accommodate reference lists spanning several topics, and scale to hundreds of thousands of publications on standard hardware. In a second step, meta-analysis and meta-regression quantify heterogeneity in topic-specific effects and relate it to topic characteristics. We illustrate the approach with about 590,000 oncology publications from the PubMed Knowledge Graph, assigned to 32 OpenAlex research topics. We find that preferential attachment, gender homophily, and self-citation vary substantially across topics, with between-topic standard deviations of 30 to 70 percent of the corresponding pooled effects. Topic age, size, and gender composition account for between a third and two-thirds of this variation: older topics exhibit stronger preferential attachment, self-citation, and gender homophily, and topics with a higher share of male authors exhibit stronger self-citation. The results caution against treating network mechanisms estimated on pooled data as uniform, and C-RHEMs offer a scalable way to study how they differ across research areas.</summary>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T12:59:09Z</published>
+    <arxiv:primary_category term="cs.DL"/>
+    <author>
+      <name>Jürgen Lerner</name>
+    </author>
+    <author>
+      <name>Mark Wittek</name>
+    </author>
+    <author>
+      <name>Raphael Heiberger</name>
+    </author>
+  </entry>
+</feed>

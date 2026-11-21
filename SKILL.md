@@ -77,12 +77,12 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.215. Nothing here is copied
+Every number below was measured on this repository at v6.8.216. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.215 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.216 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265 + r293) | 11 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js` (r265 added `uniqueness_flattery` + `unconditional_deference`; r293 added `echo_validation` / `deference_to_expertise` / `enthusiastic_escalation` / `apology_concession` as two-leg co-occurrence families via `_cooccur()`, 7→11); not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Gate-path sycophancy families (r283) | ZH 7 / EN 10 | `ZH_SIGNALS` + `EN_SIGNALS` families in `src/index.js` — r283 added `uniqueness_flattery` (comparative flattery × a disparaged reference group) and `unconditional_deference` (handing over independent judgment to the addressee) to **both** languages; before r283 ZH family A missed 10/10 attack samples |
 | Modules registered | 169 | `Object.keys(hf._modules).length` after `start()` |
@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,390 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 276 | `dimMap` keys in `src/index.js` |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
-| Test suite | 25,672 passing / 233 failing | `node test/run-all.js`（r431 全量实测 25,672/233/25,905（869 文件）——较 r430 终值基线（868 文件 25,598/233/25,831）passed +74 全部为本轮 test/round-431-selection-selfpoll-popularity.test.js 的 74 条断言、failed +0 零新增（selection_bias 扩族不新增失败，文件级硬失败清单与基线逐项相同零退化））|
+| Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |

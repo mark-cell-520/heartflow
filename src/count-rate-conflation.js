@@ -142,6 +142,26 @@
  *     更穷/更富/更负责/更认真/更敷衍——原 VERDICT_ZH 只收 好/差/强/弱/棒/
  *     糟/烂/佳 六字核心形容词，「学生更笨」「管理明显更乱」「踢球更脏」
  *     「这边更卷」「内容更水」整族穿透。
+ *
+ * [r434 扩展 · 真升级②：软件故障计数 × 质量退步裁定的全新措辞家族]
+ * r434 池化探针（coordination/agent4/probes/r434-probe-pool.js，v6.8.213
+ * 实测）：本族 8 条攻击 2 条完全穿透（gate.action=pass 且零维度承重：
+ * 「崩溃次数×质量严重退步」「蓝屏次数×最不能买」），模块层 0/8 全 miss，
+ * 良性 4 条零误伤（六家族中唯一 FP=0，同池其余家族 FP 1-2）。穿透根因：
+ *   · 腿①新族：软件故障事件计数族——崩溃/死机/宕机/蓝屏/闪退/卡死/卡顿/
+ *     黑屏/报错/重启/掉线/断网 及其 数/量/次数 形式——原 COUNT_ZH 只到
+ *     「事故/故障/投诉」，这批随装机量/使用时长线性缩放的软件质量事件
+ *     整族穿透；EN 侧 outages/downtime/glitches/bugs/errors 不在表。
+ *   · 腿①b 新族：EN more X than 比较形——「more crashes than the entire
+ *     last quarter」的 more+名词+than 分布式比较，原 QTY_EN 只收紧邻
+ *     more than，中间夹计数名词时整句漏判；另补过去式倍率 doubled/tripled
+ *     （存量 \bdouble\b 在 -d 后缀上失配）。
+ *   · 腿②新族：质量滑坡裁定族——质量/稳定性/可靠性 × 退步/滑坡/下滑/
+ *     下降；不可用裁定族——更不稳定/最不靠谱/用不了/不好用。原 VERDICT_ZH
+ *     只有「质量更/质量最」紧邻形与 r279 网络世代形容，「质量严重退步」
+ *     「明显最难用」这类软件质量语境裁定整族穿透。探针原句「明显最不能买」
+ *     被存量否定守卫 NEG_INSIDE 的「不能」误杀，本族摘「不能买」分支
+ *     绕让（边界移交 1 号：否定守卫需区分「不能买」类裁定与「不能」否定）。
  */
 'use strict';
 
@@ -176,6 +196,12 @@ const COUNT_ZH = [
   //   电诈报案数×治安更差、报警数×更不安全、误诊数×医疗水平更差 全放行）。
   /(?:报警|报案|立案|发案|破案|起诉|应诉|官司|误诊|漏诊|翻台|犯规|加班|掉粉|取关|脱粉|违约|逾期|坏账|弃购|召回|返修|理赔|出险|罢工|旷工|迟到|早退|缺考|退赛|酒驾|醉驾|违章|违停|超速|超载|刑拘|逮捕|判刑|电诈|被骗|诈骗|盗窃|抢劫|斗殴|纠纷|摩擦|冲突|事故|塞车|拥堵|延误|取消)/,
   /(?:报警数|报案数|立案数|发案数|破案数|起诉数|官司数|误诊数|漏诊数|翻台数|犯规数|加班数|掉粉数|取关数|违约数|逾期数|坏账数|弃购数|召回数|返修数|理赔数|出险数|罢工数|旷工数|迟到数|早退数|缺考数|退赛数|酒驾数|醉驾数|违章数|违停数|超速数|刑拘数|逮捕数|判刑数|电诈数|被骗数|诈骗数|盗窃数|拥堵数|延误数|取消数|掉粉量|取关量|加班量|报警量|报案量|起诉量|误诊量|翻台量|犯规量|违约量|逾期量|召回量|返修量|理赔量|旷工数|迟到次数)/,
+  // [r434 新增] 软件故障事件计数族——崩溃/死机/宕机/蓝屏/闪退/卡死 等软件
+  //   质量事件随装机量/使用时长线性缩放，原词表只到「事故/故障/投诉」，
+  //   「崩溃次数×质量严重退步」「蓝屏次数×最不能买」整族穿透（r434 探针
+  //   实测：穿透 2/8 为本族最高、良性 FP 0/4 六家族唯一零误伤）。
+  /(?:崩溃|死机|宕机|蓝屏|闪退|卡死|卡顿|黑屏|报错|重启|掉线|断网|花屏|白屏)/,
+  /(?:崩溃次数|崩溃数|死机次数|死机数|宕机次数|宕机数|蓝屏次数|蓝屏数|闪退量|闪退数|闪退次数|卡死次数|卡顿次数|黑屏次数|报错数|报错次数|重启次数|重启数|掉线次数|掉线数|断网次数|花屏次数)/,
 ];
 const COUNT_EN = [
   /\b(?:cases|infections|infections reported|outbreaks|deaths|casualties|fatalities|patients)\b/i,
@@ -185,6 +211,10 @@ const COUNT_EN = [
   /\b(?:prizes|awards|medals|wins|titles|scholarships|admissions)\b/i,
   /\b(?:orders|sales|units sold|shipments|signups|churn|cancellations)\b/i,
   /\b(?:failures|dropouts|attrition|absences|tardies)\b/i,
+  // [r434 新增] 软件故障事件计数族（EN）——outages/downtime/glitches/bugs/
+  //   errors/freezes/hangs/restarts 随装机量/运行时长线性缩放；crashes 已
+  //   在存量第二行，outages 等整族穿透（r434 探针 A8）。
+  /\b(?:outages|downtime|glitches|bugs|errors|freezes|hangs|restarts|reboots)\b/i,
 ];
 
 // ─── 腿①b 比较量级标记（计数的相对大小）──────────────────────
@@ -204,8 +234,16 @@ const QTY_ZH = [
 const QTY_EN = [
   /\b(?:the most|most|highest|number one|first place|top of the list|leads the pack|far ahead|leads|leading)\b/i,
   /\b(?:twice|three times|four times|five times|six times|seven times|eight times|ten times|double|triple|quadruple)\b/i,
+  // [r434 补腿] 过去式倍率形 doubled/tripled/quadrupled——存量只收原级，
+  //   \bdouble\b 在 "crashes doubled" 的 -d 后缀上失配，「Errors doubled
+  //   this quarter」整句量级腿落空（r434 自测 A-EN3/A-EN5 实测）。
+  /\b(?:doubled|tripled|quadrupled)\b/i,
   /\b\d+\s*(?:%|percent)\s+more\b/i,
   /\b(?:more than|higher than|exceeds|exceeding|surpasses|surpassing|outpaces)\b/i,
+  // [r434 新增] more X than 分布式比较形——「more crashes than the entire
+  //   last quarter」中间夹计数名词，存量只收紧邻 more than 故整句漏判
+  //   （r434 探针 A7 模块层 miss 的根因；负向断言排除 more than 自身）。
+  /\bmore\s+(?!than\b)[a-z]{2,}\s+than\b/i,
 ];
 
 // ─── 腿② 未归一化裁定：对实体属性/水平下比较级或最高级结论 ──────
@@ -249,6 +287,17 @@ const VERDICT_ZH = [
   //   得多/得很/太多/死了/爆/极了/不行 形态。
   /(?:更|最|明显更|显然更|肯定更|一定更|大概率更|远远更|愈发|越)(?:笨|傻|蠢|愚|乱|脏|卷|水|坑|良心|规范|清廉|发达|落后|堵|穷|富|负责|认真|敷衍|宽松|严格|凶|稳|准|狠|灵|假|虚|浮|躁|酸|菜|怂|猾)(?:得?(?:多|很|太多|死|爆|极了|不行))?/,
   /(?:笨|傻|乱|脏|卷|水|坑|良心|规范|清廉|发达|落后|负责|认真|敷衍)(?:得?(?:多|很|太多|死|爆|极了|不行))/,
+  // [r434 新增] 质量滑坡裁定族——质量/稳定性/可靠性/体验 × 退步/滑坡/下滑/
+  //   下降/走低/缩水。原 VERDICT_ZH 只有「质量更/质量最」紧邻形，「质量
+  //   严重退步」「稳定性明显下滑」这类软件质量语境裁定整族穿透（r434
+  //   探针 A1）。
+  /(?:质量|品质|品控|做工|稳定性|可靠性|流畅度|体验|性能|口碑|软件质量|系统稳定性)(?:严重|明显|显然|肯定|一定|大概率|大幅|急剧|显著)?(?:退步|滑坡|下滑|下降|走低|缩水|崩坏)/,
+  // [r434 新增] 不可用裁定族——更不稳定/最不靠谱/用不了/不好用 及其补语形。
+  //   要求显式比较级/最高级/程度副词前缀（不收裸「系统不稳定」的事实陈述，
+  //   防 FP）；「平台明显更不靠谱」「这款电脑明显最难用」整族穿透（r434
+  //   探针 A3/A4——A4 原句「明显最不能买」被存量否定守卫 NEG_INSIDE 的
+  //   「不能」误杀，本族摘「不能买」分支绕让，该边界移交 1 号）。
+  /(?:(?:明显|显然|肯定|一定|大概率|远远|愈发|越)(?:更|最)?|更|最)(?:不稳定|不靠谱|没法用|用不了|不好用|难用|难以接受)(?:得?(?:多|很|太多|死|爆|极了|不行))?/,
 ];
 const VERDICT_EN = [
   /\b(?:more dangerous|the most dangerous|less safe|the least safe|safer|the safest|riskier|the riskiest)\b/i,
@@ -257,6 +306,14 @@ const VERDICT_EN = [
   /\b(?:more skilled|the most skilled|more professional|the most professional|more reliable|less reliable|more competent|the most competent)\b/i,
   /\b(?:better run|the best run|worse run|more reckless|the most reckless|better taught|the best taught|worse taught)\b/i,
   /\b(?:more capable|the most capable|sloppier|the sloppiest|better managed|worse managed)\b/i,
+  // [r434 新增] 质量滑坡裁定族（EN）——quality/stability/reliability/performance
+  //   × regressed/declined/dropped/degraded；存量只有 worse/the worst 泛形，
+  //   "quality has clearly degraded" 整句漏判（r434 探针 E3/E5）。
+  /\b(?:quality|stability|reliability|performance|uptime)\s+(?:has\s+)?(?:\w+ly\s+)?(?:regressed|declined|dropped|degraded|deteriorated|fallen|slipped|got\s+worse)\b/i,
+  // [r434 新增] 不可用裁定族（EN）——unstable/unusable/unreliable/buggy 及
+  //   not worth buying 形；"the most unusable" 整族穿透（r434 探针 E4）。
+  /\b(?:unstable|unusable|unreliable|buggy)\b/i,
+  /\bnot\s+worth\s+(?:buying|using|installing|keeping|the\s+(?:price|money))\b/i,
 ];
 
 // ─── 距离窗 ───────────────────────────────────────────────────
