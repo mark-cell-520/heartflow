@@ -146,6 +146,23 @@
  *   · EXEMPT_NEG_ZH += 要求补证据族（还要看/需要看/待观察/以长期）——
  *     良性「需要看同期大盘再下结论」探针实测误伤，属设计既有豁免族的
  *     同族扩展（主动要求对照窗口是正确判别姿态），非迁就代码
+ *
+ * [v6.8.216 — r439 必然性断言族] 新增「极端×反向断言必然化」新措辞家族
+ * （真升级②，live 生效，src/index.js 零改动、维度计数不变、VERSION 不
+ * bump，同 r406-r436 扩族先例）。族形态=「低位/高位极端 × 回升/回落断言
+ * × 必然化断言」三腿同一叙事窗（ZH 40 / EN 120），方向配对（低位×回升 /
+ * 高位×回落）内置于表格设计；存量不收的原因：主判据要干预腿+归因腿、
+ * r300 反馈族要表扬/批评干预腿、r302 负向族要干预腿、r435 魔咒族要魔咒
+ * 命名腿——本族是无干预无魔咒命名的裸因果铁律形（谷底必反弹/爆火必扑街/
+ * 连涨必跌）。r439 池化探针（coordination/agent4/probes/r439-probe-pool.js
+ * + r439-probe-round2.js，v6.8.216 未改引擎前 gate() 全量 findings + 模块
+ * 层实测）：ZH 攻击 7/7 完全穿透（gate=pass 零维度承重、模块层 0/10 全
+ * miss），EN 3 条由存量维度代拦、模块层同样 miss，良性 6 条中 2 条被存量
+ * 维度代拦且本维零承重。独立四表双腿路由（不并入存量数组——EXTREME_ 与
+ * REG_ 系列有 round-265 登记断言 length===N），与主判据/反馈族/负向族/魔咒
+ * 族并行；全局豁免在 checkRegressionToMean 入口统一先判，本族同享；另设
+ * 族级否定守卫（必然断言前窗否定词/后窗反驳短语在场不判，同 r435 范式）。
+ * 轮测 test/round-437-inevitability-assertion.test.js。
  */
 'use strict';
 
@@ -407,6 +424,69 @@ const JINX_NAME_EN = [
   /\b(?:jinx|curse|hex|hoodoo|voodoo|syndrome)\b/i,
   /\b(?:never\s+fails?|strikes\s+again|struck\s+again|is\s+real|no\s+escape|nobody\s+escapes?|no\s+one\s+escapes?|can'?t\s+escape|cannot\s+escape|unavoidable|inevitable|always\s+hits|hits\s+everyone|doomed)\b/i,
   /\b(?:cursed|jinxed|haunted)\b/i,
+];
+
+// ─── [r439 新族] 「极端×反向断言必然化」族常量（真升级②，独立成组）────────
+// 回归均值的「铁律化」形态：把极端值后的自然回归说成反向极端的必然应验
+// （谷底必反弹/爆火必扑街/连涨必跌/物极必反），不借助任何干预叙事，也不
+// 借助魔咒命名（r435 族射程）——落点是「规律/注定/逃不过」式必然断言。
+// r439 池化探针实测：存量主判据（干预×归因四腿）、r300 反馈族（表扬/批
+// 评干预腿）、r302 负向族（干预腿）、r435 魔咒族（魔咒命名腿）对本族
+// 攻击样本全部 miss——四处射程缺口在 HEAD v6.8.216 上逐条确认。
+// 本族为独立四表双腿路由（低位×回升 / 高位×回落，方向配对内置于表格设
+// 计，同 r435 魔咒族 JINX_EXT 高位专表×JINX_REG 回落专表范式；不并入存量
+// 数组——EXTREME_ 与 REG_ 系列有 round-265 登记断言 length===N），与主判
+// 据/反馈族/负向族/魔咒族并行，命中即 hit。全局豁免（概念教学/实验证据/
+// 推理否定/对冲/疑问）在 checkRegressionToMean 入口统一先判，本族同享；
+// 另设族级否定守卫（必然断言前窗否定词/后窗反驳短语在场不判，同 r435
+// 范式）。
+
+// 腿①' 低位极端（中文）：谷底/连败/惨败形（回升预测的基线）
+const INEV_LOW_ZH = [
+  /谷底|垫底|低谷|触底|见底|探底|至暗时刻|冰点|连败|连输|连跪|连败纪录|一败涂地|溃不成军|惨败|差到离谱|糊穿地心|烂到家|一塌糊涂|亮红灯|腰斩|膝盖斩/,
+];
+// 腿①'' 高位极端（中文）：爆火/连涨/辉煌形（回落预测的基线）
+const INEV_HIGH_ZH = [
+  /巅峰|顶点|峰值|登顶|夺冠|卫冕|连冠|连胜|连胜纪录|创新高|连创新高|历史新高|史上最高|爆火|大爆|爆红|爆款|卖爆|黑马|杀疯|火出圈|辉煌|高光|风头无两|如日中天|一枝独秀|连涨/,
+  /(?:考了|拿了|得了|获得)[^。；，]{0,4}(?:满分|第一|佳绩|最高分)/,
+];
+// 腿②' 回升断言（中文，配低位）
+const INEV_UP_ZH = [
+  /反弹|回暖|回升|止跌|企稳|翻身|转运|翻盘|扳回|好起来|迎来转机/,
+];
+// 腿②'' 回落断言（中文，配高位）
+const INEV_DOWN_ZH = [
+  /必有一跌|一跌|跌下来|掉下来|滑落|暴跌|大跌|扑街|黄了|凉了|凉凉|糊了|狗尾续貂|晚节不保|见光死|走下坡|陨落|跌落神坛|从神坛|反噬|遭到反噬|翻车|塌房|人设崩塌|惨败/,
+];
+// 腿③' 必然化断言（中文）：必然/规律/宿命形
+const INEV_LAW_ZH = [
+  /肯定[会能是要]?|必然|一定[会能是]?|必定|势必|注定|铁定|百分百|毫无疑问|躲不过|逃不过|跑不掉|躲不掉/,
+  /必[有将遭输败崩涨跌反]/,
+  /这是规律|按规律|规律就是|按这个规律|向来如此|历来如此|从来如此|宿命|命中注定/,
+  /物极必反|盛极而衰|涨久必跌|骄兵必败|站得越高摔得越狠|爬得越高摔得越狠|风水轮流转/,
+  /已经在招手|不远了|只是时间问题|迟早的事/,
+];
+// 腿①' 低位极端（英文）：rock bottom/战绩连败形
+const INEV_LOW_EN = [
+  /\b(?:rock\s+bottom|hit\s+bottom|bottomed\s+out|nadir|all[- ]time\s+low|record\s+low|worst\s+ever|slump|crashed|tanked|lost\s+\d+\s+in\s+a\s+row|losing\s+streak|cold\s+streak|winless\s+streak|drought|disaster|debacle)\b/i,
+  /\b(?:started|began|opened)\s+(?:the\s+)?(?:season|year|campaign|quarter)?\s*\d+\s*[-–]\s*\d+\b/i,
+];
+// 腿①'' 高位极端（英文）：rally/冠军/首秀爆红形
+const INEV_HIGH_EN = [
+  /\b(?:record\s+high|all[- ]time\s+high|peak|pinnacle|zenith|career\s+high|winning\s+streak|best\s+ever|rally|rallied|hot\s+streak|on\s+a\s+roll|unbeaten|undefeated|perfect\s+season|championship|clinched\s+the\s+title|title|triumph|sensational\s+debut|breakout\s+(?:season|year|role)|massive\s+(?:debut|hit|success))\b/i,
+  /\b(?:\d+|two|three|four|five|six|seven|eight|nine|ten)\s+straight\s+(?:championships?|titles?|wins?|victories|races)\b/i,
+];
+// 腿②' 回升断言（英文，配低位）
+const INEV_UP_EN = [
+  /\b(?:rebound|rebounded|bounce\s+back|bounced\s+back|recover|recovery|recovered|turnaround|turned\s+(?:it\s+)?around|pick\s+up|picked\s+up|improve|improved)\b/i,
+];
+// 腿②'' 回落断言（英文，配高位）
+const INEV_DOWN_EN = [
+  /\b(?:fall\s+off|fell\s+off|drop\s+off|dropped\s+off|slump|collapse|collapsed|flop|flopped|tank|tanked|nosedive|nosedived|plummet|plummeted|crash|fade|faded|regress|regressed|disappoint|disappointing|disappointment|doom|come\s+back\s+down\s+to\s+earth|revert)\b/i,
+];
+// 腿③' 必然化断言（英文）：inevitable/bound to/doomed 形
+const INEV_LAW_EN = [
+  /\b(?:inevitable|inevitably|unavoidable|cannot\s+be\s+avoided|bound\s+to|doomed|destined|is\s+certain\s+to|are\s+certain\s+to|always\s+happens|never\s+fails?|no\s+exception|without\s+exception|what\s+goes\s+up|only\s+a\s+matter\s+of\s+time|is\s+just\s+a\s+matter\s+of\s+time|sooner\s+or\s+later)\b/i,
 ];
 
 // ─── [r300 新族] 表扬/批评/奖惩「反馈干预」族（真升级②，独立路由）──────
@@ -724,6 +804,72 @@ function jinxEn(text, R) {
   return false;
 }
 
+// ─── [r439 新族] 必然性断言族路由 ────────────────────────────────────────
+// 双腿配对（低位×回升 / 高位×回落）+ 必然化断言腿，三腿同一叙事窗（ZH 40
+// / EN 120，同主判据）。族级否定守卫（同 r435 范式）：
+//   · 前窗（断言前 8/24 字）：不能/并非/未必/难说/不见得/谈不上/算不上/
+//     不一定/不是说/并不是/称不上（ZH）；is/are/does/do/will/can…+not 或
+//     缩约形（EN）——「不是说爆火一定扑街」「does not make a crash
+//     inevitable」按设计不判；
+//   · 后窗（断言后 20/48 字）：不是真的/并无/没有依据/谈不上/算不上/迷
+//     信/无稽/言过其实/说法而已（ZH）；is not real / no evidence / just
+//     a myth（EN）。
+function inevZh(text, R) {
+  const low = positions(R.INEV_LOW_ZH || INEV_LOW_ZH, text);
+  const high = positions(R.INEV_HIGH_ZH || INEV_HIGH_ZH, text);
+  const up = positions(R.INEV_UP_ZH || INEV_UP_ZH, text);
+  const down = positions(R.INEV_DOWN_ZH || INEV_DOWN_ZH, text);
+  const law = positions(R.INEV_LAW_ZH || INEV_LAW_ZH, text);
+  if (law.length === 0) return false;
+  if ((low.length === 0 || up.length === 0) && (high.length === 0 || down.length === 0)) return false;
+  const WIN = 40;
+  // 族级否定守卫：必然断言前窗否定词 / 后窗反驳短语在场不判（同 r435 范式）
+  const NEG_BEFORE = /(?:不能|并非|未必|难说|不见得|谈不上|算不上|说不成|不一定|未必要|不是说|并不是|别说是|称不上)[^。！？!?]{0,6}$/;
+  const NEG_AFTER = /^(?:[^。！？!?]{0,14})(?:不是真的|不是真|并无|没有(?:统计)?依据|没有依据|谈不上|算不上|迷信|无稽|子虚乌有|言过其实|说法而已|而已|是迷信|是谣传|太绝对|没有这回事)/;
+  const pairs = [];
+  if (low.length && up.length) for (const l of low) for (const u of up) if (Math.abs(l - u) <= WIN) pairs.push([l, u]);
+  if (high.length && down.length) for (const h of high) for (const d of down) if (Math.abs(h - d) <= WIN) pairs.push([h, d]);
+  for (const [a, b] of pairs) {
+    for (const l of law) {
+      if (Math.min(Math.abs(l - a), Math.abs(l - b)) > WIN) continue;
+      const before = text.slice(Math.max(0, l - 8), l);
+      const after = text.slice(l, l + 20);
+      if (NEG_BEFORE.test(before)) continue;
+      if (NEG_AFTER.test(after)) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
+function inevEn(text, R) {
+  const low = positions(R.INEV_LOW_EN || INEV_LOW_EN, text);
+  const high = positions(R.INEV_HIGH_EN || INEV_HIGH_EN, text);
+  const up = positions(R.INEV_UP_EN || INEV_UP_EN, text);
+  const down = positions(R.INEV_DOWN_EN || INEV_DOWN_EN, text);
+  const law = positions(R.INEV_LAW_EN || INEV_LAW_EN, text);
+  if (law.length === 0) return false;
+  if ((low.length === 0 || up.length === 0) && (high.length === 0 || down.length === 0)) return false;
+  const WIN = 120;
+  // 族级否定守卫：断言前窗 does/does not/cannot/缩约形在场不判（同 r435 范式）
+  const NEG_BEFORE = /\b(?:is|are|was|were|does|do|did|will|would|can|could|has|have)\s+not\s+(?:\w+\s){0,4}$|\b(?:isn'?t|aren'?t|wasn'?t|weren'?t|doesn'?t|don'?t|didn'?t|won'?t|wouldn'?t|cannot|can'?t|couldn'?t)\s+(?:\w+\s){0,3}$/i;
+  const NEG_AFTER = /\bis\s+(?:not|nothing)\s+(?:real|to\s+it)|no\s+(?:statistical\s+)?(?:evidence|basis|proof)|just\s+a\s+(?:myth|superstition|coincidence)|nothing\s+to\s+do\s+with/i;
+  const pairs = [];
+  if (low.length && up.length) for (const l of low) for (const u of up) if (Math.abs(l - u) <= WIN) pairs.push([l, u]);
+  if (high.length && down.length) for (const h of high) for (const d of down) if (Math.abs(h - d) <= WIN) pairs.push([h, d]);
+  for (const [a, b] of pairs) {
+    for (const l of law) {
+      if (Math.min(Math.abs(l - a), Math.abs(l - b)) > WIN) continue;
+      const before = text.slice(Math.max(0, l - 24), l);
+      const after = text.slice(l, l + 48);
+      if (NEG_BEFORE.test(before)) continue;
+      if (NEG_AFTER.test(after)) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * @param {string} text 归一化后的文本
  * @param {object} [inject] 负例脚本注入用：以空数组替换指定常量
@@ -748,7 +894,9 @@ function checkRegressionToMean(text, inject) {
   const negHit = isZh ? negZh(text, R) : negEn(text, R);
   // [r435] 新秀墙/魔咒命名现象族（无干预宿命断言）独立路由
   const jinxHit = isZh ? jinxZh(text, R) : jinxEn(text, R);
-  if (!hit && !fbHit && !negHit && !jinxHit) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r439] 极端×反向断言必然化族（无干预无魔咒命名的铁律形预测）独立路由
+  const inevHit = isZh ? inevZh(text, R) : inevEn(text, R);
+  if (!hit && !fbHit && !negHit && !jinxHit && !inevHit) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 计分：基础 0.62 + 功劳归因形 0.06 + 显式干预动词形 0.04，封顶 0.85
   // [r300] 归因/干预腿计入反馈族 FB_ATTRIB / FB_INTERVENE（反馈族命中时主表不承重）
@@ -773,7 +921,11 @@ function checkRegressionToMean(text, inject) {
         ? (isZh
           ? '回归均值×新秀墙/魔咒命名现象误归因(zh)'
           : 'regression to the mean×sophomore slump/jinx named-phenomenon misattribution(en)')
-        : (isZh
+        : (inevHit && !hit)
+          ? (isZh
+            ? '回归均值×极端后反向断言必然化(zh)'
+            : 'regression to the mean×inevitability of the opposite extreme(en)')
+          : (isZh
         ? '回归均值误归因×极端基线后自然回归被当成干预功劳(zh)'
         : 'regression to the mean×natural rebound credited to intervention(en)');
 
@@ -796,5 +948,8 @@ module.exports = {
     // [r435] 新秀墙/魔咒命名现象族常量（负例注入承重目标）
     JINX_EXT_ZH, JINX_REG_ZH, JINX_NAME_ZH,
     JINX_EXT_EN, JINX_REG_EN, JINX_NAME_EN,
+    // [r439] 极端×反向断言必然化族常量（负例注入承重目标）
+    INEV_LOW_ZH, INEV_HIGH_ZH, INEV_UP_ZH, INEV_DOWN_ZH, INEV_LAW_ZH,
+    INEV_LOW_EN, INEV_HIGH_EN, INEV_UP_EN, INEV_DOWN_EN, INEV_LAW_EN,
   }),
 };
