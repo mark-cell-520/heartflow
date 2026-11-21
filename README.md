@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 274 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
-×  1,390 dispatch routes  ×  25,857 passing tests  ×  2 npm dependencies
+×  1,390 dispatch routes  ×  25,941 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.213**. Not marketing copy.
 | Dispatch routes | 1,390 |
 | Discrimination dimensions | 274 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
-| Test suite | 25,857 passing / 233 failing | `node test/run-all.js`（r434 全量实测 25,857/233/26,090（872 文件）——较 r433 终值基线（871 文件 25,792/233/26,025）passed +65 全部为本轮 test/round-434-count-rate-software-failure.test.js 的 65 条断言、failed +0 零新增（count_rate_conflation 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
+| Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
