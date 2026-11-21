@@ -1,3 +1,7 @@
+## 6.8.220 (2026-11-22)
+
+- **r445 ecological_fallacy「具体个体属性直推」新句式族（真升级②）**：`src/ecological-fallacy.js` 第 211 维腿② INDIVIDUAL_ZH 追加 5 条腿（F=16 连接词+所有格+断言副词、F2=17 连接词+指称+数值尾部、G=18 无连接词成员身份+断言、G2=19 无连接词属性名词直推、G3=20 范围代词+都+结论），INDIVIDUAL_EN 追加 2 条腿（F=12 连接词+具体个体指称+情状断言、G=13 无连接词居住/成员动词+属性断言），腿① AGGREGATE_EN 补 2 条（expectancy/median age/average salary 等均值量+具体群体形），BARE_IDX_ZH/EN 同步新无连接词腿。根因：存量腿②只收量化指称（每个人/人人/every individual）与带限定语指称，「他/她/he/she + 个体层属性断言」整族漏判（探针 A/B 实证 ZH 4 形 + EN 2 形攻击 0/7 命中）。轮测 `test/round-445-ecological-fallacy-individual-family.test.js` 全绿（逐腿承重 10 + 良性注入 7 + gate 端到端归因 + 存量族回归 2）；变体矩阵攻击 9/9（含倒装/长句/裸名词/范围代词/中英双语）+ 良性 6/6；五门禁 verify 16/0、guard 20/20、doc 24/24、双向 52/52 + 误拦 302/326 零新增。维度/工具/路由数不变（280/197/1390）。来源：内部缺口路径（三层外部搜索无可用方案，落盘 /tmp/hf-scout-1795280780.txt；探针 /tmp/probe-r445-{a,b,c,matrix}.js）。
+
 ## 6.8.219 (2026-11-21)
 
 - **r442 counterfactual_overclaim 否定形反事实新句式族（真升级②）**：`src/counterfactual-overclaim.js` 第 246 维新增四条腿——CN-C 否定动作先行形（连接词→否定动作→逗号→近期时点锚，修复存量 CN-A 锚窗被逗号截断导致「如果公司没有改革，去年肯定会倒闭」两腿失配）、CN-D 行动依据形（反事实前件→说明/证明→行动要求）、EN-D（without/but for + would + CERT，此前零覆盖）、EN-E（if…had not + would 显式否定形），并扩展 CERT_ZH 词表补「就能/便能」。轮初探针攻击 6/10 → 10/10，cf5/cf7/cf8/cf9 改由本维度承重；轮测 `test/round-442-counterfactual-negative-family.test.js` 28/28（攻击矩阵 17/17 + 良性 7/7 + 负例注入排他承重 4/4 + 裸名词 3/3）；四门禁 verify 16/0、guard 20/20、doc 24/24、双向 52/52 + 误拦 302/326 零新增。维度/工具/路由数不变。来源：内部缺口路径（外部 GitHub 最高 21★ 且均为 LLM 路线不采用，HN 258 pts 故事仅立意参考，侦察落盘 /tmp/hf-scout-r442.txt）。

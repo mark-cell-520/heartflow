@@ -154,6 +154,15 @@ const AGGREGATE_EN = [
   // 群体层变量整族漏判。
   /\b(?:countries|nations|states|regions|cities|groups|communities|neighborhoods|populations|cohorts|societies|counties|provinces)\s+(?:with|where|that\s+have|having)\s+(?:higher|lower|more|less|greater|fewer|high|low)\b/i,
   /\b(?:higher|lower|greater|more|less)\s+(?:chocolate|coffee|alcohol|meat|dairy|fat|sugar|salt|calorie|consumption|intake|spending|expenditure|income|wealth|education|literacy|gdp|obesity|fertility|smoking|vaccination)\b/i,
+  // [r445 扩族] 均值/期望 + 具体群体（「Life expectancy in this county is
+  // 85, so he will live at least that long」——腿①原表收 average/mean/
+  // rate 裸词与 high/low+率词，但「expectancy / life span / median age +
+  // in/for + 具体群体」是群体层统计量的另一整族书写形，整族漏判）
+  /\b(?:life\s+)?(?:expectancy|life\s+span|median\s+age|average\s+age|mean\s+age|per\s+capita\s+income|median\s+income|average\s+income|average\s+salary|median\s+salary|average\s+wage)\s+(?:in|of|for|across)\s+(?:this|that|the|our)\b/i,
+  // [r445 扩族] 数值/量 + in/for + 具体群体（「The average salary in this
+  // company is 30k」「85 in this county」——均值量词显式但书写在群体
+  // 之后的前置形）
+  /\b(?:average|mean|median|typical|per\s+capita)\s+(?:salary|wage|income|pay|score|gpa|height|weight|age|life|expectancy)\s+(?:in|for|at|of)\s+(?:this|that|the|our)\s+(?:company|firm|city|state|county|country|nation|region|area|school|group|community|neighborhood|society|cohort)\b/i,
 ];
 
 // ─── 腿② IND 个体层推断（中文；r215：推断连接 + 个体层量化结论）──
@@ -205,6 +214,34 @@ const INDIVIDUAL_ZH = [
   // E. 个体层结论副词宣告
   /(?:个体|个人)(?:身)?上(?:也|一定|必然|肯定|同样|更|都|注定)/,
   /(?:每个人|人人|个体|个人|每个成员|全体成员)\s*(?:也|一定|必然|肯定|同样|都|注定|天生|更)/,
+  // F. [r445 扩族] 具体个体所有格 + 个体层属性断言。漏判实证：
+  // 「这家公司的员工平均工资三万，所以他的月薪肯定三万」——连接词后是
+  // **第三人称所有格 + 具体属性名词 + 断言副词**，A 族指称表只收
+  // 每个人/人人/量化指称，D3 族要求「家的/这里的」限定语后置，中间形态
+  // （他的月薪 / 她的收入 / 本人的分数）整族漏判。r215 存量腿②对
+  // 「量化指称」与「带限定语指称」两族收口，漏的正是**具体个体指称**。
+  /(?:所以|因此|因而|可见|据此|也就是说|那么|这足以|这说明|这意味着|可以说)\s{0,8}(?:他|她|此人|本人|其)的[^。；，!?]{0,12}(?:肯定|一定|必然|至少|也|同样|照样|还|都)/,
+  // F2. [r445 扩族] 具体个体指称 + 属性名词 + 数值/断言尾部（「他在这公司
+  // 上班，月薪肯定三万」——指称与断言之间夹成员身份从句，中间段放宽到
+  // 20 字容纳「在这公司上班/住在这个区」类范围标记）
+  /(?:所以|因此|因而|可见|据此|也就是说|那么|这足以|这说明|这意味着)\s{0,8}(?:他|她|此人|本人)[^。；，!?]{0,20}(?:肯定|一定|必然|至少|照样|也)\s*[^。；，!?]{0,10}(?:万|千|元|块|岁|分|%|％|倍|级)/,
+  // G. [r445 扩族] 无连接词个体属性直推（裸形；161 轮纪律：去修饰仍命中）。
+  // 「这个区平均寿命85岁，他住在这个区，至少能活85」——全句无连接词、
+  // 无量化指称，个体层断言「至少能活85」挂在具体指称后。r445-b 探针实证
+  // 三条 ZH 攻击（平均工资/平均分/平均寿命）全部漏判，根因：① 中间段
+  // 排除逗号导致「他在这个班，分数肯定也高」断链；② 「这公司」无量词形
+  // （这家/这个/该）漏收。G 腿属裸指称族（进 BARE_IDX），只有无条件腿
+  // （A-F）都不命中时才启用，由主判据保证腿①在场；后置否定对冲由
+  // pair() 的 negatedBefore 兜底。
+  /(?:他|她|此人|本人)(?:住|待|生活|工作|学习|上班)?在?(?:这|那|该|此)?[^。；!?]{0,6}(?:公司|地区|区|班|组|城市|国|省|县|社区|单位|部门|学校|学院)[^。；!?]{0,14}(?:肯定|一定|至少|必然|也|照样)/,
+  // G2. [r445 扩族] 无连接词 + 个体属性名词直推（无「的」形）：
+  // 「该班平均分90，他在这个班，分数肯定也高」——属性名词（分数/月薪/
+  // 收入）直接做断言主语，不经所有格「他的」桥接。
+  /(?:他|她|此人|本人)[^。；!?]{0,16}(?:月薪|工资|收入|分数|成绩|身高|体重|寿命|年龄|存款|资产|职位|级别)[^。；!?]{0,10}(?:肯定|一定|至少|必然|也|照样)/,
+  // G3. [r445 扩族] 范围代词 + 都 + 量化结论（「全国人均可支配收入三万，
+  // 他在全国哪儿挣钱都差不多这个数」——个体层推断以范围代词（哪儿/
+  // 哪里/任何地方）+「都」收口，不挂断言副词；属裸指称腿）
+  /(?:他|她|此人|本人)[^。；!?]{0,14}(?:哪儿|哪里|任何地方|任何地区|到哪里|去到哪)[^。；!?]{0,12}(?:都|均|皆|总)[^。；!?]{0,16}/,
 ];
 
 // ─── 腿② IND 个体层推断（英文）─────────────────────────────────
@@ -230,6 +267,17 @@ const INDIVIDUAL_EN = [
   // makes you a X / makes people X 形整族漏判。
   /\b(?:makes?|made|renders?|turns?|turn)\s+(?:you|him|her|them|us|people|individuals?|persons?|members?)\s+(?:a|an|the)?\s*(?:Nobel|laureate|winner|genius|expert|master|professional|star|elite|champion|leader|pioneer|success|failure|loser|idiot|fool|criminal|threat|genius)\b/i,
   /\b(?:makes?|made|renders?|turns?)\s+(?:you|him|her|them|us)\s+(?:more|less)\s+(?:likely|prone|intelligent|smart|clever|capable|successful|wealthy|rich|healthy|fit)\b/i,
+  // F. [r445 扩族] 具体个体指称 + 个体层属性断言。漏判实证：
+  // 「The average salary at this company is 30k, so he earns about that
+  // much」——连接词后是第三人称指称 + 情状断言，EN A 腿只收 every/each/
+  // any individual，B 腿只收量化指称，具体个体指称形整族漏判。
+  /\b(?:so|thus|therefore|hence|which\s+means|this\s+means|that\s+means|meaning|implying|it\s+follows)\b[^.]{0,40}?\b(?:he|she|this\s+person|that\s+person|they)\b[^.]{0,30}?\b(?:earns?|makes?|gets?|is\s+(?:also|equally|just\s+as)|will\s+(?:live|earn|get|be)|can\s+(?:expect|live)|at\s+least|about\s+that|roughly\s+that|the\s+same)\b/i,
+  // G. [r445 扩族] 无连接词个体属性直推（裸形）——「Life expectancy in
+  // this county is 85, so…」之外的无连接形：he/she + 居住/成员动词 +
+  // 群体 + 属性断言。属裸指称族（进 BARE_IDX_EN），只有无条件腿
+  // （A-F）都不命中时才启用；后置否定对冲由 pair() 的 negatedBefore
+  // 兜底（NEG_EN）。
+  /\b(?:he|she)\s+(?:lives?|lived|works?|worked|studies|studied|resides?|belongs?)\s+(?:in|at|for)\s+(?:this|that|the)\s+(?:company|firm|region|area|city|state|county|country|nation|group|team|school|neighborhood|community)\b[^.]{0,45}?\b(?:earns?|makes?|gets?|is\s+(?:worth|paid)|lives?\s+to|will\s+(?:live|earn|be)|at\s+least|about|roughly)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
@@ -326,10 +374,15 @@ function findIndLeg(text, isZh, R, aggIdxs) {
   //     14=E 个体身上也、15=E2 每个人也（全部不含连接词）
   //     [r218 审计补] A5 腿（推断连接+范围限定+个体指称）插在 D2 之后，
   //     序号 13 属连接词腿，E/E2 由 13/14 顺移为 14/15。
+  //     [r445 扩族] F=16 所有格+断言（连接词腿）、F2=17 指称+数值断言
+  //     （连接词腿）、G=18 无连接词个体属性直推、G2=19 无连接词属性名词
+  //     直推、G3=20 范围代词+都+结论（G/G2/G3 为裸指称腿，进 BARE）。
   // EN: 2=every/each individual、3=all individuals、4=a random individual、
   //     5=any individual from、6=people from that group、7=local people
-  const BARE_IDX_ZH = [3, 4, 5, 6, 7, 8, 14, 15];
-  const BARE_IDX_EN = [2, 3, 4, 5, 6, 7];
+  //     [r445 扩族] F=12 具体个体指称+断言（连接词腿）、G=13 无连接词
+  //     个体属性直推（G 为裸指称腿，进 BARE）。
+  const BARE_IDX_ZH = [3, 4, 5, 6, 7, 8, 14, 15, 18, 19, 20];
+  const BARE_IDX_EN = [2, 3, 4, 5, 6, 7, 13];
   const bareIdx = isZh ? BARE_IDX_ZH : BARE_IDX_EN;
   const win = isZh ? WIN_AGG_IND_ZH : WIN_AGG_IND_EN;
   const pair = (list) => {

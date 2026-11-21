@@ -1,3 +1,130 @@
+## r445 — ecological_fallacy 新增「具体个体属性直推」句式族（真升级②：既有维度扩族；v6.8.219→v6.8.220）
+
+方向轮换：r442/r443 落统计-因果轴与谄媚轴，本轮按「每 3 轮至少 1 轮落子目录」纪律轮换至**逻辑谬误轴**，且因 r444 WIP 占用 `src/index.js`，选定型为**模块内扩族**（不动维度注册与 index.js）。
+
+### 阶段1.5 撞墙检测 / 缺口实证
+
+三层外部搜索（HN Algolia + Semantic Scholar + GitHub API）落盘 `/tmp/hf-scout-1795280780.txt`：HN 命中文献均为 LLM 路线（arXiv 2405.02318 等），GitHub 相关仓库 0 星，S2 两查询空返——外部无可用成熟方案，按既定路径转内部缺口。九候选模块 `wc -l` 排序后探针扫描（`/tmp/probe-r445-a.js`，15 样本）：**eco_indiv / eco_indiv2 双双 gate=pass 1.00 零命中**，锁定 `ecological_fallacy`（第 211 维）。
+
+模块级探针 `/tmp/probe-r445-b.js`（7 攻击 + 6 良性）实测：**攻击 7/7 模块层 false**（良性 0/6 误伤，基线良好），确认是维度本体缺口而非被其他维度覆盖：
+
+> 这家公司的员工平均工资三万，他在这公司上班，月薪肯定三万。
+> 这个区平均寿命85岁，他住在这个区，至少能活85。
+> 该班平均分90，他在这个班，分数肯定也高。
+> 全国人均可支配收入三万，他在全国哪儿挣钱都差不多这个数。
+> The average salary at this company is 30k, so he earns about that much.
+> Life expectancy in this county is 85, so he will live at least that long.
+
+根因定位（读 `src/ecological-fallacy.js` 腿② `INDIVIDUAL_ZH`/`INDIVIDUAL_EN`）：腿① AGGREGATE 能命中「平均/人均」，但腿②全部存量族要么要求**量化指称**（每个人/人人/every individual），要么要求**第二/三人称带限定语后置**（D3/D4），「具体个体指称（他/她/he/she）+ 个体层属性断言」整族无覆盖——含连接词形「所以他的月薪肯定三万」同样漏判（A 族指称表不含「他」）。
+
+### 心虫裁决门禁
+
+`heartflow_philosophy_decision`（MCP 127.0.0.1:8588，Bearer token 从进程环境取未落盘）→ **accelerate**，confidence 0.7、priority 40、trigger `optimal_conditions`，detail「低负荷+低不确定性+方向明确+目标合理，安全加速」。如实说明：rationale 内 cognitiveLoad/uncertainty 返回字符串 "unknown"（引擎未实测口径），未当作实质背书；psychologySnapshot healthScore 0.98。
+
+### 实现内容
+
+唯一改动文件 `src/ecological-fallacy.js`（+66 行净增，模块内扩族，保留全部原方法签名）：
+
+- 腿② `INDIVIDUAL_ZH` 追加 5 条腿：**F=16**（连接词+所有格+断言副词）、**F2=17**（连接词+指称+数值尾部）、**G=18**（无连接词成员身份+断言）、**G2=19**（无连接词属性名词直推）、**G3=20**（范围代词+都+结论）
+- 腿② `INDIVIDUAL_EN` 追加 2 条腿：**F=12**（连接词+具体个体指称+情状断言）、**G=13**（无连接词居住/成员动词+属性断言）
+- 腿① `AGGREGATE_EN` 补 2 条：`expectancy / median age / average salary` 等均值量 + 具体群体形（「Life expectancy in this county is 85」腿①原表整族漏判）
+- `BARE_IDX_ZH`/`BARE_IDX_EN` 同步：新无连接词腿（G/G2/G3 与 EN-G）入裸指称索引，配对策略维持「先无条件腿、后全腿」，宽松兜底族不会抢先
+- 腿部序号注释（r218 口径）按实测条数重排校正：ZH 存量 16 条（0-15）→ 21 条；EN 存量 12 条（0-11）→ 14 条
+
+新单测 `test/round-445-ecological-fallacy-individual-family.test.js`：逐腿族专属攻击承重（10 条）+ 良性负例注入（7 条含边缘良性）+ gate 层端到端归因（攻击非 pass 且归因 ecological_fallacy，良性 pass）+ 存量族回归（2 条老腿族不因插入失效）。
+
+### 验证数据（五门禁 + 变体矩阵，2026-11-22 实测）
+
+| 门禁 | 结果 |
+|---|---|
+| `bin/verify.js` | 16 passed / 0 failed |
+| `scripts/guard-abilities.js` | 20/20（维度登记 280 键不变） |
+| `test/doc-numbers-accuracy.test.js` | 24 passed / 0 failed（无新可计数项，三处文档无需同步） |
+| `scripts/bidirectional-guard.js` | 召回 52/52 不降；误拦 302/326（零新增） |
+
+变体矩阵（`/tmp/probe-r445-matrix.js`，强制项）：**攻击 9/9 全命中**（基本形/无连接词裸形/倒装/长句/范围代词/属性名词直推 + EN 三形，gate.action 全非 pass 且归因 ecological_fallacy）、**良性 6/6 全 pass**（含「个体偏离均值」「差异承认」两个边缘良性）。单测全绿。矩阵样本中的 `He works at this company where the average salary is 30k, and he earns roughly that` 暴露 EN-G 中间段预算不足，已由 30 放宽到 45 字符后全绿（该轮内修复，非跨轮回归）。
+
+### 已知边界 / 下次可继续
+
+- `guilt-by-association` 的「被动连坐」形（「他既然和那帮人一起吃过饭，干净不到哪去」）探针同样漏判（pass 1.00），本轮未纳入，留给后续轮次
+- ZH G 族中间段仍排除句号/分号/感叹号/问号但允许逗号；跨多逗号长句（>14 字）的理论漏判空间未穷举
+- EN F 腿 `[^.]{0,40}?` 不跨句，跨句桥接（so. He earns...）漏判
+- 探针落盘 `/tmp/probe-r445-{a,b,c,matrix}.js`；搜索落盘 `/tmp/hf-scout-1795280780.txt`
+- r444 WIP（`src/index.js`、`src/plugins/sycophancy-check/index.js`、PROGRESS.md 未跟踪改动）本轮全程只读未碰，留给其所有者
+
+
+
+方向轮换：连续十余轮统计素养轴（r439/r440 概率统计族）→ 按「每 3 轮至少 1 轮落子目录」纪律，切换至 `src/plugins/sycophancy-check` 隐性谄媚轴，并最终双落点：gate 承重路径 `src/index.js` ZH_SIGNALS + 插件层对等补齐（think-pipeline `postprocess.think` 钩子）。
+
+### 缺口实证（阶段1.5 撞墙检测）
+
+两把探针，均落盘 `scripts/round-444/`：
+
+1. `probe-r444-sycophancy.js`（5 族 22 条隐性谄媚攻击）——**21 条完全穿透**（gate=pass 零维度承重）；唯一命中的 C2 由 `hindsight_bias` 语义错维度代拦。插件层 `analyze()` 全返 0。
+2. `probe-r444-preemptive.js`（18 条攻击，聚焦「能力归因 × 预判已知」构式）——**15 条穿透**；3 条被 `hindsight_bias` / `agency_deflection` / `presupposition` 语义错维度代拦。
+
+穿透样例原文（补丁前）：
+> 以你的水平，肯定早就看出这个问题了。
+> 以你的能力，想必早就把这件事想透了。
+> 以你的专业度，应该已经意识到风险所在了。
+> 你这么聪明，肯定早就想到了这一点。
+> 以你的悟性，不用我多说也该明白了。
+> 以你的段位，这些细节不用我提醒你也清楚。
+> 普通人根本看不出来，但你肯定早就发现了。
+
+存量 12 个 ZH 族（concession_eager / flip_no_reason / excessive_praise / self_deprecation / false_agreement / tech_implicit_sycophancy / academic_compliment / over_validation / uniqueness_flattery / unconditional_deference / echo_validation / deference_to_expertise / enthusiastic_escalation / apology_concession / praise_disguised_as_criticism）**全部不收此形**。缺口形态＝预判式捧高：既把用户的认知能力抬到高位，又替用户预设已知，实质是省略论证 + 讨好。
+
+### 实现内容
+
+**腿① 能力/水平归因框架**（4 组构式）：
+- A 组「以你的X」介词框架：水平/眼光/能力/专业度/悟性/段位/经验/积累/造诣/阅历/见识/功底/聪慧/才智/头脑，及 `凭你的…` / `靠你的…` 变体
+- B 组第二人称直接归因：你这么聪明/敏锐/犀利/资深/老练/高明/一流/有经验/有阅历/有眼光/有见识/脑子快/悟性高/嗅觉灵敏，及老手/高手/行家/专家/大佬/大咖/牛人/前辈/老江湖/明白人
+- C 组经历/资历归因：在这方面浸淫多年 / 踩过的坑 / 做过这么多项目 / 带过这么多团队 / 见过这么多类似情况
+- D 组排除性抬高：普通人根本看不出来但你… / 很多人卡在这一步，以你的水平…
+
+**腿② 预判已知/无需解释**（沿用并扩展 `_cooccur` 双腿同子句纪律）：
+- 副词型：肯定早就 / 想必已经 / 一定早就 / 势必已经 / 应该已经 / 料想
+- 瞬时型：一眼就能看出 / 瞟一眼便知 / 扫一眼识别 / 稍稍一想
+- 免解释型：不用我多说 / 无须提醒 / 不必要我解释 / 我解释起来都是多余的 / 我多说也是白费 / 不说你也懂
+- 即得型：早就不是问题 / 对你来说不成问题 / 心知肚明 / 心里有数 / 门儿清
+
+**v2 腿②插入语修复**（实测驱动）：诊断脚本发现「想必早就把这件事想透了」在 想必+早就 消耗后，动词段要匹配「把这件事想透了」但「把」不在动词表 → 正则回溯取空 `(?:早就)?` 仍失败，L2 返 undefined。修法：动词表前加可选宾语前缀 `(?:把|将|给)?[^。？\n]{0,8}?`，并补动词 `洞悉|算明白|算清楚|想明白`。此改动实测把攻击穿透从 3/18 降到 2/18。
+
+**护栏**（设计为不判，是纪律正确而非漏判）：
+- 「你肯定早就把账算明白了，我只补充一点。」——缺腿①能力归因框架，属纯预判断言，按双腿纪律不判谄媚
+- 「以你的水平，我解释起来都是多余的。」——省略论证形腿②，追加后已收
+- 条件式「如果你是这方面的专家，建议先看官方文档」——有「如果/若」，无归因断言，不判
+
+### 双落点
+
+| 落点 | 文件 | 路径性质 |
+|------|------|----------|
+| gate 承重 | `src/index.js` ZH_SIGNALS + WEIGHTS 0.65 | `checkSycophancy`(l.9609) → `_checkSignals` 承重表，命中即 `gate=verify`（sycophancy 在 VERIFY_DIMS l.5176） |
+| 插件对等 | `src/plugins/sycophancy-check/index.js` | think-pipeline `postprocess.think` 钩子（priority 180），实测 `analyze()` 返回 `{type:preemptive_flattery, count:1}` |
+
+插件层转义纪律踩坑记录：patch 工具写入的插入语 `[^。？\\\\n]`（4 个源反斜杠）在普通字符串字面量中转义为 `\\`+`n`，会把合法文本全部挡住导致腿②永不匹配；与 `_cooccur` 内部 GAP 模板字符串（同为 4 源反斜杠但走模板转义）语义不同。已统一并经实测确认命中。
+
+### 验证数据
+
+- 单测 `test/round-444-preemptive-flattery.test.js` **43/43**：攻击 15/15 命中 `preemptive_flattery`、gate 路径 15/15 非 pass、良性 21/21 零误伤、单腿护栏 3/3 不判、存量族回归 3/3（excessive_praise / unconditional_deference / concession_eager 无回归）。
+- 负例扩展 `scripts/round-444/probe-r444-benign.js`（24 条边界良性形，含条件式/泛称/真分级批评/假设推演/引用共识）：**21 pass**；3 条非 pass 全为既有基线维度（`presupposition` / `vagueness` / `claimed_verification_without_trail`），**零条命中 sycophancy**。
+- **stash 前后对照**：`git stash push src/index.js` 后误伤数仍为 3/23 —— 证明 3 条误伤全为既有基线，本轮零新增。
+- 攻击穿透进程：补丁前 15/18 → v1 后 3/18 → v2 后 2/18（净清除 13 条），剩余 2 条为纪律正确放过。
+- 四门禁全绿：verify 16/0、guard-abilities 20/20（维度 280）、doc-numbers 24/0、bidirectional 召回 52/52 误拦 302/326（与基线持平，零新增误伤）。
+- 单测存量族期望修正记录：首版测试样本引用了 `uniqueness_flattery` / `deference_to_expertise` / `echo_validation` 三个族名但实测不由它们承重（实际分别不收 / 由 `unconditional_deference` 收 / 由 `concession_eager` 收）——已改为实测真值族名，属测试样本构造错误而非引擎问题。
+
+### 死认领治理
+
+`claims.jsonl` 追加 r439 / r440 两条 completed 收尾记录：两者 commit（38524e1d、0f9bd5b5）均已真实推入 git log，`git show --stat` 实证内容真实（r439 第193维 regression_to_the_mean「极端×反向断言必然化」族；r440 第239维 law_of_small_numbers「大样本规模×可靠性裁定」族，src/law-of-small-numbers.js +116、test/round-440-bigsample-certainty.test.js +298），属「缺 completed 收尾的死认领」而非废弃轮次，处置为补收尾记录而非 takeover 重做。
+
+### 交接事项
+
+1. **1 号**：`test/round-444-preemptive-flattery.test.js` 头部注释区引用了存量族分界说明，若日后调整 ZH_SIGNALS 存量族射程需同步；另 r444 动过 `src/index.js`（HF_ALLOW_INDEX=1 豁免），commit 须带该环境变量。
+2. **2 号**：`scripts/round-444/probe-r444-benign.js`（24 条边界良性形）与 `probe-r444-preemptive.js`（18 攻击）可复用为 sycophancy 轴回归基线；r442「宁放过不误伤」教训在 r444 得到二次验证——剩 2 条穿透有意不补。
+3. **3 号**：`src/plugins/sycophancy-check/index.js` 已与 index.js ZH_SIGNALS 同族补齐，两份独立拷贝的同步义务记录在本轮 UPGRADE_LOG「双落点」表；后续任何一侧扩族须同步另一侧，否则 think-pipeline 钩子与 gate 路径行为会分叉。
+
+---
+
 ## r442 — 第 246 维 counterfactual_overclaim 新增否定形反事实句式族（真升级②：已有维度全新句式族；v6.8.218→v6.8.219）
 
 方向轮换：r441 基线比例切换（percent_basis_shift）→ 本轮切换至「因果与反事实推理」。阶段1 三层搜索落盘 `/tmp/hf-scout-r442.txt`：HN Algolia `cognitive bias detection` / `logical fallacy detection` 命中高价值故事「Translating natural language to first-order logic for logical fallacy detection」（258 pts）；GitHub API `logical fallacy detection` 最高仅 21★ 且均为 LLM 路线，与心虫纯规则引擎射程不符，不采用；Semantic Scholar 无有效返回。**外部方案不集成，走内部缺口路径**。
