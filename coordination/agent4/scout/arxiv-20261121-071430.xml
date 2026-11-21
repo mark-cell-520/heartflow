@@ -1,0 +1,468 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/6WrbJqT7G3yTPQnU16oDxeAlzxs</id>
+  <title>arXiv Query: search_query=all:psychological OR all:manipulation OR all:technique OR all:detection OR all:LLM OR all:persuasion&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-21T07:14:31Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:psychological+OR+(all:manipulation+OR+(all:technique+OR+(all:detection+OR+(all:LLM+OR+all:persuasion))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>617857</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26619v1</id>
+    <title>TideCache: Efficient Hybrid LLM Serving with Transparent Cache Management and Layer-Wise Streaming</title>
+    <updated>2026-11-19T18:58:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.26619v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26619v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hybrid architectures have become mainstream among open-weight language models. Their global-attention and bounded-state layers maintain heterogeneous caches whose demands vary with context length and concurrency. We present TideCache, a serving system on CPU--GPU superchips with three components for allocating GPU memory among caches and managing their residency across GPU and host memory. The Transparent Cache Pool redistributes physical pages among cache components behind fixed virtual addresses, preserving cache layouts and backend interfaces. The Cache Streamer uses computation intervals provided by bounded-state layers to prefetch the next global-attention layer's prefix into GPU slots shared across global-attention layers, reducing GPU residency while overlapping layer-wise transfers with computation. Generated KV remains resident. The Request Scheduler selects resident or streamed execution and triggers capacity adjustments according to request size and queue state. Together, they let HBM released by streaming accommodate other cache components and additional requests. Implemented in SGLang and evaluated on GB300 and GH200 across seven model/platform configurations, TideCache completes up to 2.04x as many agent turns, reduces overall P50 per-token latency by 20--59%, and improves agent P50 TTFT by 1.40--3.05x compared with SGLang with HiCache.</summary>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:58:31Z</published>
+    <arxiv:comment>13 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.DC"/>
+    <author>
+      <name>Jinbin Luo</name>
+    </author>
+    <author>
+      <name>Xiaozhe Yao</name>
+    </author>
+    <author>
+      <name>Shang Yang</name>
+    </author>
+    <author>
+      <name>Zhijian Liu</name>
+    </author>
+    <author>
+      <name>Song Han</name>
+    </author>
+    <author>
+      <name>Qinghao Hu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26617v1</id>
+    <title>One Prior, Two Dynamics: Repurposing Video Diffusion Transformers for Self-Supervised Latent Action Learning</title>
+    <updated>2026-11-19T18:58:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.26617v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26617v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Videos reveal how the world changes, but rarely the actions that cause those changes. Latent action learning recovers such supervision from visual transitions, yet often learns the underlying dynamics largely from scratch. We ask whether a pretrained video generator can instead provide the prior for both inverse and forward dynamics. We introduce O$^{2}$LaF, built on a simple principle: one prior, two dynamics. We initialize both models from the same pretrained video DiT and adapt them to their distinct roles: a feed-forward transition encoder with learnable action queries for inverse dynamics, and a causal, action-conditioned video generator for forward dynamics. By controlling information access and optimizing both dynamics end-to-end through a compact bottleneck, O$^{2}$LaF learns transferable actions from unlabeled videos. Across navigation and robotic manipulation, O$^{2}$LaF sets a new state of the art in few-shot action probing and enables stronger zero-shot action transfer across visual contexts and embodiments. Beyond generative video priors, we further extend our framework to predictive representation priors such as V-JEPA2, achieving competitive performance. Our findings suggest a broader paradigm for latent-action learning: repurposing pretrained video models to discover transferable actions and predict their consequences.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:58:14Z</published>
+    <arxiv:comment>Project page: https://showlab.github.io/o2laf Code: https://github.com/showlab/O2LaF</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yuxin Jiang</name>
+    </author>
+    <author>
+      <name>Wenqiang Sun</name>
+    </author>
+    <author>
+      <name>Jiaqi Li</name>
+    </author>
+    <author>
+      <name>Yuchao Gu</name>
+    </author>
+    <author>
+      <name>Lvmin Zhang</name>
+    </author>
+    <author>
+      <name>Ivor Tsang</name>
+    </author>
+    <author>
+      <name>Mike Zheng Shou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26616v1</id>
+    <title>Fractional Charge at Dislocations from Band-Inversion Cancellation</title>
+    <updated>2026-11-19T18:58:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.26616v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26616v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Band inversions with opposite Chern numbers cancel in the Hall response and yield counterpropagating boundary modes that can gap out. However, a bulk probe of the topology that survives such a cancellation is lacking. We here show that dislocations in inversion-symmetric two-band crystals with cancelling band inversions bind a half-integer charge, which reveals the quantized bulk polarization of the bond-centered obstructed atomic limit realized by such crystals. To demonstrate this, we continuously deform a broad class of two-band lattice models into decoupled chains, without closing the bulk gap or breaking the inversion symmetry, where the dislocation charge follows from a count of occupied bonds. Notably, the fractional part of this charge is insensitive to local perturbations of the dislocation core, and it therefore persists after the in-gap core state is removed, as we show analytically in the chain limit and numerically away from it. In the Weyl-semimetal counterpart, the response to a magnetic flux separates this crystalline charge from the charge set by the Chern number of each momentum slice. We propose that a half-integer core charge that persists after the in-gap peak disappears from the local spectrum can be detected in artificial electronic and optical lattices, with metamaterials providing complementary access to the core modes.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:58:11Z</published>
+    <arxiv:comment>9 pages, 3 figures, SM as ancillary file</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>Vladimir Juričić</name>
+    </author>
+    <author>
+      <name>Rodrigo Soto-Garrido</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26613v1</id>
+    <title>AgentRoboCritic: Understanding the Capability of Frontier Agents on Direct Robot Control</title>
+    <updated>2026-11-19T18:57:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.26613v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26613v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier multimodal language agents such as GPT-6 Astra have demonstrated strong capabilities in controlling robots directly via low-level numerical actions without high-level primitives. However, existing benchmarks report only episode-level success rates, which show neither how these agents succeed nor where they fail. In this paper, we present a systematic action-level analysis of frontier agents on direct robot control across 12 manipulation benchmarks. We introduce AgentRoboCritic, an intent-grounded critique framework in which the policy agent states a local intent alongside each action, and a critic evaluates the action's outcome and failure mode against this intent. Our action-level analysis demonstrates the promising capabilities of frontier agents on direct robot control, including closed-loop recovery from local execution failures, reliable semantic grounding across diverse scenes, and strong zero-shot manipulation without task-specific adaptation. It also identifies their current limitations, including task-relevant physical execution bottlenecks such as grasping and alignment, and uneven recovery across failure modes. Finally, we validate our critic on a 400-action human-annotated benchmark and release a dataset of 12,844 annotated actions alongside a fine-tuned open-source critic, Muse-Glimmer-30B, whose failure-mode accuracy rises from 32.58% to 74.24%, enabling low-cost action-level analysis.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:57:25Z</published>
+    <arxiv:comment>28 pages. Project page: https://adu2021.github.io/blog/AgentRoboCritic/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yiyang Du</name>
+    </author>
+    <author>
+      <name>Yuxuan Kuang</name>
+    </author>
+    <author>
+      <name>Qitao Zhao</name>
+    </author>
+    <author>
+      <name>Yixuan Wang</name>
+    </author>
+    <author>
+      <name>Zhanqiu Guo</name>
+    </author>
+    <author>
+      <name>Yi Xu</name>
+    </author>
+    <author>
+      <name>Xin Li</name>
+    </author>
+    <author>
+      <name>Wenbin He</name>
+    </author>
+    <author>
+      <name>Liu Ren</name>
+    </author>
+    <author>
+      <name>Chenyan Xiong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26608v1</id>
+    <title>Local velocimetry for atomic superfluids: from Riemann rarefaction waves to quantized vortices</title>
+    <updated>2026-11-19T18:56:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.26608v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26608v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We demonstrate local velocimetry for atomic superfluids in two dimensions (2D). Using matter-wave interferometry based on Raman--Bragg beam splitters, we map the local gradient of the phase of the superfluid's wavefunction onto displacement of the interference fringes and reconstruct the 2D velocity field. We illustrate the capabilities of this technique by applying it to two canonical problems. First, we directly observe the self-similar evolution of the velocity field in 1D Riemann rarefaction flows. Second, we map out the full 2D velocity field around quantized vortices, explicitly demonstrating the quantization of velocity circulation.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.atom-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:56:37Z</published>
+    <arxiv:comment>11 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Yansheng Zhang</name>
+    </author>
+    <author>
+      <name>Yi Jiang</name>
+    </author>
+    <author>
+      <name>Feiyang Wang</name>
+    </author>
+    <author>
+      <name>Louis Depaepe</name>
+    </author>
+    <author>
+      <name>J. Q. Matthew Chia</name>
+    </author>
+    <author>
+      <name>Christoph Eigen</name>
+    </author>
+    <author>
+      <name>Gehrig Carlse</name>
+    </author>
+    <author>
+      <name>Zoran Hadzibabic</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26601v1</id>
+    <title>SoK: Assessing the Evolution of LLM Capability in Software Vulnerability Research</title>
+    <updated>2026-11-19T18:54:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.26601v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26601v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-based agents are becoming increasingly capable at discovering, validating and patching vulnerabilities in real software, and vendors and researchers report that this is already changing how vulnerabilities are found and fixed. These claims, however, are scattered across papers, vendor reports and disclosures and are rarely comparable. We introduce a framework that rates these capabilities on an autonomy scale modeled on the levels of driving automation, and qualifies each claim by its correctness, its availability and the strength of its evidence. We use this framework to systematize the published evidence on LLM capability in vulnerability research. We find that agents discovered, validated, and patched vulnerabilities in real-world software without human intervention before the restricted frontier models of 2026, and that open-weight models subsequently attained comparable autonomy for discovery and validation. We then measure the consequences of evolving LLM security capabilities in a decade of public vulnerability records, advisories and exploitation data. In 2026 the number of disclosed vulnerabilities more than doubled, with an increasing share rated critical or high, and severe bugs that had survived a decade or more in widely used code were reported several times more often than before. Yet the time between the stages of a vulnerability's life, from report to fix and from disclosure to attack, has not shifted noticeably so far. We grade the mitigations proposed in the literature with an explicit rubric and draw guidance for each group of stakeholders from the best-supported ones.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:54:19Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Amine Lbath</name>
+    </author>
+    <author>
+      <name>Manan Suri</name>
+    </author>
+    <author>
+      <name>Aurelien Delaitre</name>
+    </author>
+    <author>
+      <name>Vadim Okun</name>
+    </author>
+    <author>
+      <name>Massih-Reza Amini</name>
+    </author>
+    <author>
+      <name>Dinesh Manocha</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26596v1</id>
+    <title>PGX: Physically Grounded Execution for Long-Horizon Humanoid Loco-Manipulation</title>
+    <updated>2026-11-19T18:52:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.26596v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26596v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robotic vision-language-action (VLA) models can execute diverse individual manipulation skills, yet they still struggle with long-horizon loco-manipulation tasks, where temporal structure, skills, and precision are tightly coupled within a monolithic model. We propose Physically Grounded Execution (PGX), a framework that offloads temporal and precision control to two classical training-free components, allowing the VLA to focus on stage-specific skill dynamics. PGX decomposes long-horizon loco-manipulation into three layers: (i) a predicate-based state machine governs task progression, using physical predicates to gate phase transitions, trigger recovery, and coordinate navigation and waiting. Shared predicate semantics connect offline demonstration segmentation, online execution, and stage-wise evaluation; (ii) VLA skills operate within active manipulation phases, with flat or stage-trained models concentrating on task-relevant actions; and (iii) world-coordinate locking (WCL) maintains spatial consistency through base station keeping, object-relative positioning, and world-anchored contact targets. We demonstrate the effectiveness of PGX with extensive experiments conducted on three simulated tasks and one real-world task using a Unitree G1 humanoid robot for long-horizon loco-manipulation, showing improvements in stage progression and task success rates. Project page is available at: https://kl-research.github.io/pgx</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:52:18Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Kai Lu</name>
+    </author>
+    <author>
+      <name>Chenyang Ma</name>
+    </author>
+    <author>
+      <name>Ioannis Havoutis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26594v1</id>
+    <title>UV Bounds on Inflationary Parity Violation</title>
+    <updated>2026-11-19T18:51:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.26594v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26594v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A question of fundamental interest is whether parity is violated on large scales in the Universe. This possibility has been motivated by recent analyses of the four-point matter correlation function. It has also been suggested that detectable parity violation could be generated during inflation by the dynamical Chern-Simons operator, a leading effective field theory correction to general relativity. In this work, we examine this possibility in realistic UV completions, including fermionic and string-theoretic examples. We show that existing bounds on the tensor-scalar-scalar (TSS) bispectrum strongly constrain the possibility of generating a detectable parity-odd trispectrum. For tensor-to-scalar ratios near current observational limits, detectability is incompatible with, or pushes against, the regime of validity of these UV completions. A detectable signal can remain possible for a sufficiently small tensor-to-scalar ratio, but only at the cost of an extremely large enhancement of the TSS vertex. Thus, while a future search for large scale parity violation is worth pursuing, generating a detectable signal within a consistent effective theory is highly nontrivial.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:51:13Z</published>
+    <arxiv:comment>9 pages in double column format</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Alexander Cassem</name>
+    </author>
+    <author>
+      <name>Mark P. Hertzberg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26593v1</id>
+    <title>Star-forming disc galaxies align tangentially with the cosmic tidal field</title>
+    <updated>2026-11-19T18:48:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.26593v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26593v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The alignments of galaxy shapes, with one another and with the large-scale structure of the Universe, have been a topic of considerable investigation within cosmology and extragalactic astrophysics for the last 60 years. Galaxy alignments are a major systematic for weak gravitational lensing and help us learn about the processes of galaxy formation. Red early-type galaxies are known to show strong radial alignments around other galaxies; however, blue star-forming galaxies have shown little evidence of alignment. We combine SPHEREx spectrophotometry with DESI Legacy Imaging Surveys to build a full-sky catalogue of 71 million galaxies with precise redshifts. With this catalogue we are able to measure alignment signals by splitting galaxies into colour and morphological samples. We detect tangential alignment of blue disc galaxies at $22.5σ$ and radial alignment of red spheroidal galaxies at $65σ$. By measuring the alignment signal separately around overdensities and underdensities, we show that each of these alignments has the scale and environmental dependence of a linear response to the cosmic tidal field; a response purely quadratic in the Gaussian tidal field, as in classic tidal torque theory is ruled out.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:48:05Z</published>
+    <arxiv:comment>25 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Calum Murray</name>
+    </author>
+    <author>
+      <name>Roman Paviot</name>
+    </author>
+    <author>
+      <name>Martin Kilbinger</name>
+    </author>
+    <author>
+      <name>Cail Daley</name>
+    </author>
+    <author>
+      <name>Ken Ganga</name>
+    </author>
+    <author>
+      <name>Michael J. Hudson</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26588v1</id>
+    <title>Verify the Verifier: Specification-Grounded LLM Cross-Checking for Bugs That Escape UVM Scoreboards</title>
+    <updated>2026-11-19T18:45:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.26588v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26588v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A passing UVM regression shows the design agrees with the reference model on what the scoreboard checks, not that it meets the specification. Bugs that pass every test yet violate the specification, termed scoreboard escapes, survive mature testbenches. We present Verify the Verifier, to our knowledge the first framework whose LLM-based Anomaly Cross-Checker examines a passing regression's traces against the specification. Of 564 bugs inserted into four OpenTitan IPs, 68 are candidate scoreboard escapes: non-equivalent, exercised by the tests, yet passing. The framework confirmed 41 as scoreboard escapes with assertions failing on the buggy design and proven on the original.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:45:54Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Ana E. Sanchez Villalobos</name>
+    </author>
+    <author>
+      <name>Michael D. Quinn</name>
+    </author>
+    <author>
+      <name>Aakash Tyagi</name>
+    </author>
+    <author>
+      <name>Minh D. Luu</name>
+    </author>
+    <author>
+      <name>David Kebo Houngninou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26584v1</id>
+    <title>Represented but misread: Post-training changes how language models read out what they represent</title>
+    <updated>2026-11-19T18:43:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.26584v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26584v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Does post-training change what a language model represents, or how this representation is read out into an answer? We compared linear probes with the models' own answers, analyzed with signal detection theory, in six open-weight base models and their post-trained versions. For judgments of whether German texts were written by a human or an AI, probes and word n-gram classifiers separated the classes well, but the answers did not and often ordered the texts inversely. Post-training lowered the sensitivity of the answers on average ($Δd' = -0.34$ across model families; -0.29 across three prompts). It also changed the use of a stated base rate: Base models shifted their log-odds by less than the stated change in prior odds, most post-trained models by more. In two models with stage-wise checkpoints, the change occurred during supervised fine-tuning, model stitching implicated the early layers, and from mid-depth on internal states at positions after the text, not those of the text, transferred the change between checkpoints. Our corpora cannot be shared, so we add a case reproducible from public data, the truth of negated statements. Here, post-training acted in the opposite direction: Probes decoded truth at or near ceiling in every model, the answers of several base models did not use it, and post-training repaired them; by mid-depth the repair resided at the positions after the statement; below it, the representation of the statement contributed, strongly in one of four models. In a training study, adding 2,000 correctly labeled authorship judgments of news texts to otherwise identical fine-tuning data improved the answers on our newspaper and textbook corpora and inverted them on the chats, where they followed a news-trained probe of the base model. Post-training thus changed how a judgment is read out of what a model represents, and a small training signal can set its direction.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:43:56Z</published>
+    <arxiv:comment>64 pages, 7+2 figures, 4+6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jochen Laubrock</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26582v1</id>
+    <title>End-to-End Quantum Algorithm for Differential Equations: Application to Simulating a Biomolecular System</title>
+    <updated>2026-11-19T18:43:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.26582v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26582v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum algorithms for differential equations have the potential for substantial algorithmic speedups over classical methods. However, they rely on certain assumptions and abstract oracle specifications that leave their practical feasibility and computational advantages for realistic applications unclear. Here we formalize the concept of an end-to-end quantum algorithm for differential equations as one that accepts classical inputs and returns classical outputs, and provide implementations for algorithmic primitives in constructing such algorithms. We present a tailored end-to-end quantum algorithm for the linearized Poisson-Boltzmann (LPB) equation, a partial differential equation (PDE) with variable coefficients widely used in simulating a biomolecular system. We explicitly implement all aspects of the algorithm, from preparing an initial state to generating a quantum solution and estimating properties of the system. In particular, we develop a new discrete representation for variable-coefficient PDEs on a grid that enables efficient implementation of the operator oracle, and build on a recent technique based on optimal wavelet preconditioning to generate a quantum solution with a cost independent of the condition number of the discretized operator. We show the algorithm can be implemented by quantum circuits of size polylogarithmic in both the number of grid points $N_g$ and the inverse of the desired accuracy $\varepsilon$, with an overall gate cost polylogarithmic in $N_g$ and quasilinear in $1/\varepsilon$. We also show the classical preprocessing to construct the circuits has polylogarithmic cost in $N_g$ and $1/\varepsilon$. Our work provides a concrete end-to-end quantum algorithm for a PDE of practical value, demonstrates an exponential improvement in scaling with $N_g$ over classical methods, and provides a foundation for assessing its potential quantum advantage in practice.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:43:32Z</published>
+    <arxiv:comment>61 pages, 11 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Mohsen Bagherimehrab</name>
+    </author>
+    <author>
+      <name>Daniyaal Farooqi</name>
+    </author>
+    <author>
+      <name>Gavin K. Brennen</name>
+    </author>
+    <author>
+      <name>Barry C. Sanders</name>
+    </author>
+    <author>
+      <name>Alán Aspuru-Guzik</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26575v1</id>
+    <title>Stochastic counterpart of Nesterov's method for sampling and provable non-acceleration of samplers with heavy-ball structure</title>
+    <updated>2026-11-19T18:42:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.26575v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26575v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Polyak's heavy-ball method and Nesterov's method are two momentum-based methods that have inspired many optimization techniques used in applied fields, including machine learning. Momentum also provides a connection with sampling, and interestingly, many kinetic Langevin samplers reduce to the heavy-ball recurrence when velocity is eliminated and noise is removed. This observation motivates a natural question: what is the corresponding sampler for Nesterov's method? We propose a sampler whose deterministic part is exactly Nesterov's recurrence, driven by temporally correlated Gaussian noise and requires one new gradient evaluation per step. Noise correlation provides $\mathcal{O}(h^2)$ bias for smooth observables. We establish geometric ergodicity for possibly non-convex potentials. For strongly convex potentials with Lipschitz continuous gradients, we obtain contraction rates and show that, up to an additive constant, the energy decays at a rate of order $κ^{-1/2}$, where $κ$ is the condition number. For Gaussian targets, we show that relaxation has square-root dependence on $κ$. We further prove that any sampler based on heavy-ball dynamics with additive noise cannot achieve accelerated convergence uniformly over the class of strongly convex functions. Finally, we compare the proposed sampler with OBABO, BAOAB, HMC, MALA, BPS, and NUTS in numerical experiments and demonstrate the better performance of proposed sampler.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:42:01Z</published>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>A. Sharma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26565v1</id>
+    <title>PhyDEX: A Benchmark for Physical Reasoning in Vision-Language-Action Models via Dynamic Extrinsic Dexterity</title>
+    <updated>2026-11-19T18:33:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.26565v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26565v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models have advanced rapidly in language-conditioned robotic manipulation, yet existing benchmarks mainly evaluate gripper--object contact and largely ignore how objects interact with the environment through gravity, friction, inertia, and mass distribution. As a result, it remains unclear whether current policies truly understand physics or merely interpolate from their training data. We address this gap through the lens of dynamic extrinsic dexterity and introduce PhyDEX, a throwing benchmark in which a robot must infer an object's mass, center of mass, and friction to send it to a destination beyond its kinematic workspace. PhyDEX contains 35K trajectories (143 hours) across nine tasks and 100 scenes, covering uniform, irregular, and dynamic-mass objects with static, multiple, and moving destinations. All data are generated by a scalable, fully automatic pipeline that combines grasp generation, motion planning, and closed-loop throw optimization under randomized physical properties. We evaluate three representative VLAs, GR00T N1.7, DynamicVLA, and ForceVLA, and find that all achieve success rates below 3\%. Our analysis reveals two key bottlenecks: limited robustness of pretrained models, which causes most failures before the throw, and physical blindness, as providing ground-truth physical properties roughly doubles success. Experiments on a humanoid robot and in the real world show the same failure patterns. We hope PhyDEX will drive the development of physically grounded robot policies.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:33:43Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Hao Vo</name>
+    </author>
+    <author>
+      <name>Taisei Hanyu</name>
+    </author>
+    <author>
+      <name>Yuki Ikebe</name>
+    </author>
+    <author>
+      <name>Pham Tri Quang</name>
+    </author>
+    <author>
+      <name>Sreevenkata Anjani Tishita Godavarthi</name>
+    </author>
+    <author>
+      <name>Nghi D. Q. Bui</name>
+    </author>
+    <author>
+      <name>Daniel Sonntag</name>
+    </author>
+    <author>
+      <name>Chase Rainwater</name>
+    </author>
+    <author>
+      <name>Duy Minh Ho Nguyen</name>
+    </author>
+    <author>
+      <name>Anh Nguyen</name>
+    </author>
+    <author>
+      <name>Ngan Le</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.26562v1</id>
+    <title>Multi-institutional grading of Barrett's esophagus dysplasia without stain normalization using a pathology foundation model and multiple instance learning</title>
+    <updated>2026-11-19T18:27:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.26562v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.26562v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Barrett's esophagus dysplasia grading suffers substantial inter-observer variability, particularly for low-grade dysplasia, complicating clinical decision-making. We conducted a retrospective multi-institutional diagnostic accuracy study of a foundation model-based deep learning system for dysplasia grading, using 969 H\&amp;E-stained whole slide images from four institutions. Patch-level classifiers trained on expert annotations identified diagnostically relevant regions, followed by attribute-aware multiple instance learning for slide-level classification as non-dysplastic Barrett's esophagus (NDBE), low-grade dysplasia, or high-grade dysplasia. On a held-out test set (n = 130), macro-averaged AUC was 0.96 (95\% CI 0.93--0.98). For binary dysplasia detection, sensitivity was 98\% (80/82) and specificity 81\% (39/48), with a negative likelihood ratio of 0.030 and quadratic-weighted \kap{} of 0.83 against expert consensus. No high-grade dysplasia case was misclassified as NDBE. Performance was consistent across institutions without stain normalization, indicating that stain-robust foundation-model representations may remove the site-specific preprocessing that has constrained prior systems to institution-specific deployment.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-19T18:27:59Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Amirali Khosravi</name>
+    </author>
+    <author>
+      <name>Jaidip M. Jagtap</name>
+    </author>
+    <author>
+      <name>D. Chamil Codipilly</name>
+    </author>
+    <author>
+      <name>Catherine E. Hagen</name>
+    </author>
+    <author>
+      <name>Jason T. Lewis</name>
+    </author>
+    <author>
+      <name>Rickey E. Carter</name>
+    </author>
+    <author>
+      <name>Shahriar Faghani</name>
+    </author>
+    <author>
+      <name>Vani J. A. Konda</name>
+    </author>
+    <author>
+      <name>Fouad Otaki</name>
+    </author>
+    <author>
+      <name>Shajan Peter</name>
+    </author>
+    <author>
+      <name>Nicholas Shaheen</name>
+    </author>
+    <author>
+      <name>Sachin Wani</name>
+    </author>
+    <author>
+      <name>Prasad G. Iyer</name>
+    </author>
+    <author>
+      <name>Bradley J. Erickson</name>
+    </author>
+  </entry>
+</feed>
