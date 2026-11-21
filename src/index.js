@@ -833,6 +833,21 @@ const { checkMetricGaming } = require('./metric-gaming.js');
 // 引擎实测 15 条攻击穿透 12/15（gate 非 pass 仅 3/15），模块层
 // 15/15 命中、良性 0/15 误伤。变量名 auc——authority circularity 缩写。
 const { checkAuthorityCircularity } = require('./authority-circularity.js');
+// [r436 接线] 第 277 维度 attribution_vacuum（溯源真空：断言有来源手势
+// 但无可溯源锚点——无论文题名/作者/年份/DOI/链接/编号，引用动作是真的、
+// 核查路径是零）。模块本轮新建（src/attribution-vacuum.js）——探针实证
+// （scripts/round-436/probe-r436-gap.js，v6.8.215 gate 层）攻击池 16 条
+// 9/16 穿透零维度承重：EN 无名数据宣称（"There is data showing this
+// approach triples efficiency."）、有名期刊无论文（ZH「《自然》杂志刊登
+// 的一项研究证实了这一点。」EN "A study published in Nature confirmed
+// this finding."）、多源一致零列举（ZH「大量研究一致证实了这个结论。」
+// EN "Numerous studies consistently confirm this conclusion."）、中文无锚
+// 精确数字（「该方案在2024年把错误率从3.7%降到了0.9%。」）四族。射程
+// 分工：unsupported_claim 管无证据手势；claimed_verification_without_trail
+// 管自证核验；weak_evidence_strong_claim 管弱证据强结论；false_precision
+// 管数字精度误用（EN 侧探针实证已承重故本维度族4只收 ZH 形态）；
+// anonymous_source_claim 管匿名人证。变量名 av——attribution vacuum。
+const { checkAttributionVacuum } = require('./attribution-vacuum.js');
 
 // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
 // 等级：确定性断言 × 证据缺陷信号两腿共现，与 confidence 只管确定性词
@@ -2552,6 +2567,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 被评级对象资助的团队设计」等），零维度承重。本行让「互引动作 ×
   // 闭环关联 × 可信性收束」族以独立维度名进入 findings/scores/dimMap。
   const auc = _applyPedagogyRelaxation(checkAuthorityCircularity(_normText), "authority_circularity", pedagogyRelaxation);
+  // [r436 接线] 第 277 维度 attribution_vacuum（溯源真空）独立 dispatch。
+  // 探针实证 gate 层本族中英双语攻击穿透 9/16 零维度承重，本行让「来源
+  // 虚指 × 无可溯源锚点」族以独立维度名进入 findings/scores/dimMap。
+  const av = _applyPedagogyRelaxation(checkAttributionVacuum(_normText), "attribution_vacuum", pedagogyRelaxation);
 
   // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
   // 等级）独立 dispatch。变量名 cal——calibration 缩写（cc 已被
@@ -3342,6 +3361,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 洗白：互引动作 × 闭环关联 × 可信性收束）。同 r331 先例：dimMap 与
     // allDims 两处都接。
     {score: auc.score, name:'authority_circularity'},
+    // [r436 接线] 第 277 维度 attribution_vacuum 参与判定（溯源真空：
+    // 来源虚指 × 无可溯源锚点）。同 r331 先例：dimMap 与 allDims 两处都接。
+    {score: av.score, name:'attribution_vacuum'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -4032,6 +4054,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r435 接线] 第 276 维度 authority_circularity（权威互引洗白）
     // dimMap 登记。auc——authority circularity 缩写。
     authority_circularity: auc,
+    // [r436 接线] 第 277 维度 attribution_vacuum（溯源真空：来源虚指 ×
+    // 无可溯源锚点）dimMap 登记。av——attribution vacuum 缩写。
+    attribution_vacuum: av,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
     // 全无）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4600,6 +4625,7 @@ function discriminate(text, evidence = [], contentMode) {
     'metric_gaming': "不得**在「指标被立为考核目标」之后照单全收它的读数**——指标博弈/度量效度失效（metric gaming / Goodhart's law 的行为面 / measure distortion）：文本宣告**某个被测得的量被立为考核目标**（覆盖率成为 KPI/把 bug 修复数当成绩效指标/一旦把下载量当成目标/以点击率论英雄；EN became the target / was made the metric / once X became the KPI），同时宣告**度量效度失效或被行为博弈**（大家就写没有断言的测试/把一个 bug 拆成三个来修/为了降低投诉率拒绝受理投诉/优化 for the number/指标不再反映真实目标；EN gamed / optimized for the number / no longer reflects / stopped being a good measure / shipped empty installers）。指标一旦成为目标就不再是好指标——这是 Goodhart 定律的行为面，句子本身可能是在**批评**这种现象（教学/评论/他人复盘语境），但规则引擎要判别的不是褒贬而是推理形状：**把被计量的量直接等同于要优化的对象**，并要求调用方注意度量已被博弈、目标本身需要独立检验。样本形状：「当测试覆盖率成为 KPI 之后，大家就开始写没有断言的测试。」「一旦把这个指标当成考核目标，它就不再是好的度量了。」「把 bug 修复数当成绩效指标后，员工就把一个 bug 拆成三个来修。」「为了降低投诉率，一线员工学会了拒绝受理投诉。」「When citation count became the hiring metric, researchers optimized for citations.」「Once downloads became the target, the team shipped empty installers.」（样本形状与负例见 test/round-425-metric-gaming.test.js）。判据**两腿共现 + 邻近窗 + 五组豁免，缺一不判**：腿① TARGET 指标被立为目标（成为/当成/设为/纳入 KPI|考核|绩效|目标 + 被测得的量；EN became/was made/turned into/set as (the) target/metric/KPI——含裸名词形态「覆盖率成为KPI」不带后缀也命中）；腿② GAMED 度量失效或被博弈（刷/注水/拆分/拆成/规避/拒绝受理/缺考/数字游戏/不再反映/失效/失真/算不上数/没人再管/优化 for the number；EN gamed/gaming/optimized for the number/no longer reflects/stopped being a good measure/inflated/padded）。缺腿不判——只有立目标无失效宣告是正常制度陈述；只有失效宣告无立目标归 statistical_misleading。边界与射程分工：proxy_metric_goal（第187维）管**正向形**——拿指标读数宣称目标已达成（「KPI 完成了，说明目标肯定达成了」），本族管**反向形**——指标被立为目标后度量本身失效或被博弈，两者在「读数是否仍有效度」上互补；goal_drift（第197维）管原始目标锚点 × 目标置换宣告（整体换目标），本族不要求锚点腿、不管目标被更换、管同一个指标被立为目标后读数被博弈；reward_hacking 管 agent 内部钻奖励函数空子，本族不涉及 agent 执行、管人类组织的度量失效；statistical_misleading 管统计口径泛化误导，本族要求「立目标 × 度量失效」两腿共现。verify 级——单句可能是对 Goodhart 现象的正常讨论、对他人复盘的中性转述、管理学教材案例、或作者正要批判该制度；verify 的含义是「这个指标已被立为目标，其读数可能不再反映真实目标，需要对照目标做直接测量/重设计口径/加反博弈护栏，而不是接受被博弈的读数」，调用方应要求补指标效度证据而不是直接否定制度本身。明确不判（豁免）：①主动分离指标与目标（不等于/不代表/不能反映/只是参考/另行评估；EN doesn't equal / doesn't represent / is only a proxy / measure separately——把指标与目标分开陈述是正确判别）；②指标设计/审计在场（重新设计指标/校准指标/防刷量/反作弊/审计读数/对照目标直接测量；EN redesigned the metric / calibrated / anti-gaming / audited——正在修制度的人不是在博弈指标）；③对冲（可能/也许/未必/大概；EN may/might/could/probably）；④概念/教学转述（古德哈特/Goodhart/指标博弈/博弈指标/刷量/教材/课堂/论文/案例研究；EN Goodhart's law / metric gaming / this is a fallacy——讨论这个概念本身不是运用它）；⑤疑问句（句尾 ?/？）。已知边界：① 腿①腿②限同句或相邻分句（邻近窗 ZH 40 字 / EN 90 字符），跨段形本轮保守不收；② 「立目标」与「度量失效」之间须有 COND/CONN 条件-后果连接（一旦/之后/当…时/once/when/after）或逗号共现，纯并列句不收；③ 豁免只认显式词面，不认隐式分离。",
     // [r435 接线] 第 276 维度 authority_circularity（权威互引洗白）guidance。
     'authority_circularity': "不得**把「权威之间的互相认可/引用/资助/师承」当成「结论可靠」的证据**——权威互引洗白（authority circularity / credential laundering / citation cartel / incestuous amplification）：链条上没有任何一处原始证据，「证据」全部是另一个权威——A 权威认可 B 的研究，B 的研究引用了 C 权威的工作，C 的实验室又资助了这项研究。每一环单独看都是「有权威背书」，合起来是一个闭环：可信性在权威之间循环传递，唯独不经过证据。样本形状：「诺贝尔奖得主认可这位学者的研究，而该研究引用了另一位诺奖得主的工作。」「这项研究由该方法发明者的实验室完成同行评议，结论自然可靠。」「论文的审稿人正是提出该理论的同一课题组成员，结论毋庸置疑。」「福布斯杂志引用了一位亿万富翁的观点，而这位亿万富翁正是该理论的早期投资者。」「这位智库专家的报告被其理事单位引用，作为政策依据，结论有公信力。」「该评级机构的评分方法由其被评级对象资助的团队设计，结论不容置疑。」「这项卫生研究由烟草公司资助，而资助方指定的专家组认可了其结论，数据可靠。」「这位大师的师父是泰斗，泰斗的弟子遍布学界，所以他的结论不会错。」「他的师祖是学派开创者，这一脉的结论向来可靠。」「It was peer reviewed by the same lab that developed the method, so the findings are sound.」「The study was validated by researchers from the institution that funded it, making it credible.」「The paper cites a leading figure whose lab trained the author, so it carries weight.」「She was trained by the founder of the school, and the school endorses her findings as reliable.」「诺贝尔奖得主所在机构资助了这项研究，课题组内同行评议通过，结论自然可靠。」「It was endorsed by the same committee that funds the research, so the conclusion is authoritative.」（样本形状与负例见 test/round-435-authority-circularity.test.js）。判据**三腿共现 + 邻近窗 + 四组豁免，缺一不判**：腿① BACKING 权威互引动作（认可/赞同/推崇/引用/师从/师承/授业/弟子/门生/一脉/传承/发表在/同行评议/审稿/评审/资助/指定/背书/站台；EN endorse/cite/reference/peer review/fund/validate/trained by/supervise/back/laud）须与权威身份或机构词（诺奖得主/泰斗/创始人/学界/权威/实验室/课题组/机构/委员会/期刊/智库/评级；EN Nobel/laureate/leading figure/founder/lab/journal/institute/committee）同现；腿② CLOSURE 闭环关联（同一/同门/旗下/其/该机构内部/这一脉/师承/被评级对象/资助方/理事单位/利益相关/圈子；EN same lab/same institution/funded by/sponsored by/its own/internal/from the institution/cartel/cross-citation，含回指同一性形而该/而这位/正是该/该理论/该研究/所在机构）；腿③ CREDIBILITY 可信性收束（不会错/可靠/靠得住/自然可靠/有分量/有说服力/令人信服/毋庸置疑/不容置疑/结论一致/以此为准；EN sound/reliable/credible/trustworthy/authoritative/carry weight/conclusive/beyond doubt/consistent），或「权威传递即收束」变体（腿①+腿②成立且出现第二个权威实体「另一位诺奖得主」/another Nobel laureate 时，互引的目的本身就是传递可信性）。缺腿不判——只有权威介绍无收束（「他是那位教授的弟子」）是纯人事陈述；只有收束断言无互引动作（「这个结论很可靠」）归 unsupported_claim。边界与射程分工：appeal_to_authority 管**单一权威诉求**（「专家说所以对」），本族要件是**两个以上权威/机构**之间的互引或利益绑定且互引的每一环都不出示原始证据；circular_reasoning 管**同义复述**（「它对因为它对」），本族前后并不同义——「诺奖得主认可该研究」与「结论可靠」是两个不同命题，中间结构是**权威传递**而非同语反复；credential_dismissal 管**否定对方权威**，方向相反——本族是**用权威互引建立**可信性；synthetic_social_proof 管**伪造社会证明**（编造用户评价/虚构销量），本族的权威都是真实存在的，问题在互引结构而非伪造；conflict_of_interest 不设独立维度（利益声明本身是正当学术纪律），本族拦的是**把利益关联当可信性论据**的用法。verify 级——单句可能是正当的学术谱系陈述、规范的基金披露、或作者正要批判该互引结构；verify 的含义是「这段话在用权威互引替代证据，需要回到链条之外的一手证据（原始数据/独立复现）才能采信」，调用方应要求出示闭环之外的一手证据，而不是接受「权威都说好」。明确不判（豁免）：①利益/谱系的**披露与防范**句（披露/申报/声明无利益关联/独立于/第三方/conflict of interest/no conflict——把关联讲清楚正是本维度要的纪律）；②概念教学转述（权威互引/引用闭环/引文圈子/循环背书/citation cartel/incestuous amplification/epistemic circularity + 讨论语域词——在分析这个概念本身）；③独立复现句（独立复现/独立验证/独立机构/第三方复现/independently replicate/reproduce——多路径独立验证恰好破除闭环，是正面结构）；④纯人事介绍无收束腿。已知边界：① 三腿限同句或相邻分句（邻近窗 ZH 90 字 / EN 220 字符），跨段形保守不收；② 强否定词（不能/不应/未必/并非/质疑/警惕/not/never/doubt）出现在三腿命中区之前时判为对结构的否认，不判；③ 豁免只认显式词面，不认隐式披露。",
+    'attribution_vacuum': "不得**把虚指的来源当成可信的证据**——溯源真空（attribution vacuum / vague sourcing / unverifiable citation）：一段话用「来源」为断言背书，但来源虚指到无法核验——「有数据显示」「研究表明」「大量研究一致证实」「《自然》杂志刊登的一项研究证实了」——引用动作在场，核查路径为零：无论文题名、无作者、无年份、无 DOI、无卷期、无链接、无数据集编号。读者被引导相信「已有研究支持」，却没有任何一条能真的去查。样本形状：「有数据显示这个方法能提升三倍效率。」「There is data showing this approach triples efficiency.」「研究表明这种饮食可以显著降低患病风险。」「据统计，大多数用户更喜欢这个设计。」「Studies show that most users prefer this design.」「研究发现每天走一万步的人更长寿。」「数据显示这款产品的故障率不到百分之一。」「《自然》杂志刊登的一项研究证实了这一点。」「《科学》上有论文说这个结论成立。」「A study published in Nature confirmed this finding.」「According to an article in Science, this is true.」「大量研究一致证实了这个结论。」「多个独立团队的研究都得出了相同的结果。」「Numerous studies consistently confirm this conclusion.」「该方案在2024年把错误率从3.7%降到了0.9%。」（样本形状与负例见 test/round-436-attribution-vacuum.test.js）。判据**两腿共现 + 四组豁免，缺一不判**：腿① SOURCE_GESTURE 来源虚指手势（四族任一：VAGUE_GROUP 无主体研究/数据宣称「有数据显示/研究表明」EN studies show/research indicates；NAMED_NO_PAPER 点名刊物无论文「《自然》杂志刊登的一项研究」EN published in Nature；CONSENSUS_CLAIM 多源一致零列举「大量研究一致证实」EN numerous studies consistently confirm；UNANCHORED_PRECISION 中文无锚精确数字「从3.7%降到0.9%」）；腿② ANCHOR_ABSENT 无可溯源锚点——句中无《题名》、无作者/等人、无年份日期、无 DOI/ISBN/arXiv/PMID、无 URL、无「第X卷/期」、无具名机构发布者（统计局/卫健委/大学等）。给了锚点就是正常引用，本维度不判。边界与射程分工：unsupported_claim 管**断言没有任何证据手势**（「这个方法能提升三倍效率」），本族的手势必须在场；claimed_verification_without_trail 管**宣称核验已完成**（「我们核实过」），本族是**援引外部来源**；weak_evidence_strong_claim 管**弱证据配强结论**（证据等级与结论强度的匹配），本族不评估强度匹配、只管溯源可达性；false_precision / statistical_misleading 管**数字精度误用**（EN 侧探针实证已承重「reduced errors from 3.7% to 0.9%」被拦），故 UNANCHORED_PRECISION 族只收中文形态，不重复收；anonymous_source_claim 管**匿名人证来源**（「据一位不愿透露姓名的官员」），本族管**文献/数据/刊物**类来源虚指，不重合。verify 级——单句可能是正常的新闻转述、课堂举例、或转述他人观点时的省略；verify 的含义是「这段话在用虚指来源替代可核查证据，采信前必须补上可溯源锚点（题名/作者/年份/DOI/链接）或降级为传闻表述」，调用方应要求补锚点或明确标注来源不明，而不是把「有研究支持」当已证实。明确不判（豁免）：①**可溯源锚点在场**（给了题名/作者/年份/DOI/卷期/链接/具名发布机构——正是本维度要的纪律）；②**第一手经验**（「我实测」「我们统计了内部工单」「I measured」——自有数据的溯源责任在说话人自己）；③**方法论/概念转述**（证据纪律/溯源/引用规范/source criticism——在讨论这件事本身）；④**元陈述破除或对冲**（来源不明/无法考证/待核实/未经证实/unverified/rumored/rumour——说话人自己点明不可考，恰是要的纪律）。已知边界：① 腿①与腿②判据限同句，跨段虚指不收；② 否定/质疑/条件语气（不能/怀疑/质疑/如果/not/doubt/if）在场时判为对虚指的否认，不判；③ 豁免只认显式词面，隐式披露（「某知名研究」暗示可查）不认。",
     'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
@@ -6354,6 +6380,14 @@ function discriminate(text, evidence = [], contentMode) {
     // （原始数据/独立复现/利益披露）才能采信」，调用方应要求出示闭环
     // 之外的一手证据，而不是接受「权威都说好」。
     'authority_circularity',
+    // [r436 接线] 第 277 维度 attribution_vacuum（溯源真空：断言有来源
+    // 手势但无可溯源锚点——无论文题名/作者/年份/DOI/链接/编号，引用动作
+    // 是真的、核查路径是零）登记。verify 级——单句可能是正常的新闻转述、
+    // 课堂举例、或转述他人观点时的省略；verify 的含义是「这段话在用虚指
+    // 来源替代可核查证据，采信前必须补上可溯源锚点（题名/作者/年份/DOI/
+    // 链接）或降级为传闻表述」，调用方应要求补锚点或明确标注来源不明，
+    // 而不是把「有研究支持」当已证实。
+    'attribution_vacuum',
   ]);
   // pass：无问题通过
 
@@ -6852,6 +6886,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r435 接线] 第 276 维度 authority_circularity（权威互引洗白）
       // dimMap 补登记。auc——authority circularity 缩写。
       authority_circularity: auc,
+      // [r436 接线] 第 277 维度 attribution_vacuum（溯源真空：来源虚指 ×
+      // 无可溯源锚点）dimMap 补登记。av——attribution vacuum 缩写。
+      attribution_vacuum: av,
       // [r311] 第 253 维度 probability_neglect（概率忽视/零风险溢价）。png。
       probability_neglect: png,
       // [r313] 第 254 维度 zero_price_effect（零价格效应）。zpe。
@@ -7070,6 +7107,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r435 接线] 第 276 维度 authority_circularity（权威互引洗白）
     // dimMap 补登记。auc——authority circularity 缩写。
     authority_circularity: auc,
+    // [r436 接线] 第 277 维度 attribution_vacuum（溯源真空：来源虚指 ×
+    // 无可溯源锚点）dimMap 补登记。av——attribution vacuum 缩写。
+    attribution_vacuum: av,
     // [r309] 第 252 维度 vivid_case_availability（生动个案可得性
     // 偏差）。vca——vivid case availability 缩写。同上：九处一次接齐。
     vivid_case_availability: vca,

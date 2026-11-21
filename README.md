@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-275-blueviolet.svg)](#what-it-catches-275-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-276-blueviolet.svg)](#what-it-catches-276-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-275 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
+276 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
 ×  1,390 dispatch routes  ×  25,672 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 275 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 276 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (275 dimensions) -> gate
+scope-check -> premise-check -> discriminate (276 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (275 dimensions)
+## What it catches (276 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **243 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **244 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -211,7 +211,7 @@ Measured on this repository at **v6.8.215**. Not marketing copy.
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 275 |
+| Discrimination dimensions | 276 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
 | Test suite | 25,672 passing / 233 failing | `node test/run-all.js`（r431 全量实测 25,672/233/25,905（869 文件）——较 r430 终值基线（868 文件 25,598/233/25,831）passed +74 全部为本轮 test/round-431-selection-selfpoll-popularity.test.js 的 74 条断言、failed +0 零新增（selection_bias 扩族不新增失败，文件级硬失败清单与基线逐项相同零退化））|
 | Capability guard | 20 / 20 checks |
