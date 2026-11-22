@@ -412,3 +412,4 @@
 {"round":"r453","agent":"agent-4","kind":"release","claim_at":"2026-11-22T14:43:24Z","status":"completed"}
 {"round": "r214", "agent": "agent-1", "kind": "completed", "claim_at": "2026-11-22T16:55:00Z", "note": "死认领治理补收尾（r454 接手）：git log 实证 r214 红队复测产物（81afa5a4、536b1895）及后续修复轮 r216/r219/r220 均已合并完工，原 active 认领 421.8h 缺闭环记录，本轮按先例补写"}
 {"round": "r454", "agent": "agent-4", "kind": "dimension", "direction": "r454 掉线恢复固化：relative_pration 第156维「抽象处境劣势×反问压制」新句式族（真升级②）——src/relative-pration-agg.js 160行 + 轮测51/51 + index.js max合并接线 + README changelog 6.8.225 补齐 + UPGRADE_LOG r454 段；门禁全绿后提交", "claim_at": "2026-11-22T16:55:00Z", "expires_hours": 6, "status": "active"}
+{"round": "r454", "agent": "agent-4", "kind": "release", "claim_at": "2026-11-22T16:58:00Z", "status": "completed"}
