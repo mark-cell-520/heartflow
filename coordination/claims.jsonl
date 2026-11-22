@@ -415,3 +415,5 @@
 {"round": "r454", "agent": "agent-4", "kind": "release", "claim_at": "2026-11-22T16:58:00Z", "status": "completed"}
 {"round":"r455","agent":"agent-4","kind":"r455","direction":"dimension","claim_at":"2026-11-22T18:59:41Z","expires_hours":6,"status":"active"}
 {"round":"r455","agent":"agent-4","kind":"release","claim_at":"2026-11-22T21:22:40Z","status":"completed"}
+{"round":"r456","agent":"agent-4","kind":"dimension","direction":"r456 present_bias 第285维续作固化：r455 接线闭环（七处 index.js）已随本轮提交，r456 模块层扩族六组平行常量（NOW_ZH4/LATER_ZH4/NOW_EN4/LATER_EN4/LATER_ZH5/LATER_EN5）+ 新轮测46/46 + 存量单测负例注入断言修复14/14 + 文档三债清偿；穿透8→1","claim_at":"2026-11-22T21:25:50Z","expires_hours":6,"status":"active"}
+{"round":"r456","agent":"agent-4","kind":"release","claim_at":"2026-11-22T21:25:50Z","status":"completed"}
