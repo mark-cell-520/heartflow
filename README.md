@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-284-blueviolet.svg)](#what-it-catches-284-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-285-blueviolet.svg)](#what-it-catches-285-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-284 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
+285 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
 ×  1,390 dispatch routes  ×  25,941 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 284 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 285 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (284 dimensions) -> gate
+scope-check -> premise-check -> discriminate (285 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (284 dimensions)
+## What it catches (285 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **252 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **254 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.225**. Not marketing copy.
+Measured on this repository at **v6.8.226**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 284 |
+| Discrimination dimensions | 285 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
 | Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.226 | 2026-11-23 | **r455 第 285 维度 `present_bias`（现时偏差 / 双曲贴现）独立接线 + r456 新句式族扩族（真升级①+②）** — r455：模块自 r243 起草即登记进 `src/econ-reasoning-gate.js` 的 FAMILIES 聚合表（第 249 维子族），gate findings 只能出现聚合名 econ_reasoning_gate，子族名无法单独指名；缺口实证 `scripts/round-455/probe-r455-gap.js` v6.8.225 gate 层实测 17 条攻击穿透 8，present_bias 作为独立维度名 0 次承重。仿 r331/r448 先例独立接线（`src/index.js` 七处：require + discriminate 计算点 + scores + dimMap + dimensions 键 + VERIFY_DIMS + discriminate 键，变量名 prb），维度 284→285、VERIFY 252→254。r456：腿级诊断（`scripts/round-455/probe-r455-legs.js` / `probe-r455-en.js` / `probe-r455-en2.js`）定位七族整族缺席，新增六组平行常量——`NOW_ZH4`（放纵名词+一时爽格言形 / 主语名词+先+消耗动词形）、`LATER_ZH4`（等X再Y条件推迟 / 有钱了再正事形）、`NOW_EN4`（having fun now / whatever I want 放纵许可）、`LATER_EN4`（earn first / save after paycheck 挣钱优先）、`LATER_ZH5`（放纵动词+再说 / 趁X年轻未来有限性）、`LATER_EN5`（I'll start the diet tomorrow 宾语形 + 时间词前置形 + I will 全写形），存量各族一字未动、豁免层不动、距离窗复用。轮测 `test/round-456-present-bias-expansion.test.js` **46/46**（常量结构 4 + 穿透闭合 7 + 良性豁免 10 + 变体矩阵 14 + 存量回归 5），存量 `test/present-bias.test.js` 14/14（负例注入断言语义随扩族更新为新族承重正向断言）。四门禁：verify 16/0、guard 20/20@285、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增；穿透 8→1。VERSION 6.8.225→6.8.226，维度 284→285、工具/路由数不变（197/1390）。 |
 | 6.8.225 | 2026-11-23 | **r454 relative_pration「抽象处境劣势×反问压制」新句式族（真升级②：既有维度扩族）** — 第 156 维 relative_pration（诉诸更惨 / relative privation）扩族。缺口实证：`scripts/round-454/probe-r454-*.js` v6.8.224 gate 层实测，比烂论证中文核心形 5/10 穿透（「还有人吃不上饭呢，你抱怨什么加班。」「别的国家污染更严重，我们这点排放算什么。」「老一辈饥寒交迫都挺过来了，你加个班就喊累？」「非洲还有孩子饿死，你考试没考好算什么挫折。」），腿级定位显示两处均为整族缺席而非零星缺口：腿①缺**抽象处境劣势参照**族（第三方/群体/往事/别国的统计性或整体性处境劣势：污染更严重/更乱/平均寿命只有三十岁/连电都没有——存量 RP_SUFFER_ZH 刻意只收具体苦难短语防共情转述误伤），腿②缺**「抱怨什么 X」反问压制**族（第二人称诉求 + 疑问收尾的「这算什么」反问形）。新模块 `src/relative-pration-agg.js`：形态一（腿①族 C）收带具体量纲或整体处境的劣势陈述（更严重/更差/更低/只有X/连…都没有/更乱/更糟），不含 bare「更惨」；形态二（腿②族 D）「你抱怨什么加班」「你叫苦什么」「你吐槽什么」第二人称 + 疑问收尾反问形；判据不变（双腿共现缺一不判）+ 既有五组豁免全量保留 + 新增第六组豁免 RP_AGG_STATS（正当统计比较/事实陈述）。`src/index.js` 接线：与主判定取 max 合并（同一 dimMap 键 relative_pration，不新增维度、不新增 dispatch 路由）。轮测 `test/round-454-relative-pration-agg.test.js` **51/51**（12 攻击模块层 + gate 层双重断言、13 良性零误伤）。四门禁：verify 16/0、guard 20/20@284、doc 24/0（补齐本 changelog 后转绿）、双向召回 52/52 + 误拦 302/326 零新增。VERSION 6.8.224→6.8.225，维度/工具/路由数不变（284/197/1390）。 |
 | 6.8.224 | 2026-11-22 | **r449 第 283 维度 `argumentum_ex_silentio`（诉诸沉默 / argument from silence）接线闭环（真升级①：新判别维度）** — 方向「逻辑谬误检测」。缺口实证：`scripts/round-449/probe-r449-gap.js` + `probe-r449-core.js` v6.8.223 gate 层实测，检出偏误/路灯效应/观察者选择三候选族穿透 6~11 条；转攻诉诸沉默族——存量 manufactured_consent（会议程序短路）只收「宣布通过/视为一致」等表决程序宣告形，不覆盖「无反对/无投诉/无反馈/没说话」这类**缺席事实被当作在场表态**的更宽结构。新模块 `src/argumentum-ex-silentio.js`（338 行）双腿判据（缺一不判）：腿① SILENCE 沉默事实（没反对/没有异议/无投诉/零反馈/没人说话/一片沉默/stayed silent/no objections/no complaints/no response was recorded…）+ 腿② INFERENCE 由沉默推出的正面结论（就是同意/视为认可/说明支持/都接受了/therefore agree/so they approved/which shows consent…），邻近窗 ZH 60 字 / EN 160 字符。四组豁免（疑问句形、对冲限定、显式否定/方法论破除、表决与会议记录如实统计形）+ 强否定条件语气守卫；score 0.56 VERIFY 级。`src/index.js` 八处接线（变量名 aes）。轮测 `test/round-449-argumentum-ex-silentio.test.js` **58/58**（攻击 ZH 22 + EN 16 含裸名词/带修饰/长句、良性 16 零误伤含边缘良性「沉默不等于同意」教学陈述、逐常量负例注入双腿停判、射程划界回归锚）。四门禁：verify 16/0、guard 20/20@283、doc 24/0（本轮补齐 README 规格戳/action-tier 计数/Version history 三处文档债）、双向召回 52/52 + 误拦零新增。VERSION 6.8.223→6.8.224，维度 282→283、VERIFY 250→251。 **r451 截断 WIP 补固化（r453 接手，v6.8.224 保持）**：第 284 维度 `streetlight_effect`（路灯效应 / streetlight effect）接线闭环——以测量可得性限定证据范围并据此对整体下结论（「只在路灯下找钥匙就断定整个公园失物率不高」「只统计公开披露病例，未报告的等于不存在」）。缺口实证 `scripts/round-449/probe-r449-core.js` 17 条核心攻击形 11 条穿透既有 283 维；存量 proxy_metric_goal（187）/ availability_bias（200）/ vivid_case_availability（252）均不判「可得性限定证据范围并据此外推」结构。`src/streetlight-effect.js` 384 行，`src/index.js` 九处接线（变量名 sle），轮测 `test/round-451-streetlight-effect.test.js` 8/8、gate 端到端攻击 rewrite 且本维承重、良性 pass；维度 283→284、VERIFY 251→252；四门禁 verify 16/0、guard 20/20@284、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。 |
 | 6.8.223 | 2026-11-22 | **r448 selection_on_dependent_variable 第 282 维接线 + anchoring_effect「折扣锚定」扩族（真升级①+②）** — 本批次为上一轮（r448 方向）已绿未提交的 WIP 固化。**selection_on_dependent_variable（第 282 维，真升级①新维度）**：选择依赖变量/按结果归因——只从「已经达成某结果的群体」里归纳共性，再把它当成该结果的原因（「活下来的公司都有早起习惯，所以早起让公司活下来」）。模块自 r252 起草即登记进 `src/econ-reasoning-gate.js` 的 FAMILIES 聚合表（第 249 维子族），gate findings 只能出现聚合名 econ_reasoning_gate，子族名只在其 details 内文，无法单独指名；r448 缺口实证（`scripts/round-448/probe-r448.js` + `probe-r448-legs.js`）发现存量句式族有真实漏判：腿①（SELECT_ZH/SELECT2_ZH）只收「都/全/个个/无一例外」全称形与少量结果动词，「大多/多数/大部分」量化变体、「创业成功/转型成功/上市/盈利」商业结果词、「康复者/幸存者」结果者裸名词形全部零命中；腿②（CAUSE_ZH/CAUSE2_ZH）缺「看来/因为/足见」推断标记通道与「减肥/减重」结果名词，探针 7/8 攻击整句穿透 gate=pass（基线 1/8）。扩 SELECT3_ZH/CAUSE3_ZH 六族（大多全称族/裸名词族/商业结果词族 + 看来足见族/因为疑问族/减肥结果族）后模块层 8/8 命中、良性 4/5→5/5 pass，再仿 r331 先例独立接线（require + discriminate 计算点 + dimMap/allDims 判定 + detailMap 四处，变量名 sodv）。轮测 `test/round-448-selection-on-dependent-variable.test.js` 18/18（含 CAUSE4 负例注入承重）。**anchoring_effect 折扣锚定扩族（真升级②）**：`src/anchoring-effect.js` +53 行，轮测 `test/round-448-anchoring-discount-legs.test.js` 37/37（存量回归全过）。四门禁：verify 16/0、guard 20/20@282、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。VERSION 6.8.222→6.8.223。 |

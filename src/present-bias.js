@@ -366,6 +366,109 @@ const NOW_EN3 = [
 // EN 侧增益全部来自 NOW_EN3（BNPL 话术腿①），按诚实数字原则删除
 // LATER_EN3 整族，不登记轮测。
 
+// ═══════════════════════════════════════════════════════════════════
+// [r456] 「主语前置先消耗 × 等X再Y 条件推迟」新措辞家族（平行常量）
+//
+// 缺口实证（scripts/round-455/probe-r455-gap.js + probe-r455-legs.js，
+// v6.8.225 模块直调 + gate 层双路实测）：present_bias 第 285 维独立接线后，
+// 17 条攻击样本仍有 8 条穿透 gate=pass。腿级诊断（probe-r455-legs.js）
+// 定位到三处整族缺席——全部为「只命中一腿或零腿」：
+//   · 「熬夜一时爽，身体的事以后再说。」NOW 零 / LATER[以后再说]——
+//     「X一时爽」格言俗语形（熬夜/游戏/零食/奶茶 + 一时爽）存量 NOW 三族
+//     全不收（NOW_ZH[1] 的「先痛快」要求动词前缀）；
+//   · 「快递先拆，论文等双十一买完再开始写。」NOW 零 / LATER[等双十一
+//     买完再开始]——「主语名词 + 先 + 消耗动词」（快递先拆/钱先花了/这单
+//     先用了）NOW_ZH[1][2] 只收「先+动词」无主语前缀形；
+//   · EN 侧三条全单腿或零腿：「tonight I eat whatever I want」NOW 命中
+//     但 LATER 零（whatever I want 放纵许可形不在 LATER_EN2）；「I will
+//     save after I get my next paycheck」双腿零（save after I 形 LATER_EN2
+//     已收但 NOW 缺「挣钱/花钱优先」腿）；「I am having fun now」NOW 零
+//     （having fun now 形 NOW_EN 不收）。
+//
+// 设计纪律（同 r309-r319 全部先例）：
+//   · 平行常量 + findSignatures concat，存量 NOW/LATER 各族及 r314/r319
+//     新族一字不动（存量注入语义与轮测登记保持）；
+//   · 新腿一律走存量 collect(…, true) 否定守卫与距离窗（PAIR_ZH 60 /
+//     PAIR_EN 180）；
+//   · 豁免层不动：CORRECTIVE（先完成再玩）与 CONCEPT（双曲贴现教学）对
+//     新腿同样先生效；
+//   · 「一时爽」族窄化：只收「放纵类名词 + 一时爽」，不收「辛苦一时」
+//     等反向形；「等X再Y」族窄化：只收「等+事件+再+正事动词」。
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── [r456] 腿① 「X一时爽」格言形 + 主语前置先消耗形（中文）──────
+const NOW_ZH4 = [
+  // 「放纵名词 + 一时(爽|痛快|快乐|开心)」格言俗语形（熬夜一时爽/游戏一时爽/奶茶一时爽）
+  /(?:熬夜|通宵|游戏|开黑|刷剧|追剧|看剧|刷视频|短视频|零食|奶茶|火锅|烧烤|抽烟|喝酒|摆烂|摸鱼|氪金|剁手|买买买|躺平|放假|周末|857)[^。，！？；\n]{0,4}一时(?:爽|痛快|快乐|开心|嗨|香)/,
+  // 「主语名词 + 先 + 消耗动词」形（快递先拆/钱先花了/这单先用/奖金先花）
+  // 窄化纪律：动词限消耗类（拆/花/用/买/拿/开/爽/氪/剁），不收吃/喝（存量
+  // NOW_ZH[1] 已收「先吃了」且「先吃饭再吃药」类良性由 CORRECTIVE 兜底）
+  /[^。，！？；\n]{0,8}先(?:把|将)?(?:拆|拆开|花|花了|用|用了|买|买了|拿|拿了|开|开着|氪|氪金|剁|爽|爽了|享受|享受了|痛快|躺|摆烂|休息|耍|嗨|浪)(?:了|完|一下|一单|一笔|一把|一顿|一回)?(?:吧|再说|了|去)?/,
+];
+
+// ─── [r456] 腿② 「等 X 再 Y」条件推迟形（中文）──────────────────
+const LATER_ZH4 = [
+  // 等/挨/熬 + 事件 + 再/之后 + 正事动词（等双十一买完再开始/等放假再学/等有钱再存）
+  // 窄化纪律：只收「等+事件+再+正事」，不收「等你说完」（交互许可形）
+  /(?:等|挨|拖|熬|挨到|等到)[^。，！？；\n]{0,10}(?:再|之后|过后|以后)(?:说|讲|开始|弄|办|搞|做|干|整|补|修|还|存|攒|戒|努力|减肥|学习|锻炼|体检|面对|处理|考虑|想办法|安排|计划|买|换|改|调整|写)/,
+  // 「有钱了/发工资/放假/毕业 + 再 + 正事」未来条件许可形（有钱了再存/发了工资再还）
+  /(?:有钱|有钱了|发了工资|发工资|下班|放假|毕业|升职|加薪|结婚|安顿下来|稳定下来|不忙了)(?:再|之后)(?:说|讲|开始|弄|办|搞|做|存|攒|戒|努力|减肥|学习|锻炼|体检|面对|考虑|还|买)/,
+];
+
+// ─── [r456] 腿① 英文放纵许可/进行时满足形────────────────────────
+const NOW_EN4 = [
+  // having fun now / having a blast now（进行时满足形，存量 NOW_EN 未收）
+  /\b(?:having|have|had)\s+(?:fun|a\s+(?:good|great|blast|time)|myself|a\s+party)\s+(?:right\s+)?now\b/i,
+  // tonight/today + whatever I want / anything I want（放纵许可形）
+  /\b(?:tonight|today|this\s+weekend)\b[^.]{0,40}\b(?:whatever|anything|everything)\s+(?:I|we)\s+(?:want|feel\s+like|crave)\b/i,
+];
+
+// ─── [r456] 腿② 英文挣钱优先/事件后置许可形──────────────────────
+const LATER_EN4 = [
+  // earn first / spend first, save later（挣钱优先于储蓄的推迟许可）
+  /\b(?:I|we)\s+(?:have\s+to|need\s+to|gotta|got\s+to|will|'?ll)?\s*(?:earn|make)\s+(?:more\s+)?(?:money|it|that)\s+first\b/i,
+  // spend it now, save after the bills（先花后储条件形）
+  /\b(?:spend|enjoy|use)\s+(?:it|this|that)\s+(?:now|today)\s*[,.]?\s*(?:save|deal\s+with\s+it)\s+(?:after|later|once)\b/i,
+];
+
+// ─── [r456] 腿②③ 尾句推迟许可形（「再说/下次/明天再」把正事推向未来）──
+// 缺口实证：补 NOW_ZH4/LATER_ZH4/NOW_EN4/LATER_EN4 后（v6.8.225+WIP），
+// 17 条攻击穿透 4 条，腿级诊断（scripts/round-456/probe-r456-legs.js）显示
+// 全部缺腿②的「尾句推迟许可」：
+//   · 「明知道会后悔，还是先痛快吃了再说。」NOW[先痛快吃了再说] / LATER 零
+//     ——「再说」作句尾正事推迟标记（吃了再说 = 正事以后处理）；
+//   · 「能玩一天是一天，趁还年轻及时行乐。」NOW[及时行乐] / LATER 零
+//     ——活在当下宣言句，未来自我整体外包（无显式未来词，靠尾句「再说」
+//     及同句「趁X」宣言完成配对）；
+//   · EN "I'll start the diet tomorrow" 已收 LATER_EN2，但「tonight I
+//     eat whatever I want」的放纵许可与 tomorrow 的推迟共现时，存量双腿
+//     族均不收（LATER_EN2 要求 I'll start 在前）——补 EN 尾句推迟族
+//     （tomorrow/next week 单独作推迟标记腿）。
+// 设计纪律：尾句推迟族只收「现在放纵宣言 + 未来推迟标记」共现句；单现
+// 的「以后再说」不作腿②（防止把交互许可句「等你说完再说」误判为偏误）。
+const LATER_ZH5 = [
+  // 「放纵动词 + 再说」句尾推迟形（吃了再说/玩了再说/享受了再说）
+  // 窄化：动词限放纵/消耗类，不收「说/讲/问」（「等你说完再说」是交互许可）
+  /(?:吃|喝|玩|享受|花|用|买|爽|乐|放松|休息|摆烂|熬|刷|氪|剁)(?:了|完|一把|一顿|一次|一回|一下)?(?:再说)/,
+  // 「以后/回头/到时候 + 再说」显式未来推迟形
+  /(?:以后|回头|过后|到时候|下回|下次|改天|往后)(?:再说|再讲)/,
+  // 「趁 X 年轻/来得及/还能」未来有限性对照腿（趁还年轻及时行乐：NOW 侧命中
+  // 「玩一天是一天」宣言，此腿提供未来时间有限的对照片——双曲贴现判据的
+  // 现在放纵 × 未来意识共现；与 NOW_ZH2 的「趁X及时行乐」宣言形成双腿）
+  /趁[^。，！？；\n]{0,6}(?:年轻|来得及|还能|有机会|走得动|玩得动)/,
+];
+const LATER_EN5 = [
+  // I'll start the diet tomorrow（动词与 tomorrow 之间有宾语，存量 LATER_EN2
+  // 要求 contiguous 故漏）——放宽至动词后 0-2 个宾语词
+  /\bI'?ll\s+(?:start|begin|quit|save|save\s+up|exercise|study|diet|train|run|read|take\s+care|get\s+serious)\s+(?:[a-z]+\s+){0,2}(?:tomorrow|next\s+(?:week|month|year)|on\s+Monday|later)\b/i,
+  // tomorrow I'll start the diet（时间词前置形：now/tomorrow 与放纵许可
+  // 分句对举时，推迟动词跑到时间词之后——补时间词前置形）
+  /\b(?:tomorrow|next\s+(?:week|month|year)|on\s+Monday|later)\s*,?\s*I'?ll\s+(?:start|begin|quit|save|exercise|study|diet|train|run|read|take\s+care|get\s+serious)\b/i,
+  // I will save after I get my next paycheck（存量 LATER_EN2 只收 I'll 缩略形，
+  // "I will" 全写形漏）——补全写 will 形
+  /\bI\s+will\s+(?:save|start|begin|quit|exercise|study|diet|train|run|read)\s+(?:after|once|when|as\s+soon\s+as)\b/i,
+];
+
 // ─── 距离窗（腿①×腿②）──────────────────────────────────────
 const PAIR_ZH = 60;
 const PAIR_EN = 180;
@@ -438,8 +541,8 @@ function dist(a, b) {
 function findSignatures(text, R) {
   const sigs = [];
   const langs = [
-    { now: (R.NOW_ZH || NOW_ZH).concat(R.NOW_ZH2 || NOW_ZH2, R.NOW_ZH3 || NOW_ZH3), later: (R.LATER_ZH || LATER_ZH).concat(R.LATER_ZH2 || LATER_ZH2, R.LATER_ZH3 || LATER_ZH3), win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh' },
-    { now: (R.NOW_EN || NOW_EN).concat(R.NOW_EN2 || NOW_EN2, R.NOW_EN3 || NOW_EN3), later: (R.LATER_EN || LATER_EN).concat(R.LATER_EN2 || LATER_EN2), win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
+    { now: (R.NOW_ZH || NOW_ZH).concat(R.NOW_ZH2 || NOW_ZH2, R.NOW_ZH3 || NOW_ZH3, R.NOW_ZH4 || NOW_ZH4), later: (R.LATER_ZH || LATER_ZH).concat(R.LATER_ZH2 || LATER_ZH2, R.LATER_ZH3 || LATER_ZH3, R.LATER_ZH4 || LATER_ZH4, R.LATER_ZH5 || LATER_ZH5), win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh' },
+    { now: (R.NOW_EN || NOW_EN).concat(R.NOW_EN2 || NOW_EN2, R.NOW_EN3 || NOW_EN3, R.NOW_EN4 || NOW_EN4), later: (R.LATER_EN || LATER_EN).concat(R.LATER_EN2 || LATER_EN2, R.LATER_EN4 || LATER_EN4, R.LATER_EN5 || LATER_EN5), win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
   ];
   for (const L of langs) {
     const nm = collect(text, L.now, true);
@@ -505,6 +608,10 @@ module.exports = {
     NOW_ZH2, NOW_EN2, LATER_ZH2, LATER_EN2,
     // [r319] 先用后付/BNPL × 未来自我贴现新族（平行常量，负例注入-删条用）
     NOW_ZH3, NOW_EN3, LATER_ZH3,
+    // [r456] 「主语前置先消耗 × 等X再Y 条件推迟」新族（平行常量，负例注入-删条用）
+    NOW_ZH4, NOW_EN4, LATER_ZH4, LATER_EN4,
+    // [r456] 尾句推迟许可族「再说/tomorrow 全写形」（平行常量，负例注入-删条用）
+    LATER_ZH5, LATER_EN5,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     PAIR_ZH, PAIR_EN,

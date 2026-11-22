@@ -744,6 +744,16 @@ const { checkEconReasoningGate } = require('./econ-reasoning-gate.js');
 // 良性 4/5 pass（mod 5/5 承重），再仿 r331 先例独立接线。变量名 sodv——
 // selection on dependent variable 缩写，grep 0 命中无冲突。
 const { detectSelectionOnDependentVariable } = require('./selection-on-dependent-variable.js');
+// [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现）require。模块
+// src/present-bias.js 自 r243 起草即登记进 src/econ-reasoning-gate.js:55 的
+// FAMILIES 聚合表（第 249 维度子族），gate findings 里只会出现聚合名
+// econ_reasoning_gate、子族名只在其 details 内文中，无法单独指名该族；且
+// r455 缺口实证（scripts/round-455/probe-r455-gap.js）发现存量句式族在
+// gate 层有真实漏判：17 条攻击样本（拖延许可腿/活在当下宣言腿/标准双曲
+// 贴现/EN 侧推迟形）8 条穿透 gate=pass，present_bias 作为独立维度名 0 次
+// 承重。本行让现时偏差以独立维度名进入 findings/scores/dimMap。变量名
+// prb——present bias 缩写，grep 0 命中无冲突。
+const { detectPresentBias } = require('./present-bias.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
 // 细节见 src/dose-response-linearity.js 头注释。
@@ -2597,6 +2607,11 @@ function discriminate(text, evidence = [], contentMode) {
   // scores/dimMap/findings——同一文本可同时命中聚合与子族，findings 里
   // 出现 selection_on_dependent_variable 即指名该族。变量名 sodv。
   const sodv = detectSelectionOnDependentVariable(_normText);
+  // [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现）独立 dispatch。
+  // r243 起只经 econ_reasoning_gate 聚合（第 249 维子族），本行让它以独立
+  // 维度名进 scores/dimMap/findings——同一文本可同时命中聚合与子族，
+  // findings 里出现 present_bias 即指名该族。变量名 prb。
+  const prb = _applyPedagogyRelaxation(detectPresentBias(_normText), "present_bias", pedagogyRelaxation);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -3465,6 +3480,10 @@ function discriminate(text, evidence = [], contentMode) {
     // （选择依赖变量/按结果归因）。同 r331 先例：dimMap 与 allDims 两处
     // 都接——此前只作为第 249 维聚合的子族登记，findings 无法单独指名。
     {score: sodv.score, name:'selection_on_dependent_variable'},
+    // [r455 接线] 第 285 维度 present_bias 参与判定（现时偏差/双曲贴现）。
+    // 同 r448 先例：dimMap 与 allDims 两处都接——此前只作为第 249 维聚合
+    // 的子族登记，findings 无法单独指名。
+    {score: prb.score, name:'present_bias'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -4181,6 +4200,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r448 接线] 第 282 维度 selection_on_dependent_variable（选择依赖变量
     // /按结果归因×结果选择腿×归因宣告腿×CAUSE4 共同点族）。
     selection_on_dependent_variable: sodv,
+    // [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现×
+    // 即时诱惑陈述腿×推迟/贴现腿）。
+    present_bias: prb,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -6132,6 +6154,19 @@ function discriminate(text, evidence = [], contentMode) {
     // 性，要比较失败者」正是本族要教的判别动作）、商业案例复述、对他人
     // 论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
     'selection_on_dependent_variable',
+    // [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现：把当下的
+    // 即时满足置于显著更高的权重，以「先X了再说」「以后再说」等贴现句式
+    // 为推迟行为背书——即时诱惑陈述腿×推迟/贴现腿两腿共现+邻近窗+五组
+    // 豁免）登记。r243 起只作为第 249 维 econ_reasoning_gate 聚合的子族
+    // 存在，findings 无法单独指名该族；r455 仿 r448/r331 先例独立接线
+    // （dimMap + allDims + dimensions 键 + VERIFY_DIMS 六处）。verify 级
+    // ——单句也可能是正当的跨期计划陈述与批评（「拖延是现时偏差的表现，
+    // 要用承诺机制克服」正是本族要教的判别动作）、消费金融教学、对他人
+    // 拖延行为的转述引用。与 r206-r232 同口径只登记 VERIFY。射程边界：
+    // 与 planning_fallacy（235，低估完成时间）轴不同、与
+    // loss_aversion（236，损失规避）与 sunk_cost_coercion（98，已投入
+    // 沉没成本）零交集，详见 src/present-bias.js 头注释。
+    'present_bias',
     // [r249] 第 224 维度 denominator_swap（分母替换谬误：拿不同分母的
     // 绝对计数直接做优劣/安全/多少比较并下结论，忽略人口、样本量、
     // 暴露规模等基数不同——「A城十起事故B城一起所以B城更安全」）登记。
@@ -6487,6 +6522,14 @@ function discriminate(text, evidence = [], contentMode) {
     // guidance 修正后再采信」。射程边界：本维度只管「概念误用」这一族，
     // 不管该概念所属领域的事实对错。
     'econ_reasoning_gate',
+    // [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现）登记。
+    // verify 级——单句也可能是经济学/行为科学教学的正确转述与批评
+    // （「现时偏差让人高估当下满足」正是本族要教的判别动作）、正当的
+    // 跨期计划陈述、对拖延行为的转述引用，rewrite/block 会误伤。verify
+    // 的含义是「这段文本把当下的即时满足当成了推迟行为的充分理由，
+    // 需要按 findings 的 guidance 补上跨期权衡依据再采信」。射程边界：
+    // 本维度只管「贴现句式」这一族，不管该拖延行为的真实后果。
+    'present_bias',
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）登记。
     // verify 级——剂量陈述+外推断言也可能是医学/营养学教学的正确转述
     // 与批评（「不能线性外推剂量效应」正是本族要教的判别动作）、医疗
@@ -7257,6 +7300,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （选择依赖变量/按结果归因）。同上：九处一次接齐——此前 r252 起仅作
       // 第 249 维聚合子族，dimensions 无键 → discriminate() 读数恒 281。
       selection_on_dependent_variable: sodv,
+      // [r455 接线] 第 285 维度 present_bias 补登记（现时偏差/双曲贴现）。
+      // 同上：九处一次接齐——此前 r243 起仅作第 249 维聚合子族，
+      // dimensions 无键 → discriminate() 读数恒 284。
+      present_bias: prb,
       // [r249] 第 224 维度 denominator_swap 补登记（分母替换谬误）。
       // 同上：九处一次接齐。
       denominator_swap: dsw,

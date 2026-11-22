@@ -1,3 +1,57 @@
+# r456 — present_bias 新句式族（真升级②：已有维度的全新句式族；v6.8.226）
+
+- **轮次**：r456
+- **VERSION**：6.8.225 → 6.8.226
+- **方向**：行为经济学偏误检测（present bias / 即时满足偏误）
+- **来源**：内部路径。外部三源扫描（HN Algolia / Semantic Scholar / GitHub API，关键词 present-bias / hyperbolic discounting）本轮无可用新研究（命中项均为既有 econ-reasoning 族覆盖内容或纯学术论文无可复用语料），按既定路径走内部路径。
+- **上一轮目标状态**：r455 将 `src/present-bias.js` 从 econ-reasoning-gate 聚合族独立接线为第 285 维；撞墙检测复跑缺口实证探针 `scripts/round-455/probe-r455-gap.js`（v6.8.225）：17 条攻击穿透 8，确认非完工目标，允许继续投入。
+
+## 实现内容（src/present-bias.js，+16 行）
+
+六组全新句式族，全部为**新腿常量**而非旧族样本扩容：
+
+| 新常量 | 条数 | 覆盖句式 |
+|--------|------|---------|
+| `NOW_ZH4` | 2 | 「放纵名词+一时爽」格言形（熬夜/游戏/奶茶/零食/抽烟/喝酒/刷短视频+一时爽）；「主语名词+先+消耗动词」前置形（快递先拆/钱先花了/奖金先花了） |
+| `LATER_ZH4` | 2 | 「等X再Y」条件推迟形（等双十一买完再写/等发工资再存）；「有钱了/发工资+再+正事」挣钱优先推迟形 |
+| `NOW_EN4` / `LATER_EN4` | 各 2 | EN 放纵许可形（I eat whatever I want / I am having fun now）；EN 挣钱优先推迟形（I will save after I get my next paycheck） |
+| `LATER_ZH5` / `LATER_EN5` | 3 / 3 | ZH：放纵动词+再说（先抽了这支烟再说）、「X的事+再说」裸推迟（身体的事以后再说）、趁X年轻/今朝有酒今朝醉/能玩一天是一天宣言形；EN：`I'll start the diet tomorrow` 宾语形 + `tomorrow I'll start` 时间词前置形 + `I will save after` 全写形 |
+
+- **判据不变**：两腿共现（NOW × LATER 同窗）缺一不判，邻近窗沿用存量常量。
+- **豁免全量保留**：原有教学/自省/顺序陈述豁免表未动；「先吃饭再吃药」「先完成作业再玩」等良性零误伤。
+- **接线复用**：r455 已完成的 require/discriminate/dimMap/allDims/detailMap 八处接线复用，本轮只加腿常量；维度数 285 不变（真升级②扩族不新增维度）。
+
+## 验证数据（本回合真实运行）
+
+| 门禁 | 结果 |
+|------|------|
+| `node --check` | ✅ src/present-bias.js / src/index.js / test 均通过 |
+| `bin/verify.js` | ✅ 16 passed / 0 failed |
+| `scripts/guard-abilities.js` | ✅ 20/20 全通过；判别维度 285 个 |
+| `test/doc-numbers-accuracy.test.js` | ✅ 24/24（本轮补齐 README/SKILL 规格表版本戳 6.8.225→6.8.226 + README changelog 6.8.226 段后转绿；首轮实测 21/24 三处文档债，修复后 24/24） |
+| `scripts/bidirectional-guard.js` | ✅ 召回=52/52 误拦=302/326 |
+| 轮测 `test/round-456-present-bias-expansion.test.js` | ✅ **46/46**（常量结构 4 + 穿透闭合 7 + 良性豁免 10 + 变体矩阵 14 + 存量回归 5） |
+| 存量轮测 `test/present-bias.test.js` | ✅ **14/14**（首轮实测 13/14——中文负例注入断言因扩族后新族独力承重而失败，断言语义按真升级②预期更新为「存量族删后新族承重」正向断言 + 新族删条停判反向断言） |
+| 缺口探针复跑 `scripts/round-455/probe-r455-gap.js` | ✅ 攻击穿透 8→1（唯一穿透为 `Save money? I will save after I get my next paycheck.` 单腿推迟宣告，双腿判据铁律下不补 NOW 腿，属合理边界）；present_bias 独立维度名进 gate findings 16 次 |
+
+**负例注入承重**：每条穿透样本均通过 `__internals()` 删条验证——删掉新腿后 score 归零，证明承重来自本轮新常量。注意：存量 LATER_ZH 已收「以后再说」，故「熬夜一时爽，身体的事以后再说」删条锚定 NOW_ZH4 承重腿（诊断实证：NOW_ZH4["熬夜一时爽"] + LATER_ZH["以后再说"] + LATER_ZH5["以后再说"] 三处命中，删条断言按实际承重腿写）。
+
+**变体矩阵**（攻击 14/14 命中 / 良性 10/10 pass，含中英双语、裸名词、带修饰、长句、边缘良性）：
+- 攻击：熬夜一时爽（身体的事以后再说）/ 游戏一时爽 / 奶茶一时爽 / 零食一时爽 / 快递先拆（论文等双十一买完再开始写）/ 钱先花了 / 奖金先花了 / 这单先氪了 / 先抽了这支烟再说 / 先痛快吃了再说 / 今朝有酒今朝醉 / 能玩一天是一天（趁还年轻及时行乐）/ I am having fun now (tomorrow I'll start the diet) / Tonight I eat whatever I want (I'll start the diet tomorrow)
+- 良性：先吃饭再吃药 / 等你说完我再发表意见 / 包裹明天到我现在下单 / 我先把作业写完再玩游戏 / 这个月固定存两千年底去体检 / 趁年轻要多锻炼但也要循序渐进 / 双曲贴现模型教学句 / 等对方回复我们再推进 / 先把任务拆成小步每天完成一点 / 等这阵子忙完我再开始系统锻炼
+
+## 已知边界（下轮可继续）
+
+1. **单腿短句不判**（双腿判据铁律）：「熬夜一时爽。」「快递先拆。」单独出现不判，需同窗 LATER 腿共现——防误伤正当顺序陈述的设计取舍。
+2. **「健身卡办了再说」类**（办卡是 NOW 侧消耗、句尾推迟词无放纵动词前缀）不判——LATER_ZH5「再说」腿要求放纵动词前缀，防误伤「方案定了再说」。
+3. **LATER_EN3「pay later」裸短语已删**（诚实原则，不并行裸短语）：存量 EN BNPL 样本依赖「先用后付」类短语与 LATER 腿配对，表述变化为存量基线行为，非本轮回归。
+
+## 门禁对照（r455 → r456）
+
+维度 285→285、VERIFY 254→254、模块 169→169、工具 197→197、路由 1390→1390、双向攻击穿透 1→1；轮测 +46。
+
+---
+
 ## r454 — relative_pration 第156维「抽象处境劣势 × 反问压制」新句式族（真升级②：已有维度的全新句式族；v6.8.225）
 
 ### 本轮定位

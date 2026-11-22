@@ -175,11 +175,21 @@ check('中英混排与多签名加分档', () => {
   assert.ok(Math.abs(z.score - 0.72) < 1e-9, '双签名加分档');
 });
 
-check('负例注入：中文双腿族删除后攻击全部不再命中', () => {
-  assert.equal(detectPresentBias(ATTACKS_ZH[0], { NOW_ZH: [] }).hit, false, '删现在即时满足ZH');
-  assert.equal(detectPresentBias(ATTACKS_ZH[0], { LATER_ZH: [] }).hit, false, '删未来推迟贴现ZH');
-  assert.equal(detectPresentBias(ATTACKS_ZH[3], { NOW_ZH: [] }).hit, false, '删现在即时满足ZH-2');
-  assert.equal(detectPresentBias(ATTACKS_ZH[6], { LATER_ZH: [] }).hit, false, '删未来推迟贴现ZH-2');
+// 注：r456 起该断言语义扩展——NOW_ZH/LATER_ZH 注入只删存量第一族，
+// r456 新族（NOW_ZH4/LATER_ZH4/LATER_ZH5）同样能独力承重同一攻击样本，
+// 这正是真升级②（既有维度扩族）的预期行为：攻击不再依赖单一存量族。
+// 故此处改为「删除存量族后仍由新族命中」的正向断言，新族自身的承重由
+// test/round-456-present-bias-expansion.test.js 的删条注入单独证明。
+check('负例注入：中文存量双腿族删除后攻击由 r456 新族承重', () => {
+  assert.equal(detectPresentBias(ATTACKS_ZH[0], { NOW_ZH: [] }).hit, true, '存量 NOW_ZH 删后由新族承重');
+  assert.equal(detectPresentBias(ATTACKS_ZH[0], { LATER_ZH: [] }).hit, true, '存量 LATER_ZH 删后由新族承重');
+  assert.equal(detectPresentBias(ATTACKS_ZH[0], { NOW_ZH: [], LATER_ZH: [] }).hit, true, '存量双腿全删后新族仍承重');
+  // 新族自身删条后必须停判（证明存量族+新族缺一不判的双腿判据仍成立）
+  const I = require('../src/present-bias.js').__internals();
+  assert.equal(detectPresentBias(ATTACKS_ZH[0], { ...I, NOW_ZH: [], NOW_ZH4: [] }).hit, false, '存量+新 NOW 全删后停判');
+  assert.equal(detectPresentBias(ATTACKS_ZH[0], { ...I, LATER_ZH: [], LATER_ZH4: [], LATER_ZH5: [] }).hit, false, '存量+新 LATER 全删后停判');
+  assert.equal(detectPresentBias(ATTACKS_ZH[3], { ...I, NOW_ZH: [], NOW_ZH4: [] }).hit, false, '删现在即时满足ZH-2');
+  assert.equal(detectPresentBias(ATTACKS_ZH[6], { ...I, LATER_ZH: [], LATER_ZH4: [], LATER_ZH5: [] }).hit, false, '删未来推迟贴现ZH-2');
 });
 
 check('负例注入：英文双腿族删除后攻击全部不再命中', () => {
