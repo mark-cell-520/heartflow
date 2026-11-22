@@ -1044,6 +1044,8 @@ const { checkAppealToWealth } = require('./appeal-to-wealth.js');
 // 误伤 0/12；r724/r725/r726 连续三轮 83%/86%/86%。判据第三方苦难参照腿×
 // 压制诉求腿共现；细节见 src/relative-pration.js。
 const { checkRelativePrivation } = require('./relative-pration.js');
+// [r454] relative_pration 第156维「抽象处境劣势×反问压制」新句式族（真升级②）。
+const { checkRelativePrivationAgg } = require('./relative-pration-agg.js');
 // [r727] 第 157 维度 forer_effect（巴纳姆效应：放之四海皆准的性格描述佯称
 // 精准解读）。双腿共现（人格描述句式×第二人称指向）；细节见 src/forer-effect.js。
 const { checkForerEffect } = require('./forer-effect.js');
@@ -2773,7 +2775,13 @@ function discriminate(text, evidence = [], contentMode) {
   const atw = _applyPedagogyRelaxation(checkAppealToWealth(_normText), "appeal_to_wealth", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
-  const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
+  // [r454] 新句式族（抽象处境劣势×反问压制）与主判定取 max 合并——同一
+  // dimMap 键 relative_pration，不新增维度、不新增 dispatch 路由。
+  const _rprMain = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
+  const _rprAgg = checkRelativePrivationAgg(_normText);
+  const rpr = (_rprAgg && _rprAgg.score > _rprMain.score)
+    ? { score: _rprAgg.score, name: 'relative_pration', family: 'agg' }
+    : _rprMain;
   // [r727] 第 157 维度 forer_effect（巴纳姆效应）计算点。
   const fre = _applyPedagogyRelaxation(checkForerEffect(_normText), "forer_effect", pedagogyRelaxation);
   // [r728] 第 159 维度 no_true_scotsman（无真正的苏格兰人）计算点。
@@ -18854,6 +18862,9 @@ module.exports = {
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,
+  // [r454] relative_pration 新句式族（抽象处境劣势×反问压制）导出——
+  // 供单测与负例注入逐常量验证承重。
+  checkRelativePrivationAgg,
   // [r727] 第 157 维度 forer_effect 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkForerEffect,

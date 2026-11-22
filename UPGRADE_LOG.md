@@ -1,3 +1,47 @@
+## r454 — relative_pration 第156维「抽象处境劣势 × 反问压制」新句式族（真升级②：已有维度的全新句式族；v6.8.225）
+
+### 本轮定位
+
+开轮同步 exit 0（ahead=0/behind=0），死认领扫描发现 r214/agent-1 一条 421.8 小时（17.5 天）前认领、无 release/completed 记录的疑似死认领——git log 实证 r214 的红队复测产物（81afa5a4、536b1895）及其后续修复轮 r216/r219/r220 均已合并完工，按 r439/r440 先例补 completed 记录。`git status` 发现 r454 的完整未提交 WIP：M 8 个已跟踪文件（README/SKILL/VERSION/package.json/src/core/heartflow.js/src/core/version.js/src/index.js/claims.jsonl）+ ?? `src/relative-pration-agg.js`（160 行）+ ?? `test/round-454-relative-pration-agg.test.js`（180 行）+ `scripts/round-454/` 四个探针文件。按「本地独有产能优先固化」纪律，本轮不另起新选题，先核实固化这批产出。增量价值：把 r454 从「未提交的本地 WIP」变为「已推送的引擎能力」，并补齐其唯一文档债（README Version history 6.8.225 条目）。
+
+### 缺口实证（scripts/round-454/，本轮复跑核实）
+
+`probe-r454-gap.js` + `probe-r454-legs.js` 对 v6.8.224 gate() 全量实测：比烂论证中文 **10 条攻击穿透 5 条**（gate=pass 零 findings）。腿级诊断定位两处**整族缺席**（非零星样本缺口）：
+
+- P1（「还有人吃不上饭呢，你抱怨什么加班。」）腿①=true / 腿②=false——主维度 RP_DISMISS_ZH 无「抱怨什么+宾语」反问压制形
+- P2/P3/P4（「别的国家污染更严重，我们这点排放算什么。」「老一辈饥寒交迫都挺过来了，你加个班就喊累？」「非洲还有孩子饿死，你考试没考好算什么挫折。」）腿①=false / 腿②=true——主维度 RP_WEAK_ZH 只收个体弱势（乞丐/流浪/残疾/孤儿/老人/病人），不收「饿死/营养不良/打仗/群体困境短语」这类**群体/抽象处境劣势**参照
+
+### 实现（src/relative-pration-agg.js，160 行）
+
+- 腿① `RP_AGG_SUFFER_ZH`（35 条）：参照群体劣势形（古人/老一辈/非洲/战乱地区 + 劣势描述）、「比你+低/少/差」数量劣势形、群体整体困境短语（饥寒交迫/民不聊生/食不果腹…）、群体具体苦难名词（饿死/营养不良/打了十年仗/瘟疫横行…）；同时并集兜底主维度腿①（RP_SUFFER_ZH / RP_COMPARATIVE_ZH / RP_MINIMIZE_HAVE / RP_SUFFER_EN）——P1 腿①本就在主维度表中（吃不上饭），本族只补其缺失的腿②
+- 腿② `RP_DISMISS_QUERY_ZH`（5 条）：「你抱怨什么 X」「你这叫什么 X」「这也叫X？」「就嚷嚷/就喊累？」「算什么+诉求名词」；兜底主维度 RP_DISMISS_ZH 但**显式排除陈述句压制形 /别[喊叫抱怨吐槽嫌]/**（「你租不起房就别抱怨」是陈述句，归主判定射程，r454 实测排除后良性零误伤）
+- 豁免组 `RP_AGG_STATS`（10 条）：比去年/上年/十年前+下降/降低/提升等正当统计比较形
+- 判据不变：双腿共现（sufferHit AND dismissHit，缺一不判）+ 既有五组豁免（RP_SELF_SUFFER / RP_META / RP_TEACH / RP_NEG_FLIP / RP_HEDGE）在 index.js 侧由主判定先行过滤，本函数不重复，只在本族新增 RP_AGG_STATS 处过滤
+
+### 接线（src/index.js）
+
+lazy require + checkRelativePrivationAgg 调用，取 max 与主判定合并（`family: 'agg'`，同一 dimMap 键 relative_pration）。**维度数不变（284），无新增 dimMap 键、无新增 dispatch 路由**——本族是第 156 维 relative_pration 的新句式族，不是新维度。
+
+### 本轮实测（全部来自本回合真实运行）
+
+- 语法：`node --check` src/relative-pration-agg.js、src/index.js 全 OK
+- 轮测 `test/round-454-relative-pration-agg.test.js` **51/51**（PASS 51 / FAIL 0）：攻击 12 条（模块层 + gate 层双重断言）、良性 13 条、腿①独现不判 3 条、腿②独现不判 3 条、负例注入 4 条、射程分工 1 条
+- gate 端到端（`src/gate.js`）：5/5 攻击全部 **action=rewrite 且 relative_pration 承重**（「还有人吃不上饭呢，你抱怨什么加班。」「别的国家污染更严重，我们这点排放算什么。」「老一辈饥寒交迫都挺过来了，你加个班就喊累？」「非洲还有孩子饿死，你考试没考好算什么挫折。」「战乱地区的人连命都保不住，你这点压力就叫苦？」）
+- 良性零误伤（含 agg 腿置空等效对照，两条非 pass 样本的 findings 逐个一致，证明为既有基线行为非新族误伤）：「实验失败不算什么挫折，重要的是我们从中学会了方法。」→ pass 零 findings；「非洲儿童死亡率下降40%」→ verify[perfect_error]（既有基线）；「你租不起房就别抱怨」→ rewrite[relative_pration 主族, completion_evidence]（陈述句归主判定射程，非新族）
+- 四门禁（`hf4-gates.sh`）：verify **16/0**、guard-abilities **20/20@284**、doc-numbers **24/0**（首跑 23/1 FAIL——README Version history 缺 6.8.225 条目，补齐后转绿）、双向召回 **52/52** + 误拦 302/326 零新增
+
+### 文档债修复
+
+r454 WIP 已同步 README/SKILL/package.json/src/core/heartflow.js/src/core/version.js 的 VERSION 6.8.224→6.8.225 与 README 规格戳，但缺 README Version history 的 6.8.225 changelog 条目（doc-numbers 门禁唯一 FAIL 项）——本轮补齐后门禁转绿。UPGRADE_LOG 本段按 scripts/round-454/r454-upgrade-log-entry.md 草稿 + 本轮实测数字固化。
+
+### VERSION 与维度
+
+VERSION 6.8.224→**6.8.225**；维度/工具/路由数不变（284/197/1390）。命中「什么是真升级」第②条：既有维度 relative_pration 全新句式族（红队漏判证据：探针 5/10 穿透 + 腿级定位两处整族缺席）。
+
+### 已知边界（如实记录）
+
+腿②只收反问压制形，陈述句压制形（「少抱怨两句」「别叫苦」）仍归主维度；EN 侧腿②未建族（本轮仅 ZH 缺口实证充分）；「比你工资低一半」族要求第二人称在场，泛指「有人工资更低」不判。
+
 ## r453 — r451 截断 WIP 补固化：streetlight_effect 第 284 维度接线（真升级①承接固化；v6.8.224 保持，接线固化不 bump）
 
 ### 本轮定位
