@@ -7,8 +7,11 @@
  *
  * 策略：正向最长匹配（greedy longest-match）+ 单字回退。
  *  · 第一步沿用原契约：按空白和英文/半角标点切分（保证英文与既有样本零影响）
- *  · 第二步中文片段进一步处理：
- *      - 中文标点视作分隔符（与原「标点即分隔」契约一致）
+ *  · 第二步所有片段（不只中文片段）进一步处理：
+ *      - 中文及全角标点视作分隔符（与原「标点即分隔」契约一致）；
+ *        [2026-11-16 修复] 该剥离此前只对含 CJK 的片段生效，非 CJK 片段
+ *        被整段 push——纯标点串成 token、全角逗号粘在英文词上。现所有
+ *        片段统一先过标点剥离（test/chinese-tokenizer.test.js D 节守护）。
  *      - CJK ↔ 非 CJK（字母/数字）边界强制切开，保证「API接口」能切出「接口」
  *      - 对每个连续中文串从最长词向最短词贪心匹配，命中即出词
  *      - 未命中任何词时回退单字（成语检测依赖字序列，不能丢字）
@@ -175,10 +178,8 @@ class ChineseTokenizer {
     const out = [];
     const raw = text.split(LEGACY_SPLIT_RE).filter(w => w.length > 0);
     for (const frag of raw) {
-      if (!CJK_RE.test(frag)) {
-        out.push(frag);
-        continue;
-      }
+      // [2026-11-16 同 _segment] 非 CJK 片段同样先剥全角标点：
+      // 「，，。！！」不再成为 token，「hello，world」切出两侧整词。
       const subFrags = frag.split(ZH_PUNCT_RE).filter(s => s.length > 0);
       for (const sf of subFrags) {
         for (const run of this._splitCJKBoundaries(sf)) {
@@ -197,16 +198,17 @@ class ChineseTokenizer {
     const out = [];
     const raw = text.split(LEGACY_SPLIT_RE).filter(w => w.length > 0);
     for (const frag of raw) {
-      if (!CJK_RE.test(frag)) {
-        out.push(frag);
-        continue;
-      }
-      this._segmentCJKFragment(frag, out);
+      // [2026-11-16 test/chinese-tokenizer.test.js D 节守护]
+      // 全角标点剥离先于 CJK 判定：非 CJK 片段（纯标点串 / 纯英文 /
+      // 中英标点混排）同受模块头「标点即分隔」契约约束。曾经的短路
+      // （!CJK_RE.test(frag) → 整段 push）把「，，。！！」当一个 token、
+      // 把「hello，world」的逗号粘在词上——关键词匹配对这类文本恒失效。
+      this._segmentFragment(frag, out);
     }
     return out;
   }
 
-  _segmentCJKFragment(frag, out) {
+  _segmentFragment(frag, out) {
     // 中文标点视作分隔符
     const subFrags = frag.split(ZH_PUNCT_RE).filter(s => s.length > 0);
     for (const sf of subFrags) {
