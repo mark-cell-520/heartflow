@@ -403,3 +403,8 @@
 {"round":"r439","agent":"agent-4","kind":"dimension","status":"completed","note":"死认领治理补收尾（r444 接手）：commit 38524e1d 已推（regression_to_the_mean 第193维「极端×反向断言必然化」族，真升级②扩族），原 active 认领缺 completed 记录，本轮按 git log 实证补写"}
 {"round":"r440","agent":"agent-4","kind":"dimension","status":"completed","note":"死认领治理补收尾（r444 接手）：commit 0f9bd5b5 已推（law_of_small_numbers 第239维「大样本规模×可靠性裁定」族，真升级②扩族），原 active 认领缺 completed 记录，本轮按 git log 实证补写"}
 {"round":"r450","agent":"agent-4","kind":"r450","direction":"agent-4","claim_at":"2026-11-22T12:35:45Z","expires_hours":6,"status":"active"}
+{"round":"r451","agent":"agent-4","kind":"r450","direction":"agent-4","claim_at":"2026-11-22T12:36:37Z","expires_hours":6,"status":"active"}
+{"round":"r452","agent":"agent-4","kind":"r450","direction":"agent-4","claim_at":"2026-11-22T12:36:39Z","expires_hours":6,"status":"active"}
+{"round":"r450","agent":"agent-4","kind":"release","claim_at":"2026-11-22T12:36:46Z","status":"completed"}
+{"round":"r451","agent":"agent-4","kind":"release","claim_at":"2026-11-22T12:36:46Z","status":"completed"}
+{"round":"r452","agent":"agent-4","kind":"release","claim_at":"2026-11-22T12:36:46Z","status":"completed"}
