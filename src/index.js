@@ -727,6 +727,23 @@ const { checkAdHominem } = require('./ad-hominem.js');
 // 的 FAMILIES 表（think() 置信度打折），gate.action 恒 pass；细节见
 // src/econ-reasoning-gate.js 头注释。
 const { checkEconReasoningGate } = require('./econ-reasoning-gate.js');
+// [r448 接线] 第 282 维度 selection_on_dependent_variable（选择依赖变量 /
+// 按结果归因：只从「已经达成某结果的群体」里归纳共性，再把它当成该结果的
+// 原因——存活者偏差的因果归因形）require。模块 src/selection-on-dependent-
+// variable.js 自 r252 起草即登记进 src/econ-reasoning-gate.js:61 的 FAMILIES
+// 聚合表（第 249 维度子族），gate findings 里只会出现聚合名
+// econ_reasoning_gate、子族名只在其 details 内文中，无法单独指名该族；且
+// r448 缺口实证（scripts/round-448/probe-r448.js + probe-r448-legs.js）发现
+// 存量句式族有真实漏判：腿①（SELECT_ZH/SELECT2_ZH）只收「都/全/个个/
+// 无一例外」全称形与少量结果动词，「大多/多数/大部分」全称量化变体、
+// 「创业成功/转型成功/上市/盈利」商业结果词、「康复者/幸存者」结果者
+// 裸名词形全部零命中；腿②（CAUSE_ZH/CAUSE2_ZH）缺「看来/因为/足见」
+// 推断标记通道与「减肥/减重」结果名词，探针 7/8 攻击整句穿透 gate=pass
+// （基线 1/8）。r448 扩 SELECT3_ZH/CAUSE3_ZH 六族（大多全称族/裸名词族/
+// 商业结果词族 + 看来足见族/因为疑问族/减肥结果族）后模块层 8/8 命中、
+// 良性 4/5 pass（mod 5/5 承重），再仿 r331 先例独立接线。变量名 sodv——
+// selection on dependent variable 缩写，grep 0 命中无冲突。
+const { detectSelectionOnDependentVariable } = require('./selection-on-dependent-variable.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
 // 细节见 src/dose-response-linearity.js 头注释。
@@ -2557,6 +2574,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 计算点。同 r297 先例：八处一次接齐，漏一处 gate.action 恒 pass。变量名
   // erg——econ reasoning gate 缩写，grep 0 命中无冲突。
   const erg = checkEconReasoningGate(_normText);
+  // [r448 接线] 第 282 维度 selection_on_dependent_variable 计算点。r252 起
+  // 只经 econ_reasoning_gate 聚合（第 249 维子族），本行让它以独立维度名进
+  // scores/dimMap/findings——同一文本可同时命中聚合与子族，findings 里
+  // 出现 selection_on_dependent_variable 即指名该族。变量名 sodv。
+  const sodv = detectSelectionOnDependentVariable(_normText);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -3408,6 +3430,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r304 接线] 第 249 维度 econ_reasoning_gate 参与判定（经济学/统计
     // 推理谬误族聚合）。同 r297 先例：dimMap 与 allDims 两处都接。
     {score: erg.score, name:'econ_reasoning_gate'},
+    // [r448 接线] 第 282 维度 selection_on_dependent_variable 参与判定
+    // （选择依赖变量/按结果归因）。同 r331 先例：dimMap 与 allDims 两处
+    // 都接——此前只作为第 249 维聚合的子族登记，findings 无法单独指名。
+    {score: sodv.score, name:'selection_on_dependent_variable'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -4115,6 +4141,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r304 接线] 第 249 维度 econ_reasoning_gate（经济学/统计推理谬误族
     // 聚合×17 子族双腿判据×子族明细暴露腿）。
     econ_reasoning_gate: erg,
+    // [r448 接线] 第 282 维度 selection_on_dependent_variable（选择依赖变量
+    // /按结果归因×结果选择腿×归因宣告腿×CAUSE4 共同点族）。
+    selection_on_dependent_variable: sodv,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -6036,6 +6065,15 @@ function discriminate(text, evidence = [], contentMode) {
     // 事，前者看存量后者看流量」正是本族要教的判别动作）、公共卫生课
     // 堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
     'prevalence_incidence_confusion',
+    // [r448] 第 282 维度 selection_on_dependent_variable（选择依赖变量 /
+    // 按结果归因：只从「已经达成某结果的群体」里归纳共性，再把它当成该
+    // 结果的原因——存活者偏差的因果归因形）登记。r252 起只作为第 249 维
+    // econ_reasoning_gate 聚合的子族存在，findings 无法单独指名该族；r448
+    // 仿 r331 先例独立接线（dimMap + allDims + VERIFY_DIMS 三处）。verify
+    // 级——单句也可能是正当的归因方法教学与批评（「不能只看成功者的共
+    // 性，要比较失败者」正是本族要教的判别动作）、商业案例复述、对他人
+    // 论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
+    'selection_on_dependent_variable',
     // [r249] 第 224 维度 denominator_swap（分母替换谬误：拿不同分母的
     // 绝对计数直接做优劣/安全/多少比较并下结论，忽略人口、样本量、
     // 暴露规模等基数不同——「A城十起事故B城一起所以B城更安全」）登记。
@@ -7151,6 +7189,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [r447] 第 281 维度 prevalence_incidence_confusion 补登记（患病率-发病率混淆）。
       // 同上：九处一次接齐。
       prevalence_incidence_confusion: pic,
+      // [r448 接线] 第 282 维度 selection_on_dependent_variable 补登记
+      // （选择依赖变量/按结果归因）。同上：九处一次接齐——此前 r252 起仅作
+      // 第 249 维聚合子族，dimensions 无键 → discriminate() 读数恒 281。
+      selection_on_dependent_variable: sodv,
       // [r249] 第 224 维度 denominator_swap 补登记（分母替换谬误）。
       // 同上：九处一次接齐。
       denominator_swap: dsw,

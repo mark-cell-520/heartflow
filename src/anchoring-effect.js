@@ -149,6 +149,15 @@ const ANCHOR_ZH = [
   /(?:薪资|工资|薪水|薪酬|中标价|标的额|预算|总额)[^。，！？；\n]{0,6}[一二三四五六七八九十百千万亿两0-9０-９]/, // 薪资开到一万五/薪资说了两万
   /第一(?:个)?(?:数|报价|价格|数字|印象)/,                       // 第一个数/第一句报的价
   /第一(?:个|项|条)(?:项目|报价|价格|数|数字|条目|候选|候选人)/,   // 报价单上第一个项目/第一个候选人
+  // [r448] 腿①补形（紧凑数字 + 动词远距形）——存量 ANCHOR_ZH 要求
+  // 锚词后紧跟数字，漏三类高发形：①「原价从两千抬到一万」锚词与数字
+  // 间插「从/到/抬到/降到」动词；②「锚定在一万八的售价上」以「锚定」
+  // 裸词开头；③「先看三万的车」比较起点形。r448 探针这三形 0/3
+  // 命中、腿②（DEAL_ZH 新族）全中——补后与腿②配对。
+  /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|价签)(?:从|自)[一二三四五六七八九十百千万亿两0-9０-９]/, // 原价从两千
+  /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|价签)[^。，！？；\n]{0,6}(?:抬到|升到|涨到|提到|拉到|标到|调到)/, // 原价抬到一万/标价拉到一万
+  /(?:^|[。，！？；\n])\s*锚定(?:在|到|于)?/,                      // 锚定在一万八的售价上（句首）
+  /(?:先|一)?(?:看|看的是|报的|谈的)(?:的)?[一二三四五六七八九十百千万亿两0-9０-９]/, // 先看三万的车
   /(?:先|头一句|开口)(?:报|开|说)了?(?:价|数|个)?/,                // 先报了原价/先开口
   /(?:对方|他|她|买家|卖家|中介|销售)(?:先|一上来|开口)(?:报|开|说)/, // 对方先开口
   /(?:起的头|开头(?:的)?(?:数|价|价码))/,                          // 起的头
@@ -173,6 +182,24 @@ const ANCHOR_EN = [
   /\blisted\s+(?:it|them|the\s+\w+)?\s*(?:at|for)\s+[\w\s-]{0,20}\d/i, // listed it at 40 / listed for 12000
   /\bpriced\s+(?:it\s+)?at\s+[\w\s-]{0,20}\d/i,                 // priced at five thousand
   /\b(?:salary|pay|budget|floor)\s+(?:was\s+)?(?:set|fixed|placed)\s+at\s+[\w\s-]{0,20}\d/i, // salary floor was set at eighty
+  // [r448] anchor 名词形——存量 ANCHOR_EN 只收 list/sticker/asking/first
+  // price 等转述形，漏最直白的「anchor price / anchor number / the anchor」
+  // 裸名词组合与「anchored at 18000」被动形（r448 探针：EN 攻击 1/8，
+  // 7/8 穿透，良性 0/8）。
+  /\b(?:the\s+|a\s+|an\s+|that\s+|this\s+)?anchor\s+(?:price|number|figure|point|value|amount|offer|bid)\b/i, // the anchor price / an anchor number
+  /\banchored\s+(?:at|on|to)\s+[\w\s-]{0,20}\d/i,           // anchored at 18000
+  // [r448] 文字数字形——存量 anchored at 只收阿拉伯数字（\d），漏
+  // 「anchored at two hundred a share」「anchored at one million」式英文
+  // 文字数字锚点（r448 EN 诊断：句 2/5 腿②命中、腿①穿透）。
+  /\banchored\s+(?:at|on|to)\s+(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|a\s+few|several)\b/i, // anchored at two hundred / one million
+  // [r448] sticker was + 文字数字——存量只有 sticker said/read/showed 动词
+  // 形，漏系动词「The sticker was ten thousand」（r448 EN 诊断句 1：腿②
+  // 命中、腿①穿透）。
+  /\b(?:sticker|label|tag|list|asking)\s+(?:was|is)\s+(?:about\s+|around\s+|roughly\s+)?(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|[\w-]{0,12})\b/i, // the sticker was ten thousand
+  // [r448] first bid was + 文字数字——存量 first price/offer/figure/quote
+  // 名词族漏「The first bid was eighty」（r448 EN 诊断句 4：腿②命中、
+  // 腿①穿透）。
+  /\b(?:first|initial|opening)\s+(?:bid|offer|ask|number)\s+(?:was|is|came\s+in\s+at)\s+(?:about\s+|around\s+|roughly\s+)?(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|[\w-]{0,12})\b/i, // the first bid was eighty
 ];
 
 // ─── 腿② ORBIT 围绕锚点族（中文；查否定前缀）───────────────────
@@ -197,6 +224,20 @@ const DEAL_ZH = [
   /(?:试都没试|想都没想|看都没看)(?:就)?(?:刷卡|下单|买了|签了|付了)/, // 试都没试就刷卡
   /怎么看(?:都)?(?:很|挺)?划算/,                                 // 怎么看都划算
   /比(?:标价|原价|定价|市场价)省了?/,                            // 比标价省了八千多
+  // [r448] 折扣兑现族（紧凑数字形「原价三千/标价一万二」的腿②缺位）——
+  // 存量 DEAL_ZH 只收「觉得划算/占了便宜」，漏「太值了」「等于便宜了
+  // 七成」「就像白送一样」「占了大便宜」「觉得赢了」「觉得不贵」
+  // 式**折扣兑现表达**：r448 探针实测这类句子攻击 1/8（穿透 7/8），
+  // 良性 0/8。语义同族：锚点折扣 × 便宜/划算结论。腿②统一走否定守卫
+  // （「并不觉得值」式由 matchAlive 拦）。
+  /(?:太|真|挺|很|特别)?值了/,                                    // 太值了/真值
+  /便宜了?[一二三四五六七八九十百千万两0-9０-９]?[成倍]?/,       // 便宜了七成/便宜了三千
+  /(?:等于|相当于|就跟|就像|好像)(?:白送|白拿|不要钱|送的)/,    // 就像白送一样
+  /占(?:了|个)?(?:大|大个|老大)?(?:便宜|大便宜)/,               // 占了大便宜
+  /(?:觉得|感觉)(?:自己)?(?:像)?(?:赢|赚了|胜利了)/,             // 觉得赢了/感觉赚了
+  /(?:觉得|看起来|看着)?(?:不贵|真便宜|挺便宜)/,                 // 觉得不贵/真便宜
+  /(?:折扣|降价|让利|优惠)(?:力度|幅度)?(?:很|挺|真|特别)?(?:大|给力|狠|猛|可观)/, // 折扣力度真大/优惠很给力
+  /打[一二三四五六七八九十百千0-9０-９]{1,3}折(?:都)?(?:很|挺|真)?(?:划算|值)/, // 打三折都很划算
 ];
 
 // ─── 腿② WORTH 估值即锚点族（中文；查否定前缀）─────────────────
@@ -223,6 +264,18 @@ const DOMINATED_EN = [
   /\bfeel\s+like\s+a\s+(?:win|bargain|deal|steal)\b/i,           // made the purchase feel like a win
   /\bfelt\s+generous\b/i,                                        // my counter of ten thousand felt generous
   /\bfelt\s+(?:so\s+|really\s+)?cheap\b/i,                       // everything felt cheap
+  // [r448] 折扣兑现族 EN 侧——存量 DOMINATED_EN 的 DEAL 组只收
+  // felt/getting 系动词形，漏「makes/made it a steal」「looked/seemed
+  // cheap」「is a bargain at」式**使动/系动词折扣兑现**（r448 探针：EN
+  // 攻击 1/8，7/8 穿透，良性 0/8）。
+  /\b(?:makes?|made|making)\s+(?:it|this|that|them)\s+(?:a\s+)?(?:great\s+|real\s+)?(?:steal|bargain|deal|win)\b/i, // makes it a steal
+  /\b(?:looked|looks|seemed|seems|appears?)\s+(?:so\s+|really\s+|quite\s+)?cheap\b/i, // looked cheap
+  /\b(?:looked|looks|seemed|seems)\s+like\s+(?:a\s+)?(?:great\s+|real\s+)?(?:steal|bargain|deal)\b/i, // looked like a steal
+  // [r448] made X look/feel cheap 使动形——存量 cheap 族只收系动词
+  // 「looked/seemed cheap」，漏「the twenty-eight look cheap」式宾语前置
+  // 使动结构（r448 EN 诊断：句 3 腿①命中、腿②穿透）。
+  /\b(?:makes?|made|making)\s+(?:the\s+)?[\w-]{1,20}\s+(?:look|feel|seem)\s+(?:so\s+|really\s+|quite\s+)?cheap\b/i, // made the twenty-eight look cheap
+  /\b(?:is|was)\s+a\s+(?:bargain|steal)\s+at\b/i,                 // is a steal at 1200
   /\bhad\s+to\s+(?:buy|get)\s+it\b/i,                            // I had to buy it
   /\bswiped\s+my\s+card\b/i,                                     // swiped my card
   /\bwithout\s+(?:even\s+)?trying\s+it\s+on\b/i,                 // without even trying it on

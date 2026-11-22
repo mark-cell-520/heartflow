@@ -1,3 +1,36 @@
+## r448 — selection_on_dependent_variable 第 282 维接线 + anchoring_effect 折扣腿扩族（真升级①+②；v6.8.222→v6.8.223）
+
+### 本轮定位
+
+r448 为上一轮次的未提交本地产出（工作区发现 M src/selection-on-dependent-variable.js、M src/anchoring-effect.js、M src/index.js + 两个未跟踪轮测文件），按「本地独有产能优先固化」纪律，本轮不做新选题，先把这批产出核实固化。r448 含第 282 个判别维度，命中宪法「什么是真升级」第①条（新判别维度）；同批 anchoring_effect 扩族命中第②条（既有维度补腿）。
+
+### 缺口实证
+
+`selection_on_dependent_variable`（选择依赖变量/按结果归因）自 r252 起即登记在 `src/econ-reasoning-gate.js` 的 FAMILIES 聚合表（第 249 维子族），但 gate findings 只能出现聚合名 `econ_reasoning_gate`、子族名仅在其 details 内文，调用方无法单独指名该子族。r448 探针（`scripts/round-448/probe-r448.js`、`probe-r448-legs.js`）进一步发现存量句式族有真实漏判：腿① SELECT_ZH/SELECT2_ZH 只收「都/全/个个/无一例外」全称形与少量结果动词，「大多/多数/大部分」全称量化变体、「创业成功/转型成功/上市/盈利」商业结果词、「康复者/幸存者」结果者裸名词形全部零命中；腿② CAUSE_ZH/CAUSE2_ZH 缺「看来/足见/因为」推断标记通道与「减肥/减重」结果名词。探针 7/8 攻击整句穿透 gate=pass（基线 1/8）。
+
+### 判据设计（src/selection-on-dependent-variable.js，+117 行）
+
+扩族（SELECT3_ZH/CAUSE3_ZH 三条新正则平行并存，不并入存量数组——避开 length 断言与既有负例注入语义，同 r309 手法；合并点在 findSignatures 的 langs 表）：
+
+1. **族 D「大多/多数/大部分 全称」**：存量结果动词表 ∪ 创业/商业新结果词 × 大多/多数/过半/十有八九 等量化变体。r448 收尾修正：尾部窗 {0,10}→{0,4}，原宽度会把腿①职责外溢到归因宣告段、导致腿②空数组仍可成 sig（负例注入失效）。
+2. **族 E「结果名词裸形 + 大多/多数」**：康复者/幸存者/上岸者 等结果者名词直接作主语（无「的」桥）配全称量化词。
+3. **族 F「创业/商业成功结果动词 + 群体」**：存量结果动词表外新词（上市/盈利/连任/卫冕/破局/拿到融资 等）。
+4. **CAUSE3_ZH/CAUSE4_ZH/CAUSE4_EN**：看来/足见/因为疑问/减肥减重 推断标记族 + 共同点族（≥4 族 ZH / ≥3 族 EN）。
+
+扩族后模块层 8/8 命中、良性 4/5→5/5 pass，再仿 r331 先例独立接线（require + discriminate 计算点 + dimMap/allDims 判定 + detailMap 四处，变量名 sodv grep 确认零冲突）。
+
+anchoring_effect（+53 行）：折扣锚定腿扩族，模块内扩写不动维度注册与 index.js 注册表。
+
+### 验证（数字来自本轮真实运行）
+
+- 轮测 `test/round-448-selection-on-dependent-variable.test.js`：18/18（含 CAUSE4_ZH/CAUSE4_EN 负例注入承重——注入空后 miss、存量语义保留）。
+- 轮测 `test/round-448-anchoring-discount-legs.test.js`：37/37（含 4 legacy attack + 4 legacy exempt 存量回归）。
+- 四门禁：`bin/verify.js` 16/0、`scripts/guard-abilities.js` 20/20（判别维度 282 个）、`test/doc-numbers-accuracy.test.js` 24/0、`scripts/bidirectional-guard.js` 召回 52/52 + 误拦 302/326 零新增。
+
+### 文档同步
+
+VERSION 6.8.222→6.8.223（VERSION / package.json / src/core/version.js 兜底 / SKILL.md:4 + :80 + :85 / src/core/heartflow.js BUILD_DATE 2026-11-22-6.8.223，由 scripts/sync-version.js 同步）；AGENTS.md、README.md、SKILL.md 三份文档的 dimensions 281→282、verify 249→250、Verify 层列举追加 `selection_on_dependent_variable`、README badge/锚点/规格表版本戳同步；README Version history 插入 6.8.223/r448 条目。
+
 ## r447 — prevalence_incidence_confusion 第 281 维接线（真升级①：新判别维度；v6.8.221→v6.8.222）
 
 ### 本轮定位
