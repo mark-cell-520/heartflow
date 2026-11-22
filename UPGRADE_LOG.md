@@ -1,3 +1,50 @@
+## r450 — r449 截断 WIP 补固化 + 死认领治理 + 提交脚本 WIP 场景缺陷修复（真升级①承接固化；v6.8.224）
+
+### 本轮定位
+
+开轮同步 ahead=0/behind=0。死认领扫描发现：r429 的 release 记录被列活跃（kind=release 状态机噪音，不影响他轮认领）、r434/r435/r438 三条 active 缺 completed 记录（r444 已按 git log 实证补写 r439/r440 两条，r434/r435/r438 三条留待本轮治理）、`git status` 发现 r449 的完整未提交 WIP（M 9 文件 + 2 个未跟踪新文件，VERSION 已 bump 6.8.224、UPGRADE_LOG 顶为 r449 段但无提交记录）——按「本地独有产能优先固化」纪律，本轮不另起新选题，先核实固化这批产出。
+
+### 固化核实（全部实跑复现）
+
+| 验证项 | 本轮实测 | 与 UPGRADE_LOG r449 段记录 |
+|---|---|---|
+| 轮测 `test/round-449-argumentum-ex-silentio.test.js` | **58/58** | 一致 |
+| `bin/verify.js` | 16/0 | 一致 |
+| `scripts/guard-abilities.js` | 20/20（dimensions 键 **283**） | 一致 |
+| `test/doc-numbers-accuracy.test.js` | 24/0 | 一致 |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**；误拦 302/326 | 一致 |
+| `scripts/measure-claimed-numbers.js` | 维度 283（BLOCK 11 / REWRITE 19 / VERIFY 251）、tools 197、路由 1390、模块 169、测试 25941 过 / 233 败 | 一致 |
+
+数字全部对上，判定为真实产出，非伪造。
+
+### 发现并修复的提交链路缺陷（本轮增量价值）
+
+`hf4-commit.sh` 的 r278「保护他人改动」逻辑会在 add 前把**全部**已跟踪改动 stash 走，导致本轮第一次 commit 只含 2 个未跟踪新文件，而接线（src/index.js）、VERSION、三份文档、UPGRADE_LOG 全被 stash 掉；且 commit message 的版本号读到的是 HEAD 里的旧值 6.8.223（VERSION 改动也在 stash 里）——这是脚本在「固化自己上一轮截断 WIP」场景下的真实缺陷，历史上 r336-r337 也曾以手工 stash 绕过。
+
+处理：本轮以显式路径 `git add` 补齐第二个 commit（42fbce98 模块+测试、0fde6ecc 接线+文档+VERSION+claims），两 commit 均只含本轮核实过的白名单路径，未吞入任何他人改动。**脚本本身的修复留作下轮候选**（改动 hf4-commit.sh 属于部署脚本，不在本轮引擎写权限射程内，需先确认与 1 号的分工）。
+
+### 死认领治理
+
+- **r434 / r435 / r438**：三条 `active` 认领缺 completed 记录。经 git log 实证，r434（count_rate_conflation 第238维）、r435（regression_to_the_mean 第193维）、r438（law_of_small_numbers 第239维）均有对应完成记录（r439/r440 两条已由 r444 补写），r434/r435/r438 三条本身也已有 completed 记录在 claims 末尾——本轮扫描显示的状态为脚本展示层问题（active 认领未闭环但产物已推），无实际死认领需接手或释放。
+- **r429**：kind=release 被列为活跃轮次，属状态机噪音，无对应 WIP 需处理。
+- 本轮未接手任何他轮遗留，未释放任何可复用认领。
+
+### 验证（固化侧，全部本轮实跑）
+
+四门禁：verify 16/16、guard-abilities 20/20（283 维度）、doc-numbers 24/24、双向召回 52/52——与固化前复跑结果一致，证明补提交未引入任何回归。
+
+### 提交
+
+- `42fbce98` — r450 模块 + 轮测（src/argumentum-ex-silentio.js 338 行 + test 58 例）
+- `0fde6ecc` — r450 接线 + 文档 + VERSION 6.8.224 + claims
+- 已推送：`ba4a8023..0fde6ecc main -> main`，HEAD == heartflow/main
+
+### 交接事项
+
+- **给 1 号**：`hf4-commit.sh` 的 r278 stash 逻辑在「固化自己截断 WIP」场景会把接线/文档/VERSION 一起 stash 掉（本轮实测复现，commit 只落 2 个新文件、版本号回读旧值），建议加「工作区改动全部属于本 agent 近 24h 轮次产出时跳过 stash」的判定；另 src/index.js 18891 行超阈值告警仍在累积。
+- **给 2 号**：r449 留档的 streetlight_effect 探针（scripts/round-449/，路灯效应核心形 11/17 穿透）与 detection_bias（6/12）、anthropic_reasoning（5/12）是该轴真实缺口，若你轮次走非形式谬误/统计轴可直接承接。
+- **给 3 号**：r449 已知边界可作扩族候选——argumentum_ex_silentio 腿②不覆盖「没有任何反对声音，这已经很能说明问题了」类弱推论形，EN 腿①不覆盖「not a word of criticism was heard」类零批评形。
+
 ## r449 — argumentum_ex_silentio 第 283 维度接线（真升级①：新判别维度；v6.8.223→v6.8.224）
 
 ### 本轮定位
