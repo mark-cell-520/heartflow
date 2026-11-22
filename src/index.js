@@ -1125,6 +1125,15 @@ const { detectFramingEffect: checkFramingEffect } = require('./framing-effect.js
 // [r447] 第 281 维度 prevalence_incidence_confusion（患病率-发病率混淆：
 // 流量指标腿×存量现患结论腿×推导形状，混用双向）。缩写 pic。
 const { checkPrevalenceIncidenceConfusion } = require('./prevalence-incidence-confusion.js');
+// [r451 接线] 第 284 维度 streetlight_effect（路灯效应：以测量可得性限定
+// 证据范围，并据此对整体下结论）。模块 src/streetlight-effect.js。r449 缺口
+// 实证（scripts/round-449/probe-r449-core.js + 本轮 round-451 复跑）：17 条
+// 核心攻击形 11 条穿透既有 283 维，三类形——①易测量处→整体结论（只在路灯
+// 下找钥匙）②未测量=不存在/无需关注 ③只按可得指标做最终判断——在存量
+// 维度中无射程：proxy_metric_goal（第 187 维）只覆盖用代理指标替代真目标，
+// availability_bias（第 200 维）/ vivid_case_availability（第 252 维）只覆盖
+// 生动个案易回忆，均不判「可得性限定证据范围并据此外推」。缩写 sle。
+const { checkStreetlightEffect } = require('./streetlight-effect.js');
 
 // [r249] 第 224 维度 denominator_swap（分母替换谬误：拿不同分母的绝对
 // 计数直接做优劣/安全比较，忽略人口、样本量、暴露规模等基数不同；中英
@@ -2808,6 +2817,10 @@ function discriminate(text, evidence = [], contentMode) {
   const fme = _applyPedagogyRelaxation(checkFramingEffect(_normText), "framing_effect", pedagogyRelaxation);
   // [r447] 第 281 维度 prevalence_incidence_confusion（患病率-发病率混淆）计算点。
   const pic = _applyPedagogyRelaxation(checkPrevalenceIncidenceConfusion(_normText), "prevalence_incidence_confusion", pedagogyRelaxation);
+  // [r451 接线] 第 284 维度 streetlight_effect（路灯效应）计算点。同 r449
+  // 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名 sle——
+  // streetlight effect 缩写，grep 0 命中无冲突。
+  const sle = _applyPedagogyRelaxation(checkStreetlightEffect(_normText), "streetlight_effect", pedagogyRelaxation);
 
   // [r249] 第 224 维度 denominator_swap（分母替换谬误）计算点。
   const dsw = _applyPedagogyRelaxation(checkDenominatorSwap(_normText), "denominator_swap", pedagogyRelaxation);
@@ -3602,6 +3615,9 @@ function discriminate(text, evidence = [], contentMode) {
     {score: fme.score, name:'framing_effect'},
     // [r447] 第 281 维度 prevalence_incidence_confusion 参与判定（患病率-发病率混淆）。
     {score: pic.score, name:'prevalence_incidence_confusion'},
+    // [r451 接线] 第 284 维度 streetlight_effect 参与判定（路灯效应）。
+    // 同 r449 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: sle.score, name:'streetlight_effect'},
     // [r249] 第 224 维度 denominator_swap 参与判定（分母替换谬误）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: dsw.score, name:'denominator_swap'},
@@ -4298,6 +4314,9 @@ function discriminate(text, evidence = [], contentMode) {
     framing_effect: fme,
     // [r447] 第 281 维度 prevalence_incidence_confusion（患病率-发病率混淆×流量指标腿×存量现患结论腿×推导形状腿）。
     prevalence_incidence_confusion: pic,
+    // [r451 接线] 第 284 维度 streetlight_effect（路灯效应：测量可得性限定
+    // 证据范围腿 × 据此推断整体/未测量即不存在腿）dimMap 登记。sle。
+    streetlight_effect: sle,
     // [r249] 第 224 维度 denominator_swap（分母替换×绝对计数腿×比较结论腿×主体对置腿）。
     denominator_swap: dsw,
     // [r250] 第 226 维度 survivor_time_bias（幸存时间偏误×生存期语义腿×
@@ -6080,6 +6099,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 事，前者看存量后者看流量」正是本族要教的判别动作）、公共卫生课
     // 堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
     'prevalence_incidence_confusion',
+    // [r451 接线] 第 284 维度 streetlight_effect（路灯效应：以测量可得性
+    // 限定证据范围，并据此对整体下结论）登记。verify 级——单句可能是对他人
+    // 数据局限的客观转述、方法论文本或附带局限声明的样本描述；verify 的
+    // 含义是「结论的证据范围被可得性而非代表性限定，采信前必须检查未测量
+    // 部分与整体的差异，或把结论降级为已测量范围内成立」。
+    'streetlight_effect',
     // [r449] 第 283 维度 argumentum_ex_silentio（诉诸沉默 / silence-as-evidence：
     // 把沉默、无反对、无投诉、无反馈这一缺席事实，当作某主张为真、某人同意、
     // 某事合格的证据——缺席被当成在场表态）登记。verify 级——单句也可能是
@@ -7217,6 +7242,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r447] 第 281 维度 prevalence_incidence_confusion 补登记（患病率-发病率混淆）。
       // 同上：九处一次接齐。
       prevalence_incidence_confusion: pic,
+      // [r451 接线] 第 284 维度 streetlight_effect 补登记（路灯效应）。
+      // 同上：九处一次接齐——此前 discriminate() 读数恒 283。
+      streetlight_effect: sle,
       // [r448 接线] 第 282 维度 selection_on_dependent_variable 补登记
       // （选择依赖变量/按结果归因）。同上：九处一次接齐——此前 r252 起仅作
       // 第 249 维聚合子族，dimensions 无键 → discriminate() 读数恒 281。
@@ -18729,6 +18757,7 @@ module.exports = {
   // [r447 接线] 第 281 维度 prevalence_incidence_confusion 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkPrevalenceIncidenceConfusion,
+  checkStreetlightEffect,
   // [r249] 第 224 维度 denominator_swap 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkDenominatorSwap,

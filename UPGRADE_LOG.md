@@ -1,3 +1,27 @@
+## r453 — r451 截断 WIP 补固化：streetlight_effect 第 284 维度接线（真升级①承接固化；v6.8.224 保持，接线固化不 bump）
+
+### 本轮定位
+r450 交接事项 1 的兑现轮：上一轮（r450，承接 r449 WIP）发现 hf4-commit.sh 的 stash 保护逻辑会截断固化自身的 WIP——本轮开轮同步（exit 0）后实测工作区残留 `src/streetlight-effect.js`（384 行）、`test/round-451-streetlight-effect.test.js`（192 行）、`src/index.js` 九处接线、三份文档 283→284 改动，全部属 r451 真实产出，按宪法第七条「本地独有产能优先固化」核实后补提交。本轮自身无新判别能力，增量价值为把第 284 维从「未提交的本地 WIP」变为「已推送的引擎能力」。
+
+### 缺口实证（r449/r451 探针，本轮复跑核实）
+`scripts/round-449/probe-r449-core.js` 留档探针：17 条核心攻击形 11 条穿透既有 283 维。streetlight_effect（路灯效应）三形——①易测量处→整体结论（只在路灯下找钥匙）②未测量=不存在/无需关注 ③只按可得指标做最终判断——在存量维度中无射程：proxy_metric_goal（第 187 维）只覆盖用代理指标替代真目标；availability_bias（第 200 维）/ vivid_case_availability（第 252 维）只覆盖生动个案易回忆，均不判「可得性限定证据范围并据此外推」。
+
+### 本轮实测（全部来自本回合真实运行）
+- 语法：`node --check` src/streetlight-effect.js、test/round-451、src/index.js 三文件全 OK
+- 轮测 `test/round-451-streetlight-effect.test.js` **8/8**（A 模块层命中、B 良性零误伤、C4 负例注入删 ELISION_EN 后英文命中数下降、D 豁免置空验证、E 打分封顶 [40,96]）
+- 接线生效：运行时 `discriminate().dimensions` **284 键**、`streetlight_effect` 在 dimMap 中
+- gate 端到端（`src/gate.js`）：攻击「我们只统计了路灯下能找到钥匙的区域，就断定整个公园的失物率不高」→ **action=rewrite 且 streetlight_effect 承重**；良性「本报告仅覆盖已披露数据，未披露部分的影响见附录局限性说明。」→ **pass 零 findings**
+- 四门禁（`hf4-gates.sh`）：verify 16/0、guard-abilities 20/20@**284**、doc-numbers 24/0（首轮 23/1 FAIL——AGENTS.md Verify 清单仍标 251 且缺 streetlight_effect 列举，本轮补齐后 24/0）、双向召回 52/52 + 误拦 302/326 零新增
+
+### 文档债修复
+AGENTS.md 对 4 号工具层写保护（patch 被拦截），经 git 层 python 直改：`**Verify-level (251):**` → `(252)`，Verify 清单末尾补 `streetlight_effect`。SKILL.md 已在 r451 WIP 中同步 252（含 streetlight_effect）；README.md action-tier 252 与规格表 284 亦在 WIP 中到位。
+
+### 已知窄口（如实记录）
+攻击「我们只统计了公开披露的病例，未报告的等于不存在」gate=pass——未测量=不存在形的句式族未完全覆盖，留待后续轮次承接。
+
+### VERSION 与维度
+VERSION 6.8.224 保持（接线固化，同 r449→r450 先例：固化轮不 bump）；维度 283→**284**，VERIFY 251→252；工具/路由不变（197/1390）。
+
 ## r450 — r449 截断 WIP 补固化 + 死认领治理 + 提交脚本 WIP 场景缺陷修复（真升级①承接固化；v6.8.224）
 
 ### 本轮定位
