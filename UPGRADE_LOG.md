@@ -1,3 +1,34 @@
+## r447 — prevalence_incidence_confusion 第 281 维接线（真升级①：新判别维度；v6.8.221→v6.8.222）
+
+### 本轮定位
+
+r444（sycophancy 插件层补齐）与 r447 均为上一轮次的未提交本地产出，按「本地独有产能优先固化」纪律，本轮不做新选题，先把两批产出核实固化。r447 是第 281 个判别维度，命中宪法「什么是真升级」第①条（新判别维度）。
+
+### 缺口实证
+
+存量维度族里 `base_rate_neglect`（基率忽视）、`survivor_time_bias`（生存时间偏误）、`relative_risk_individual_transfer`（相对风险个体迁移）都只管基率与生存时间口径，「用发病率（流量/incidence）证据直接论证现患规模（存量/prevalence）」或反向混用的整族句式零覆盖。这是流行病学与公共卫生论述里最高频的统计口径混淆之一（「发病率高所以满大街都是病人」「患病率低说明新发感染少」），引擎此前完全放行。
+
+### 判据设计（src/prevalence-incidence-confusion.js，402 行）
+
+三腿判据，缺一不判：
+
+1. **腿① FLOW 流量指标**：发病率 / 新发病例 / 新增病例 / 年发病 / 新发感染 / incidence / new cases / incidence rate 等。含 r161 裸名词教训——流量名词必须落在推导位置或带修饰，裸名词出现不判。
+2. **腿② STOCK 存量现患结论**：满大街都是病人 / 患病人群占 / 人群中到处都是 / living with / currently has the disease 等，必须落在推导结论位置而非单纯概念陈述。
+3. **腿③ LINK 推导连接**：所以 / 说明 / 可见 / 足以证明 / so / therefore / which means 等，邻近窗 ZH 60 字 / EN 160 字符。
+
+四组豁免：正确破除混淆的元陈述（「患病率和发病率是两回事，前者看存量后者看流量」）、纯概念教学、疑问句与对冲、存量在前流量在后的反向并列。
+
+score 0.56，VERIFY 级——理由：单句可能是教学中引用反例，或作者正要指出口径问题，不宜硬拦。
+
+### 验证（数字来自本轮真实运行）
+
+- 轮测 `test/round-447-prevalence-incidence-confusion.test.js`：攻击命中 11/11、良性零误伤 12/12、FLOW_ZH 腿承重注入验证（shadow 替换后命中数下降）、返回形状契约。
+- 四门禁：`bin/verify.js` 16/0、`scripts/guard-abilities.js` 20/20（判别维度 281 个）、`test/doc-numbers-accuracy.test.js` 24/0、`scripts/bidirectional-guard.js` 召回 52/52 + 误拦 302/326 零新增。
+
+### 文档同步
+
+VERSION 6.8.221→6.8.222（VERSION / package.json / src/core/version.js 兜底 / SKILL.md:4 + :85 / src/core/heartflow.js BUILD_DATE，由 scripts/sync-version.js 同步）；AGENTS.md、README.md、SKILL.md 三份文档的 dimensions 280→281、verify 248→249、Verify 层列举追加 `prevalence_incidence_confusion`；README Version history 插入 6.8.222/r447 条目。
+
 ## r446 — guilt_by_association 新增「被动连坐」句式族（真升级②：既有维度扩族；v6.8.220→v6.8.221）
 
 方向轮换：r445 落逻辑谬误轴（ecological_fallacy 扩族），本轮继续逻辑谬误轴但换维度——从 r445 探针池的候选中选定 `guilt_by_association`（第 154 维连坐定罪）的被动连坐缺口。心虫裁决门禁 `heartflow_philosophy_decision` 返回 accelerate（confidence 0.7 / priority 40 / trigger optimal_conditions；本体一次选中无打平）。如实说明：rationale 内 cognitiveLoad/uncertainty 返回字符串 "unknown"（引擎未实测口径），未当作实质背书。

@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-280-blueviolet.svg)](#what-it-catches-280-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-281-blueviolet.svg)](#what-it-catches-281-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-280 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
+281 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
 ×  1,390 dispatch routes  ×  25,941 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 280 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 281 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (280 dimensions) -> gate
+scope-check -> premise-check -> discriminate (281 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (280 dimensions)
+## What it catches (281 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **248 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **249 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.221**. Not marketing copy.
+Measured on this repository at **v6.8.222**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 280 |
+| Discrimination dimensions | 281 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
 | Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.222 | 2026-11-22 | **r447 prevalence_incidence_confusion 第 281 维接线（真升级①：新判别维度）** — 患病率/发病率存量-流量混淆检测。缺口实证：存量维 `base_rate_neglect`/`survivor_time_bias`/`relative_risk_individual_transfer` 只管基率与生存时间，「用发病率（流量）证据直接论证现患规模（存量）」或反向混用整族零覆盖。三腿判据缺一不判：腿① FLOW 流量指标（发病率/新发病例/新增病例/年发病/新发感染/incidence/new cases/incidence rate 等，含 r161 裸名词教训——流量名词须绑定修饰或推导位置）× 腿② STOCK 存量现患结论（满大街都是病人/患病人群占/人群中到处都是/living with/currently has the disease 等，必须落在推导结论位置）× 腿③ LINK 推导连接（所以/说明/可见/足以证明/so/therefore/which means，邻近窗 ZH 60 字 / EN 160 字符）。四组豁免：正确破除混淆的元陈述（「患病率和发病率是两回事」）、纯概念教学、疑问句与对冲、存量在前流量在后的反向并列。score 0.56 VERIFY 级（单句可能是教学反例或作者正要指出口径问题）。轮测 `test/round-447-prevalence-incidence-confusion.test.js` 11/11 攻击命中 + 12/12 良性零误伤 + FLOW_ZH 腿承重注入验证；guard-abilities 20/20@281；双向召回 52/52 + 误拦 302/326 零新增。维度 280→281、工具/路由数不变（197/1390）。VERSION 6.8.221→6.8.222。 |
 | 6.8.220 | 2026-11-22 | **r445 ecological_fallacy「具体个体属性直推」新句式族（真升级②）** — `src/ecological-fallacy.js` 第 211 维腿② INDIVIDUAL_ZH 追加 5 条腿（F=16 连接词+所有格+断言副词、F2=17 连接词+指称+数值尾部、G=18 无连接词成员身份+断言、G2=19 无连接词属性名词直推、G3=20 范围代词+都+结论），INDIVIDUAL_EN 追加 2 条腿，腿① AGGREGATE_EN 补均值量+具体群体形。根因：存量腿②只收量化指称，「他/她 + 个体层属性断言」整族漏判。轮测全绿；五门禁全绿。维度/工具/路由数不变（280/197/1390）。来源：内部缺口路径（探针 /tmp/probe-r445-{a,b,c,matrix}.js）。 |
 | 6.8.221 | 2026-11-22 | **r446 guilt_by_association「被动连坐」新句式族（真升级②）** — `src/guilt-by-association.js` 第 154 维新增被动连坐族：存量 INFER_ZH 是主动断言形（「他也不是好人」直判），新族是**否定式清白不可能**——不直接定罪，而把「证明清白的不可能」强加给关系人（洗不清/脱不了干系/撇不清关系/屁股不干净/跑不掉/说不清白/有何清白可言），修辞更隐蔽、舆论场更常见。三腿判据缺一不判：腿①关系链指称（存量 REL_ZH ∪ PASSIVE_REL_EXTRA 扩展 34 词：老板/上司/领导/熟人/故交/世交/走得近/那种人……）× 腿②清白不可能（PASSIVE_INFER_RE 14 条正则，覆盖否定式/疑问反问式/名词化三类形态）× 腿③反连坐正当程序豁免（PASSIVE_REBUTTAL 18 词：不等于参与/证据链/分别认定/本人行为……）。缺口实证：r446-a 探针 ZH 侧 8/8 零命中（gate=pass），EN 侧已被 fallacy_of_relevance 拦下故按射程分工不重复建设。轮测 `test/round-446-guilt-by-association-passive.test.js` 53/53（攻击 17 + 良性 15 + 存量族回归 4 + gate 端到端归因 10 + 裸名词自查 3 + 豁免逐条承重 4）；变体矩阵攻击 17/17 命中、良性 0/15 误伤。五门禁全绿：verify 16/0、guard 20/20@280、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。维度/工具/路由数不变（280/197/1390）。VERSION 6.8.220→6.8.221。 |
 | 6.8.219 | 2026-11-21 | **r442 counterfactual_overclaim 否定形反事实句式族（真升级②：既有维度扩族，CN-C/CN-D/EN-D/EN-E 四族）** — 反事实过度断言维度的句式扩族。缺口实证：探针 `/tmp/probe-r442-b.js` 在 v6.8.218 gate 层实测 cf5/cf7/cf8/cf9 四条漏判（6/10 命中），对应四类高频反事实构式此前零覆盖。① **CN-C 否定动作先行形**——连接词（如果/若/要是/要不是/若非）→ [≤14字] → 否定动作（没有/没/未曾/未/不曾/不）→ 逗号 → [≤10字] → 近期时点锚（去年/今年/现在/如今/初期…）；CN-A 的时点锚窗被逗号截断，「如果公司没有改革，去年肯定会倒闭」整句失配，而否定动作形是商业与政策论述最高频的反事实构式（"if we had not…"）② **CN-D 行动依据形**——反事实前件（如果…就能/便能…）→ 逗号 → 说明/证明/表明/意味着 → 行动要求（必须/应当/需要/要/得）；把反事实推断本身当下一步行动的论据（「既然当初改革就能成功，说明现在必须再改革一次」），确定性由前件侧「就能/便能」承载 ③ **EN-D without/but for + would + CERT**——含 would certainly have / would surely have / would have certainly 三种语序；EN-A 要求 if + had 形，without/but for 是否定性反事实介词框架，此前零覆盖 ④ **EN-E if…had not + would**——had not 显式否定形，CERT 腿兜住确定性。新单测 `test/round-442-counterfactual-negative-family.test.js` 28/28；轮测 28/28、verify 16/0、guard 20/20@280、doc 24/24、双向召回 52/52 + 误拦 302/326 零新增；探针 6/10→10/10。维度总数仍为 280（扩族不增维）。VERSION 6.8.218→6.8.219。**r443 审计修复（维护，非升级）**：choice_architecture_manipulation 两处裸形误伤——① MANEUVER_DISGUISE_ZH 去裸「话术/措辞/文案写」形（良性反诈/教学陈述「反诈宣传文案列举诱导信任话术」整句三腿误触发；承重攻击族 P1a/P1c/P2a 全部走「写成/设计成/设成」绑定形，不依赖裸名词）② MANEUVER_OBSTRUCT_ZH 去裸「比…长/麻烦/复杂」比较形及残留前缀形「流程比」（良性技术陈述「服务调用链路比较复杂」「退订流程比注册麻烦」误触发，后者经 MCP 实测 score 0.72 真命中 obstruction_or_misdirection 腿）；MANEUVER_OBSTRUCT_EN 同步去 `longer than` / `obstruct(ion)` / `friction` 三个裸形（良性重构论述「this refactor introduces friction」同类误伤）；攻击族 P6b/P9b 承重于具象显著性形 做小/调暗/角落/等N个工作日，不依赖裸比较形。161 轮教训：同族词去修饰后仍须命中——绑定形与具象形均在表。修复后 `test/round-438-choice-architecture-manipulation.test.js` 36/36 无回归、`round-438-window-stable-generalization` 23/23、guard 20/20、双向 52/52。 |
