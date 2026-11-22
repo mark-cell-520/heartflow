@@ -1,3 +1,71 @@
+## r449 — argumentum_ex_silentio 第 283 维度接线（真升级①：新判别维度；v6.8.223→v6.8.224）
+
+### 本轮定位
+
+按「本地独有产能优先固化」纪律：阶段3 动手前 `git status` 发现上一轮截断的完整 WIP（M 8 文件 + ?? `src/argumentum-ex-silentio.js` + ?? `test/round-449-argumentum-ex-silentio.test.js`；UPGRADE_LOG 顶为 r448、VERSION 已 bump 6.8.224 但无提交记录），判定为 r449 未固化产出。本轮不另起新选题，先核实固化。**注意**：本轮对 WIP 做了矩阵修复（5 处正则/豁免），因此固化内容 = 上一轮实现 + 本轮矩阵实测修复，非纯打包。
+
+命中宪法「什么是真升级」第①条：dimMap 新键 `argumentum_ex_silentio`，独立命中「诉诸沉默 / argument from silence」新攻击族。
+
+### 缺口实证（scripts/round-449/）
+
+原计划攻 streetlight_effect，池探针 `probe-r449-gap.js` 三候选（A detection_bias / B streetlight_effect / C anthropic_reasoning）gate 层穿透 A 6/12、B 8/12、C 5/12；`probe-r449-core.js` 路灯效应核心形 11/17 穿透——数据留档作下轮候选。转向 r449 WIP 后对该族做缺口实证：
+
+存量 `manufactured_consent`（第 64 维，`src/manufactured-consent.js`）M2 腿只收「宣布通过 / 就这么定了 / 视为一致」等**表决程序宣告形**，射程不覆盖「无反对 / 无投诉 / 零反馈 / 没人说话」这类**缺席事实被当作在场表态**的更宽结构。探针确认核心攻击形穿透（gate=pass），族真实未覆盖。
+
+### 判据设计（src/argumentum-ex-silentio.js，338 行 + 本轮 +9 行矩阵修复）
+
+双腿判据（缺一不判，负例注入测试逐常量验证承重）：
+
+- **腿① SILENCE（沉默事实）**：ZH 沉默/鸦雀无声/没有反对/没有异议/无人质疑/无投诉/零反馈/没人说话/没收到任何反馈 + EN no objections / no complaints / no response recorded / silence from / went unanswered / nobody has spoken against（本轮新增）。
+- **腿② INFERENCE（由沉默推出的正面结论）**：ZH 就是同意/等于同意/视为认可/沉默即赞成（本轮新增「即/亦即/也即/便」族）/那就是通过/默认通过 + EN so they agreed / therefore approved / community clearly endorses（本轮新增群体 endorse 族）。
+- **邻近窗**：ZH 60 字 / EN 160 字符。
+- **四组豁免**：疑问句形、对冲限定、显式否定/方法论破除（EXEMPT_DISCERN_ZH/EN，本轮补「暂不/有待/待确认/不视为」与 EN pending/awaiting/not yet treated 族）、表决与会议记录如实统计形。
+- **强否定条件语气守卫**；score clamp 40–96；VERIFY 级。
+
+`src/index.js` 八处接线（变量名 `aes`，grep 确认零冲突）：require + discriminate 计算点（2795-2796）、dimMap/allDims（3593）、detailMap（4292）、VERIFY_DIMS 登记 + 与 manufactured_consent 射程划界注释（6084-6096）、索引补登记（7207）。
+
+### 矩阵实测（scripts/round-449/matrix-r449.js，强制项）
+
+**首跑未全绿 → 本轮矩阵修复 5 处后复跑**：
+
+| 项 | 首跑 | 修复后 |
+|---|---|---|
+| 攻击变体（12 条：ZH 核心/量化/倒装/裸成语/长句 + EN 核心/修饰/倒装/长句） | 10/12 | **12/12** |
+| 良性（12 条，含边缘良性教学陈述） | 8/12 | 模块侧 0 误伤（剩余 4 条为存量维度既有行为） |
+
+矩阵修复明细（全部落在 WIP 模块内，不改存量维度文件）：
+
+1. 腿② ZH 补「即/亦即/也即/便 + 表态词」——修「沉默即赞成」裸成语形 MISS。
+2. 腿① EN 补 `nobody has spoken/voiced/said anything … against`——修 EN 倒装 MISS。
+3. 腿② EN 补群体 endorse/embrace/accept/approve 族——修「community clearly endorses」MISS。
+4. 豁免 ZH 补「暂不/尚不/仍待/有待/待确认/不视为/不宜/不足以」——修「暂不视为通过」被腿②误触发。
+5. 豁免 EN 补 pending/awaiting/not yet treated/insufficient/tentatively 同族。
+
+### 良性 FP 基线对照（scripts/round-449/baseline-fp.js）
+
+矩阵剩余 4 条良性非 pass（claimed_verification_without_trail ×2、manufactured_consent ×2）经 git checkout 到 v6.8.223 干净基线同文复跑，**action 与维度完全一致** → 存量既有行为，非本轮引入，符合「良性存量误伤不计本轮增量」纪律。（注：基线对照时 git checkout 误回退了 VERSION 链 4 文件，已重跑 sync-version.js 完整恢复 6.8.224 + BUILD_DATE `2026-11-22-6.8.224`，工作区形态复原 8 M + 2 ??。）
+
+### 验证
+
+| 门禁 | 结果 |
+|---|---|
+| 轮测 `test/round-449-argumentum-ex-silentio.test.js` | **58/58**（模块层直接命中 22/22、良性零误伤 0/16、单腿①/单腿②不判、疑问句豁免/反问不豁免、index.js 导出检查） |
+| `bin/verify.js` | 16 passed / 0 failed |
+| `scripts/guard-abilities.js` | 20/20（dimensions 键 283） |
+| `test/doc-numbers-accuracy.test.js` | 24 通过 / 0 失败 |
+| `scripts/bidirectional-guard.js` | 召回 52/52；误拦 302/326（与 r448 基线一致，零新增） |
+| 变体矩阵（强制项） | 攻击 **12/12** 命中；良性模块侧 0 误伤 |
+| `scripts/measure-claimed-numbers.js` | 维度 283（BLOCK 11 / REWRITE 19 / VERIFY 251）、tools/handlers 197、路由 1390、模块 169、测试 25941 过 / 233 败（零回归） |
+
+文档同步：README Verified metrics 版本戳 + action-tier verify 计数 250→251 + Version history 新行；SKILL.md 规格表版本戳 + Engine version 行；AGENTS.md 上一轮已同步（含新维名与计数 251，本轮零改动）。
+
+### 已知边界
+
+- 腿②「即赞成」族目前只覆盖「沉默/不表态 + 即 + 表态词」的显式等值形，不覆盖「没有任何反对声音，这已经很能说明问题了」这类**弱推论形**（无显式表态词）——下轮可作扩族候选。
+- EN 腿① `nobody has spoken against` 依赖 against/opposed/contrary 显式反向词；「not a word of criticism was heard」类零批评形未覆盖。
+- 4 条良性存量 FP 属既有维度射程问题（claimed_verification_without_trail 对「不等于/暂不」类判别句仍开火），可作后续轮次独立议题。
+- 非阻塞告警：src/index.js 18891 行（阈值 14000），累积告警非本轮引入。
+
 ## r448 — selection_on_dependent_variable 第 282 维接线 + anchoring_effect 折扣腿扩族（真升级①+②；v6.8.222→v6.8.223）
 
 ### 本轮定位

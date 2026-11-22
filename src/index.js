@@ -1097,6 +1097,13 @@ const { detectSelfFulfillingProphecy } = require('./self-fulfilling-prophecy.js'
 // 双腿共现（未来证据腿 × 当下行动/结论腿）+ 邻近窗；细节见
 // src/appeal-to-future.js。
 const { detectAppealToFuture: checkAppealToFuture } = require('./appeal-to-future.js');
+// [r449] 第 283 维度 argumentum_ex_silentio（诉诸沉默 / silence-as-evidence：
+// 把沉默、无反对、无投诉、无反馈这一缺席事实，当作某主张为真、某人同意、
+// 某事合格的证据）。与 manufactured_consent（会议程序短路）射程不同：本族不
+// 要求集体或表决语境，一个人沉默也照样判，且腿②收任何由沉默推出的正面
+// 结论。双腿共现（沉默事实腿 × 沉默即证据推论腿）+ 邻近窗 + 六组豁免。
+// 实现见 src/argumentum-ex-silentio.js。
+const { checkArgumentumExSilentio } = require('./argumentum-ex-silentio.js');
 // [r232] 第 219 维度 appeal_to_rumor（传闻即事实：把「某说法正在流传」
 // 这一传播事实当成该说法为真的证据，是传播强度与证据强度的混淆）。双腿
 // 共现（传播事实腿 × 真实性推断腿）+ 邻近窗；细节见
@@ -2784,6 +2791,9 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r231 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
   // atf——appeal to future 缩写，grep 0 命中无冲突。
   const atf = _applyPedagogyRelaxation(checkAppealToFuture(_normText), "appeal_to_future", pedagogyRelaxation);
+  // [r449] 第 283 维度 argumentum_ex_silentio（诉诸沉默）计算点。变量名
+  // aes——argumentum ex silentio 缩写，grep 0 命中无冲突。
+  const aes = _applyPedagogyRelaxation(checkArgumentumExSilentio(_normText), "argumentum_ex_silentio", pedagogyRelaxation);
   // [r232] 第 219 维度 appeal_to_rumor（传闻即事实）计算点。
   // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
   // atr——appeal to rumor 缩写，grep 0 命中无冲突。
@@ -3578,6 +3588,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r232] 第 218 维度 appeal_to_future 参与判定（诉诸未来）。
     // 同 r231 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: atf.score, name:'appeal_to_future'},
+    // [r449] 第 283 维度 argumentum_ex_silentio 参与判定（诉诸沉默）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: aes.score, name:'argumentum_ex_silentio'},
     // [r232] 第 219 维度 appeal_to_rumor 参与判定（传闻即事实）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: atr.score, name:'appeal_to_rumor'},
@@ -4275,6 +4288,8 @@ function discriminate(text, evidence = [], contentMode) {
     self_fulfilling_prophecy: sfp,
     // [r232] 第 218 维度 appeal_to_future（诉诸未来×未来证据腿×当下行动腿）。
     appeal_to_future: atf,
+    // [r449] 第 283 维度 argumentum_ex_silentio（诉诸沉默×沉默事实腿×沉默即证据推论腿）。
+    argumentum_ex_silentio: aes,
     // [r232] 第 219 维度 appeal_to_rumor（传闻即事实×传播事实腿×真实性推断腿）。
     appeal_to_rumor: atr,
     // [r232] 第 220 维度 confirmatory_evidence（证实性取证×确认动作腿×真理性结论腿）。
@@ -6065,6 +6080,16 @@ function discriminate(text, evidence = [], contentMode) {
     // 事，前者看存量后者看流量」正是本族要教的判别动作）、公共卫生课
     // 堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
     'prevalence_incidence_confusion',
+    // [r449] 第 283 维度 argumentum_ex_silentio（诉诸沉默 / silence-as-evidence：
+    // 把沉默、无反对、无投诉、无反馈这一缺席事实，当作某主张为真、某人同意、
+    // 某事合格的证据——缺席被当成在场表态）登记。verify 级——单句也可能是
+    // 对该推理的正当判别与批评（「沉默不等于同意，需要逐一向每个人确认」
+    // 正是本族要教的判别动作）、表决程序与会议记录说明、舆情工单统计、
+    // 逻辑谬误教学案例。与第 64 维附近 manufactured_consent（会议程序短路：
+    // M2 腿只收「宣布通过/就这么定了/视为一致」等程序宣告形）射程不同——
+    // 本族腿②宽到任何由沉默推出的正面结论，且不要求集体或表决语境。
+    // 与 r206-r232 同口径只登记 VERIFY。
+    'argumentum_ex_silentio',
     // [r448] 第 282 维度 selection_on_dependent_variable（选择依赖变量 /
     // 按结果归因：只从「已经达成某结果的群体」里归纳共性，再把它当成该
     // 结果的原因——存活者偏差的因果归因形）登记。r252 起只作为第 249 维
@@ -7177,6 +7202,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r232] 第 218 维度 appeal_to_future 补登记（诉诸未来）。
       // 同上：九处一次接齐。
       appeal_to_future: atf,
+      // [r449] 第 283 维度 argumentum_ex_silentio 补登记（诉诸沉默）。
+      // 同上：九处一次接齐。
+      argumentum_ex_silentio: aes,
       // [r232] 第 219 维度 appeal_to_rumor 补登记（传闻即事实）。
       // 同上：九处一次接齐。
       appeal_to_rumor: atr,
@@ -18686,6 +18714,9 @@ module.exports = {
   // [r232] 第 218 维度 appeal_to_future 导出（同先例，漏导出会让测试与
   // MCP handler 拿不到单维函数）。
   checkAppealToFuture,
+  // [r449] 第 283 维度 argumentum_ex_silentio 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkArgumentumExSilentio,
   // [r232] 第 219 维度 appeal_to_rumor 导出（同先例，漏导出会让测试与
   // MCP handler 拿不到单维函数）。
   checkAppealToRumor,

@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-282-blueviolet.svg)](#what-it-catches-282-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-283-blueviolet.svg)](#what-it-catches-283-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-282 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
+283 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
 ×  1,390 dispatch routes  ×  25,941 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 282 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 283 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (282 dimensions) -> gate
+scope-check -> premise-check -> discriminate (283 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (282 dimensions)
+## What it catches (283 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **250 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **251 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.223**. Not marketing copy.
+Measured on this repository at **v6.8.224**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 282 |
+| Discrimination dimensions | 283 |
 | MCP tools | 197 | tool definitions exposed via `tools/list` |
 | Test suite | 25,941 passing / 233 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.224 | 2026-11-22 | **r449 第 283 维度 `argumentum_ex_silentio`（诉诸沉默 / argument from silence）接线闭环（真升级①：新判别维度）** — 方向「逻辑谬误检测」。缺口实证：`scripts/round-449/probe-r449-gap.js` + `probe-r449-core.js` v6.8.223 gate 层实测，检出偏误/路灯效应/观察者选择三候选族穿透 6~11 条；转攻诉诸沉默族——存量 manufactured_consent（会议程序短路）只收「宣布通过/视为一致」等表决程序宣告形，不覆盖「无反对/无投诉/无反馈/没说话」这类**缺席事实被当作在场表态**的更宽结构。新模块 `src/argumentum-ex-silentio.js`（338 行）双腿判据（缺一不判）：腿① SILENCE 沉默事实（没反对/没有异议/无投诉/零反馈/没人说话/一片沉默/stayed silent/no objections/no complaints/no response was recorded…）+ 腿② INFERENCE 由沉默推出的正面结论（就是同意/视为认可/说明支持/都接受了/therefore agree/so they approved/which shows consent…），邻近窗 ZH 60 字 / EN 160 字符。四组豁免（疑问句形、对冲限定、显式否定/方法论破除、表决与会议记录如实统计形）+ 强否定条件语气守卫；score 0.56 VERIFY 级。`src/index.js` 八处接线（变量名 aes）。轮测 `test/round-449-argumentum-ex-silentio.test.js` **58/58**（攻击 ZH 22 + EN 16 含裸名词/带修饰/长句、良性 16 零误伤含边缘良性「沉默不等于同意」教学陈述、逐常量负例注入双腿停判、射程划界回归锚）。四门禁：verify 16/0、guard 20/20@283、doc 24/0（本轮补齐 README 规格戳/action-tier 计数/Version history 三处文档债）、双向召回 52/52 + 误拦零新增。VERSION 6.8.223→6.8.224，维度 282→283、VERIFY 250→251。 |
 | 6.8.223 | 2026-11-22 | **r448 selection_on_dependent_variable 第 282 维接线 + anchoring_effect「折扣锚定」扩族（真升级①+②）** — 本批次为上一轮（r448 方向）已绿未提交的 WIP 固化。**selection_on_dependent_variable（第 282 维，真升级①新维度）**：选择依赖变量/按结果归因——只从「已经达成某结果的群体」里归纳共性，再把它当成该结果的原因（「活下来的公司都有早起习惯，所以早起让公司活下来」）。模块自 r252 起草即登记进 `src/econ-reasoning-gate.js` 的 FAMILIES 聚合表（第 249 维子族），gate findings 只能出现聚合名 econ_reasoning_gate，子族名只在其 details 内文，无法单独指名；r448 缺口实证（`scripts/round-448/probe-r448.js` + `probe-r448-legs.js`）发现存量句式族有真实漏判：腿①（SELECT_ZH/SELECT2_ZH）只收「都/全/个个/无一例外」全称形与少量结果动词，「大多/多数/大部分」量化变体、「创业成功/转型成功/上市/盈利」商业结果词、「康复者/幸存者」结果者裸名词形全部零命中；腿②（CAUSE_ZH/CAUSE2_ZH）缺「看来/因为/足见」推断标记通道与「减肥/减重」结果名词，探针 7/8 攻击整句穿透 gate=pass（基线 1/8）。扩 SELECT3_ZH/CAUSE3_ZH 六族（大多全称族/裸名词族/商业结果词族 + 看来足见族/因为疑问族/减肥结果族）后模块层 8/8 命中、良性 4/5→5/5 pass，再仿 r331 先例独立接线（require + discriminate 计算点 + dimMap/allDims 判定 + detailMap 四处，变量名 sodv）。轮测 `test/round-448-selection-on-dependent-variable.test.js` 18/18（含 CAUSE4 负例注入承重）。**anchoring_effect 折扣锚定扩族（真升级②）**：`src/anchoring-effect.js` +53 行，轮测 `test/round-448-anchoring-discount-legs.test.js` 37/37（存量回归全过）。四门禁：verify 16/0、guard 20/20@282、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。VERSION 6.8.222→6.8.223。 |
 | 6.8.222 | 2026-11-22 | **r447 prevalence_incidence_confusion 第 281 维接线（真升级①：新判别维度）** — 患病率/发病率存量-流量混淆检测。缺口实证：存量维 `base_rate_neglect`/`survivor_time_bias`/`relative_risk_individual_transfer` 只管基率与生存时间，「用发病率（流量）证据直接论证现患规模（存量）」或反向混用整族零覆盖。三腿判据缺一不判：腿① FLOW 流量指标（发病率/新发病例/新增病例/年发病/新发感染/incidence/new cases/incidence rate 等，含 r161 裸名词教训——流量名词须绑定修饰或推导位置）× 腿② STOCK 存量现患结论（满大街都是病人/患病人群占/人群中到处都是/living with/currently has the disease 等，必须落在推导结论位置）× 腿③ LINK 推导连接（所以/说明/可见/足以证明/so/therefore/which means，邻近窗 ZH 60 字 / EN 160 字符）。四组豁免：正确破除混淆的元陈述（「患病率和发病率是两回事」）、纯概念教学、疑问句与对冲、存量在前流量在后的反向并列。score 0.56 VERIFY 级（单句可能是教学反例或作者正要指出口径问题）。轮测 `test/round-447-prevalence-incidence-confusion.test.js` 11/11 攻击命中 + 12/12 良性零误伤 + FLOW_ZH 腿承重注入验证；guard-abilities 20/20@281；双向召回 52/52 + 误拦 302/326 零新增。维度 280→281、工具/路由数不变（197/1390）。VERSION 6.8.221→6.8.222。 |
 | 6.8.220 | 2026-11-22 | **r445 ecological_fallacy「具体个体属性直推」新句式族（真升级②）** — `src/ecological-fallacy.js` 第 211 维腿② INDIVIDUAL_ZH 追加 5 条腿（F=16 连接词+所有格+断言副词、F2=17 连接词+指称+数值尾部、G=18 无连接词成员身份+断言、G2=19 无连接词属性名词直推、G3=20 范围代词+都+结论），INDIVIDUAL_EN 追加 2 条腿，腿① AGGREGATE_EN 补均值量+具体群体形。根因：存量腿②只收量化指称，「他/她 + 个体层属性断言」整族漏判。轮测全绿；五门禁全绿。维度/工具/路由数不变（280/197/1390）。来源：内部缺口路径（探针 /tmp/probe-r445-{a,b,c,matrix}.js）。 |
