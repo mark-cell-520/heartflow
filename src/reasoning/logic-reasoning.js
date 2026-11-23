@@ -1,5 +1,77 @@
 // [v6.0.71] 纯函数 + 推理模式常量已提取到 logic-patterns.js
 const { _matchKeywords, _matchAnyRegex, REASONING_PATTERNS, FALLACY_PATTERNS, FRAMEWORKS, PROBLEM_PATTERNS, PROBLEM_FRAMEWORK_MAP } = require('./logic-patterns.js');
+// [AUDIT-FIX 2026-11-23] 本文件的 LLM 兜底外传门槛，与主路径
+// （src/llm/llm-client.js + src/workflow/thought-chain.js）共用同一套判定：
+// 总开关 HEARTFLOW_LLM_FALLBACK 与身份归一化（guest 一律不外传）都直接复用
+// llm-client 的导出函数，避免两处各写一套语义后出现"一边开一边关"。
+// 这里只在模块顶层取函数引用，不触发任何配置读取（llm-client 的 getConfig 是懒加载）。
+const { isLlmFallbackEnabled, isGuestRole } = require('../llm/llm-client.js');
+const { logger } = require('../utils/logger');
+
+// ════════════════════════════════════════════════════════════════
+// [AUDIT-FIX 2026-11-23] 本文件 LLM 兜底外传门槛的辅助函数
+// （契约与 src/workflow/thought-chain.js 的 _classifyTask 保持一致）
+// ════════════════════════════════════════════════════════════════
+
+// 与 thought-chain.js 的 CALLER_ROLE_FIELDS 同源：身份可能被承载的字段名
+const CALLER_ROLE_FIELDS = [
+  'role', 'callerRole', '__mcpCallerRole', '__heartflowMcpCallerRole',
+  'sessionRole', '_sessionRole', 'currentRole', '_callerRole',
+];
+
+/**
+ * [AUDIT-FIX 2026-11-23] 解析本次 LLM 兜底的调用方身份。
+ *
+ * 现状（实测）：selectAnswer 只把 { reasoningType, fallacies, premiseCheck } 作为
+ * options 传进来，链路上没有 role；mcp-server.js 的 role 只用于
+ * WRITE_TOOLS / GUEST_DENY_TOOLS 的工具级拦截，之后
+ * `handler.length >= 2 ? handler(args, sessionId) : handler(args)` 既不透传
+ * role 也不写回引擎实例。因此本方法当前**恒定解析不到身份**。
+ *
+ * 语义（fail-closed）：返回 'user' / 'admin' = 已认证，允许外传；
+ * 返回 undefined/其他值 = 身份未知，调用方按 guest 拦死。
+ * 一旦 mcp-server 把角色写进 options.role（或 globalThis.__heartflowMcpCallerRole
+ * 等字段），这里立刻生效，无需再改本文件。
+ *
+ * @param {object} [options]
+ * @returns {string|undefined}
+ */
+function _resolveLlmCallerRole(options) {
+  const sources = [options, globalThis];
+  for (const src of sources) {
+    if (!src || typeof src !== 'object') continue;
+    for (const field of CALLER_ROLE_FIELDS) {
+      const v = src[field];
+      if (typeof v !== 'string') continue;
+      const r = v.trim().toLowerCase();
+      if (r === 'user' || r === 'admin') return r;
+      // 显式写着 guest：身份已知且为匿名，直接判定，不再找别的字段
+      if (r === 'guest') return 'guest';
+    }
+  }
+  return undefined;
+}
+
+/** 只取 base_url 的 hostname（日志用）。绝不记录完整 base_url——它可能带 key 查询参数。 */
+function _hostOf(baseUrl) {
+  try { return new URL(baseUrl).hostname; } catch { return 'unknown'; }
+}
+
+/** [AUDIT-FIX 2026-11-23] 关闭提示只打一次，避免每次调用都刷一行 */
+let _llmFallbackDisabledLogged = false;
+function _logLlmFallbackDisabledOnce() {
+  if (_llmFallbackDisabledLogged) return;
+  _llmFallbackDisabledLogged = true;
+  logger.info('logic-reasoning', 'LLM 兜底已禁用（HEARTFLOW_LLM_FALLBACK 未设置为 1/true），走纯规则降级，不发起任何外部请求');
+}
+
+/**
+ * [AUDIT-FIX 2026-11-23] 外传可观测：一次真实外传发生时打一行日志。
+ * 只记目标域名 + 状态码 + 耗时 + 成败；**严禁**记录待判别的选择题原文/选项与 api_key。
+ */
+function _logLlmEgress(host, startedAt, status, ok) {
+  logger.info('logic-reasoning', `LLM 外传 host=${host} status=${status} dur=${Date.now() - startedAt}ms ok=${ok}`);
+}
 
 class LogicReasoning {
   constructor(options = {}) {
@@ -1143,8 +1215,36 @@ class LogicReasoning {
   /**
    * LLM兜底推理 — 当规则引擎打0分时，调LLM做选择题推理
    * [P-005] routed through safeFetch — SSRF protection + timeout
+   *
+   * [AUDIT-FIX 2026-11-23] 这是心虫**第二条独立的** LLM 外传路径（不走
+   * src/llm/llm-client.js，自带 prompt/model 默认值/env key）。心虫对外承诺
+   * 「数据不外传 / 纯本地运算」，而本方法会把选择题原文发往外部服务，且
+   * selectAnswer 对 guest（匿名 MCP 调用）可达。现按主路径完全一致的契约加门槛：
+   *   门槛1（总开关）：HEARTFLOW_LLM_FALLBACK 未显式开启 → 在任何网络动作之前
+   *     返回 null，selectAnswer 保持纯规则结果（等同本兜底不存在时的行为）。
+   *     是"根本不发"，不是"发了再丢结果"。
+   *   门槛2（身份）：调用方不是已认证的 user/admin 一律按 guest 处理（fail-closed）。
+   *     本链路上 role 目前没有透传下来（详见下方 _resolveLlmCallerRole 注释），
+   *     所以现状是**恒被拦下**；这不是删功能，是把"能否外传"的决定权交回鉴权层。
+   * 可观测性：真实外传时只记目标 host（hostname，不含可能带 key 的完整 base_url）
+   *   + 状态码 + 耗时；严禁把选择题原文/选项/api_key 写进日志。
+   *
+   * @returns {Promise<{selectedAnswer: string}|null>} null = 走纯规则降级
    */
   async _llmFallback(input, options, reasoningType) {
+    // ── 门槛 1：总开关。复用 llm-client 的单一实现，语义逐字一致 ──────────
+    if (!isLlmFallbackEnabled()) {
+      _logLlmFallbackDisabledOnce();
+      return null;
+    }
+
+    // ── 门槛 2：调用方身份。身份未知/guest 一律不外传 ─────────────────────
+    const callerRole = _resolveLlmCallerRole(options);
+    if (isGuestRole(callerRole)) {
+      logger.info('logic-reasoning', 'LLM 兜底已跳过：调用方身份为 guest/未识别，不外传选择题原文');
+      return null;
+    }
+
     // 构建简洁的英文 prompt
     const qPart = input.replace(/\n[A-D][.、．)）].+/g, '').trim();
     const optLines = input.match(/\n[A-D][.、．)）].+/g);
@@ -1186,15 +1286,29 @@ class LogicReasoning {
       }
       const url = finalBase + '/chat/completions';
 
-      const res = await safeFetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey,
-        },
-        body,
-        timeout: 15000,
-      });
+      // [AUDIT-FIX 2026-11-23] 外发前记录目标域名（仅 hostname，base_url 可能带
+      // ?key= 之类查询参数，绝不计入日志）与起始时间，用于事后审计
+      const host = _hostOf(finalBase);
+      const startedAt = Date.now();
+
+      let res;
+      try {
+        res = await safeFetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey,
+          },
+          body,
+          timeout: 15000,
+        });
+      } catch (e) {
+        // 网络层失败（超时/DNS/SSRF 拦截）也留痕，否则"悄悄失败"无法与"从未发起"区分
+        _logLlmEgress(host, startedAt, 0, false);
+        throw e;
+      }
+      // 一次真实外传完成：只记域名 + 状态码 + 耗时 + 成败，不记任何请求/响应内容
+      _logLlmEgress(host, startedAt, res.status, !!res.ok);
 
       const raw = await res.text();
       let content = '';

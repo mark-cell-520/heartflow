@@ -9,11 +9,11 @@
   "scripts": {
     "prepublishOnly": "node scripts/sync-version.js",
     "start": "node bin/cli.js chat",
-    "status": "node bin/cli.js status",
+    "status": "curl -sS --noproxy '*' --max-time 8 -f http://127.0.0.1:8588/health | node -e \"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{let j;try{j=JSON.parse(s)}catch(e){console.error('heartflow status: /health 返回非 JSON（服务可能已坏）');process.exit(1)}if(j.status!=='ok'){console.error('heartflow status: /health 报 status='+j.status+'，服务不健康');process.exit(1)}console.log(JSON.stringify({status:'ok',version:j.version,clients:j.clients,source:'http://127.0.0.1:8588/health'},null,2))})\" || { echo 'heartflow status: 读不到 127.0.0.1:8588/health（端口未监听 / 服务未运行 / 已挂死）；启动用 npm start'; exit 1; }",
     "test": "node test/run-all.js",
     "test:integration": "node test/integration.test.js",
     "test:unit": "node test/core/path-guard.test.js && node test/code-verifier.test.js",
-    "test:full": "find test -name '*.test.js' -exec node {} \\;",
+    "test:full": "HF_RUN_ALL_JOBS=1 node test/run-all.js",
     "verify": "node bin/verify.js",
     "check": "node -e \"require('fs').readdirSync('src',{recursive:true}).filter(f=>f.endsWith('.js')).forEach(f=>require('child_process').execSync('node --check src/'+f,{stdio:'inherit'}))\""
   },

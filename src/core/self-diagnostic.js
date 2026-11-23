@@ -235,7 +235,10 @@ function _sdSyntaxCheckInMemory(text, filePath) {
 
 
 // 从备份回滚（尽力而为；失败只能靠外部告警，不能再写坏一次）
-
+// 三种情况都要覆盖：
+//   ① 原文件存在且有备份 → 用备份覆盖回去；
+//   ② 原文件不存在 → 删掉本次刚创建的文件（existed=false 时 backupPath 必为 null）；
+//   ③ 回滚本身失败 → 打 stderr 让人工介入，绝不再写一次。
 function _sdRollback(abs, backupPath, existed) {
 
   try {
@@ -244,17 +247,15 @@ function _sdRollback(abs, backupPath, existed) {
 
       fs.copyFileSync(backupPath, abs);
 
-    } else if (backupPath) {
+    } else if (!existed) {
 
-      // 原文件本来不存在：删掉刚创建的文件即可
-
-      try { fs.unlinkSync(backupPath); } catch (_) { /* 备份清理失败不影响回滚结论 */ }
+      try { fs.unlinkSync(abs); } catch (_) { /* 本来就没这文件，无需清理 */ }
 
     }
 
   } catch (e) {
 
-    process.stderr.write(`[self-diagnostic] 回滚失败（请手工从 ${backupPath} 恢复 ${abs}）: ${e.message}\n`);
+    process.stderr.write(`[self-diagnostic] 回滚失败（请手工从 ${backupPath || '无备份'} 恢复 ${abs}）: ${e.message}\n`);
 
   }
 

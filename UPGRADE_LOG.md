@@ -1,3 +1,19 @@
+# r464 审计修复 — 本地独有 AUDIT-FIX 2026-11-23 三件套固化 + 文档口径 24→25 项补齐 + 门禁全绿（v6.8.229 保持）
+
+- **轮次**：r464 每日审计·修复 cron（2026-11-23 23:31）
+- **VERSION**：6.8.229 → **6.8.229**（纯审计修复 + 文档口径同步，无引擎能力变化，不 bump）
+- **类型**：真升级③（新护栏/可执行检查）+ 类型 0 维护（文档口径同步）
+- **背景**：开轮核实发现上一轮（r463）遗留的 `src/normalcy-bias.js` 语法阻塞已在 HEAD `9986cd81` 修复消除（`node --check` exit 0），但工作区躺着一批 `[AUDIT-FIX 2026-11-23]` 标记的三文件 diff 无人认领、无 commit、无 UPGRADE_LOG 登记。按「本地独有产能优先固化：不丢弃不覆盖，先核实真实性（门禁+单测）再补提交」纪律处理。
+- **核实结论**（三 diff 均带 cgroup 实测数据的高质量审计修复，非半成品）：
+  1. `src/core/self-diagnostic.js` — `_sdRollback` 回滚三态修正：原 `else if (backupPath)` 在「原文件本不存在（existed=false, backupPath=null）」时不覆盖也不删除，刚写坏的新文件残留，且 stderr 打 `${null}`；改 `else if (!existed)` → `fs.unlinkSync(abs)`，错误文案 `${backupPath || '无备份'}`。
+  2. `src/reasoning/logic-reasoning.js` — LLM 兜底外传双门槛：复用 `llm-client.js` 的 `isLlmFallbackEnabled`（总开关）+ `isGuestRole`（身份门槛，`_resolveLlmCallerRole` 扫 8 个身份字段，解析不到即 fail-closed 按 guest 拦死，不外传选择题原文）；外传审计日志 `_logLlmEgress` 只记 hostname（`_hostOf` 仅取 hostname，base_url 可能带 `?key=` 查询参数绝不入日志）+ 状态码 + 耗时 + 成败；fetch 段外包 try/catch，网络层失败也记 egress 后再 throw。
+  3. `test/run-all.js` — 测试基建三缺陷修复（依据全量审计 903 文件/21353 用例/195 失败/65.7 分钟）：① 头条数字不可复现（passed 四次在 21158~28751 摆动 36%）：根因是 JOBS=4 超本容器 cgroup CPU 配额（cpu.max="200000 100000"=2 核、nr_throttled 累计 31 万次、oom_kill 7 次、swap 8191/8191 用尽），非超时太短——JOBS 4→2（`HF_RUN_ALL_JOBS` 可覆盖）、CHILD_TIMEOUT 150000→600000（`HF_RUN_ALL_TIMEOUT` 可覆盖）；② 26% 失败是统计误报（195 里约 50 不成立）：汇总行解析只认中文 ✗（18 个全过文件被计失败含 9 个 node:test TAP）、重复推送、`[异常]` 分支混框架崩溃与断言失败且 stderr 被 execFile 丢弃——FAIL_LINE_RE 扩 ❌/❎/✘/✖/×/✗ + 裸 x/X 需后跟空白、BANNER_RE 扩 6 组全过形、failureKeys Set 按 `${idx}::${error}` 去重、execFile 捕获 stderr、分 passed/failed/timeout/crash/skip 五桶（恒等式 files=okFiles+timeoutFiles+crashFiles+skipFiles）；③ 175 个测试脚本不被收集（原只收 `*.test.js`，抽样 21 个有 8 红 38%）：扩收 `round-*.js`/`test-*.js`/`*-test.js`/`*benchmark*.js`，显式排除 archive/dead-tests/fixtures/helpers/node_modules 与 12 个具名文件 + 内容过滤 `-samples/-list/-fixtures/-data/-cases`。
+- **新增单测** `test/audit-fix-20261123-behavior.test.js` **13/13**（真实行为验证非语法通过）：writeWithBackup 三态（async 契约、新文件创建、新文件语法坏→回滚后零残留、已存在文件回滚后原内容恢复）、self-diagnostic 旧分支签名已消失断言、logic-reasoning 总开关关→零 fetch、显式 guest + 身份未识别→零 fetch（选择题原文不外传）、hostname-only 日志契约（`_logLlmEgress` 不得传 finalBase）、run-all JOBS 默认 2 / CHILD_TIMEOUT 默认 600000 / FAIL_LINE_RE 覆盖中文✗与英文 x 形解析。
+- **文档口径修复**（doc-numbers 25/25 转绿的实质工作）：AGENTS.md 三处（`287 dimensions`→`289`、`The 287 dimensions`→`The 289`、`Verify-level (245)`→`(246)` 且列举追加引擎实测唯一缺项 `narrative_fallacy`——用 `VERIFY_DIMS` 内联字面量与文档列举双向 diff 精确定位，非猜数字）；README/SKILL 规格表版本戳 v6.8.228→v6.8.229；README Version history 补 6.8.229（r463）与 6.8.228（r458）两条 changelog 记录（此前 changelog 落后两个版本）。
+- **四门禁**（`hf4-gates.sh` 全绿）：verify 16/0、guard-abilities 20/20（289 键）、doc-numbers 25/0、双向召回 52/52 + 误拦 302/326（与 r463 基线逐项相同，零新增误伤）。
+- **死认领治理**：`hf4-claim.sh scan` 两次均报无活跃轮次，r214/r429–r433/r458 均已 completed——本轮无死认领需接手或释放。
+- **未跑项**：全量回归（`node test/run-all.js` 约 85–95 分钟）未在本轮跑——本轮无引擎行为变化（三 diff 均为审计修复 + 测试基建 + 文档），guard-abilities 20/20 与 verify 16/0 已覆盖引擎接线面；run-all 的 JOBS/超时修正正是为下次全量提供可信数字，交由下一轮验证。
+
 # r463 审计修复 — normalcy_bias dimensions 输出键补登 + r463 守卫修复 + 文档口径全量同步（v6.8.229）
 
 - **轮次**：r463 每日审计·修复 cron（2026-11-23 22:30）

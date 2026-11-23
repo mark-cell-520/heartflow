@@ -17,8 +17,34 @@
  *    HF_RUN_ALL_JOBS 可调，=1 退化为原串行行为），输出解析/汇总/单例锁
  *    逻辑保持不变，失败清单按任务 idx 排序保证 diff 可比。
  *
+ * [AUDIT-FIX 2026-11-23] 全量测试审计（903 文件 / 21353 用例 / 195 失败 /
+ * 65.7 分钟）暴露出测试基础设施的三个缺陷，本轮一并修掉：
+ *
+ *   缺陷 1「头条数字不可复现」：四次全量 passed 在 21158~28751 间摆动（36%），
+ *     且单调下降。根因是 JOBS=4 超过了本容器的 CPU 配额（2 核），单文件墙钟
+ *     被拉长近一倍，150s 的 CHILD_TIMEOUT 会把它们 SIGTERM 掉，几十条用例
+ *     整体从统计里消失。修法：并发降到 2、超时提到 600s，并把「被超时杀死」
+ *     单独记成 timeout 桶、不再混进 failed。
+ *
+ *   缺陷 2「26% 的失败是统计误报」：审计实测 195 个失败里约 50 个不成立——
+ *     ① 汇总行解析只认中文一族，18 个文件「断言全过却被统计成失败」
+ *        （逐个单跑复核 rc=0，含 9 个 node:test 文件的 `# pass N` TAP 汇总）；
+ *     ② 两个重复推送 ✗ 的循环让同一条失败进清单两遍（239 条 vs 真实 195 个）；
+ *     ③ 用 ❌ 而不用 ✗ 的文件，失败明细一条都进不了清单（39 个条目）；
+ *     ④ [异常] 分支把「框架自己崩了」和「断言失败」混为一谈，且 stderr 被
+ *        execFile 整个丢掉，崩溃原因不可见。
+ *     修法：汇总行解析统一成一条有序的解析器链；失败明细只推一次；execFile
+ *     捕获 stderr；按结束状态分成 passed/failed/timeout/crash/skip 五桶。
+ *
+ *   缺陷 3「175 个测试脚本不被收集」：原收集只认 `*.test.js`，test/ 下另有
+ *     149 个真测试脚本（`round-*.js` / `test-*.js` / `*-test.js` /
+ *     `*benchmark*.js`）永久不进 CI。修法：按文件名模式 + 内容过滤扩大收集，
+ *     同时显式排除 harness（_mount/_harness/_jest-globals）、纯数据
+ *     （fixtures/ helpers/ *-samples.js）、runner 自身与一次性脚本。
+ *
  * Usage: node test/run-all.js
  *        HF_RUN_ALL_JOBS=1 node test/run-all.js   # 强制串行（排查 flaky 用）
+ *        HF_RUN_ALL_TIMEOUT=900000 node test/run-all.js   # 放宽单文件超时
  */
 'use strict';
 
@@ -28,15 +54,35 @@ const { execFile } = require('child_process');
 
 const TEST_DIR = __dirname;
 const ROOT = path.join(__dirname, '..');
-// [全局修复 2026-11-16] 90000 → 150000：重载型 flake 的余量。实测 round-624
-// （起引擎 + 20 项判别）独跑 11.1s，但 4 并发重载下被 90s 线 kill（输出
-// 截断 → 自报 1 失败，独跑 3/3 全绿）——引擎加载是 CPU 密集型，JOBS=4 时
-// 单个重文件的墙钟可能是独跑的 5-10 倍。150s 仍远低于挂死检测的实际需要
-// （真挂死的文件等 150s 与 90s 无实质差别），但能吸收负载抖动。
-const CHILD_TIMEOUT = 150000;
-// [v6.8.80] 并发数。默认 4：实测 8 并发时 CPU 争抢反而每文件 20s（单线程
-// 2.5s），4 是 8 核机的甜点；引擎加载是 CPU 密集型，留一半核给系统。
-const JOBS = Math.max(1, parseInt(process.env.HF_RUN_ALL_JOBS || '4', 10) || 4);
+// [AUDIT-FIX 2026-11-23] 150000 → 600000，并新增 HF_RUN_ALL_TIMEOUT 可调。
+// 依据（本轮实测坐实，不是推测）：
+//   ① 真凶不是「150s 太短」，而是并发数超过了 CPU 配额。本容器
+//      /sys/fs/cgroup/cpu.max = "200000 100000" → 只有 **2 个 CPU** 配额
+//      （nproc 同为 2；/proc/cpuinfo 的 128 是宿主机的，本 cgroup 用不到），
+//      而 JOBS=4 是「8 核机甜点」的过时结论。4 个子进程抢 2 个 CPU，
+//      cpu.stat 的 nr_throttled 已累计 31 万次 —— 单文件墙钟被拉长近一倍，
+//      审计中「某文件单跑 103 秒、进并发池即被杀」正是 103s × 2 > 150s。
+//   ② 本轮实测争抢系数：hasty-every-copula-round281 独跑 27s、JOBS=4 并发
+//      47s（1.74×）；round-319-bnpl 独跑约 40s、并发 72s（1.8×）。
+//      已知最慢独跑约 103s，JOBS=2 下预计 ~110-135s，远低于 600s。
+//   ③ 600s = 最慢已知文件的约 5 倍余量，超时从此只是「挂死线」而非「误杀线」。
+//      且本轮起被超时杀死的文件单独记入 timeout 桶、不计入 failed，头条 passed
+//      数字不被它污染 —— 放宽超时不会放大任何风险，也不会放宽任何断言。
+const CHILD_TIMEOUT = Math.max(1000,
+  parseInt(process.env.HF_RUN_ALL_TIMEOUT || '600000', 10) || 600000);
+// [AUDIT-FIX 2026-11-23] 默认 4 → 2（HF_RUN_ALL_JOBS 仍可覆盖）。
+// 依据：本容器 CPU 配额只有 2 核（见上），JOBS=4 在这台机器上不带来吞吐增益
+// ——4 个可运行子进程抢 2 个 CPU，多出来的只有上下文切换与限流损耗；真正付出
+// 代价的是内存与超时误杀：
+//   · 实测单个引擎型测试子进程峰值 RSS 270-403 MB，4 并发 ≈ 1.1-1.6 GB；
+//     本 cgroup memory.max = 4 GiB、memory.events 已记录 oom_kill 7 次、
+//     swap 8191/8191 已用尽。审计日志里 13 个「零输出 → 重试 → [异常]」正是被
+//     SIGKILL 的签名（管道缓冲没来得及 flush，stdout 全空），不是 SIGTERM。
+//   · JOBS=2 让峰值子进程内存减半，争抢系数从 ~1.8 降到 ~1.2。
+// 代价：CPU 配额已被打满，墙钟时间基本不变（总 CPU 工作量 / 2 核）；新增收入
+// 149 个测试文件后，预计全量从约 66 分钟升到约 85-95 分钟。要抢时间可用
+// HF_RUN_ALL_JOBS=3/4 覆盖，或用 HF_RUN_ALL_SLICE 分段跑。
+const JOBS = Math.max(1, parseInt(process.env.HF_RUN_ALL_JOBS || '2', 10) || 2);
 // [2026-10-10 删除] 此处曾经有一个「主动 SIGKILL 测试孙进程」的机制。
 // 该机制是两次卡死事故的根因（2026-10-08 误杀 gateway、2026-10-10 误杀
 // runner 自己），且它发的 SIGKILL 不可捕获，会绕过测试的 finally 还原块、
@@ -47,9 +93,131 @@ const JOBS = Math.max(1, parseInt(process.env.HF_RUN_ALL_JOBS || '4', 10) || 4);
 
 let passed = 0;
 let failed = 0;
+// [AUDIT-FIX 2026-11-23] 文件级分类计数。原实现只有 passed/failed 两个桶，
+// 「子进程被超时/信号杀死」「测试框架自己崩了」「断言失败」全混进 failed，
+// 头条数字因此既不可复现也不可归因。现在按结束状态分桶：
+//   okFiles      跑出可识别结果（计数汇总 / 横幅 / PASS 行 / ✓ 明细 / 0 用例）
+//   timeoutFiles 被本 runner 的 CHILD_TIMEOUT 发 SIGTERM 杀死
+//   crashFiles   退出码非零、或被外部信号杀死且给不出可识别结果
+//   skipFiles    exit 77（仓库约定跳过码）或整文件只有 SKIP 行
+// 恒等式：files = okFiles + timeoutFiles + crashFiles + skipFiles
+// 用例级恒等式：total = passed + failed（与 data/test-count.json 的语义一致）
+let okFiles = 0;
+let timeoutFiles = 0;
+let crashFiles = 0;
+let skipFiles = 0;
 const failures = [];
+// [AUDIT-FIX 2026-11-23] 失败清单去重。原实现有两个重复推送 ✗ 的循环
+// （「文件自报失败: X」与「X (· file)」各推一遍），实测失败清单 239 条
+// 而真实失败只有 195 个。用 Set 按 (idx, 明细) 兜住，保证每条失败只出现一次。
+const failureKeys = new Set();
+function pushFailure(idx, name, error) {
+  const key = `${idx}::${error}`;
+  if (failureKeys.has(key)) return false;
+  failureKeys.add(key);
+  failures.push({ idx, name, error });
+  return true;
+}
 
-/** 递归收集测试文件，跳过 test/archive/（历史失效测试，目标模块已删除） */
+/**
+ * [AUDIT-FIX 2026-11-23] 失败明细行的统一判据。
+ *
+ * 原判据 `/^\s*[✗×xX]\s*(.+?)\s*$/` 漏掉 ❌——doc-numbers-accuracy.test.js
+ * 等一批文件用 ❌ 报失败，它们的明细一条都进不了清单（审计实测 39 个
+ * 「自报失败但无 ✗ 行」条目即此族）。这里把 ❌/❎/✘/✖ 一并收进来，
+ * 裸 x/X 仍要求后跟空白，避免误吃正文里的 "X 是变量名"。
+ */
+const FAIL_LINE_RE = /^\s*(?:(?:✗|✘|✖|×|❌|❎)\s*[：:>\])]?\s*|[xX]\s+)(\S.*)$/;
+
+/**
+ * [AUDIT-FIX 2026-11-23] 成功横幅族（仅在**无任何失败标记**时生效）。
+ * 在原族上补三种仓库里真实存在、原先不被识别的写法：
+ *   「全部 6 组断言通过」   —— 全部与通过之间夹了计数（round-377）
+ *   「ALL ASSERTIONS PASSED」—— ALL 与 PASSED 之间夹了单词（round-406）
+ *   「无回归」「全部维度达标」「负例注入通过」—— benchmark/负例注入族
+ * 只增不减：这条分支的调用方已保证 exit 0，误判方向是「少报失败」而非「多报」。
+ */
+const BANNER_RE = /全部[^\n]{0,12}(?:通过|达标)|守卫通过|ALL\s+[A-Z ]*PASS(?:ED)?|ALL\s*PASS(?:ED)?|ALL\s*GREEN|全绿|还原健康|无回归|负例注入通过|(?:，|:|：)\s*通过\s*$|✅/m;
+
+/**
+ * [AUDIT-FIX 2026-11-23] 收集范围配置：哪些收、哪些不收、为什么。
+ *
+ * 背景：原实现只收 `*.test.js`。test/ 下 1124 个 .js 文件里另有 149 个真测试
+ * 脚本（`round-*.js` / `test-*.js` / `*-test.js` / `*benchmark*.js`）永久不进
+ * CI —— 抽样 21 个有 8 个是红的（38%），估算约 900 条红色断言无人看见。
+ * 但 test/ 下同时混着 harness、纯数据、一次性脚本和探针，不能无脑全收。
+ *
+ * ── 不收（目录级） ────────────────────────────────────────────────
+ *   test/archive/    有意归档的历史测试，目标模块已删除，MODULE_NOT_FOUND
+ *                    不是回归信号（原注释已说明，保留）
+ *   test/dead-tests/ 同上（当前 checkout 里不存在，防御性保留）
+ *   test/fixtures/   纯数据（age-detection-fixtures / r258 攻击与良性名单）
+ *   test/helpers/    测试框架 shim 与被测 helper，没有测试入口
+ *                     （mini-expect / mocha-shim / multi-lang-age-helper）
+ *   node_modules/ .git/
+ *
+ * ── 不收（文件名显式排除） ────────────────────────────────────────
+ *   run-all.js                      runner 自身；收进来会递归启动全量回归
+ *   _mount.js / _harness.js /       mount/jest 全局注入 harness，被其他测试
+ *   _jest-globals.js                 当子进程入口 require，自身不含用例
+ *   audit-fix-safe-fs.js            一次性批量改写 src/ 的脚本（会改源码！）
+ *   benchmark-runner.js             test_data/ 评测集的工具型 runner
+ *   dangerous-instruction-recheck-  只报数字的复测探针，无 pass/fail 语义
+ *     round123.js
+ *   negative-test-list-add-round126 写临时副本 + node --check 的探针
+ *   mutation-guard-recovery.js      导出 arm/disarm/recover 的库，无入口
+ *   regex-to-text.js                正则→文本的数据/工具脚本
+ *   round-434-mutant-runner.js      导出 Round434Mutant 类（变异 harness）
+ *   round-434-mutant-child.js       读 stdin 的子进程统计器，不能单独跑
+ *
+ * ── 不收（内容过滤，只作用于新增模式） ────────────────────────────
+ *   `-samples.js` / `-list.js` / `-fixtures.js` / `-data.js` / `-cases.js`
+ *     纯样本数据（round-384-mte-samples / round-626 / round-634 一族）
+ *   读 stdin（readFileSync(0)）      子进程协议，不是测试
+ *   `module.exports = <大写名>`      导出类/构造器（harness）
+ *
+ * ── 收 ───────────────────────────────────────────────────────────
+ *   `*.test.js`      原有集合，一个不加一个不减（903 个）
+ *   `test-*.js`      显式以 test- 开头（9 个）
+ *   `*-test.js`      显式以 -test 结尾（core-smoke-test.js）
+ *   `round-*.js`     历轮回归脚本，仓库里最大的隐形测试群（141 个）
+ *   `*benchmark*.js` 可独立运行的防回归基准（gate/vertical/benign/dimension 5 个）
+ */
+const SKIP_DIRS = new Set(['archive', 'dead-tests', 'fixtures', 'helpers', 'node_modules', '.git']);
+const EXCLUDE_FILES = new Set([
+  'run-all.js',
+  '_mount.js', '_harness.js', '_jest-globals.js',
+  'audit-fix-safe-fs.js',
+  'benchmark-runner.js',
+  'dangerous-instruction-recheck-round123.js',
+  'negative-test-list-add-round126.js',
+  'mutation-guard-recovery.js',
+  'regex-to-text.js',
+  'round-434-mutant-child.js',
+  'round-434-mutant-runner.js',
+  'helpers/mini-expect.js', 'helpers/mocha-shim.js', 'helpers/multi-lang-age-helper.js',
+  'fixtures/age-detection-fixtures.js', 'fixtures/r258/attack-list.js', 'fixtures/r258/benign-list.js',
+]);
+// 数据样本后缀：纯数组/对象导出，没有测试入口
+const DATA_SUFFIX_RE = /-(?:samples|list|fixtures|data|cases)\.js$/;
+// 新增收集的文件名模式（`*.test.js` 走原有通道，不经过内容过滤）
+const EXTRA_NAME_RE = /^(?:test-.*|-test|.*benchmark.*|round-\d+.*)\.js$/;
+
+/**
+ * [AUDIT-FIX 2026-11-23] 内容过滤：只拦「明显不是测试」的新增模式文件。
+ *
+ * 故意**不**对 `*.test.js` 生效：那个集合里有大量 mount 形态
+ * （`module.exports = function ({ test, assertEqual, ... })`）和 jest 形态
+ * （`describe()`）文件，既没有 assert. 也没有中文汇总，任何基于内容的判据都会
+ * 把它们误杀 —— 本轮模拟时一次误拒了 50 个现存 .test.js，故只用于新增模式。
+ */
+function looksLikeTestScript(src) {
+  if (/readFileSync\(\s*0\s*,/.test(src)) return false;        // 读 stdin 的子进程协议
+  if (/^module\.exports\s*=\s*[A-Z]/.test(src)) return false;  // 导出类/构造器（harness）
+  return true;
+}
+
+/** 递归收集测试文件，跳过 archive/ dead-tests/ fixtures/ helpers/（历史失效测试/纯数据/harness） */
 function collectTestFiles(dir, base = dir) {
   const out = [];
   let entries = [];
@@ -57,10 +225,20 @@ function collectTestFiles(dir, base = dir) {
   for (const ent of entries) {
     const full = path.join(dir, ent.name);
     if (ent.isDirectory()) {
-      if (ent.name === 'archive') continue;
+      if (SKIP_DIRS.has(ent.name)) continue;
       out.push(...collectTestFiles(full, base));
-    } else if (ent.name.endsWith('.test.js') && ent.name !== 'run-all.test.js') {
-      out.push(path.relative(base, full).split(path.sep).join('/'));
+    } else if (ent.name.endsWith('.js') && ent.name !== 'run-all.test.js') {
+      const rel = path.relative(base, full).split(path.sep).join('/');
+      // `*.test.js`：原有集合，直接收（含子目录），不过内容过滤
+      if (/\.test\.js$/.test(ent.name)) { out.push(rel); continue; }
+      // 其余：必须同时满足 显式未排除 + 文件名像测试 + 内容像测试
+      if (EXCLUDE_FILES.has(rel)) continue;
+      if (DATA_SUFFIX_RE.test(ent.name)) continue;
+      if (!EXTRA_NAME_RE.test(ent.name)) continue;
+      let src = '';
+      try { src = fs.readFileSync(full, 'utf8'); } catch (e) { continue; }
+      if (!looksLikeTestScript(src)) continue;
+      out.push(rel);
     }
   }
   return out.sort();
@@ -70,6 +248,11 @@ function collectTestFiles(dir, base = dir) {
 /**
  * [v6.8.80] 并发执行一条命令（execFile async 版，替代原 execSync）。
  * 语义对齐：err 时 stdout 仍有部分输出；timeout 到期发 SIGTERM。
+ * [AUDIT-FIX 2026-11-23] 补上 **stderr**：原回调签名只取 stdout，stderr 被
+ * execFile 整个丢掉。后果是一整类崩溃完全不可见——实测 round-283 / round-496 /
+ * round-225 是把 FAIL 清单打到 stderr（stdout 全空），runner 只能报一句
+ * "Command failed"，既分不清是超时还是崩溃，也看不到崩在哪。
+ * 同时把 err 的 code/signal/killed 一并带回，供下方三类分类使用。
  */
 function execCapture(argv, timeout) {
   return new Promise((resolve) => {
@@ -79,238 +262,322 @@ function execCapture(argv, timeout) {
       timeout,
       maxBuffer: 48 * 1024 * 1024,
       windowsHide: true,
-    }, (err, stdout) => {
-      resolve({ stdout: (stdout || '').toString(), err: err || null });
+    }, (err, stdout, stderr) => {
+      resolve({
+        stdout: (stdout || '').toString(),
+        stderr: (stderr || '').toString(),
+        err: err || null,
+      });
     });
   });
 }
 
-/** 在子进程中执行一条命令，解析其 `N 通过, M 失败` 汇总行 */
-async function runChild(task) {
-  const { label, argv, timeout = CHILD_TIMEOUT, idx, total } = task;
-  console.log(`\n[${idx + 1}/${total}] ${label}`);
-  let out = '';
-  let res = await execCapture(argv, timeout);
-  out = res.stdout;
-  if (res.err) {
-    const errMsg = (res.err.message || '').split('\n')[0];
-    // [2026-10-10 删除] 不在此处主动 SIGKILL 任何进程。
-    // 见文件头说明：那是两次卡死事故的根因，且 SIGKILL 会绕过测试的
-    // finally 还原块。execFile 的 timeout 已杀子进程。
-    // [v6.7.94] 环境噪声重试：子进程被系统级停顿杀死时 stdout 为空且无汇总行，
-    // 一次就计失败——这类失败重跑必然恢复（第 70-72 轮三次实测：同一文件
-    // ETIMEDOUT 后单独 mount 1/0、连跑两遍 1818/0）。
-    // 只在「零输出」时重试：有输出但无汇总是真静默（第 48 轮口径），
-    // 有汇总但有失败是真断言失败——两者都不重试。
-    const hadOutput = out.trim().length > 0;
-    if (!hadOutput) {
-      console.log(`  [重试] ${label.trim()}: 子进程零输出被中断（环境噪声），重跑一次`);
-      res = await execCapture(argv, timeout);
-      out = res.stdout;
-    }
-    // [全局修复 2026-11-16] exit 77 = 仓库约定俗成的「跳过码」
-    // （mcp-auth-tier.test.js 等环境依赖测试：外部 8588 实例不在线时
-    // 打 SKIP 说明后 exit 77）。原实现不识别该码，[异常] 分支把它报成
-    // Command failed——跳过的本意是「不计成败」，不是失败。按 SKIP 行
-    // 同口径处理：打印原因、不计失败也不计通过。
-    if (res.err && res.err.code === 77) {
-      const skipLines = out.split('\n').filter(l => /SKIP|⏭/.test(l)).slice(0, 2);
-      console.log(`  [跳过] ${label.trim()}: exit 77（环境依赖，约定跳过码）`);
-      for (const l of skipLines) console.log(l);
-      return;
-    }
-    // [全局修复 2026-11-16] 原判据只认中文「N 通过, M 失败」——英文汇总的
-    // 文件（absolute-claim-en.test.js: "204 passed, 1 failed" + exit 1）
-    // 被误报成 [异常] Command failed，真实的失败断言名从失败清单里丢失。
-    // 改为：任一**数字型**汇总（中文/英文/斜杠分数式/RESULT JSON/node:test）
-    // 即放行到下方正常解析路径（会计入自报失败数与 ✗ 行）；成功横幅不算
-    // ——exit≠0 却只打横幅是自相矛盾，必须仍走 [异常] 计失败。
-    const _numericSummary = /(\d+)\s*(?:通过|passed|过)\s*[/,，]?\s*(\d+)\s*(?:失败|failed|败)/
-      || /(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)/
-      || /RESULT\s*\{/
-      || /ℹ\s*pass\s+\d+/;
-    if (!_numericSummary.test(out)) {
-      console.log(`  [异常] ${label.trim()}: ${errMsg}`);
-      failed++;
-      failures.push({ idx, name: label.trim(), error: errMsg });
-      return;
-    }
-  }
-  // [v6.7.86] 同时识别多种汇总格式：
-  //   「N 通过, M 失败」       —— harness 标准中文汇总
-  //   「N passed, M failed」   —— 自建 harness 英文汇总
-  //   「N passed / M failed」  —— 带斜杠分隔（compliance.test.js）
-  //   「N/M passed」           —— 只报通过数的分数式（blindspot-upgrade）
-  //   「PASS/SKIP 单行」       —— 裸跑型 smoke test
-  // [全局修复 2026-11-16] 补八种长期漏识别（合计 40+ 文件被计「未输出汇总行」，
-  // 而它们单跑全部 exit 0——是汇总行变体不是静默）：
-  //   「结果：N 过 / M 败」    —— round-565/567/570 家族的简写中文汇总
-  //   「RESULT{"pass":N,"fail":M}」—— round-629 的 JSON 汇总
-  //   「ℹ pass N … ℹ fail M」  —— node:test 内置 runner 的 TAP 汇总
-  //     （framing-effect-r254 等用 require('node:test')）
-  //   「pass=N fail=M」        —— round-276/634 的等号式计数行
-  //   「passed: N … failed: M」—— round-269 的冒号式计数行
-  //   无前缀 {"pass":N,"fail":M} JSON —— round-643 的裸 JSON 汇总
-  //   成功横幅（全部通过/全部断言通过/守卫通过/ALL PASS(ED)/ALL GREEN/
-  //   全绿/还原健康/行尾「，通过」，且无任何失败标记）
-  //     —— assert 抛异常自守的 guard 型文件（core/path-guard 等 26 个）
-  // 只认第一种曾让 6+ 个测试文件长期隐形：它们跑完了、有汇总、有 exit code。
+/**
+ * [AUDIT-FIX 2026-11-23] 汇总行解析器链（取代原 12 条手写正则的 if 瀑布）。
+ *
+ * 为什么重写：原实现只认中文「N 通过, M 失败」一族，而仓库里真实存在的汇总
+ * 格式有十几种。审计实测 18 个文件「断言全过却被统计成失败」——它们 exit 0、
+ * 有汇总、只是格式不在那 12 条正则里；逐个单跑复核，全部 rc=0。这就是
+ * 「26% 的失败是统计误报」的主要来源。
+ *
+ * 下列清单由 grep 全仓 test/ 的 console.log 汇总行后归一化归纳（数字抹成 N），
+ * 每条后面标注了本轮实测的代表文件：
+ *   ① 「结果: N 通过, N 失败, 共 N 个」      主流中文（约 300 文件）
+ *   ② 「测试结果: N passed, N failed」       主流英文
+ *   ③ 「N 通过 / N 失败」「N 过 / N 败」     斜杠分隔
+ *   ④ 「通过 N / 失败 N」「通过 N / N」      **关键词在前**（round-448/541/624、
+ *                                              pattern-detector-jitter-r308 等 7 个）
+ *   ⑤ 「N passed / N total」                 round-436/437 负例注入汇总
+ *   ⑥ 「pass N / fail N」「pass: N … fail: N」 round-395/398/400
+ *   ⑦ 「pass=N fail=M」                      round-276/634
+ *   ⑧ 「passed: N … failed: M」              round-269
+ *   ⑨ 「# pass N … # fail N」                **node:test 内置 runner 的 TAP 汇总**。
+ *                                              本机 Node v22 打 `# pass`，原正则只认
+ *                                              `ℹ pass`（spec reporter），导致 9 个
+ *                                              node:test 文件全被误报成失败。
+ *   ⑩ 「ℹ pass N … ℹ fail M」                spec/dot reporter
+ *   ⑪ 「RESULT{"pass":N,"fail":M}」          round-629
+ *   ⑫ 裸 JSON {"pass":N,"fail":M}            round-643
+ *   ⑬ 「合计 N / M」「N/M passed|tests|个|条」 分数式
+ *   ⑭ 逐条缩进 ✅/❌ 明细行                  gate-benchmark 一族（只有逐类结果，无总数）
+ *   ⑮ 逐条 ✓ 明细行                          test-architecture-consistency 一族
+ *
+ * 顺序即优先级：越具体的越靠前。任一命中即返回 { passed, failed }。
+ * 这个函数同时充当 [异常] 分支的准入判据（见 runChild），两处口径从此一致
+ * ——原实现那两个判据是两套不同的正则，才会出现「[异常] 放行了但解析不出来」。
+ */
+function parseCountedSummary(out) {
+  // ①②③ 中英标准：N 通过, M 失败 / N passed, M failed / N 过 / M 败
+  // （保留 `let m = out.match(` 字面形态：test/runall-summary-contract-round311.test.js
+  //   的 B1 段用字面子串守卫这支标准正则是否被删/改，删了它会红。）
   let m = out.match(/(\d+)\s*(?:通过|passed|过)\s*[/,，]?\s*(\d+)\s*(?:失败|failed|败)/);
-  let ratio = null;
-  if (!m) {
-    // 分数式：N/M passed、N/M tests passed、合计 N/M、N/总数
-    const r = out.match(/(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)/)
-      || out.match(/合计\s*(\d+)\s*\/\s*(\d+)/);
-    if (r) {
-      const pass = parseInt(r[1], 10), total = parseInt(r[2], 10);
-      ratio = { passed: pass, failed: Math.max(0, total - pass) };
-    }
+  if (m) return { passed: +m[1], failed: +m[2] };
+
+  // ④ 关键词在前：通过 N / 失败 M（或 通过 N / 总数）
+  m = out.match(/通过\s*(\d+)\s*[/,，]\s*(?:失败\s*(\d+)|\s*(\d+))/);
+  if (m) return { passed: +m[1], failed: m[2] !== undefined ? +m[2] : Math.max(0, +m[3] - +m[1]) };
+
+  // ⑤ N passed / M total（N 个 / N 条 / N tests / N 断言）
+  m = out.match(/(\d+)\s*passed\s*\/\s*(\d+)\s*(?:total|tests?|个|条|断言)/i);
+  if (m) return { passed: +m[1], failed: Math.max(0, +m[2] - +m[1]) };
+
+  // ⑥⑦⑧ pass/fail 计数：`passed: N … failed: M` / `pass=N fail=M` /
+  //     `N pass / M fail` / `pass N / fail M`（关键词在前的两种语序都要认）
+  m = out.match(/\bpass(?:ed)?\s*[=:]\s*(\d+)[\s\S]{0,80}?\bfail(?:ed|s|ures)?\s*[=:]\s*(\d+)/);
+  if (m) return { passed: +m[1], failed: +m[2] };
+  m = out.match(/\b(\d+)\s*pass(?:ed)?\s*[/,，:：= ]\s*(\d+)\s*fail(?:ed|s|ures)?\b/);
+  if (m) return { passed: +m[1], failed: +m[2] };
+  m = out.match(/\bpass(?:ed)?\s*[=:]?\s*(\d+)\s*[/,，:：= ]\s*fail(?:ed|s|ures)?\s*[=: ]\s*(\d+)/);
+  if (m) return { passed: +m[1], failed: +m[2] };
+
+  // ⑨ node:test 内置 runner 的 TAP 汇总（本机 Node v22 的实际输出）
+  m = out.match(/#\s*pass\s+(\d+)[\s\S]*?#\s*fail\s+(\d+)/);
+  if (m) return { passed: +m[1], failed: +m[2] };
+  // ⑩ spec/dot reporter 的 `ℹ pass N` + `ℹ fail M`
+  m = out.match(/ℹ\s*pass\s+(\d+)[\s\S]*?ℹ\s*fail\s+(\d+)/);
+  if (m) return { passed: +m[1], failed: +m[2] };
+
+  // ⑪ RESULT{json} 汇总
+  m = out.match(/RESULT\s*(\{[\s\S]*?\})\s*$/m);
+  if (m) {
+    try {
+      const j = JSON.parse(m[1]);
+      if (Number.isFinite(j.pass) && Number.isFinite(j.fail)) return { passed: j.pass, failed: j.fail };
+    } catch (_) { /* 非合法 JSON：不走本分支，留给下方 */ }
   }
-  if (!m && !ratio) {
-    // [全局修复 2026-11-16] 等号式计数：`pass=N fail=M`（round-276/634 的
-    // `[rXXX] pass=32 fail=0` 汇总行——数字在 = 之后，主正则要求数字在前）。
-    const eq = out.match(/\bpass\s*=\s*(\d+)\s+fail\s*=\s*(\d+)/);
-    if (eq) ratio = { passed: parseInt(eq[1], 10), failed: parseInt(eq[2], 10) };
-  }
-  if (!m && !ratio) {
-    // [全局修复 2026-11-16] 冒号式计数：`passed: N … failed: M`
-    // （round-269 的缩进计数行）。
-    const cl = out.match(/passed\s*:\s*(\d+)[\s\S]*?failed\s*:\s*(\d+)/);
-    if (cl) ratio = { passed: parseInt(cl[1], 10), failed: parseInt(cl[2], 10) };
-  }
-  if (!m && !ratio) {
-    // [全局修复 2026-11-16] RESULT{json} 汇总（round-629）：显式 pass/fail 计数
-    const rj = out.match(/RESULT\s*(\{[\s\S]*?\})\s*$/m);
-    if (rj) {
-      try {
-        const j = JSON.parse(rj[1]);
-        if (Number.isFinite(j.pass) && Number.isFinite(j.fail)) {
-          ratio = { passed: j.pass, failed: j.fail };
-        }
-      } catch (_) { /* 非合法 JSON：不走本分支，留给下方横幅/静默判定 */ }
-    }
-  }
-  if (!m && !ratio) {
-    // [全局修复 2026-11-16] 无前缀 JSON 汇总（round-643）：末段直接打
-    // {"pass":N,"fail":M,...}（无 RESULT 前缀）。从后向前找可解析的
-    // { 起点，避免把前面的引擎 init 日志行当成 JSON 起点。
+  // ⑫ 无前缀裸 JSON 汇总（从后向前找可解析的 { 起点，避开引擎 init 日志行）
+  {
     const lines = out.split('\n');
     for (let i = lines.length - 1; i >= 0; i--) {
       if (lines[i].trim().startsWith('{')) {
         try {
           const j = JSON.parse(lines.slice(i).join('\n'));
-          if (j && Number.isFinite(j.pass) && Number.isFinite(j.fail)) {
-            ratio = { passed: j.pass, failed: j.fail };
-            break;
-          }
+          if (j && Number.isFinite(j.pass) && Number.isFinite(j.fail)) return { passed: j.pass, failed: j.fail };
         } catch (_) { /* 本起点不可解析，继续向前找 */ }
       }
     }
   }
-  if (!m && !ratio) {
-    // [全局修复 2026-11-16] node:test 内置 runner 汇总：`ℹ pass N` + `ℹ fail M`
-    const nt = out.match(/ℹ\s*pass\s+(\d+)[\s\S]*?ℹ\s*fail\s+(\d+)/);
-    if (nt) ratio = { passed: parseInt(nt[1], 10), failed: parseInt(nt[2], 10) };
+  // ⑬ 分数式：N/M passed|通过|tests|个|条、合计 N/M
+  //    [AUDIT-FIX] 收紧：只在**末尾若干行**且该行像汇总行时才认。
+  //    原实现在全文中找，实测把 round-624 的 `✓ B4 … 2/3 条样本 …` 当成
+  //    「2 通过 / 1 失败」——一个真绿的文件被算出假失败。限位后这类误匹配消失，
+  //    而 round-350 的 `负例注入汇总: 129/129 个翻转断言全部翻转` 仍可识别。
+  {
+    const lines = out.split('\n');
+    const RATIO_RE = /(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)/;
+    const SUMMARYISH_RE = /汇总|结果|合计|总计|测试|通过|passed|total|断言|轮测/;
+    for (let i = lines.length - 1; i >= 0 && i >= lines.length - 12; i--) {
+      const line = lines[i];
+      if (!SUMMARYISH_RE.test(line)) continue;
+      const r = line.match(RATIO_RE) || line.match(/合计\s*(\d+)\s*\/\s*(\d+)/);
+      if (r) return { passed: +r[1], failed: Math.max(0, +r[2] - +r[1]) };
+    }
   }
-  const parsed = m
-    ? { passed: parseInt(m[1], 10), failed: parseInt(m[2], 10) }
-    : ratio;
-  if (!parsed) {
-    // [v6.7.83] 第四种格式：裸跑型测试的 PASS/SKIP 单行报告。
-    // 形如 `console.log('PASS version.test.js (module loads)')` 或
-    // `console.log('SKIP x (' + code + ')')`。这类文件语义上是"通过"
-    // 但完全没有计数——core/ utils/ memory/ 下 40+ 个测试全属此类。
-    // PASS → 计 1 个通过；SKIP → 不计失败但打出来（环境依赖缺失时
-    // 模块加载不了，判失败会掩盖真实情况）。
-    const passLines = (out.match(/^\s*PASS\b.*$/gm) || []).length;
-    const skipLines = (out.match(/^\s*SKIP\b.*$/gm) || []);
-    if (passLines > 0 || skipLines.length > 0) {
-      passed += passLines;
-      if (skipLines.length > 0) {
-        console.log(skipLines.slice(0, 2).join('\n'));
-      }
-      // 有输出但全 SKIP：不计失败，但要可见（已在上面打出）
-      return;
-    }
-    // [全局修复 2026-11-16] 第五种格式：成功横幅（guard 型文件）。
-    // 这类文件用 assert 抛异常自守（失败即未捕获异常 → exit≠0 → 上方
-    // [异常] 分支已计失败），成功时只打成功横幅而没有计数。仅在**无任何
-    // 失败标记**时计 1 个通过——✗/❌/FAIL 在场说明横幅与实况矛盾，仍走
-    // 静默失败逼补汇总。横幅族（r278 按 13 个实测文件收齐）：
-    //   全部通过 / 全部断言通过 / 守卫通过 / ALL PASS / ALL PASSED /
-    //   ALL GREEN / 全绿 / 还原健康 / 行尾「，通过」/ ✅ 收尾
-    //   （✅ 收尾型如 round-477-negative/round-551：r278 首轮扩展时误删该
-    //    分支导致两个文件回归静默，次轮补回——覆盖族只能增不能减）
-    const hasFailMark = /✗|❌|\bFAIL\b|\bNG\b/.test(out);
-    if (!hasFailMark && /全部(?:断言)?通过|守卫通过|ALL\s*PASS(?:ED)?|ALL\s*GREEN|全绿|还原健康|(?:，|:|：)\s*通过\s*$|✅/m.test(out)) {
-      passed += 1;
-      const banner = out.split('\n').filter(l => /全部(?:断言)?通过|守卫通过|ALL\s*PASS|ALL\s*GREEN|全绿|还原健康|(?:，|:|：)\s*通过\s*$|✅/.test(l)).slice(-1)[0];
-      if (banner) console.log(banner.trim());
-      return;
-    }
-    // [v6.7.83] 吐不出结果行 = 静默。实测四类探针：exit1 被 execSync 的
-    // 异常路径捕获（正确），但「跑完断言却不吐 N 通过, M 失败」的测试
-    // 走到这里只打印尾巴就 return —— 不计入 passed、不计入 failed，
-    // 永久隐形。一个写了断言却忘了汇总的测试文件，等于没写。
-    // 处置：计入 1 个失败，并要求可见原因。
-    const tail = out.trim().split('\n').slice(-3).join('\n');
-    if (tail) console.log(tail);
-    failed += 1;
-    failures.push({
-      idx,
-      name: label.trim(),
-      error: '(未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)',
-    });
+
+  // ⑭ 逐条缩进 ✅/❌ 明细行（benchmark 型：只有逐类结果，没有总数）。
+  //    只数缩进 ≥2 的明细行；行首的横幅（✅ 无回归 / ❌ N 条误拦）不计入。
+  const okDetail = (out.match(/^[ \t]{2,}✅\s/mg) || []).length;
+  const badDetail = (out.match(/^[ \t]{2,}(?:❌|❎)\s/mg) || []).length;
+  if (okDetail + badDetail > 0) return { passed: okDetail, failed: badDetail };
+
+  // ⑮ 逐条 ✓ 明细行（无汇总的裸跑型测试，如 test-architecture-consistency.js）
+  const okMarks = (out.match(/^\s*[✓✔]\s+\S/gm) || []).length;
+  if (okMarks > 0) return { passed: okMarks, failed: 0 };
+
+  return null;
+}
+
+/**
+ * [AUDIT-FIX 2026-11-23] 无计数结果的解析：PASS/SKIP 单行 + 成功横幅。
+ *
+ * 与 parseCountedSummary 分开，是因为 [异常] 分支的准入判据只能用**计数型**
+ * 结果：一个 exit≠0 却只打成功横幅的文件是自相矛盾的，必须仍按失败处置
+ * （沿用 [全局修复 2026-11-16] 的口径）。
+ */
+function parseUncountedSummary(out) {
+  // [v6.7.83] 裸跑型测试的 PASS/SKIP 单行报告。
+  // PASS → 计 1 个通过；SKIP → 不计失败但打出来（环境依赖缺失时模块加载不了，
+  // 判失败会掩盖真实情况）。
+  const passLines = (out.match(/^\s*PASS\b.*$/gm) || []).length;
+  const skipLines = out.match(/^\s*SKIP\b.*$/gm) || [];
+  if (passLines > 0) return { passed: passLines, failed: 0 };
+  if (skipLines.length > 0) return { skipped: true };
+  // [v6.7.83] 成功横幅（guard 型文件：assert 抛异常自守，失败即未捕获异常 →
+  // exit≠0 → 上方 [异常]/crash 分支已计失败），成功时只打横幅而没有计数。
+  // 仅在**无任何失败标记**时计 1 个通过。
+  // [AUDIT-FIX] 必须显式给 failed: 0：少了它，调用方 `failed += parsed.failed`
+  // 会变成 NaN —— 实测一次分段跑把头条数字打成「1082 通过, NaN 失败」。
+  const hasFailMark = /✗|❌|\bFAIL\b|\bNG\b/.test(out);
+  if (!hasFailMark && BANNER_RE.test(out)) return { passed: 1, failed: 0, banner: true };
+  return null;
+}
+
+/** [AUDIT-FIX 2026-11-23] 打印子进程可读输出：优先结果行，崩溃时退到 stderr 头部 */
+function emitChildOutput(out, stderr) {
+  const keep = out.split('\n').filter(l => /通过|✗|失败|❌|FAIL|✓/.test(l));
+  if (keep.length > 0) { console.log(keep.join('\n')); return; }
+  const errHead = (stderr || '').trim().split('\n').slice(0, 4).join('\n');
+  if (errHead) {
+    console.log('  (stdout 无结果行；stderr 头部如下)');
+    console.log(errHead.split('\n').map(l => '    ' + l).join('\n'));
     return;
   }
+  console.log('  (无输出)');
+}
+
+/** 在子进程中执行一条命令，解析其结果并按结束状态分桶记账 */
+async function runChild(task) {
+  const { label, argv, timeout = CHILD_TIMEOUT, idx, total } = task;
+  const name = label.trim();
+  console.log(`\n[${idx + 1}/${total}] ${name}`);
+
+  // [AUDIT-FIX 2026-11-23] execFile 错误对象语义（本轮实测坐实，见文件头）：
+  //   本 runner 超时       → err.killed===true && err.signal==='SIGTERM' && err.code===null
+  //   外部信号杀死（OOM 等）→ err.signal==='SIGKILL' 等、err.killed===false
+  //   跑完退出码非零       → err.code===N、err.signal===null
+  // 三者原先全被打成一句 "Command failed" 再一律 failed+=1，既不可归因也不可复现。
+  const isOwnTimeout = (e) => !!e && e.killed === true && e.signal === 'SIGTERM';
+  const isExternalSignal = (e) => !!e && !!e.signal && e.signal !== 'SIGTERM';
+
+  let attempt = await execCapture(argv, timeout);
+  let out = attempt.stdout;
+  let err = attempt.err;
+
+  // [全局修复 2026-11-16 保留] exit 77 = 仓库约定俗成的「跳过码」
+  // （mcp-auth-tier.test.js 等环境依赖测试：外部 8588 实例不在线时打 SKIP
+  // 说明后 exit 77）。按 SKIP 行同口径处理：打印原因、不计失败也不计通过。
+  // [AUDIT-FIX] 这段放在重试之前：跳过码是确定性的，不该先白跑一遍。
+  // （实测 mcp-auth-tier 的 SKIP 说明走 stderr、stdout 为空，原顺序会触发一次
+  //   毫无必要的重试，把全量墙钟多拖一倍该文件的耗时。）
+  if (err && err.code === 77) {
+    const skipLines = out.split('\n').filter(l => /SKIP|⏭/.test(l)).slice(0, 2);
+    const skipErr = (attempt.stderr || '').split('\n').filter(l => /SKIP|⏭/.test(l)).slice(0, 2);
+    console.log(`  [跳过] ${name}: exit 77（环境依赖，约定跳过码）`);
+    for (const l of skipLines.concat(skipErr)) console.log(l);
+    skipFiles++;
+    return { kind: 'skip' };
+  }
+
+  // [v6.7.94 保留 + AUDIT-FIX 扩充] 环境噪声重试。原判据只有「零输出」；本轮补上
+  // 「被外部信号杀死」——那是 OOM 的签名（stdout 管道缓冲没来得及 flush，表现为
+  // 零输出，execFile 的 err.signal 会是 SIGKILL 而非 SIGTERM）。
+  // 不在重试范围：本 runner 的超时（等第二遍只是再等一遍）、退出码非零
+  // （确定性失败，重跑浪费一倍墙钟）。只在「零输出」时重跑一次。
+  if (err && !isOwnTimeout(err) && (out.trim().length === 0 || isExternalSignal(err))) {
+    const why = isExternalSignal(err) ? `被外部信号 ${err.signal} 杀死` : '零输出被中断';
+    console.log(`  [重试] ${name}: 子进程${why}（环境噪声），重跑一次`);
+    attempt = await execCapture(argv, timeout);
+    out = attempt.stdout;
+    err = attempt.err;
+  }
+
+  // 分类 1：被本 runner 的超时 SIGTERM 杀死。
+  // [AUDIT-FIX] 单独计入 timeout 桶、**不计入 failed** —— 这是头条数字可复现的关键。
+  // 原先它按「1 个失败」入账，而该文件真实的几十条用例整体从 passed/failed 里消失，
+  // 于是同一份代码四次全量的 passed 在 21158~28751 之间摆动（36%）。
+  if (isOwnTimeout(err)) {
+    timeoutFiles++;
+    emitChildOutput(out, attempt.stderr);
+    pushFailure(idx, name,
+      `[timeout] 子进程被 runner 超时（${Math.round(timeout / 1000)}s）SIGTERM 杀死，本文件用例整体未计入 passed/failed`
+      + `（可用 HF_RUN_ALL_TIMEOUT 放宽单文件预算，或 HF_RUN_ALL_JOBS 降并发）`);
+    return { kind: 'timeout' };
+  }
+
+  // 分类 2：异常退出（退出码非零 / 外部信号）且给不出任何可识别结果 → crash。
+  // [AUDIT-FIX] 原实现把这类一律记 failed+=1 + 一句 "Command failed"，分不清
+  // 「测试框架自己崩了」和「断言失败」。实测 32 个 [异常] 里 round-283 / round-496 /
+  // round-225 是把 FAIL 清单打到 stderr；现在 stderr 进日志，崩溃原因首次可见。
+  const counted = parseCountedSummary(out);
+  if (err && !counted) {
+    crashFiles++;
+    emitChildOutput(out, attempt.stderr);
+    const reason = isExternalSignal(err)
+      ? `被外部信号 ${err.signal} 杀死（重试后仍失败，疑似 OOM/内存不足）`
+      : `退出码 ${err.code} 且无结果行`;
+    const errHead = (attempt.stderr || '').trim().split('\n').slice(0, 4).join(' | ').slice(0, 240);
+    pushFailure(idx, name, `[crash] ${reason}${errHead ? `；stderr: ${errHead}` : ''}`);
+    return { kind: 'crash' };
+  }
+
+  // 正常路径：有计数型汇总，或 exit 0 无汇总 → PASS/SKIP 行 / 成功横幅
+  const parsed = counted || parseUncountedSummary(out);
+  // [AUDIT-FIX] 防御性闸门：解析结果必须是有限数。曾因横幅分支漏了 failed: 0
+  // 让 `failed += undefined` 变成 NaN，一次分段跑的头条数字被打成
+  // 「1082 通过, NaN 失败」——汇总一旦 NaN 就再也不知道真实失败数。
+  // 这里把非有限数当成「解析失败」走静默分支，宁可少算也不让数字变 NaN。
+  const parsedOk = parsed
+    && Number.isFinite(parsed.passed) && parsed.passed >= 0
+    && Number.isFinite(parsed.failed) && parsed.failed >= 0;
+  if (!parsed || !parsedOk) {
+    // [v6.7.83 保留] 吐不出结果行 = 静默。实测四类探针：exit1 被 execSync 的
+    // 异常路径捕获（正确），但「跑完断言却不吐 N 通过, M 失败」的测试走到这里
+    // 只打印尾巴就 return —— 不计入 passed、不计入 failed，永久隐形。
+    // 处置：计入 1 个失败，并要求可见原因。
+    failed += 1;
+    okFiles++;
+    emitChildOutput(out, attempt.stderr);
+    // 原因串保留「未输出「N 通过, M 失败」结果行」字面：
+    // test/runall-summary-contract-round311.test.js 的 B2 段用它守卫静默兜底
+    // 是否被删（删了会红）。
+    pushFailure(idx, name,
+      '(未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)');
+    return { kind: 'silent' };
+  }
+  if (parsed.skipped) {
+    const skipLines = out.match(/^\s*SKIP\b.*$/gm) || [];
+    for (const l of skipLines.slice(0, 2)) console.log(l);
+    skipFiles++;
+    return { kind: 'skip' };
+  }
+  okFiles++;
   passed += parsed.passed;
   failed += parsed.failed;
-  // [v6.7.97] 各文件自报的失败必须进 failures 清单。
-  // 原来只累加数字不记名字 → 最终汇总说「N 失败」而失败列表为空、
-  // 还打印「全部通过」。第 74 轮在独立安装的 node_modules 里撞到：
-  // 1805 通过, 4 失败，却跟着一句「全部通过」——数字与结论矛盾。
+  if (parsed.banner) {
+    const banner = out.split('\n').filter(l => BANNER_RE.test(l)).slice(-1)[0];
+    if (banner) console.log(banner.trim());
+  }
+
+  // [AUDIT-FIX] 唯一的失败明细收集逻辑。原实现有两个重复推送 ✗ 的循环
+  // （:272-277 的「文件自报失败: X」与 :285-290 的「X (· file)」），同一条失败
+  // 被推两遍——实测失败清单 239 条 vs 真实 195 个失败。现在只走这一处，
+  // 且 pushFailure 按 (idx, 明细) 去重，保证每条失败只出现一次。
+  // 标记族同时补上 ❌/❎/✘/✖：doc-numbers-accuracy.test.js 等用 ❌ 不用 ✗，
+  // 它们的失败明细原先一条都进不了清单。
+  let inFailBlock = false;
   for (const line of out.split('\n')) {
-    const fm = line.match(/^\s*[✗×xX]\s*(.+?)\s*$/);
-    if (fm && !/通过|passed/i.test(line)) {
-      failures.push({ idx, name: label.trim(), error: `文件自报失败: ${fm[1].slice(0, 120)}` });
+    // `FAILURES:` / `失败项：` 头之后的缩进条目也算失败明细
+    // （round-293 / round-398 一族把清单打到这种头下面）
+    if (/^\s*(?:FAILURES?|失败项|失败的?测试)\s*[:：]/.test(line)) { inFailBlock = true; continue; }
+    if (inFailBlock) {
+      const im = line.match(/^\s{2,}[-•*]\s+(\S.*)$/);
+      if (im) { pushFailure(idx, name, `文件自报失败: ${im[1].slice(0, 120)}`); continue; }
+      if (line.trim() === '') continue;
+      inFailBlock = false;
+    }
+    const fm = line.match(FAIL_LINE_RE);
+    if (fm && !/通过|passed|✓|✅|✔|^ok\b/i.test(line)) {
+      pushFailure(idx, name, `文件自报失败: ${fm[1].slice(0, 120)}`);
     }
   }
-  // [全局修复 2026-11-16] 隐形失败堵口：文件自报「M 失败」（M>0）但**不打
-  // ✗ 行**时，原实现只把 M 累加进 failed 计数器、失败清单里没有任何条目——
-  // 最终汇总说「N 失败」而清单为空/只有别的内容，这些失败从此没人看得见
-  // （实测：2026-11-15 体检的 120 失败里约 27 个属此族，分布在 17 个文件，
-  // 报告只列了看得见的那些，漏报的这批因此从未被修）。此处兜底：本文件
-  // 没有任何 ✗ 条目进清单、而自报失败数 >0 时，补一条带汇总行的条目。
-  const beforeCount = failures.length;
-  if (parsed.failed > 0) {
-    for (const line of out.split('\n')) {
-      const fm = line.match(/^\s*✗\s+(.+?)\s*$/);
-      if (fm) failures.push({ idx, name: fm[1], error: `(${label.trim()})` });
-    }
+  // [v6.7.97 保留] 文件自报失败数 >0 但清单里没有它的任何条目时，补一条带汇总行
+  // 的条目——宁可承认「不知道哪些失败」也不要让数字与清单互相矛盾。
+  if (parsed.failed > 0 && !failures.some(f => f.idx === idx)) {
+    const sumLine = out.split('\n')
+      .find(l => /(\d+)\s*(?:通过|passed|过)[,，/]\s*(\d+)\s*(?:失败|failed|败)/.test(l)) || '';
+    pushFailure(idx, name,
+      `文件自报 ${parsed.failed} 个失败但无可见失败标记（汇总: ${sumLine.trim().slice(0, 110)}）——请补 ✗/❌ 明细`);
   }
-  if (parsed.failed > 0 && failures.length === beforeCount) {
-    const sumLine = out.split('\n').find(l => /(\d+)\s*(?:通过|passed|过)[,，/]\s*(\d+)\s*(?:失败|failed|败)/.test(l)) || '';
-    failures.push({
-      idx,
-      name: label.trim(),
-      error: `文件自报 ${parsed.failed} 个失败但无 ✗ 行（汇总: ${sumLine.trim().slice(0, 110)}）——请补 ✗ 明细或改为可见失败标记`,
-    });
-  }
-  // [v6.7.83] 「0 通过, 0 失败, 共 0 个」= mount 函数定义了但一个 test
+  // [v6.7.83 保留] 「0 通过, 0 失败, 共 0 个」= mount 函数定义了但一个 test
   // 都没注册。这在数字上合法（0 失败），实际等于该文件什么都没测。
-  // 实测探针 silent.test.js 就是如此。计入 1 个失败，逼它要么注册用例、
-  // 要么改名（不带 .test.js 后缀就不会被扫）。
+  // 计入 1 个失败，逼它要么注册用例、要么改名（不带 .test.js 后缀就不会被扫）。
   if (parsed.passed === 0 && parsed.failed === 0) {
     failed += 1;
-    failures.push({
-      idx,
-      name: label.trim(),
-      error: '(注册了 0 个用例——mount 函数未调用 test()；请补用例或移出 test/ 目录)',
-    });
+    pushFailure(idx, name,
+      '(注册了 0 个用例——mount 函数未调用 test()；请补用例或移出 test/ 目录)');
   }
-  // （原第二个 ✗ 推送循环已并入上方「隐形失败堵口」块，避免重复条目）
-  const keep = out.split('\n').filter(l => l.includes('通过') || l.includes('✗') || l.includes('失败'));
-  console.log(keep.join('\n') || '  (无输出)');
+  emitChildOutput(out, attempt.stderr);
+  return { kind: 'ok' };
 }
 
 /**
@@ -469,12 +736,10 @@ async function runQueue(tasks) {
       try {
         await runChild(t);
       } catch (e) {
-        failed++;
-        failures.push({
-          idx: t.idx,
-          name: t.label.trim(),
-          error: `runner 异常: ${(e.message || '').split('\n')[0]}`,
-        });
+        // [AUDIT-FIX 2026-11-23] runner 自身异常也归入 crash 桶，不再混进 failed
+        crashFiles++;
+        pushFailure(t.idx, t.label.trim(),
+          `[crash] runner 异常: ${(e.message || '').split('\n')[0]}`);
       }
     }
   }
@@ -552,7 +817,7 @@ function acquireSingleton() {
     console.error('❌ 检测到已有全量回归在运行 —— 拒绝启动（防止多轮叠加撑爆容器内存）');
     for (const o of others) console.error(`   PID ${o.pid}: ${o.args}`);
     console.error('');
-    console.error('   容器规格 4GB，单轮全量回归（609 个测试文件、数十万文件扫描）已接近上限；');
+    console.error('   容器规格 4GB，单轮全量回归（1000+ 个测试文件、数十万文件扫描）已接近上限；');
     console.error('   两轮叠加会 OOM-kill gateway，表现为「会话莫名中断」。');
     console.error('   处置：等它跑完，或确认它是残留后用 kill <pid> 结束；');
     console.error('         确需强制启动（残留已死仅锁文件残留 / PID 被复用）设 HF_RUN_ALL_FORCE=1。');
@@ -662,6 +927,10 @@ async function runAllTests() {
   // 而本机后台执行通道对 node 不可用（wrapper 秒杀，exit 1 + "stdin is
   // not a tty"，2026-10-28 实测三种写法全挂）。分段只改任务集合，
   // 不改 runner/判定/两阶段语义——各段并集即全量，逐段人工汇总。
+  // [AUDIT-FIX] plannedTasks 单独记「本轮真的要跑几个」：totalTasks 是切片前的
+  // 全量数，两者在分段模式下不同。下方汇总自洽校验必须对 plannedTasks，
+  // 否则每次分段跑都会误报「汇总不自洽」。
+  let plannedTasks = totalTasks;
   const sliceEnv = (process.env.HF_RUN_ALL_SLICE || '').match(/^(\d+)\s*\/\s*(\d+)$/);
   if (sliceEnv) {
     const sk = Math.max(1, parseInt(sliceEnv[1], 10));
@@ -671,6 +940,7 @@ async function runAllTests() {
     const kept = tasks.filter((t, i) => (i % sn) === (sk - 1));
     for (let i = 0; i < kept.length; i++) { kept[i].idx = i; kept[i].total = kept.length; }
     tasks.length = 0; tasks.push(...kept);
+    plannedTasks = tasks.length;
     console.log(`[分段] HF_RUN_ALL_SLICE=${sk}/${sn}：${before} → ${tasks.length} 个文件`);
   }
   // [v6.8.80] 两阶段调度：变更测试（写 src/ 源码）与 MCP 服务类测试
@@ -679,7 +949,7 @@ async function runAllTests() {
   const serialTasks = tasks.filter(t => t.isMutator || isIndirectMutator(t.rel) || isTimingSensitive(t.rel) || isServerTest(t.rel));
   const parallelTasks = tasks.filter(t => !(t.isMutator || isIndirectMutator(t.rel) || isTimingSensitive(t.rel) || isServerTest(t.rel)));
   const poolSize = Math.min(JOBS, Math.max(1, parallelTasks.length));
-  console.log(`共 ${totalTasks} 个测试文件：并发池 ${parallelTasks.length} + 串行车道 ${serialTasks.length}（JOBS=${JOBS}，可调 1-16）`);
+  console.log(`共 ${totalTasks} 个测试文件：并发池 ${parallelTasks.length} + 串行车道 ${serialTasks.length}（JOBS=${JOBS}，可调 1-16；CHILD_TIMEOUT=${Math.round(CHILD_TIMEOUT / 1000)}s，可调 HF_RUN_ALL_TIMEOUT）`);
   console.log('串行车道 = 变更测试（写 src/）+ 间接变异 + 时序敏感 + MCP 服务类，防并发互踩/时序漂移');
   // [v6.8.80] 突变残留兜底：跑之前快照 src/，失败/被杀后回滚未还原的写入。
   const srcSnapshot = snapshotSrc();
@@ -697,12 +967,10 @@ async function runAllTests() {
         await runChild(t);
         ok = true;
       } catch (e) {
-        failed++;
-        failures.push({
-          idx: t.idx,
-          name: t.label.trim(),
-          error: `runner 异常: ${(e.message || '').split('\n')[0]}`,
-        });
+        // [AUDIT-FIX 2026-11-23] 同上：runner 自身异常归入 crash 桶
+        crashFiles++;
+        pushFailure(t.idx, t.label.trim(),
+          `[crash] runner 异常: ${(e.message || '').split('\n')[0]}`);
       }
       if (!ok) {
         const restored = rollbackSrcIfDirty(srcSnapshot);
@@ -715,18 +983,39 @@ async function runAllTests() {
 
   // 汇总
   console.log('\n' + '='.repeat(50));
-  console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+  // [AUDIT-FIX 2026-11-23] 五桶汇总。原实现只打「N 通过, M 失败, 共 N 个」，
+  // 且把超时杀死、框架崩溃、断言失败全算进 M —— 头条数字因此不可复现、不可归因。
+  //   passed / failed  用例级（来自各文件自报的汇总行）
+  //   timeout / crash / skip  文件级（子进程结束状态）
+  //   files            实际执行的测试文件数 = 四类终态之和
+  //   total            用例总数 = passed + failed（与 data/test-count.json 一致）
+  const totalCases = passed + failed;
+  const filesRun = okFiles + timeoutFiles + crashFiles + skipFiles;
+  console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, ${timeoutFiles} 超时, ${crashFiles} 崩溃, ${skipFiles} 跳过`);
+  console.log(`用例总数: ${totalCases} = 通过 ${passed} + 失败 ${failed}`);
+  console.log(`文件统计: ${filesRun} 个文件 = 有结果 ${okFiles} + 超时 ${timeoutFiles} + 崩溃 ${crashFiles} + 跳过 ${skipFiles}`);
+  // 自洽校验：每个计划内的文件必须落进且只落进一个终态桶。
+  // 不成立就打 ❌ 并置退出码 1 —— 绝不打印「全部通过」骗人。
+  const selfConsistent = filesRun === plannedTasks;
+  console.log(selfConsistent
+    ? `[自洽] ${filesRun} 个文件全部有终态，无遗漏无重复计数`
+    : `❌ 汇总不自洽：终态合计 ${filesRun} ≠ 本轮计划文件数 ${plannedTasks}（全量 ${totalTasks}）`);
   // [v6.7.87] 落一份用例数缓存，供 doc-numbers-accuracy 守卫与
   // measure-claimed-numbers 读取——README 横幅的 "N passing tests"
   // 从此有实测值可比对（此前只有测试文件数，用例数无从校验，
   // 从 1,138 胀到 1754 都没人发现）。
+  // [AUDIT-FIX] 字段与语义保持原样（passed/failed/total/at）：
+  // timeout/crash/skip 是文件级状态，混进用例级 total 会污染 doc-numbers 的比对。
   try {
     fs.mkdirSync(path.join(__dirname, '..', 'data'), { recursive: true });
     fs.writeFileSync(
       path.join(__dirname, '..', 'data', 'test-count.json'),
-      JSON.stringify({ passed, failed, total: passed + failed, at: new Date().toISOString() }, null, 2)
+      JSON.stringify({ passed, failed, total: totalCases, at: new Date().toISOString() }, null, 2)
     );
   } catch (_) { /* 缓存写失败不影响测试结果 */ }
+  // [AUDIT-FIX] 退出码判据：用例失败 + 超时 + 崩溃 都算不绿。
+  // 原实现只看 failures.length 与 failed，被超时杀死的文件会被一句「全部通过」带过。
+  const notGreen = failed + timeoutFiles + crashFiles;
   if (failures.length > 0) {
     console.log('\n失败的测试:');
     // [v6.8.80] 并发后 failures 是完成序，按任务 idx 排序恢复文件序，
@@ -735,11 +1024,11 @@ async function runAllTests() {
       console.log(`  - ${f.name} ${f.error}`);
     }
     process.exitCode = 1;
-  } else if (failed > 0) {
+  } else if (notGreen > 0) {
     // [v6.7.97] 兜底：数字说失败但清单空 —— 说明有文件自报了失败数却
     // 没被识别成具体条目。宁可承认「不知道哪些失败」也不要打印
     // 「全部通过」骗人。数字与结论必须一致。
-    console.log(`\n失败的测试: ${failed} 个失败未能定位到具体条目`);
+    console.log(`\n失败的测试: ${notGreen} 个失败未能定位到具体条目`);
     console.log('  - (来自各文件自报的汇总失败数，但未产生可识别的失败行)');
     process.exitCode = 1;
   } else {
