@@ -1,3 +1,86 @@
+# r457 — 融合轮：3 号本地滞留产出落到上游主线（v6.8.226 → v6.8.227）
+
+- **轮次**：r457
+- **VERSION**：6.8.226 → 6.8.227
+- **方向**：真升级③（工程修复轮，非新维度）+ 版本线融合
+- **来源**：用户指令「拉取最新版本，本地做好升级融合，然后再同步上去」
+- **操作方**：deepseek bot（3 号环境）本地滞留产出 + 1 号侧融合判定
+
+## 背景：为什么需要专门一轮融合
+
+3 号克隆自 2026-11-16 起**产出全部滞留本地未推送**（遵守「本地升级纪律」），期间上游 main 从 v6.8.158 推进到 **v6.8.226**——631 个 commit、轮次 r277 → r456。直接 push 不可能（非 fast-forward），直接 rebase 又会把上游已修过的东西再修一遍。本轮按「三据判定」（测试断言语义 → 模块头注释设计意图 → git 历史）逐冲突裁决，**上游已修的取上游，上游没有的才保留**。
+
+## 一、融合中判定「上游已修且更完善」→ 取上游版（不重复建设）
+
+| 项 | 上游对应轮次 | 判定依据 |
+|----|------------|---------|
+| `appeal_to_pity` 正则字符类 → 词 alternation | r320 | 上游除改为词 alternation 外还补 `可悲/好惨/好难`，覆盖本地修复想防的「认可/好评」前缀误伤，严格更优 |
+| `REVERSED` 倒装方向约束测试改守近距窗 | r318 | 同一处过期断言，上游版本断言语义更完整（含 `PAIR2_ZH: 0` 承重） |
+| `dream-loop` 行锚 326/337 | r399 | 上游 2026-11-18 实测校准到 328/339，更新 |
+| `heartflow_check_output` 只读工具条目 | r298 | 上游改用真实存在的 `heartflow_gate`，本地那条靠 -32601 空响应构成 vacuous pass |
+| `round-257` 维度计数硬编码 214 | r318 | 上游改为 `>= 基线` 单调下界，同一修法 |
+| 全部版本戳 / 维度 / 工具 / 路由 / 测试数元数据 | — | 上游 2026-11-21 实测值，本地为 11-16 旧树口径 |
+
+## 二、判定「上游没有的真产出」→ 保留落地
+
+**A. `bullshit_recognition` 行动层静默断裂（上游至今未修，影响最大的单点）**
+- `src/index.js` `REWRITE_DIMS` 里的 `'bullshit'` 是死条目：v6.8.120（8990451d）把维度改名为 `bullshit_recognition`（allDims/dimensions/dimMap/DIM_GUIDANCE 四处）时漏改行动层集合，`findings.dimension` 恒为新名、集合成员永不匹配 → bullshit 命中自 2026-11-02 起静默退化成 verify/pass（真空话不再触发 rewrite）。
+- **融合后复核确认**：上游 `origin/main` 的 `src/index.js:5197` 仍是 `'bullshit'`，本修复为上游确实缺失。
+- 同步 `pedagogy.js` 的 relax 键为 `bullshit_recognition`（与四处登记同口径），AGENTS.md 的 Rewrite-level 名单同步更正，`test/bullshit-engineering-context.test.js` 两处维度名断言同步。
+
+**B. `fallacy_of_relevance` 五个良性误报豁免族（同一维度、六个语族）**
+- 建设性转介结论 `CONSTRUCTIVE_ZH/EN`（round-488：「I only execute…→connect you with the engineer」）
+- 规范等权结论 `EQUAL_WEIGHT_ZH/EN`（round-510 atk#8：与 false_balance 共现被升级规则顶成 rewrite，而测试口径是 verify）
+- 分项/分别处置结论 `SEPARATE_ZH/EN`（round-537 benign[15]）
+- 争议已解决→结论成立 `RESOLVED_CONSEQUENCE_EN`（round-225）
+- 保密域直接后果 `CONFIDENTIAL_ZH`（round-331 + round-350 同句）
+- 每条豁免均配窄性对照实证（解决域×诚实域、保密域×产品质量域等真不相干仍命中），不放开为全文任意共现。
+
+**C. 评分制式 0-100 残留连修 10 个维度**
+- `src/fallacy-of-relevance.js` score=68 是原凶：severity=round(68×100)=6800 → totalPenalty=40.68 → overallScore=0.000 → 触发「overallScore<0.5 && severity>=60」升级规则，把 VERIFY 级维度顶成 rewrite（良性因果/后果句被误判改写）。归一 0.68。
+- 同族 9 个：affirming_disjunct(70→0.7)、appeal_to_rumor(62→0.62 含加减法与 clamp 链)、confirmatory_evidence(62→0.62 同)、one_sided_dismissal(72→0.72 含 verdict/strength 阈值换算)、relative_pration(60→0.6)、forer_effect(60→0.6)、means_as_end(45→0.45)、motivated_reasoning(70→0.7)。内部子系统计分（judgment/self-healing/identity 等自有度量）不受影响。
+
+**D. 毒正则 `/(?!)/` 还原 + 死正则守卫**
+- `src/sole-narrative.js` 英文三支（SOLE_SOURCE_EN/EXCLUSIVE_EN/DEFER_EN）在 ef9200dc（v6.8.85）被换成永不匹配死正则——该 commit 只修了中文侧 EXCLUSIVE_ZH 死支，英文侧连同覆盖一起消失，5 条英文攻击样本自 v6.8.85 起整族漏判。从 ef9200dc^ 原样还原三支。
+- `src/helplessness-induction.js` 的 ACTION_FUTILE_ZH 在 9ee267ec（v6.8.86「[replay] fix」）中被夹带换成同一毒正则（该 commit 本质是文件搬迁却夹带一处无关 src/ 改动）。整文件还原至 9ee267ec^。
+- 系统性防线 `test/src-no-dead-regex.test.js`：src/**/*.js 出现 `= /(?!)/'` 即红（test/ 与 scripts/ 的变异注入永假正则属正当，不在扫描面）。正反两向实测。
+
+**E. `chinese-tokenizer` 全角标点契约修复 + 22 条守护**
+- 模块头成文契约「中文标点视作分隔符」此前只对含 CJK 的片段生效：`_segment` 与 `tokenizeChars` 对 `!CJK_RE.test(frag)` 的片段整段 push，不过标点剥离。
+- 症状：`tokenize('，，。！！')` → `["，，。！！"]`；`tokenize('hello，world')` → `["hello，world"]`（全角逗号粘在词上，下游关键词匹配对这类文本恒失效）。
+- 对照组证明是逻辑缺口而非数据问题：CJK 在场时标点正确剥离、纯 ASCII 正确，只有「非 CJK 片段 + 全角标点」这一格坏。
+- 修法：所有片段统一先过 `ZH_PUNCT_RE` 剥离再走 CJK 边界切分；`_segmentCJKFragment` 更名 `_segmentFragment`。修复后 CJK 路径输出与修复前逐字节一致（r540 探针对照）。
+- 守护 `test/chinese-tokenizer.test.js` 22 断言六节（A 构造与词表 4 / B tokenize 词级 6 / C 边界与切片 / D 全角标点契约 / E segment 别名 / F 单例与注入）。
+
+**F. 测试与 runner 侧**
+- 6 个 dispatch 守卫测试计数漂移修复（round-606/608/609/614/615/621，硬编码基线未随 eduEngine 接入同步）+ 汇总行标准格式。
+- `test/round-268-benign-fp-five-families.test.js` r268 五族中性误伤回归落库（r266 红队报告 → run-all 可达常驻断言）。
+- `test/run-all.js` runner 补齐「自报失败无 ✗ 行」清单堵口——历史隐形的存量失败此前被计为通过，污染 passed 口径。
+- `package.json` 的 npm `files` 补 `test/`（守护测试随包发布）。
+
+## 三、认领与轮次号处置（遵守宪法 §1.1 轮次号唯一）
+
+- 本地 `de994f18` 的 r277 认领行**丢弃**：上游已就该撞号事故作出处置——`{"round":"r277","status":"abandoned","note":"撞号事故：本地 r277 认领（04:06:03Z）随工作 commit 滞留本地未推送期间，远端 main 于 2026-11-10 13:38 CST 发布了另一条无认领记录的 r27…"}`，并已把 r278 重编号为 active。复活该行会再造重复轮次号。
+- 本地 r278（全局修复轮）与 r279（同步轮）两个轮次号**合并为本轮 r457**——它们是同一次本地滞留的两个 commit，在同一轮落地，不拆成两个轮次号。
+- 本轮认领已写入 `coordination/claims.jsonl`。
+
+## 四、融合方法与安全措施
+
+- 方法：`git rebase origin/main`，逐冲突按三据判定；**无 `push --force`**；备份分支 `backup/deepseek-pre-sync-20261123`（指向融合前 HEAD 929c9f7a）全程可回退。
+- 融合前后均跑四门禁；误拦侧 302/326 与基线逐位一致、零新增退化。
+- 环境侧阻塞修复（本轮能推送的前提）：`AppData/Local/hermes/git/etc/gitconfig` 的 `credential.helper` 原为 `helper-selector`——那是 Git Credential Manager 的 **GUI 选择器**（Avalonia 桌面程序），headless 子进程弹不出授权框即无限期挂起，导致一切需认证的 git 操作卡死。已改为非交互的 `wincred`（读同一凭据条目），备份 `gitconfig.bak-pre-wincred-20261123`。
+
+## 五、验证数据（本回合真实运行）
+
+| 门禁 | 结果 |
+|------|------|
+| `bin/verify.js` | ✅ 16 passed / 0 failed |
+| `scripts/guard-abilities.js` | ✅ 20/20 全通过；判别维度 285 个 |
+| `test/doc-numbers-accuracy.test.js` | ✅ 25/25（含本轮新增 README changelog 条目） |
+| `scripts/bidirectional-guard.js` | ✅ 召回 52/52 + 误拦 302/326，与基线逐位一致零新增 |
+| 全量回归 `test/run-all.js` | ✅ 28,751 通过 / 177 失败 / 28,928 总数（896 文件）。上游基线 25,941/233/26,174——**通过 +2,810、失败 −56**；177 项失败经逐条与上游纯净树（`git worktree` @ d875eaa3）双树对照，全部为上游存量技术债（`affective-forecast` 2 条、`ai-writing-tell` 1 条、`unsupported-claim-exemption` 2 条、round-614/615/621 dispatch 守卫、round-734 等），融合零新增回归 |
+| 新增守护测试 | ✅ `src-no-dead-regex` 4/4（修注释误报后）/ `chinese-tokenizer` 22 条 / `round-268` 五族回归 |
+
 # r456 — present_bias 新句式族（真升级②：已有维度的全新句式族；v6.8.226）
 
 - **轮次**：r456

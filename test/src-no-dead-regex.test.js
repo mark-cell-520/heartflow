@@ -18,6 +18,15 @@ const SRC = path.join(ROOT, 'src');
 // 毒正则形态：= /(?!)/ 或 = /(?!) /' （允许引号包裹的变体）
 const DEAD_RE = /=\s*\/\(\?\!\)\//;
 
+// [r457 融合轮修正] 注释行不计。上游 r361 在 src/will-rogers-phenomenon.js
+// 的 round-295 blind inject 协议说明里写了字面量 `inject[k] = /(?!)/i`，
+// 那是**文档**而非代码；原守卫按行裸匹配把它当成毒残留误报。注释里的死
+// 正则不会让任何判据静默死亡（它不被执行），不在本守卫射程内。
+function isCommentLine(line) {
+  const t = line.trim();
+  return t.startsWith('//') || t.startsWith('*') || t.startsWith('/*');
+}
+
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
@@ -31,6 +40,7 @@ const hits = [];
 for (const f of walk(SRC)) {
   const lines = fs.readFileSync(f, 'utf8').split('\n');
   lines.forEach((line, i) => {
+    if (isCommentLine(line)) return;
     if (DEAD_RE.test(line)) {
       hits.push(`${path.relative(ROOT, f).replace(/\\/g, '/')}:${i + 1}  ${line.trim().slice(0, 90)}`);
     }
