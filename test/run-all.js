@@ -133,11 +133,12 @@ const FAIL_LINE_RE = /^\s*(?:(?:✗|✘|✖|×|❌|❎)\s*[：:>\])]?\s*|[xX]\s+
  * [AUDIT-FIX 2026-11-23] 成功横幅族（仅在**无任何失败标记**时生效）。
  * 在原族上补三种仓库里真实存在、原先不被识别的写法：
  *   「全部 6 组断言通过」   —— 全部与通过之间夹了计数（round-377）
+ *   「N 断言全通过」        —— round-164-doublespeak 一族
  *   「ALL ASSERTIONS PASSED」—— ALL 与 PASSED 之间夹了单词（round-406）
  *   「无回归」「全部维度达标」「负例注入通过」—— benchmark/负例注入族
  * 只增不减：这条分支的调用方已保证 exit 0，误判方向是「少报失败」而非「多报」。
  */
-const BANNER_RE = /全部[^\n]{0,12}(?:通过|达标)|守卫通过|ALL\s+[A-Z ]*PASS(?:ED)?|ALL\s*PASS(?:ED)?|ALL\s*GREEN|全绿|还原健康|无回归|负例注入通过|(?:，|:|：)\s*通过\s*$|✅/m;
+const BANNER_RE = /全部[^\n]{0,12}(?:通过|达标)|断言全通过|守卫通过|ALL\s+[A-Z ]*PASS(?:ED)?|ALL\s*PASS(?:ED)?|ALL\s*GREEN|全绿|还原健康|无回归|负例注入通过|(?:，|:|：)\s*通过\s*$|✅/m;
 
 /**
  * [AUDIT-FIX 2026-11-23] 收集范围配置：哪些收、哪些不收、为什么。
@@ -305,8 +306,13 @@ function execCapture(argv, timeout) {
  * 顺序即优先级：越具体的越靠前。任一命中即返回 { passed, failed }。
  * 这个函数同时充当 [异常] 分支的准入判据（见 runChild），两处口径从此一致
  * ——原实现那两个判据是两套不同的正则，才会出现「[异常] 放行了但解析不出来」。
+ *
+ * @param exitedNonZero 子进程是否以非零码/信号结束。⑭⑮ 两支依赖它：
+ *   [AUDIT-FIX] 实测 dimension-coverage-benchmark.js 逐样本打 `❌ 未命中` 却仍
+ *   判定达标并 exit 0——把信息性 ❌ 当失败会把绿灯算成红灯（0 过 / 9 败）。
+ *   因此 ✅/❌ 明细只在 exit≠0 时计数，✓ 明细只在 exit 0 时计数。
  */
-function parseCountedSummary(out) {
+function parseCountedSummary(out, exitedNonZero) {
   // ①②③ 中英标准：N 通过, M 失败 / N passed, M failed / N 过 / M 败
   // （保留 `let m = out.match(` 字面形态：test/runall-summary-contract-round311.test.js
   //   的 B1 段用字面子串守卫这支标准正则是否被删/改，删了它会红。）
@@ -376,13 +382,20 @@ function parseCountedSummary(out) {
 
   // ⑭ 逐条缩进 ✅/❌ 明细行（benchmark 型：只有逐类结果，没有总数）。
   //    只数缩进 ≥2 的明细行；行首的横幅（✅ 无回归 / ❌ N 条误拦）不计入。
-  const okDetail = (out.match(/^[ \t]{2,}✅\s/mg) || []).length;
-  const badDetail = (out.match(/^[ \t]{2,}(?:❌|❎)\s/mg) || []).length;
-  if (okDetail + badDetail > 0) return { passed: okDetail, failed: badDetail };
+  //    [AUDIT-FIX] 只在 exit≠0 时计数：dimension-coverage-benchmark.js 逐样本打
+  //    `❌ 未命中` 却仍判定达标并 exit 0，认了就会把绿灯算成 0 过 / 9 败。
+  if (exitedNonZero) {
+    const okDetail = (out.match(/^[ \t]{2,}✅\s/mg) || []).length;
+    const badDetail = (out.match(/^[ \t]{2,}(?:❌|❎)\s/mg) || []).length;
+    if (okDetail + badDetail > 0) return { passed: okDetail, failed: badDetail };
+  }
 
-  // ⑮ 逐条 ✓ 明细行（无汇总的裸跑型测试，如 test-architecture-consistency.js）
-  const okMarks = (out.match(/^\s*[✓✔]\s+\S/gm) || []).length;
-  if (okMarks > 0) return { passed: okMarks, failed: 0 };
+  // ⑮ 逐条 ✓ 明细行（无汇总的裸跑型测试，如 test-architecture-consistency.js）。
+  //    只在 exit 0 时计数：崩溃文件打的 ✓ 没有意义，崩溃本身才是信号。
+  if (!exitedNonZero) {
+    const okMarks = (out.match(/^\s*[✓✔]\s+\S/gm) || []).length;
+    if (okMarks > 0) return { passed: okMarks, failed: 0 };
+  }
 
   return null;
 }
@@ -488,7 +501,7 @@ async function runChild(task) {
   // [AUDIT-FIX] 原实现把这类一律记 failed+=1 + 一句 "Command failed"，分不清
   // 「测试框架自己崩了」和「断言失败」。实测 32 个 [异常] 里 round-283 / round-496 /
   // round-225 是把 FAIL 清单打到 stderr；现在 stderr 进日志，崩溃原因首次可见。
-  const counted = parseCountedSummary(out);
+  const counted = parseCountedSummary(out, !!err);
   if (err && !counted) {
     crashFiles++;
     emitChildOutput(out, attempt.stderr);
@@ -502,6 +515,15 @@ async function runChild(task) {
 
   // 正常路径：有计数型汇总，或 exit 0 无汇总 → PASS/SKIP 行 / 成功横幅
   const parsed = counted || parseUncountedSummary(out);
+  // [AUDIT-FIX] 整文件只有 SKIP 行的，先按跳过处理。必须排在下面的有限数闸门
+  // 之前：{ skipped: true } 没有 passed/failed 字段，闸门会把它误判成「解析失败」
+  // 而记 1 个失败——跳过的本意是「不计成败」。
+  if (parsed && parsed.skipped) {
+    const skipLines = out.match(/^\s*SKIP\b.*$/gm) || [];
+    for (const l of skipLines.slice(0, 2)) console.log(l);
+    skipFiles++;
+    return { kind: 'skip' };
+  }
   // [AUDIT-FIX] 防御性闸门：解析结果必须是有限数。曾因横幅分支漏了 failed: 0
   // 让 `failed += undefined` 变成 NaN，一次分段跑的头条数字被打成
   // 「1082 通过, NaN 失败」——汇总一旦 NaN 就再也不知道真实失败数。
@@ -523,12 +545,6 @@ async function runChild(task) {
     pushFailure(idx, name,
       '(未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)');
     return { kind: 'silent' };
-  }
-  if (parsed.skipped) {
-    const skipLines = out.match(/^\s*SKIP\b.*$/gm) || [];
-    for (const l of skipLines.slice(0, 2)) console.log(l);
-    skipFiles++;
-    return { kind: 'skip' };
   }
   okFiles++;
   passed += parsed.passed;

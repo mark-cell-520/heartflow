@@ -31,6 +31,29 @@ const path = require('path');
 require('./utils/stdio-guard.js');
 
 
+// [AUDIT-FIX 2026-11-23] 进程环境最小化：删除不属于心虫的外来凭据。
+// 背景：本进程由 supervisord 拉起，而 supervisord 自身的环境里混有同机其他组件的
+// 密钥（filebrowser 的 ICE 服务器凭据、IIB 的 SECRET_KEY/ACCESS_CONTROL）。
+// supervisord 的 [program] environment= 只能追加变量、无法删除，所以这些外来凭据
+// 会一路继承进心虫进程（/proc/<pid>/environ 实测可见）。
+// 风险：心虫自身不需要它们，但一旦有代码路径读取 process.env、或错误处理/诊断
+// 把环境 dump 进日志或外传，就成了同机其他组件的凭据泄露面。
+// 这里只删明确的外来凭据；心虫自己的 HEARTFLOW_* 与运行必需的 PATH/HOME/代理设置
+// 一律不碰。删除动作放在所有其它 require 之前，确保下游模块加载时已看不到它们。
+const _FOREIGN_CREDENTIAL_ENVS = [
+  'IIB_SECRET_KEY',
+  'IIB_ACCESS_CONTROL',
+  'FILE_BROWSER_ICE_SERVER_CREDENTIAL',
+  'FILE_BROWSER_ICE_SERVER_USERNAME',
+  'FILE_BROWSER_ICE_SERVER_URLS',
+];
+for (const _k of _FOREIGN_CREDENTIAL_ENVS) {
+  if (Object.prototype.hasOwnProperty.call(process.env, _k)) {
+    delete process.env[_k];
+  }
+}
+
+
 // [v6.6.4] P0: gate.action → 决策类型映射（品牌四层理论）
 const DECISION_TYPE_MAP = {
   pass: 'RESONATE',     // 通过 → 共振/加强
@@ -298,13 +321,16 @@ const WRITE_TOOLS = new Set([
 //   2. 该工具本身是读语义（写类工具已由 WRITE_TOOLS 收口，不重复收）。
 //
 // 刻意**不收**的（避免误伤，理由见报告）：
-//   · heartflow_memory_index_read —— round-298-memory-index-wiring.test.js 与
-//     mcp-guest-permission.test.js 都固化了"guest 可读该工具"，且它读的是
-//     记忆索引元数据而非记忆正文。要收需先改那两个测试。
 //   · heartflow_multi_agent_dialogue / heartflow_debate / heartflow_user_to_llm /
 //     heartflow_llm_to_user —— 只处理调用方当次传入的文本，不读沉淀库。
 //   · heartflow_forgetting —— 只返回遗忘引擎的聚合计数（getStats），无正文。
 //   · heartflow_memory_quality —— 只给调用方传进来的字符串打分，不碰记忆库。
+//
+// [AUDIT-FIX 2026-11-23] heartflow_memory_index_read 由"不收"改为"收"：
+// 它读 data/memory-index.json，里面不只有索引元数据，还含**用户身份/反馈/项目
+// 上下文/未解决问题列表**——按上面的筛选标准第 1 条属于敏感内容。此前为了让
+// round-298-memory-index-wiring.test.js 与 mcp-guest-permission.test.js 保持绿
+// 而把它排除在外（那是固化旧策略，不是安全结论），本轮同步更新那两个测试后收口。
 //
 // 与 WRITE_TOOLS 的关系：互不重叠、互不影响。WRITE_TOOLS 集合内容保持原样未改。
 const GUEST_DENY_TOOLS = new Set([
@@ -337,6 +363,11 @@ const GUEST_DENY_TOOLS = new Set([
   // ── 决策日志 ──
   // handleDecisionHistory：返回 _decisionHistory 全文 + 成功率/自动决策开关
   'heartflow_decision_history',
+  // ── 记忆索引（含用户画像与未解决问题列表） ──
+  // [AUDIT-FIX 2026-11-23] 读 data/memory-index.json，除索引元数据外还含用户
+  // 身份/反馈/项目上下文/未解决问题列表，按筛选标准第 1 条属敏感内容。
+  // 此前因两个测试固化"guest 可读"而排除，本轮同步更新测试后收口。
+  'heartflow_memory_index_read',
 ]);
 
 

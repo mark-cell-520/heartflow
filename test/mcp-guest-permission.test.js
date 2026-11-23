@@ -48,11 +48,20 @@ const WRITE_TOOLS = [
   'heartflow_confidence_feedback',
 ];
 
+// [AUDIT-FIX 2026-11-23] heartflow_memory_index_read 从"guest 应放行的只读工具"
+// 移入"guest 应被拦的敏感读工具"。原因：它读 data/memory-index.json，除索引元
+// 数据外还含用户身份/反馈/项目上下文/未解决问题列表，与 GUEST_DENY_TOOLS 的筛选
+// 标准（用户私密内容）一致。此前本文件把它当只读工具抽样是固化了旧策略。
+// round-298-memory-index-wiring.test.js 断言"guest 测试抽样含该读工具"——字符串
+// 在本文件中仍然存在（在下面的 GUEST_DENIED_READ_TOOLS 里），该断言不受影响。
+const GUEST_DENIED_READ_TOOLS = [
+  // [AUDIT-FIX 2026-11-23] 由 READ_TOOLS 移入（理由见上）
+  'heartflow_memory_index_read',
+];
+
 const READ_TOOLS = [
   'heartflow_think',
   'heartflow_check_output',
-  // [r298] memoryIndex 读工具（读不拦，验证 guest 可调）
-  'heartflow_memory_index_read',
 ];
 
 function argsFor(tool) {
@@ -158,6 +167,24 @@ module.exports = function ({ test }) {
           results.push({ name: tool, ok: false, detail: '只读工具被 guest 拦截误伤' });
         } else {
           results.push({ name: tool, ok: true, detail: '只读工具正常放行' });
+        }
+      } catch (e) {
+        results.push({ name: tool, ok: false, detail: e.message });
+      }
+    }
+
+    // [AUDIT-FIX 2026-11-23] 敏感读工具对 guest 必须被拦（与 READ_TOOLS 相反断言）。
+    // 这些工具读的是用户私密内容（记忆索引里的画像/未解决问题等），不是调用方
+    // 当次传入的文本，所以匿名不应可读。
+    for (const tool of GUEST_DENIED_READ_TOOLS) {
+      try {
+        const r = await callTool(tool, argsFor(tool));
+        const res = r.result || {};
+        const text = res.content && res.content[0] ? res.content[0].text : '';
+        if (res.isError === true && /权限不足/.test(text)) {
+          results.push({ name: tool, ok: true, detail: '敏感读工具 guest 已拦截' });
+        } else {
+          results.push({ name: tool, ok: false, detail: '敏感读工具对 guest 放行了（回归）' });
         }
       } catch (e) {
         results.push({ name: tool, ok: false, detail: e.message });

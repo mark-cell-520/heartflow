@@ -194,3 +194,13 @@ tests/
 /src/reasoning/verifier.js
 /src/workflow/decision-verifier.js
 /src/workflow/layer-bus.js
+
+# [AUDIT-FIX 2026-11-24] 仓库瘦身：一次性探针的原始 API 响应不入库。
+# coordination/agent4/scout/ 的 *.xml/*.json 是 arXiv/S2/GitHub 的原始响应
+# （791 个文件 10.2MB），*.txt 是词表（被 src/ 下 33 处注释引用为实证依据，
+# 保留入库）；probes/*.txt 是探针 stdout 输出。这些原始响应无代码引用价值
+# （真实 require 0 处，仅 3 处注释顺带提及），体积占大头。
+# 保留磁盘备查，只是不再进 git —— 需要时 git add -f 可强制入库。
+coordination/agent4/scout/*.xml
+coordination/agent4/scout/*.json
+coordination/agent4/probes/*.txt

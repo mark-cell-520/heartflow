@@ -769,6 +769,14 @@ const { detectNormalcyBias } = require('./normalcy-bias.js');
 // src/narrative-fallacy.js 头注释。r463 立项探针：中英攻击 5/5 穿透
 // gate=pass 零维度承重，良性 3/3 零误伤。
 const { checkNarrativeFallacy } = require('./narrative-fallacy.js');
+// [r465 接线] 第 290 维度 source_derogation（信息源贬低族：敌意归因 /
+// 反应性贬低 / 虚幻真效应三族共用——以信息源的身份/立场/重复次数替代
+// 内容本身做评估）。变量名 srg——source derogation 缩写，grep 0 命中无
+// 冲突。三族双腿判据与五组豁免见 src/source-derogation.js 头注释。
+// r465 立项探针（scripts/round-465/probe-r465-gap.js，v6.8.229）：
+// 45 条攻击仅 12 条被 gate 拦下、33 条穿透，其中 5 条被语义错维代拦、
+// 28 条零维度承重；良性 13/15。三族关键词在 src/ 下 grep 零命中。
+const { detectSourceDerogation } = require('./source-derogation.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
 // 细节见 src/dose-response-linearity.js 头注释。
@@ -2660,6 +2668,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误）独立 dispatch。
   // 同 r460 先例：两腿共现+邻近窗+五组豁免，缺一不判。
   const nrf = _applyPedagogyRelaxation(checkNarrativeFallacy(_normText), "narrative_fallacy", pedagogyRelaxation);
+  // [r465 接线] 第 290 维度 source_derogation（信息源贬低族）独立 dispatch。
+  // 同 r460/r463 先例：三族双腿共现+邻近窗+五组豁免，缺一不判。
+  const srg = _applyPedagogyRelaxation(detectSourceDerogation(_normText), "source_derogation", pedagogyRelaxation);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -3550,6 +3561,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 连贯化叙述框架腿×必然化断言腿）。同 r460 先例：dimMap 与 allDims
     // 两处都接，findings 可单独指名该族。nrf。
     {score: nrf.score, name:'narrative_fallacy'},
+    // [r465 接线] 第 290 维度 source_derogation 参与判定（信息源贬低族：
+    // 敌意归因 / 反应性贬低 / 虚幻真效应三族双腿判据）。同 r460 先例：
+    // dimMap 与 allDims 两处都接，findings 可单独指名该族。srg。
+    {score: srg.score, name:'source_derogation'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -4282,6 +4297,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误×连贯化叙述框架
     // 腿×必然化断言腿）。nrf。
     narrative_fallacy: nrf,
+    // [r465 接线] 第 290 维度 source_derogation（信息源贬低族×敌意归因
+    // 模糊行为腿×恶意结论腿 / 反应性贬低 源标记腿×贬低结论腿 / 虚幻真
+    // 效应 重复陈述腿×真值断言腿）。srg。
+    source_derogation: srg,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -6640,6 +6659,15 @@ function discriminate(text, evidence = [], contentMode) {
     // 而不是把叙述的流畅当成真理的代理。射程边界：只管「连贯化叙述
     // 框架×必然化断言」这一族，不管该结果本身的事实真伪。
     'narrative_fallacy',
+    // [r465 接线] 第 290 维度 source_derogation（信息源贬低族）登记。
+    // verify 级——单句也可能是正确转述他人观点、心理治疗记录、对被歧视
+    // 的正当申诉（「不能因为他反对就认为他的方案不好」正是本族要教的
+    // 判别动作）、法律程序复述、学术综述；rewrite/block 会误伤。verify
+    // 的含义是「这段文本拿信息源的身份/立场/重复次数替代内容本身做
+    // 评估，需要按 findings 的 guidance 把论据还原到内容层面再采信」。
+    // 射程边界：只管「源标记×结论断言」双腿共现这一族，不管该内容
+    // 本身的事实真伪、也不管人际关系本身的真实状态。
+    'source_derogation',
     // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸）登记。
     // verify 级——单句也可能是司法结果复述、绩效归责说明、事故通报与
     // 谬误教学（「诉诸恶意是一种常见的逻辑谬误」正是本族要教的判别
@@ -7211,6 +7239,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误）。
       // 同 r460 先例：九处一次接齐，漏一处 dimensions 读数缺键。nrf。
       narrative_fallacy: nrf,
+      // [r465 接线] 第 290 维度 source_derogation（信息源贬低族）补登记。
+      // 同 r460 先例：九处一次接齐，漏一处 dimensions 读数缺键。srg。
+      source_derogation: srg,
       // [r178] 第 176 维度 conjunction_fallacy（合取谬误）。
       conjunction_fallacy: cjf,
       // [r179] 第 177 维度 moralistic_fallacy（道德主义谬误）。
@@ -7911,6 +7942,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r463 接线] 第 289 维度 narrative_fallacy 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       nrf.count ? nrf.count + ' 处叙事谬误' : '',
+      // [r465 接线] 第 290 维度 source_derogation 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。srg。
+      srg.count ? srg.count + ' 处信息源贬低' : '',
       // [r178] 第 176 维度 conjunction_fallacy 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       cjf.count ? cjf.count + ' 处合取谬误' : '',

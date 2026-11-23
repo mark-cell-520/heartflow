@@ -1,3 +1,44 @@
+# r466 第 290 维度 source_derogation 腿族穿透修复（EN/ZH 双语全覆盖）+ r465  stranded WIP 固化（v6.8.229 保持）
+
+- **轮次**：r466 每日升级 cron（2026-11-24 06:12）
+- **VERSION**：6.8.229 → **6.8.229**（已有维度全新句式族 + stranded WIP 固化，无新增可计数维度，不 bump）
+- **类型**：真升级②（已有维度的全新句式族——不是给旧族加样本，是补齐「同族不同形态」的腿级穿透）
+- **背景**：r465 接线第 290 维度 `source_derogation`（敌意归因 hostile_attribution / 反应性贬低 reactive_devaluation / 虚幻真效应 illusory_truth，三族 × A/B 两腿 × ZH/EN 双语）后单测 84/0，但**变体矩阵实测 named=false 全 23 条**——即维度注册了、单测绿了，真实句子却零命中。按 161 轮教训（负例测试全绿 ≠ 矩阵实测过）逐腿诊断。
+- **诊断**（`scripts/round-466/probe-r466-legs.js` + `probe-r466-matrix.js`，均落盘）：
+  - `src/index.js:779` require / `:2673` dispatch 完好，`gate.js` 无 srg 引用（设计如此）→ **非接线问题，是腿族覆盖问题**。
+  - `detectSourceDerogation()` 对 ZH/EN 标准句直接返回 `{hit:false, score:0}` → 模块缺陷。
+  - 逐腿 A/B 探针：EN 三族 A 腿全零；ZH 多族单腿命中（A 腿有 B 腿无，或反之）。
+- **修复**（12 条新腿常量，全部带 `[r466]` 注释说明穿透点与缺口原因）：
+  | 腿 | 穿透点 | 缺口原因 |
+  |----|--------|---------|
+  | HA_AMBIG_EN | `raised/voiced/pushed/expressed + (an\|the\|that\|this) + objection\|question\|concern` + bare `raised it` | 存量只收否定形/情绪名词形，漏「中性程序行为动词 + 人格归因」 |
+  | HA_VERDICT_EN | `is jealous/envious/resentful of` + `wants to undermine/sabotage/discredit` | 存量只收沉默=心虚形，漏「动机人格归因」结论 |
+  | HA_AMBIG_ZH | `之所以…提出质疑/异议/反对/方案/建议` | 存量收「提出+异议词」，漏把程序动作包进动机从句的形 |
+  | HA_VERDICT_ZH | `看不得/见不得别人好`、`巴不得我们失败` | 存量收沉默/动机推断，漏口语化恶意投射句式 |
+  | RD_SOURCE_ZH | `因为被开除/淘汰/竞标失败/拒稿` | 存量只收身份名词（前女友/落选者），漏「被动受损事件」归因结构 |
+  | RD_DEROGATE_ZH | `到处说坏话/所谓内幕不过是抹黑` | 存量缺传播形态 + 抹黑定形 |
+  | RD_SOURCE_EN | `is against the policy/plan/decision` | 存量只收 loser/resigned/rejected，漏立场归因前提 |
+  | RD_DEROGATE_EN | `(a) sore/bad/bitter loser` | 存量只收 cannot be trusted，漏输不起人格标签 |
+  | IT_REPEAT_ZH | `反复/不停/逢人就 + 强调/灌输/宣传/洗脑` | 存量只收「说」族，漏最高频的「强调」 |
+  | IT_TRUTH_ZH | `听多了自然就成真`、`久而久之当成事实` | 存量连接副词与结论词之间不允许隔「就」等 |
+  | IT_REPEAT_EN | `repeated/echoed/parroted + (so) many/few times` + 倒装 `So often has it been said` | 存量 383 行族是 `repeated + so often|many times` 交替支，「so many times」隔 `so` 不匹配；漏倒装强调形 |
+  | IT_TRUTH_EN | `has become/became + true/fact/common knowledge`、`no longer just a rumour but a fact` | 存量只收 must be true / probably true，漏完成体结论 |
+- **验证**：
+  - 变体矩阵 `test/round-466-source-derogation-matrix.test.js`：**46/46**（13 攻击 gate 非 pass + detect 命中，10 良性 source_derogation 零误伤 + detect 零误报）。修复前 13/13 攻击全 pass、named=false 23/23。
+  - r465 单测：84/0
+  - 五门禁：verify 16/0、guard-abilities 20/20、doc-numbers 22/3（3 项全为 AGENTS.md 写保护阻塞，非本轮引入）、bidirectional-guard 52/52 召回 + 302/326 误拦（与 r463/r464 基线完全一致，零回归）
+- **同时固化的 stranded WIP**（四批，显式路径提交）：
+  1. r465 290th dimension：`src/source-derogation.js`（712 行）+ `src/index.js`（+34 行接线，9 个 srg 站点）+ `test/round-465-source-derogation.test.js`（84/0）
+  2. doc-sync：README.md ×7、SKILL.md ×6（含 Verify 层列举 246→247 + `source_derogation`）、package.json description 289→290
+  3. AUDIT-FIX batch：`src/mcp-server.js`、`test/mcp-guest-permission.test.js`、`test/run-all.js`、`scripts/auto-upgrade-hourly.js`、`.gitignore`
+  4. 本轮 r466：`src/source-derogation.js` 腿族补丁 + `test/round-466-source-derogation-matrix.test.js`
+- **已知边界 / 下次可继续**：
+  - AGENTS.md 仍写 289 dimensions / 246 verify（行 15/113），写保护阻塞，需交互授权或非保护通路——doc-numbers 卡在 22/3 的唯一原因。
+  - `src/index.js` 19159 行（阈值 14000 警告），拆分为高危重构议题。
+  - 矩阵 2 条攻击由其他维度承重（EN-IT-倒装 由 appeal_to_probability、EN-RD 由 fallacy_of_relevance/mediator_confusion）——非本族漏判，但说明 source_derogation 与既有维度射程仍有重叠，可在后续轮次细化分工写入 guidance。
+  - 并发写信号：`src/source-derogation.js` mtime 2026-11-24 04:30 早于本轮可见段，文件含 `[r466]` 修复痕迹——提交前已重新核对全部 diff 归属。
+- **外部搜索**：本轮为 stranded WIP 固化 + 已接线维度的真实缺口修复（矩阵实证 0/23），未走论文/GitHub 搜索路径（阶段2b 内部路径）。
+
 # r464 审计修复 — 本地独有 AUDIT-FIX 2026-11-23 三件套固化 + 文档口径 24→25 项补齐 + 门禁全绿（v6.8.229 保持）
 
 - **轮次**：r464 每日审计·修复 cron（2026-11-23 23:31）

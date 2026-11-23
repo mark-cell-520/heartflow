@@ -1,7 +1,7 @@
 {
   "name": "@yun520-1/heartflow",
   "version": "6.8.229",
-  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 289 discrimination dimensions, 11-layer pipeline, 169 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 198 MCP tools, 1,390 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
+  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 290 discrimination dimensions, 11-layer pipeline, 169 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 198 MCP tools, 1,390 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
   "main": "src/gate.js",
   "bin": {
     "heartflow": "src/mcp-server.js"
@@ -15,7 +15,8 @@
     "test:unit": "node test/core/path-guard.test.js && node test/code-verifier.test.js",
     "test:full": "HF_RUN_ALL_JOBS=1 node test/run-all.js",
     "verify": "node bin/verify.js",
-    "check": "node -e \"require('fs').readdirSync('src',{recursive:true}).filter(f=>f.endsWith('.js')).forEach(f=>require('child_process').execSync('node --check src/'+f,{stdio:'inherit'}))\""
+    "check": "node -e \"require('fs').readdirSync('src',{recursive:true}).filter(f=>f.endsWith('.js')).forEach(f=>require('child_process').execSync('node --check src/'+f,{stdio:'inherit'}))\"",
+    "backup": "bash /root/ops-runbook/scripts/heartflow-backup.sh"
   },
   "files": [
     "VERSION",
