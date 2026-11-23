@@ -231,11 +231,26 @@ try {
 // 现在：明确要求 HEARTFLOW_MCP_TOKEN / MCP_HEARTFLOW_API_KEY / MCP_HEARTFLOW_KEY 之一。
 const AUTH_TOKEN = process.env.HEARTFLOW_MCP_TOKEN || process.env.MCP_HEARTFLOW_API_KEY || process.env.MCP_HEARTFLOW_KEY || null;
 
+// [AUDIT-FIX 2026-11-24 位置修正] 原来这里直接 process.exit(1)，写在模块顶层。
+//   后果：本文件被 require 时（mcp-smoke / round-572-associative-handler /
+//   run-all-no-silent-skill 等一批测试，以及任何将来把它当库用的代码）宿主进程
+//   直接被杀掉，报错只有三行 stderr，看不出是被谁拖死的。而这与 L6854 启动守卫
+//   的既定设计相反——那里注释写明「被 require 时仅导出，供测试显式调用 start()」。
+//
+//   现在分两种情形，安全强度不减：
+//     · 作为入口直接执行：仍拒绝启动（检查移入 L6854 的 require.main 守卫内）。
+//     · 被 require 当库用：不杀进程，AUTH_TOKEN 保持 null；此时 L6368 的
+//       `AUTH_ENABLED && !safeCompare(token, AUTH_TOKEN)` 经 L381
+//       `if (!AUTH_TOKEN) return false` 恒为真，即所有请求一律走鉴权拒绝分支。
+//       fail-closed，不存在「无 token 反而放行」的窗口。
 if (!AUTH_TOKEN) {
   console.error('[MCP] SECURITY: no auth token configured.');
   console.error('[MCP] Set one of: HEARTFLOW_MCP_TOKEN / MCP_HEARTFLOW_API_KEY / MCP_HEARTFLOW_KEY');
-  console.error('[MCP] Refusing to start without authentication token (aligned with mcp-server-http.js).');
-  process.exit(1);
+  if (require.main === module) {
+    console.error('[MCP] Refusing to start without authentication token (aligned with mcp-server-http.js).');
+    process.exit(1);
+  }
+  console.error('[MCP] 作为库被 require：不退出进程，但鉴权层将拒绝所有请求（fail-closed）。');
 }
 
 const AUTH_ENABLED = true;

@@ -21,6 +21,7 @@
  */
 const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
+const crypto = require('crypto');
 const assert = require('assert');
 const net = require('net');
 const os = require('os');
@@ -117,7 +118,11 @@ function extractPayload(res) {
 
 try { fs.unlinkSync(SOCK); } catch (_) {}
 const mcpProc = spawn('node', [path.join(SRC, 'mcp-server.js'), '--socket', SOCK], {
-  cwd: ROOT, stdio: ['ignore', 'ignore', 'ignore'],
+  cwd: ROOT, // [全局修复 2026-11-23 适配] mcp-server.js 自该轮起拒绝无鉴权启动
+    //   （"Refusing to start without authentication token"，与 mcp-server-http.js 对齐）。
+    //   自生成随机 token 注入子进程，避免复用线上凭据、也不落盘。
+    env: { ...process.env, MCP_HEARTFLOW_KEY: 'test-' + crypto.randomBytes(24).toString('hex') },
+    stdio: ['ignore', 'ignore', 'ignore'],
 });
 
 // 命中七条指令判据的样本。注意口径：audit() 按 applyTo 过滤场景——

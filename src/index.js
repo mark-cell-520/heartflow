@@ -18734,6 +18734,14 @@ module.exports = {
   checkIncoherentCoverage,
   checkToolDeflection,
   checkPaternalisticDecide,
+  // [r467] 第 82 维度 loyalty_by_omission（立场连坐）外部接口补漏。
+  // 该维度自 r554 起已在 discriminate() L2181 dispatch 并进入 findings，
+  // 但漏导出 check* 函数，导致 MCP heartflow_check_single(
+  // dimension='loyalty_by_omission') 一直返回「维度不存在」（handler 按
+  // dimension 名转驼峰查 hf['checkX']，available 218 项中无此项）。
+  // 同区块相邻的 checkToolDeflection / checkPaternalisticDecide 均已导出，
+  // 属单点遗漏而非有意不导出。守卫测试见 test/round-555-loyalty-by-omission.test.js。
+  checkLoyaltyByOmission,
   checkAnecdoteAsProof,
   checkCrisisExceptionalism,
   checkFavorLedger,
@@ -19155,4 +19163,88 @@ module.exports = {
   tomEngine:        require('./consciousness/tom-engine.js'),
   debateEngine:     require('./consciousness/debate-engine.js'),
   evolutionarySearch: require('./planner/evolutionary-search.js'),
+
+  // ─── [r468] 导出缺口补齐：discriminate() 已 dispatch 但 module.exports 漏登记 ───
+  // 背景：MCP heartflow_check_single(dimension=...) 按 dimension 名转驼峰查
+  //   hf['checkXxx']（src/mcp-server.js handleCheckSingle），查不到就返回
+  //   「维度不存在」并把 available 列表一起吐回去。r467 修第 82 维度
+  //   loyalty_by_omission 时，系统性审计（scripts/round-467/probe-r467-export-audit.js）
+  //   发现 discriminate() 调用 251 个 check* 函数、module.exports 仅登记 219 个，
+  //   52 个维度因此在单点调用面完全不可达——管线内正常判定，外部只能吃
+  //   「维度不存在」。
+  // 判据：静态核对（src/index.js 去掉注释后 discriminate() 函数体内的 check* 调用）
+  //   × 逐一回查源模块确有该导出。checkOutput 是 src/gate.js 的顶层入口而非维度，
+  //   有意不导出，见 test/round-468-check-export-coverage.test.js 白名单。
+  // 本块只增加 exports key，不改任何既有 key 与判别逻辑。
+  checkAdNauseam,
+  checkAffirmingDisjunct,
+  checkAgencyDeflection,
+  checkAggregationOverreach,
+  checkAppealToIgnorance,
+  checkAppealToSpite,
+  checkAppealToTradition,
+  checkAppealToWealth,
+  checkArgumentToModeration,
+  checkAttributionVacuum,
+  checkBaselineOmission,
+  checkChoiceArchitectureManipulation,
+  checkClaimedVerificationWithoutTrail,
+  checkCoerciveAffection,
+  checkComplexityShield,
+  checkConcessionCoercion,
+  checkCumHoc,
+  checkDoseResponseLinearity,
+  checkEconReasoningGate,
+  checkEvidenceClaimMismatch,
+  checkExistentialFallacy,
+  checkFallacyOfRelevance,
+  checkFalseDilemma,
+  checkFalseMemoryTransplant,
+  checkFalsePrecision,
+  checkGoalDrift,
+  checkHomogeneityAssumption,
+  checkInterventionEffectWithoutBaseline,
+  checkLeadTimeBias,
+  checkManufacturedConsent,
+  checkMaskedManFallacy,
+  checkMeanAsTypical,
+  checkMostTransitivity,
+  checkMotivatedReasoning,
+  checkMotteAndBailey,
+  checkMultiTurnEscalation: require('./multi-turn-tactics.js').checkMultiTurnEscalation,
+  checkNegativeExistentialImport,
+  checkOpinionEntitlement,
+  checkPackageDeal,
+  checkPercentBasisShift,
+  checkPerfectError,
+  checkPrePostAttribution,
+  checkProbabilityNeglect,
+  checkProtopathicBias,
+  checkPzombieBoundary,
+  checkQuantifierScopeShift,
+  checkRedHerring,
+  checkRegressionToMean,
+  checkStatisticalMisleading,
+  checkTuringRoute,
+  checkUndistributedMiddle,
+  checkVividCaseAvailability,
+
+  // [r468 补录] 上一批 52 项之外的又 6 项——静态调用扫描的第二个盲区。
+  //   盲区①「作为值传递」：`_dual(_mt.checkPhishingCoercion)` 这类把函数当参数
+  //     交给包装器的形态，正则 `\b(check[A-Z]\w*)\s*\(` 抓不到（后面不是括号），
+  //     checkRewardHacking 就是这么漏的。
+  //   盲区②「绑定名与导出名不一致」：checkWeakEvidenceStrongClaim 顶层绑定成了
+  //     _checkWeakEvidenceStrongClaim，导出用的也是带下划线的名字，handler 按
+  //     checkWeakEvidenceStrongClaim 自然查不到。
+  //   判据：六个维度的 score 均进入 dimensions/summary 汇总（src/index.js
+  //   L3866-3870 与 L3790），是正式维度而非内部辅助。
+  //   对照：checkDespacedInjection / checkInjectionSynonyms 是 prompt_injection
+  //   判别的内部腿（不产生独立 dimension），有意不导出。
+  checkPhishingCoercion: require('./manipulation-tactics.js').checkPhishingCoercion,
+  checkInducedTrust: require('./manipulation-tactics.js').checkInducedTrust,
+  checkCoverupInduction: require('./manipulation-tactics.js').checkCoverupInduction,
+  checkDangerousInstruction: require('./dangerous-instruction.js').checkDangerousInstruction,
+  checkRewardHacking,
+  checkWeakEvidenceStrongClaim: _checkWeakEvidenceStrongClaim,
+
 };

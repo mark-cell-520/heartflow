@@ -7,6 +7,7 @@
 'use strict';
 
 const net = require('net');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawn } = require('child_process');
@@ -43,7 +44,11 @@ async function startServer(sock) {
   const isWin = process.platform === 'win32';
   if (!isWin && fs.existsSync(sock)) fs.unlinkSync(sock);
   const proc = spawn(process.execPath, [SERVER, '--socket', sock], {
-    cwd: ROOT, stdio: ['ignore', 'ignore', 'ignore'],
+    cwd: ROOT, // [全局修复 2026-11-23 适配] mcp-server.js 自该轮起拒绝无鉴权启动
+    //   （"Refusing to start without authentication token"，与 mcp-server-http.js 对齐）。
+    //   自生成随机 token 注入子进程，避免复用线上凭据、也不落盘。
+    env: { ...process.env, MCP_HEARTFLOW_KEY: 'test-' + crypto.randomBytes(24).toString('hex') },
+    stdio: ['ignore', 'ignore', 'ignore'],
   });
   for (let i = 0; i < 80; i++) {
     await sleep(500);

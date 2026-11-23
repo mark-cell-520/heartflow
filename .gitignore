@@ -203,4 +203,9 @@ tests/
 # 保留磁盘备查，只是不再进 git —— 需要时 git add -f 可强制入库。
 coordination/agent4/scout/*.xml
 coordination/agent4/scout/*.json
+# [r468] 上一版只匹配了 scout 顶层；agent4 后来又按轮次建了子目录
+# （r399-logic / r399-stat 等），同样是 arXiv/S2/GitHub 的原始一次性响应，
+# 一并忽略。仅收 *.xml/*.json，子目录里的 .txt 词表仍可见（有注释引用）。
+coordination/agent4/scout/*/*.xml
+coordination/agent4/scout/*/*.json
 coordination/agent4/probes/*.txt
