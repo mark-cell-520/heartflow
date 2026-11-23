@@ -70,6 +70,8 @@ data/meaningful-memory.json
 data/memories/ # 显式排除记忆金库
 data/memories/**
 data/memory-bank.json
+data/memory-bank.json.*.bak
+data/memory-bank.json.undecryptable.*.bak
 data/memory-index.json
 data/narrative-self.json
 data/self-benchmark.json
