@@ -286,6 +286,61 @@ const WRITE_TOOLS = new Set([
 
 
 
+// [AUDIT-FIX 2026-11-23] guest 敏感**读**收口（GUEST_DENY_TOOLS）。
+//
+// 背景：WRITE_TOOLS 收口的是"写"，guest 档名义上是"匿名只读"，但此前**读**侧
+// 完全没有收口——实测无 Authorization 头调 heartflow_memory_search 即可拿到
+// data/memories/core.json 的正文。本地 HTTP 服务 + 匿名可读 = 任意本机进程
+// （以及能打到 127.0.0.1 的恶意网页，见下方 Origin/Host 校验）都能拖走记忆库。
+//
+// 筛选标准（两条同时满足才收入）：
+//   1. 读出的内容是**用户私密记忆 / 决策日志 / 经验沉淀**，而不是调用方刚传进来的文本；
+//   2. 该工具本身是读语义（写类工具已由 WRITE_TOOLS 收口，不重复收）。
+//
+// 刻意**不收**的（避免误伤，理由见报告）：
+//   · heartflow_memory_index_read —— round-298-memory-index-wiring.test.js 与
+//     mcp-guest-permission.test.js 都固化了"guest 可读该工具"，且它读的是
+//     记忆索引元数据而非记忆正文。要收需先改那两个测试。
+//   · heartflow_multi_agent_dialogue / heartflow_debate / heartflow_user_to_llm /
+//     heartflow_llm_to_user —— 只处理调用方当次传入的文本，不读沉淀库。
+//   · heartflow_forgetting —— 只返回遗忘引擎的聚合计数（getStats），无正文。
+//   · heartflow_memory_quality —— 只给调用方传进来的字符串打分，不碰记忆库。
+//
+// 与 WRITE_TOOLS 的关系：互不重叠、互不影响。WRITE_TOOLS 集合内容保持原样未改。
+const GUEST_DENY_TOOLS = new Set([
+  // ── 记忆库正文读取 ──
+  // 直接检索 core/learned/ephemeral 三层记忆正文（审计实测的泄露点）
+  'heartflow_memory_search',
+  // memory.consolidate：巩固过程要读入大量记忆条目并返回巩固结果
+  'heartflow_memory_consolidate',
+  // Reflector.run()：读 data 目录产出反思报告，语料即历史记忆/经验
+  'heartflow_reflect',
+  // lessonRetrieval.retrieve：返回 lesson 的 content/context/trigger/guidance，
+  // 即从历史交互沉淀的私密经验条目
+  'heartflow_lesson_search',
+  // WhatLearned.brief：汇总"学到过什么"，来源同样是记忆与经验沉淀
+  'heartflow_what_learned',
+  // ExperienceReplay.getStats：经验回放缓冲的统计与行为数据
+  'heartflow_experience_replay',
+  // ── 用户画像 / 偏好档案 ──
+  // UserModel.getModel：返回用户身份与偏好画像
+  'heartflow_user_model',
+  // PreferenceGuard.shouldApply：读用户偏好库做判定
+  'heartflow_preference_guard',
+  // ── 梦境引擎（语料来自记忆库） ──
+  // handleDream：new DreamEngine(heartflow.memory) 后 dream(theme)
+  'heartflow_dream',
+  // DreamEngineV2.generate：以记忆为语料的梦境合成
+  'heartflow_dream_v2',
+  // InteractiveDream：action=summarize 走 summarizeMemory() 直接汇总记忆库
+  'heartflow_interactive_dream',
+  // ── 决策日志 ──
+  // handleDecisionHistory：返回 _decisionHistory 全文 + 成功率/自动决策开关
+  'heartflow_decision_history',
+]);
+
+
+
 // ─── 时间安全的 token 比较（防止 timing attack）───
 
 function safeCompare(provided, expected) {
@@ -329,7 +384,27 @@ async function getOrCreateInstance(sessionId) {
   if (cached) return cached;
   if (_sessionInstances.size >= _SESSION_INSTANCE_CAP) {
     const oldest = _sessionInstances.keys().next().value;
+    const stale = _sessionInstances.get(oldest);
     _sessionInstances.delete(oldest);
+    // [AUDIT-FIX 2026-11-23] 逐出必须真的停实例：原实现只删 Map 引用，被逐出的
+    // HeartFlow 实例（consolidate 定时器、记忆保存队列、后台 worker）仍在跑，
+    // 每建联 17 个会话就漏一个，长跑下定时器与内存单向增长——这就是资源泄漏。
+    // 缓存里的值只可能是下方 `new HeartFlow(...)` 的实例，该类提供 stop()
+    // （内部转 shutdown()，见 src/core/heartflow.js:6088）；仍按
+    // stop → shutdown → close → dispose 顺序探测，取第一个可调的。
+    // 整体 try/catch：停止失败只记日志，绝不能阻断建联主流程。
+    if (stale) {
+      for (const m of ['stop', 'shutdown', 'close', 'dispose']) {
+        if (typeof stale[m] === 'function') {
+          try {
+            stale[m]();
+          } catch (e) {
+            console.error(`[HeartFlow MCP] 逐出会话实例停止失败(${m}):`, e && e.message);
+          }
+          break;
+        }
+      }
+    }
   }
   const { HeartFlow } = require(HEARTFLOW_PATH);
   const inst = new HeartFlow({ rootPath: HF_DIR, sessionId });
@@ -5938,6 +6013,15 @@ async function handleRequest(request, sessionId, httpHeaders, forcedRole) {
         }) }], isError: true };
       }
 
+      // [AUDIT-FIX 2026-11-23] guest 敏感读收口：错误结构与上面的 needsWrite
+      // 分支完全一致（{error} + isError:true），文案说明"需要认证"而非"不可写"。
+      const needsAuthRead = GUEST_DENY_TOOLS.has(name);
+      if (needsAuthRead && role === 'guest') {
+        return { content: [{ type: 'text', text: JSON.stringify({
+          error: '权限不足：该工具返回用户私密记忆/决策日志/经验沉淀，guest 角色不可读，请携带 Bearer token 认证后调用'
+        }) }], isError: true };
+      }
+
       const handler = HANDLERS[name];
 
       if (!handler) throw { code: -32601, message: `Method not found: ${name}` };
@@ -5987,16 +6071,21 @@ async function handleRequest(request, sessionId, httpHeaders, forcedRole) {
       let result;
 
       // 兼容两种签名：handler(args) 和 handler(args, sessionId)
-
-      try {
-
-        result = handler(args, sessionId);
-
-      } catch (_) {
-
-        result = handler(args);
-
-      }
+      //
+      // [AUDIT-FIX 2026-11-23] 原实现用 try/catch 做签名探测：先传两个参数，
+      // 抛错就退化成传一个。问题不在"探测失败"，而在**副作用会执行两次** ——
+      // handler 签名确实是 (args) 时传第二个参数无害，可一旦 handler 内部抛错
+      // （写盘失败、下游模块 throw），catch 会把整个 handler 再跑一遍，落盘/
+      // 出网/计数器全部双算。改成按**函数声明的形参个数**判断，只调一次。
+      //
+      // 可靠性核对（2026-11-23 实测）：
+      //   · HANDLERS 全部 198 个值只有两种形态——命名函数引用（如 handleGate）
+      //     与内联箭头/async 箭头，无 rest 形参（对象字面量里的 `...` 全是展开
+      //     运算符，不在形参位）、无 .bind()、无 Proxy，故 `.length` 可信。
+      //   · 形参个数为 0/1 的 handler 传第二个参数本就被 JS 忽略，改后行为不变；
+      //     形参个数 >= 2 的 handler 原本也能收到 sessionId，同样不变。
+      //   · async handler 的 await 语义由下一行原样保留，未改动。
+      result = handler.length >= 2 ? handler(args, sessionId) : handler(args);
 
       if (result && typeof result.then === 'function') result = await result;
 
@@ -6091,12 +6180,144 @@ function sendEvent(client, event, data) {
 
 
 
+// ═══════════════════════════════════════════════
+// [AUDIT-FIX 2026-11-23] Origin / Host 白名单（DNS rebinding 防线）
+//
+// 背景：本服务是只绑 127.0.0.1 的本地 HTTP 服务，但此前**完全不检查** Origin
+// 与 Host 头。两条攻击路径：
+//   1. 恶意网页直接 fetch('http://localhost:8588/mcp')，浏览器自动带
+//      Origin: https://evil.com —— 此前原样放行，以 guest 身份读记忆库。
+//   2. DNS rebinding：攻击者域名先解析到自己的服务器拿到响应，再把同域名
+//      绑到 127.0.0.1，浏览器后续请求就打到本服务，Host 头是 evil.com。
+//
+// 两道校验：
+//   · Origin（浏览器必然携带）：非本地来源直接 403。**无 Origin 头豁免** ——
+//     curl / MCP SDK / Hermes 等非浏览器客户端不发这个头。
+//   · Host：只接受 localhost / 127.0.0.1 / [::1] / 0.0.0.0（可带端口）。
+//     这是 DNS rebinding 的第二道防线：域名绑过来也过不了 Host 校验。
+//
+// 配置：HEARTFLOW_ALLOWED_ORIGINS / HEARTFLOW_ALLOWED_HOSTS，逗号分隔。
+//   例：HEARTFLOW_ALLOWED_ORIGINS=https://nascab.local
+//       HEARTFLOW_ALLOWED_HOSTS=nascab.local
+//   环境变量里显式写的 origin，其 hostname 一并纳入 Host 白名单（配了即信任）。
+//
+// 作用范围：仅 HTTP 通道（本 createServer 回调内）。Unix socket 通道
+// （handleUnixClient → handleRequest）没有 HTTP Origin/Host 语义，天然豁免，
+// 不在此处校验，不会被误伤。
+// ═══════════════════════════════════════════════
+
+// 本地回环主机名集合（Host 头与 Origin 的 hostname 共用）。
+// 注意 WHATWG URL 对 IPv6 字面量返回带方括号的 hostname（'[::1]'），故两种写法都收。
+const HF_LOCAL_HOSTS = new Set([
+  'localhost', '127.0.0.1', '[::1]', '::1', '0.0.0.0', '::',
+]);
+
+// 环境变量显式追加的完整 origin（精确匹配，如 https://nascab.local）
+const HF_EXTRA_ORIGINS = new Set(
+  String(process.env.HEARTFLOW_ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+);
+
+// 环境变量显式追加的 Host 主机名
+const HF_EXTRA_HOSTS = new Set(
+  String(process.env.HEARTFLOW_ALLOWED_HOSTS || '')
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean)
+);
+
+for (const o of HF_EXTRA_ORIGINS) {
+  try {
+    HF_LOCAL_HOSTS.add(new URL(o).hostname.toLowerCase());
+  } catch (_) { /* 非法配置值忽略：不能让坏配置把服务搞崩 */ }
+}
+for (const h of HF_EXTRA_HOSTS) HF_LOCAL_HOSTS.add(h);
+
+/**
+ * 校验 Origin 头。
+ * @returns {string|null} null = 放行；否则为 403 body 用的原因
+ *          （只回显 hostname，不回显完整 Origin，避免日志注入）
+ */
+function checkHeartflowOrigin(originHeader) {
+  const raw = String(originHeader == null ? '' : originHeader).trim();
+  if (!raw) return null;                        // 非浏览器客户端：无 Origin
+  if (HF_EXTRA_ORIGINS.has(raw)) return null;   // 显式配置的完整 origin
+  let u;
+  try {
+    u = new URL(raw);
+  } catch (_) {
+    return 'Origin 头不是合法 URL';
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+    return 'Origin 协议不被允许';
+  }
+  const host = u.hostname.toLowerCase();
+  if (HF_LOCAL_HOSTS.has(host)) return null;
+  return 'Origin ' + host + ' 不在本地来源白名单内';
+}
+
+/** 从 Host 头里取主机名部分（剥掉端口），IPv6 字面量保留方括号 */
+function heartflowHostName(hostHeader) {
+  const h = String(hostHeader == null ? '' : hostHeader).trim();
+  if (!h) return '';
+  if (h.charAt(0) === '[') {                    // [::1]:8588
+    const end = h.indexOf(']');
+    return (end > 0 ? h.slice(0, end + 1) : h).toLowerCase();
+  }
+  const i = h.lastIndexOf(':');
+  // 只在「冒号后全是数字」时才当端口剥掉，避免把异常值切坏
+  if (i > 0 && /^\d+$/.test(h.slice(i + 1))) return h.slice(0, i).toLowerCase();
+  return h.toLowerCase();
+}
+
+/**
+ * 校验 Host 头（DNS rebinding 第二道防线）。
+ * @returns {string|null} null = 放行；否则为 403 body 用的原因（只回显主机名）
+ */
+function checkHeartflowHost(hostHeader) {
+  const name = heartflowHostName(hostHeader);
+  if (!name) return '缺少 Host 头';
+  if (HF_LOCAL_HOSTS.has(name)) return null;
+  return 'Host ' + name + ' 不是本地回环地址';
+}
+
+/** 统一的 403 拒绝响应：JSON body，不回显完整 Origin/Host 原值 */
+function rejectHeartflowRequest(res, reason) {
+  res.writeHead(403, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Forbidden', message: reason }));
+}
+
+
+
 const server = http.createServer((req, res) => {
 
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
   const pathname = url.pathname;
 
+
+
+  // ─── [AUDIT-FIX 2026-11-23] Origin / Host 校验（防 DNS rebinding 与跨站读取）───
+  // 必须在鉴权之前：先确认"这个请求真的是冲本机来的"，再谈它是什么身份。
+  // 两个头都校验，任一不过即 403。
+  //   · Origin：仅拦"带了 Origin 且非本地来源"的请求。无 Origin 的 curl /
+  //     MCP SDK / Hermes unix socket 通道天然通过。
+  //   · Host：一律校验（含 /health）。这是 DNS rebinding 的第二道防线。
+  // Unix socket 通道不走本回调，无 Origin/Host 语义，不受影响。
+  const _originReason = checkHeartflowOrigin(req.headers.origin);
+  if (_originReason) {
+    console.error(`[HeartFlow MCP] 拒绝非本地 Origin 请求 path=${pathname}`);
+    rejectHeartflowRequest(res, _originReason);
+    return;
+  }
+  const _hostReason = checkHeartflowHost(req.headers.host);
+  if (_hostReason) {
+    console.error(`[HeartFlow MCP] 拒绝非本地 Host 请求 path=${pathname}`);
+    rejectHeartflowRequest(res, _hostReason);
+    return;
+  }
 
 
   // ─── 安全认证检查 (SkillSpector fix: 强制认证，仅接受 Authorization header) ───
