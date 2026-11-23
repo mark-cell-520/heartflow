@@ -227,6 +227,11 @@ const AUTH_ENABLED = true;
 // 静态判据会误判（如 self_benchmark 模块别处有 writeFileSync 但 handler
 // 只调 assess()），故此处为人工核对后的保守集合——宁可多拦，不可漏放。
 const WRITE_TOOLS = new Set([
+  // [r457] 置信度反馈写入：recordFeedback/updateFromFeedback/recalibrate
+  // 会改常驻校准器 weights/thresholds/records 并落盘
+  // data/confidence-calibration.json，收口到 user 角色。
+  // 对应读工具 heartflow_confidence_calibrate 不在此集合（纯读判别）。
+  'heartflow_confidence_feedback',
   // 记忆写/删/压缩/巩固
   'heartflow_memory_write_control',
   'heartflow_memory_eraser',
@@ -5020,12 +5025,79 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [r457 接线] heartflow_confidence_calibrate 重写：旧实现每次调用
+  //   `new ConfidenceCalibrator({silent:true})` 一次性实例 → memoryPath=null →
+  //   _load/_save 空转、records 恒空、recalibrate 无历史可依——assess 之外的
+  //   11 个方法（recordFeedback/updateFromFeedback/generateDistribution/
+  //   getCalibrationError/getThresholdStability/recalibrate/五维评分）零消费方。
+  //   现改为 safeDispatch 走常驻实例（heartflow.js:2101，r457 已补 memoryPath），
+  //   以 action 参数暴露判别能力（只读）；状态变更操作独立为
+  //   heartflow_confidence_feedback 工具并进 WRITE_TOOLS 权限收口。
   heartflow_confidence_calibrate: (args) => {
+    const { action = 'assess', text, record } = args || {};
+    const R = 'confidence.';
     try {
-      const { ConfidenceCalibrator } = require('./core/confidence-calibrator.js');
-      const cc = new ConfidenceCalibrator({ silent: true });
-      const r = cc.assess ? cc.assess(args?.text || '') : {};
-      return { confidence: r, timestamp: Date.now() };
+      switch (action) {
+        case 'assess':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数（待校准置信度的文本）' };
+          return safeDispatch(R + 'assess', text);
+        case 'calibrate':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'calibrate', text);
+        case 'distribution':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'generateDistribution', text);
+        case 'calibrationError':
+          return safeDispatch(R + 'getCalibrationError');
+        case 'thresholdStability':
+          return safeDispatch(R + 'getThresholdStability');
+        case 'scoreEvidenceCoverage':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'scoreEvidenceCoverage', text);
+        case 'scoreConsistency':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'scoreConsistency', text);
+        case 'scoreSpecificity':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'scoreSpecificity', text);
+        case 'scoreSourceReliability':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'scoreSourceReliability', text);
+        case 'scoreComplexityFit':
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数' };
+          return safeDispatch(R + 'scoreComplexityFit', text);
+        case 'stats':
+          return safeDispatch(R + 'stats');
+        default:
+          return { error: `未知 action: ${action}（只读判别: assess/calibrate/distribution/calibrationError/thresholdStability/scoreEvidenceCoverage/scoreConsistency/scoreSpecificity/scoreSourceReliability/scoreComplexityFit/stats；状态变更请用 heartflow_confidence_feedback）` };
+      }
+    } catch (e) { return { error: e.message }; }
+  },
+
+  // [r457 接线] 置信度反馈写入工具（WRITE_TOOLS 收口）：把 ConfidenceCalibrator
+  // 的持续校准闭环暴露给外部——recordFeedback(text, wasCorrect) /
+  // updateFromFeedback(wasCorrect, context) / recalibrate() 三个状态变更方法此前
+  // 零 dispatch（常驻实例 memoryPath=null 使 _save/_load 空转，闭环从未闭合）。
+  // 权限模型按工具名收口（见 tools/call 内 needsWrite），故写操作必须独立成工具名。
+  heartflow_confidence_feedback: (args) => {
+    const { action = 'record', text, wasCorrect, context } = args || {};
+    const R = 'confidence.';
+    try {
+      switch (action) {
+        case 'record': {  // recordFeedback(text, wasCorrect)
+          if (typeof text !== 'string' || !text) return { error: 'text 是必填参数（被校准的原文本）' };
+          if (typeof wasCorrect !== 'boolean') return { error: 'wasCorrect 是必填参数（布尔：该次判定是否正确）' };
+          return safeDispatch(R + 'recordFeedback', text, wasCorrect);
+        }
+        case 'update': {  // updateFromFeedback(wasCorrect, context)
+          if (typeof wasCorrect !== 'boolean') return { error: 'wasCorrect 是必填参数（布尔：该次判定是否正确）' };
+          return safeDispatch(R + 'updateFromFeedback', wasCorrect, context || {});
+        }
+        case 'recalibrate':
+          return safeDispatch(R + 'recalibrate');
+        default:
+          return { error: `未知 action: ${action}（可用: record/update/recalibrate）` };
+      }
     } catch (e) { return { error: e.message }; }
   },
 

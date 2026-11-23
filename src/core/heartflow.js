@@ -204,7 +204,16 @@ function _looksLikeMacroQuery(text) {
 
 // ─── [DeepSeek V4.1 alignment] Sparse module activation tiers ──────
 const MODULE_TIERS = {
-  tier1: new Set(['gate', 'discriminate', 'auto-rules', 'psychology', 'truth', 'translator']),
+  // [r459 修复] philosophyToDecision / agentPhilosophy / agentPsychology
+  // 从 tier1 缺席补齐：心虫裁决门禁（philosophy_decision MCP 工具）走
+  // safeDispatch → dispatch('philosophyToDecision.decide')，而 dispatch 在
+  // _sparseMode 下按 MODULE_TIERS 过滤激活集。这三个模块原本不在任何 tier，
+  // 导致 sparse 模式一旦开启（MCP handleThinkFast line 1092 固定传
+  // effort:20 → low 模式）就永久不可达，裁决恒返回
+  // {skipped:true, reason:'module_not_active'}——门禁静默失效。
+  // 它们是心虫「判断是非」的核心件，任何 effort 档位都必须可达。
+  tier1: new Set(['gate', 'discriminate', 'auto-rules', 'psychology', 'truth', 'translator',
+                  'philosophyToDecision', 'agentPhilosophy', 'agentPsychology']),
   tier2: new Set(['dao-decision', 'uncertainty', 'priority-guardian', 'progress-judgment', 'pipeline', 'feedback']),
   tier3: new Set(['adversarial-synthesis', 'meta-calibration', 'blindspot', 'worldtree', 'knowledgeExplorer']),
   tier4: new Set(['decisionRouter', 'decisionExecutor', 'decisionFeedback', 'selfDiagnosis', 'hypothesisDriver']),
@@ -792,7 +801,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-23-6.8.227';
+const BUILD_DATE = '2026-11-23-6.8.228';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -2098,7 +2107,11 @@ class HeartFlow {
 
     try { this.counterfactual = new (_CounterfactualEngine().CounterfactualEngine)(); } catch (e) { _boundedPush(this._initErrors, {module: 'counterfactual', error: e.message}, MAX_HISTORY_SIZE); }
 
-    try { this.confidence = new (_ConfidenceCalibrator().ConfidenceCalibrator)(); } catch (e) { _boundedPush(this._initErrors, {module: 'confidence', error: e.message}, MAX_HISTORY_SIZE); }
+    // [r457 接线] ConfidenceCalibrator 常驻实例补 memoryPath：此前无参构造 →
+    // this.memoryPath=null → _load()/_save() 全空转，recordFeedback→recalibrate
+    // →_save→_load 的持续校准闭环从未闭合（12 个方法零 dispatch 的根因之一）。
+    // memoryPath 指向 data/confidence-calibration.json（运行态数据，不入库）。
+    try { this.confidence = new (_ConfidenceCalibrator().ConfidenceCalibrator)({ memoryPath: path.join(this.rootPath || process.cwd(), 'data', 'confidence-calibration.json') }); } catch (e) { _boundedPush(this._initErrors, {module: 'confidence', error: e.message}, MAX_HISTORY_SIZE); }
 
     try { this.restraint = new (_SpontaneousRestraint().SpontaneousRestraint)(); } catch (e) { _boundedPush(this._initErrors, {module: 'restraint', error: e.message}, MAX_HISTORY_SIZE); }
 
@@ -5847,6 +5860,18 @@ class HeartFlow {
 
   result._reasoningEffort = effort;
   result._reasoningEffortMode = effortMode;
+
+  // [r459 修复] sparse 粘滞状态复位：_sparseMode/_activeModules 是实例级
+  // 状态，此前一旦某次 think() 显式传 effort 就置位，直到下一次不带
+  // effort 的 think() 才清除。MCP 服务是长驻进程，handleThinkFast
+  // （line 1092）固定传 effort:20 → low 模式置位后长期驻留，期间任何
+  // dispatch（含 philosophyToDecision.decide 裁决门禁）都被 tier 过滤
+  // 挡在激活集外，恒返回 module_not_active——「已加载但 dispatch 不到」。
+  // 修复：think() 返回前把 sparse 门控复位为关闭态，让 effort 只作用于
+  // 本次推理深度，不跨调用污染后续 dispatch 可达性。
+  this._sparseMode = false;
+  this._activeModules = null;
+  this._sparseEffort = null;
 
   // ═══════════════════════════════════════════════════════════════════════
   // [v6.8.0 cronfix15] MacroStrategyInference 接入 think() 主链路

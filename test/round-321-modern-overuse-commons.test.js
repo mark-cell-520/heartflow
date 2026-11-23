@@ -168,7 +168,13 @@ for (const k of ['A_ZH4', 'A_EN4', 'B_ZH4', 'B_EN4', 'C_ZH4', 'C_EN4']) {
   ok(k in toc, `G 登记：tragedy-of-commons __internals 暴露 ${k}`);
 }
 const VERSION = require('../src/core/version.js').VERSION;
-ok(VERSION === '6.8.179', `G 登记：VERSION 本轮不变 6.8.179（实测 ${VERSION}）`);
+// [r458 修订] 原文写死 VERSION === '6.8.179'，下一轮 bump 必然误红
+// （r458 run-all 实测该断言成为 round-321 的失败项，与 r283→r284 同型）。
+// 改为下限校验：既保住「r321 那轮 bump 过 6.8.179」的登记意图，
+// 又不再随后续轮次递增而假失败。修法同 round-283-causation-families.test.js。
+const _vp = VERSION.split('.').map(Number);
+ok(_vp[0] > 6 || (_vp[0] === 6 && _vp[1] > 8) || (_vp[0] === 6 && _vp[1] === 8 && _vp[2] >= 179),
+  `G 登记：VERSION 应为合法语义版本且 ≥6.8.179（r321 bump 下限，实测 ${VERSION}）`);
 const claims = require('fs').readFileSync(require('path').join(__dirname, '..', 'coordination', 'claims.jsonl'), 'utf8');
 ok(claims.includes('"round":"r321"'), 'G 登记：claims.jsonl 含 r321 认领');
 

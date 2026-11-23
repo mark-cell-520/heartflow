@@ -383,13 +383,45 @@ const EXTENDED_TOOLS = [
   },
   {
     "name": "heartflow_confidence_calibrate",
-    "description": "confidence calibrate（confidence-calibrator）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "description": "[r457 扩展] 置信度校准判别（ConfidenceCalibrator，走常驻实例，含历史校准状态）。action 选择判别面：assess（五维加权评分+阈值分级+来源归因）/ calibrate（语言校准建议）/ distribution（置信度分布四情景）/ calibrationError（历史校准误差）/ thresholdStability（阈值漂移稳定性）/ scoreEvidenceCoverage|scoreConsistency|scoreSpecificity|scoreSourceReliability|scoreComplexityFit（五维单项分）/ stats。只读工具，无副作用。",
     "inputSchema": {
       "type": "object",
       "properties": {
+        "action": {
+          "type": "string",
+          "description": "判别动作（默认 assess）",
+          "enum": ["assess", "calibrate", "distribution", "calibrationError", "thresholdStability", "scoreEvidenceCoverage", "scoreConsistency", "scoreSpecificity", "scoreSourceReliability", "scoreComplexityFit", "stats"]
+        },
         "text": {
           "type": "string",
-          "description": "text（可选）"
+          "description": "待判别的文本（assess/calibrate/distribution/五维评分必填）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_confidence_feedback",
+    "description": "[r457 新增] 置信度反馈写入（ConfidenceCalibrator 持续校准闭环）。action：record（recordFeedback(text, wasCorrect) 记录一次原文本+用户判定对错）/ update（updateFromFeedback(wasCorrect, context) 公式驱动更新阈值）/ recalibrate（依历史记录重算权重阈值）。写操作，改常驻校准器状态并落盘 data/confidence-calibration.json，需 user/admin 权限。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "写入动作（默认 record）",
+          "enum": ["record", "update", "recalibrate"]
+        },
+        "text": {
+          "type": "string",
+          "description": "被校准的原文本（action=record 必填）"
+        },
+        "wasCorrect": {
+          "type": "boolean",
+          "description": "该次判定是否正确（action=record/update 必填）"
+        },
+        "context": {
+          "type": "object",
+          "description": "校准上下文 {text, calibrated}（action=update 可选）"
         }
       },
       "required": []

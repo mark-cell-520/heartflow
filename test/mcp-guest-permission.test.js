@@ -43,6 +43,9 @@ const WRITE_TOOLS = [
   // [r314] self_benchmark 的 assess 落盘 / safe_fetch 出网（WRITE_TOOLS 收口新增项，同步进抽样清单）
   'heartflow_self_benchmark',
   'heartflow_safe_fetch',
+  // [r457] 置信度反馈写入（recordFeedback/updateFromFeedback/recalibrate 改常驻
+  // 校准器状态并落盘 data/confidence-calibration.json，同步进抽样清单）
+  'heartflow_confidence_feedback',
 ];
 
 const READ_TOOLS = [

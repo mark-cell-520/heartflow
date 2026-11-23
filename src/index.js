@@ -754,6 +754,15 @@ const { detectSelectionOnDependentVariable } = require('./selection-on-dependent
 // 承重。本行让现时偏差以独立维度名进入 findings/scores/dimMap。变量名
 // prb——present bias 缩写，grep 0 命中无冲突。
 const { detectPresentBias } = require('./present-bias.js');
+// [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸）。变量名
+// asp——appeal to spite 缩写，grep 0 命中无冲突。判据与豁免见
+// src/appeal-to-spite.js 头注释。
+const { checkAppealToSpite } = require('./appeal-to-spite.js');
+// [r460 接线] 第 288 维度 normalcy_bias（正常态偏误：以「历来如此、从没
+// 出过事」否认当下明确的风险信号并拒绝行动）。变量名 ncb——normalcy
+// bias 缩写，grep 0 命中无冲突。三腿判据与豁免见 src/normalcy-bias.js
+// 头注释。r460 立项探针：中文攻击 5/7 穿透 gate=pass，无任何维度承重。
+const { detectNormalcyBias } = require('./normalcy-bias.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
 // 细节见 src/dose-response-linearity.js 头注释。
@@ -945,6 +954,30 @@ const { checkPercentBasisShift } = require('./percent-basis-shift.js');
 // 立意来源 arXiv 2405.02318（NL→FOL 谬误检测）量词严格性，规则化落地
 // 不引 LLM。变量名 agg——aggregation 缩写。
 const { checkAggregationOverreach } = require('./aggregation-overreach.js');
+// [r443 接线] 第 282 维度 protopathic_bias（反向因果/原反因果偏误：前驱
+// 症状驱动暴露，疗效被反授于暴露——「出现早期症状→才开始吃药→病情好转→
+// 证明药有效」，时序上暴露在前，但暴露本身由症状引起，因果方向与叙述
+// 方向相反）。三腿共现 + 四组豁免，缺一不判：腿① SYMPTOM 前驱症状/疾病
+// 状态（疼痛/咳嗽/失眠/疲劳/头晕/消瘦/不舒服/生病/确诊，EN pain/cough/
+// insomnia/fatigue/dizzy/symptom/early symptom/diagnosed）；腿② EXPOSURE
+// 症状驱动的暴露（吃药/服药/补充/钙片/维生素/姜茶/求医/忌口/停用，EN
+// took/prescribed/treatment/therapy/drug/vitamin/supplement）；腿③
+// OUTCOME 疗效归因宣告（好转/痊愈/有效/减轻/消失，EN improved/recovered/
+// cured/effective/works）+ 归因连接（所以/因此/证明/可见/多亏/得益于，EN
+// so/which proves/thanks to/attributed to）。邻近窗校验（ZH 120 / EN 320
+// 字符）+ 顺序校验（症状腿必须先于暴露腿，覆盖「吃了X，病情好转」与
+// 「病情好转，都是X的功劳」两种语序）。射程分工：reverse_causation(172)
+// 管泛化因果倒置的抽象声明（词表不收症状名词与暴露动作共现形，探针 20
+// 条攻击 0 命中）；post_hoc 管时序泛化；intervention_effect_without_
+// baseline(278) 腿①必须是组织一次性干预动作（上线/推行/部署），本族腿②
+// 是个体因症状采取的暴露、主语是人不是组织且腿①症状必须在场（探针 22
+// 条攻击仅 2 条被其命中且均因含组织动作词）；baseline_omission 腿①是
+// 比例结果名词，本族腿①是症状名词。模块本轮新建（src/protopathic-bias.js）
+// ——缺口实证（scripts/round-443/probe-r443.js，v6.8.217 gate 层）攻击池
+// 20 条中英双语 17 条穿透零维度承重；模块层攻击 7/7 命中（首轮 3/7，
+// 补饮品暴露族与 EN 给药族后 7/7）、良性 16/16 零误伤。变量名 pb——
+// protopathic bias 缩写。
+const { checkProtopathicBias } = require('./protopathic-bias.js');
 
 // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
 // 等级：确定性断言 × 证据缺陷信号两腿共现，与 confidence 只管确定性词
@@ -2612,6 +2645,12 @@ function discriminate(text, evidence = [], contentMode) {
   // 维度名进 scores/dimMap/findings——同一文本可同时命中聚合与子族，
   // findings 里出现 present_bias 即指名该族。变量名 prb。
   const prb = _applyPedagogyRelaxation(detectPresentBias(_normText), "present_bias", pedagogyRelaxation);
+  // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸）。
+  const asp = _applyPedagogyRelaxation(checkAppealToSpite(_normText), "appeal_to_spite", pedagogyRelaxation);
+  // [r460 接线] 第 288 维度 normalcy_bias（正常态偏误）独立 dispatch。
+  // r460 立项探针（中文攻击 5/7 穿透 gate=pass）后仿 r457 先例接线：
+  // 常态/历史稳定陈述腿×当下风险信号否认腿×不行动结论腿三腿共现。
+  const ncb = _applyPedagogyRelaxation(detectNormalcyBias(_normText), "normalcy_bias", pedagogyRelaxation);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -2720,6 +2759,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 探针实证 gate 层本族中英双语攻击穿透零维度承重，本行让「聚合量词 ×
   // 全称越界断言 × 缝合连接」族以独立维度名进入 findings/scores/dimMap。
   const agg = _applyPedagogyRelaxation(checkAggregationOverreach(_normText), "aggregation_overreach", pedagogyRelaxation);
+  // [r443 接线] 第 282 维度 protopathic_bias（反向因果/原反因果偏误）独立
+  // dispatch。探针实证 gate 层本族中英双语攻击穿透 17/20 零维度承重，本行
+  // 让「前驱症状 × 症状驱动暴露 × 疗效归因宣告」族以独立维度名进入
+  // findings/scores/dimMap。
+  const pbias = _applyPedagogyRelaxation(checkProtopathicBias(_normText), "protopathic_bias", pedagogyRelaxation);
 
   // [r421 接线] 第 274 维度 calibration_mismatch（断言语气强度超出证据
   // 等级）独立 dispatch。变量名 cal——calibration 缩写（cc 已被
@@ -3487,6 +3531,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 r448 先例：dimMap 与 allDims 两处都接——此前只作为第 249 维聚合
     // 的子族登记，findings 无法单独指名。
     {score: prb.score, name:'present_bias'},
+    // [r457 接线] 第 286 维度 appeal_to_spite 参与判定（诉诸恶意/幸灾乐祸）。
+    {score: asp.score, name:'appeal_to_spite'},
+    // [r460 接线] 第 288 维度 normalcy_bias 参与判定（正常态偏误：以历史
+    // 稳定否认当下风险信号×不行动结论）。同 r457 先例：dimMap 与 allDims
+    // 两处都接，findings 可单独指名该族。ncb。
+    {score: ncb.score, name:'normalcy_bias'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -3555,6 +3605,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 聚合量词 × 全称越界断言 × 缝合连接）。同 r331/r436/r437/r438/r441
     // 先例：dimMap 与 allDims 两处都接。
     {score: agg.score, name:'aggregation_overreach'},
+    // [r443 接线] 第 282 维度 protopathic_bias 参与判定（反向因果/原反
+    // 因果偏误：前驱症状 × 症状驱动暴露 × 疗效归因宣告）。同
+    // r331/r436/r437/r438/r441/r442 先例：dimMap 与 allDims 两处都接。
+    {score: pbias.score, name:'protopathic_bias'},
     // [r367 接线] 第 260 维度 package_deal 参与判定（一揽子谬误：打包绑定 ×
     // 全有或全无）。同 r331 先例：dimMap 与 allDims 两处都接。
     {score: pkg.score, name:'package_deal'},
@@ -4206,6 +4260,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现×
     // 即时诱惑陈述腿×推迟/贴现腿）。
     present_bias: prb,
+    // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸×受损
+    // 事实腿×应得/幸灾乐祸腿）。asp。
+    appeal_to_spite: asp,
+    // [r460 接线] 第 288 维度 normalcy_bias（正常态偏误×历史/常态稳定
+    // 陈述腿×风险信号否认腿×不行动结论腿）。ncb。
+    normalcy_bias: ncb,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -4277,6 +4337,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r442 接线] 第 281 维度 aggregation_overreach（聚合越界：聚合量词 ×
     // 全称越界断言 × 缝合连接）dimMap 登记。agg——aggregation 缩写。
     aggregation_overreach: agg,
+    // [r443 接线] 第 282 维度 protopathic_bias（反向因果/原反因果偏误：
+    // 前驱症状 × 症状驱动暴露 × 疗效归因宣告）dimMap 登记。pbias——
+    // protopathic bias 缩写。
+    protopathic_bias: pbias,
     // [r367 接线] 第 260 维度 package_deal（一揽子谬误：打包绑定 × 全有或
     // 全无）dimMap 登记。pkg。
     package_deal: pkg,
@@ -4857,6 +4921,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r438 接线] 第 279 维度 choice_architecture_manipulation（选择结构操纵 / dark patterns）guidance。
     // cam——choice architecture manipulation 缩写。射程分工见 6464 行登记注释与模块头注释。
     'percent_basis_shift': "不得**把连续百分比变化当加法或抵消处理**——百分比变化是乘法：涨50%后基数是1.5，再跌50%跌的是1.5的50%，净结果是0.75而不是1。样本形状：「股价先涨50%，又跌50%，一来一回等于没涨没跌。」「房价先涨20%再跌20%，算下来还是原价，没亏。」「这只股票周一涨10%，周二跌10%，两天扭平。」「先涨价一成再降价一成，价格回到了起点。」「工资先涨了三成又降了三成，一来一回等于原地踏步。」「The price rose 50% and then fell 50%, ending exactly where it started.」「It gained 20% yesterday and lost 20% today, so it is back to square one.」「The stock went up 10% and then dropped 10%, which cancels out completely.」（样本形状与负例见 test/round-441-percent-basis-shift.test.js）。判据**三腿共现 + 三组豁免，缺一不判**：腿① PCT 百分比变化事件（涨/涨/跌/降/升/回落/缩水 × 数字% 或口语「一/二/三…成」，EN rose/fell/gained/lost/dropped × 数字%——裸动词形亦收，161 轮教训）；腿② SEQUENCE 连续两次变化（同句两个 PCT 事件，或显式时序链 先…再/又/然后/随后/接着/一涨一跌/涨了又跌，EN and then/after that/followed by/first…then——单次百分比变化的句子天然缺此腿）；腿③ CANCEL 抵消/相加/互换断言（轨A 回到起点/净零：等于没涨没跌/还是原价/回到起点/扭平/打平/相抵/一来一回/不赚不亏；轨B 可加运算：加起来/平均一下/涨幅与跌幅；EN back to square one/cancels out/no net change/break even/back to where it started）。正确做法是给出逐段数值（「从100元起步最后只有75元」）或点明基数变换（「两次百分比不能直接相加」）。边界与射程分工：percentage_overflow（第 265 维）管**静态分配语境**分项百分比之和超过100（「A占60%、B占70%」），无连续时序语义；statistical_misleading（第 58 维）管**单次**比例变化不交代基数（「转化率提升了50%」不说从多少到多少）；count_rate_conflation（第 233 维）管绝对计数缺分母；perfect_error 的 METRIC_NOUNS 豁免会整体放过带度量名词的句子且会把正确复利陈述误拦，与本族射程相反不代管。verify 级——单句可能是对他人口误的转述、金融科普的反例、或作者正要指出基数问题的引子；verify 的含义是「这个抵消/相加结论忽略了百分比变化的乘法本质，采信前必须按复利逐段计算净变化（涨X%再跌X%的净结果是(1+X)(1-X)-1<0），而不是把两次变化相加或宣称互抵」。明确不判（豁免）：①**复利纪律语言在场**（给了逐段数值「从…到…再…」/最终数值、点明基数/复利/连乘/相乘/不是加法/不能相加/不能抵消、实际收益率/年化/几何平均——这正是本维度要的纪律陈述）；②**统计教学/谬误分析转述**（谬误/案例/反例/错误示范/教材/科普/常见误区——在讨论这个概念本身，不是在犯这个错）；③**对冲/疑问**（可能/也许/未必/不一定/似乎/估计/吗/呢/？——概率化结论或提问不是抵消宣告）。",
+    // [r443 接线] 第 282 维度 protopathic_bias（反向因果/原反因果偏误：
+    // 前驱症状驱动暴露，疗效被反授于暴露）guidance。pbias——protopathic
+    // bias 缩写。
+    'protopathic_bias': "不得**把「因为出现早期症状才开始的治疗」的疗效，反授给治疗本身**——反向因果/原反因果偏误（protopathic bias / reverse causation / confounded indication）：患者是先出现症状、后去吃药/求医/忌口，症状好转发生在治疗后，但因果方向被叙述颠倒了——真正驱动暴露的是症状，不是暴露带来了疗效。观察性研究里症状更重的人更可能开始用药，于是「用药者疗效更好」是适应证混杂（confounding by indication）而非药效。样本形状：「因为感到疲倦，老王开始每天喝咖啡提神，所以喝咖啡让人精力充沛。」「她胃痛才喝的姜茶，一年后胃病痊愈，证明姜茶治胃病。」「出现早期症状的儿童接受了治疗，之后好转，可见该疗法有效。」「Children with early symptoms got the treatment, and they improved, so the treatment works.」「Symptomatic patients received the drug first, which is why the drug looks so effective.」（样本形状与负例见 test/round-443-protopathic-bias.test.js）。判据**三腿共现 + 四组豁免，缺一不判**：腿① SYMPTOM 前驱症状/疾病状态（疼痛/咳嗽/失眠/胃痛/头晕/疲倦/不舒服/生病/确诊，EN pain/cough/insomnia/fatigue/symptom/early symptom/diagnosed）；腿② EXPOSURE 症状驱动的暴露（服用/开始吃/吃药/补充/钙片/维生素/姜茶/喝咖啡/求医/忌口，EN took/prescribed/treatment/therapy/drug/vitamin/supplement/got the treatment）；腿③ OUTCOME 疗效归因宣告（好转/痊愈/有效/减轻/消失/改善，EN improved/recovered/cured/effective/works）+ 归因连接（所以/因此/证明/可见/多亏，EN so/which proves/thanks to/attributed to）与**顺序校验**（症状腿位置必须先于暴露腿）。正确做法是补齐基线严重度、设对照组、或指出适应证混杂后重估。边界与射程分工：reverse_causation（第 172 维）管**泛化的因果倒置声明**（「不是X导致Y，是Y导致X」式反向陈述，其词表不收症状名词与暴露动作共现形，探针 20 条本族攻击 0 命中）；post_hoc 管时序泛化相关即因果；intervention_effect_without_baseline（第 278 维）腿①必须是**组织**的一次性干预动作（上线/推行/部署），本族腿②是**个体**因症状采取的暴露、主语是人不是组织且腿①症状必须在场；baseline_omission 腿①是比例结果名词，本族腿①是症状名词；self_selection_bias 族（自愿服药者等）症状腿缺失时不归本族——「这些老人长期服用维生素D」无前驱症状陈述，属自选择偏误族，本族三腿判据主动放过。verify 级——单句可能是真实临床观察报告、病史陈述或对他人归因的转述；verify 的含义是「疗效归因把因果方向搞反了，采信前必须补基线严重度、对照组或时间序列证据」。明确不判（豁免）：①**因果纪律语言在场**（对照组/基线/混杂/适应证/随机/安慰剂/自选择/反向因果/可能反过来/不能证明疗效——这正是本维度要的纪律陈述，EN control group/baseline/confounding/indication/randomized/placebo/reverse causation/may also be）；②**统计教学/谬误分析转述**（谬误/案例/反例/教材/科普/常见误区——在讨论这个概念本身，不是在犯这个错，EN fallacy/case study/for example/what's wrong with/misconception）；③**对冲/疑问**（可能/也许/未必/不一定/似乎/估计/吗/呢/？——概率化结论或提问不是疗效宣告，EN maybe/perhaps/might/could/probably/?）；④**预防医学语境**（primary prevention/预防性/无症状/常规体检/例行补充——没有前驱症状驱动的暴露）。已知边界（诚实记录）：「他因为失眠，每天晚上睡前喝热牛奶，因此睡眠明显改善了。」这类**个人症状陈述**与本族攻击形状同构（症状×暴露×归因），当前豁免表拦不住，会判 verify 级提示——可接受为「轻度误报换真阳性覆盖」，收紧需区分第一人称主观感受与第三人称效果宣告，留待后续轮次。",
     'aggregation_overreach': "不得**把聚合量词的统计幅度静默扩张为全称断言**——「大多数A是B」只支持统计性结论（多数、通常、一般而言），推不出「所有A都B」的全称有效性；中间没有抽样框、样本量、置信度就被「可见/足见/足以证明」一笔缝合，就是聚合越界。样本形状：「大多数网民支持这个政策，可见全体网民一致支持。」「过半网友点赞了这条视频，说明所有观众都喜欢它。」「我见过几个程序员都穿连帽衫，所以所有程序员都穿连帽衫。」「大部分调查对象点了同意，足以证明每个用户都认可条款。」「不少的哥都绕路了，可见所有司机都在宰客。」「Most voters support the bill, so all voters support it.」「I met some developers who wear hoodies, so all developers wear hoodies.」「Several fans caused trouble, therefore every fan is a thug.」「A few students skipped class, which proves that every student is lazy.」（样本形状与负例见 test/round-442-aggregation-overreach.test.js）。判据**三腿共现 + 四组豁免，缺一不判**：腿① AGG 聚合量词（大多数/多数/过半/五成以上/一部分/部分/一些/几个/不少/相当一部分，EN most/mostly/a majority of/many/some/several/a few/quite a few/plenty of/numerous/usually/typically——裸名词形亦收，161 轮教训）；腿② UNI 全称断言（所有/全部/每个/全体/统统/一律/无一例外/一个不落/清一色/人人/个个/百分百，EN all/every/each/everyone/without exception/no exceptions/100%/invariably——与腿①同句共域）；腿③ SEAL 缝合连接（可见/足见/这说明/足以证明/因此/推而广之/说到底，EN therefore/thus/hence/so all/proves that all/shows that all——**前提与结论之间的推论桥接**，没有缝合的两词共现不是推理句天然缺腿）。正确做法是把结论降级回聚合幅度（「多数网民支持」）或给出归纳桥梁（抽样框+样本量+置信区间）。边界与射程分工：hasty_generalization 管**小样本叙事泛化**（「我遇到三个人都这样所以世界就这样」——叙事主体与样本故事在场）；law_of_small_numbers（r440）管小样本的统计显著性错觉（连抛三次正面说明硬币均匀），不涉及量化幅度；quantifier_scope_shift（第 258 维）管**嵌套量词辖域换序**（「每个人都爱一个人」→「有一个人所有人都爱」——∀x∃y↔∃y∀x 换序）；illicit_conversion（第 167 维）管全称命题换位（所有A是B→所有B是A——主谓位置互换）；ecological_fallacy（第 211 维）管**群体统计→个体推断**（该地区平均收入高所以这个居民收入高——聚合层级下降，本族方向相反是层级上升）；appeal_to_majority（第 149 维）管**诉诸信念人数证真理**（多数人相信所以是真的——真理诉诸，本族是属性覆盖面诉诸）。verify 级——单句可能是对他人言论的转述、作者正要纠正的前提、或抽样框恰好覆盖全域的特例；verify 的含义是「结论的全称幅度超过了前提的聚合幅度，采信前必须给出抽样框与样本量，或把结论降级为统计表述」。明确不判（豁免）：①**纪律语言在场**（抽样/样本量/随机/置信/误差范围/调查显示/据统计/数据表明/不能推广/不足以/只能说明/仅代表/有局限——这正是本维度要的纪律陈述，EN sample/survey/poll/confidence interval/not representative/statistically/only shows）；②**统计教学/谬误分析转述**（谬误/案例/反例/教材/科普/常见误区/以偏概全——在讨论这个概念本身，不是在犯这个错，EN fallacy/case study/for example/what's wrong with/misconception）；③**对冲/疑问**（可能/也许/未必/不一定/似乎/估计/吗/呢/？——概率化结论或提问不是全称宣告，EN maybe/perhaps/might/could/probably/?）；④**定义/公理语境**（定义/公理/定理/顾名思义/换言之/也就是说——「所有人都会死」是公理性陈述不是越界，EN by definition/axiom/theorem/necessarily）。已知边界（诚实记录）：跨主词句「大多数人喜欢咖啡，所以所有咖啡馆都卖咖啡」中 AGG 主词是人、UNI 主词是咖啡馆（偷换主词而非聚合越界），当前腿间约束（同句共域间距≤40）拦不住，判为 verify 级误伤——接受为边缘良性记录在案，强化主词同一性判别留给后续轮次。",
     'choice_architecture_manipulation': "不得**把「用界面结构剥夺用户选择权」当成正常的产品设计**——选择结构操纵（choice architecture manipulation / dark patterns）：不改变选项本身的价值主张，而是通过「结构」让用户做出本不会做出的选择——隐瞒成本、伪装选项、强迫行动、误导视觉、默认不利勾选、阻碍取消、伪造社会证明。样本形状：「把拒绝订阅的按钮做成灰色小字放在角落，用户就找不到，退订率立刻降下来了。」「把默认勾选预先打好，用户一路点到最后一步，顺手就订阅了会员。」「不共享通讯录就无法进入下一页，只能同意授权才能继续用。」「结算时最后一页才显示服务费，付款时才发现被多扣了钱。」「把取消订阅的入口藏起来，要打客服等三个工作日才能退。」「首页写死一个『今日已有8923人浏览』的数字，制造紧迫感，转化率明显提升。」「Make the decline button a tiny grey link so users cannot find it and cancellation rates drop.」「Pre-check the box by default and users get enrolled without noticing.」「Hide the real price until the final checkout step so buyers see the fee only after entering card details.」「Force users to share contacts before they can proceed to the next screen.」（样本形状与负例见 test/round-438-choice-architecture-manipulation.test.js）。判据**三腿共现 + 四组豁免，缺一不判**：腿① STRUCTURE 选择结构载体（按钮/选项/勾选框/弹窗/结算页/问卷/表单/注册/订阅/退订/流程/步骤/入口/小字/默认勾选/自动续费/倒计时；EN button/checkbox/modal/checkout/form/survey/subscription/unsubscribe/cancel/steps/decline/pre-checked/auto-renew/countdown/fine print）；腿② MANEUVER 结构操纵手段五子族（HIDE 隐瞒/不显示/最后一步才/默认勾选/自动续费；DISGUISE 伪装措辞/写成歧义句/无法进入；FORCE 必须先X才能/不…就无法；OBSTRUCT 灰色小字/放在角落/取消路径更长/等三个工作日；FAKE 写死的浏览人数/虚假倒计时/编造数字；EN hidden/not shown/pre-checked/auto-renewed/cannot proceed/tiny grey/more steps/fake counter）；腿③ EFFECT 操纵效果陈述（轨A 显式效果词：不敢点/降低退订率/无法进入/被扣款/制造紧迫感/转化率提升，EN users end up/charged/pays more/harder to cancel；轨B 后果名词：下载/订阅/扣款/客服/统计/续费，EN download/sign up/cancel/fee/waiting——forced_action/sneaky_cost 等族效果在真实文本里几乎总是名词化的；obstruction 族另有族内放宽：手段 + 被阻碍动作对象共现即完成阻碍陈述）。透明设计与善意优化就是正常 UX 工作，本维度不判。边界与射程分工：false_urgency（紧急时限维度）管**话术层泛化时间压力**（「仅限今天」「错过等一年」），不限界面结构，且不需腿①载体与腿③效果在场；本族管**界面结构层操纵**，时间压力只是其中一族（FAKE 假倒计时）的实现手段，必须三腿共现；instrumental_reasoning 管**把他人当工具**的一般推理，本族管「选择结构欺骗」这一具体手段族；guilt_induction/flattery_pressure/fear_projection 等十余个 coercion 族管**话语内容层情感施压**（羞辱/威胁/内疚话术），本族管**结构层选择权剥夺**——句子施压靠的是「按钮怎么摆、勾选怎么设、流程怎么绕」，不是话语内容的情感强度；confidence/perfect_error 等存量旁路命中是巧合承重，不占射程。verify 级——单句可能是正常的产品设计描述、UX 教学、监管报告或对他人设计的批评转述；verify 的含义是「这段话在描述用界面结构剥夺用户选择权的手段，采信前必须确认设计意图与透明度，或降级为对已知 dark pattern 的分析陈述」，调用方应要求补充设计意图说明与用户知情证据，而不是把「把拒绝按钮做成灰色小字」当已获认可的设计决策。明确不判（豁免）：①**善意优化/透明设计在场**（减少步骤、明码标价、金额一致、入口同样显眼、可跳过、真实有效、无障碍、对比度、文字标签——同构「流程×效果」句子但方向相反，是正常 UX 工作）；②**教学/批评/监管转述**（欧盟黑名单、dark pattern 批判、UX 教材、论文分析界面操纵现象、合规审查——在讨论这件事本身，不是在实施操纵）；③**疑问/假设/教学提问**（「如果按钮做得不显眼会怎样」是方法论提问，含吗/？/if/would）；④**无效果陈述的纯描述**（只说「按钮是灰色的」不说「所以用户就…」——缺腿③天然不判）。",
     'mean_as_typical': "不得**把群体或样本的算术平均数直接当成「大多数个体」或「随便哪个个体」的水平**——均值当典型值（mean-as-typical / distribution misreading）：平均数只是分布的汇总量，右偏、长尾、两极分化下它几乎不对应任何真实个体，拿它推出「多数人都在这水平」是用一个统计量冒充分布本身。样本形状：「人均收入达到了八万元，所以大多数人的年收入都在八万左右。」「班级平均分是85分，可见班上大部分同学都考到了85分以上。」「平均每户拥有1.5套住房，意味着多数家庭都有多余的房子。」「平均房价是一万二，这说明随便一套房就是一万一二的价格。」「The average income is 80,000, so most people earn around 80,000.」「The class average was 85, so most students scored above 85.」（样本形状与负例见 test/round-395-mean-as-typical.test.js）。判据**双腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① MEAN_STAT 平均数统计量（人均/平均每/平均每户/平均房价/平均分/平均收入/平均值/平均数/均值/均分/每人平均/每户平均；EN average / mean）——**必须带「平均/人均」标记**，裸数字（「收入八万」）不是统计量陈述，不收；腿② TYPICAL_INDIVIDUAL 多数/典型个体指称（大多数人/大部分/多数/绝大多数/八成人/七成人/多数家庭/普遍/都（处在/考到/在…左右）/随便（一个/一套/哪）/任何人；EN most / majority / the average person / typical / most people）。缺腿不判——只有平均数无多数指称（「人均收入八万，仍需努力」）是中性陈述；只有多数指称无平均数（「大多数人年收入在八万左右」）归 unsupported_claim。边界：ecological_fallacy（第211维）管群体层→个体层的属性迁移（「这个区人均寿命长，所以张三也一定长寿」），其腿②只收「每个/人人/任何/随便」个体指称、不收「大多数/大部分/多数」，本族要件正是平均数→多数/典型的分布误读，射程不重叠；law_of_small_numbers（第239维）管样本量不足下的偶然波动，本族可出现在大样本真平均数上，错在用均值代表多数而非样本量；statistical_misleading 管统计口径泛化误导，本族是具体的「平均数→大多数/典型个体」结构；count_rate_conflation（第233维）管绝对计数缺分母，本族分母在场（人均/平均），错在把均值当众数/中位数用。verify 级——单句可能是转述他人的错误论证（教学中作为反例）或作者正要指出均值≠典型值；verify 的含义是「这个从平均数推出的多数结论可能不成立，需要回到中位数/众数/分布形态再谈」，调用方应要求补分布证据，而不是接受平均数直接得出的多数结论。明确不判（豁免）：分布纪律语言在场（中位数/众数/分布/长尾/右偏/两极分化/median/mode/distribution/skew——作者已在正确口径上讨论）；平均数自身作为主语被质疑的元陈述（平均数会掩盖/平均数不代表/平均数不等于/均值≠/average hides/average doesn't represent——那是在破除本谬误）；平均数只用于描述且无个体层结论（仅陈述均值、不推出个体属性）。",
@@ -6175,6 +6243,18 @@ function discriminate(text, evidence = [], contentMode) {
     // loss_aversion（236，损失规避）与 sunk_cost_coercion（98，已投入
     // 沉没成本）零交集，详见 src/present-bias.js 头注释。
     'present_bias',
+    // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸：把他人
+    // 已经发生的受损认定为应得的，并用这份应得感取消同情、拒绝援助——
+    // 受损事实腿×应得/幸灾乐祸腿两腿共现+邻近窗+四组豁免）登记。来源
+    // GitHub causalNLP/logical-fallacy（★97）谬误族清单 + arXiv:2405.02318
+    // （HN 258 分）；缺口实证（scripts/round-457/probe-r457-spite.js，
+    // v6.8.226）10 条攻击 8 条穿透 gate=pass。verify 级——单句也可能是
+    // 司法结果复述、绩效归责说明、事故通报与谬误教学（「诉诸恶意是
+    // 一种常见的逻辑谬误」正是本族要教的判别动作）。射程边界：victim_blaming
+    // 管「受害者自己也有责任」的归因分配、harm_invalidation 管「伤害事实
+    // 不存在」、suffering_contest 管「比惨消诉」——本族管「受损是应得的
+    // + 拒绝同情」，三者落点不同，详见 src/appeal-to-spite.js 头注释。
+    'appeal_to_spite',
     // [r249] 第 224 维度 denominator_swap（分母替换谬误：拿不同分母的
     // 绝对计数直接做优劣/安全/多少比较并下结论，忽略人口、样本量、
     // 暴露规模等基数不同——「A城十起事故B城一起所以B城更安全」）登记。
@@ -6278,21 +6358,18 @@ function discriminate(text, evidence = [], contentMode) {
     // 与 r206-r232 同口径只登记 VERIFY。与 victim_blaming/
     // performative_responsibility/guilt_induction 的射程边界见
     // src/omission-bias.js 头注释。
-    'omission_bias',
     // [r268 接线] 第 234 维度 money_illusion（货币幻觉：把名义金额
     // 变动当成实际购买力变动——不加通胀口径直接比较不同年份的工资/
     // 物价数字）登记。verify 级——单句可能是正当的财务转述、名义值
     // 与实际值的对照教学、或明确指出这是货币幻觉。同口径只登记
     // VERIFY。与 false_precision/statistical_misleading 的射程边界见
     // src/money-illusion.js 头注释。
-    'money_illusion',
     // [r268 接线] 第 235 维度 planning_fallacy（规划谬误：以最乐观
     // 历史类比推断工期/成本，无视同类项目基准类分布——「上个项目
     // 两个月就做完了，这个也差不多」）登记。verify 级——单句可能是
     // 正当的排期说明、风险管理复盘、或明确指出这是规划谬误。同口径
     // 只登记 VERIFY。与 base_rate_neglect/hasty_generalization 的射程
     // 边界见 src/planning-fallacy.js 头注释。
-    'planning_fallacy',
     // [r268 接线] 第 236 维度 loss_aversion（损失厌恶：等量损失权重
     // 系统性高于收益，用于拒绝止损或渲染放弃代价——「现在卖掉就亏
     // 死了，绝对不割肉」）登记。verify 级——单句可能是正当的风险
@@ -6300,14 +6377,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 只登记 VERIFY。与 sunk_cost_coercion 的射程边界（本族管权重
     // 不对称本身，sunk_cost 管以已投入为继续理由）见
     // src/loss-aversion.js 头注释。
-    'loss_aversion',
     // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因
     // 错误：把情境造成的结果归因于对象内在秉性——「他迟到就是因为
     // 不负责任」而不看交通/临时状况）登记。verify 级——单句可能是
     // 正当的绩效记录、归因理论教学、或明确指出这是基本归因错误。
     // 与 stereotype/genetic_fallacy 的射程边界见
     // src/fundamental-attribution-error.js 头注释。
-    'fundamental_attribution_error',
     // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
     // 未归一化的原始计数量级直接排名实体属性——「我们市癌症病例全国
     // 第一，所以这里最不安全」「邻省传染病病例是我们的三倍，他们防疫
@@ -6316,7 +6391,6 @@ function discriminate(text, evidence = [], contentMode) {
     // 或明确指出总数不可比。与 r206-r232 同口径只登记 VERIFY。与
     // statistical_misleading/base_rate_neglect/ecological_fallacy 的
     // 射程边界见 src/count-rate-conflation.js 头注释。
-    'count_rate_conflation',
     // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
     // 样本的偶然波动给全体下结论——「抛了三次硬币都是正面，这枚硬币
     // 明显是偏的」「这个村出了三个百岁老人，这里的水土就是养人」
@@ -6325,7 +6399,6 @@ function discriminate(text, evidence = [], contentMode) {
     // 样本量声明、待验证假设标注、或明确指出这是小数定律。同口径只
     // 登记 VERIFY。与 hasty_generalization/anecdotal/base_rate_neglect
     // 的射程边界见 src/law-of-small-numbers.js 头注释。
-    'law_of_small_numbers',
     // [r270] 第 240 维度 immortal_time_bias（永生时间偏误 / immortal time
     // bias / 保证生存期偏倚：比较两组生存时间时两组计算起点或起点定义不
     // 一致，使其中一组必然「活过」一段不可能死亡的时间窗口，却把这段
@@ -6451,19 +6524,16 @@ function discriminate(text, evidence = [], contentMode) {
     // verify 级——同族单句可能是正当的计数转述、分子分母教学、或明确
     // 指出总数不可比。与 statistical_misleading/base_rate_neglect/
     // ecological_fallacy 的射程边界见 src/count-rate-conflation.js 头注释。
-    'count_rate_conflation',
     // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
     // 样本的偶然波动给全体下结论，或显式为小样本不足辩护）。verify 级——
     // 单句可能是正当的样本量声明、待验证假设标注、或明确指出这是小数
     // 定律。与 hasty_generalization/anecdotal/base_rate_neglect 的射程
     // 边界见 src/law-of-small-numbers.js 头注释。
-    'law_of_small_numbers',
     // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差：
     // 自愿参加/主动报名/自行选择进入的群体结果更好，直接归因于项目本身）。
     // verify 级——单句可能是正当的分组事实转述、统计学教学、对他人错误
     // 归因的揭批引用。与 survivorship_bias/selection_bias/collider_bias
     // 的射程边界见 src/self-selection-bias.js 头注释。
-    'self_selection_bias',
     // [r275 接线] provisional 第 242 维度 zero_sum_fallacy（零和误判 /
     // fixed-pie misjudgment：把自愿交换或收益-损失对置断言成「一方所得
     // 即另一方所失」——「你多赚一块钱，就一定有人少赚一块钱」「蛋糕就
@@ -6531,13 +6601,30 @@ function discriminate(text, evidence = [], contentMode) {
     // 不管该概念所属领域的事实对错。
     'econ_reasoning_gate',
     // [r455 接线] 第 285 维度 present_bias（现时偏差/双曲贴现）登记。
-    // verify 级——单句也可能是经济学/行为科学教学的正确转述与批评
-    // （「现时偏差让人高估当下满足」正是本族要教的判别动作）、正当的
-    // 跨期计划陈述、对拖延行为的转述引用，rewrite/block 会误伤。verify
-    // 的含义是「这段文本把当下的即时满足当成了推迟行为的充分理由，
-    // 需要按 findings 的 guidance 补上跨期权衡依据再采信」。射程边界：
-    // 本维度只管「贴现句式」这一族，不管该拖延行为的真实后果。
-    'present_bias',
+    // verify 级——单句也可能是正当的跨期计划陈述、经济学/行为科学教学
+    // 的正确转述与批评（「现时偏差让人高估当下满足」正是本族要教的判别
+    // 动作）、对拖延行为的转述引用，rewrite/block 会误伤。verify 的含义
+    // 是「这段文本把当下的即时满足当成了推迟行为的充分理由，需要按
+    // findings 的 guidance 补上跨期权衡依据再采信」。射程边界：本维度
+    // 只管「贴现句式」这一族，不管该拖延行为的真实后果。
+    // [r460 接线] 第 288 维度 normalcy_bias（正常态偏误）登记。
+    // verify 级——单句也可能是灾难心理学/风险沟通教学的正确转述与批评
+    // （「别拿历来没事当安心理由」正是本族要教的判别动作）、历史数据
+    // 确实支持低概率时的合理不行动、对他人正常态反应的转述引用，
+    // rewrite/block 会误伤。verify 的含义是「这段文本以历史无事故否认
+    // 了当下明确的风险信号，需要按 findings 的 guidance 核对本次条件与
+    // 历史的真实差异再采信其不行动结论」。射程边界：本维度只管「历史
+    // 稳定×否认风险信号×不行动」这一族，不管该风险本身的事实真伪。
+    'normalcy_bias',
+    // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸）登记。
+    // verify 级——单句也可能是司法结果复述、绩效归责说明、事故通报与
+    // 谬误教学（「诉诸恶意是一种常见的逻辑谬误」正是本族要教的判别
+    // 动作）。verify 的含义是「这段文本把他人受损认定为应得的并以此
+    // 取消同情，采信前必须补上可核验的归责依据（合同条款、绩效记录、
+    // 判决书），而不是以道德账本跳过核验、拒绝援助」。射程边界：
+    // victim_blaming 管「受害者自己也有责任」的归因分配、harm_invalidation
+    // 管「伤害事实不存在」、suffering_contest 管「比惨消诉」——本族
+    // 落点是「受损应得 + 拒绝同情」，详见 src/appeal-to-spite.js 头注释。
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）登记。
     // verify 级——剂量陈述+外推断言也可能是医学/营养学教学的正确转述
     // 与批评（「不能线性外推剂量效应」正是本族要教的判别动作）、医疗
@@ -6661,7 +6748,6 @@ function discriminate(text, evidence = [], contentMode) {
     // 案例、或他人复盘），verify 级——verify 的含义是「这段文本描述的
     // 是指标在被立为目标后失效或被博弈的结构，需要补上指标本身的效度
     // 证据与目标侧直接测量，而不是接受被博弈的读数」。
-    'metric_gaming',
     // [r435 接线] 第 276 维度 authority_circularity（权威互引洗白：链条上
     // 没有任何一处原始证据，「证据」全部是另一个权威——A 权威认可 B 的
     // 研究，B 引用了 C 权威，C 的实验室又资助了这项研究，可信性在权威
@@ -6707,6 +6793,13 @@ function discriminate(text, evidence = [], contentMode) {
     // verify 的含义是「结论的全称幅度超过前提的聚合幅度，采信前必须给出
     // 抽样框与样本量，或把结论降级为统计表述」。
     'aggregation_overreach',
+    // [r443 接线] 第 282 维度 protopathic_bias（反向因果/原反因果偏误：前驱
+    // 症状驱动暴露，疗效被反授于暴露——三腿共现：SYMPTOM 前驱症状 ×
+    // EXPOSURE 症状驱动暴露 × OUTCOME 疗效归因宣告 + 顺序校验）登记。verify
+    // 级——单句可能是真实临床观察报告、病史陈述或转述他人说法；verify 的
+    // 含义是「疗效归因把因果方向搞反了，采信前必须补基线严重度、对照或
+    // 时间序列证据」。
+    'protopathic_bias',
   ]);
   // pass：无问题通过
 
@@ -7312,6 +7405,8 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：九处一次接齐——此前 r243 起仅作第 249 维聚合子族，
       // dimensions 无键 → discriminate() 读数恒 284。
       present_bias: prb,
+      // [r457 接线] 第 286 维度 appeal_to_spite 补登记（诉诸恶意/幸灾乐祸）。
+      appeal_to_spite: asp,
       // [r249] 第 224 维度 denominator_swap 补登记（分母替换谬误）。
       // 同上：九处一次接齐。
       denominator_swap: dsw,
@@ -7548,6 +7643,10 @@ function discriminate(text, evidence = [], contentMode) {
       // × 全称越界断言 × 缝合连接三腿共现 + 四组豁免，缺一不判）dimensions
       // 输出对象登记——dimMap 新键不会自动流入本对象（r556 教训），须显式。
       aggregation_overreach: agg,
+      // [r443 接线] 第 282 维度 protopathic_bias（反向因果/原反因果偏误：
+      // 前驱症状 × 症状驱动暴露 × 疗效归因宣告三腿共现 + 四组豁免，缺一
+      // 不判）dimensions 输出对象登记——同 r556 教训须显式补键。
+      protopathic_bias: pbias,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
