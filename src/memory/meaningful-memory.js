@@ -290,7 +290,11 @@ class MeaningfulMemory {
 
     if (!fs.existsSync(exportPath)) return;
 
-    
+    // [AUDIT-FIX 2026-11-23] 先记下文件大小：catch 里 raw 已出作用域，但报错必须带
+    // 字节数，否则「文件是 0 字节」和「文件是 5.4MB 但 JSON 写坏了」在日志里长得
+    // 一模一样，等于没报。
+    let byteLen = -1;
+    try { byteLen = fs.statSync(exportPath).size; } catch (e) { /* 取不到大小不阻塞加载 */ }
 
     try {
 
@@ -340,11 +344,36 @@ class MeaningfulMemory {
 
       }
 
-      
 
-    } catch (_) { /* [v5.9.18] intentional: graceful degradation */ }
 
-  // [AUDIT-FIX] console.error("[{context}] catch error:", e);
+    } catch (e) {
+      // [AUDIT-FIX 2026-11-23] 原实现是 `catch (_) {}`，注释还写着
+      // "intentional: graceful degradation" —— 实际效果是：meaningful-memory.json
+      // 被写坏（半截 JSON、截断、磁盘满留下空文件）时，表现为「0 条记忆」且毫无
+      // 报错。本次修掉这个静默吞错：至少留下文件名、字节数、错误类型与信息。
+      const errName = (e && e.name) ? e.name : 'Error';
+      const errMsg = (e && e.message !== undefined) ? e.message : String(e);
+      console.error(
+        '[MeaningfulMemory] 解析记忆文件失败，按空库启动（不再静默）：' + exportPath +
+        ' bytes=' + byteLen + ' ' + errName + ': ' + errMsg
+      );
+      // 保留现场：把损坏文件改名，而不是删除。删掉会销毁证据，也会让「下次读到空库」
+      // 无从追溯；改名后本进程按空库继续跑，后续 _doSave 会写出新的完好文件。
+      try {
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const corruptPath = exportPath + '.corrupt-' + stamp;
+        if (fs.existsSync(corruptPath)) {
+          // 同名现场已存在（罕见：同一毫秒内两次损坏）→ 追加随机后缀，绝不覆盖已有证据
+          fs.renameSync(exportPath, corruptPath + '-' + crypto.randomBytes(3).toString('hex'));
+        } else {
+          fs.renameSync(exportPath, corruptPath);
+        }
+        console.error('[MeaningfulMemory] 损坏文件已保留为 ' + corruptPath + '（未删除，供人工取证）');
+      } catch (renameErr) {
+        const rMsg = (renameErr && renameErr.message !== undefined) ? renameErr.message : String(renameErr);
+        console.error('[MeaningfulMemory] 保留损坏文件失败（仍按空库启动）：' + rMsg);
+      }
+    }
 
   }
 
@@ -394,15 +423,60 @@ class MeaningfulMemory {
 
       };
 
-      
+      const payload = JSON.stringify(exportData, null, 2);
 
-      fs.writeFileSync(exportPath, JSON.stringify(exportData, null, 2));
+      // [AUDIT-FIX 2026-11-23] 原子写：同目录临时文件 → fsync → rename 覆盖。
+      // 原实现是一句 `fs.writeFileSync(exportPath, ...)` 全量直写 5.4MB：
+      //   ① 写一半崩掉/磁盘满 → 留下半截 JSON → 下次 JSON.parse 炸 → 被 catch 吞掉
+      //      → 「0 条记忆」且无报错（_loadFromExport 的静默 catch，已一并修掉）；
+      //   ② rename 之前目标文件始终处于「内容不完整」状态。
+      // 临时文件与目标同目录，保证 rename 在同一文件系统内、是原子操作。
+      // 命名沿用仓库既有约定 `<file>.<pid>.<ts>.tmp`（见 memory/ 下遗留的
+      // .q-table.json.*.tmp），便于识别与追溯。
+      const tmpPath = exportPath + '.' + process.pid + '.' + Date.now() + '.tmp';
 
-      this.stats.lastSave = new Date().toISOString();
+      // rename 成功后临时文件自然消失；只有没走到 rename 才需要在 finally 里清掉，
+      // 否则一次崩溃就留一个垃圾 .tmp（仓库里已有 2 个这样的遗留空文件）。
+      // 先置 true：连 writeFileSync 写一半失败留下的残file 也一并清掉。
+      let tmpPending = true;
 
-    } catch (_) { /* [v5.9.18] intentional: graceful degradation */ }
+      try {
 
-  // [AUDIT-FIX] console.error("[{context}] catch error:", e);
+        fs.writeFileSync(tmpPath, payload, 'utf8');
+
+        // fsync：把内容真正压到磁盘。缺了它，rename 之后掉电仍可能得到一个空壳文件。
+        // 平台不支持时（部分文件系统/容器挂载）不阻塞保存。
+        try {
+
+          const fd = fs.openSync(tmpPath, 'r+');
+
+          try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
+
+        } catch (fsyncErr) { /* 平台不支持 fsync：忽略，原子性语义不受影响 */ }
+
+        fs.renameSync(tmpPath, exportPath);
+
+        tmpPending = false;
+
+        this.stats.lastSave = new Date().toISOString();
+
+      } finally {
+
+        if (tmpPending) {
+
+          try { fs.unlinkSync(tmpPath); } catch (cleanupErr) { /* 清理失败不扩散 */ }
+
+        }
+
+      }
+
+    } catch (e) {
+      // [AUDIT-FIX 2026-11-23] 原来也是 `catch (_) {}` 静默吞掉：保存失败时
+      // 「记忆好像存了」其实一个字节都没落盘，且无任何痕迹。现在至少出声。
+      const errName = (e && e.name) ? e.name : 'Error';
+      const errMsg = (e && e.message !== undefined) ? e.message : String(e);
+      console.error('[MeaningfulMemory] 保存记忆文件失败（数据未落盘）：' + exportPath + ' ' + errName + ': ' + errMsg);
+    }
 
   }
 

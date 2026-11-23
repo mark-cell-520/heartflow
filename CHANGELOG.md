@@ -1,3 +1,9 @@
+## 6.8.228 (2026-11-23)
+
+- **r459 sparse 门控缺陷修复（真升级③：接线已加载但从未 dispatch 的能力）**：心虫裁决门禁 `philosophyToDecision.decide` 长期恒返回 `{skipped:true, reason:"module_not_active"}`，MCP 调用方永远拿到空裁决。根因两处叠加：① `MODULE_TIERS` 四层（tier1-4）均不含 `philosophyToDecision` / `agentPhilosophy` / `agentPsychology`，dispatch 在 sparse 模式下按 MODULE_TIERS 过滤激活集，导致三模块在任何 effort 档位不可达；② `_sparseMode`/`_activeModules` 是实例级粘滞状态，`think()` 仅在 `opts.effort !== undefined` 时置位且直到下次不带 effort 的 think() 才清除——MCP 长驻进程 `mcp-server.js:1092`（handleThinkFast）固定 `effort: 20` 命中 low 档只激活 tier1，此后裁决门禁恒被 `heartflow.js:4827-4830` 短路。修复：tier1 补入三模块 + `think()` 返回前复位 `_sparseMode/_activeModules/_sparseEffort`，effort 只作用于本次推理深度、不跨调用污染可达性。轮测 `test/round-459-sparse-gate-decision-reachability.test.js` 24/24 全绿（含 effort 语义保留项，证明未为修门禁废掉 effort 特性）。运行态实证：`supervisorctl restart heartflow-mcp` 后 MCP `heartflow_philosophy_decision` 返回完整裁决 `{type: "accelerate", confidence: 0.7, goalReviewed: true}`，不再 module_not_active。
+- **r458 遗留落地**：第 286 维 `appeal_to_spite`（诉诸恶意 / 幸灾乐祸）源码 `src/appeal-to-spite.js`（307 行）与轮测 `test/round-458-appeal-to-spite.test.js`（37/37）此前已写完、`src/index.js` 17 处接线已在工作区，但仍是未跟踪状态——r458 实质缺口是 commit 未做，本轮随修复一并提交。变体矩阵实测 gate 层 spite 命中 7/8（唯一 miss 为倒装短句「活该！」无受损事实陈述，两腿判据设计边界，且被存量维度 favor_ledger 兜住非 pass）。
+- **已知边界**：`AGENTS.md` 对 cron 环境系统写保护（patch BLOCKED: write to protected agent-instruction file(s)），Verify-level 列举未补 `appeal_to_spite` / `protopathic_bias`，需主会话人工同步；`src/protopathic-bias.js`（r443 第 282 维）+ 轮测仍是 git log 从未提交的历史遗留，属 r443 所有者产物，本轮不代提交。
+
 ## 6.8.227 (2026-11-23)
 
 - **r457 融合轮：3 号本地滞留产出落到上游主线（真升级③：工程修复 + 版本线融合）**：3 号克隆自 2026-11-16 起产出滞留本地未推送，期间上游 main 从 v6.8.158 推进到 v6.8.226（631 commit、r277→r456）。`git rebase origin/main` 逐冲突按「测试断言语义 → 模块头注释设计意图 → git 历史」三据裁决：上游已修的取上游（appeal_to_pity 正则 r320、REVERSED 倒装测试 r318、dream-loop 行锚 r399、heartflow_check_output 条目 r298、round-257 计数断言 r318，以及全部版本戳与计数元数据），上游没有的才保留。无 `push --force`，备份分支 `backup/deepseek-pre-sync-20261123`。

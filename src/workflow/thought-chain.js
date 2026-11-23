@@ -1,6 +1,24 @@
 // [v6.0.71] 常量已提取到 thought-chain-config.js
 const { REASONING_DEPTH, DUAL_PROCESS, TASK_STRATEGIES } = require('./thought-chain-config.js');
 // const { ConsciousnessBridge } = require('../identity/consciousness-bridge.js'); // DELETED
+const { logger } = require('../utils/logger');
+// [AUDIT-FIX 2026-11-23] LLM 兜底门槛：总开关与身份归一化复用 llm-client 的
+// 单一实现，避免两处各写一套判定（出现"一边开一边关"的 split-brain）。
+// 这里只取函数、不在模块顶层触发任何配置读取。
+const { isLlmFallbackEnabled: _isLlmFallbackEnabled, isGuestRole: _isGuestRole } = require('../llm/llm-client.js');
+
+// [AUDIT-FIX 2026-11-23] 本模块已识别的"调用方身份"承载字段。
+// mcp-server.js 目前把 role 算在 handleRequest 的局部变量里，只用于
+// WRITE_TOOLS / GUEST_DENY_TOOLS 的 guest 拦截，**没有**透传到 reasoning 链
+// （dispatch 是 `handler.length >= 2 ? handler(args, sessionId) : handler(args)`，
+// 引擎实例上也没有 role 字段）。所以下面这些字段现在全是 undefined ——
+// 这是事实，不是漏写。
+// 一旦 mcp-server 在 dispatch 前把角色写下来（引擎实例的 hf.callerRole，
+// 或 globalThis.__heartflowMcpCallerRole），这里立刻生效，无需再改本文件。
+const CALLER_ROLE_FIELDS = [
+  'callerRole', '__mcpCallerRole', '__heartflowMcpCallerRole',
+  'sessionRole', '_sessionRole', 'currentRole', '_callerRole', 'role',
+];
 
 // 实词抽取停用词表 —— 中文虚词/英文功能词，命中即丢弃，避免假设被"的/了/is/the"污染。
 const SUBSTOP = new Set([
@@ -31,6 +49,37 @@ class ThoughtChain {
   setDepth(depth) {
     this.depth = depth;
     return this;
+  }
+
+  /**
+   * [AUDIT-FIX 2026-11-23] 解析调用方身份（guest / user / admin）。
+   *
+   * 现状（实测）：mcp-server.js 的 handleRequest 把 role 算在局部变量里，
+   * 只用于 WRITE_TOOLS / GUEST_DENY_TOOLS 的 guest 拦截，之后
+   * `handler.length >= 2 ? handler(args, sessionId) : handler(args)`
+   * 既不透传 role，也不写回引擎实例；Unix socket 通道的 httpHeadersFor()
+   * 也只产出 authorization/oid 两个 header。因此 reasoning 链上**拿不到**
+   * 角色信息，本方法当前恒定返回 null。
+   *
+   * 语义：返回 null = 身份未知，调用方按 guest 处理（fail-closed）。
+   * 返回 'user' / 'admin' = 已认证，允许 LLM 兜底外传。
+   *
+   * @returns {'user'|'admin'|null}
+   */
+  _resolveCallerRole() {
+    const sources = [this.context, this.hf, this.hf && this.hf.session, globalThis];
+    for (const src of sources) {
+      if (!src || typeof src !== 'object') continue;
+      for (const field of CALLER_ROLE_FIELDS) {
+        const v = src[field];
+        if (typeof v !== 'string') continue;
+        const r = v.trim().toLowerCase();
+        if (r === 'user' || r === 'admin') return r;
+        // 显式写着 guest：身份已知且为匿名，直接判定，不再找别的字段
+        if (r === 'guest') return null;
+      }
+    }
+    return null;
   }
 
   /**
@@ -111,17 +160,35 @@ class ThoughtChain {
       matchedPatterns.push('debate');
     }
 
-    // LLM 兜底：置信度 < 0.7 且已注册 LLM fallback
+    // ── [AUDIT-FIX 2026-11-23] LLM 兜底双门槛 ────────────────────────
+    // 心虫对外承诺「数据不外传 / 纯本地运算」，而 LLM 兜底会把待判别的原文
+    // 发往外部服务。因此：
+    //   门槛1（总开关）：HEARTFLOW_LLM_FALLBACK 未显式开启 → 根本不调用兜底，
+    //     保持 LLM 兜底不存在时的纯规则行为（llm-client 侧也会再拒一次）。
+    //   门槛2（身份）：调用方不是已认证的 user/admin 一律按 guest 处理，
+    //     匿名会话不得触发外传。身份信息目前**没有**从 mcp-server 透传下来
+    //     （见 _resolveCallerRole 注释），所以默认解析结果为 guest → 跳过；
+    //     这不是把功能删掉，是把"能否外传"的决定权交回鉴权层。
     if (bestConfidence < 0.7 && this.hf._llmFallback) {
-      try {
-        const llmResult = await this.hf._llmFallback(input, matchedPatterns);
-        if (llmResult && llmResult.type) {
-          bestType = llmResult.type;
-          bestConfidence = llmResult.confidence || 0.7;
-          matchedPatterns.push('llm-fallback');
+      const llmEnabled = _isLlmFallbackEnabled();
+      const callerRole = this._resolveCallerRole();
+      if (!llmEnabled) {
+        logger.info('thought-chain', 'LLM 兜底已禁用，走规则降级（HEARTFLOW_LLM_FALLBACK 未设置为 1/true）');
+      } else if (_isGuestRole(callerRole)) {
+        logger.info('thought-chain', 'LLM 兜底已跳过：调用方身份为 guest/未识别，不外传待判别文本');
+      } else {
+        try {
+          // 第三参数把身份带给兜底实现（heartflow.js 的包装目前会丢弃它，
+          // 属预期；将来透传 role 时无需再改这里）
+          const llmResult = await this.hf._llmFallback(input, matchedPatterns, { role: callerRole });
+          if (llmResult && llmResult.type) {
+            bestType = llmResult.type;
+            bestConfidence = llmResult.confidence || 0.7;
+            matchedPatterns.push('llm-fallback');
+          }
+        } catch (e) {
+          // LLM 失败（含被开关/身份门槛拒绝），保持规则分类结果
         }
-      } catch (e) {
-        // LLM 失败，保持规则分类结果
       }
     }
 

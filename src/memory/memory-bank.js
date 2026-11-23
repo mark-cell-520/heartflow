@@ -48,15 +48,81 @@ const DECAY_RATES = {
 const LAYER_ORDER = ['core', 'learned', 'ephemeral'];
 
 
+// [AUDIT-FIX 2026-11-23] 不可解密密文备份的条数配额。
+// 原缺陷：解密失败走 _backupUndecryptableBank 时，每次调用都无条件落一个
+// `.undecryptable.<ISO8601>.bak`，既无条数上限也无 TTL —— 审计期间 data/ 下实测
+// 堆积到 435 份 / 约 0.9MB，且 sha256 去重后唯一（全是同一份密文的拷贝，纯垃圾）。
+// 根因还在于 src/mcp-server.js 的 heartflow_memory_bank 每次调用都 new MemoryBank()，
+// 于是每次工具调用都触发一次失败路径 + 一个 .bak（该处不在本次改动范围内）。
+// 现在补上条数配额：只保留最新的 MAX_UNDECRYPTABLE_BACKUPS 份，
+// 其余由 _pruneUndecryptableBackups 删除。
+const MAX_UNDECRYPTABLE_BACKUPS = 3;
+
+// [AUDIT-FIX 2026-11-23] 修剪不可解密备份：只保留 bankPath 所在目录下最新的
+// MAX_UNDECRYPTABLE_BACKUPS 个 `<basename>.undecryptable.*.bak`，删除更早的。
+//
+// 性能约束（审计明确要求）：只做一次 readdirSync + 按文件名排序，不读文件内容、
+// 不计算 hash。文件名内嵌定长 ISO8601 时间戳，字典序即时间序，因此单次修剪是
+// O(n log n) 的目录列举；即使每次 MemoryBank 构造都触发一次备份+修剪，
+// 也不会退化成 O(n) 的全文件读取。
+//
+// 匹配规则刻意与备份命名保持一致：只认 `<basename>.undecryptable.` 前缀 +
+// `.bak` 后缀，因此 `memory-bank.json`、`memory-bank.json.bak`、
+// `memory-bank.json.undecryptable.txt`、其他模块的 .bak 都不会被误删。
+//
+// 容错：目录不可读、单个文件无权限删除等都只记日志，绝不影响调用方主流程。
+// 返回值：实际删除的文件数（供调用方决定是否要汇报，避免稳态轮转时刷屏）。
+function _pruneUndecryptableBackups(bankPath) {
+  let removed = 0;
+  try {
+    const dir = path.dirname(bankPath);
+    const base = path.basename(bankPath);
+    const prefix = base + '.undecryptable.';
+    let names;
+    try {
+      names = fs.readdirSync(dir);
+    } catch (e) {
+      return 0; // 目录不存在/不可读：没有备份可修剪
+    }
+    const baks = names
+      .filter((f) => f.startsWith(prefix) && f.endsWith('.bak'))
+      .sort(); // ISO8601 定长时间戳 → 字典序 === 时间序
+    if (baks.length <= MAX_UNDECRYPTABLE_BACKUPS) return 0;
+    const stale = baks.slice(0, baks.length - MAX_UNDECRYPTABLE_BACKUPS);
+    for (const name of stale) {
+      try {
+        fs.unlinkSync(path.join(dir, name));
+        removed++;
+      } catch (e) {
+        console.warn('[MemoryBank] 删除过期不可解密备份失败（不影响主流程）: ' + name + ' — ' + e.message);
+      }
+    }
+  } catch (e) {
+    console.warn('[MemoryBank] 修剪不可解密备份失败（不影响主流程）:', e.message);
+  }
+  return removed;
+}
+
 // [AUDIT-FIX 2026-11-09] 解密失败时先把不可解密的密文备份，再 starting fresh。
 // 原行为：直接丢弃 + 后续 save 覆盖，密文永久丢失，密钥找回也读不回来。
+// [AUDIT-FIX 2026-11-23] 落盘成功后立即修剪，把条数收敛到 MAX_UNDECRYPTABLE_BACKUPS。
+// 修剪结果并入上面那一条 warn，不额外刷一行 —— src/mcp-server.js 每次调用
+// heartflow_memory_bank 都 new MemoryBank()，这条路径可能被高频触发，
+// 多一行日志就是多一档噪声。仅在真正收敛了存量 backlog（一次删 >=2 份）时补充说明。
 function _backupUndecryptableBank(bankPath, reason) {
   try {
     if (!fs.existsSync(bankPath)) return;
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    // [AUDIT-FIX 2026-11-23] 显式用 Date.now() 取时间戳，而不是裸 new Date()。
+    // 两者输出格式完全一致（ISO8601，':'/'.' 替换为 '-'，保证文件名定长、字典序==时间序），
+    // 但裸 new Date() 读的是内部时钟、不受 Date.now 注入影响 —— 一旦同一毫秒内
+    // 连续备份多次，文件名会互相撞名覆盖，配额就失去意义（r458 测试第 2 例实测踩中）。
+    const stamp = new Date(Date.now()).toISOString().replace(/[:.]/g, "-");
     const backupPath = bankPath + ".undecryptable." + stamp + ".bak";
     fs.copyFileSync(bankPath, backupPath);
-    console.warn("[MemoryBank] 密文已备份至 " + backupPath + "（原因: " + reason + "）。设回原 HEARTFLOW_AES_KEY 后可从该备份恢复。");
+    const pruned = _pruneUndecryptableBackups(bankPath);
+    let msg = "[MemoryBank] 密文已备份至 " + backupPath + "（原因: " + reason + "）。设回原 HEARTFLOW_AES_KEY 后可从该备份恢复。";
+    if (pruned >= 2) msg += "（已修剪 " + pruned + " 份过期备份，收敛到最新 " + MAX_UNDECRYPTABLE_BACKUPS + " 份）";
+    console.warn(msg);
   } catch (e) {
     console.warn("[MemoryBank] 备份不可解密密文失败（不影响启动）:", e.message);
   }

@@ -24,6 +24,9 @@ const fs = require('../utils/safe-fs');
 
 const path = require('path');
 
+// [AUDIT-FIX 2026-11-23] 语法校验用：execFileSync + 参数数组，绝不拼 shell 字符串
+const childProcess = require('child_process');
+
 
 
 // 根目录（self-diagnostic.js 在 src/core/，向上两级到项目根）
@@ -86,6 +89,342 @@ function isEmptyFile(filePath) {
     return true;
 
   }
+
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+//
+// [AUDIT-FIX 2026-11-23] 自诊断写文件的唯一出口：writeWithBackup
+//
+// 背景（审计结论）：step19 版本同步原先对 5 个目标文件一律是
+//   readFileSync → String.prototype.replace → writeFileSync
+// 裸写。replace 一旦失配（目标串已被其他改动抹掉）就把文件写空/写坏，
+// 没有备份、没有回滚、没有 dry-run。其中 package.json 与
+// src/core/heartflow.js 是语法敏感文件——package.json 写坏整个服务起不来。
+//
+// 现在所有覆写点都必须经过本函数，它保证：
+//   ① 写入前校验 replace 真的发生了（content !== original），
+//      未发生则不落盘，返回结构化错误 reason='pattern_not_matched'；
+//   ② 写入前在**目标文件同目录**生成可预测、可清理的备份
+//      `<file>.sdbak-<timestamp>-<seq>`（不落 /tmp）；
+//   ③ 写入后对语法敏感文件立即校验：
+//      .js/.cjs/.mjs → node --check（execFileSync + 参数数组）
+//      .json        → JSON.parse
+//      校验失败**从备份回滚**并返回 reason='syntax_check_failed'；
+//   ④ 支持 dryRun：只回报"将要改什么、改成什么"，完全不落盘。
+//
+// 命名说明：src/utils/atomic-write.js 里也有一个同名 writeWithBackup，
+// 但它是 async + `.bak.N` 轮转命名 + 无失配校验 + 无语法校验 + 无 dry-run，
+// 且不在本次允许修改的文件清单内，因此这里按自诊断的实际需求实现同名函数，
+// 不新增平行函数（全模块只有这一个写出口）。
+//
+// ═══════════════════════════════════════════════════════════════
+
+const SDBACKUP_TAG = 'sdbak';   // 备份后缀标识：<file>.sdbak-<ts>-<seq>
+
+let _sdBackupSeq = 0;
+
+function _sdBackupPath(filePath) {
+
+  _sdBackupSeq += 1;
+
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+
+  return `${filePath}.${SDBACKUP_TAG}-${ts}-${_sdBackupSeq}`;
+
+}
+
+
+
+// 供 dry-run / 错误信息展示的短预览（避免把整个 heartflow.js 塞进返回值）
+
+function _sdPreview(text, max = 400) {
+
+  if (typeof text !== 'string') return null;
+
+  return text.length > max ? `${text.slice(0, max)}\n…[共 ${text.length} 字符，已截断]` : text;
+
+}
+
+
+
+// 落盘后的语法校验（真实写入路径）
+
+function _sdSyntaxCheckOnDisk(filePath) {
+
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (ext === '.js' || ext === '.cjs' || ext === '.mjs') {
+
+    try {
+
+      // 参数数组 + execFileSync：不经过 shell，无命令注入面
+      childProcess.execFileSync(process.execPath, ['--check', filePath], {
+
+        stdio: ['ignore', 'ignore', 'pipe'],
+
+      });
+
+      return { ok: true, kind: 'node --check' };
+
+    } catch (e) {
+
+      return { ok: false, kind: 'node --check', error: String((e.stderr || e.message) || '').trim().slice(0, 500) };
+
+    }
+
+  }
+
+  if (ext === '.json') {
+
+    try {
+
+      JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+      return { ok: true, kind: 'JSON.parse' };
+
+    } catch (e) {
+
+      return { ok: false, kind: 'JSON.parse', error: e.message };
+
+    }
+
+  }
+
+  // .md 等纯文本文件无语法可校验
+
+  return { ok: true, kind: 'none', skipped: true };
+
+}
+
+
+
+// dry-run 用的内存语法预检（不落盘，用 vm 编译代替 node --check）
+
+function _sdSyntaxCheckInMemory(text, filePath) {
+
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (ext === '.json') {
+
+    try { JSON.parse(text); return { ok: true, kind: 'JSON.parse' }; }
+
+    catch (e) { return { ok: false, kind: 'JSON.parse', error: e.message }; }
+
+  }
+
+  if (ext === '.js' || ext === '.cjs' || ext === '.mjs') {
+
+    try {
+
+      // 只编译不执行，纯语法校验
+      new (require('vm').Script)(text, { filename: filePath });
+
+      return { ok: true, kind: 'vm.Script (dry-run 近似)' };
+
+    } catch (e) { return { ok: false, kind: 'vm.Script (dry-run 近似)', error: e.message }; }
+
+  }
+
+  return { ok: true, kind: 'none', skipped: true };
+
+}
+
+
+
+// 从备份回滚（尽力而为；失败只能靠外部告警，不能再写坏一次）
+
+function _sdRollback(abs, backupPath, existed) {
+
+  try {
+
+    if (existed && backupPath) {
+
+      fs.copyFileSync(backupPath, abs);
+
+    } else if (backupPath) {
+
+      // 原文件本来不存在：删掉刚创建的文件即可
+
+      try { fs.unlinkSync(backupPath); } catch (_) { /* 备份清理失败不影响回滚结论 */ }
+
+    }
+
+  } catch (e) {
+
+    process.stderr.write(`[self-diagnostic] 回滚失败（请手工从 ${backupPath} 恢复 ${abs}）: ${e.message}\n`);
+
+  }
+
+}
+
+
+
+/**
+
+ * 带备份 + 失配校验 + 语法校验 + 回滚 + dry-run 的文件覆写
+
+ *
+
+ * @param {string} filePath 目标文件（绝对或相对，内部 resolve）
+
+ * @param {string} content 将要写入的完整内容
+
+ * @param {object} [options]
+
+ * @param {boolean} [options.dryRun=false] true 时只回报差异，不落盘
+
+ * @param {boolean} [options.expectChange=true] false 时允许"内容无变化"（跳过写入不算失败）
+
+ * @param {string}  [options.label] 调用方标签，仅用于错误信息
+
+ * @returns {Promise<{ok:boolean,file:string,dryRun:boolean,changed:boolean,backup:string|null,
+
+ *          syntaxCheck:object|null,rolledBack:boolean,error?:string,reason?:string,
+
+ *          before?:string,after?:string}>}
+
+ */
+
+async function writeWithBackup(filePath, content, options = {}) {
+
+  const dryRun = options.dryRun === true;
+
+  const expectChange = options.expectChange !== false;
+
+  const abs = path.resolve(filePath);
+
+  const base = { ok: false, file: abs, dryRun, changed: false, backup: null, syntaxCheck: null, rolledBack: false };
+
+
+
+  // ── 读原内容（同时用于失配校验与 dry-run 预览）──
+
+  let original = null;
+
+  let existed = true;
+
+  try {
+
+    original = fs.readFileSync(abs, 'utf-8');
+
+  } catch (e) {
+
+    if (e.code === 'ENOENT') { existed = false; original = ''; }
+
+    else return { ...base, error: `读取原文件失败: ${e.message}`, reason: 'read_failed' };
+
+  }
+
+
+
+  const changed = content !== original;
+
+  if (!changed && expectChange) {
+
+    // replace 没匹配上：目标模式不存在。**不写文件**，明确告知未做任何修改。
+
+    return {
+
+      ...base, ok: false, changed: false, existed,
+
+      reason: 'pattern_not_matched',
+
+      error: `目标模式未匹配，未做任何修改: ${abs}（原文件保持原样，未生成备份）`,
+
+    };
+
+  }
+
+  if (!changed) {
+
+    return { ...base, ok: true, changed: false, existed, note: '内容无变化，跳过写入' };
+
+  }
+
+
+
+  if (dryRun) {
+
+    return {
+
+      ...base, ok: true, changed: true, existed, wouldWrite: true,
+
+      syntaxCheck: _sdSyntaxCheckInMemory(content, abs),
+
+      before: _sdPreview(original),
+
+      after: _sdPreview(content),
+
+    };
+
+  }
+
+
+
+  // ── 备份（同目录、可预测命名、可清理）──
+
+  let backupPath = null;
+
+  if (existed) {
+
+    backupPath = _sdBackupPath(abs);
+
+    try {
+
+      fs.copyFileSync(abs, backupPath);
+
+    } catch (e) {
+
+      return { ...base, error: `创建备份失败，已中止写入: ${e.message}`, reason: 'backup_failed' };
+
+    }
+
+  }
+
+
+
+  // ── 写入 ──
+
+  try {
+
+    fs.writeFileSync(abs, content, 'utf-8');
+
+  } catch (e) {
+
+    _sdRollback(abs, backupPath, existed);
+
+    return { ...base, error: `写入失败，已回滚: ${e.message}`, reason: 'write_failed', rolledBack: true, backup: backupPath };
+
+  }
+
+
+
+  // ── 语法敏感文件写入后立即校验，失败即回滚 ──
+
+  const check = _sdSyntaxCheckOnDisk(abs);
+
+  if (!check.ok) {
+
+    _sdRollback(abs, backupPath, existed);
+
+    return {
+
+      ...base, ok: false, changed: false, rolledBack: true, backup: backupPath, syntaxCheck: check,
+
+      reason: 'syntax_check_failed',
+
+      error: `语法校验失败（${check.kind}），已从备份回滚: ${check.error}`,
+
+    };
+
+  }
+
+
+
+  return { ...base, ok: true, changed: true, existed, backup: backupPath, syntaxCheck: check };
 
 }
 
@@ -839,7 +1178,11 @@ async function step18_dreamEngineCheck(result) {
 
 
 
-async function step19_versionSync(result) {
+// [AUDIT-FIX 2026-11-23] options.dryRun=true 时，版本同步只回报"将要改什么"，
+// 不落盘、不生成备份。默认 false（保持原行为：真的去修）。
+async function step19_versionSync(result, options = {}) {
+
+  const _step19Opts = options || {};
 
   const versions = {};
 
@@ -921,7 +1264,39 @@ async function step19_versionSync(result) {
 
     const fixes = [];
 
-    
+    const failures = [];
+
+    const backups = [];
+
+    // [AUDIT-FIX 2026-11-23] dry-run 由调用方（runDiagnostic(options)）透传，
+    // 为 true 时本步骤只回报将要发生的改动，不落盘、不生成备份。
+    const dryRun = _step19Opts.dryRun === true;
+
+    const tag = dryRun ? ' [dry-run]' : '';
+
+    const _apply = async (file, content, desc) => {
+
+      const w = await writeWithBackup(file, content, { dryRun, label: desc });
+
+      if (w.ok) {
+
+        fixes.push(desc + tag);
+
+        // 备份路径单独收集，不混进 fixes——否则 fixedCount 会被备份条目灌水
+        if (w.backup) backups.push({ file, backup: w.backup });
+
+      } else {
+
+        failures.push({ file, reason: w.reason, error: w.error, rolledBack: w.rolledBack === true });
+
+        process.stderr.write(`[self-diagnostic] 版本同步失败（${desc}）: ${w.error}\n`);
+
+      }
+
+      return w;
+
+    };
+
 
     // 修复 package.json
 
@@ -933,83 +1308,94 @@ async function step19_versionSync(result) {
 
         pkg.version = canonical;
 
-        fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n');
+        // 语法敏感文件：写入后 JSON.parse 校验，失败自动回滚
+        await _apply(pkgFile, JSON.stringify(pkg, null, 2) + '\n', `package.json: ${versions.package} → ${canonical}`);
 
-        fixes.push(`package.json: ${versions.package} → ${canonical}`);
+      } catch (e) {
 
-      } catch (e) { process.stderr.write('[self-diagnostic] Failed to update package.json version: ' + e.message + '\n'); }
+        failures.push({ file: pkgFile, reason: 'read_or_parse_failed', error: e.message });
 
-    // [AUDIT-FIX] console.error("[{context}] catch error:", e);
+        process.stderr.write('[self-diagnostic] Failed to update package.json version: ' + e.message + '\n');
+
+      }
 
     }
 
-    
 
     // 修复 SKILL.md frontmatter
 
     if (versions.SKILL_fm && versions.SKILL_fm !== canonical) {
 
-      let content = fs.readFileSync(skillFile, 'utf-8');
+      const original = fs.readFileSync(skillFile, 'utf-8');
 
-      content = content.replace(/version:\s*"?([^"\n]+)"?/, `version: "${canonical}"`);
+      const next = original.replace(/version:\s*"?([^"\n]+)"?/, `version: "${canonical}"`);
 
-      fs.writeFileSync(skillFile, content);
-
-      fixes.push(`SKILL.md frontmatter: ${versions.SKILL_fm} → ${canonical}`);
+      // 失配时 writeWithBackup 返回 pattern_not_matched 且不落盘
+      await _apply(skillFile, next, `SKILL.md frontmatter: ${versions.SKILL_fm} → ${canonical}`);
 
     }
 
-    
 
     // 修复 SKILL.md title
 
     if (versions.SKILL_title && versions.SKILL_title !== canonical) {
 
-      let content = fs.readFileSync(skillFile, 'utf-8');
+      const original = fs.readFileSync(skillFile, 'utf-8');
 
-      content = content.replace(/# HeartFlow.*?v(\d+\.\d+\.\d+)/, `# HeartFlow / 引擎 v${canonical}`);
+      const next = original.replace(/# HeartFlow.*?v(\d+\.\d+\.\d+)/, `# HeartFlow / 引擎 v${canonical}`);
 
-      fs.writeFileSync(skillFile, content);
-
-      fixes.push(`SKILL.md title: ${versions.SKILL_title} → ${canonical}`);
+      await _apply(skillFile, next, `SKILL.md title: ${versions.SKILL_title} → ${canonical}`);
 
     }
 
-    
 
     // 修复 docs/README.md
 
     if (versions.docs && versions.docs !== canonical) {
 
-      let content = fs.readFileSync(docReadme, 'utf-8');
+      const original = fs.readFileSync(docReadme, 'utf-8');
 
-      content = content.replace(/Current Version.*?v(\d+\.\d+\.\d+)/, `Current Version / 当前版本: v${canonical}`);
+      const next = original.replace(/Current Version.*?v(\d+\.\d+\.\d+)/, `Current Version / 当前版本: v${canonical}`);
 
-      fs.writeFileSync(docReadme, content);
-
-      fixes.push(`docs/README.md: ${versions.docs} → ${canonical}`);
+      await _apply(docReadme, next, `docs/README.md: ${versions.docs} → ${canonical}`);
 
     }
 
-    
 
-    // 修复 heartflow.js 顶部注释
+    // 修复 heartflow.js 顶部注释（语法敏感：写入后 node --check，失败回滚）
 
     if (versions.heartflowJS_doc && versions.heartflowJS_doc !== canonical) {
 
-      let content = fs.readFileSync(hfFile, 'utf-8');
+      const original = fs.readFileSync(hfFile, 'utf-8');
 
-      content = content.replace(/HeartFlow\s+v(\d+\.\d+\.\d+)/, `HeartFlow v${canonical}`);
+      const next = original.replace(/HeartFlow\s+v(\d+\.\d+\.\d+)/, `HeartFlow v${canonical}`);
 
-      fs.writeFileSync(hfFile, content);
-
-      fixes.push(`heartflow.js doc: ${versions.heartflowJS_doc} → ${canonical}`);
+      await _apply(hfFile, next, `heartflow.js doc: ${versions.heartflowJS_doc} → ${canonical}`);
 
     }
 
-    
 
-    result.setStep('19', 'pass', { before: versions, after: canonical, fixed: fixes.length }, null, { description: `Auto-synced ${fixes.length} files to v${canonical}`, fixes });
+    // [AUDIT-FIX 2026-11-23] 有失败就不算 pass：否则"自动修了 N 个文件"的假象
+    // 会掩盖 package.json 被写坏却没人知道的事实。
+    const status = failures.length > 0 ? 'fail' : 'pass';
+
+    result.setStep('19', status, {
+
+      before: versions,
+
+      after: canonical,
+
+      fixed: fixes.length,
+
+      dryRun,
+
+      backups,
+
+      failures,
+
+    }, failures.length > 0 ? `${failures.length} 个版本同步点失败（未做修改或已回滚）` : null,
+
+      { description: `Auto-synced ${fixes.length} files to v${canonical}${tag}`, fixes });
 
   } else {
 
@@ -1041,7 +1427,11 @@ async function step20_finalReport(result) {
 
 
 
-async function runDiagnostic() {
+// [AUDIT-FIX 2026-11-23] 新增 options 参数，当前只支持 dryRun。
+// dryRun=true 时 Step 19 的版本同步只回报差异，不写任何文件、不生成备份。
+async function runDiagnostic(options = {}) {
+
+  const opts = options || {};
 
   const result = new DiagnosticResult();
 
@@ -1096,8 +1486,8 @@ async function runDiagnostic() {
   
 
   // Step 19: 版本同步（串行，需要写文件）
-
-  await step19_versionSync(result);
+  // [AUDIT-FIX 2026-11-23] options.dryRun 透传给 step19：true 时只预览不落盘
+  await step19_versionSync(result, options);
 
   
 
@@ -1133,4 +1523,6 @@ if (require.main === module) {
 
 
 
-module.exports = { runDiagnostic, DiagnosticResult };
+// [AUDIT-FIX 2026-11-23] 导出 writeWithBackup：它是本模块唯一的文件写出口，
+// 也供外部（引擎/MCP 层）做同样带备份 + 校验 + 回滚的覆写，避免再造平行实现。
+module.exports = { runDiagnostic, DiagnosticResult, writeWithBackup };
