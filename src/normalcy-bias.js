@@ -172,11 +172,37 @@ const STABLE_EN = [
   // flood\b 会被词内后续字符（ed/s/t）卡死（r460 实测踩坑：族首版加 \b
   // 导致 has never flooded 整句漏判）。has never been hit 的 been 可省，
   // 因为 been 本身在 (?:been\s+)? 里可选。
-  /\b(?:has|have)\s+never\s+(?:been\s+)?(?:flood(?:ed|ing|s)?|hit|struck|burn(?:t|ed|ing)?|erupt(?:ed|ing|s)?|collaps(?:e|ed|es|ing)|fail(?:ed|ing|s|ure|ures)?|breach(?:ed|es|ing)?|damag(?:e|ed|es|ing)|injur(?:y|ies|ed|es|ing)|kill(?:ed|ing|s)?|occur(?:red|ring|s)?|happen(?:ed|ing|s)?|materiali[sz](?:e|ed|es|ing))/i,
+  // [r462 补] 动词表扩族：overflow（That river has never overflowed）与
+  //   burst/topped 同族水文事件词；前缀匹配不加尾 \b（同 flooded 坑）。
+  /\b(?:has|have)\s+never\s+(?:been\s+)?(?:flood(?:ed|ing|s)?|hit|struck|burn(?:t|ed|ing)?|erupt(?:ed|ing|s)?|collaps(?:e|ed|es|ing)|fail(?:ed|ing|s|ure|ures)?|breach(?:ed|es|ing)?|damag(?:e|ed|es|ing)|injur(?:y|ies|ed|es|ing)|kill(?:ed|ing|s)?|occur(?:red|ring|s)?|happen(?:ed|ing|s)?|materiali[sz](?:e|ed|es|ing)|overflow(?:ed|ing|s)?|burst|topped|overtopp(?:ed|ing)|spill(?:ed|ing)|give(?:n)?\s+way|given\s+way|wash(?:ed)?\s+out|sink(?:ing)?|sank|submerg(?:e|ed|es|ing)|inundat(?:e|ed|es|ing))/i,
+  // [r462 补] 「从不需要做某事」形：We have never had to leave / we have
+  //   never had to evacuate——用完成时否定「必要性」表达历史稳定，是英语
+  //   母语者最常用的正常态偏误表述形之一（r462 探针 MISS 实证）。动词收
+  //   撤离/避险类，防止「never had to work hard」类无关句误入腿①（即便
+  //   误入也需腿②③共现才成族，双保险）。
+  /\b(?:has|have)\s+never\s+had\s+to\s+(?:leave|leaving|evacuate|evacuating|flee|fleeing|escape|escaping|relocate|relocating|move|moving|seek\s+shelter|take\s+shelter|find\s+shelter|close|shut|board\s+up|sandbag|stock\s+up|worry|worrying|care|caring|do\s+anything|act|react)/i,
+  // [r462 补] 被迫行动的历史缺失形：「We have never had to leave」「It has
+  //   never been necessary to evacuate」——与族 9（has never + 灾害动词）分工：
+  //   族 9 是「灾害从未发生」，本族是「从未被迫行动」（had to / been forced
+  //   to / been necessary to + leave/evacuate）。r462 实证：样本 "We have
+  //   never had to leave, so ignore the order" 腿②③已命中但腿①缺此形，
+  //   整句漏判。to 可选因 "never been forced out" 无 to 形。
+  /\b(?:has|have)\s+never\s+(?:had|been)\s+(?:to\s+|forced\s+to\s+|necessary\s+to\s+|needed?\s+to\s+|obliged\s+to\s+|required\s+to\s+)?(?:leave|left|evacuate|evacuated|evacuating|relocat(?:e|ed|ing)|move\s+out|moved\s+out|flee|fled|seek\s+shelter|take\s+shelter|go\s+to\s+a\s+shelter|get\s+out)\b/i,
   // [r460 补] 反义形：「We have always lived here safely」——always + 完成时
-  // 持续状态。与族 3（it has always been）分工：族 3 主语限 it/this/that/
-  // things，本族收 we/they/people + lived/stayed/been 类延续动词。
+  //   持续状态。与族 3（it has always been）分工：族 3 主语限 it/this/that/
+  //   things，本族收 we/they/people + lived/stayed/been 类延续动词。
   /\b(?:we|they|people|everyone|residents)\s+(?:has|have|had)\s+always\s+(?:been|liv(?:e|ed|es|ing)|stay(?:ed|s|ing)?|surviv(?:e|ed|es|ing|or|ors)?|manag(?:e|ed|es|ing)|got(?:ten)?)\b/i,
+  // [r462 补] 族 9 动词表外扩：r462 探针剩余 2 条 MISS 的根因诊断——
+  //   「That river has never overflowed」「We have never had to leave」中
+  //   overflowed / had to leave 不在族 9 动词表内（腿②③实际已命中，纯粹
+  //   腿①缺口）。动词形分三组：① 灾害/故障动词前缀族续补（overflow /
+  //   breach / slide / slide / blow / gust / strike...）；② 「never had to
+  //   + 动词」被迫行动否定形（never had to leave/evacuate/flee/rebuild/
+  //   move/close/repair——从未被迫做过某事，历史顺利的强断言）；③ 「never
+  //   needed + 名词」形（never needed insurance/repairs/aid/help）。
+  /\b(?:has|have)\s+never\s+(?:been\s+)?(?:overflow|overflowed|overflown|breach(?:e|ed|es|ing)|breached|washed\s+away|swept\s+away|slide|slid|slump|slump|sink|sank|sunk|buckl|blow(?:n|ing)?|gust|strik(?:e|ing)|strike|toppl|tilt|lean|shift|drop(?:ped)?|fall(?:en)?|fell|deteriorat|degrad|erod|worn|wore|rust|rot(?:ted)?|leak(?:ed|s|ing)?|flood(?:ed|ing|s)?|flood|burn(?:t|ed|ing)?|collaps(?:e|ed|es|ing)|fail(?:ed|ing|s|ure|ures)?)\b/i,
+  /\b(?:has|have)\s+never\s+(?:had\s+to|been\s+forced\s+to|been\s+made\s+to|needed\s+to|had\s+any\s+need\s+to)\s+(?:leave|evacuate|evacuated|flee|fled|run|move|moved|relocate|relocated|rebuild|rebuilt|repair|repaired|close|closed|shut|evacuating|seek\s+shelter|take\s+shelter|abandon)\b/i,
+  /\b(?:has|have)\s+never\s+needed\s+(?:any\s+)?(?:insurance|repair|repairs|aid|help|assistance|reinforcement|reinforcing|subsid|bailout|rescue|evacuation)\b/i,
 ];
 
 // ─── 腿② 当下风险信号被否认（英文）──────────────────────────────
@@ -234,7 +260,14 @@ const INACTION_EN = [
   //   r460 实测 "disregard the safety order" / "dismiss the forecast" 类
   //   具体指令物宾语不在族内；与腿②新宾语族同源，分工：腿③重「不动作
   //   结论」，腿②重「风险被否认」。
-  /\b(?:ignore|ignoring|dismiss|dismissing|disregard|disregarding|forget|skip|shelve|pay\s+no\s+attention\s+to)\s+(?:the\s+|that\s+|this\s+|any\s+|their\s+)?(?:evacuation|evacuate|order|orders|alert|alerts|warning|warnings|advisory|advisories|notice|directive|instruction|siren|forecast|forecasts|prediction|predictions|plan|plans|threat|threats|danger|risks?)\b/i,
+  // [r462 补] 宾语修饰词层放开：存量族只允许限定词（the/that/this/any/
+  //   their），r461 腿②已放开同形。r462 实证：样本 "disregard the safety
+  //   order." / "disregard the flood warning." 中 safety/flood 这类「修饰
+  //   词 + 指令物」形被 (?:the\s+...)? 后的裸词 \b 挡死，整句三腿缺腿③
+  //   漏判（探针 BEFORE 3/5 MISS）。放开为：限定词? + 修饰词? + 指令物，
+  //   修饰词限定 1-2 词（safety / evacuation / flood / mandatory / local
+  //   / official / immediate / evacuation...），防无限贪吃。
+  /\b(?:ignore|ignoring|dismiss|dismissing|disregard|disregarding|forget|skip|shelve|pay\s+no\s+attention\s+to)\s+(?:the\s+|that\s+|this\s+|any\s+|their\s+|a\s+)?(?:(?:mandatory|official|local|immediate|state|city|county|federal|new|latest|current|evacuation|safety|flood|storm|fire|tsunami|hurricane|tornado|emergency|voluntary)\s+)?(?:evacuation|evacuate|order|orders|alert|alerts|warning|warnings|advisory|advisories|notice|directive|instruction|siren|forecast|forecasts|prediction|predictions|plan|plans|threat|threats|danger|risks?)\b/i,
 ];
 
 // ─── 距离窗（三腿共现）────────────────────────────────────────
@@ -273,14 +306,21 @@ const NEG_INSIDE = /(?:不能|不可|不应|不该|不准|不可以|不允许|�
 const NEG_INSIDE_EN = /\bnot\s+that\b|\bnot\s+to\s+say\b|\bhardly\b|\bbarely\b|\bfar\s+from\b|\bno\s+guarantee\b|\bnot\s+necessarily\b|\bmakes?\s+no\s+difference\b|\bisn'?t\s+(?:always|necessarily)\b|\bdoesn'?t\s+(?:always|mean)\b/i;
 const NEG_BEFORE_EN = /\b(?:not|no|cannot|can'?t|doesn'?t|don'?t|isn'?t|aren'?t|wasn'?t|weren'?t|won'?t|wouldn'?t|couldn'?t|shouldn'?t|mustn'?t|never|neither|nor|no\s+longer|not\s+anymore|hardly|barely|far\s+from|nowhere\s+near|stop|refuse\s+to|avoid)\s+(?:\w+\s+){0,4}$/i;
 
-function matchAlive(text, x, useNeg) {
+// r462：否定守卫窗口按腿分取。腿②/腿③ 本身是「动作」（disregard / ignore /
+// stay put），否定它必须紧贴匹配点（"must not disregard"）；腿① 的 STABLE 否定
+// （"has never collapsed"）可以离动作腿很远，若沿用同一宽窗会把远处 STABLE 的
+// never 误当动作腿自身的否定，杀死真实攻击（r461 实证 5 条缺陷样本 3 条 MISS）。
+const NEG_WIN_EN_ACTION = 12;
+
+function matchAlive(text, x, useNeg, negWinEn) {
   if (!useNeg) return true;
   if (NEG_INSIDE.test(x.raw) || NEG_INSIDE_EN.test(x.raw)) return false;
   const before = text.slice(Math.max(0, x.idx - 8), x.idx);
   const beforeLong = text.slice(Math.max(0, x.idx - 12), x.idx);
   const ababForm = /([一-龥]{1,2})不\1[^。，！？；\n]{0,4}$/.test(beforeLong);
   if (!ababForm && (NEG_BEFORE.test(before) || IMMEDIATE_NEG_ZH.test(before) || SHORT_NEG_ZH.test(before))) return false;
-  const beforeEn = text.slice(Math.max(0, x.idx - 45), x.idx);
+  const winEn = typeof negWinEn === 'number' ? negWinEn : 45;
+  const beforeEn = text.slice(Math.max(0, x.idx - winEn), x.idx);
   return !NEG_BEFORE_EN.test(beforeEn);
 }
 
@@ -294,10 +334,10 @@ function dedupeOverlap(arr) {
   return out.sort((a, b) => a.idx - b.idx);
 }
 
-function collect(text, list, useNeg) {
+function collect(text, list, useNeg, negWinEn) {
   let m = [];
   for (const re of list) for (const x of allMatches(re, text)) {
-    if (matchAlive(text, x, useNeg)) m.push(x);
+    if (matchAlive(text, x, useNeg, negWinEn)) m.push(x);
   }
   return dedupeOverlap(m);
 }
@@ -316,11 +356,14 @@ function findSignatures(text, R) {
     { stable: R.STABLE_EN || STABLE_EN, dismiss: R.DISMISS_EN || DISMISS_EN, inaction: R.INACTION_EN || INACTION_EN, win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
   ];
   for (const L of langs) {
+    // 腿① STABLE 保持宽窗 45（其否定修饰可离得远）；腿② DISMISS / 腿③
+    // INACTION 是动作腿，否定必须紧贴匹配点，收窄到 NEG_WIN_EN_ACTION，
+    // 避免远处 STABLE 的 never 杀死真实动作腿（r462 修复）。
     const sm = collect(text, L.stable, true);
     if (sm.length === 0) continue;
-    const dm = collect(text, L.dismiss, true);
+    const dm = collect(text, L.dismiss, true, NEG_WIN_EN_ACTION);
     if (dm.length === 0) continue;
-    const im = collect(text, L.inaction, true);
+    const im = collect(text, L.inaction, true, NEG_WIN_EN_ACTION);
     if (im.length === 0) continue;
     for (const s of sm) {
       for (const d of dm) {
@@ -383,6 +426,7 @@ function detectNormalcyBias(text, inject) {
 
 module.exports = {
   detectNormalcyBias,
+  __testCollect: collect,
   __internals: () => ({
     STABLE_ZH, STABLE_EN,
     DISMISS_ZH, DISMISS_EN,

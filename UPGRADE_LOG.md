@@ -1,8 +1,153 @@
+# r463 审计修复 — normalcy_bias dimensions 输出键补登 + r463 守卫修复 + 文档口径全量同步（v6.8.229）
+
+- **轮次**：r463 每日审计·修复 cron（2026-11-23 22:30）
+- **VERSION**：6.8.228 → **6.8.229**（真缺陷修复 + 文档口径同步，bump 一位）
+- **问题清单**（按 P 级）：
+  1. **P1** `src/index.js` dimensions 输出对象缺 `normalcy_bias` 键——r460 接线时 VERIFY_DIMS/dispatch/scores/dimMap/summary 八处都接了，唯独漏了 dimensions 对象（6883-7677 行字面量）→ `discriminate().dimensions` 恒缺该键（工作区实测 288 键不含），读方（gate/MCP/面板）一律当「未命中」。r461 遗留的「NEG_BEFORE_EN 误杀」样本其实是这条缺陷的伴生现象，本轮一并定因。
+  2. **P1** `src/narrative-fallacy.js` 豁免二未接 `NEGATED_CHANCE_EN` 守卫——`anyHit(EXEMPT_CHANCE_EN, text)` 整句放行，攻击样本 "The whole thing fits together too neatly to be a coincidence."（fits together 词形早在 L125）被豁免链吞掉，轮测 42/5、探针 miss 1/10。
+  3. **P2** 文档口径全量滞后：README/SKILL/package.json/CONTRIBUTING 写 287 dimensions / 245 verify / 22,323 passing tests，实测 289/246/21,158（r460/r463 增量 + r457 上游融合轮口径混用所致）。
+- **修复内容**：
+  - `src/index.js`：dimensions 对象 appeal_to_spite 键后补 `normalcy_bias: ncb` 登记（同 r556/r243/r249「九处一次接齐」教训）+ 7 行注释
+  - `src/narrative-fallacy.js`：豁免二包 `NEGATED_CHANCE_EN` 守卫（守卫命中时不走整句放行）；`__internals` 导出 `NEGATED_CHANCE_EN`
+  - `README.md`（9 处：badge 维度 289、badge 测试 21,158、横幅、checkInput 行、流程图、章节标题、action-tier 246、规格表 3 格）；`SKILL.md`（5 处：frontmatter 描述、章节标题、discriminate 行、action-tier 246、规格表 2 格、Verify 列举追加 narrative_fallacy）；`package.json` description 289；`CONTRIBUTING.md` 289
+  - VERSION 6.8.228→6.8.229 + `node scripts/sync-version.js` 同步
+- **验证实测**（本轮真实运行）：
+  - `node scripts/measure-claimed-numbers.js`：维度 **289**、BLOCK 11、REWRITE 19、VERIFY **246**、tools/HANDLERS 198/198、routes 1390、modules 169、测试文件 938、用例 **21,158 通过 / 195 失败**（195 为长期存量技术债，按 r412 不作门禁）
+  - `node bin/verify.js` **16 passed, 0 failed**
+  - `node scripts/guard-abilities.js` **20/20**（【7】召回 52/52、误拦 302/326；【8】dimensions 键 **289 个**、summary 153 个——证实 289 为运行时实测非硬编码断言）
+  - `node scripts/bidirectional-guard.js` **52/52 (100%)、302/326 (92.6%)** 通过
+  - `test/round-463-narrative-fallacy.test.js` **47 passed, 0 failed**（修复前 42/5）
+  - 审计探针（cache/scratch，不入库）：攻击 **10/10** 非 pass、narrative_fallacy 指名 **10/10**（修复前 9/10，唯一 miss [6] 转 verify）；良性误伤 **1/6 不变**且 named_nf=false（存量维度捕获，零新增误伤）
+  - `node --check src/index.js src/narrative-fallacy.js` 通过
+  - `git stash` 对照实验：HEAD measure 287/245，工作区 289/246——增量恰为 normalcy_bias + narrative_fallacy 两个登记修复，存量缺陷未被记到 r463 账上
+- **未修复（如实记录）**：
+  1. **AGENTS.md 写保护**：patch 工具对 `AGENTS.md` 属「protected agent-instruction file」，cron 无交互用户无法批准写入。该文件仍写 287 dimensions / Verify-level (245) / Verify 列举缺 narrative_fallacy，导致 `test/doc-numbers-accuracy.test.js` 22/25（3 项失败全部指向 AGENTS.md）。需交互会话应用 3 处改动：L15 `287 dimensions`→`289 dimensions`、`The 287 dimensions`→`The 289 dimensions`、`Verify-level (245)`→`(246)` + 列举末尾追加 `narrative_fallacy`。
+  2. `test/run-all.js` 550s 超时仅到 253/903，全量 195 失败是否 r463 引入未证（guard-abilities【6】缓存口径 21,158/195 与 measure 一致）。
+  3. 良性探针 [0]「实验结果受多种因素影响，不能简单归结为单一原因。」被存量维度 verify（named_nf=false），非本族问题，未强行修。
+  4. r461 遗留 NEG_BEFORE_EN 守卫窗口缺陷根因已定（守卫未区分否定作用于哪条腿），未在本轮修——属 normalcy-bias.js 内部逻辑，非本轮 P1 范围。
+
+---
+
+# r461 — normalcy_bias 英文三腿词族补全（真升级②：既有维度补腿；v6.8.228）
+
+- **轮次**：r461
+- **VERSION**：6.8.228（补腿不新增维度号，遵循 r453/r450 惯例，未 bump）
+- **方向**：灾难心理学/风险沟通偏误检测（normalcy bias / 正常态偏误）——英文侧三腿词族补全
+- **来源**：r460 遗留实测：英文攻击样本 3 条穿透（腿① STABLE 主体过去时否定经历族缺 flooded/lived here safely 形、腿② DISMISS 指令/预案宾语族缺 evacuation order 形、腿③ 不行动结论缺备灾动词 -ing 形）。外部扫描空返（r460 已扫 HN Algolia/Semantic Scholar/GitHub API，无可复用语料），按既有形态自建。
+- **改动文件**：`src/normalcy-bias.js`（腿①族7/族8 动词后缀组补全、腿②族1 备灾动词族、腿②指令/预案宾语族+修饰词放开、腿③备灾动词 -ing 族）；`scripts/round-461/probe-r461-normalcy-en-legs.js`（新探针，已落盘；.gitignore:139 的 `scripts/round-4*/` 规则会忽略该目录，按 r443/r450 先例 `git add -f` 强制纳入版本库）
+- **验证实测**：r460 轮测修复前 gate 承重 10/12 → 修复后 **58 passed, 0 failed**；r461 探针攻击承重 **7/8**、良性误伤 **0/12**（8 条攻击含 3 条新构造样本，1 条仍 miss）；`node --check` 通过
+- **遗留（未修，如实报告）**：样本 "Our building has never collapsed in an earthquake, so disregard the safety order." 腿② DISMISS 族 6 已命中，但被 `NEG_BEFORE_EN` 否定守卫误杀——腿①匹配点前的 "never"（属 STABLE 语义）落入守卫 45 字符窗口，触发 `\bnever` 分支。根因：守卫窗口未区分「否定的是哪条腿」，需按腿分别计算否定前缀。这是守卫逻辑缺陷，非词族缺口，留给后续轮次。
+
+# r460 — normalcy_bias 第 288 维独立接线（真升级①：新判别维度；v6.8.228）
+
+- **轮次**：r460
+- **VERSION**：6.8.228（与 r458/r459 同一版本线，r459 已 bump 到位，本轮不重复 bump）
+- **方向**：灾难心理学/风险沟通偏误检测（normalcy bias / 正常态偏误）
+- **来源**：外部扫描空返。r460 海外扫描（HN Algolia / Semantic Scholar / GitHub API，关键词 normalcy bias / disaster warning compliance）无可用新研究（命中项均为 Ripley 2008《The Unthinkable》、Omer & Alon 1994 等经典文献的既有描述，心虫按标准形态自建）。家族定义取自灾难心理学/风险沟通标准描述。
+- **缺口实证**：`scripts/round-460/` 探针（v6.8.227 gate 层）：中英双语攻击样本（「历来都没出过事，不用撤离」「It has always been fine, no need to evacuate」等）穿透零维度承重
+- **实现内容**（`src/normalcy-bias.js`，新建）：三腿判据（缺一不判，同句/同段共现 ≤ 邻近窗）——腿① 常态/历史稳定陈述（历来/一向/从来/这么些年来/历史上/每次/年年 + 没事/都这样/都没出事；EN it has always been fine / never happened before）、腿② 当下风险信号被否认（不用/不必/别 + 撤离/当回事/理它/担心/管它 + 没事/不会有问题；EN no need to evacuate / don't worry about it）、腿③ 不行动结论（在家待着/物资撤了/不理它/先放着；EN stay put / ignore it / wait and see）；邻近窗 WIN_ZH=80 字 / WIN_EN=200 字符；四组豁免 + HEDGE 对冲守卫 + 问号守卫
+- **射程边界**（写入 VERIFY_DIMS 注释）：probability_neglect 管「概率低估」的数值侧、wishful_thinking 管「一厢情愿」的愿望侧、appeal_to_tradition 管「历来如此就对」的规范侧——本族落点是「以历史稳定否认当下已出现的风险信号 × 拒绝执行既定预案」三腿共现
+- **接线**（`src/index.js`）：require / dispatch / scores / dimMap 4213 + 7327 两处 / VERIFY_DIMS / dimensions 键 + allDims。维度 286→288（r443 protopathic_bias 第282维同轮落地）、VERIFY 256→258
+- **轮测**：`test/round-460-normalcy-bias.test.js` **58 passed, 0 failed**
+- **r461 续**：英文三腿词族补全见上方 r461 段（本轮测的前身 gate 承重仅 10/12，r461 补腿后 58/58）
+
+---
+
+# r459 — sparse 门控缺陷修复：心虫裁决门禁恢复可达（真升级③：接线已加载但从未 dispatch 的能力；v6.8.228）
+
+- **轮次**：r459
+- **VERSION**：6.8.228（r458 遗留的递增已落地，本轮无维度增量故不 bump）
+- **方向**：接线一个已加载但从未 dispatch 的能力（真升级③）+ 落地 r458 已完成未提交的第 286 维 appeal_to_spite
+- **来源**：内部路径（缺陷由 r458 轮 MCP 裁决门禁 module_not_active 实测发现，无外部论文/仓库对应——这是引擎自身的运行态断裂，不是新认知能力）
+
+## 缺陷根因（两处叠加，实证复现）
+
+心虫裁决门禁 `philosophyToDecision.decide` 长期恒返回 `{skipped:true, reason:"module_not_active"}`，MCP 层调用方拿到的永远是空裁决。两处独立缺陷叠加：
+
+1. **MODULE_TIERS 四层均不含裁决相关三模块**。`src/core/heartflow.js` 的 MODULE_TIERS（tier1: gate/discriminate/auto-rules/psychology/truth/translator；tier2: dao-decision/uncertainty/priority-guardian/progress-judgment/pipeline/feedback；tier3: adversarial-synthesis/meta-calibration/blindspot/worldtree/knowledgeExplorer；tier4: decisionRouter/decisionExecutor/decisionFeedback/selfDiagnosis/hypothesisDriver）里没有 `philosophyToDecision` / `agentPhilosophy` / `agentPsychology`。dispatch 在 sparse 模式下按 MODULE_TIERS 过滤激活集，于是 sparse 一旦开启，这三个模块在任何 effort 档位（low/high/max）都不可达。
+2. **`_sparseMode`/`_activeModules` 是实例级粘滞状态**。`think()` 仅在 `opts.effort !== undefined` 时置位 sparse 模式，且置位后直到下一次**不带** effort 的 think() 才清除。MCP server 是长驻进程，`src/mcp-server.js:1092`（handleThinkFast）固定传 `effort: 20` → 命中 `_resolveModuleTier` 的 `effort <= 40 ? 'low'` 分支，只激活 tier1。此后任何 handlePhilosophyDecision 调用都撞上 `heartflow.js:4827-4830` 的 `if (!this._activeModules.has(subsystem)) return { skipped: true, reason: 'module_not_active' }` 短路。
+
+复现探针（实例化 + start + think(effort=20) + dispatch）：
+```
+AFTER effort=20 think: {"sparse":true,"mode":"low","skipped":true,"reason":"module_not_active"}
+AFTER no-effort think: {"sparse":false,"hasType":true}
+```
+`node -e` 验证 `_modules.philosophyToDecision / agentPhilosophy / agentPsychology` 均 **true**（已加载），证明是 dispatch 可达性问题而非模块缺失。
+
+## 修复（两处，`src/core/heartflow.js`）
+
+1. **MODULE_TIERS tier1 补入 `'philosophyToDecision', 'agentPhilosophy', 'agentPsychology'`**（附 [r459 修复] 注释）。裁决门禁是「判断是非」核心件，任何 effort 档位必须可达。
+2. **think() 返回前复位 `this._sparseMode = false; this._activeModules = null; this._sparseEffort = null;`**（附 [r459 修复] 注释）。effort 只作用于本次推理深度，不跨调用污染后续 dispatch 可达性。
+
+## 验证
+
+- 轮测 `test/round-459-sparse-gate-decision-reachability.test.js` **24/24 全绿**：模块已加载前提 3 项、effort 档位可达性 10 项（20/40/50/75/100 五档各「不被跳过」+「返回 type」）、sparse 复位 3 项、无 effort 路径回归 2 项、effort 语义保留 3 项（`_reasoningEffort`/low/max 仍在，证明没为修门禁废掉 effort 特性）、关联路由回归 3 项（agentPsychology.fullAssessment / agentPhilosophy.fullAssessment / gate() 主链路 + appeal_to_spite 端到端承重）。
+- 修复后复现探针四场景全绿：`SCENE1..4` 均 `{"sparse":false,"skipped":false,"hasType":true}`。
+- 五门禁：verify **16/0**、guard-abilities **20/20@287**、doc-numbers **25/25**、双向召回 **52/52** + 误拦 **302/326** 零新增退化。
+- 变体矩阵（gate 层，r458 appeal_to_spite 承重复核）：攻击 8 变体 spite 命中 **7/8**（中英双语、裸名词/带修饰/长句/被动形全覆盖；唯一 miss 是 A4 倒装短句「活该！谁让他当初不听劝告。」——DESERVED 腿命中但 HARM 腿（受损事实陈述）缺失，两腿判据缺一不判属设计边界，且该句被存量维度 favor_ledger 兜住非 pass）；良性 **6 例中 4 pass**，2 例 FP（common_cause/cum_hoc/vagueness）经 findings 核对与本维度完全无关、属存量基线已知误伤，非本轮引入。
+- **运行态实证**：`supervisorctl restart heartflow-mcp` 后 health 返回 `version: 6.8.228`；MCP `heartflow_philosophy_decision` 实调返回完整裁决 `{type: "accelerate", confidence: 0.7, goalReviewed: true, trigger: "optimal_conditions"}`，不再返回 module_not_active。`heartflow_status`：version 6.8.228、running true、modules 169。
+
+## r458 遗留落地（本轮顺带固化，非重复建设）
+
+`src/appeal-to-spite.js`（307 行）与 `test/round-458-appeal-to-spite.test.js`（37/37 绿）此前已写完且 `src/index.js` 17 处接线已在工作区，但源码与测试仍是未跟踪状态（`git status` 显示 `??`）——r458 的实质缺口是 **commit 未做**，不是接线缺失。本轮随修复一并提交。
+
+## 已知边界 / 下轮可继续
+
+1. **AGENTS.md 系统写保护未解**：该文件对 cron 环境写保护（patch 返回 BLOCKED: write to protected agent-instruction file(s) requires approval but no interactive user or gateway is present）。此前 `touch AGENTS.md` 成功只证明 mtime 可改，不代表内容可写——r458 自报的「写保护」判断成立，我此前的证伪是误判。遗留三项需主会话人工同步：Verify-level 列举追加 `appeal_to_spite, protopathic_bias`（列举尾现为 `streetlight_effect, present_bias`）、三文档互查数字。doc-numbers 25/25 全绿是因为该测试只查 AGENTS.md 的 dimensions/MCP tools/routes 三项总数（287/198/1390 均已对），不校验 Verify 列举行内容。
+2. A4 类倒装短句（「活该！」独立成句、无受损事实陈述）为两腿判据的设计边界，不扩——扩了会把「罪有应得」的正当司法评价误伤。
+3. `src/protopathic-bias.js`（r443 第 282 维）+ `test/round-443-protopathic-bias.test.js` 仍是 git log 从未提交的历史遗留（index.js 已 13 处引用、VERIFY_DIMS 已含）。属 r443 所有者产物，本轮不代为提交，报告点名留验。
+
+---
+
+# r458 — appeal_to_spite 第 286 维独立接线（真升级①：新判别维度；v6.8.228）
+
+- **轮次**：r458
+- **VERSION**：6.8.227 → 6.8.228
+- **方向**：逻辑谬误检测（appeal to spite / 诉诸恶意 / 幸灾乐祸）
+- **来源**：causalNLP/logical-fallacy（GitHub，97★，LogicClimate/LogicEdu 谬误数据集，`codes_to_get_data/intermediate_data_files/fallacy_list.txt` 317 行 canonical 谬误清单）。检索路径：HN Algolia「logical fallacy」→ arXiv 2405.02318（258 分）；GitHub API fallacy 关键词按星排序（LogicalDefence 139★ 仅 Flutter App 无检测逻辑、causalNLP 97★ 采用）。清单与心虫 285 维比对，筛出零覆盖族 appeal to spite；grep 实证 spite 词族对专维 0 命中。
+- **上一轮目标状态**：r456 present_bias 扩族已完成（285 维不变）；本轮按轮换规则转逻辑谬误方向。
+
+## 缺口实证（v6.8.226 gate 层）
+
+`scripts/round-457/probe-r457-spite.js`：攻击 10 条（裁员失业活该/拖欠工资罪有应得/封号报应/倒闭风水轮流转/网暴作死/Serves him right/had it coming/Karma/deserved every/Good riddance）→ 6 条 pass 穿透（其中 4 条被 victim_blaming 代拦为 rewrite），确认真缺口：spite 族作为独立维度 0 次承重。
+
+## 实现内容（src/appeal-to-spite.js，~310 行，新建）
+
+两腿判据（缺一不判，同句/同段共现 ≤ 邻近窗）：
+- 腿① HARM 受损事实陈述：`HARM_ZH`（辞退/失业/破产/封号/起诉/生病/被骗/赔光/负债/挨打/进医院等，含被动形与裸名词形，r457 补肢体受害裸形「被打/挨揍/打进医院」与金钱受损裸形「赔光/血本无归/负债/断供」）、`HARM_PASSIVE_ZH`、`HARM_EN`（fired/unemployed/bankrupt/scammed/banned/doxxed/injured/hospitalized/bankrupt/ruined…，r457 补 hospitalized/injured/hurt/beaten up/attacked/assaulted + bankrupt/broke/destitute/ruined/wiped out）
+- 腿② DESERVED 应得/幸灾乐祸：`DESERVED_ZH`（活该/报应/罪有应得/咎由自取/风水轮流转/自找的/怪不得别人/不算冤/不值得同情）、`DESERVED_EN`（deserved/deserves it/had it coming/good riddance/serves him right/karma/what did you expect）
+- 邻近窗：WIN_ZH=80 字 / WIN_EN=200 字符
+- 四组豁免全量保留（EXEMPT_ZH/EN：司法结果复述、绩效归责说明、事故通报、谬误教学与对冲）+ HEDGE 对冲守卫 + 问号守卫（疑问推测不判，设计行为）
+
+射程边界（写入 VERIFY_DIMS 注释）：victim_blaming 管「受害者自己也有责任」归因分配、harm_invalidation 管「伤害事实不存在」、suffering_contest 管「比惨消诉」——本族落点是「把他人受损认定为应得 + 以此取消同情」。
+
+导出 `checkAppealToSpite` + `__internals()` 句柄（守卫测试置空变异注入）。
+
+## src/index.js 七处接线（仿 present_bias r455 先例）
+
+require 756 / dispatch 2616（`const asp = _applyPedadogyRelaxation(checkAppealToSpite(_normText), "appeal_to_spite", pedagogyRelaxation);`）/ scores 3492 / dimMap 4213 + 7327（`appeal_to_spite: asp,`）/ VERIFY_DIMS ~6167 / dimensions 键 + allDims ~6553 + r457 登记注释。无 DIM_GUIDANCE 条目、无 module.exports 暴露（present_bias 实测先例：全文件 7 类接线点，无第 8 处）。维度 285→286、VERIFY 254→256。
+
+## 验证数据
+
+| 门禁 | 结果 |
+|------|------|
+| node --check（appeal-to-spite.js + index.js） | OK |
+| bin/verify.js | 16 passed / 0 failed |
+| guard-abilities.js | 20/20（dimensions 键 286、summary 152） |
+| bidirectional-guard.js | 召回 52/52 + 误拦 302/326 零新增 |
+| doc-numbers-accuracy | 20/24（剩余 4 项全阻塞 AGENTS.md 写保护，见下） |
+| 变体矩阵 probe-r457-matrix.js（gate 层） | 攻击 11/14 非 pass（appeal_to_spite 独立承重 9 条）；良性 8/11 pass |
+
+已知边界：
+- 3 个问句形未命中（问号守卫设计行为：只判已宣告的应得判断，不判疑问推测），记为射程边界非缺口
+- 3 条良性 FP 全为存量维度误伤基线（victim_blaming 拦绩效辞退说明、vagueness 拦「调查中」、contradiction 拦疑问句），非本轮引入
+- **doc-numbers 未绿**：AGENTS.md 属系统写保护的 agent 指令文件，cron 环境无交互用户无法批准写入，本轮 4 项失败全部指向该文件（285 dimensions→286、197 MCP tools→198、Verify-level 列举 (254)→(256) 且追加 appeal_to_spite、三文档互查）。README.md 与 SKILL.md 已全部同步（维度 286、Verify 列举追加 appeal_to_spite、action-tier verify 256、MCP tools 198、版本戳 v6.8.228、Version history 6.8.228 条目）。下一轮或主会话需人工同步 AGENTS.md 后 doc-numbers 转 24/24
+
 # r457 — 融合轮：3 号本地滞留产出落到上游主线（v6.8.226 → v6.8.227）
 
 - **轮次**：r457
 - **VERSION**：6.8.226 → 6.8.227
-- **方向**：真升级③（工程修复轮，非新维度）+ 版本线融合
+- **方向**：真升级③（工程修复轮，非新维度）+ 版本线融合；v6.8.227 号由 r458 appeal_to_spite 承接（轮次号唯一）
 - **来源**：用户指令「拉取最新版本，本地做好升级融合，然后再同步上去」
 - **操作方**：deepseek bot（3 号环境）本地滞留产出 + 1 号侧融合判定
 

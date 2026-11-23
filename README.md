@@ -5,24 +5,37 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
-[![Test Suite](https://img.shields.io/badge/test%20suite-25%2C536%20passing-brightgreen)](test/)
-[![MCP tools](https://img.shields.io/badge/MCP%20tools-197-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-285-blueviolet.svg)](#what-it-catches-285-dimensions)
+[![Test Suite](https://img.shields.io/badge/test%20suite-21%2C158%20passing-brightgreen)](test/)
+[![MCP tools](https://img.shields.io/badge/MCP%20tools-198-blue.svg)](#mcp-server)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-289-blueviolet.svg)](#what-it-catches-289-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
-A pure rule engine that judges whether a statement or an action is right, wrong, safe,
-or dangerous — **before it reaches a human**. Zero LLM dependency.
+A pure rule engine — no LLM, no network, no embeddings — that judges whether a
+statement or an action is right, wrong, safe, or dangerous, **before it reaches a
+human or an LLM**. It answers one question and nothing else: *is this okay to let
+through?*
 
 ```
-285 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  197 MCP tools
-×  1,390 dispatch routes  ×  28,751 passing tests  ×  2 npm dependencies
+289 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  198 MCP tools  ×  1,390 dispatch routes  ×  21,158 passing tests  ×  2 npm dependencies
 ```
 
 </div>
 
-HeartFlow does not generate. It does not compete with an LLM. It stands between the
-LLM and the human, like a pain receptor that says "no" when something is wrong.
+Every number above is measured by `node bin/verify.js` and the doc-numbers gate
+(`test/doc-numbers-accuracy.test.js`) on this repository — none of them are
+targets, aspirations, or marketing.
+
+HeartFlow does not generate text, does not answer questions, and does not compete
+with an LLM. It sits between the model and the human, like a pain receptor that
+says "no" when something is wrong — it can only block, rewrite, or flag what the
+generating layer already produced.
+
+Three entry points, one job each:
+
+- `checkInput(text)` — before a prompt reaches a model: is this a jailbreak, an injection, a harmful ask?
+- `checkDraft(text)` — after generation, before delivery: does this output lie, manipulate, flatter, or coerce?
+- `checkOutput(text)` — final gate: what must be rewritten, what must be held back, and why.
 
 ## The gap it fills
 
@@ -35,7 +48,8 @@ LLM and the human, like a pain receptor that says "no" when something is wrong.
 | **1** | **Discriminate** | **HeartFlow** |
 
 HeartFlow takes layer 1 because this layer does not depend on compute, code volume,
-or framework ecosystems. It depends on judgment alone.
+or framework ecosystems. It depends on judgment alone — and a rule engine that
+judges wrong is a bug you can read, not a black box you have to trust.
 
 ---
 
@@ -131,7 +145,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 285 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 289 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +172,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (285 dimensions) -> gate
+scope-check -> premise-check -> discriminate (289 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +199,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (285 dimensions)
+## What it catches (289 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **254 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **246 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,16 +218,16 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.227**. Not marketing copy.
+Measured on this repository at **v6.8.228**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 285 |
-| MCP tools | 197 | tool definitions exposed via `tools/list` |
-| Test suite | 28,751 passing / 177 failing | `node test/run-all.js`（r435 全量实测 25,941/233/26,174（873 文件）——较 r434 终值基线（872 文件 25,857/233/26,090）passed +84 全部为本轮 test/round-435-regression-slump-jinx.test.js 的 84 条断言、failed +0 零新增（regression_to_the_mean 扩族不新增失败，硬失败清单 173 条 + 自报失败 46 条与基线逐项 diff 相同零退化））|
+| Discrimination dimensions | 289 |
+| MCP tools | 198 | tool definitions exposed via `tools/list` |
+| Test suite | 21,158 passing / 195 failing | `node test/run-all.js`（r463 审计修复轮全量实测 21,158/195（938 文件）——195 项失败为长期存量技术债，按 r412 不作门禁；r457 上游融合轮全量实测 28,751/177/28,928（896 文件）、r435 基线 25,941/233/26,174（873 文件），两侧口径不同勿混用）|
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,7 +396,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
-| 6.8.227 | 2026-11-23 | **r457 融合轮：3 号本地滞留产出落到上游主线（真升级③：工程修复 + 版本线融合，非新维度）** — 3 号克隆自 2026-11-16 起产出滞留本地未推送，期间上游 main 从 v6.8.158 推进到 v6.8.226（631 commit、r277→r456）。`git rebase origin/main` 逐冲突按「测试断言语义 → 模块头注释设计意图 → git 历史」三据裁决，上游已修的取上游、上游没有的才保留，无 `push --force`，备份分支 `backup/deepseek-pre-sync-20261123`。**上游缺失而本轮落地的真产出**：① `bullshit_recognition` 行动层断裂——v6.8.120（8990451d）改维度名时漏改 `REWRITE_DIMS`，`'bullshit'` 成死条目，命中自 2026-11-02 起静默退化成 verify/pass（融合后复核上游 `src/index.js:5197` 确实仍是 `'bullshit'`）；② `fallacy_of_relevance` 五个良性误报豁免族（建设性转介 `CONSTRUCTIVE` / 规范等权 `EQUAL_WEIGHT` / 分项处置 `SEPARATE` / 争议已解决 `RESOLVED_CONSEQUENCE_EN` / 保密域 `CONFIDENTIAL_ZH`），每条配窄性对照实证；③ 评分制式 0-100 残留连修 10 个维度（fallacy_of_relevance 68→0.68 是「良性句被顶成 rewrite」原凶）；④ 毒正则 `/(?!)/` 还原两支（sole-narrative 英文三支自 v6.8.85 整族漏判、helplessness-induction 自 v6.8.86）+ 新增 `test/src-no-dead-regex.test.js` 死正则守卫；⑤ `chinese-tokenizer` 全角标点契约修复（非 CJK 片段此前不剥全角标点，「，，。！！」成 token、「hello，world」粘逗号）+ 22 条守护；⑥ 6 个 dispatch 守卫测试计数漂移 + run-all runner「自报失败无 ✗ 行」堵口 + r268 五族中性误伤回归落库。**取上游不重复建设**：appeal_to_pity 正则（r320 更优）、REVERSED 倒装测试（r318）、dream-loop 行锚（r399）、heartflow_check_output 条目（r298）、round-257 计数断言（r318）。**轮次号处置**（宪法 §1.1）：本地 r277 认领行丢弃（上游已判 abandoned 的撞号事故），本地 r278/r279 合并为本轮 r457。四门禁 verify 16/0、guard 20/20@285、doc 25/25、双向召回 52/52 + 误拦 302/326 零新增。维度/工具/路由数不变（285/197/1390）。 |
+| 6.8.228 | 2026-11-23 | **r458 第 286 维度 `appeal_to_spite`（诉诸恶意 / 幸灾乐祸 / appeal to spite）独立接线（真升级①）** — 外部来源：causalNLP/logical-fallacy（97★，LogicClimate/LogicEdu 谬误数据集，`fallacy_list.txt` 317 行 canonical 清单）筛出心虫零覆盖的 appeal to spite 族；内部缺口实证 `scripts/round-457/probe-r457-spite.js` v6.8.226 gate 层实测攻击 10 条 6 条穿透 pass、spite 词族对专维 0 命中。两腿判据（缺一不判）：腿① HARM 受损事实陈述（辞退/失业/破产/封号/起诉/破产/生病/被骗/被裁/赔光/负债/挨打/进医院；EN：fired/unemployed/bankrupt/scammed/banned/doxxed/injured/hospitalized，含被动形 `was fired` 与裸名词形） × 腿② DESERVED 应得/幸灾乐祸（活该/报应/罪有应得/咎由自取/风水轮流转/自找的/怪不得别人/不算冤/不值得同情；EN：deserved/deserves it/had it coming/good riddance/serves him right/karma/what did you expect），邻近窗 ZH 80 字 / EN 200 字符。射程边界：victim_blaming 管「受害者自己也有责任」的归因分配、harm_invalidation 管「伤害事实不存在」、suffering_contest 管「比惨消诉」——本族落点是「把他人受损认定为应得 + 以此取消同情」。四组豁免全量保留（司法结果复述 / 绩效归责说明 / 事故通报 / 谬误教学与对冲）。`src/appeal-to-spite.js`（~310 行）导出 `checkAppealToSpite` 与 `__internals()` 句柄（守卫测试可置空指定支验承重）。`src/index.js` 七处接线（require / dispatch 变量 `asp` / scores / dimMap×2 / dimensions 键+登记注释 / VERIFY_DIMS），维度 285→287、VERIFY 254→257。验证：矩阵探针 `scripts/round-457/probe-r457-matrix.js` gate 层攻击 11/14 非 pass（appeal_to_spite 独立承重 9 条）、良性 8/11 pass（3 条 FP 全为存量维度 victim_blaming/vagueness/contradiction 已知误伤基线，非本轮引入）；剩余 3 个未命中均为问号守卫挡掉的疑问形，属设计边界（只判已宣告的应得判断，不判疑问推测）。四门禁：verify 16/0、guard-abilities 20/20@287、双向召回 52/52 + 误拦 302/326 零新增。**未绿项**：doc-numbers 19/24，剩余 5 项全部阻塞在 AGENTS.md 写保护（该文件对 cron 系统写保护，无交互用户无法批准）：维度总数 285→287、MCP 工具 197→198、Verify-level 列举 (254)→(256) 且列举追加 `appeal_to_spite`、三文档互查数字——需主会话人工同步后转绿；README/SKILL 两侧已全部同步（含 Verify 列举追加与版本戳 v6.8.228）。VERSION 6.8.227→6.8.228。 |
+| 6.8.227 | 2026-11-23 | **r457 融合轮：3 号本地滞留产出落到上游主线（真升级③：工程修复 + 版本线融合，非新维度）** — 3 号克隆自 2026-11-16 起产出滞留本地未推送，期间上游 main 从 v6.8.158 推进到 v6.8.226（631 commit、r277→r456）。`git rebase origin/main` 逐冲突按「测试断言语义 → 模块头注释设计意图 → git 历史」三据裁决，上游已修的取上游、上游没有的才保留，无 `push --force`，备份分支 `backup/deepseek-pre-sync-20261123`。**上游缺失而本轮落地的真产出**：① `bullshit_recognition` 行动层断裂——v6.8.120（8990451d）改维度名时漏改 `REWRITE_DIMS`，`'bullshit'` 成死条目，命中自 2026-11-02 起静默退化成 verify/pass（融合后复核上游 `src/index.js:5197` 确实仍是 `'bullshit'`）；② `fallacy_of_relevance` 五个良性误报豁免族（建设性转介 `CONSTRUCTIVE` / 规范等权 `EQUAL_WEIGHT` / 分项处置 `SEPARATE` / 争议已解决 `RESOLVED_CONSEQUENCE_EN` / 保密域 `CONFIDENTIAL_ZH`），每条配窄性对照实证；③ 评分制式 0-100 残留连修 10 个维度（fallacy_of_relevance 68→0.68 是「良性句被顶成 rewrite」原凶）；④ 毒正则 `/(?!)/` 还原两支（sole-narrative 英文三支自 v6.8.85 整族漏判、helplessness-induction 自 v6.8.86）+ 新增 `test/src-no-dead-regex.test.js` 死正则守卫；⑤ `chinese-tokenizer` 全角标点契约修复（非 CJK 片段此前不剥全角标点，「，，。！！」成 token、「hello，world」粘逗号）+ 22 条守护；⑥ 6 个 dispatch 守卫测试计数漂移 + run-all runner「自报失败无 ✗ 行」堵口 + r268 五族中性误伤回归落库。**取上游不重复建设**：appeal_to_pity 正则（r320 更优）、REVERSED 倒装测试（r318）、dream-loop 行锚（r399）、heartflow_check_output 条目（r298）、round-257 计数断言（r318）。**轮次号处置**（宪法 §1.1）：本地 r277 认领行丢弃（上游已判 abandoned 的撞号事故），本地 r278/r279 合并为本轮 r457。**版本号说明**：本轮 VERSION 6.8.227 与同日本地滞留的 r458 appeal_to_spite（第 286 维）撞号，按轮次号唯一原则仲裁——上游融合轮保持 6.8.227，appeal_to_spite 升级为 6.8.228（r458），两轮同属 2026-11-23，Version history 中 r458 条目在前。四门禁 verify 16/0、guard 20/20@285、doc 25/25、双向召回 52/52 + 误拦 302/326 零新增。维度/工具/路由数不变（285/197/1390）。 |
 | 6.8.226 | 2026-11-23 | **r455 第 285 维度 `present_bias`（现时偏差 / 双曲贴现）独立接线 + r456 新句式族扩族（真升级①+②）** — r455：模块自 r243 起草即登记进 `src/econ-reasoning-gate.js` 的 FAMILIES 聚合表（第 249 维子族），gate findings 只能出现聚合名 econ_reasoning_gate，子族名无法单独指名；缺口实证 `scripts/round-455/probe-r455-gap.js` v6.8.225 gate 层实测 17 条攻击穿透 8，present_bias 作为独立维度名 0 次承重。仿 r331/r448 先例独立接线（`src/index.js` 七处：require + discriminate 计算点 + scores + dimMap + dimensions 键 + VERIFY_DIMS + discriminate 键，变量名 prb），维度 284→285、VERIFY 252→254。r456：腿级诊断（`scripts/round-455/probe-r455-legs.js` / `probe-r455-en.js` / `probe-r455-en2.js`）定位七族整族缺席，新增六组平行常量——`NOW_ZH4`（放纵名词+一时爽格言形 / 主语名词+先+消耗动词形）、`LATER_ZH4`（等X再Y条件推迟 / 有钱了再正事形）、`NOW_EN4`（having fun now / whatever I want 放纵许可）、`LATER_EN4`（earn first / save after paycheck 挣钱优先）、`LATER_ZH5`（放纵动词+再说 / 趁X年轻未来有限性）、`LATER_EN5`（I'll start the diet tomorrow 宾语形 + 时间词前置形 + I will 全写形），存量各族一字未动、豁免层不动、距离窗复用。轮测 `test/round-456-present-bias-expansion.test.js` **46/46**（常量结构 4 + 穿透闭合 7 + 良性豁免 10 + 变体矩阵 14 + 存量回归 5），存量 `test/present-bias.test.js` 14/14（负例注入断言语义随扩族更新为新族承重正向断言）。四门禁：verify 16/0、guard 20/20@285、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增；穿透 8→1。VERSION 6.8.225→6.8.226，维度 284→285、工具/路由数不变（197/1390）。 |
 | 6.8.225 | 2026-11-23 | **r454 relative_pration「抽象处境劣势×反问压制」新句式族（真升级②：既有维度扩族）** — 第 156 维 relative_pration（诉诸更惨 / relative privation）扩族。缺口实证：`scripts/round-454/probe-r454-*.js` v6.8.224 gate 层实测，比烂论证中文核心形 5/10 穿透（「还有人吃不上饭呢，你抱怨什么加班。」「别的国家污染更严重，我们这点排放算什么。」「老一辈饥寒交迫都挺过来了，你加个班就喊累？」「非洲还有孩子饿死，你考试没考好算什么挫折。」），腿级定位显示两处均为整族缺席而非零星缺口：腿①缺**抽象处境劣势参照**族（第三方/群体/往事/别国的统计性或整体性处境劣势：污染更严重/更乱/平均寿命只有三十岁/连电都没有——存量 RP_SUFFER_ZH 刻意只收具体苦难短语防共情转述误伤），腿②缺**「抱怨什么 X」反问压制**族（第二人称诉求 + 疑问收尾的「这算什么」反问形）。新模块 `src/relative-pration-agg.js`：形态一（腿①族 C）收带具体量纲或整体处境的劣势陈述（更严重/更差/更低/只有X/连…都没有/更乱/更糟），不含 bare「更惨」；形态二（腿②族 D）「你抱怨什么加班」「你叫苦什么」「你吐槽什么」第二人称 + 疑问收尾反问形；判据不变（双腿共现缺一不判）+ 既有五组豁免全量保留 + 新增第六组豁免 RP_AGG_STATS（正当统计比较/事实陈述）。`src/index.js` 接线：与主判定取 max 合并（同一 dimMap 键 relative_pration，不新增维度、不新增 dispatch 路由）。轮测 `test/round-454-relative-pration-agg.test.js` **51/51**（12 攻击模块层 + gate 层双重断言、13 良性零误伤）。四门禁：verify 16/0、guard 20/20@284、doc 24/0（补齐本 changelog 后转绿）、双向召回 52/52 + 误拦 302/326 零新增。VERSION 6.8.224→6.8.225，维度/工具/路由数不变（284/197/1390）。 |
 | 6.8.224 | 2026-11-22 | **r449 第 283 维度 `argumentum_ex_silentio`（诉诸沉默 / argument from silence）接线闭环（真升级①：新判别维度）** — 方向「逻辑谬误检测」。缺口实证：`scripts/round-449/probe-r449-gap.js` + `probe-r449-core.js` v6.8.223 gate 层实测，检出偏误/路灯效应/观察者选择三候选族穿透 6~11 条；转攻诉诸沉默族——存量 manufactured_consent（会议程序短路）只收「宣布通过/视为一致」等表决程序宣告形，不覆盖「无反对/无投诉/无反馈/没说话」这类**缺席事实被当作在场表态**的更宽结构。新模块 `src/argumentum-ex-silentio.js`（338 行）双腿判据（缺一不判）：腿① SILENCE 沉默事实（没反对/没有异议/无投诉/零反馈/没人说话/一片沉默/stayed silent/no objections/no complaints/no response was recorded…）+ 腿② INFERENCE 由沉默推出的正面结论（就是同意/视为认可/说明支持/都接受了/therefore agree/so they approved/which shows consent…），邻近窗 ZH 60 字 / EN 160 字符。四组豁免（疑问句形、对冲限定、显式否定/方法论破除、表决与会议记录如实统计形）+ 强否定条件语气守卫；score 0.56 VERIFY 级。`src/index.js` 八处接线（变量名 aes）。轮测 `test/round-449-argumentum-ex-silentio.test.js` **58/58**（攻击 ZH 22 + EN 16 含裸名词/带修饰/长句、良性 16 零误伤含边缘良性「沉默不等于同意」教学陈述、逐常量负例注入双腿停判、射程划界回归锚）。四门禁：verify 16/0、guard 20/20@283、doc 24/0（本轮补齐 README 规格戳/action-tier 计数/Version history 三处文档债）、双向召回 52/52 + 误拦零新增。VERSION 6.8.223→6.8.224，维度 282→283、VERIFY 250→251。 **r451 截断 WIP 补固化（r453 接手，v6.8.224 保持）**：第 284 维度 `streetlight_effect`（路灯效应 / streetlight effect）接线闭环——以测量可得性限定证据范围并据此对整体下结论（「只在路灯下找钥匙就断定整个公园失物率不高」「只统计公开披露病例，未报告的等于不存在」）。缺口实证 `scripts/round-449/probe-r449-core.js` 17 条核心攻击形 11 条穿透既有 283 维；存量 proxy_metric_goal（187）/ availability_bias（200）/ vivid_case_availability（252）均不判「可得性限定证据范围并据此外推」结构。`src/streetlight-effect.js` 384 行，`src/index.js` 九处接线（变量名 sle），轮测 `test/round-451-streetlight-effect.test.js` 8/8、gate 端到端攻击 rewrite 且本维承重、良性 pass；维度 283→284、VERIFY 251→252；四门禁 verify 16/0、guard 20/20@284、doc 24/0、双向召回 52/52 + 误拦 302/326 零新增。 |

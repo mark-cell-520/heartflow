@@ -763,6 +763,12 @@ const { checkAppealToSpite } = require('./appeal-to-spite.js');
 // bias 缩写，grep 0 命中无冲突。三腿判据与豁免见 src/normalcy-bias.js
 // 头注释。r460 立项探针：中文攻击 5/7 穿透 gate=pass，无任何维度承重。
 const { detectNormalcyBias } = require('./normalcy-bias.js');
+// [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误：用连贯化叙述框架
+// ×必然化断言把偶然/多因结果追认为单一必然故事）。变量名 nrf——narrative
+// fallacy 缩写，grep 0 命中无冲突。两腿判据与豁免见
+// src/narrative-fallacy.js 头注释。r463 立项探针：中英攻击 5/5 穿透
+// gate=pass 零维度承重，良性 3/3 零误伤。
+const { checkNarrativeFallacy } = require('./narrative-fallacy.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
 // 细节见 src/dose-response-linearity.js 头注释。
@@ -2651,6 +2657,9 @@ function discriminate(text, evidence = [], contentMode) {
   // r460 立项探针（中文攻击 5/7 穿透 gate=pass）后仿 r457 先例接线：
   // 常态/历史稳定陈述腿×当下风险信号否认腿×不行动结论腿三腿共现。
   const ncb = _applyPedagogyRelaxation(detectNormalcyBias(_normText), "normalcy_bias", pedagogyRelaxation);
+  // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误）独立 dispatch。
+  // 同 r460 先例：两腿共现+邻近窗+五组豁免，缺一不判。
+  const nrf = _applyPedagogyRelaxation(checkNarrativeFallacy(_normText), "narrative_fallacy", pedagogyRelaxation);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -3537,6 +3546,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 稳定否认当下风险信号×不行动结论）。同 r457 先例：dimMap 与 allDims
     // 两处都接，findings 可单独指名该族。ncb。
     {score: ncb.score, name:'normalcy_bias'},
+    // [r463 接线] 第 289 维度 narrative_fallacy 参与判定（叙事谬误：
+    // 连贯化叙述框架腿×必然化断言腿）。同 r460 先例：dimMap 与 allDims
+    // 两处都接，findings 可单独指名该族。nrf。
+    {score: nrf.score, name:'narrative_fallacy'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -4266,6 +4279,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r460 接线] 第 288 维度 normalcy_bias（正常态偏误×历史/常态稳定
     // 陈述腿×风险信号否认腿×不行动结论腿）。ncb。
     normalcy_bias: ncb,
+    // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误×连贯化叙述框架
+    // 腿×必然化断言腿）。nrf。
+    narrative_fallacy: nrf,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -4934,6 +4950,7 @@ function discriminate(text, evidence = [], contentMode) {
     'quantifier_scope_shift': "不得**把「对每个 x 各有一个 y」偷换成「有一个 y 对所有 x 成立」**——量词辖域移位（quantifier scope shift / scope fallacy，∀x∃y 推不出 ∃y∀x）是把逐点成立的断言整体化为同一对象的普遍断言：「对每个员工都有一个工位，所以存在一个工位是所有员工共用的」「每个人都有一位守护天使，所以有一位守护天使守护所有人」「有人迟到了，所以所有人都必须提前到」（Every student has a mentor, so there is a mentor for every student. / Each child has a parent, so there is a parent for all children.）。∀x∃y（每个人有自己的）与 ∃y∀x（有一个共用的）是逻辑强度完全不同的两个命题，前者弱、后者强，用推断连接词把前者接到后者上等于把弱命题伪装成强命题。判据**四腿共现 + 邻近窗 + 豁免组，缺一不判**：腿① SCOPE-PREMISE 辖域前提（对每个/每一个/每个/每人/人人/每个人/各有一位/各自有/每人都有一个/任何人都有一个；EN every / each / every person / everyone has / each child / anyone has，含裸名词形：单独出现「每个」「人人」即命中腿①）；腿② EXISTENCE 存在量词结论（存在一个/有一个/某一个/某个/同一个/共用/共享/只用同一个/统统归；EN there is one / there exists / one single / the same / shared by all / a common，含裸名词形：单独出现「同一个」「共用」即命中腿②）；腿③ INFERENCE 推断连接词（所以/因此/这说明/就意味着/那就是/可见/故而；EN so / therefore / which means / hence / thus / that means，含倒装形：结论在前、前提在后作理由）；腿④ PREDICATE-SHARED 谓域共享——结论中的谓词与前提中的谓词同族（工位-工位/导师-导师/天使-天使/工位-座位；mentor-mentor/angel-angel），确保偷换的是同一个关系而非两个无关陈述。四腿落在 80 字（EN 200 字符）邻近窗内且豁免全不中即视为同一次「辖域移位」叙述。边界：undistributed_middle（中项不周延）管三段论中项未周延，本族管量词辖域顺序；affirming_the_consequent/denying_the_antecedent 管条件句逆/否误用，本族不依赖条件句；fallacy_of_relevance 管相关性缺失，本族的推理形式本身无效；hasty_generalization 管样本不足的归纳，本族是演绎形式的误用而非样本问题；whole_part_transfer 管整体部分性质互推，本族管的是量词嵌套顺序而非整体-部分。明确不判：正确辖域表述（每个人有各自的工位，不是同一个/每人都配了一把钥匙，钥匙不通用——**把 ∀x∃y 与 ∃y∀x 区分开是正确判别**）、同一性本来成立的陈述（全校共用一个食堂/大家共用一条网线——**对象真的是同一个时不是移位**）、提问句式（含 ?/？）、否定与对冲（不意味着/不代表/未必/不一定/取决于；EN does not mean / not necessarily / depends on）、概念教学（量词辖域/辖域移位/quantifier scope / scope fallacy / ∀x∃y）。",
     // [r402 接线] 第 270 维度 lead_time_bias（领先时间偏误：筛查提前确诊
     // 时点造成的生存期假性延长）guidance。ltb——lead time bias 缩写。
+    'narrative_fallacy': "不得**用连贯化叙述框架把偶然/多因结果追认成单一必然故事**——叙事谬误（narrative fallacy，Taleb《黑天鹅》）：把分散事件「串起来看/环环相扣/顺着脉络捋」编成一个流畅整体，再配上「注定/迟早/毫无意外」的必然化断言，就把事后编故事的能力当成了对因果结构的理解。人类大脑天生嗜好因果叙事，流畅的故事会制造「本该如此」的错觉，系统性高估世界的可解释性、低估随机性与多因性，进而错误总结规律、错误追责、对纯巧合赋予解释力。样本形状：「把这件事从头到尾串起来看，他的失败是注定的。」「回头一看，每一步都环环相扣，这个结果毫无意外。」「整件事情顺着脉络捋一遍，公司倒闭是迟早的事。」「这些线索拼在一起，真相已经很明显了。」「Looking back, every step led inevitably to this outcome.」「Piece the clues together and the pattern is unmistakable.」「The whole thing fits together too neatly to be a coincidence.」（样本形状与负例见 test/round-463-narrative-fallacy.test.js）。判据**两腿共现+邻近窗+五组豁免，缺一不判**：腿① COHERE 连贯化叙述框架（把…串起来/连起来/拼在一起/环环相扣/一环扣一环/丝丝入扣/顺着脉络/顺着线索/捋一遍/梳理下来/对上了/从头到尾/来龙去脉/因果链/一条线/拼图/回过头看/整体来看；EN string together / piece together / connect the dots / it all fits / fits together / hangs together / adds up / the whole thing / every step led / led to this / chain of events / the pattern / the bigger picture / falls into place / too neat）——**161 轮教训：全部收裸名词形态**；腿② INEVIT 必然化断言（注定/迟早/早晚/必然/毫无意外/毫无悬念/一点都不意外/不是偶然/绝非偶然/命定/在劫难逃/大势所趋/顺理成章/水到渠成/意料之中/一环都少不了/剧本/写好的/安排好的/精心策划/蓄谋已久/早有预谋/不是巧合；EN inevitable / inevitably / bound to / doomed / foregone conclusion / no accident / not a coincidence / too neat / meant to be / written in the stars / scripted / choreographed / orchestrated / by design / premeditated / masterminded / planned all along / only a matter of time）。窗：中文 60 字双朝向、EN 150 字符双朝向（覆盖连贯框架在前的主形与必然断言在前的倒装形）。事后叙述的流畅不是必然性的证据：正当做法是**补上机制证据**（哪条因果机制在起作用、机制在决策时点是否可知）或**交代偶然性空间与反事实检验**（换一条路径结果会不会不同、有多少纯运气成分），而不是用「每一步都对上了」替代论证。边界：hindsight_bias（第175维）管「事后结果倒推为事前注定」的**判断力虚构**（早知如此/明眼人/迹象一直都在），腿①是回望立场标记（事后看来/looking back on the outcome）；本维度腿①是**连贯化叙述动作**（把线索连起来/顺着脉络捋一遍/every step led）——强调「叙述自身制造了连贯感」，腿②也不必是事前可预见形（「迟早的事」是事后归因，不是事前预言），两族要件不同、可共现；post_hoc（第21维）管「时序连接×因果断言」（先A后B所以A导致B），本族不依赖具体事件时序、只要叙述框架×必然断言共现；monocausal_attribution（第214维）管单一原因过度简化（把多因结果归给一个原因），本族甚至不必指明任何单一原因——攻击腿是**必然性叙事本身**；perfect_error 管「声称零失误/一贯正确」的自我完美化，本族评价对象是事后叙述的必然性虚构。明确不判（豁免）：概念/教学转述（叙事谬误/叙事偏差/叙述谬误/后见之明/认知偏差/心理学/行为经济学/黑天鹅/反脆弱/教科书/文献/概念/理论/谬误/偏见；EN narrative fallacy / cognitive bias / behavioral economics / black swan / antifragile / textbook / literature / randomness / probability——讨论这个概念本身是正确判别）、偶然性承认（偶然/巧合/随机/未必/不一定/多种可能/存在变数/充满不确定/谁也想不到/没人能预料/难以预料/一念之差/差一点/侥幸/运气；EN coincidence / random / by chance / could have gone either way / unpredictable / no way to know / luck / fluke——承认偶然是叙事谬误的**反面**）、多因陈述（多因/多种因素/多个因素/错综复杂/交织/叠加/共同作用/不能简单归结/不能一概而论；EN multiple causes / many factors / a combination of / complex interplay / cannot be reduced to——把结果归给多因是正确的因果纪律）、推理否定/劝诫（不可取/要不得/别把/不能把/警惕/避免/防止/切忌/拒绝/抵制/当心/谨防/不等于/并不意味着；EN do not / don't / avoid / beware / resist / guard against / is a mistake——拒绝该倾向本身是正确判别）、对冲（可能/也许/或许/大概/似乎/说不定/未必/很难说/不见得/待验证/有待；EN maybe / perhaps / might / possibly / probably / seems / appears / could be——概率化表述不作谬误判定）、疑问句（含 ?/？）。已知边界：① 腿①腿②限同句共现（窗 60/150 字符），跨句形本轮保守不收；② 将来时预测（「这条路走下去必将成功」）不在射程（无已发生结果锚点，归 absolute_claim 类）；③ 存量维度 monocausal_attribution / hindsight_bias 会代拦部分边缘形（r463 实测见 UPGRADE_LOG），非本维度引入。",
     'lead_time_bias': "不得**把「筛查让确诊时点提前」当成「筛查延长了寿命」的证据**——领先时间偏误（lead-time bias / lead time artifact）：以确诊日为起算点，筛查只是把发现疾病的日子往前挪，从确诊到死亡的时长必然被拉长，但病人的实际死亡日期没有变。拿「筛查组比未筛查组活得更久」直接宣称筛查救命，等于把记账起点前移造成的生存期假性延长误认为真实获益。样本形状：「有了筛查项目之后，患者的平均生存时间从2年延长到了5年，说明筛查显著延长了生命。」「这个病现在确诊后平均能活8年，而几十年前只能活3年，医学进步真大。」「普查让我们更早发现癌症，所以患者的生存期明显变长了。」「因为疾病被更早发现，患者的生存率大幅提高。」「Screening advanced the date of diagnosis by two years, so patients appeared to live longer.」「Tumors found by screening are smaller and patients survive longer.」（样本形状与负例见 test/round-402-lead-time-bias.test.js）。判据**三腿共现 + 邻近窗 + 三组豁免，缺一不判**：腿① SCREENING 筛查/早诊语义（筛查/普查/筛癌/体检/两癌筛查/钼靶/乳腺X线/肠镜/胃镜/PSA/低剂量CT/防癌体检/癌症筛查/早筛/肿瘤筛查/定期检查/健康体检；EN screening / mammogram / colonoscopy / PSA / annual physical / check-up）；腿② DIAGNOSIS_TIMING 诊断时点提前（早发现/更早发现/提前发现/提前确诊/提早诊断/诊断时间提前/发现得更早/时间提前了/比以往提前/检出更早；EN earlier / advanced the date of diagnosis / at an early stage / caught earlier / detected sooner）；腿③ SURVIVAL_GAIN 生存获益（生存期/存活期/生存时间/寿命/活得更久/多活了/生存期延长/生存时间延长/生存率提高/生存率大幅提高/五年生存率/10年生存率/患者活到/能活N年；EN survival / lived longer / survival time / survival rate / live N years）。缺腿不判——只有筛查无时点提前（「开展筛查项目」）是中性描述；有时点提前无获益断言（「筛查能更早发现问题」）是正当的健康宣教。边界：survivor_time_bias（第226维）管以「从确诊起算」为准的生存期比较中零时偏置（immortal time / length-time bias），本族特指**筛查语境下诊断时点前移≠寿命延长**的口径误读，三腿结构不重叠；survivorship_bias（第132维）管只看活下来的人造成的高估，本族活着的与死去的都在统计内、错在起算点前移；selection_bias（第168维）管进入筛查组的人本身更健康（self-selection），本族不依赖人群差异、单句即可构成口径谬误；base_rate_neglect（第169维）管忽略先验概率，本族先验（真实死亡率）正是应当被拿出来对比的量；activity_outcome_confusion（第184维）管把活动本身当结果，本族的活动（筛查）确实产生了可测结果（早诊），错在对结果的解释口径；hindsight_bias（第175维）管事后诸葛亮，本族不涉及事后视角。verify 级——单句可能是正当的 RCT 死亡率结论转述、他人宣传话术引述、或作者正要批判 lead-time bias；verify 的含义是「这个以生存期变长为依据的筛查有效性宣称没有区分提前确诊与延长寿命，需要补死亡率/总生存期口径的对照数据才能采信」，调用方应要求补硬终点证据，而不是把「生存期变长」当「筛查救命」。明确不判（豁免）：①硬终点口径（死亡率下降/死亡风险降低/总体生存期显著改善/总生存期/OS/疾病特异性生存期/RCT死亡率终点；EN mortality reduction / overall survival / OS / disease-specific survival / death rate）——作者已在正确口径上陈述；②元陈述破除（领先时间偏误/lead-time bias/lead time artifact/lead time effect/生存期假性延长/假性获益/时间偏倚）——正在指出本谬误本身；③机制性治愈口径（治愈/根治/完全缓解/癌细胞清除/肿瘤消失；EN cured / eradicated / complete remission）——有治愈机制时不涉及生存期起算问题。",
     // [r398 接线] 第 268 维度 baseline_omission（基线缺失：无对照比例结果断言）guidance。
     'baseline_omission': "不得**把一个没有对照组、基线或分母口径的比例结果当成疗效/效果的证明**——基线缺失（baseline omission / uncontrolled rate claim）：报告治愈率、满意度、成功率却不交代自愈率是多少、安慰剂组表现如何、样本分母是谁，等于把「无人对照的百分比」伪装成「效果证据」。样本形状：「这种新疗法治愈率高达九成，效果惊人。」「用了我们的产品，百分之八十的客户都满意。」「本课程学员九成实现了收入翻倍。」「这种药的缓解率达到百分之八十五。」「The new treatment cures ninety percent of patients.」「Our product achieves an eighty percent success rate.」「After the training, ninety percent of students doubled their income.」（模块层矩阵攻击 12/12、良性 10/10，见 src/baseline-omission.js）。判据**双腿共现 + 三组豁免，缺一不判**：腿① RATE_RESULT 比例结果——治愈率/缓解率/成功率/满意率/满意度/达标率/留存率/复购率/完成率/合格率/通过率/有效率/好评率/完课率/及格率/转化率/退货率/退订率/增幅/降幅/中奖率/命中率/占有率（EN cure/recovery/success/satisfaction/retention/pass/completion/response/conversion rate）或腿①b RATE_RESULT_VERB 结果动词×比例（治愈/治好了/缓解/改善/满意/认可/达标/完成/通过/留存/复购/翻倍/提升 × 九成/八成/百分之N/N% / ninety percent / N out of N）；腿② CLAIM_EFFECT 疗效/效果断言（高达/达到/惊人/显著/明显/完胜/效果看得见/证明有效/疗效确切/遥遥领先/都很满意/大获成功/好评如潮/很成功/成效显著；EN achieves/delivers/proves/remarkable/impressive/dramatic/industry-leading/overwhelmingly positive/cures…percent）。缺腿不判——只报数字无效果断言（「治愈率90%，待验证」）是中性披露，归 verify 前的 unsupported_claim。边界：statistical_misleading（第58维）管**基数小到没意义**（样本 2→8 人），要求句中给出绝对量；本族可完全无数字细节、只给大比例，错在无参照系——它给了大基数（样本量 12000）会早退放过，而「样本量 12000 的治愈率九成」若无对照组仍是本族；percentage_overflow 管**百分比超 100** 的算术错误，本族百分比完全合法；base_rate_neglect（第169维）管**阳性信号→高置信后验**（检测阳性所以几乎肯定得病），错在忽略先验，本族错在缺对照组、腿②是疗效断言而非置信模态；weak_evidence_strong_claim（第245维）管**证据强度与结论强度不匹配**的泛化结构，不特指比例结果缺对照；unsupported_claim 管泛化无依据断言，本族有依据（百分比结果）、错在依据不完整。verify 级——单句可能是合规披露中的一句、转述他人宣传话术、或作者正要批判该数据缺对照；verify 的含义是「这个比例结果没有对照参照系，需要补上对照组、基线或分母口径才能判断它是否构成疗效证据」，调用方应要求补对照数据，而不是接受孤立百分比当效果证明。明确不判（豁免）：①对照/基线纪律语言在场（对照组/控制组/基线组/基线值/安慰剂/双盲/随机对照/RCT/历史对照/行业均值/基准值/分母/样本量/参与人数/统计口径/与…相比/环比/同比；EN control group/placebo/randomized/baseline/benchmark/compared with/versus/sample size/out of N）；②数字被质疑或待核验的元陈述（需要验证/数据存疑/样本太小/缺乏对照/孤证/尚未核验/未公布；EN unverified/needs verification/sample too small/lacks control/insufficient evidence）；③统计教学/谬误分析转述（谬误/案例教学/反例/典型错误/教学/教材/举例/示例/剖析；EN fallacy/case study/for example/illustrates/textbook）。",
@@ -6616,6 +6633,13 @@ function discriminate(text, evidence = [], contentMode) {
     // 历史的真实差异再采信其不行动结论」。射程边界：本维度只管「历史
     // 稳定×否认风险信号×不行动」这一族，不管该风险本身的事实真伪。
     'normalcy_bias',
+    // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误）登记。
+    // verify 级——单句也可能是文学分析、正当复盘、对巧合的正确质疑；
+    // verify 的含义是「该必然化断言缺乏必然机制与偶然性空间的交代，
+    // 需要补机制证据与反事实检验后再采信」，调用方应要求补上机制证据，
+    // 而不是把叙述的流畅当成真理的代理。射程边界：只管「连贯化叙述
+    // 框架×必然化断言」这一族，不管该结果本身的事实真伪。
+    'narrative_fallacy',
     // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸）登记。
     // verify 级——单句也可能是司法结果复述、绩效归责说明、事故通报与
     // 谬误教学（「诉诸恶意是一种常见的逻辑谬误」正是本族要教的判别
@@ -7184,6 +7208,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r177] 第 175 维度 hindsight_bias（事后聪明偏差）。
       // 同 r176 先例：九处一次接齐，漏一处 dimensions 读数缺键。
       hindsight_bias: hb,
+      // [r463 接线] 第 289 维度 narrative_fallacy（叙事谬误）。
+      // 同 r460 先例：九处一次接齐，漏一处 dimensions 读数缺键。nrf。
+      narrative_fallacy: nrf,
       // [r178] 第 176 维度 conjunction_fallacy（合取谬误）。
       conjunction_fallacy: cjf,
       // [r179] 第 177 维度 moralistic_fallacy（道德主义谬误）。
@@ -7407,6 +7434,13 @@ function discriminate(text, evidence = [], contentMode) {
       present_bias: prb,
       // [r457 接线] 第 286 维度 appeal_to_spite 补登记（诉诸恶意/幸灾乐祸）。
       appeal_to_spite: asp,
+      // [r463 审计修复] 第 288 维度 normalcy_bias 补登记（正常态偏误：
+      // 以历史无事故否认当下明确风险信号×不行动结论）。r460 接线时
+      // VERIFY_DIMS/dispatch/scores/dimMap/summary 八处都接了，唯独漏了
+      // 本 dimensions 输出对象键 → discriminate().dimensions 恒缺该键，
+      // 读方（gate/MCP/面板）一律当「未命中」，findings 指名可达但
+      // 运行态读数不可见。同 r556/r243/r249 教训：九处须一次接齐。
+      normalcy_bias: ncb,
       // [r249] 第 224 维度 denominator_swap 补登记（分母替换谬误）。
       // 同上：九处一次接齐。
       denominator_swap: dsw,
@@ -7874,6 +7908,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r177] 第 175 维度 hindsight_bias 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       hb.count ? hb.count + ' 处事后聪明偏差' : '',
+      // [r463 接线] 第 289 维度 narrative_fallacy 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      nrf.count ? nrf.count + ' 处叙事谬误' : '',
       // [r178] 第 176 维度 conjunction_fallacy 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       cjf.count ? cjf.count + ' 处合取谬误' : '',
@@ -18978,6 +19015,9 @@ module.exports = {
   // [r177] 第 175 维度 hindsight_bias 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkHindsightBias,
+  // [r463 接线] 第 289 维度 narrative_fallacy 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkNarrativeFallacy,
   // [r178] 第 176 维度 conjunction_fallacy 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkConjunctionFallacy,
