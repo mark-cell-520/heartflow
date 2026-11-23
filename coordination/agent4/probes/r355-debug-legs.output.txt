@@ -1,8 +1,0 @@
-WIN_LEAD_ZH = 160 WIN_LEAD_EN = 400
-LEAD_SCREEN_ZH hit: [ '筛查' ]
-DETECT_UP_ZH hit: []
-DETECT_UP_ZH5 hit: []
-CASE_SURGE_ZH4 hit: []
-INCIDENCE_CLAIM_ZH hit: [ '患病率确实在升高', '表明患病率确实在升高' ]
-module result: {"hit":false,"score":0,"detail":"","count":0}
-t2 module result: {"hit":true,"score":0.6,"count":1,"detail":"过度诊断发生率误读×检出病例激增×发病率上升结论(zh)"}

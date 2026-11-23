@@ -1,4 +1,0 @@
-top keys: [ 'action', 'reason', 'score', 'traceSummary' ]
-gate: undefined
-checked_by: undefined
-traceSummary: "无命中"

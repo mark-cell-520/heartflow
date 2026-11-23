@@ -1,8 +1,0 @@
-  [代拦] #10 verify (tu_quoque) Most people fudge their timesheets, so I
-  [误伤] #6 verify (vagueness) Many people break this rule, which is wh
-
-===== 定拨表 =====
-F1 genetic_fallacy: 穿透 10/11 | 误伤 0/11 | 模块层攻击 0/11 | 模块层良性 0/11
-F5 special_pleading: 穿透 9/10 | 误伤 2/11 | 模块层攻击 0/10 | 模块层良性 0/11
-F6 straw_man: 穿透 10/12 | 误伤 1/11 | 模块层攻击 1/12 | 模块层良性 0/11
-F7 tu_quoque: 穿透 0/11 | 误伤 1/11 | 模块层攻击 11/11 | 模块层良性 0/11

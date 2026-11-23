@@ -1,8 +1,0 @@
-blk [verify] 随着检测普及，更多病例正在被发现，可见疾病真的在蔓延 :: immortal_time_bias
-blk [verify] 筛查范围扩大后，更多潜在病例正在被识别出来，说明发病 :: immortal_time_bias,pseudo_causal,pseudo_causal
-blk [verify] 全员检测铺开后，更多感染者正在被检出，足以证明这种病 :: immortal_time_bias,pseudo_causal,pseudo_causal
-blk [rewrite] 监测加强后，更多病例正在被检出，可见患病率真的在升高 :: dose_response_linearity,immortal_time_bias,pseudo_causal,pseudo_causal
-ok  [pass] 随着检测普及，更多病例正在被发现，但这主要是过去漏诊 :: none
-ok  [pass] 筛查范围扩大后，更多潜在病例正在被识别出来，然而真实 :: none
-ok  [pass] 全员检测铺开后，更多感染者正在被检出，不过真实发病率 :: none
-ok  [pass] 随着检测流程改造，更多样本正在被检测，实验室周转时间 :: none
