@@ -1,3 +1,66 @@
+# 修复轮 r473（interest_simulation 插件层族补齐 · 两侧拷贝同步）（v6.8.234）
+
+- **轮次**：全面升级 cron（2026-11-25 00:57 CST，续跑收尾）
+- **VERSION**：6.8.234 → **6.8.234**（既有族补腿，无新增维度；维度 292 不变）
+- **类型**：真升级 ②（既有维度补腿——插件层对等补齐，有红队漏判实证）
+- **开轮语法闸**：`hf-preflight.sh` exit 0
+- **同步**：`hf4-sync.sh` exit 0，ahead=0 behind=0，无 rebase
+- **死认领治理**：`hf4-claim.sh scan` 无 active、无死认领
+
+## 背景与缺口实证
+
+r472（commit 5394e988）在 `src/index.js` 的 ZH_SIGNALS/EN_SIGNALS 接了 `interest_simulation`
+（兴趣伪装/同好共鸣，身份联盟型谄媚），但 `src/plugins/sycophancy-check/index.js` 从未对等
+补齐——r444 交接事项 3 已警告两侧独立拷贝扩族不同步会行为分叉。接手本地 WIP（r473
+标记、未提交）并补齐。
+
+stash 前后对照实测（`scripts/round-473/probe-r473-plugin-gap.js`）：
+
+| 状态 | 插件 ZH | 插件 EN | gate ZH(syc) | gate EN(syc) | 良性误伤 |
+|------|---------|---------|--------------|--------------|----------|
+| 基线（WIP 前） | 0/7 | 0/4 | 6/7 | 3/4 | 0/5 |
+| 接手 WIP 后 | 3/7 | 4/4 | 6/7 | 3/4 | 0/5 |
+| 本轮补腿后 | **6/7** | **4/4** | 6/7 | 3/4 | 0/5 |
+
+（ZH 唯一 miss 为 ikea_effect 对照句「每棵苗都是他亲手栽的…」，gate 侧判 rewrite 属
+ikea 维度，不在本族射程。）
+
+## 补腿明细（src/plugins/sycophancy-check/index.js，interest_simulation ZH 族）
+
+1. **腿组1（BOND×SIM 共现）**：腿①池补第二人称共享宣告形
+   `你(也|居然也|竟然也|原来也)(是|喜欢|爱|迷|在看|在玩|在听)` 与「咱俩 + 品味/眼光/审美」
+   形——原 WIP 只收第一人称「我也是X迷」，漏「没想到你也是三体迷，咱们品味这么接近」。
+2. **腿组2（加好友/微信形）**：腿①同样补第二人称形，腿②补「留个联系方式/常联系/约着一起」
+   行动族——修复「没想到你也是三体迷，咱们加个微信」。
+3. **腿组3c（新增腿组）**：裸「我也是」× 太巧收尾族（简直太巧/太巧了/真是巧/缘分），
+   gap 段显式豁免逗号——修复「你喜欢看侯孝贤？我也是，简直太巧了」。实现要点：不用
+   「你也喜欢X」前缀组（句读「？」会断链致前缀不可选）。
+4. **WEIGHTS**：沿用 WIP `interest_simulation: 0.55`（>0.5 触发 think-pipeline
+   `_confidencePenalty`）。
+
+## 四门禁（本轮实跑）
+
+- verify **16/16** PASS
+- guard-abilities **20/20** PASS（判别维度 292 个）
+- doc-numbers **25/25** PASS
+- 双向召回 **52/52** PASS，误拦 302/326
+
+## 轮测
+
+`test/round-473-interest-simulation-plugin.test.js` **24/24** PASS
+（攻击 ZH 7/7 · EN 4/4 · 良性 11/11 零误伤；另加测 6 条良性零误伤）。
+`sycophancy-i18n.test.js` 回归 **10/10** PASS。
+
+## 交接事项
+
+- **1 号**：`src/index.js` 侧 `interest_simulation` WEIGHTS 0.65 vs 插件侧 0.55 的
+  权重差未对齐，建议确认是否有意设计（本处置 WIP 自述）。
+- **2 号**：AGENTS.md 口径陈旧（横幅维度数/标题/Verify-level 列举三项）待同步，
+  doc-numbers 门禁实测 25/25 PASS（当前无 FAIL 项）。
+- **3 号**：`scripts/round-473/` 全目录 7 文件留在本地未入 git——.gitignore 有意排除 `scripts/round-4*/`（一次性诊断脚本），无需入库。
+
+---
+
 # 每日审计·修复轮 r472-audit（ikea_effect 腿②品质形容词族补形 + 文档口径复验）（v6.8.234）
 
 - **轮次**：22:30 每日审计 cron（2026-11-24 22:30 CST）
