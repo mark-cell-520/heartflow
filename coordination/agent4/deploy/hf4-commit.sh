@@ -8,6 +8,9 @@
 #   - commit message 必须含 round + type + VERSION
 #   - 提交前跑隐私闸（staged）
 #   - research 类型允许零引擎改动（只产 coordination/ 报告），此时走 --allow-empty
+#   - [r278 修] 工作区可能有 1 号（人工/主会话）的未提交修复：add 前显式 stash 保住，
+#     commit 完立即 pop 回来。绝不用 `git add <目录>` 静默吞掉他人未提交改动——
+#     那会让他人的修复在「无人认领的 r277」里消失，且工作区显示干净无法察觉。
 set -uo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/hf4-common.sh"
 need_repo
@@ -42,6 +45,40 @@ ENGINE_DIRS=(
   "src/tools/"
   "src/"
 )
+
+# ===== [r278 修] 保护 1 号未提交改动 =====
+# 本机（hermes1）上 4 号与 1 号共用同一工作区。1 号正在修 bug 时 4 号若直接
+# git add src/，会把 1 号未提交的修复卷进 4 号的 commit——修复「消失」在别人的
+# 轮次里，1 号工作区显示干净，下一轮误判修复丢失（r267/完美错误/post-hoc 曾踩坑）。
+# 修法：commit 前 stash（带时间戳），commit 后立即 pop。pop 失败 = 本轮失败并
+# 明确告知 stash 位置，绝不静默继续。
+FOREIGN_STASH=0
+FOREIGN_STASH_REF=""
+if [ -n "$(git status --porcelain | grep -v '^??')" ]; then
+  if git stash push -m "hf4-commit foreign-work guard $(utcnow) round=$round" >/dev/null 2>&1; then
+    FOREIGN_STASH=1
+    FOREIGN_STASH_REF=$(git rev-parse --short 'stash@{0}')
+    log "r278: 已 stash 1 号/他人未提交改动（$FOREIGN_STASH_REF），commit 后恢复"
+  else
+    die "r278: stash 失败，为保护他人未提交改动，本轮拒绝提交（改动无损，现场保留）"
+  fi
+fi
+
+restore_foreign() {
+  if [ "${FOREIGN_STASH:-0}" = "1" ]; then
+    # [r278 修] 双保险：git stash pop 冲突时 rc 可能为 0（版本行为不一），
+    # 故同时查 pop 后该 stash 条目是否仍在；条目还在 = 恢复未完成。
+    pop_ref=$(git rev-parse --short 'stash@{0}' 2>/dev/null || echo '?')
+    git stash pop >/dev/null 2>&1
+    pop_rc=$?
+    if [ $pop_rc -eq 0 ] && ! git stash list | grep -q "hf4-commit foreign-work guard"; then
+      log "r278: 已恢复 1 号/他人未提交改动"
+    else
+      log "FATAL: stash pop 未完成（rc=$pop_rc, stash@{0}=$pop_ref, guard-ref=$FOREIGN_STASH_REF）——改动在 stash 里，必须人工恢复"
+      exit 5
+    fi
+  fi
+}
 
 to_add=()
 untracked_out=()
@@ -86,6 +123,7 @@ if [ "${HF_ALLOW_INDEX:-0}" != "1" ]; then
     [ -z "$f" ] && continue
     case "$f" in
       src/index.js|bin/verify.js|scripts/guard-abilities.js|scripts/bidirectional-guard.js|test/doc-numbers-accuracy.test.js)
+        restore_foreign
         die "拒绝提交全局接入点/门禁脚本: $f（1 号独占；确认是审计修复请设 HF_ALLOW_INDEX=1）" ;;
     esac
   done
@@ -97,8 +135,11 @@ if [ ${#to_add[@]} -eq 0 ]; then
   if [ "$ctype" = "research" ]; then
     log "无白名单内改动（research 轮允许）→ 空提交仅记录轮次"
     git commit --allow-empty -m "$(printf '%s: %s by %s\n\n%s' "$round" "$ctype" "$HF_AGENT" "$msg")"
-    exit $?
+    rc=$?
+    restore_foreign
+    exit $rc
   fi
+  restore_foreign
   die "无可提交内容（且非 research 轮）"
 fi
 
@@ -107,10 +148,14 @@ git add -- "${to_add[@]}"
 # 隐私闸（暂存区）
 if ! privacy_scan staged; then
   git reset -q
+  restore_foreign
   die "隐私闸命中，已 unstage，拒绝提交"
 fi
 
 ver=$(cat VERSION 2>/dev/null || echo '?')
 full_msg=$(printf '%s: %s by %s (v%s)\n\n%s' "$round" "$ctype" "$HF_AGENT" "$ver" "$msg")
-git commit -m "$full_msg" || die "commit 失败"
+git commit -m "$full_msg"
+rc=$?
+restore_foreign
+[ $rc -ne 0 ] && exit $rc
 log "已提交 $round ($ctype, v$ver): $(git rev-parse --short HEAD)"

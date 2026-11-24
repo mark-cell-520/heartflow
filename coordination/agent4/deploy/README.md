@@ -67,7 +67,7 @@ node scripts/bidirectional-guard.js     # 期望 召回>=52、误拦<=302/326
 | `scripts/guard-abilities.js` | 门禁脚本 |
 | `scripts/bidirectional-guard.js` | 门禁脚本 |
 | `test/doc-numbers-accuracy.test.js` | 门禁脚本 |
-| `README.md` / `SKILL.md` / `AGENTS.md` | 文档口径由 3 号 CI 统一，你改会造成漂移 |
+| `README.md` / `SKILL.md` / `AGENTS.md` | 文档口径名义上由 3 号 CI 统一——**但 3 号 cron 任务并不存在**（`hermes cron list` 只有五个任务：全面升级、海外单元、agent4 同步、每日审计、每日推送兜底）。你仍不必改这三份，但必须在最终报告点名「AGENTS.md 口径陈旧（横幅维度数 / 标题 / Verify-level 列举）」并给出 doc-numbers 实测 FAIL 项，交给 1 号。**不要让这个坑无声累积**——r469/r470/r471/r472 连续四轮 3 项 FAIL 全在 AGENTS.md，就是这条失效分工假设的直接后果。 |
 
 ### 轮次认领（宪法 §1.1）
 

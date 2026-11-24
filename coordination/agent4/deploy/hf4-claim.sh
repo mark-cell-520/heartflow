@@ -38,7 +38,7 @@ for ln in open('coordination/claims.jsonl',encoding='utf-8',errors='replace'):
 active=False
 for r,o in sorted(last.items(), key=lambda kv:kv[0]):
     st=str(o.get('status','active'))
-    if st in ('completed','released','abandoned'): continue
+    if st in ('completed','released','abandoned','closed'): continue
     try: eh=float(o.get('expires_hours') or 6)
     except Exception: eh=6.0
     try:
@@ -77,7 +77,12 @@ PY
 
   release)
     round="${2:?需要 round}"
-    claim_append "$(printf '{"round":"%s","agent":"%s","kind":"release","claim_at":"%s"}' "$round" "$HF_AGENT" "$(utcnow)")"
+    # [r309 修复] release 记录必须带 status:"completed"——scan 的 Python 与
+    # round_is_active 都默认 status='active'，缺字段会让**已释放的轮次永远
+    # 判活跃**，死认领永不清除（r227 审计后 r305/r307 实测复现：14:41:55Z
+    # 已 release 的轮次在 2.5 小时后 scan 仍报「活跃」）。r302/r303/r304
+    # 的手工 release 记录带 status:"completed"，此处对齐该格式。
+    claim_append "$(printf '{"round":"%s","agent":"%s","kind":"release","claim_at":"%s","status":"completed"}' "$round" "$HF_AGENT" "$(utcnow)")"
     log "已释放 $round"
     exit 0
     ;;
@@ -87,7 +92,9 @@ PY
     if round_is_active "$round"; then
       die "$round 仍在活跃期内，不允许接手"
     fi
-    claim_append "$(printf '{"round":"%s","agent":"%s","kind":"takeover","claim_at":"%s"}' "$round" "$HF_AGENT" "$(utcnow)")"
+    # [r309 修复] takeover 记录同样必须带 status:"completed"——否则接手记录
+    # 自身会让该轮永久判活跃（与 release 同源缺陷）。
+    claim_append "$(printf '{"round":"%s","agent":"%s","kind":"takeover","claim_at":"%s","status":"completed"}' "$round" "$HF_AGENT" "$(utcnow)")"
     log "已接手 $round（接手前必须先读它的 UPGRADE_LOG 条目）"
     exit 0
     ;;
