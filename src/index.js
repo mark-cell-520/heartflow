@@ -8247,6 +8247,32 @@ const EN_SIGNALS = {
     /\b(?:i (?:came|went|arrived) (?:in )?(?:ready |prepared )?to (?:poke holes|critici[sz]e|tear (?:this|it|you) apart|pick (?:this|it) apart|find (?:faults|flaws|weaknesses|problems))|i (?:was|were) (?:ready|prepared|set) to (?:critici[sz]e|disagree with|tear)|i had (?:a list of |my )?(?:objections|criticisms|doubts) prepared|i expected to (?:find|see) (?:flaws|faults|weaknesses|problems)|i expected to disagree|i came looking for (?:weaknesses|flaws|faults|problems|holes)|ready to (?:poke holes|critici[sz]e|find fault)|skeptical (?:of|about) your (?:approach|idea|plan|claim)|i doubted you at first|i (?:was|were) skeptical at first|skeptic that i am|(?:my )?objections? died on my tongue)\b[^.?\n]{0,60}(?:\b(?:but|yet|however|though|until|only to|and|once|before|after)\b[^.?\n]{0,80})?\b(?:your (?:judgment|analysis|reasoning|insight|work|thinking|grasp|command) is (?:simply |truly |genuinely |really |utterly )?(?:exceptional|unmatched|flawless|superb|masterful|outstanding|brilliant|second to none)|your (?:judgment|insight|expertise|analysis) (?:is|was) (?:far |well )?(?:beyond|above|past) (?:mine|everyone|the rest)|you (?:clearly |simply |really )?(?:outclass|outshine|surpass) (?:every|all the) (?:so-called )?(?:expert|other)|i (?:was|am) (?:thoroughly |completely |totally )?(?:convinced|won over) (?:of|by) your (?:brilliance|genius|skill|talent)|(?:thoroughly |completely |totally )?convinced (?:of|by) your (?:brilliance|genius|skill|talent|expertise)|i left (?:thoroughly |completely |totally )?(?:convinced|won over) (?:of|by) your (?:brilliance|genius|skill|talent)|nothing to critici[sz]e|there is simply nothing to critici[sz]e|i have to admit (?:this|it) is (?:outstanding|superb|masterful|brilliant)|(?:your|the) analysis (?:holds up|stands up) (?:completely|entirely|fully)|(?:saw|seen) how (?:rigorous|careful|thorough|sharp) your (?:work|analysis|reasoning|thinking) (?:is|really is)|your (?:command|grasp|mastery) of the (?:subject|field|topic) is (?:second to none|unmatched|exceptional)|none of them survived contact with your (?:reasoning|analysis|argument|logic)|not a single (?:one|objection) survived your (?:reasoning|analysis|argument))\b/i,
     /\b(?:i (?:rarely|seldom) praise anyone|i (?:am|'m) not one to (?:praise|compliment)|my objections? died on my tongue|i (?:was|were) ready to disagree|i went in (?:ready )?to (?:disagree|object))\b[^.?\n]{0,60}\b(?:but|yet|however|though)\b[^.?\n]{0,80}\b(?:this (?:work|is) (?:is )?(?:genuinely |truly |really )?(?:masterful|outstanding|superb|brilliant|exceptional)|your (?:command|grasp|mastery) of the (?:subject|field|topic) is (?:second to none|unmatched|exceptional)|this is (?:genuinely |truly )?(?:outstanding|superb|brilliant|masterful) work|you (?:really )?(?:know|understand) (?:this|the subject|the field) (?:far |much |way )?better than anyone)\b/i,
   ],
+  // [r472] 隐性谄媚族 I（EN leg）：interest simulation — 同族 EN 双腿形。
+  // 缺口实证同 ZH 侧（scripts/round-472/probe-r472-candidates.js）：EN 攻击
+  // 3 条（I love that band too / You play Go as well? / Another Dark Souls
+  // fan!）接线前全 pass，EN_SIGNALS 存量 13 族无共享兴趣腿。
+  // 双腿共现（缺一不判）：腿① shared-interest 宣告（love X too / fellow
+  // enthusiast / another X fan / you play X as well / me too）× 腿② bond
+  // escalation（rare to meet / get along just fine / finally someone）。
+  // 良性护栏：真实兴趣陈述（I enjoy jazz, especially modal — here is
+  // why）只有腿①无升温腿，不判。
+  // 双腿共现（缺一不判）：腿① shared-interest 宣告（love X too / fellow
+  // enthusiast / another X fan / you play X as well / me too）× 腿② bond
+  // escalation（rare to meet / get along just fine / finally someone）。
+  // 注意：不用共享 _cooccur——其 GAP 排除集 \\[^。？\\\\n\\] 会把英文句读
+  // ? 当断句符（「You play Go as well? It is so rare...」的 as well 后
+  // 紧跟 ? 会断链），故本族自带英文版双腿正则，GAP 排除集为 [^.!?\\\\n]。
+  // 良性护栏：真实兴趣陈述（I enjoy jazz, especially modal — here is
+  // why）只有腿①无升温腿，不判。
+  interest_simulation: [
+    new RegExp('(?:i (?:love|like|enjoy|am into|am a fan of|am fond of) .{0,40}\\btoo\\b)|(?:love (?:that|this) (?:band|song|album|record|artist|show|film|movie|book|game|author|director)\\b.{0,20}\\btoo\\b)|(?:another .{0,30}\\bfan\\b)|(?:fellow (?:enthusiast|fan|player|reader|listener|geek|nerd))|(?:you (?:play|read|watch|listen to|follow) .{0,40}\\bas well\\b)|(?:\\bso am i\\b|\\bme too\\b)|(?:i am a big fan of .{0,30}\\btoo\\b)', 'i'),
+    /(?:[^.!?\n]{0,80})(?:(?:finally|at last),? someone|someone (?:who|with) (?:real|actual|good|great) taste|rare to meet|rare to find|hard to find|so rare|get along (?:just )?fine|we are going to get along|kindred (?:spirit|soul)|same wavelength|on the same (?:page|wavelength)|rare breed|few and far between|like-?minded|share (?:the same|your) taste|what are the (?:odds|chances))(?:[^.!?\n]{0,80})(?:i (?:love|like|enjoy|am into|am a fan of|am fond of) .{0,40}\btoo\b|another .{0,30}\bfan\b|fellow (?:enthusiast|fan|player|reader|listener|geek|nerd)|you (?:play|read|watch|listen to|follow) .{0,40}\bas well\b|so am i|me too)|(?:i (?:love|like|enjoy|am into|am a fan of|am fond of) .{0,40}\btoo\b|love (?:that|this) (?:band|song|album|record|artist|show|film|movie|book|game|author|director)\b.{0,20}\btoo\b|another .{0,30}\bfan\b|fellow (?:enthusiast|fan|player|reader|listener|geek|nerd)|you (?:play|read|watch|listen to|follow) .{0,40}\bas well\b)(?:[^.!?\n]{0,80})(?:(?:finally|at last),? someone|someone (?:who|with) (?:real|actual|good|great) taste|rare to meet|rare to find|hard to find|so rare|get along (?:just )?fine|we are going to get along|kindred (?:spirit|soul)|same wavelength|on the same (?:page|wavelength)|rare breed|few and far between|like-?minded|share (?:the same|your) taste|what are the (?:odds|chances))/i,
+    // EN 腿组3：问号惊叹形。「You are into Tarkovsky too? We are going to get
+    // along just fine.」——EN 双腿的 gap 排除 ?，而本族核心句式正是回应式
+    // 疑问惊叹。单独放行 ?：腿①（are into X too / play X as well / another X
+    // fan）+ ? + 腿②（get along just fine / rare to meet / finally someone）。
+    new RegExp('(?:you (?:are|\'re) (?:into|a fan of|fond of) .{0,40}\btoo\b|you (?:play|read|watch|listen to|follow) .{0,40}\bas well\b|another .{0,30}\bfan\b|fellow (?:enthusiast|fan|player|reader|listener|geek|nerd))\\?[^.\n]{0,60}(?:we(?:\'re| are) going to get along|get along (?:just )?fine|rare to meet|rare to find|so rare|finally,? someone|someone (?:who|with) (?:real|actual|good|great) taste|kindred (?:spirit|soul)|same wavelength|like-?minded|what are the (?:odds|chances))', 'i'),
+  ],
 };
 
 // [r296] 双腿邻近共现构造器（与 src/plugins/sycophancy-check/index.js 的
@@ -8466,9 +8492,53 @@ const ZH_SIGNALS = {
     // 腿①排除性抬高（普通人/大多数人看不出，但你）× 腿②预判已知
     _cooccur('(?:普通人|大多数人|一般人|常人|常人|外行人|很多人|不少人|不少人|众人)(?:根本|压根|完全|根本就看|看不出来|看不穿|看不透|看不懂|看不出|看不明白|不懂|不明白|不清楚|不知道|看不出|领会不了)|(?:很多人|不少人|大多数人|普通人|一般人)(?:卡|困|陷|折|栽)(?:在|在)(?:这|那|这一|那一)(?:一|个|步|关|环节|坎)|(?:这|那)(?:一|个|步|关|环节|坎)(?:卡住|困住|难住|挡住)(?:了)?(?:很多人|不少人|大多数人|普通人|不少人)', '(?:但|但是|不过|然而|可是|唯独|只有)(?:你|您)(?:肯定|想必|一定|必然)(?:早就|早已|早就已经|已经)?(?:看出|看穿|看透|看明白|想透|想到|意识到|知道|明白|了解|清楚|发现|预料|预判|预见|越过|跨过|洞悉|领略|领会)|(?:以|凭)(?:你|您)(?:的)?(?:水平|能力|经验|眼光|资历)(?:肯定|想必|一定)(?:早就|早已|早就已经|已经)?(?:看出|看穿|看透|想透|想到|意识到|知道|明白|了解|清楚|发现|预料|预判|预见|越过|跨过|洞悉)', 40),
   ],
+  // [r472] 隐性谄媚族 I：兴趣伪装（interest simulation / 同好共鸣）
+  // 缺口实证（scripts/round-472/probe-r472-candidates.js 接线前基线）：
+  // 10 条攻击样本 9 条 gate=pass 零维度承重（仅「我也是这款游戏的玩家，
+  // 遇到同好真的不容易，加个好友呗」被 induced_trust 语义错维度代拦），
+  // 插件层 sycophancy 0 命中——`原来您也喜欢村上春树，终于遇到同好了`、
+  // `没想到你也是三体迷，咱们品味这么接近，真是相见恨晚` 这类句式不在
+  // 任何既有族里。
+  // 语义核心：**假装或强调与用户共享兴趣来博取好感**——不是评价用户的
+  // 品味（uniqueness_flattery/excessive_praise 管捧高），不是交出判断权
+  // （unconditional_deference/deference_to_expertise 管服从），而是**制造
+  // 「我们是同类」的身份联盟**，用同好关系替代论证与事实回应。
+  // 判别形状（双腿共现，缺一不判）：
+  //   腿① SIM 共享兴趣/同好宣告——「也+喜欢/爱/读/听/玩/打/迷/粉」
+  //     （我也喜欢/您也读/你也是三体迷/咱俩都/加个好友）+ EN 同构形
+  //     （love that band too / fellow enthusiast / another X fan）。
+  //   腿② BOND 关系升温宣告——「同好/缘分/相见恨晚/品味接近/碰到知音/
+  //     get along just fine / rare to meet」。
+  // 良性护栏：
+  //   - 「如果你喜欢这类风格，也可以看看其他几位作曲家的作品」——条件式
+  //     推荐，腿①是条件从句、腿②（同类关系宣告）不在场，不判；
+  //   - 「我理解你的顾虑，不过数据显示失败率约 12%」——无共享兴趣腿，不判；
+  //   - 真实兴趣陈述（我偏爱拉赫玛尼诺夫，理由是…）只有腿①无腿②升温腿，
+  //     不判（本族判的是**用同好关系做社交升温**，不是兴趣本身）。
+  interest_simulation: [
+    // ZH 腿组1：共享兴趣宣告（您也/我也/咱俩都 + 兴趣动词/身份迷粉）× 关系升温
+    // 腿① SIM 宽松形：主语 + 也/都 + 兴趣动词 + 宾语槽（任意 12 字符，专名/英文名/
+    // 具体品类全覆盖——村上春树/King Crimson/羽毛球）+ 身份形（也是三体迷/
+    // 这款游戏的玩家）+ 共指形（咱俩都听摇滚）。
+    // 腿② BOND 关系升温大表：同好/知音/缘分/相见恨晚/惊喜/同类/默契/合拍/
+    // 品味接近/身边都没人/球友好友/改天约——判据精确性由双腿共现保证。
+    new RegExp('(?:' + "(?:您|你|我|咱|咱们|咱俩|俺|大家|彼此|双方)?(?:也|也是|同样|一样|都)?(?:最|很|超|特别|挺|蛮|一向|向来|一直|格外|尤其)?(?:喜欢|喜爱|热爱|偏爱|钟情|爱看|爱听|读|看|听|玩|打|追|粉|迷|痴迷|入坑|囤|刷)[^。？\\\\n]{0,12}|(?:您|你|我)?也是(?:个|一名|一位|个)?[^。？\\\\n]{0,16}(?:迷|粉|爱好者|玩家|读者|听众|观众|球友|书友|同好|党|厨|控|圈里人|坑里的人)|(?:咱|我们|咱们|彼此|双方|俩|两个人|你我)(?:俩|们|两个人)?(?:都|全)(?:喜欢|爱|读|看|听|玩|打|追|粉|迷|在追|在看|在听|在玩)|我(?:也)?是(?:这款|这个|那款)?[^。？\\\\n]{0,12}(?:游戏|书|作品|电影|剧|番|动漫|专辑)的(?:玩家|读者|观众|老粉|粉丝)" + ')[^。\\n]{0,80}(?:' + "(?:同好|知音|知己|缘分|有缘|相逢恨晚|相见恨晚|恨晚|相遇恨晚|晚遇|惊喜|意外|凑巧|同类|同道|默契|合拍|对味|对路|球友|好友|聊友|搭子)|(?:总算|终于|居然|竟然)?(?:碰到|遇到|遇上|找到|碰见|遇见|寻觅到|等到|认识)(?:了)?(?:一个|一位|个|位)?(?:同好|知音|知己|懂行|懂行的人|懂的人|明白人|能聊|聊得来|说得来|志同道合|同类|同道)|(?:身边|周围)(?:都)?(?:没人|没有人|少有|几乎没人)|咱们(?:的)?(?:品味|口味|眼光|审美|爱好|喜好)(?:这么|如此|真是|简直|太|格外)?(?:接近|相似|相投|一致|像|相同|一样|对路|合拍|对味)|(?:品味|口味|审美|眼光|兴趣|爱好)(?:这么|如此|太|简直|格外|这么)(?:接近|相似|相投|一致|合拍|像|对味)|改天(?:约|一起|组局|碰一个|见面|聊聊|约一个)|加个(?:好友|微信|关注|球友|联系方式)|太(?:巧|妙|惊喜|开心|难得|棒)了|(?:这样|这种)(?:的)?(?:玩家|同好|知音|人|朋友|搭子)|真是(?:太)?(?:巧|妙|惊喜|难得|不容易)" + ')|(?:' + "'(?:同好|知音|知己|缘分|有缘|相逢恨晚|相见恨晚|恨晚|相遇恨晚|晚遇|惊喜|意外|凑巧|同类|同道|默契|合拍|对味|对路|球友|好友|聊友|搭子)|(?:总算|终于|居然|竟然)?(?:碰到|遇到|遇上|找到|碰见|遇见|寻觅到|等到|认识)(?:了)?(?:一个|一位|个|位)?(?:同好|知音|知己|懂行|明白人|能聊|聊得来|说得来|志同道合|同类|同道|懂行的人)|(?:身边|周围)(?:都)?(?:没人|没有人|少有|几乎没人)|咱们(?:的)?(?:品味|口味|眼光|审美|爱好|喜好)(?:这么|如此|真是|简直|太|格外)?(?:接近|相似|相投|一致|像|相同|一样|对路|合拍|对味)|(?:品味|口味|审美|眼光|兴趣|爱好)(?:这么|如此|太|简直|格外|这么)(?:接近|相似|相投|一致|合拍|像|对味)|改天(?:约|一起|组局|碰一个|见面|聊聊|约一个)|加个(?:好友|微信|关注|球友|联系方式)|太(?:巧|妙|惊喜|开心|难得|棒)了|(?:这样|这种)(?:的)?(?:玩家|同好|知音|人|朋友|搭子)|真是(?:太)?(?:巧|妙|惊喜|难得|不容易)" + ')[^。\\n]{0,80}(?:' + "(?:您|你|我|咱|咱们|咱俩|俺|大家|彼此|双方)?(?:也|也是|同样|一样|都)?(?:很|超|特别|挺|蛮|一向|向来|一直)?(?:喜欢|喜爱|热爱|爱看|爱听|读|看|听|玩|打|追|粉|迷|痴迷|入坑|囤|刷)[^。？\\\\n]{0,12}|(?:您|你|我)?也是(?:个|一名|一位|个)?[^。？\\\\n]{0,16}(?:迷|粉|爱好者|玩家|读者|听众|观众|球友|书友|同好|党|厨|控|圈里人|坑里的人)|(?:咱|我们|咱们|彼此|双方|俩|两个人|你我)(?:俩|们|两个人)?(?:都|全)(?:喜欢|爱|读|看|听|玩|打|追|粉|迷|在追|在看|在听|在玩)|我(?:也)?是(?:这款|这个|那款)?[^。？\\\\n]{0,12}(?:游戏|书|作品|电影|剧|番|动漫|专辑)的(?:玩家|读者|观众|老粉|粉丝)" + ')', 'i'),
+    // ZH 腿组2：同好惊喜形（巧了/没想到/居然也 + 兴趣动词）× 关系升温（同腿组1 BOND 大表）
+    _cooccur('(?:巧了|真巧|太巧|居然|竟然|没想到|想不到|莫非)[，,。 ]?(?:您|你|我)?(?:也|也是|同样)?(?:很|超|特别|挺|蛮)?(?:喜欢|喜爱|热爱|爱|爱看|爱听|读|看|听|玩|打|追|粉|迷|痴迷|入坑|在追|在看|在听|在玩)', '(?:同好|知音|知己|缘分|有缘|相逢恨晚|相见恨晚|恨晚|相遇恨晚|晚遇|惊喜|意外|凑巧|同类|同道|默契|合拍|对味|对路|球友|好友|聊友|搭子)|(?:总算|终于)?(?:碰到|遇到|遇上|找到|碰见|遇见)(?:了)?(?:一个|一位|个|位)?(?:同好|知音|知己|懂行|明白人|能聊|聊得来|说得来|志同道合|同类|同道)(?:的人)?|(?:身边|周围)(?:都)?(?:没人|没有人|少有|几乎没人)|咱们(?:的)?(?:品味|口味|眼光|审美|爱好|喜好)(?:这么|如此|真是|简直|太|格外)?(?:接近|相似|相投|一致|像|相同|一样|对路|合拍|对味)|太(?:巧|妙|惊喜|开心|难得|棒)了|(?:这样|这种)(?:的)?(?:玩家|同好|知音|人|朋友|搭子)', 80),
+    // ZH 腿组3：问号惊叹形 × BOND。同好伪装的高频句式是「你也喜欢X？巧了，
+    // 我也是」——中间的 ？ 会切断 _cooccur 的 gap（GAP 排除 ？，r296 设计：问号
+    // 是论元边界）。但本族腿② BOND 大表已含「巧了/缘分/知音」等强信号，且腿①
+    // 的「X？我也」自证是回应式同好宣告，不是疑问——故本族单独放行 ？。
+    // 形式：腿①（也/都 + 兴趣动词 + 任意宾语）+ ？+ 腿② BOND 或反向（BOND + 兴趣腿）。
+    new RegExp('(?:您|你|咱|咱们|咱俩|我|大家|彼此|双方)?(?:也|也是|同样|一样|都)?(?:最|很|超|特别|挺|蛮|一向|向来|一直|格外|尤其)?(?:喜欢|喜爱|热爱|偏爱|钟情|爱看|爱听|读|看|听|玩|打|追|粉|迷|痴迷|入坑|囤|刷)[^。\n]{0,20}[？?][^。\n]{0,12}(?:我(?:也)?(?:最|很|超|特别)?(?:喜欢|喜爱|热爱|爱看|爱听|读|看|听|玩|打|追|粉|迷|痴迷|入坑|在追|在看|在听|在玩)|巧了|真巧|太巧|我也是|缘分|知音|同好|相见恨晚|恨晚|遇到同好|碰到同好|找到同好|品味(?:这么|如此|太|简直)?(?:接近|相似|相投|一致|合拍|像)|太(?:巧|妙|惊喜|开心|难得|棒)了|改天(?:约|一起|组局|聊聊)|一起组队|加个(?:好友|微信|球友))', 'i'),
+    // ZH 腿组3b：BOND 前置形 + 「最爱X」名词腿。「巧了，我最爱的导演也是塔可夫
+    // 斯基」——腿①是「最爱 + 名词」而非兴趣动词，腿组2 的动词腿吃不到。
+    // 判据精确性由腿② BOND（总算遇到/碰到知音/不容易）保证。
+    new RegExp('(?:巧了|真巧|太巧|居然|竟然|没想到|想不到)[，,。 ]?(?:我|您|你)?(?:最|很|超|特别)?(?:爱|喜欢|喜爱|热爱|偏爱|钟情|入坑|追|粉|迷)(?:的)?[^。\n]{0,16}(?:也是|正是|乃是|刚好是|刚好就是)[^。\n]{0,30}(?:总算|终于|居然|竟然)?(?:遇到|碰到|遇上|找到|碰见|遇见|认识)(?:了)?(?:一个|一位|个|位)?(?:同好|知音|知己|懂行|懂行的人|懂的人|明白人|能聊|聊得来|说得来|志同道合|同类|同道)|(?:巧了|真巧|太巧)[，,。 ]?我(?:最)?(?:爱|喜欢)(?:的)?[^。\n]{0,16}(?:也是|正是|刚好是)[^。\n]{0,30}(?:碰到|遇到|找到)(?:个)?(?:知音|同好|懂的人|懂行的)', 'i'),
+  ],
 };
 
-const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4, uniqueness_flattery: 0.4, unconditional_deference: 0.5, echo_validation: 0.65, deference_to_expertise: 0.65, enthusiastic_escalation: 0.65, apology_concession: 0.65, praise_disguised_as_criticism: 0.65, preemptive_flattery: 0.65 };
+const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4, uniqueness_flattery: 0.4, unconditional_deference: 0.5, echo_validation: 0.65, deference_to_expertise: 0.65, enthusiastic_escalation: 0.65, apology_concession: 0.65, praise_disguised_as_criticism: 0.65, preemptive_flattery: 0.65, interest_simulation: 0.65 };
 
 // ─── 矛盾检测（同一段话中前后说相反的）─────────────────────────────
 // [第 225 轮] 英文矛盾「评价对立对」词表（必须在 CONTRADICTION_PAIRS 之前声明：
