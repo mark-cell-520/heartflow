@@ -145,7 +145,13 @@
 // ─── 腿① 锚点呈现（中文；锚词后紧跟数字或锚词本身即数字呈现）────
 const ANCHOR_ZH = [
   /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|建议零售价|价签|标牌价)[一二三四五六七八九十百千万亿两0-9０-９]/, // 标价五百万/原价九千九
-  /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|价签)[^。，！？；\n]{0,4}(?:是|为|写|标)(?:了)?[一二三四五六七八九十百千万亿两0-9０-９]/, // 标价是五千
+  /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|价签)[^。，！？；\n]{0,4}(?:是|为|写|标)(?:了)?[一二三四五六七八九十百千万两0-9０-９]/, // 标价是五千
+  // [r471] 锚词与数字间空格形——存量两行都要求锚词**紧贴**数字（「原价
+  // 9999」带一个空格即不命中），漏排版最常见的「原价 9999 元」「标价
+  // 5999」式**空格分隔紧凑数字**（r471 探针：ZH 攻击 5 条中 3 条穿透，
+  // 全部断在腿①）。语义同族：锚词 × 紧邻数字呈现。
+  /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|建议零售价|价签|标牌价)\s{0,3}[一二三四五六七八九十百千万两0-9０-９]/, // 原价 9999
+  /(?:标价|吊牌价|原价|定价|售价|市场价|开价|报价|起拍价|起步价|价签)\s{0,3}(?:是|为|写|标)\s{0,3}(?:了)?\s{0,3}[一二三四五六七八九十百千万两0-9０-９]/, // 原价 是 9999
   /(?:薪资|工资|薪水|薪酬|中标价|标的额|预算|总额)[^。，！？；\n]{0,6}[一二三四五六七八九十百千万亿两0-9０-９]/, // 薪资开到一万五/薪资说了两万
   /第一(?:个)?(?:数|报价|价格|数字|印象)/,                       // 第一个数/第一句报的价
   /第一(?:个|项|条)(?:项目|报价|价格|数|数字|条目|候选|候选人)/,   // 报价单上第一个项目/第一个候选人
@@ -163,6 +169,12 @@ const ANCHOR_ZH = [
   /(?:起的头|开头(?:的)?(?:数|价|价码))/,                          // 起的头
   /(?:随口|顺口|试探性?|随便)(?:报|开|说)(?:了)?(?:个|价)?/,      // 随口报了个价
   /(?:第|头)(?:一|1)(?:句|个|轮|口)(?:报|说|开)/,                 // 第一句报了
+  // [r471] 高价参照名词形——存量 ANCHOR_ZH 只收「标价/原价/报价」等
+  // **价格转述词**，漏「旗舰版」「顶配」「高配」「Pro 版」「豪华版」
+  // 式**产品档位名词**直接带数字的锚点呈现（r471 探针 AN6：「跟五万的
+  // 旗舰版一比」腿①穿透——「旗舰版」非锚词表成员）。语义同族：高价档位
+  // 名词 × 紧邻数字。
+  /(?:旗舰|顶配|高配|中配|低配|丐版|尊享|豪华|至尊|Pro|Plus|Max|Ultra|典藏)(?:版|款|型|配置|套餐|档|号)?\s{0,3}[一二三四五六七八九十百千万两0-9０-９]/, // 旗舰版五万/顶配 9999
 ];
 
 // ─── 腿① 锚点呈现（英文）──────────────────────────────────────
@@ -188,6 +200,12 @@ const ANCHOR_EN = [
   // 7/8 穿透，良性 0/8）。
   /\b(?:the\s+|a\s+|an\s+|that\s+|this\s+)?anchor\s+(?:price|number|figure|point|value|amount|offer|bid)\b/i, // the anchor price / an anchor number
   /\banchored\s+(?:at|on|to)\s+[\w\s-]{0,20}\d/i,           // anchored at 18000
+  // [r471] 档位名词参照形——存量 ANCHOR_EN 只收 list/sticker/asking/anchor
+  // 等**价格转述词**与价格动词形，漏「the $5000 enterprise tier」「the
+  // premium plan at」式**档位名词 + 价格修饰**的锚点呈现（r471 探针 AN5：
+  // 双腿穿透）。语义同族：高价档位名词 × 相邻价格数字。
+  /\b(?:the\s+|a\s+|that\s+|this\s+)?(?:enterprise|premium|top|top-tier|high-end|upper|deluxe|ultimate|max|plus|pro|flagship)\s+(?:tier|plan|option|model|version|package|edition|level)\b/i, // the enterprise tier
+  /\b(?:tier|plan|option|model|version|package|edition)\s+(?:at|for|starting\s+at)\s+[\w$]{1,14}\d/i, // tier at $5000
   // [r448] 文字数字形——存量 anchored at 只收阿拉伯数字（\d），漏
   // 「anchored at two hundred a share」「anchored at one million」式英文
   // 文字数字锚点（r448 EN 诊断：句 2/5 腿②命中、腿①穿透）。
@@ -200,6 +218,13 @@ const ANCHOR_EN = [
   // 名词族漏「The first bid was eighty」（r448 EN 诊断句 4：腿②命中、
   // 腿①穿透）。
   /\b(?:first|initial|opening)\s+(?:bid|offer|ask|number)\s+(?:was|is|came\s+in\s+at)\s+(?:about\s+|around\s+|roughly\s+)?(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|[\w-]{0,12})\b/i, // the first bid was eighty
+  // [r471] 无数字价格转述词形——存量 ANCHOR_EN 全部要求「锚词 + 相邻数
+  // 字」，漏「The sale price is a great deal at $699.」式**腿②自带价格转述
+  // 词、句内无独立锚点数字**的呈现（r471 探针 A5：腿② DOMINATED_EN 命中
+  // 「sale price is a great deal」、腿①穿透）。此形由腿②的价格词承担腿①
+  // 语义职责，故此处补**价格转述名词本身在场**即可配对（不带数字，避免
+  // 与 r448 的锚词+数字族语义重叠）。
+  /\b(?:sale|discount|discounted|clearance|marked|final|current|selling|asking|list|posted)\s+price\b/i, // the sale price（无数字在场形）
 ];
 
 // ─── 腿② ORBIT 围绕锚点族（中文；查否定前缀）───────────────────
@@ -223,6 +248,10 @@ const DEAL_ZH = [
   /(?:差点|忍不住|冲动)(?:就)?(?:签|买|下单|刷卡|付了)/,          // 差点就签
   /(?:试都没试|想都没想|看都没看)(?:就)?(?:刷卡|下单|买了|签了|付了)/, // 试都没试就刷卡
   /怎么看(?:都)?(?:很|挺)?划算/,                                 // 怎么看都划算
+  // [r471] 怎么看都值/都值形——存量只收「怎么看都划算」，漏「怎么看都
+  // 值」「怎么看都值得」式同族兑现（r471 探针 A3：腿①「标价是五」命中、
+  // 腿②全族穿透）。语义同族：锚点在场 × 目标价被判值回票价。
+  /怎么看(?:都)?(?:很|挺|真)?(?:值|值得|划得来)/,               // 怎么看都值/怎么看都值得
   /比(?:标价|原价|定价|市场价)省了?/,                            // 比标价省了八千多
   // [r448] 折扣兑现族（紧凑数字形「原价三千/标价一万二」的腿②缺位）——
   // 存量 DEAL_ZH 只收「觉得划算/占了便宜」，漏「太值了」「等于便宜了
@@ -237,7 +266,21 @@ const DEAL_ZH = [
   /(?:觉得|感觉)(?:自己)?(?:像)?(?:赢|赚了|胜利了)/,             // 觉得赢了/感觉赚了
   /(?:觉得|看起来|看着)?(?:不贵|真便宜|挺便宜)/,                 // 觉得不贵/真便宜
   /(?:折扣|降价|让利|优惠)(?:力度|幅度)?(?:很|挺|真|特别)?(?:大|给力|狠|猛|可观)/, // 折扣力度真大/优惠很给力
+  // [r471] 划算裸形——存量 DEAL_ZH 收「觉得划算/怎么看都划算」，漏
+  // 「太划算了」「真划算」「很实惠」式**无系动词划算直陈**（r471 探针
+  // AN2：腿①命中、腿②穿透）。语义同族：折扣兑现表达。
+  /(?:太|真|挺|很|特别|真心)?(?:划算|实惠|划得来|超值)(?:了)?(?:吧|呀|啊)?/, // 太划算了/真划算
   /打[一二三四五六七八九十百千0-9０-９]{1,3}折(?:都)?(?:很|挺|真)?(?:划算|值)/, // 打三折都很划算
+  // [r471] 衬托比较族（紧凑数字形腿②缺位）——存量 DEAL_ZH 收「觉得划算/
+  // 太值了」式**绝对折扣兑现**，漏「跟五万的旗舰一比，三千显得便宜」「摆
+  // 个贵得离谱的选项，大家就会选中间档」式**相对衬托兑现**（r471 探针：
+  // ZH 攻击 5 条中 2 条穿透，全部断在腿②）。语义同族：高价参照在场 ×
+  // 目标价因衬托被判便宜/合理。
+  /(?:跟|和|与|同|比|相比|对照)[^。，！？；\n]{0,18}(?:一比|对比|衬托|映衬|参照|比较)/, // 跟五万的旗舰版一比
+  /(?:一比|对比之下|对照之下|相形之下)[^。，！？；\n]{0,20}(?:显得|看上去|看起来|顿时|立马)?(?:很|挺|真|特别)?(?:便宜|划算|实惠|合理|值)/, // 一比显得便宜
+  /(?:显得|看上去|看起来|顿时|立马|一下子)(?:很|挺|真|特别)?(?:便宜|划算|实惠|合理)/, // 显得便宜
+  /(?:摆|放|设|弄|搞)一?个?(?:贵|高价|天价|离谱)[^。，！？；\n]{0,14}(?:选项|档|版本|配置|套餐|价位)/, // 摆一个贵得离谱的选项
+  /(?:功能|配置)?(?:残缺|缩水|阉割|丐)[^。，！？；\n]{0,10}(?:版|款|档)/, // 功能残缺的丐版
 ];
 
 // ─── 腿② WORTH 估值即锚点族（中文；查否定前缀）─────────────────
@@ -303,6 +346,31 @@ const DOMINATED_EN = [
   /\bnever\s+(?:left|leaves|leaving)\s+the\s+orbit\s+of\s+(?:that|this|those|these|the\s+(?:opening|asking|sticker|quoted|listed|posted|first|initial|original|anchor|list)|his|her|their|its)\b/i,
   /\bstayed\s+inside\s+the\s+orbit\s+of\b/i,                               // 已在 ORBIT 族首行，此处为冗余保险（不改语义）
   /\bnever\s+questioned\s+(?:whether|if)\s+it\s+was\s+worth\b/i,           // never questioned whether it was worth
+  // [r471] 折扣兑现裸形——存量 DEAL 族都要求 felt/makes/looked 系动词或
+  // getting 形式，漏最直白的「the sale price is a great deal」「$699 is a
+  // steal」式**裸系动词折扣兑现**（r471 探针：EN 攻击 5 条中 3 条穿透，
+  // 全部断在腿②）。语义同族：锚点在场 × 折扣价被判划算。
+  /\b(?:sale|discounted|discount|final|offer|asking|selling|current)\s+(?:price|offer|rate|amount)\s+(?:is|was)\s+(?:a\s+|an\s+)?(?:great\s+|good\s+|real\s+|fantastic\s+)?(?:deal|bargain|steal|win)\b/i, // the sale price is a great deal
+  /\b[\w$-]{1,12}\s+(?:is|was)\s+(?:a\s+|an\s+)?(?:great\s+|good\s+|real\s+)?(?:deal|bargain|steal)\s+(?:for|at|compared)\b/i, // $699 is a steal for this
+  // [r471] 裸系动词便宜形——存量 is-a-deal 族只收 deal/bargain/steal 名词
+  // 形，漏「the $500 plan is cheap」「that price looks reasonable」式**裸
+  // 系动词 + 便宜/合理**的兑现直陈（r471 探针 AN5：腿①命中、腿②穿透）。
+  // 语义同族：目标价因参照被判便宜。
+  /\b(?:the\s+|that\s+|this\s+|a\s+)?[\w$]{1,14}\s+(?:plan|tier|option|model|version|package|price|offer|deal)\s+(?:is|was)\s+(?:so\s+|really\s+|quite\s+|pretty\s+|actually\s+)?(?:cheap|affordable|inexpensive|reasonable)\b/i, // the $500 plan is cheap
+  /\b[\w$-]{1,12}\s+(?:is|was)\s+(?:so\s+|really\s+|quite\s+|actually\s+)?(?:cheap|affordable)\s+(?:for|compared)\b/i, // $500 is cheap for
+  // [r471] 衬托比较族 EN 侧——存量无「与更贵选项相比显得便宜」形，漏
+  // 「makes the $500 plan look cheap / seems reasonable next to」式**相对
+  // 衬托兑现**（r471 探针 EN-5 穿透）。语义同族：高价参照在场 × 目标价
+  // 因衬托被判合理/便宜。
+  /\b(?:makes?|made|making)\s+(?:the\s+)?[\w$]{1,14}\s+(?:plan|tier|option|model|version|package|price)\s+(?:look|seem|feel|appear)\s+(?:so\s+|really\s+|quite\s+)?(?:cheap|reasonable|affordable|better)\b/i, // makes the $500 plan look cheap
+  /\b(?:looked|looks|seemed|seems|feels?|appears?)\s+(?:so\s+|really\s+|quite\s+|pretty\s+)?(?:cheap|reasonable|affordable)\s+(?:next\s+to|beside|compared\s+(?:to|with)|against|versus|vs\.?)\b/i, // looks cheap next to / seems reasonable compared with
+  /\b(?:next\s+to|beside|compared\s+(?:to|with)|against)\s+(?:the\s+)?[\w$]{1,14}\s+(?:tier|plan|option|model|version|price)\b[^.]{0,40}\b(?:cheap|reasonable|affordable|bargain)\b/i, // next to the $5000 tier ... cheap
+  // [r471] makes X feel/seem reasonable 形——存量 DOMINATED_EN 的使动族
+  // 只收 makes it a steal / makes X look cheap，漏「makes the $30000
+  // offer feel reasonable」式**使动 + 合理感知**（r471 探针 AN3：腿①命中、
+  // 腿②穿透）。语义同族：锚点在场 × 目标价因锚点被判合理。
+  /\b(?:makes?|made|making)\s+(?:the\s+|that\s+|this\s+)?[\w$]{1,14}\s+(?:offer|price|deal|plan|option|tier|quote|number|amount)\s+(?:feel|seem|sound|look)\s+(?:so\s+|really\s+|quite\s+)?(?:reasonable|fair|cheap|affordable|generous)\b/i, // makes the $30000 offer feel reasonable
+  /\b(?:feel|feels|felt|seem|seems|seemed|sound|sounds|look|looks)\s+(?:so\s+|really\s+|quite\s+)?(?:reasonable|fair|affordable)\s+(?:next\s+to|beside|by\s+comparison|compared|against|versus|in\s+comparison)\b/i, // feels reasonable by comparison
 ];
 
 // ─── [r305] 腿① 元语言锚点命名（中文；全新句式族，查否定前缀）──────

@@ -785,6 +785,12 @@ const { checkNarrativeFallacy } = require('./narrative-fallacy.js');
 // 类比桥全删后攻击 0/16、源域属性全删 0/16、迁移结论全删 0/16。
 // 与 false_equivalence（只管「两类事物被说成等同」的结论层抹平）射程
 // 互补：本族管类比桥上的属性迁移，源域与目标域始终是两个东西。
+// [r471 接线] 第 292 维度 anchoring_effect（锚定效应：初始数字不成比例地
+// 支配后续估计——锚点呈现腿 × 估计被支配腿两腿共现 + 邻近窗 + 概念/纠正
+// 两组豁免，缺一不判）。src/anchoring-effect.js 718 行自 r305 起实现，历经
+// r309/r314/r318/r448 四轮补腿，从未 dispatch——r471 探针实测 6 条锚定攻击
+// 5 条穿透 pass（承重仅泛化 econ_reasoning_gate，无专名承重）。变量名 anc。
+const { detectAnchoringEffect } = require('./anchoring-effect.js');
 const { checkFalseAnalogy } = require('./false-analogy.js');
 const { detectSourceDerogation } = require('./source-derogation.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
@@ -2685,6 +2691,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r465 先例：类比桥 × 源域属性 × 迁移结论三腿共现 + 邻近窗 + 五组
   // 豁免，缺一不判。变量名 fna——grep 0 命中无冲突。
   const fna = _applyPedagogyRelaxation(checkFalseAnalogy(_normText), "false_analogy", pedagogyRelaxation);
+  // [r471 接线] 第 292 维度 anchoring_effect（锚定效应）计算点。同 r469
+  // 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 anc——anchoring
+  // effect 缩写，grep 0 命中无冲突。
+  const anc = _applyPedagogyRelaxation(detectAnchoringEffect(_normText), "anchoring_effect", pedagogyRelaxation);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -3583,6 +3593,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 类比桥 × 源域属性 × 迁移结论三腿共现）。同 r465 先例：dimMap 与
     // allDims 两处都接，findings 可单独指名该族。fna。
     {score: fna.score, name:'false_analogy'},
+    // [r471 接线] 第 292 维度 anchoring_effect 参与判定（锚定效应：锚点
+    // 呈现 × 估计被支配两腿共现）。同 r469 先例：dimMap 与 allDims 两处
+    // 都接，findings 可单独指名该族。anc。
+    {score: anc.score, name:'anchoring_effect'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -4322,6 +4336,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r469 接线] 第 291 维度 false_analogy（虚假类比论证：类比桥 ×
     // 源域属性 × 迁移结论三腿共现）。同 r465 先例：六处一次接齐。fna。
     false_analogy: fna,
+    // [r471 接线] 第 292 维度 anchoring_effect（锚定效应：锚点呈现 ×
+    // 估计被支配两腿共现）。同 r469 先例：六处一次接齐。anc。
+    anchoring_effect: anc,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -5436,6 +5453,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（verify 级——需补出实际
     // 票数与程序痕迹；单句也可能是会议流程复述/文学对白，rewrite 会误伤）。
     'manufactured_consent',
+    // [r471] 第 292 维度 anchoring_effect（锚定效应：锚点呈现 × 估计被
+    // 支配两腿共现——verify 级：需补独立估价依据；单句也可能是行情
+    // 报道/谈判复盘/比价教学，rewrite 会误伤）。anc。
+    'anchoring_effect',
     // [r644] 第 66 维度：检出冲突却不传达不确定性（verify 级——需写出冲突
     // 仍在、两侧依据与置信度；单句也可能是小说台词/案例复述/推演记录，
     // rewrite 会误伤）。
@@ -7276,6 +7297,10 @@ function discriminate(text, evidence = [], contentMode) {
       // 源域属性 × 迁移结论三腿共现）补登记。同 r460 先例：九处一次接齐，
       // 漏一处 dimensions 读数缺键。fna。
       false_analogy: fna,
+      // [r471 接线] 第 292 维度 anchoring_effect（锚定效应：锚点呈现 ×
+      // 估计被支配两腿共现）补登记。同 r460 先例：九处一次接齐，漏一处
+      // dimensions 读数缺键。anc。
+      anchoring_effect: anc,
       // [r178] 第 176 维度 conjunction_fallacy（合取谬误）。
       conjunction_fallacy: cjf,
       // [r179] 第 177 维度 moralistic_fallacy（道德主义谬误）。

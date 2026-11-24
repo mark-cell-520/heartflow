@@ -1,3 +1,23 @@
+# r471 ikea_effect 宜家效应接线 econ 聚合族 + anchoring_effect 补腿固化（v6.8.233）
+
+- **轮次**：r471 每日升级 cron（2026-11-24 15:35 CST）
+- **VERSION**：6.8.232 → **6.8.233**（维度 291→292；VERIFY 249→249，聚合子族不增可计数维度）
+- **类型**：真升级①+②（新聚合子族接线 + r470 stranded WIP 补腿固化）
+- **背景**：开轮 git status 发现两项 WIP：① `src/anchoring-effect.js` +59 行补腿且 `src/index.js` +25 行已六处接线（第 292 维度 `anchoring_effect`，变量 `anc`，verify 级）——r470 遗留，核实为有效 WIP 后固化；② `src/ikea-effect.js` 370 行完整实现未接线（grep ikea src/index.js = 0 命中）——r471 新建候选。
+- **方向定拨**（`scripts/round-471/probe-r471-candidates.js` + `probe-r471-shortlist.js`）：6 候选族穿透率 ikea 6/8 最高（certainty_effect 0/4、zero_risk_bias 1/4、pseudocertainty 1/4、curse_of_knowledge 2/4、ambiguity_aversion 3/6）；存量 econ/stats 47 子族 + 291 维度对同批攻击形仅 6/8；插件层 econReasoning 零族命中、良性 4/4 零误伤。缺口真实存在。
+- **心虫裁决门禁**：`heartflow_philosophy_decision` 返回 decision=**accelerate**，confidence 0.7，priority 40，healthScore 0.98 / cognitiveLoad 0。
+- **接线决策**：定为 `src/econ-reasoning-gate.js` FAMILIES **第 48 子族**（引擎聚合层现 43 族——插件层 48 族，引擎不含 ad_hominem / incentive_blind_spot 等 5 族，见模块头注释），免六处接线、免可计数维度递增；模块头部设计意图即「聚合族第 48 子族」。注册项：`{ key: 'ikea_effect', mod: './ikea-effect.js', fn: 'detectIkeaEffect', zh: '宜家效应（劳动投入高估）', en: 'IKEA effect (labor-led overvaluation of own output)', round: 'r471' }`，插入 `per_protocol_misread`(r392) 之后、表尾 `];` 之前（+22 行含射程分工与来源注释）。
+- **实现**（`src/ikea-effect.js` 374 行）：双腿判据（缺一不判）——腿① LABOR 劳动自指（亲手/自己/DIY/一针一线/亲手栽的/assembled themselves/on his own…，含裸名词形）→ 邻近窗 ZH 60 / EN 160 字内腿② QUALITY/VALUE 虚高断言（更好/更值/格外珍贵/better than ready-made/more valuable…）。四组豁免：A 概念教学 / B 推理否定 / C 基准在先 / D 疑问句守卫（QUESTION_ZH，本轮新增——「自己做的真的更好吗？」两腿零宽自命中形）。强否定守卫本轮补「并不|也不|也不并」族（修复「但并不比现成的工厂货好多少」误命中——否定词在腿②命中串内部，前窗结构看不到）。射程分工：effort_justification（r234）判努力辩护承诺一致、endowment_effect（r241）判禀赋所有权溢价、absolute_claim、budget_value_conflation（r219）；本族落点是「劳动投入导致对自有产出的虚高估值」。
+- **验证**：
+  - 矩阵探针 `scripts/round-471/probe-r471-matrix.js`：攻击 **10/10 命中**（gate 非 pass 且 ikea 族承重）、良性模块层 **8/8 零误伤**；唯一 gate 非 pass 良性为沉没成本句（归 sunk_cost_coercion 领地，按规则不计本族误伤）。
+  - 轮测 `test/round-471-ikea-effect.test.js` **43/43**：攻击 16、良性 12、13 条腿族代表句式逐条命中（防死腿）、整腿①/整腿②删除注入后攻击全失配（双腿结构承重）、邻近窗注入、四组豁免逐条承重（复活或覆盖验证）、FAMILIES 注册断言、邻居射程边界回归。
+  - 四门禁：`bin/verify.js` **16 passed / 0 failed**；`guard-abilities.js` **20/20 @292**；双向门禁召回 **52/52** + 误拦 302/326 **零新增**；`doc-numbers` **23/25**。
+- **已知边界 / 下轮可继续**：
+  - doc-numbers 剩 2 项 FAIL 全部是 `AGENTS.md` cron 系统写保护 BLOCKED（r470 起遗留）：L15 横幅 291→292、L113 标题 291→292。README/SKILL/CHANGELOG 均已同步，需主会话人工同步 AGENTS.md 两处（Verify 列举口径本轮无新增维度无需改）。
+  - `src/index.js` 19310 行超 14000 阈值（⚠️ 拆分高危，不自动处理）。
+  - 兄弟 subagent 'cron:bf25299699e8:6531ba6fb9e14716b5497ec38422dc17' 15:40/15:46 两次并发改过 `src/ikea-effect.js`（栽种族补腿在先）；本 agent 的 STRONG_NEG 与 QUESTION_ZH 改动均在兄弟改动之后重读确认后追加，提交前已逐个确认路径归属。
+  - 全量测试 21158 过 / 195 败为存量噪声（未逐项排查），按纪律不跑 run-all.js。
+
 # r470 false_analogy 中英双语腿族补强 + r469 stranded WIP 固化（v6.8.232）
 
 - **轮次**：r470 每日升级 cron（2026-11-24 11:04 CST）

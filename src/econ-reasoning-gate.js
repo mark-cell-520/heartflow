@@ -293,6 +293,28 @@ const FAMILIES = [
   //   攻击 26/26 + 良性 34/34；海外扫描 arXiv parse-fail / GitHub 0 / S2 429
   //   ——空返，按既有形态自建。
   { key: 'per_protocol_misread',               mod: './per-protocol-misread.js',               fn: 'detectPerProtocolMisread',             zh: '按方案分析集误读',        en: 'per-protocol misread (completer-subgroup effect cashed out as the drug\'s true effect)', round: 'r392' },
+  // r471 新增（行为经济学轴，选题探针 scripts/round-471/probe-r471-candidates.js
+  //   + probe-r471-shortlist.js，VERSION 6.8.232 pristine 基线）：宜家效应 /
+  //   劳动投入高估（IKEA effect / labor-led overvaluation——文本先给出自己对
+  //   产物投入劳动的在場指称（亲手拼装/自己写的/团队熬出来的/built it
+  //   ourselves），再把劳动直接兑现为质量或价值虚高断言（自己的东西就是
+  //   更好/更值/更结实）。同池 6 候选定拨：ikea 穿透 6/8 最高且判据最可规则
+  //   化，certainty_effect 0/4、zero_risk_bias 1/4、pseudocertainty 1/4、
+  //   curse_of_knowledge 2/4、ambiguity_aversion 3/6 均不及；存量 econ/stats
+  //   47 子族 + 291 维度对同批攻击形 6/8 穿透，插件层 econReasoning 零族
+  //   命中、良性 4/4 零误伤——射程真空确认。双腿（LABOR 劳动投入在场 ×
+  //   QUALITY 质量虚高或 VALUE 价值虚高任一）+ 邻近窗（ZH 60 / EN 160 字符，
+  //   方向不限）+ 腿②强否定前缀守卫 + 三组豁免（CONCEPT 概念教学 / CORRECT
+  //   纠正句 / BASELINE 基准在先）；与 effort_justification（r234，已投入×
+  //   放弃可耻——沉没成本轴）、endowment_effect（r241，所有权高估——无劳动
+  //   投入在场要求）、absolute_claim（绝对化措辞）、budget_value_conflation
+  //   （r219，预算约束≠价值）射程不重叠。外部来源：Norton, Mochon & Ariely
+  //   (2012) "The IKEA effect: When labor leads to love"（JCR 行为经济学标准
+  //   文献）+ arXiv 3 条命中（"Can IKEA effect promote empathy for agents?" /
+  //   "The Importance of Cognitive Biases in the Recommendation Ecosystem" /
+  //   "Silent Leaks: Implicit Knowledge Extraction Attack on RAG Systems
+  //   through Benign Queries"）；GitHub repos total_count=0、S2 429 限流。
+  { key: 'ikea_effect',                        mod: './ikea-effect.js',                        fn: 'detectIkeaEffect',                       zh: '宜家效应（劳动投入高估）', en: 'IKEA effect (labor-led overvaluation of own output)', round: 'r471' },
 ];
 
 const _cache = new Map();
