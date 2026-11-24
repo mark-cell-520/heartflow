@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Test Suite](https://img.shields.io/badge/test%20suite-21%2C158%20passing-brightgreen)](test/)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-198-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-290-blueviolet.svg)](#what-it-catches-290-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-291-blueviolet.svg)](#what-it-catches-291-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -17,7 +17,7 @@ human or an LLM**. It answers one question and nothing else: *is this okay to le
 through?*
 
 ```
-290 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  198 MCP tools  ×  1,390 dispatch routes  ×  21,158 passing tests  ×  2 npm dependencies
+291 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  198 MCP tools  ×  1,390 dispatch routes  ×  21,158 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -145,7 +145,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 290 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 291 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -172,7 +172,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (290 dimensions) -> gate
+scope-check -> premise-check -> discriminate (291 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -199,14 +199,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (290 dimensions)
+## What it catches (291 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **247 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **248 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
 | Coercion & manipulation | `commitment_coercion`, `investment_as_debt`, `love_bombing`, `social_isolation`, `selfharm_coercion`, `triangulation`, `future_faking`, `intermittent_reinforcement`, `reproductive_coercion`, `deprivation_coercion`, `pet_harm_coercion` | 6.8.3 – 6.8.32 |
-| Logical fallacies | `straw_man`, `appeal_to_nature`, `appeal_to_novelty`, `circular_reasoning`, `no_true_scotsman`, `special_pleading`, `conditional_proposition`, `appeal_to_probability`, `gamblers_fallacy`, `hot_hand`, `appeal_to_majority`, `affirming_the_consequent` | 6.8.40 – 6.8.78 |
+| Logical fallacies | `straw_man`, `appeal_to_nature`, `appeal_to_novelty`, `circular_reasoning`, `no_true_scotsman`, `special_pleading`, `conditional_proposition`, `appeal_to_probability`, `gamblers_fallacy`, `hot_hand`, `appeal_to_majority`, `affirming_the_consequent`, `false_analogy` | 6.8.40 – 6.8.231 |
 | Emotional & psychological | `emotional_manipulation`, `gaslighting`, `mind_reading`, `darvo`, `kafkatrapping`, `concern_trolling`, `fear_projection`, `guilt_induction`, `suffering_capital` | 6.7.x – 6.8.x |
 | Agent-era attacks | `reward_hacking`, `prompt_injection` (+ synonym families: 37 verbs × 24 anchors × 52 objects = 46,176 combinations), `instrumental_reasoning`, `deceptive_alignment`, `capability_overclaim`, `turing_mimicry` | 6.7.10 – 6.8.84 |
 | Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias`, `selection_bias`, `count_rate_conflation`, `law_of_small_numbers`, `immortal_time_bias`, `unfalsifiable_assertion` | 6.7.x – 6.8.167 |
@@ -218,14 +218,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.230**. Not marketing copy.
+Measured on this repository at **v6.8.231**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 169 |
 | Module init errors | 0 |
 | Dispatch routes | 1,390 |
-| Discrimination dimensions | 290 |
+| Discrimination dimensions | 291 |
 | MCP tools | 198 | tool definitions exposed via `tools/list` |
 | Test suite | 21,158 passing / 195 failing | `node test/run-all.js`（r463 审计修复轮全量实测 21,158/195（938 文件）——195 项失败为长期存量技术债，按 r412 不作门禁；r457 上游融合轮全量实测 28,751/177/28,928（896 文件）、r435 基线 25,941/233/26,174（873 文件），两侧口径不同勿混用）|
 | Capability guard | 20 / 20 checks |
@@ -396,6 +396,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |--------|-------|--------|
+| 6.8.231 | 2026-11-24 | **r469 第 291 维度 `false_analogy`（虚假类比论证 / false analogy）独立接线（真升级①：新判别维度）** — 方向「逻辑谬误检测」，承接 1 号红队报告「类比桥属性迁移零覆盖」。缺口实证：存量 `false_equivalence` 管「两事物被当作等同」的混淆宣告，`analogy`-adjacent 各维均不判「借 A 的属性论证 B」的**跨域属性迁移**结构——探针 v6.8.230 gate 层实测攻击 16 条 16 条穿透 pass。三腿判据（缺一不判）：腿① ANALOGY 类比桥（就像/好比/正如/无异于/相当于/is like/just as…，含裸名词桥）→ 邻近窗 ZH 60 / EN 160 字内 腿② PROP 源域属性 → 距离窗 ZH 80 / EN 200 内 腿③ INFER/MODAL 迁移标记 + 腿④ TARGET 目标域名词（≤40 字）。三条路由：主路由（桥→属性→迁移→目标域，score 0.56）、退回路由一结论先行（目标域先行+桥+迁移，0.56）、退回路由二源域名词桥接（SRC→≤30字→桥→属性→迁移，属性词可缺席，0.54）。五组全局豁免（概念教学/推理否定/对冲/类比局限声明/`/[?？]/` 疑问句）。射程边界：`false_equivalence` 判「等同混淆」、`whole_part_transfer` 判「整体-部分属性迁移」、`hasty_generalization` 判「样本-总体外推」——本族落点是「跨域类比桥上把源域属性搬到目标域」。`src/false-analogy.js`（371 行，变量名 `fna`）导出 `checkFalseAnalogy` 与 `__internals()` 20 常量句柄；`src/index.js` 六处接线（require / dispatch 带 pedagogy relaxation / allDims / dimMap / VERIFY_DIMS 带 verify 级理由注释 / dimensions 读数）。轮测 `test/round-469-false-analogy.test.js` **51/51**；矩阵探针 `scripts/round-469/probe-r469.js` 攻击 **16/16 命中**（score 0.56）、良性 **0/13 误伤**、逐常量单腿删除注入（ANALOGY/PROP/INFER/MODAL/TARGET/SOURCE × ZH/EN + 五组豁免）确认无单腿独撑。维度 290→291、VERIFY 247→248、工具/路由数不变（198/1390）。VERSION 6.8.230→6.8.231。四门禁：verify 16/0、guard-abilities 20/20@291、双向召回 52/52 + 误拦 302/326 零新增；doc-numbers 因 AGENTS.md 对 cron 写保护 BLOCKED（3 项待改：L15 banner 290→291、L113 标题、L127 Verify-level (247)→(248) 且列举追加 `false_analogy`）未全绿，README/SKILL 已同步 291/248 + 补删 SKILL Verify 列举尾部重复登记的 `false_analogy`。 |
 | 6.8.230 | 2026-11-24 | **r468 工程修复轮：58 项 check* 导出缺口补齐 + MCP 加载即退出的位置缺陷（真升级②，非新维度）** — 起于 r467 修第 82 维度 `loyalty_by_omission` 时探针（`scripts/round-467/probe-r467-export-audit.js`）报出的「discriminate() 调用 251 个 check*、module.exports 仅登记 219 个，55 个同类缺口本轮只修 1 个作闭环示范」。缺口机理在 `src/mcp-server.js` `handleCheckSingle`：`dimension` 名转驼峰后查 `hf['checkXxx']`，查不到即返回「维度不存在」并把 available 列表一起吐回——**导出是单点调用可达性的唯一开关**，管线内部测试全绿看不出来。**第一批 52 项**按静态调用扫描补齐；**第二批 6 项**来自该扫描的两个盲区：①「函数作为值传递」`_dual(_mt.checkPhishingCoercion)` 后面跟的不是括号，正则 `\b(check[A-Z]\w*)\s*\(` 抓不到，`checkRewardHacking` 就这么漏的；②「绑定名与导出名不一致」，`checkWeakEvidenceStrongClaim` 顶层绑定成了 `_checkWeakEvidenceStrongClaim`，导出用的是带下划线的名字。第二批的 `phishing_coercion` / `coverup_induction` / `dangerous_instruction` 三个还在 `BLOCK_DIMS`（单条命中即硬撤）里——不可达会让外部调用方误判该攻击面不存在。修后可用 check 维度 219→277，新增 `test/round-468-check-export-coverage.test.js`（11/11）把「dispatch 了就必须导出」固化为不变量，并**用标识符级 ∪ 运行时 typeof 双重校验替代原来的调用形态扫描**（正是后者漏了 6 项）。**同轮修掉一个自己在 2026-11-23 全局修复轮留下的实现位置缺陷**：`src/mcp-server.js` 的无 token 拒绝启动写在模块顶层，`process.exit(1)` 无 `require.main` 守卫，导致任何 require 本文件的代码（`mcp-smoke` / `round-572-associative-handler` / `run-all-no-silent-skip` 等一批测试，以及将来把它当库用的调用方）宿主进程直接被杀掉，报错只有三行 stderr 看不出是被谁拖死的。而这与 L6854 启动守卫注释写明的既定设计（「被 require 时仅导出，供测试显式调用 start()」）正相反。现分两种情形、安全强度不减：作为入口执行仍拒绝启动；被 require 时不杀进程，`AUTH_TOKEN` 保持 null，经 L381 `if (!AUTH_TOKEN) return false` 使 L6368 的鉴权判定恒真，即所有请求一律走拒绝分支——fail-closed，不存在「无 token 反而放行」的窗口。另给 5 个自起 server 的测试（`knowledge-layer-mcp-state-round313` / `knowledge-graph-mcp-state-round593` / `round-578-topic-scope-wiring` / `round-627-strategic-restraint-mcp` / `round-590-instruction-audit-mcp-wiring`）按 `mcp-guest-permission.test.js` 既有模式注入自生成随机 token，不复用线上凭据、不落盘。**文档同步**：`64127fee`（第 290 维度 source_derogation）只改了 README 漏改 AGENTS.md，doc-numbers 三门禁因此红（维度总数 289≠290、三文档互查不一致、Verify 列举 246≠247），本轮补齐 AGENTS.md 三处（289→290 / Verify-level (246)→(247) 且列举追加 `source_derogation`）。四门禁：verify 16/0、guard-abilities 20/20@290、doc-numbers 25/0、双向召回 52/52 + 误拦 302/326 **与基线逐项相同、零新增误伤**。**遗留未修**：`attribution_vacuum` 对英文良性财报句 `The quarterly report shows revenue grew 12%.` 误判 severity 70 → gate 顶成 verify（`test/round-732-despaced-injection.test.js` 57/1 失败）；已用改动前的 index.js 在隔离目录对照确认是存量行为、非本轮引入，修它需单独设计 ZH/EN 豁免族 + 回归测试，另起一轮。VERSION 6.8.229→6.8.230。 |
 | 6.8.229 | 2026-11-23 | **r463 审计修复轮：normalcy_bias dimensions 键补登 + narrative-fallacy 豁免二接 NEGATED_CHANCE_EN 守卫（真升级②）** — P1 `src/normalcy-bias.js` dimensions 字面量漏 `normalcy_bias` 键（r460 接线八处接了唯独漏键，读方一律当未命中）；P1 `src/narrative-fallacy.js` 豁免二未接 `NEGATED_CHANCE_EN` 守卫（样本 "The whole thing fits together too neatly to be a coincidence." 被吞）。文档三层同步 289/246/21,158。四门禁：verify 16/0、guard-abilities 20/20@289、双向召回 52/52 + 误拦 302/326。轮测 `test/round-463-narrative-fallacy.test.js` 47/0（修复前 42/5）；探针攻击 10/10、指名 10/10。 |
 | 6.8.228 | 2026-11-23 | **r458 第 286 维度 `appeal_to_spite`（诉诸恶意 / 幸灾乐祸 / appeal to spite）独立接线（真升级①）** — 外部来源：causalNLP/logical-fallacy（97★，LogicClimate/LogicEdu 谬误数据集，`fallacy_list.txt` 317 行 canonical 清单）筛出心虫零覆盖的 appeal to spite 族；内部缺口实证 `scripts/round-457/probe-r457-spite.js` v6.8.226 gate 层实测攻击 10 条 6 条穿透 pass、spite 词族对专维 0 命中。两腿判据（缺一不判）：腿① HARM 受损事实陈述（辞退/失业/破产/封号/起诉/破产/生病/被骗/被裁/赔光/负债/挨打/进医院；EN：fired/unemployed/bankrupt/scammed/banned/doxxed/injured/hospitalized，含被动形 `was fired` 与裸名词形） × 腿② DESERVED 应得/幸灾乐祸（活该/报应/罪有应得/咎由自取/风水轮流转/自找的/怪不得别人/不算冤/不值得同情；EN：deserved/deserves it/had it coming/good riddance/serves him right/karma/what did you expect），邻近窗 ZH 80 字 / EN 200 字符。射程边界：victim_blaming 管「受害者自己也有责任」的归因分配、harm_invalidation 管「伤害事实不存在」、suffering_contest 管「比惨消诉」——本族落点是「把他人受损认定为应得 + 以此取消同情」。四组豁免全量保留（司法结果复述 / 绩效归责说明 / 事故通报 / 谬误教学与对冲）。`src/appeal-to-spite.js`（~310 行）导出 `checkAppealToSpite` 与 `__internals()` 句柄（守卫测试可置空指定支验承重）。`src/index.js` 七处接线（require / dispatch 变量 `asp` / scores / dimMap×2 / dimensions 键+登记注释 / VERIFY_DIMS），维度 285→287、VERIFY 254→257。验证：矩阵探针 `scripts/round-457/probe-r457-matrix.js` gate 层攻击 11/14 非 pass（appeal_to_spite 独立承重 9 条）、良性 8/11 pass（3 条 FP 全为存量维度 victim_blaming/vagueness/contradiction 已知误伤基线，非本轮引入）；剩余 3 个未命中均为问号守卫挡掉的疑问形，属设计边界（只判已宣告的应得判断，不判疑问推测）。四门禁：verify 16/0、guard-abilities 20/20@287、双向召回 52/52 + 误拦 302/326 零新增。**未绿项**：doc-numbers 19/24，剩余 5 项全部阻塞在 AGENTS.md 写保护（该文件对 cron 系统写保护，无交互用户无法批准）：维度总数 285→287、MCP 工具 197→198、Verify-level 列举 (254)→(256) 且列举追加 `appeal_to_spite`、三文档互查数字——需主会话人工同步后转绿；README/SKILL 两侧已全部同步（含 Verify 列举追加与版本戳 v6.8.228）。VERSION 6.8.227→6.8.228。 |

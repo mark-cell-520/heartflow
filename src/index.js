@@ -776,6 +776,16 @@ const { checkNarrativeFallacy } = require('./narrative-fallacy.js');
 // r465 立项探针（scripts/round-465/probe-r465-gap.js，v6.8.229）：
 // 45 条攻击仅 12 条被 gate 拦下、33 条穿透，其中 5 条被语义错维代拦、
 // 28 条零维度承重；良性 13/15。三族关键词在 src/ 下 grep 零命中。
+// [r469 接线] 第 291 维度 false_analogy（虚假类比论证：类比桥 × 源域
+// 属性 × 迁移结论三腿共现，缺一不判）。变量名 fna——false analogy 缩写，
+// grep 0 命中无冲突。三腿判据、五组豁免与边界见 src/false-analogy.js
+// 头注释。r469 立项实测（scripts/round-469/probe-r469.js，v6.8.230）：
+// 攻击 16/16 命中（含裸名词「好比」、倒装目标域先行、长句多分句、跟…
+// 一样形、把…比作形、英文 6 变体），良性 13/13 零误伤；负例注入中英
+// 类比桥全删后攻击 0/16、源域属性全删 0/16、迁移结论全删 0/16。
+// 与 false_equivalence（只管「两类事物被说成等同」的结论层抹平）射程
+// 互补：本族管类比桥上的属性迁移，源域与目标域始终是两个东西。
+const { checkFalseAnalogy } = require('./false-analogy.js');
 const { detectSourceDerogation } = require('./source-derogation.js');
 // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推：把有效
 // 剂量的效果按比例/倍数放大断言——剂量陈述腿×线性外推腿两腿共现+邻近窗。
@@ -2671,6 +2681,10 @@ function discriminate(text, evidence = [], contentMode) {
   // [r465 接线] 第 290 维度 source_derogation（信息源贬低族）独立 dispatch。
   // 同 r460/r463 先例：三族双腿共现+邻近窗+五组豁免，缺一不判。
   const srg = _applyPedagogyRelaxation(detectSourceDerogation(_normText), "source_derogation", pedagogyRelaxation);
+  // [r469 接线] 第 291 维度 false_analogy（虚假类比论证）独立 dispatch。
+  // 同 r465 先例：类比桥 × 源域属性 × 迁移结论三腿共现 + 邻近窗 + 五组
+  // 豁免，缺一不判。变量名 fna——grep 0 命中无冲突。
+  const fna = _applyPedagogyRelaxation(checkFalseAnalogy(_normText), "false_analogy", pedagogyRelaxation);
   // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推）计算点。
   // 同 r304 先例：六处一次接齐，漏一处 gate.action 恒 pass。变量名 drl——
   // dose response linearity 缩写，grep 0 命中无冲突。
@@ -3565,6 +3579,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 敌意归因 / 反应性贬低 / 虚幻真效应三族双腿判据）。同 r460 先例：
     // dimMap 与 allDims 两处都接，findings 可单独指名该族。srg。
     {score: srg.score, name:'source_derogation'},
+    // [r469 接线] 第 291 维度 false_analogy 参与判定（虚假类比论证：
+    // 类比桥 × 源域属性 × 迁移结论三腿共现）。同 r465 先例：dimMap 与
+    // allDims 两处都接，findings 可单独指名该族。fna。
+    {score: fna.score, name:'false_analogy'},
     // [r306] 第 250 维度 dose_response_linearity 参与判定（剂量-反应线性
     // 外推）。同 r304 先例：dimMap 与 allDims 两处都接。
     {score: drl.score, name:'dose_response_linearity'},
@@ -4301,6 +4319,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 模糊行为腿×恶意结论腿 / 反应性贬低 源标记腿×贬低结论腿 / 虚幻真
     // 效应 重复陈述腿×真值断言腿）。srg。
     source_derogation: srg,
+    // [r469 接线] 第 291 维度 false_analogy（虚假类比论证：类比桥 ×
+    // 源域属性 × 迁移结论三腿共现）。同 r465 先例：六处一次接齐。fna。
+    false_analogy: fna,
     // [r306] 第 250 维度 dose_response_linearity（剂量-反应线性外推×
     // 剂量陈述腿×线性外推断言腿）。
     dose_response_linearity: drl,
@@ -6668,6 +6689,15 @@ function discriminate(text, evidence = [], contentMode) {
     // 射程边界：只管「源标记×结论断言」双腿共现这一族，不管该内容
     // 本身的事实真伪、也不管人际关系本身的真实状态。
     'source_derogation',
+    // [r469 接线] 第 291 维度 false_analogy 进 VERIFY_DIMS。verify 的含义：
+    // 该结论由「A 像 B」这一类比桥承载，需要先补上类比有效性的论证（源域
+    // 属性在同一关系上对目标域成立）再采信，而不是接受「像」冒充的「是」。
+    // 单句可能是正确的类比使用（类比作为说明工具）、文学修辞、对类比失效
+    // 的正确指出（「把国家比作家庭是错误的类比」正是本族要教的判别动作）、
+    // 课堂案例——rewrite/block 会误伤这些，故取 verify。射程边界：只管
+    // 「类比桥 × 源域属性 × 迁移结论」三腿共现，缺一不判（见模块头注释
+    // 五组豁免）。
+    'false_analogy',
     // [r457 接线] 第 286 维度 appeal_to_spite（诉诸恶意/幸灾乐祸）登记。
     // verify 级——单句也可能是司法结果复述、绩效归责说明、事故通报与
     // 谬误教学（「诉诸恶意是一种常见的逻辑谬误」正是本族要教的判别
@@ -7242,6 +7272,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [r465 接线] 第 290 维度 source_derogation（信息源贬低族）补登记。
       // 同 r460 先例：九处一次接齐，漏一处 dimensions 读数缺键。srg。
       source_derogation: srg,
+      // [r469 接线] 第 291 维度 false_analogy（虚假类比论证：类比桥 ×
+      // 源域属性 × 迁移结论三腿共现）补登记。同 r460 先例：九处一次接齐，
+      // 漏一处 dimensions 读数缺键。fna。
+      false_analogy: fna,
       // [r178] 第 176 维度 conjunction_fallacy（合取谬误）。
       conjunction_fallacy: cjf,
       // [r179] 第 177 维度 moralistic_fallacy（道德主义谬误）。

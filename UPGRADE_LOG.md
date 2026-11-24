@@ -1,3 +1,15 @@
+# r469 第 291 维度 false_analogy 独立接线（虚假类比论证 / false analogy）（v6.8.231）
+
+- **轮次**：r469 每日升级 cron（2026-11-24 08:46 CST）
+- **VERSION**：6.8.230 → **6.8.231**（新增可计数维度，VERIFY 247→248）
+- **类型**：真升级①（新判别维度）
+- **背景**：r468 后 upstream HEAD 5959a70e；工作区发现 r469 滞留 WIP（`src/false-analogy.js` 371 行 + 轮测 112 行 + `src/index.js` +34 行接线），按「容错纪律：本地独有产能优先固化——先核实真实性再补提交，不丢弃不覆盖」接手。
+- **缺口实证**（v6.8.230 gate 层，`scripts/round-469/probe-r469.js`）：攻击 16 条 16 条穿透 pass。存量 `false_equivalence` 判「等同混淆」、`whole_part_transfer` 判整体-部分、`hasty_generalization` 判样本-总体，均不判「跨域类比桥上把源域属性搬到目标域」。
+- **实现**：三腿判据缺一不判（ANALOGY 类比桥 → PROP 源域属性 → INFER/MODAL 迁移标记 + TARGET 目标域名词），三条路由（主路由 0.56 / 结论先行 0.56 / 源域名词桥接 0.54），五组全局豁免（概念教学/推理否定/对冲/类比局限声明/疑问句）。`src/false-analogy.js` 371 行导出 `checkFalseAnalogy` + `__internals()` 20 常量句柄；`src/index.js` 六处接线（require / dispatch 变量 `fna` 带 pedagogy relaxation / allDims / dimMap / VERIFY_DIMS / dimensions 读数）。
+- **验证**：轮测 `test/round-469-false-analogy.test.js` **51/51**；探针攻击 **16/16 命中**（score 0.56）、良性 **0/13 误伤**、逐常量单腿删除注入 12 组腿 × ZH/EN + 五组豁免确认无单腿独撑。
+- **四门禁**：verify 16/0、guard-abilities 20/20@291、双向召回 52/52 + 误拦 302/326 零新增；doc-numbers 因 AGENTS.md 写保护 BLOCKED 3 项（详见 README changelog 与最终报告）。
+- **文档同步**：SKILL.md 横幅 290→291 + Verify 列举删尾部重复登记 `false_analogy`；README.md 补 6.8.231 changelog（README 主体 291 口径由滞留 WIP 已改）。
+
 # r466 第 290 维度 source_derogation 腿族穿透修复（EN/ZH 双语全覆盖）+ r465  stranded WIP 固化（v6.8.229 保持）
 
 - **轮次**：r466 每日升级 cron（2026-11-24 06:12）
