@@ -1,3 +1,51 @@
+# r470 false_analogy 中英双语腿族补强 + r469 stranded WIP 固化（v6.8.232）
+
+- **轮次**：r470 每日升级 cron（2026-11-24 11:04 CST）
+- **VERSION**：6.8.231 → **6.8.232**（既有维度补腿，无新增可计数维度；维度 291 不变、VERIFY 248 不变）
+- **类型**：真升级②（既有维度补腿——新句式族/词族，红队漏判证据：EN 4 条矩阵样本穿透）
+- **背景**：开轮同步（`hf4-sync.sh` ahead=1 behind=0）后发现工作区有 `src/false-analogy.js` 未提交改动（+69/-8），按宪法 §7「本地独有产能优先固化」核实为上一轮 r469 掉线前遗留的 r470 WIP：改动注释标 `[r470]`、`scripts/round-470/` 探针与 apply 脚本齐全（10:58–11:04 共 12 个）、r469 单测仍 51/51、矩阵 11/15 命中且 0 误伤——判定为有效 stranded WIP，不丢弃。
+- **WIP 内容**（本轮承接）：ANALOGY_ZH「没(?:有什么)?区别」→「没(?:有)?什么?区别」放宽插入形；新增「(?:将|把|拿|以)…(?:与|和|同|跟)…(?:作类比|做类比|相比拟|相类比|类比)」作类比腿；PROP_ZH 补财政族（入不敷出/超支/透支）、行为规训族（管/管教/约束/要求/对待…孩子/子女/下属/士兵/国民；要/须/必须/得/应当/应该…严格/严厉/服从/听话/守规矩/守纪律；令行禁止/绝对服从/服从命令/军令如山/不得违抗）、渐进步骤族（一级一级/一层一层/一步步/循序/逐步/按部就班…爬/升/走/来/做/建/完成）；PROP_EN 补财务族（overspent/lives beyond its means/maxed out/debt (ceiling|limit|burden)）、规训族（tamed/policed/governed/controlled/regulated/subdued/conquered/disciplined/patrolled/lawmen/sheriff/posse/keepers? of (the) (peace|order)）；INFFER_ZH 补当然/显然/毫无疑问。
+- **缺口实证**（`scripts/round-470/probe-r470-matrix.js`）：矩阵 15 攻击 + 12 良性，承接 WIP 后攻击 11/15、良性 0/12。ZH-1~ZH-8 全命中，EN 侧 EN-1/EN-3/EN-4/EN-7 四个未中（gate 非 pass 但由其他维度承重，本维度 named=false）。
+- **逐腿诊断**（`scripts/round-470/probe-r470-legs-en.js`，用 `__internals()` 逐常量匹配）：4 个 EN MISS 全部断在腿② PROP_EN；EN-7 另断腿③ TARGET_EN（`students` 不在目标域名词表，表止于 `user`）。据此只扩 PROP_EN 与 TARGET_EN，不动 ANALOGY_EN 桥腿（已覆盖 is just like / works like / the same way as / as if 四形）。
+- **本轮补齐**：
+  - PROP_EN 家用财务族：`\b(?:household|family|home)\s+budget\b|\b(?:budget|spending|finances?)\s+(?:works?|balanced|tight)\b`（EN-1「a family budget works」）
+  - PROP_EN 存储数据族：`store[sd]?|stores|storing|save[sd]?|saved|saving|record[sd]?|log(?:s|ged)?|kee(?:p|ps|ping) + data|information|memories|files|records|everything`、`data (in|as) files|folders|chunks|bits`、`stored in (specific )?(brain )?regions?`、`files (and|or) folders`（EN-4「computers store data in files」）
+  - PROP_EN 容器灌注族：`empty|blank|hollow + vessels?|containers?|cups?|pots?|jars?|buckets?|slates?`、`filled?|poured|stuffed|crammed|loaded + (with|into) + knowledge|information|facts|ideas|data`、`fill(?:ing|s)? (them|students|pupils|children) with`（EN-7「empty vessels to be filled with knowledge」）
+  - PROP_EN 燃料族放宽：原形 `needs? (fuel|energy|input|food) to` 要求 fuel 后紧跟 `to`，漏「engines need fuel, so…」逗号形；改为 `\bneeds?\s+(?:fuel|energy|input|food|gasoline|petrol|coal|electricity)\b` 无后缀要求（EN-3）。同族 `survival of the fittest / law of the jungle / stronger ones win / eat or be eaten` 保持原样单列一行。
+  - TARGET_EN 教育域名词：student|students|pupil|pupils|learner|learners|child|children|kid|kids|workforce|population|voter|voters（EN-7 腿③）
+- **验证**：
+  - 矩阵复跑：攻击 **15/15 命中**（原 11/15，+4）、良性 **0/12 误伤**。逐条明细：EN-1 gate=rewrite、EN-3 gate=block、EN-4 gate=rewrite、EN-7 gate=rewrite 均本维度承重。
+  - 轮测 `test/round-469-false-analogy.test.js` 扩至 **61/61**（原 51）：攻击族 16→22（补 6 条 r470 新形态：家用财务/存储数据/容器灌注/燃料/将…与…作类比/比作+行为规训）、良性族 13→17（补 4 条新族负例：家用财务非类比/存储机制非类比/空容器教学转述/燃料疑问句，零误伤）。零注入基线 16→22、删概念/否定豁免后仍 22/22。
+  - 新增 `test/round-470-false-analogy-matrix.test.js` **32/32**（r470 矩阵逐条固化，含 ZH-2 规训属性等 4 条攻击变体 + 3 条边缘良性）。
+  - r469 单测 51/51 无回归（补腿前后各跑一次）。
+- **四门禁**（本回合真实运行）：verify **16/0 PASS**、guard-abilities **20/20 PASS@291**、双向 **召回 52/52 + 误拦 302/326 零新增 PASS**、doc-numbers **FAIL**——6 项失败全部为文档债，非本轮引入：3 项为 r469 遗留 AGENTS.md cron 写保护 BLOCKED（维度总数 290→291、三文档互查、Verify-level 247→248）；另 3 项为 VERSION bump 到 6.8.232 后 README/SKILL 口径戳与 changelog 落后，本轮已修 README（规格戳 + 补 6.8.232 changelog）与 SKILL（横幅/规格表/口径戳）。AGENTS.md 保护层明确禁止绕路径写入，未重试。
+- **文档同步**：README.md 补 6.8.232 changelog + 规格戳；SKILL.md 6.8.231→6.8.232 三处；UPGRADE_LOG.md 补本条。
+- **交接**：AGENTS.md 三处待改点仍待 1 号放行（L15 横幅 290→291、L113 标题 290→291、L127 Verify-level (247)→(248) 且列举追加 `false_analogy`），改完 doc-numbers 即全绿。
+
+# r470 false_analogy 腿族新句式族扩展（倒装形 + 规训/渐进/超支属性族）（v6.8.232）
+
+- **轮次**：r470 每日升级 cron（2026-11-24 10:51 CST）
+- **VERSION**：6.8.231 → **6.8.232**（腿族补强，维度数不变 291 / VERIFY 248）
+- **类型**：真升级②（已有维度的全新句式族，非旧族加样本）
+- **背景**：r469 固化提交 50e8e3d2 在 HEAD。按撞墙检测纪律，先跑变体矩阵缺口实证（scripts/round-470/probe-r470-matrix.js，15 攻击 + 12 良性经 gate.js 全管线）——攻击本维度仅命中 5/15、5 条完全 pass，确认有真实漏判才动手。
+- **缺口实证**（矩阵实测原文）：「ZH-2 把…比作形 MISS / ZH-3 跟…一样插入形 MISS / ZH-5 倒装/结论先行 MISS / ZH-7 与…作类比形 MISS / EN-5 comparable to 长句 MISS / EN-6 as if 倒装 MISS；良性误伤 0/12」。逐腿诊断（probe-r470-legs.js）定位 6 条断腿：无一是接线或阈值问题，全部是腿族正则覆盖缺口。
+- **实现**（src/false-analogy.js，六处腿族 + 一条新路由）：
+  1. 类比桥补「将/把/拿/以…与/和/同/跟…作类比/做类比/相比拟/相类比/类比」形（ZH-7）；修正「跟…没什么区别」插入形（没(?:有)?什么?区别 兼容「没什么区别」，ZH-3）
+  2. PROP_ZH 补「行为规训」属性族（管孩子要严格/令行禁止族，ZH-2）与「渐进步骤」属性族（一级一级爬/逐步族，ZH-7）
+  3. PROP_EN 财政族扩 overspent/lives beyond its means/maxed out/debt burden（EN-6），补「规训/秩序强加」属性族（tamed/policed/governed/lawmen/sheriff 族，EN-5）
+  4. INFER_ZH 补推断词「当然/显然/毫无疑问」（ZH-5）
+  5. MODAL_EN 补 should/shall/ought to/had best（EN-6 should 前置形）
+  6. **新增退回路由 route4（结论先行倒装形，score 0.54）**：结论词与目标域名词互为邻居（dist ≤ WIN，双向顺序不限）→ 类比桥（桥起点 = 结论词之后，桥-目标域双向 dist ≤ WIN）→ 源域属性（dist ≤ propWin）。覆盖「先下结论再补类比」的倒装句式（ZH-5 / EN-6），原三路由均要求桥在结论词之后
+  7. TARGET_ZH 补抽象域名词族（学习/读书/认知/思维/心理/文化/历史/政治/道德/婚姻/育儿/医疗/环境/金融/竞争/创新等 40+ 名词，ZH-7「学习」域）
+- **验证**：
+  - 变体矩阵（修复后复跑）：**攻击 11/15 本维度命中 + 4/15 其他维度承重（15/15 全部非 pass）、良性误伤 0/12**
+  - r469 原轮测 test/round-469-false-analogy.test.js：51 passed / 0 failed（零回归）
+  - 新固化轮测 test/round-470-false-analogy-matrix.test.js：32 passed / 0 failed（10 攻击族 + 8 边缘良性 + route4 承重）
+  - 五门禁：verify 16/16、guard-abilities 20/20@291、双向 52/52 + 302/326、r469 轮测 51/51、doc-numbers 22/3（3 项均为 AGENTS.md 工具层写保护阻塞：290→291 / 247→248 / Verify 列举缺 false_analogy，非本轮引入）
+  - 语法：node --check src/false-analogy.js OK
+- **探针脚本**（随本轮提交）：scripts/round-470/probe-r470-matrix.js（矩阵）、probe-r470-legs.js（逐腿诊断）、probe-r470-analogy.js（ANALOGY_ZH 逐正则）、probe-r470-en6.js/probe-r470-en6b.js（route4 断点插桩）、apply-r470-*.js（5 个补丁应用脚本，幂等）
+- **已知边界**：① AGENTS.md 工具层写保护未解除（patch 4 次 BLOCKED，禁止改道终端重试），doc-numbers 3 项失败需交互授权；② EN-3/EN-7 由其他维度（code_security/absolute_claim 等）承重非 pass，false_analogy 模块层未命中（works like+vessels 形的属性族「fill with knowledge」未收，属下轮可增量点）；③ 全量测试 195 失败未排查（倾向存量噪声，门禁用例与轮测均绿）。
+
 # r469 第 291 维度 false_analogy 独立接线（虚假类比论证 / false analogy）（v6.8.231）
 
 - **轮次**：r469 每日升级 cron（2026-11-24 08:46 CST）

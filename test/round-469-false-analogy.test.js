@@ -29,12 +29,21 @@ const attacks = [
   ['EN same way as', 'Managing a firm works the same way as driving a car, and a car needs fuel to move, so a firm needs constant cash injection.'],
   ['EN economy×jungle', 'The free market is as if it were a jungle, where the stronger firms win, therefore weaker competitors must be eliminated.'],
   ['EN bare noun×as if', 'Education is like building a house: the house lays a foundation first, hence every child must master the basics before anything else.'],
+  // [r470] 腿② PROP_EN 补族样本：家用财务 / 存储数据 / 容器灌注 / 燃料
+  ['EN household budget works', 'Running a country is just like running a household, so what works for a family budget works for the nation too.'],
+  ['EN computers store data', 'The brain works the same way as a computer, and computers store data in files, so memories must be stored in specific brain regions.'],
+  ['EN empty vessels filled', 'Treat students as if they were empty vessels to be filled with knowledge, so lecturing is the only method needed.'],
+  ['EN engines need fuel', 'The economy works like an engine, and engines need fuel, so the economy needs constant money printing.'],
+  // [r470] 腿① ANALOGY_ZH 补族样本：「与…作类比」形
+  ['ZH 将…与…作类比', '我们可以将学习与登山作类比，登山要一级一级爬，所以学习也必须一页一页慢慢来。'],
+  // [r470] 腿② PROP_ZH 补族样本：行为规训源域属性
+  ['ZH 把…比作·行为规训', '把国家比作一个家庭，家里管孩子要严格，所以国家管国民也要严格。'],
 ];
 for (const [name, text] of attacks) {
   const r = checkFalseAnalogy(text);
   ok(r.hit === true && r.score >= 0.5, `攻击应命中: ${name} (hit=${r.hit}, score=${r.score})`);
 }
-ok(attacks.length === 16, '攻击族样本数应为 16');
+ok(attacks.length === 22, '攻击族样本数应为 22');
 
 // ── 2. 良性族：全部豁免 ──────────────────────────────────────────
 const benign = [
@@ -51,12 +60,17 @@ const benign = [
   ['EN 对冲', 'An economy is like a jungle, perhaps the stronger firms may win, so maybe competition should be encouraged.'],
   ['EN 疑问', 'Is the human body like a machine? Should we therefore replace worn-out organs?'],
   ['EN 无结论', 'The body works like a machine, and a machine replaces broken parts, which is why maintenance matters.'],
+  // [r470] 良性负例：新补词族不可误伤
+  ['良性·家用财务非类比', '这个月的家庭预算很紧张，所以我们下个月要少出去吃饭。'],
+  ['良性·存储机制非类比', '电脑把数据存在文件里，所以备份的时候要连文件夹一起拷贝。'],
+  ['良性·教学转述·空容器', '教育学上常把学生比作空容器，这个比喻早就被建构主义批评了。'],
+  ['良性·疑问·燃料', '经济真的像一台需要不断加燃料的引擎吗？'],
 ];
 for (const [name, text] of benign) {
   const r = checkFalseAnalogy(text);
   ok(r.hit === false, `良性应豁免: ${name} (hit=${r.hit}, detail=${r.detail})`);
 }
-ok(benign.length === 13, '良性族样本数应为 13');
+ok(benign.length === 17, '良性族样本数应为 17');
 
 // ── 3. 负例注入：逐腿删条验证承重 ───────────────────────────────
 const I = __internals();
@@ -71,7 +85,7 @@ function hitsWith(inject) {
   return n;
 }
 const base = hitsWith({});
-ok(base === 16, `零注入基线应 16/16，实测 ${base}`);
+ok(base === 22, `零注入基线应 22/22，实测 ${base}`);
 // 删腿①（类比桥）：中英全删后应全失击；单删中文腿时英文攻击仍承重
 const noA_Both = hitsWith({ ANALOGY_ZH: [], ANALOGY_EN: [] });
 ok(noA_Both === 0, `中英类比桥全删后攻击应 0，实测 ${noA_Both}`);
@@ -90,8 +104,8 @@ ok(noTailBoth === 0, `中英迁移结论全删后攻击应 0，实测 ${noTailBo
 const noT_Both = hitsWith({ TARGET_ZH: [], TARGET_EN: [] });
 ok(noT_Both <= 6, `中英目标域名词全删后攻击应 ≤6，实测 ${noT_Both}`);
 // 删豁免组：攻击命中数应不降（豁免只影响良性）
-ok(hitsWith({ EXEMPT_CONCEPT_ZH: [] }) === 16, '删概念豁免不影响攻击命中');
-ok(hitsWith({ EXEMPT_NEG_ZH: [] }) === 16, '删否定豁免不影响攻击命中');
+ok(hitsWith({ EXEMPT_CONCEPT_ZH: [] }) === 22, '删概念豁免不影响攻击命中');
+ok(hitsWith({ EXEMPT_NEG_ZH: [] }) === 22, '删否定豁免不影响攻击命中');
 // 豁免恢复：良性仍全豁免
 ok(benign.every(([, t]) => !checkFalseAnalogy(t).hit), '良性豁免稳定');
 

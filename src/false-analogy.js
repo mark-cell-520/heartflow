@@ -97,12 +97,13 @@ const ANALOGY_ZH = [
   // 全部命中）——「就该像管理家庭一样」曾被漏判，因为只收「就像」紧邻形。
   /像/,
   /就好像|正像|如同|犹如|好比|譬如有|仿若|宛如|仿佛|彷若/,
-  // [r469] 「跟/与…(没什么)区别」——原表要求「没有区别」紧邻，漏
-  // 「跟一支军队没有什么区别」这种插入形。
-  /(?:跟|与|和|同)[^。，！？!?,;；\n]{1,12}(?:一样|差不多|没(?:有什么)?区别|没啥区别|相似|类似)/,
+  /(?:跟|与|和|同)[^。，！？!?,;；\n]{1,12}(?:一样|差不多|没(?:有)?什么?区别|没啥区别|相似|类似)/,
   // [r469] 「把/将/拿…比作」形——原表只收「类似于/相提并论」，
   // 「把国家比作家庭」整族漏判（r469 实测 ZH-10）。
   /(?:把|将|拿|以)[^。，！？!?,;；\n]{1,12}(?:比作|比成|比做|比喻成|比喻为|比拟)/,
+  // [r470] 「将/把/拿…与…作类比」形——原腿③只收「比作」紧邻形，
+  // 「将学习与登山作类比」整族漏判（r470 矩阵 ZH-7）。
+  /(?:将|把|拿|以)[^。，！？!?,;；\n]{1,12}(?:与|和|同|跟)[^。，！？!?,;；\n]{1,12}(?:作类比|做类比|相比拟|相类比|类比)/,
   /类似于|类比于|可?与[^。，！？!?,;；\n]{1,12}相提并论|可?与[^。，！？!?,;；\n]{1,12}相比/,
 ];
 
@@ -119,7 +120,16 @@ const ANALOGY_EN = [
 // 源域事实性陈述：把 B 身上发生的事说出来（能省则省/坏了要换零件/先打
 // 地基/弱肉强食/自然进化/适者生存…）。
 const PROP_ZH = [
-  /能省则省|省吃俭用|勤俭节约|量入为出|收支平衡|精打细算|积少成多|紧缩开支|节衣缩食|削减开支|省吃俭用地|省钱/,
+  /能省则省|省吃俭用|勤俭节约|量入为出|收支平衡|精打细算|积少成多|紧缩开支|节衣缩食|削减开支|省吃俭用地|省钱|入不敷出|超支|透支/,
+  // [r470] 「行为规训」源域属性族——原表只收财政/机械/建筑/丛林/进化
+  // 四族，「家里管孩子要严格」这种源域行为规整属性整族漏判（r470 矩阵
+  // ZH-2：类比桥命中但 PROP NULL）。
+  /(?:管|管教|管教|约束|要求|对待)[^。，！？!?,;；\n]{0,8}(?:孩子|子女|后代|下属|成员|士兵|群众|国民)/,
+  /(?:要|须|必须|得|应当|应该|就该)[^。，！？!?,;；\n]{0,6}(?:严格|严厉|从严|服从|听话|守规矩|守纪律|令行禁止)/,
+  /令行禁止|绝对服从|服从命令|军令如山|不得违抗/,
+  // [r470] 「渐进步骤」源域属性族——「登山要一级一级爬」这种源域
+  // 渐进机制属性（r470 矩阵 ZH-7：桥命中但 PROP NULL）。
+  /(?:一(?:级|步|层|个|层层|步步|层层|点一点)|循序|逐步|按部就班)[^。，！？!?,;；\n]{0,8}(?:爬|升|走|来|做|建|完成)/,
   // [r469] 裸词自查（r161 教训）：「坏」字族必须含「故障」——ZH-8 长句
   // 「机器出现故障时就要更换损坏的零件」因只收「坏」整族漏判；另收
   // 「更换零件/换零件」整词形（不依赖前后「坏」字）。
@@ -137,18 +147,37 @@ const PROP_ZH = [
 
 // ─── 腿② PROP 源域属性/机制（英文）─────────────────────────────────
 const PROP_EN = [
-  /\bsaves?\s+(?:money|for\s+a\s+rainy\s+day)\b|\blive[sd]?\s+within\s+(?:its|their|your)\s+means\b|\bbalanced?\s+budget\b|\bcuts?\s+(?:back|spending)\b/i,
+  /\bsaves?\s+(?:money|for\s+a\s+rainy\s+day)\b|\blive[sd]?\s+within\s+(?:its|their|your)\s+means\b|\bbalanced?\s+budget\b|\bcuts?\s+(?:back|spending)\b|\boversp(?:ent|ends?|ending)\b|\blives?\s+beyond\s+its\s+means\b|\bmaxed?\s+out\b|\bdebt\s+(?:ceiling|limit|burden)\b/i,
   /\b(?:replace[sd]?|swap[s]?|change[s]?)\s+(?:the\s+)?(?:broken|worn|failing|bad)\s+(?:part|parts|component|components|organ|organs)\b/i,
   /\b(?:lay[s]?|laid|build[s]?)\s+(?:a\s+)?(?:solid|strong|good|deep)?\s*foundation\b|\blay[s]?\s+the\s+groundwork\b/i,
-  /\bsurvival\s+of\s+the\s+fittest\b|\blaw\s+of\s+the\s+jungle\b|\bstronger\s+(?:ones?|firms?|companies)\s+(?:win|prevail|survive)\b|\beat\s+or\s+be\s+eaten\b|\bneeds?\s+(?:fuel|energy|input|food)\s+to\b|\brequires?\s+(?:fuel|energy|input|food)\s+to\b|\bcannot\s+(?:run|function|operate|move)\s+without\b/i,
+  // [r470] 「燃料/能量」源域属性族——原族形为 `needs? (fuel|energy|input|food) to`，
+  // 要求 fuel 后紧跟 to，漏「engines need fuel, so…」这种 fuel 后接逗号/
+  // 句号的形态（r470 矩阵 EN-3 PROP NULL）。放宽后缀要求。
+  /\bsurvival\s+of\s+the\s+fittest\b|\blaw\s+of\s+the\s+jungle\b|\bstronger\s+(?:ones?|firms?|companies)\s+(?:win|prevail|survive)\b|\beat\s+or\s+be\s+eaten\b/i,
+  /\bneeds?\s+(?:fuel|energy|input|food|gasoline|petrol|coal|electricity)\b|\brequires?\s+(?:fuel|energy|input|food|gasoline|petrol|coal|electricity)\b|\bcannot\s+(?:run|function|operate|move)\s+without\b/i,
+  // [r470] 「规训/秩序强加」源域属性族——原表缺 frontier→tamed 这类属性
+  // （r470 矩阵 EN-5：PROP NULL）。
+  /\b(?:tamed?|policed|governed|controlled|regulated|subdued|conquered|disciplined|patrolled)\b|\blawmen\b|\bsheriff\b|\bposse\b|\bkeepers?\s+of\s+(?:the\s+)?(?:peace|order)\b/i,
   /\b(?:evolve[s]?|evolved|adapts?|adapted|improves?|improved|gets?\s+better)\b/i,
+  // [r470] 「家用财务」源域属性族——EN-1「a family budget works」：
+  // 原财务族只收 saves/within its means/budget cuts 等谓语形，漏
+  // 「family budget」这种名词性财务载体形（r470 矩阵 EN-1 PROP NULL）。
+  /\b(?:household|family|home)\s+budget\b|\b(?:budget|spending|finances?)\s+(?:works?|balanced|tight)\b/i,
+  // [r470] 「存储/数据」源域属性族——EN-4「computers store data in
+  // files」：原表无存储机制族，机械/进化/丛林之外整族漏判（EN-4 PROP
+  // NULL）。
+  /\b(?:store[sd]?|stores|storing|save[sd]?|saved|saving|record[sd]?|log(?:s|ged)?|kee(?:p|ps|ping))\s+(?:data|information|memories|files|records|everything)\b|\bdata\s+(?:in|as)\s+(?:files?|folders?|chunks?|bits?)\b|\bstored\s+in\s+(?:specific\s+)?(?:brain\s+)?regions?\b|\bfiles?\s+(?:and|or)\s+folders?\b/i,
+  // [r470] 「容器灌注」源域属性族——EN-7「empty vessels to be filled
+  // with knowledge」：原表无灌注族，「把学生当空容器」整族漏判（EN-7
+  // PROP NULL）。
+  /\b(?:empty|blank|hollow)\s+(?:vessels?|containers?|cups?|pots?|jars?|buckets?|slates?)\b|\b(?:filled?|poured|stuffed|crammed|loaded)\s+(?:with|into)\s+(?:knowledge|information|facts|ideas|data)\b|\bfill(?:ing|s)?\s+(?:them|students|pupils|children)\s+with\b/i,
   /\bmetabolis[mn]|\bcell[s]?\s+(?:die|turn\s+over|regenerate|renew)\b|\bapoptosis\b/i,
   /\bdivision\s+of\s+labou?r\b|\bwork[s]?\s+together\b|\bcooperat(?:es?|ion)\b/i,
 ];
 
 // ─── 腿③ TRANSFER 推断词 + 目标域复现（中文）───────────────────────
 const INFER_ZH = [
-  /所以|因此|因而|故而|故|可见|这说明|意味着|足以证明|据此|于是/,
+  /所以|因此|因而|故而|故|可见|这说明|意味着|足以证明|据此|于是|当然|显然|毫无疑问/,
 ];
 const MODAL_ZH = [
   /自然|必然|一定|肯定|势必|无疑|必定|同样|也|就该|也应该|也要/,
@@ -159,17 +188,20 @@ const INFER_EN = [
   /\b(?:therefore|thus|hence|consequently|which\s+means|so)\b/i,
 ];
 const MODAL_EN = [
-  /\b(?:must|certainly|guaranteed|bound\s+to|sure\s+to|inevitably|no\s+doubt|definitely|also|too|as\s+well)\b/i,
+  /\b(?:must|should|shall|ought\s+to|had\s+best|certainly|guaranteed|bound\s+to|sure\s+to|inevitably|no\s+doubt|definitely|also|too|as\s+well)\b/i,
 ];
 
 // ─── 目标域名词（腿③复现用，中英裸名词形）─────────────────────────
 // 与 PROP 侧源域名词分开：迁移的有效形态是「源域名词（桥前）→ 属性（桥
 // 后）→ 目标域名词（推断词后）」，两侧名词同族不同实例。
 const TARGET_ZH = [
-  /国家|政府|民族|社会|企业|公司|市场|经济|团队|组织|机构|学校|家庭|家族|城市|行业|系统|平台|软件|项目|产品|人体|身体|生命|人生|教育|管理|改革|政策|制度|法律|军队|部队|学校|班级|个人|员工|国民|公民|群众|消费者|用户/,
+  /国家|政府|民族|社会|企业|公司|市场|经济|团队|组织|机构|学校|家庭|家族|城市|行业|系统|平台|软件|项目|产品|人体|身体|生命|人生|教育|管理|改革|政策|制度|法律|军队|部队|学校|班级|个人|员工|国民|公民|群众|消费者|用户|学习|读书|认知|思维|心理|语言|文化|艺术|科学|技术|历史|政治|道德|伦理|宗教|信仰|婚姻|育儿|养老|医疗|健康|环境|能源|交通|通信|金融|投资|贸易|竞争|合作|创新|创业|职业|职场|社区|村庄|城镇/,
 ];
 const TARGET_EN = [
-  /\b(?:country|nation|government|society|company|corporation|firm|market|economy|team|organization|institution|school|family|city|industry|system|platform|software|project|product|body|person|life|education|management|reform|policy|law|military|army|class|individual|employee|citizen|consumer|user)\b/i,
+  // [r470] 教育域目标名词——EN-7「Treat students as if they were empty
+  // vessels」：原表有 school/class 但无 students/pupils/learners，
+  // 教育学类比整族断在腿③目标域名词（r470 矩阵 EN-7 TARGET NULL）。
+  /\b(?:country|nation|government|society|company|corporation|firm|market|economy|team|organization|institution|school|family|city|industry|system|platform|software|project|product|body|person|life|education|management|reform|policy|law|military|army|class|individual|employee|citizen|consumer|user|student|students|pupil|pupils|learner|learners|child|children|kid|kids|workforce|population|voter|voters)\b/i,
 ];
 
 // ─── 源域名词（腿②定位用，中英裸名词形）───────────────────────────
@@ -351,6 +383,54 @@ function checkFalseAnalogy(text, inject) {
             detail: isZh
               ? '虚假类比论证×源域名词桥接+属性迁移(zh)'
               : 'false analogy×source-noun bridged transfer(en)',
+          };
+        }
+      }
+    }
+  }
+
+  // ── 退回路由三（结论先行倒装形）─────────────────────────────────
+  // 「人老了就该把器官换掉，人体就像一台机器，机器坏了当然要换零件。」
+  // / "We should cut social spending, as if the nation were a household that
+  //   has overspent."——目标域名词与迁移结论（推断词或迁移情态）在类比桥
+  // **之前**出现（先下结论再补类比），桥后只跟源域属性、无推断词。
+  // 判据：目标域名词 → 迁移结论词（dist ≤ WIN）→ 类比桥（dist ≤ 40）→
+  // 源域属性（dist ≤ propWin）。r470 矩阵 ZH-5 / EN-6 实证补路。
+  const tgtR4 = firstMatch(TGT, text, 0);
+  const propWin4 = isZh ? 60 : 160;
+  if (tgtR4) {
+    // 检索方向修正：结论词可能在目标域**之前**（EN-6: should@3 < nation@41）。
+    // 全文收集全部结论词候选，取与目标域互为邻居（双向 dist ≤ WIN）中最近者。
+    let conclR4 = null;
+    let conclBest = Infinity;
+    for (let ci = 0; ci < text.length; ci++) {
+      const infC = firstMatch(INF, text, ci);
+      const tailC = firstMatch(TAIL, text, ci);
+      const c = infC && (!tailC || infC.idx <= tailC.idx) ? infC : tailC;
+      if (!c) break;
+      const d = Math.abs(c.idx - (tgtR4.idx + tgtR4.len));
+      if (d <= WIN && d < conclBest) { conclBest = d; conclR4 = c; }
+      ci = c.idx; // 推进到该命中处，避免死循环
+    }
+    // 顺序不限：结论词可在目标域前（EN-6）或后（ZH-5），二者互为邻居即可。
+    const dTgtConcl = conclR4
+      ? Math.abs(conclR4.idx - (tgtR4.idx + tgtR4.len))
+      : Infinity;
+    if (conclR4 && dTgtConcl <= WIN) {
+      // 桥起点 = 结论词之后即可。EN-6 的桥@31 在目标域 nation@41 之前（
+      // 「should cut spending, as if the nation were a household…」），
+      // 不能再要求桥必须出现在目标域之后。
+      const an4 = firstMatch(ANA, text, conclR4.idx + conclR4.len);
+      // 桥与目标域互为邻居：双向 dist ≤ WIN（倒装形中二者顺序不定）。
+      const dAnaTgt = an4 ? Math.abs(an4.idx - (tgtR4.idx + tgtR4.len)) : Infinity;
+      if (an4 && dAnaTgt <= WIN) {
+        const pr4 = firstMatch(PROP, text, Math.max(an4.idx + an4.len, tgtR4.idx + tgtR4.len));
+        if (pr4 && pr4.idx - (an4.idx + an4.len) <= propWin4) {
+          return {
+            hit: true, score: 0.54, count: 1,
+            detail: isZh
+              ? '虚假类比论证×结论先行倒装+类比桥属性迁移(zh)'
+              : 'false analogy×conclusion-first inverted transfer(en)',
           };
         }
       }
