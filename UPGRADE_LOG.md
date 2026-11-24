@@ -1,4 +1,51 @@
-# r471 ikea_effect 宜家效应接线 econ 聚合族 + anchoring_effect 补腿固化（v6.8.233）
+# 每日审计·修复轮 r472-audit（ikea_effect 腿②品质形容词族补形 + 文档口径复验）（v6.8.234）
+
+- **轮次**：22:30 每日审计 cron（2026-11-24 22:30 CST）
+- **VERSION**：6.8.233 → **6.8.234**（既有维度补腿，无新增可计数维度；维度 292 不变、VERIFY 249 不变）
+- **类型**：审计修复（P2 漏判族补齐）
+- **开轮语法闸**：`bash /root/hermes1/scripts/hf-preflight.sh` exit 0（r472 事故的语法破损已被 c00f9395 修复，树干净）
+- **审计范围**：24h 内 15 个 commit（r463–r472），UPGRADE_LOG 顶部条目与 commit 一一对应，无虚构轮次
+- **实测口径**（`scripts/measure-claimed-numbers.js` 本轮实跑）：维度 **292**（BLOCK 11 / REWRITE 19 / VERIFY 249）、模块 **169**、MCP 工具 **198**、路由 **1390**——与 AGENTS.md / README / SKILL 完全一致
+- **运行态一致性**：MCP `heartflow_status` 返回 version=**6.8.233**、running=true、modules=169，与磁盘一致
+- **四门禁复跑（修复前基线）**：verify **16/16**、guard-abilities **20/20**（召回 52/52、误拦 302/326）、doc-numbers **25/25**（AGENTS.md 已由主会话 22:00 同步 292 维口径，r470/r471 遗留的两项 BLOCKED 已清）
+- **相关轮测复跑**：r471 ikea 43/43、source_derogation 84+46、false_analogy 61+32 全绿
+
+## 发现问题（P2 ×1）
+
+- **P2 ikea_effect 腿②漏「品质形容词虚高断言」族**：r471 官方矩阵 A6 句式「每棵苗都是他亲手栽的，因此他觉得自家菜比超市的新鲜」在**模块层直测 hit=false**（`detectIkeaEffect` 返回 hit=false）。逐腿诊断：腿① `LABOR_SELF_ZH` 命中「亲手栽」，腿②三条全 miss——`QUALITY_ZH` 要求比较对象命中购买词族（现成/工厂/开源/商店…，A6 的比较对象是「超市」）、`QUALITY_CLAIM_ZH` 要求质量名词（质量/品质/性能…）或强度词+断言、`VALUE_ZH` / `VALUE_TOIL_ZH` 要求「值钱/心血」价值族。三者都不收「自家菜比超市的新鲜/更甜/更大」式**纯品质形容词虚高断言**。该句与 A1「比工厂流水线产的更结实」语义同族（劳动投入 × 品质虚高），仅比较对象域不同——属真实漏判缺口，非样本问题（同句删掉「更有价值」后连 r471 轮测内的 A6 变体也会失配）。
+- 附带确认：r471 轮测的负例注入清单 `LEG_KEYS` 硬编码腿族常量名，新族若不登记会被「删整组腿②」注入漏删——这是测试清单落后于模块的固有问题，本轮随修复一并补登。
+
+## 修复内容
+
+1. **`src/ikea-effect.js`（+腿②族 ×2）**：
+   - 新增 `QUALITY_ADJ_ZH`：①「比/赛过/胜过/不输/不亚于… + 比较对象」+ 品质形容词（新鲜/水灵/饱满/甜/香/好吃/好看/大/圆/匀称/地道/正宗…）比较断言形；② 强度断言形（肯定/一定/必然/显然/就是/格外… + 更新鲜/更甜/更好吃/更大…）。**固定要求比较结构或强度词在场**，不收裸形容词陈述（防「桌子是我亲手钉的，很结实」中性描述误伤）。
+   - 新增 `QUALITY_ADJ_EN`：`tastier/fresher/sweeter/prettier/nicer/better…` + than + `store-bought/supermarket/grocery/commercial/ready-made/factory…`。
+   - 两条分别接入 `QUALITY_ZH_GROUPS` / `QUALITY_EN_GROUPS` 与 `__internals` 导出（供负例注入测试引用）。
+2. **`test/round-471-ikea-effect.test.js`（43 → 50）**：
+   - `LEG_KEYS.leg2_zh / leg2_en` 补登 `QUALITY_ADJ_ZH` / `QUALITY_ADJ_EN`（修「删整组腿②」注入漏删）。
+   - 攻击表 +3：A6 原句（亲手栽 × 比超市新鲜）、强度断言形（自家鸡 × 肯定更好吃）、EN-A6（grew × tastier than supermarket）。
+   - 良性表 +4：中性品质陈述无比较对象、ZH 疑问守卫、ZH 否定守卫、EN 疑问守卫。
+   - 未改任何既有断言，只补清单与样本。
+
+## 修复后验证（本轮真实运行）
+
+- 攻击/良性抽样直测：4 条攻击 `detectIkeaEffect.hit=true`（原 0），gate 全非 pass（verify ×2 / rewrite ×1 / verify-EN ×1）；4 条良性（疑问 / 否定 / 中性无比较 / 概念教学）`hit=false` 且 gate=pass，**零误伤**。
+- `scripts/round-471/probe-r471-matrix.js`：官方矩阵仍 **攻击 10/10 命中、良性 8/8 零误伤**，无回归。
+- `test/round-471-ikea-effect.test.js`：**50 passed / 0 failed**（原 43）。
+- 双向门禁 `scripts/bidirectional-guard.js`：召回 **52/52**、误拦 **302/326**，与修复前基线完全一致，零新增。
+- 四门禁全绿：verify **16/16**、guard-abilities **20/20**、doc-numbers **25/25**。
+- `node --check src/ikea-effect.js` 通过；VERSION 6.8.233 → 6.8.234，sync-version.js 同步 package.json / SKILL.md / version.js fallback / heartflow.js BUILD_DATE 全部到位。
+
+## 任务健康
+
+- 升级任务 95f75ea9ea95（every 120m）最新产出 20:46；兄弟 agent4 bf25299699e8 20:35；推送兜底 ccd207615160（no_agent 脚本）昨夜 22:45 正常执行，日志记录 `HEAD == heartflow/main`。
+- 升级任务近 6 轮产出真实（r469–r472 均含新维度/新族/补腿固化），无空转（非连续 chore/fix）。已知多轮预算耗尽记录（18:16 轮「无回复」失败、20:46 轮语法破损未提交），但树现干净、语法闸 exit 0，不构成 P0/P1。
+- 无 429，无撞车（22:30 vs every 120m 天然错开）。
+
+## 推送状态
+
+- fresh fetch 后 `HEAD == heartflow/main`（c00f9395），待推 **0**——昨夜 22:45 脚本兜底成功，本轮审计修复 commit 交今夜 22:45 脚本推送。
+
 
 - **轮次**：r471 每日升级 cron（2026-11-24 15:35 CST）
 - **VERSION**：6.8.232 → **6.8.233**（维度 291→292；VERIFY 249→249，聚合子族不增可计数维度）

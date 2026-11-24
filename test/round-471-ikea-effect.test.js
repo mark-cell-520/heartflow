@@ -27,6 +27,9 @@ const ATTACKS = [
   ['ZH 隐性虚高（不比店里卖的差）', '自己腌的咸菜不比店里卖的差，毕竟是亲手做的。'],
   ['ZH 长句（亲手栽 × 更有价值）', '老张在院子里种了十年菜，每棵苗都是他亲手栽的，因此他觉得自家菜比超市买的更有价值。'],
   ['ZH 亲手打磨 × 质量肯定更高', '我们团队亲手打磨的这份方案，含着自己的心血，质量肯定更高。'],
+  ['ZH 品质形容词虚高（亲手栽 × 比超市新鲜）r472补', '老张在院子里种了十年菜，每棵苗都是他亲手栽的，因此他觉得自家菜比超市的新鲜。'],
+  ['ZH 品质形容词强度断言（自家鸡 × 肯定更好吃）r472补', '这筐鸡蛋是我家自己养的鸡下的，所以肯定比超市买的更好吃。'],
+  ['EN 品质形容词虚高（grew × tastier than supermarket）r472补', 'The tomatoes I grew myself are much tastier than the ones from the supermarket.'],
   ['EN 裸名词（assembled × ready-made）', 'People overvalue furniture they assembled themselves compared with ready-made pieces.'],
   ['EN in-house × better than commercial', 'Because we built the tool in-house, it must be better than any commercial alternative.'],
   ['EN 长句（knitted × superior to store-bought）', 'The sweater she knitted herself is clearly superior to anything store-bought, since she made it with her own hands.'],
@@ -55,6 +58,10 @@ const BENIGN = [
   ['沉没成本邻居（effort_justification 领地）', '这个项目已经投入了这么多心血，现在放弃太可惜了，必须继续做完。'],
   ['疑问句（豁免 D）', '自己做的真的更好吗？'],
   ['EN 基准在先（豁免 C）', 'Before deciding to build in-house, we benchmarked against three commercial products.'],
+  ['中性品质陈述无比较对象（r472补）', '这张桌子是我亲手钉的，很结实，用了不少好木料。'],
+  ['品质形容词疑问守卫（r472补）', '自己种的菜真的比超市的新鲜吗？'],
+  ['品质形容词否定守卫（r472补）', '虽然是自己亲手栽的，但并不比超市卖的新鲜多少。'],
+  ['EN 品质形容词疑问守卫（r472补）', 'Are the tomatoes you grew yourself really tastier than supermarket ones?'],
 ];
 for (const [name, text] of BENIGN) {
   t('良性不误伤 — ' + name, () => {
@@ -75,8 +82,8 @@ for (const [name, text] of BENIGN) {
 const LEG_KEYS = {
   labor_zh: ['LABOR_SELF_ZH', 'LABOR_TOIL_ZH', 'LABOR_DIY_ZH'],
   labor_en: ['LABOR_ASSEMBLED_EN', 'LABOR_OWN_EN', 'LABOR_HAND_EN'],
-  leg2_zh: ['QUALITY_ZH', 'QUALITY_CLAIM_ZH', 'QUALITY_NOLOSE_ZH', 'VALUE_ZH', 'VALUE_TOIL_ZH'],
-  leg2_en: ['QUALITY_EN', 'QUALITY_CLAIM_EN', 'VALUE_EN', 'VALUE_OVER_EN'],
+  leg2_zh: ['QUALITY_ZH', 'QUALITY_CLAIM_ZH', 'QUALITY_NOLOSE_ZH', 'QUALITY_ADJ_ZH', 'VALUE_ZH', 'VALUE_TOIL_ZH'],
+  leg2_en: ['QUALITY_EN', 'QUALITY_CLAIM_EN', 'QUALITY_ADJ_EN', 'VALUE_EN', 'VALUE_OVER_EN'],
 };
 const ALL_ATTACKS = ATTACKS.map(a => a[1]);
 t('负例注入承重 — 删整组腿①（ZH+EN 全部腿族）', () => {

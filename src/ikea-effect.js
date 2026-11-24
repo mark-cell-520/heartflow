@@ -167,10 +167,29 @@ const VALUE_EN = /\b(?:more|extra|added|greater|special|sentimental)\s+(?:valuab
 //    30 字窗。补 own/ourselves 后缀形。
 const VALUE_OVER_EN = /\b(?:overvalue|overrate|overestimate)\b[^.]{0,60}\b(?:own|our|my|self|handiwork|work|creation|build|assembled|built|made|crafted|designed|themselves|himself|herself|ourselves|myself)\b|\bovervalue\s+the\s+quality\s+of\s+(?:our|my|their|his|her)\s+own\b/i;
 
+// Z4d 品质形容词虚高断言族（r472 审计修复补形）
+//    r471 官方矩阵 A6 句式「每棵苗都是他亲手栽的，因此他觉得自家菜
+//    比超市的新鲜」模块层 hit=false——腿②断在此：QUALITY_ZH 要求
+//    比较对象命中购买词族（现成/工厂/开源/商店…），QUALITY_CLAIM_ZH
+//    要求质量名词（质量/品质/性能…）或强度词+断言，VALUE_ZH /
+//    VALUE_TOIL_ZH 要求「值钱/心血」价值族——三者都不收「自家菜
+//    比超市的新鲜/更甜/更大」式**纯品质形容词虚高断言**。A6 是同族
+//    攻击（劳动投入 × 品质虚高），与 A1「比工厂流水线产的更结实」
+//    语义等价，仅比较对象是超市/自家而非工厂。本族补齐该缺口：
+//    ① 断言形固定为「比|赛过|胜过|不输… + 比较对象」（比较结构在场，
+//    非裸形容词陈述——「更新鲜」无比较对象时不判，防中性描述误伤）
+//    ② 品质形容词表收新鲜/甜/香/好吃/好看/大/饱满/水灵/地道/正 等
+//    农产品与手作品族（A6 领域）
+//    ③ 强度断言形（肯定/一定/就是…更新鲜）也收，与②等价
+const QUALITY_ADJ_ZH = /(?:[^。，！？；\n]{0,8}(?:比|赛过|胜过|不输|不亚于|不下于|不弱于)[^。，！？；\n]{0,14}(?:新鲜|水灵|饱满|甜|香|好吃|好味|美味|好看|漂亮|大|圆|匀称|地道|正宗|地道|起眼|像样))|(?:[^。，！？；\n]{0,10}(?:肯定|一定|必然|显然|明显|就是|才是|当真|想必|格外|特别|尤其)[^。，！？；\n]{0,8}(?:更新鲜|更甜|更香|更好吃|更好看|更大|更漂亮|更水灵|更饱满|最香|最甜|最新鲜|最好吃))/;
+// Z5c 价值虚高形容词族（EN，对应 A6 英侧形）
+const QUALITY_ADJ_EN = /\b(?:tastier|fresher|sweeter|prettier|nicer|better|juicier|plumper|bigger)\b[^.]{0,30}\bthan\b[^.]{0,40}\b(?:store-?bought|supermarket|grocery|commercial|ready-?made|factory|mass-?produced|off-?the-?shelf|bought|purchased)\b/i;
+
 const QUALITY_ZH_GROUPS = [
   ['QUALITY_ZH', [QUALITY_ZH]],
   ['QUALITY_CLAIM_ZH', [QUALITY_CLAIM_ZH]],
   ['QUALITY_NOLOSE_ZH', [QUALITY_NOLOSE_ZH]],
+  ['QUALITY_ADJ_ZH', [QUALITY_ADJ_ZH]],
 ];
 const VALUE_ZH_GROUPS = [
   ['VALUE_ZH', [VALUE_ZH]],
@@ -179,6 +198,7 @@ const VALUE_ZH_GROUPS = [
 const QUALITY_EN_GROUPS = [
   ['QUALITY_EN', [QUALITY_EN]],
   ['QUALITY_CLAIM_EN', [QUALITY_CLAIM_EN]],
+  ['QUALITY_ADJ_EN', [QUALITY_ADJ_EN]],
 ];
 const VALUE_EN_GROUPS = [
   ['VALUE_EN', [VALUE_EN]],
@@ -377,9 +397,9 @@ module.exports = {
   __internals: () => ({
     LABOR_SELF_ZH, LABOR_TOIL_ZH, LABOR_DIY_ZH,
     LABOR_ASSEMBLED_EN, LABOR_OWN_EN, LABOR_HAND_EN,
-    QUALITY_ZH, QUALITY_CLAIM_ZH, QUALITY_NOLOSE_ZH,
+    QUALITY_ZH, QUALITY_CLAIM_ZH, QUALITY_NOLOSE_ZH, QUALITY_ADJ_ZH,
     VALUE_ZH, VALUE_TOIL_ZH,
-    QUALITY_EN, QUALITY_CLAIM_EN,
+    QUALITY_EN, QUALITY_CLAIM_EN, QUALITY_ADJ_EN,
     VALUE_EN, VALUE_OVER_EN,
     LABOR_ZH_GROUPS, LABOR_EN_GROUPS,
     QUALITY_ZH_GROUPS, VALUE_ZH_GROUPS, QUALITY_EN_GROUPS, VALUE_EN_GROUPS,
