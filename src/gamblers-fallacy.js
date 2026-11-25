@@ -203,6 +203,48 @@ const TURN_ZH = /(?:该轮到|轮到[我了它你他]|总该轮到|也该轮到|
 // it is his turn / bound to go his way」的轮次分配义。
 const TURN_EN = /\b(?:my|your|his|her|their|our)\s+turn\s+(?:is|must\s+be|has)\s+(?:due|next|coming|now|here)\b|\bit\s+is\s+(?:my|your|his|her|their)\s+turn\b|\bturn\s+(?:is|has)\s+(?:come|finally\s+come)\b|\bbound\s+to\s+(?:go|happen)\s+(?:his|her|my|your|their)\s+way\b|\b(?:is|it'?s)\s+(?:my|his|her|their)\s+turn\s+(?:to|for)\b|\bsomeone\s+else'?s\s+turn\b|\b(?:my|your|his|her|their)\s+turn\s+to\s+(?:win|pass|succeed|get|be\s+chosen|be\s+picked)\b|\bturn\s+is\s+(?:due|coming)\s+up\b|\b(?:is|it'?s)\s+(?:my|his|her|their)\s+turn\b/i;
 
+
+// ─── [r477 新增族] 腿①「守恒/攒积断言」（运气账本：把运气/功德/人情
+// 当成可存取、可透支、有额度的账户）──────────────────────────────────
+// 缺口实证（coordination/agent4/probes/r477-probe-pool.js，HEAD v6.8.237
+// 改前实测）：运气账本族穿透 10/10、概率攒积族穿透 12/12、系统纠偏族
+// 穿透 14/14——存量腿①（STREAK_*）只收「连输/连开/连续N天」的 streak
+// 事实形，不收「守恒/额度/账户/透支/攒够了/等久了/系统纠偏」的存量
+// 结算断言形。逐条跑腿诊断（r477-legs-diagnosis.js）：36 条中文攻击
+// 无一被任一存量腿命中。本腿收守恒/攒积/透支/额度/账户/临界点/系统
+// 纠偏七类存量断言形。
+// 语义红线（r477 定）：不收裸「没/未+动词」无计数形；「守恒/额度」等
+// 词必须处在**非否定破除语境**（见 NEGATION_BREAK）。
+const CONSERVE_ZH = /(?:守恒|额度|账户|账本|攒人品|攒运气|攒福|攒功德|攒着|攒够|攒多|攒了|攒下|攒得|攒到|积攒|存运气|存人品|存福|存了|存下|存入|存进|透支|提前透支|连本带利|运气存款|人品存款|运气账|人品账|用得太狠|等久了?|等得越久|等越久|越等越|越[买等投参与]越|等了[这十]?[年久]|等了这么久|早就该|概率[^。！？!?]{0,8}(?:攒|涨到|升高|变高|攒积)|几率[^。！？!?]{0,8}(?:攒|涨到|升高|变高|攒积)|临界点|苦吃完了?|苦尽甘来|不可能[再又]?[^。！？!?]{0,4}一直|不会一直|不可能一直|不可能让[^。！？!?]{0,8}一直|一直赢|自我纠偏|纠偏机制|均衡力量|有个力量|系统不会|系统不可能|系统不会允许|系统总归|概率系统|概率的?纠偏|输到[这哪]份上|到这份上|到顶|攒到头|连错[这那]?[么多]|这么多(?:把|次|回)|亏了这么|亏了[十]?[年]|顺了这|顺了这么|老天|命运|菩萨|老天爷)/;
+
+// [r477 新增族] 同族英文守恒/攒积断言形。存量 STREAK_EN 只认
+// 「N times in a row + losses/wins」与「has been cold/hot」，不收
+// 「conserved / luck account / banking goodwill / stack up / built up
+// enough / self-corrects / even things out」的存量结算断言形。
+const CONSERVE_EN = /(?:conserved|karma\s+(?:is\s+a\s+)?ledger|luck\s+account|goodwill\s+account|banking\s+(?:goodwill|kindness|good\s+fortune|credit)|deposited?\s+(?:so\s+much\s+)?(?:goodwill|kindness|good\s+fortune)|accumulated?\s+credit|comes?\s+back\s+with\s+interest|return\s+on\s+it|saved\s+up\s+(?:his|her|my|your|their|our)?\s*(?:good\s+)?fortune|stack(?:s|ed|ing)?\s+up|piled?\s+up|built\s+up\s+enough|accumulates|cannot\s+stay\s+one-sided|one-sided\s+forever|cannot\s+last|self-?corrects?|even\s+things?\s+out|restore\s+the\s+balance|owes?\s+(?:him|her|me|us)\s+a\s+correction|correction\s+in\s+(?:his|her|my|their)\s+favour|keep\s+winning\s+indefinitely|the\s+(?:longer|more)\s+you\s+wait[^.]{0,40}(?:odds|probability|chance)|raises?\s+the\s+(?:chance|odds)|not\s+the\s+odds|average\s+is\s+due|win\s+is\s+(?:statistically\s+)?due|will\s+even\s+things?\s+out)/i;
+
+// ─── [r477 新增族] 腿②「到期结算断言」（补偿/兑现/返还/还债/转运）──
+// 缺口实证（同 r477 探针）：存量腿②（DUE_ZH/DUE_DAILY_ZH/TURN_*）只收
+// 「该出大小/该转运/该轮到 X」的轮次公平形，不收「补偿/兑现/返还/
+// 还债/均值要回归/天平摆回来」的结算义务形——「老天迟早要补偿他」
+// 「到期连本带利返还」「均值要回归」整族穿过。本腿收结算义务族。
+// 刻意不收裸「爆发/迟早」无守恒语境的普通预期（双腿 AND 天然排除）。
+const SETTLE_ZH = /(?:补偿|平衡|均衡回来|摆正|摆回来|拉回来|拉回|拉[他我你一]?一把|回归|反转|反弹|触底|转运|生效|失衡|兑现|还给他|还了|该还|会还|要?还的|回馈|返还|补回来|补上|爆发|越高|涨到|变高|该中|该赢|该轮到|轮也该|总该|迟早|早晚|一次性|到期|一并|全是甜|均值要|天平|该转运|就会来|总会来|迟早来|该他|该我|该她|保佑|发挥作用|该回本|回本了|自然有人帮|开花结果|还债|一直[赢输败]|让他|让她|让他们|会?存着|存着|攒着)/;
+
+// [r477 新增族] 同族英文到期结算断言形。存量 DUE_EN 只收 is due /
+// overdue / bound to happen，不收 pays off / repaid / comes back /
+// statistically due / must reverse / even things out 的结算义务形。
+const SETTLE_EN = /(?:compensat|balanc|restore|correct|reverse|even\s+things?\s+out|pays?\s+off|payoff|come\s+back|repay|return|owed|is\s+due|due\s+next|higher|built\s+up|accumulat|inevitable|must\s+begin|due\s+to|bound\s+to|statistically\s+due|paid\s+off|repaid|saved\s+up|with\s+interest|must\s+reverse|chance\s+of\s+winning)/i;
+
+// ─── [r477 新增族] 守卫：否定破除语境（「不代表/不存在/没有/不是…」）
+// 收「守恒/额度/系统/概率」等词时是在破除谬误，不是运用它。
+// 探针实测（r477-proto11/proto16）：良性样本 20 条中 2 条
+// （「连败次数不影响下一局胜率，概率系统没有补偿功能」「合同履约靠
+// 条款，不是靠人情账户的存取平衡」）双腿齐中，必须由本守卫排除；
+// 攻击样本无一落入否定破除语境。
+const NEGATION_BREAK_ZH = /(?:不代表|不影响|不存在|没有|不是|无|未|非|不该|不能|不应|不足以|未必)[^。！？!?]{0,8}(?:纠偏|补偿|均衡|摆正|守恒|额度|账户|攒|透支|临界|系统|运气|好运|概率)/;
+const NEGATION_BREAK_EN = /(?:(?:does|do|did|is|are|was|were|will|would|can|could|should|must)\s+not|not|no|never|cannot|without)\s+(?:accumulat|compensat|balanc|correct|reverse|restore|repay|return|even\s+things?\s+out|pay\s+off|come\s+back|raise|stack\s+up|pile\s+up|exist|apply|hold|work)/i;
+
 const CHASE_EN = /(?:double\s+down|doubling\s+down|double\s+(?:the|my|your|our)\s+(?:bet|stake|wager)|increase\s+the\s+(?:bet|stake|stakes)|(?:bet|betting|wager(?:ing)?)\s+(?:bigger|more|larger|heavier)|raise\s+the\s+(?:bet|stake|stakes)|go(?:ing)?\s+all\s+in|all\s+in\s+on|win\s+it\s+(?:all\s+)?back|chase\s+(?:the\s+)?(?:losses|loss)|load(?:ing)?\s+up\s+on|double\s+or\s+nothing)/i;
 
 // ─── 豁免一：元话语/概念引述（分析这个概念本身不是运用它）──────────
@@ -228,6 +270,9 @@ function checkZh(text, R) {
   const turn = R.TURN_ZH || TURN_ZH;
   const chase = R.CHASE_ZH || CHASE_ZH;
   const lln = R.LLN_ZH || LLN_ZH;
+  // [r477 新族] 运气守恒族双腿：守恒/攒积断言 × 到期结算断言
+  const conserve = R.CONSERVE_ZH || CONSERVE_ZH;
+  const settle = R.SETTLE_ZH || SETTLE_ZH;
   const hasStreak = streak.test(text) || streakDaily.test(text);
   const hasCount = streakCount.test(text);
   if (hasStreak) {
@@ -253,6 +298,16 @@ function checkZh(text, R) {
     if (due.test(text)) return { route: 'zh:count×due' };
     if (dueDaily.test(text)) return { route: 'zh:count×daily' };
   }
+  // [r477 新族] 守恒/攒积断言 × 到期结算断言（运气账本族）：存量腿①
+  // 只收 streak 事实形，存量腿②只收轮次公平/日常反转型；「攒人品
+  // 迟早兑现」「概率守恒所以该转运」「系统纠偏该补偿」整族穿过。
+  // 与既有路由并联：conserve/settle 独立判定，不依赖 hasStreak。
+  // 否定破除语境（「不代表系统会纠偏」）由 NEGATION_BREAK_ZH 排除。
+  if (conserve.test(text) && settle.test(text)) {
+    if (!(R.NEGATION_BREAK_ZH || NEGATION_BREAK_ZH).test(text)) {
+      return { route: 'zh:conserve×settle' };
+    }
+  }
   // [r301 新族] 长期平均论证 × 反转预期/追投行动（law of averages）：
   // 引用「长期总会扯平 / 样本越多越趋近均值 / 频率回归平均」为短期
   // 补偿背书。该族可无连发形在场（「样本越多…这一把该赢回来」）。
@@ -273,6 +328,9 @@ function checkEn(text, R) {
   const turn = R.TURN_EN || TURN_EN;
   const chase = R.CHASE_EN || CHASE_EN;
   const lln = R.LLN_EN || LLN_EN;
+  // [r477 新族] 运气守恒族双腿（英文）
+  const conserve = R.CONSERVE_EN || CONSERVE_EN;
+  const settle = R.SETTLE_EN || SETTLE_EN;
   const hasStreak = streak.test(text);
   const hasCount = streakCount.test(text);
   if (hasStreak || hasCount) {
@@ -284,6 +342,13 @@ function checkEn(text, R) {
     // bound to go her way：公平分配义）。存量 DUE_EN 只收 is due /
     // overdue，不收 my turn is due 的轮次分配形。
     if (turn.test(text)) return { route: 'en:streak×turn' };
+  }
+  // [r477 新族] 守恒/攒积断言 × 到期结算断言（英文：conserved /
+  // luck account / banking goodwill × pays off / repaid / must reverse）
+  if (conserve.test(text) && settle.test(text)) {
+    if (!(R.NEGATION_BREAK_EN || NEGATION_BREAK_EN).test(text)) {
+      return { route: 'en:conserve×settle' };
+    }
   }
   // [r301 新族] 长期平均论证 × 反转预期/追投行动（law of averages）
   if (lln.test(text)) {
@@ -339,6 +404,8 @@ module.exports = {
     STREAK_ZH, STREAK_DAILY_ZH, STREAK_COUNT_ZH, DUE_ZH, DUE_DAILY_ZH, TURN_ZH,
     STREAK_EN, STREAK_COUNT_EN, DUE_EN, TURN_EN,
     LLN_ZH, LLN_EN, CHASE_ZH, CHASE_EN,
+    CONSERVE_ZH, CONSERVE_EN, SETTLE_ZH, SETTLE_EN,
+    NEGATION_BREAK_ZH, NEGATION_BREAK_EN,
     META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT,
   }),
 };
