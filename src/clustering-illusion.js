@@ -319,6 +319,64 @@ const SIGNIF_CURSE_EN = [
   /\bunlucky\s+(?:ground|place|spot|venue|stadium|building|street|road|room)\b/i,
 ];
 
+// ─── [r478 新增] 腿② SIGNIF R7 神谕/灵示归因（中文）──────────────────
+// r478 池化探针（coordination/agent4/probes/r478-probe-pool.js +
+// r478-probe-round2.js，v6.8.238 gate() 全量 findings 实测）：统计素养
+// 维度文件池 48 个中，clustering_illusion 仍是可扩展族最多的模块。
+// 候选族「神谕/灵示归因」14 条攻击中存量腿②（SIGNIF_NEG/ANOM/MYST/LAW/
+// CYCLE/CURSE 六形）仅拦 3 条，其余 11 条整句穿透（gate=pass 且零维度
+// 承重）；12 条良性零存量误伤。穿透根因是腿②七形词表的措辞出口全停在
+// 「场所/附体/氛围」三层，没有覆盖「聚集被读成超自然主体的**示警传话**」
+// 这一独立出口：
+//   · R6 CURSE 收 凶地/凶宅/中邪/邪乎——主体是**场所与力量**，不是**发话者**；
+//   · R3 MYST 收 天意/魔咒/宿命/风水——是**命运观名词**，不是**示警动作**；
+//   · 卦象/签文/托梦/扶乩/看事的/算命/菩萨显灵 等「占卜判词 + 传话形」
+//     七形均无，整族漏。
+// 本族三小组平行独立路由（新常量数组，不并入存量数组——round-265
+// 登记断言 EVENT_ZH.length===2 / SIGNIF_ANOM_ZH.length===2 等 length
+// 锁；round-432 断言 SIGNIF_CURSE_ZH.length===3），与 R1-R6 并联：
+//   · 占卜判词组（卦象/签文/求签/算命/看事的/批命）：聚集被读成占卜判词；
+//   · 托梦显灵组（托梦/显灵/通灵/扶乩/降乩）：聚集被读成入梦传话；
+//   · 神格示警组（示警/警示/上天给的暗示/老天爷的提醒）：聚集被读成
+//     超自然主体发来的警告。
+// 口径（r478-probe-round2 实测后收窄，两处防误伤）：
+//   ① 神格主体（菩萨/神仙/老天爷/山神/土地公/先人…）**须与归因动词
+//      共现**才判——单提「菩萨」「求签」不判，保护「研究卦象与占卜史」
+//      「专程去庙里求签问事业」等日常/学术占卜陈述；
+//   ② 不含 EXEMPT_CONCEPT_ZH 的「老师」同形词——r432 注释记录的已知
+//      窄口（老师傅×中了邪）保持不动，本族样本改用「村民/街坊/老人」
+//      规避，不改共享豁免（教学转述豁免保护面更大）。
+const ORACLE_SUBJ_ZH = [
+  // 占卜判词组：聚集被读成卦象/签文/命理的判读结果
+  /(?:卦象|签文|求签|算卦|占卜|算命的说|算命先生|看事的?说|问米|扶乩|降乩|批命|相面|风水先生说|阴阳先生)/,
+  // 托梦/显灵组：聚集被读成超自然主体的入梦传话或显灵感应
+  /(?:托梦|先祖托梦|祖宗托梦|先人托梦|菩萨显灵|神仙显灵|神灵感应|通灵|鬼魂托梦|亡魂托梦)/,
+  // 神格示警组：聚集被读成神格主体发来的警告/暗示。
+  // 「X在」形之外补「X神/X公/先人 + 降下/托梦/显灵」动作共现形——r478
+  // 实测「村里老人说是山神降下的警示」无「在」字，被上一版漏掉。
+  /(?:菩萨在|神仙在|老天爷在|上天[^。，！？!?,;；\n]{0,6}(?:示警|警示|暗示|示意|提醒)|土地公在|山神在|城隍在|河神在|先人在)/,
+  /(?:菩萨|神仙|神灵|老天爷|土地公|山神|城隍|河神|先人|祖宗|先祖|亡魂)[^。，！？!?,;；\n]{0,8}(?:降下|托梦|显灵|传话|示下|开示)/,
+];
+const ORACLE_ACT_ZH = [
+  /(?:示警|警示|天启|神谕|灵示|给的暗示|在示意|在提醒|降下的警示|降下的?凶|传话|感应到|显灵|显示.{0,6}不祥|乃是.{0,4}劫数|是.{0,4}劫数|在还愿|破财消灾)/,
+];
+
+// ─── [r478 新增] 腿② SIGNIF R7 神谕/灵示归因（英文）──────────────────
+// 与存量 SIGNIF_MYST_EN（cursed/doomed/ghosts/spirits/omen）分工：存量收
+// **命运判定名词**，本族收「**发话主体 + 传话动作**」形——sign/message/
+// warning from the gods/spirits/ancestors、the shaman says the spirits are
+// sending、read it as a sign from above。裸 read it as a sign 不收（学术
+// 阅读场景），必须带 from + 神格/超自然来源。
+const ORACLE_SUBJ_EN = [
+  /\b(?:sign|message|warning|signal)s?\s+from\s+(?:above|the\s+(?:gods?|spirits?|heavens?|universe|ancestors?|shaman)|heaven)\b/i,
+  /\b(?:gods?|spirits?|heaven|ancestors?|shaman|oracle|medium)\b\s+(?:are|is|were)?\s*(?:sending|sent|telling|speaking|warning)\b/i,
+];
+const ORACLE_ACT_EN = [
+  /\b(?:read|reads|reading|see|sees|interpret\w*)\s+(?:it|this|them)?\s*as\s+(?:a\s+)?(?:sign|warning|message|omen)\s+from\b/i,
+  /\bshaman\s+(?:says?|said|insists?|explains?)\b/i,
+  /\bmedium\s+(?:says?|said|insists?)\b/i,
+];
+
 // ─── 豁免一：显式随机性/统计处理（中文）──────────────────────────────
 // 注意：绝不收裸「巧合/偶然/随机」或「纯属巧合/纯属偶然/随机现象/偶然
 // 现象」——那些会出现在 R1 攻击（「绝非纯属偶然」「绝不是巧合」）里，
@@ -465,6 +523,25 @@ function checkClusteringIllusion(text, inject) {
     return { hit: true, score: 0.58, count: 1, detail: 'clustering illusion×supernatural jinx/haunted attribution(en)' };
   }
 
+  // [r478 新族] 神谕/灵示归因（R7）：聚集被读成超自然主体的示警/托梦/占卜
+  // 判词。双腿 AND 才判（主体词 × 归因动词）——单腿（日常占卜陈述、学术
+  // 神格名词）不判，防误伤。与 R6 同级置于对冲豁免之后。
+  if (isZh) {
+    // 双腿 AND 为主；托梦/显灵为「主体+动作一体」形，单腿即足——r478 实测
+    // 「有人说先人托梦让我改门牌号」里托梦自身就是传话动作，AND 判不到，
+    // 而该形在日常语言里几乎只以聚集归因出现（学术转述走 EXEMPT_CONCEPT
+    // 的论文/文章里/教授等豁免），故单腿放行。
+    const subjZh = anyHit(R.ORACLE_SUBJ_ZH || ORACLE_SUBJ_ZH, text);
+    const actZh = anyHit(R.ORACLE_ACT_ZH || ORACLE_ACT_ZH, text);
+    const oneLegZh = /(?:托梦|显灵|通灵|扶乩|降乩)/.test(text);
+    if ((subjZh && actZh) || oneLegZh) {
+      return { hit: true, score: 0.58, count: 1, detail: '集群错觉×神谕/灵示归因(zh)' };
+    }
+  } else if (anyHit(R.ORACLE_ACT_EN || ORACLE_ACT_EN, text)
+             || (anyHit(R.ORACLE_SUBJ_EN || ORACLE_SUBJ_EN, text) && anyHit(R.ORACLE_ACT_EN || ORACLE_ACT_EN, text))) {
+    return { hit: true, score: 0.58, count: 1, detail: 'clustering illusion×oracle/omen-message attribution(en)' };
+  }
+
   // R2 异常断言 / R3 神秘归因 / R4 定律化 / R5 周期迷信
   const signif = isZh
     ? anyHit(R.SIGNIF_ANOM_ZH || SIGNIF_ANOM_ZH, text)
@@ -494,6 +571,7 @@ module.exports = {
     SIGNIF_NEG_EN, SIGNIF_ANOM_EN, SIGNIF_MYST_EN, SIGNIF_LAW_EN, SIGNIF_CYCLE_EN,
     // [r432] 超自然凶地/邪异归因新族常量（负例注入承重目标）
     SIGNIF_CURSE_ZH, SIGNIF_CURSE_EN,
+    ORACLE_SUBJ_ZH, ORACLE_ACT_ZH, ORACLE_SUBJ_EN, ORACLE_ACT_EN,
     EXEMPT_RAND_ZH, EXEMPT_RAND_EN, EXEMPT_NEG_ZH, EXEMPT_NEG_EN,
     EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN, EXEMPT_CONCEPT_ZH, EXEMPT_CONCEPT_EN,
   }),
