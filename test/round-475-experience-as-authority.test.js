@@ -43,14 +43,20 @@ const EN_ATTACK = [
 ];
 
 // ── C. 良性样本（单腿 / 纯履历 / 履历+正当限定）──
+// 注：2 条样本属存量维度射程（duration_neglect r380 / stereotype），
+// gate 端到端在 r475 前提交 0c4827d5 即判 verify——基线行为非本轮回归，
+// 故 H 段 gate 断言只覆盖本维度射程样本，存量射程样本单列对照组
+// （要求与本轮前逐项一致，不得新增误伤）。
+const ZH_BENIGN_STALE = [
+  '我在这行干了二十年，主要负责账务核算。', // duration_neglect 射程（时长陈述）
+  '我一看就知道这人靠不靠谱。',             // stereotype 射程（即刻判定形）
+];
 const ZH_BENIGN = [
   // 单腿：只有年资，无越级判定
   '我做了三十年的会计，现在准备退休。',
-  '我在这行干了二十年，主要负责账务核算。',
   '我教了二十五年书，下个月离职。',
   // 单腿：只有越级判定，无年资
   '我扫一眼片子就知道这是什么病。',
-  '我一看就知道这人靠不靠谱。',
   // 履历 + 正当限定（承认需验证 / 归因于训练而非资历）
   '虽然我做了三十年会计，这种复杂的合并报表我还是得查准则。',
   '我干了二十年这行，但这次的纠纷我也不敢下结论，得看证据。',
@@ -142,6 +148,17 @@ for (const t of ZH_BENIGN.concat(EN_BENIGN)) {
   if (a === 'pass') benignPass++;
 }
 ok('benign_gate_pass', benignPass === ZH_BENIGN.length + EN_BENIGN.length);
+
+// H2: 存量维度射程样本对照——r475 前提交 0c4827d5 即判 verify
+//     （duration_neglect / stereotype 射程），本轮不得新增误伤：
+//     要求 action 仍为 verify（与基线逐项一致），且本维度 count=0。
+let staleBaselineOk = 0;
+for (const t of ZH_BENIGN_STALE) {
+  const a = gate.checkOutput(t).gate.action;
+  const own = detected(t);
+  if (a === 'verify' && !own) staleBaselineOk++;
+}
+ok('stale_range_baseline_preserved', staleBaselineOk === ZH_BENIGN_STALE.length);
 
 // I. 异常输入不崩
 for (const bad of [null, undefined, '', 42, {}, []]) {
