@@ -14546,6 +14546,128 @@ const AUTHORITY_DISMISSAL = {
   },
 };
 
+// ─── [r475] 经验年资族：从业年限声明 × 年资越级能力断言 ────────────────────
+// 缺口实证（scripts/round-475/probe-r475-experience-gap.js，v6.8.235）：
+//   「我做了一辈子医生，这种病我扫一眼片子就知道是什么」「我干了三十年
+//    会计，翻两页账本就知道这家公司有没有问题」等 10/10 中文 + 8/8 英文
+//   gate.action=pass 完全穿透引擎，checkAppealToAuthority count=0，
+//   无任何维度承重。
+// 结构分析：AUTHORITY_FIRST_PERSON 管「身份职权声明」（我是X/我说了算/
+//   我拍板），AUTHORITY_DISMISSAL 管「第三人称权威 + 剥夺质疑资格」，两边
+//   都以**权威身份在场**为必要条件；本族没有身份宣示、也没有要求对方服从
+//   或剥夺质疑权——它只说「我干了 X 年」，然后把年资直接兑换成**免训练的
+//   即时判定能力**（扫一眼/翻两页/闻一下/舔一口就 X）。论据是**资历长度**，
+//   替代的是专业训练、检查流程与证据。这正是诉诸权威的变体：把「经验长度」
+//   当成「判定权」的来源。
+//
+// 判据形状（双腿 AND，单腿不命中，沿用 r227/r697 同款纪律）：
+//   腿① seniority：从业年限/工龄声明（干了X年/做了X年/一辈子/几十年/
+//       从业X年/N years in X）
+//   腿② leap：年资兑换成越级即时判定（扫一眼/翻两页/摸一下/闻一下/
+//       尝一口/见一面 + 就知道/就能看出/at a glance/can tell）
+// 良性边界（测试锁定 10/10 中文 + 6/6 英文不命中）：
+//   ① 纯履历陈述（「干了三十年会计，现在准备退休」）——有 seniority 无 leap；
+//   ② 纯越级判定（「我扫一眼片子就知道」）——有 leap 无 seniority；
+//   ③ 履历 + 正当限定（承认需查准则/看证据/按流程复核）——履历在场但结论
+//      未由年资背书，且出现否定/限定词；
+//   ④ 对冲（「也许这次我判断得也不一定对」）/ 否定（「不是干了三十年就
+//      一定对」）/ 疑问（「真的就一眼能看出来吗？」）/ 概念转述（「诉诸
+//      权威指的是拿资历替代论证」）——转述本维度自身，不是压制行为。
+//   豁免实现：seniority 与 leap 必须同时在场，且句中不得出现限定/否定/
+//   疑问/教学转述标记（NEGATION/MODAL/CONCEPT_MARK）。
+const AUTHORITY_EXPERIENCE = {
+  zh: {
+    seniority: [
+      /[我我]?(?:干|做|搞|混|待|待过|待了|待了|在)?[^，。]{0,6}(?:这|那)?(?:一)?(?:行|界|块|方面|领域|岗位|职位|职业|工作|这活儿|这门)?[^，。]{0,4}[二三四五六七八九十\d]+多?年/,
+      /(?:做|干|当|任|从事|入行|入这行|执教|任教|开|驾驶|跑|煮|种|管|教|带|守|磨|练|研|医|审|查)[^，。]{0,10}[二三四五六七八九十\d]+多?年/,
+      /(?:一辈子|大半辈子|半辈子|几十年|数十年|大半生|大半辈子|几十年如一日)/,
+      /(?:工龄|从业年限|执业年限|驾龄|教龄|店龄|会龄|党龄)[二三四五六七八九十\d]*多?年?/,
+      /(?:从事|深耕|扎根|专注|钻研|浸润)[^，。]{0,8}[二三四五六七八九十\d]+多?年/,
+      /(?:师父|师傅|前辈|老师|祖师)[^，。]{0,10}(?:传|教|带|授)[^，。]{0,6}[二三四五六七八九十\d]+多?年/,
+      // r475b：主语省略形（「在这行干了三十年」「种了四十年地」）——动词
+      // 前置时主语空位，原判据要求动词后 10 字内出现年数，「在这行」占了
+      // 3 字后「干了三十年」仍可命中，但「比那些刚毕业的博士生更懂行」这类
+      // 纯比较越级无越级动词，改由 leap 侧「比…更懂」覆盖（见下）。
+      /(?:这|那)?(?:一)?(?:行|界|块|方面|领域|圈|门)[^，。]{0,4}(?:干|做|混|待|闯|钻)[^，。]{0,6}[二三四五六七八九十\d]+多?年/,
+    ],
+    leap: [
+      /(?:扫|瞥|瞄|瞟)?一?[眼眼]?(?:就|便)?(?:知道|看出|看出|认得|认得|分辨|辨出|看穿|看透|看准)/,
+      /(?:翻|扫|瞥|瞄)?[一两二三四五\d]+[页行段张遍条]?[^，。]{0,8}(?:就|便)?(?:知道|看出|看出|清楚|明白|有数)/,
+      /(?:摸|碰|触|捏|握|捻|掂)一?[下下]?[^，。]{0,6}(?:就|便)?(?:知道|清楚|明白|有数)/,
+      /(?:闻|嗅|听|尝|舔|舔一口|咂)?一?[下口遍]?[^，。]{0,6}(?:就|便)?(?:知道|清楚|明白|分辨)/,
+      /(?:见|见一|打一|碰一)?[面次回趟]?[^，。]{0,8}(?:就|便)?(?:知道|看出|确定|判定|认出|识破)/,
+      /(?:一眼|一眼看|瞄一眼|扫一眼|瞥一眼|瞟一眼|瞧一眼|看一眼|望一眼)/,
+      /(?:张嘴|开口|张口)就(?:来|说|报|背|唱|讲)/,
+      // r475b 补：比较型越级——「我比那些刚毕业的博士生更懂行」，以年资
+      // 压过正规训练。腿①已在，腿②是「比…更懂/更明白/更内行」。
+      /比[^，。]{0,12}(?:更|还)(?:懂|明白|清楚|内行|专业|熟|有数|准)/,
+      /(?:强|胜)过[^，。]{0,8}(?:科班|学院|专业|博士|硕士|毕业|新手|年轻人)/,
+      // r475b 补：动词收尾形（「舔一口就尝出来」「闻一下就清楚」）——越级
+      // 动词后接「出来/出来/得出来」时，现有判据要求紧跟「就/便」+认知词，
+      // 「尝出来」的「尝」属另一动词族。
+      /(?:尝|品|咂|舔|闻|嗅|听|摸|掂|捏|摸)一?[下口遍]?[^，。]{0,4}(?:就|便)?(?:尝|品|辨|分|闻|听|摸|掂)(?:得)?出(?:来|的)?/,
+    ],
+    negation: [
+      /(?:不一定|未必|不见得|说不好|难说|不好说|不敢|不敢下|没法下|无法确定|说不准|未必准)/,
+      /(?:还得|还是得|仍然要|还是要|必须|得)[^，。]{0,12}(?:查|核|验证|复核|检验|看证据|按流程|依据|求诊|会诊|转诊|上报)/,
+      /(?:不是|并非|不等于|不代表|不意味着)[^，。]{0,10}(?:年|资历|经验|工龄)[^，。]{0,6}(?:就|便|一定|必然)/,
+      /(?:经验|资历|工龄|年限)[^，。]{0,4}(?:不能|不足以|无法|不能替代|替代不了|替代不了)/,
+      /(?:仅凭|单凭|光靠|只靠)[^，。]{0,8}(?:经验|资历|年头|工龄)/,
+      /(?:教训|教会我|让我明白|告诉我)[^，。]{0,12}(?:不能|不可|未必|不要)/,
+      /(?:结合|配合|辅以|加上|加上看)[^，。]{0,10}(?:检验|检查|化验|影像|证据|数据|流程|复核)/,
+      /(?:按|依照|遵循|走)[^，。]{0,4}(?:流程|程序|规范|规程|准则|标准|制度|复核|三级)/,
+      /(?:入门|刚入门|才入门|不敢称|谈不上|算不上|远未|尚未)/,
+      // r475b 补：疑问形——「这笔账真的就一眼能看出来吗？」年资在场但结论
+      // 是被质疑的对象而非被断言的事实，不构成压制。
+      /[^，。]{0,24}(?:吗|么)\s*[？?]/,
+      /(?:真的|果真|当真)[^，。]{0,16}[？?]/,
+    ],
+  },
+  en: {
+    seniority: [
+      /\b(?:i(?:'ve| have)?\s+)?(?:been|worked|spent)\s+\d+\s+years?\b/i,
+      /\b\d+\s+years?\s+(?:in|on|at|behind|as)\b/i,
+      // r475b 补：英文数词形（Thirty years in accounting / Twenty-five years
+      //   in the classroom / Thirty years on the force）——原判据只收数字形
+      //   （30 years），而英文自然句高频使用数词前置且无主语。
+      /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|twenty-five|thirty|forty|fifty|sixty|seventy|eighty|ninety)\s+years?\s+(?:in|on|at|behind|as|of)\b/i,
+      /\b(?:for|after)\s+(?:nearly\s+|over\s+|almost\s+)?(?:two|three|four|five|ten|twenty|thirty|forty|fifty)\s+years?\b/i,
+      /\b(?:decades?|a lifetime|my whole life|most of my (?:life|career))\b/i,
+      /\b(?:three|two|four|five)\s+decades?\b/i,
+      /\bsince\s+(?:the\s+)?(?:late\s+)?\d{2}s\b/i,
+    ],
+    leap: [
+      /\b(?:at a glance|in one look|in a single look|the moment i see|as soon as i see)\b/i,
+      /\bi can tell\b[^.]{0,48}\b(?:instantly|immediately|at a glance|right away|in seconds|in two pages)\b/i,
+      /\bi can (?:tell|see|spot|know|judge)\b[^.]{0,40}\b(?:instantly|immediately|at a glance|right away|from across the room)\b/i,
+      /\b(?:one look|one glance|a quick look)\s+(?:is enough|and i know|tells me)\b/i,
+      /\bi just (?:know|sense|feel)\b[^.]{0,32}\b(?:right away|immediately)\b/i,
+      /\bcan (?:tell|spot|diagnose|size up)\b[^.]{0,32}\b(?:in|within)\s+(?:seconds|two pages|a minute|one meeting)\b/i,
+      // r475b 补：「I can tell whether a company has problems in two pages」/
+      //   「I can tell which students will make it on day one」——越级动词
+      //   can tell 后接疑问词从句 + 限时量词，原判据只覆盖副词尾句形。
+      /\bi can tell\b[^.]{0,64}\b(?:in two pages|in one page|in a minute|in seconds|on day one|instantly|immediately)\b/i,
+      // r475b 补：「I can tell a suspect the moment I see him」——瞬间同步形。
+      /\bthe (?:moment|second|instant) i (?:see|meet|hear|read)\b/i,
+    ],
+    negation: [
+      /\b(?:i(?:'d| would)?\s+(?:still|always)\s+(?:order|run|check|verify|confirm)\b)/i,
+      /\b(?:needs?|requires?)\s+(?:a\s+)?(?:specialist|second opinion|proper (?:test|review|process)|full (?:panel|workup))\b/i,
+      /\b(?:not|never)\s+(?:enough|sufficient|a substitute)\b[^.]{0,32}\b(?:experience|years|seniority)\b/i,
+      /\bi (?:know|learned)\s+better than to\b/i,
+      /\bcan (?:mislead|be wrong|deceive)\b/i,
+      /\bstill (?:need|have) to\b[^.]{0,32}\b(?:evidence|verify|test|review|check)\b/i,
+      /\bby the book\b/i,
+      /\btaught me\b[^.]{0,32}\bnot to\b/i,
+    ],
+  },
+};
+
+// 教学/概念转述标记：句中在陈述本维度概念时不判（「诉诸权威指的是拿资历
+// 替代论证」）。中英两侧共用同一判据。
+const AUTHORITY_EXPERIENCE_CONCEPT =
+  /(?:诉诸权威|诉诸年资|诉诸资历|拿资历|以年资|appeal to authority|seniority instead of|instead of evidence|appeal to seniority|citing seniority)/i;
+
 function checkAppealToAuthority(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -14639,6 +14761,32 @@ function checkAppealToAuthority(text) {
         type: 'third_person_authority_dismissal',
         detail: '第三人称权威在场 + 反质疑/资格剥夺（用权威身份压制质疑）',
         guidance: '权威身份不能替代论证，质疑权不因对方身份而被剥夺',
+      });
+    }
+  }
+  // ── [r475] 经验年资族：年资半 AND 越级半（无权威身份在场也算诉诸权威）──
+  // 与 r227 第一人称权威、r697 第三人称权威互补：那两族要求权威身份在场
+  // （我是X/老板已批），本族只要「干了X年」+「扫一眼就知道」两半齐备，
+  // 即把经验长度兑换成免训练判定权。单腿不命中（守卫见
+  // scripts/negative-test-appeal-authority-experience-r475.js）。
+  // 中英两侧各跑自己那半（混排两侧都跑，与 r227 同口径）。
+  const expLangs = hasChinese ? ['zh'] : ['en'];
+  if (hasChinese && /[a-zA-Z]{2,}/.test(text)) expLangs.push('en');
+  if (!AUTHORITY_EXPERIENCE_CONCEPT.test(text)) {
+    for (const lang of expLangs) {
+      const fam = AUTHORITY_EXPERIENCE[lang];
+      if (!fam) continue;
+      const senHit = fam.seniority.find(re => re.test(text));
+      if (!senHit) continue;
+      const leapHit = fam.leap.find(re => re.test(text));
+      if (!leapHit) continue;
+      // 正当限定/否定在场：年资未被用来替代论证，不判
+      if (fam.negation && fam.negation.some(re => re.test(text))) continue;
+      signals.push({
+        pattern: 'experience_as_authority:' + lang,
+        type: 'experience_as_authority',
+        detail: '经验年资替代论证（从业年限直接兑换成免训练即时判定）',
+        guidance: '年限长短不是判定依据，结论需证据、检查流程与专业训练支撑',
       });
     }
   }
@@ -19376,4 +19524,14 @@ module.exports = {
   checkRewardHacking,
   checkWeakEvidenceStrongClaim: _checkWeakEvidenceStrongClaim,
 
+  // [r475] 负例注入守卫：测试把 AUTHORITY_EXPERIENCE 从 __internals 摘除后，
+  //   全部攻击样本必须失去 experience_as_authority 命中（证明命中由新族
+  //   独立承重，而非借别的判据搭车）。只读视图，不暴露可变引用。
+  __internals() {
+    return {
+      AUTHORITY_FIRST_PERSON,
+      AUTHORITY_DISMISSAL,
+      AUTHORITY_EXPERIENCE,
+    };
+  },
 };
