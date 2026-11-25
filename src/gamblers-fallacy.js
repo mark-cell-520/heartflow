@@ -157,6 +157,52 @@ const LLN_EN = /(?:in\s+the\s+long\s+run|over\s+the\s+long\s+run|over\s+time|as\
 const CHASE_ZH = /(?:加倍[下押投注]|翻倍[下押注]|加注|加码|重注|重押|梭哈|全押|满仓|追投)/;
 
 // [r301 新增族] 同族英文追投行动形。
+// ─── [r476 新增族] 腿①「累计失败计数」（非博彩日常事件的失败累加形）
+// ───────────────────────────────────────────────────────────────
+// 缺口实证（coordination/agent4/probes/r476-probe-pool.js，HEAD v6.8.236
+// 改前实测）：P2 族穿透 4/10、良性 FP 0/4。逐条跑腿诊断：
+//   「我这阵子连错五道题，下一道肯定该轮到我对了。」——STREAK_ZH 否、
+//     STREAK_DAILY_ZH 否、DUE_ZH 是（「该轮到我了」在存量 DUE_ZH 内）
+//   「她面试被拒了八次，下一次该轮到她被录取了吧。」——六条腿全否
+//   「他已经连着七天没开单了，按概率下一单该成交了。」——STREAK_ZH 是
+//     （连着七天），DUE 两条腿全否
+//   「I have bought lottery tickets for ten years without winning; my
+//     turn is due.」——DUE_EN 是，STREAK_EN 否
+// 结论：存量腿①只收赌博术语（连输/连开/大小连续开出）与「连续N天+X」
+// 单向持续形（STREAK_DAILY_ZH 的 连续…[失败词] 形），不收「动词+N次+
+// 没/都+否定结果」的累计失败计数形（连错五道题/被拒八次/三十份简历
+// 石沉大海/三年没摇到号）；存量腿②只收赌局术语（该出大小/该转运/
+// is due），不收「轮到某人」的轮次公平分配义。两条缺口各补一条腿。
+// 刻意不收裸「没/未+动词」无计数形（「没开单」无累加语境是普通陈述，
+// 会被「客户还没回复」类良性误伤）——计数词（N次/N年/N份）或内嵌否定
+// 动词（连错/连败/被拒）是硬门槛。两类硬门槛：
+//   ① 连[否定动词]+N+[量词]——否定内嵌在动词里（连错五道题/连败三局），
+//      后置否定词可选；
+//   ② N+[次回份年天] + 后置否定（五次没中/三年没摇到/八次都石沉大海）。
+const STREAK_COUNT_ZH = /(?:连[错败输拒挂考丢翻][一二三四五六七八九十百千\d]*[道题次回份下场局科]|连[错败输拒挂考丢翻]\s*[一二三四五六七八九十百千\d]+\s*[道题次回份下场局科]|连着[一二三四五六七八九十百千\d]*[道题次回份下场天][^。！？!?]{0,6}(?:没|未|都|也没|没能)|[一二三四五六七八九十百千\d]+[次回][^。！？!?]{0,4}(?:没[中过开成]|未[中开成]|都[没不]|也没|石沉大海|杳无音信)|被拒[了着过]?[一二三四五六七八九十百千\d]+[次回]|投[了递]?[一二三四五六七八九十百千\d]+[份][^。！？!?]{0,8}(?:石沉大海|杳无音信|没[有回]?消息|都[没无]回应|没[中成])|摇[了]?[一二三四五六七八九十百千\d]+[年][^。！？!?]{0,4}(?:没[中摇到]|未[中摇到]|没中过)|报[了名]?[一二三四五六七八九十百千\d]+[次][^。！？!?]{0,6}(?:没[抽中中]|未[抽中中]|[都也][没不]))/
+
+// [r476 新增族] 同族英文累计失败计数形。存量 STREAK_EN 只认
+// 「N times in a row + losses/wins」与「has been cold/hot」，不收
+// 「has been rejected eight times / has gone seven days without /
+// thirty applications without a reply」的完成时累计形。
+const STREAK_COUNT_EN = /\b(?:has|have)\s+been\s+(?:rejected|declined|passed\s+over|turned\s+down|unsuccessful|defeated|rejected)\b|\b(?:has|have)\s+gone\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:days?|weeks?|months?|years?)\s+without\b|\b(?:has|have)\s+spent\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:days?|weeks?|months?|years?)\s+(?:without|on)\b|\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|thirty|fifty|dozens?\s+of)\s+(?:applications?|resumes?|interviews?|exams?|attempts?|tries|lottery\s+tickets?)\s+(?:without|and\s+no)\b|\b(?:for|in|after)\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:years?|months?|weeks?|days?)\s+(?:without|and\s+no)\b|\bwithout\s+a\s+(?:reply|response|offer|win|success|job|promotion)\s+(?:for|in|after)\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b|\bapplications?\s+without\s+a\s+(?:reply|response|offer)\b|\b(?:after|following|with)\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:failed|rejected|declined|unsuccessful|losing)\s+(?:exams?|attempts?|tries|interviews?|applications?|resumes?|auditions?|tryouts?|submissions?|bids?|proposals?)\s+in\s+a\s+row\b|\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:failed|rejected|declined)\s+(?:exams?|attempts?|tries|interviews?|applications?|auditions?|tryouts?)\s+in\s+a\s+row\b/i;
+
+// ─── [r476 新增族] 腿②「轮次公平断言」（该轮到/该转运：公平分配义）
+// ───────────────────────────────────────────────────────────────
+// 缺口实证（同 r476 探针）：存量腿②（DUE_ZH / DUE_DAILY_ZH）只收赌局
+// 术语（该出大小/该转运/该中一次）与日常事件反转（该反弹/该好转），
+// 不收「该轮到 X」的公平分配断言——「下一次该轮到她被录取」「下一单
+// 该成交」「my turn is due」。轮次公平断言是赌徒谬误在日常语域的
+// 标准外壳：把独立事件当成会轮流发生的轮次。
+// 刻意不收值班分派义（「这周轮到小李值班」）——无累计失败计数在场，
+// 双腿 AND 路由天然排除；TURN_ZH 不要求该前缀绑定计数词。
+const TURN_ZH = /(?:该轮到|轮到[我了它你他]|总该轮到|也该轮到|该轮到[我了它你他][^。！？!?]{0,10}(?:了|吧|呗)?|下一[道题次回家单]?[^。！？!?]{0,8}该(?:轮到|中|成|过|上岸|被录取|成交|拿到|摇到|抽中)|这[次回]?[^。！？!?]{0,6}该(?:轮到|中一|过|上岸|成|成交)|轮到我|轮到你|轮到他|轮到她)/;
+
+// [r476 新增族] 同族英文轮次公平断言形。存量 DUE_EN 只收
+// 「is due / overdue / bound to happen」，不收「my turn is due /
+// it is his turn / bound to go his way」的轮次分配义。
+const TURN_EN = /\b(?:my|your|his|her|their|our)\s+turn\s+(?:is|must\s+be|has)\s+(?:due|next|coming|now|here)\b|\bit\s+is\s+(?:my|your|his|her|their)\s+turn\b|\bturn\s+(?:is|has)\s+(?:come|finally\s+come)\b|\bbound\s+to\s+(?:go|happen)\s+(?:his|her|my|your|their)\s+way\b|\b(?:is|it'?s)\s+(?:my|his|her|their)\s+turn\s+(?:to|for)\b|\bsomeone\s+else'?s\s+turn\b|\b(?:my|your|his|her|their)\s+turn\s+to\s+(?:win|pass|succeed|get|be\s+chosen|be\s+picked)\b|\bturn\s+is\s+(?:due|coming)\s+up\b|\b(?:is|it'?s)\s+(?:my|his|her|their)\s+turn\b/i;
+
 const CHASE_EN = /(?:double\s+down|doubling\s+down|double\s+(?:the|my|your|our)\s+(?:bet|stake|wager)|increase\s+the\s+(?:bet|stake|stakes)|(?:bet|betting|wager(?:ing)?)\s+(?:bigger|more|larger|heavier)|raise\s+the\s+(?:bet|stake|stakes)|go(?:ing)?\s+all\s+in|all\s+in\s+on|win\s+it\s+(?:all\s+)?back|chase\s+(?:the\s+)?(?:losses|loss)|load(?:ing)?\s+up\s+on|double\s+or\s+nothing)/i;
 
 // ─── 豁免一：元话语/概念引述（分析这个概念本身不是运用它）──────────
@@ -176,11 +222,14 @@ const THIRD_PERSON_EXEMPT = /(?:概率论老师|统计学老师|数学老师|概
 function checkZh(text, R) {
   const streak = R.STREAK_ZH || STREAK_ZH;
   const streakDaily = R.STREAK_DAILY_ZH || STREAK_DAILY_ZH;
+  const streakCount = R.STREAK_COUNT_ZH || STREAK_COUNT_ZH;
   const due = R.DUE_ZH || DUE_ZH;
   const dueDaily = R.DUE_DAILY_ZH || DUE_DAILY_ZH;
+  const turn = R.TURN_ZH || TURN_ZH;
   const chase = R.CHASE_ZH || CHASE_ZH;
   const lln = R.LLN_ZH || LLN_ZH;
   const hasStreak = streak.test(text) || streakDaily.test(text);
+  const hasCount = streakCount.test(text);
   if (hasStreak) {
     if (due.test(text)) return { route: 'zh:streak×due' };
     // [r289 新族] 日常事件反转断言：连发形 × 该反向形。
@@ -190,6 +239,19 @@ function checkZh(text, R) {
     // [r301 新族] 连发形 × 追投行动：连输五把后加倍下注/梭哈/全押，
     // 是「下一把该回来了」的赌桌行动面表达（存量腿②只收预期形）。
     if (chase.test(text)) return { route: 'zh:streak×chase' };
+    // [r476 新族] 连发形 × 轮次公平断言：存量腿②不收「该轮到 X」的
+    // 公平分配义（该轮到我了/该成交/该上岸）。
+    if (turn.test(text)) return { route: 'zh:streak×turn' };
+  }
+  // [r476 新族] 累计失败计数 × 轮次公平断言：连错五道题/被拒八次/
+  // 三十份简历石沉大海/三年没摇到号 —— 存量腿①不收「动词+N次+没/
+  // 都+否定结果」的计数形（连错五道题 STREAK_ZH 否、STREAK_DAILY_ZH
+  // 否）。探针实测穿透 4/10（r476-probe-pool.js）。与上面 streak×turn
+  // 并联：hasCount 独立判定，不与 hasStreak 共用分支。
+  if (hasCount) {
+    if (turn.test(text)) return { route: 'zh:count×turn' };
+    if (due.test(text)) return { route: 'zh:count×due' };
+    if (dueDaily.test(text)) return { route: 'zh:count×daily' };
   }
   // [r301 新族] 长期平均论证 × 反转预期/追投行动（law of averages）：
   // 引用「长期总会扯平 / 样本越多越趋近均值 / 频率回归平均」为短期
@@ -206,14 +268,22 @@ function checkZh(text, R) {
  */
 function checkEn(text, R) {
   const streak = R.STREAK_EN || STREAK_EN;
+  const streakCount = R.STREAK_COUNT_EN || STREAK_COUNT_EN;
   const due = R.DUE_EN || DUE_EN;
+  const turn = R.TURN_EN || TURN_EN;
   const chase = R.CHASE_EN || CHASE_EN;
   const lln = R.LLN_EN || LLN_EN;
-  if (streak.test(text)) {
+  const hasStreak = streak.test(text);
+  const hasCount = streakCount.test(text);
+  if (hasStreak || hasCount) {
     if (due.test(text)) return { route: 'en:streak×due' };
     // [r301 新族] 连发形 × 追投行动（double down / all in / raise the
     // stakes：平衡义务的英文行动面表达）
     if (chase.test(text)) return { route: 'en:streak×chase' };
+    // [r476 新族] 累计失败计数/连发形 × 轮次公平断言（my turn is due /
+    // bound to go her way：公平分配义）。存量 DUE_EN 只收 is due /
+    // overdue，不收 my turn is due 的轮次分配形。
+    if (turn.test(text)) return { route: 'en:streak×turn' };
   }
   // [r301 新族] 长期平均论证 × 反转预期/追投行动（law of averages）
   if (lln.test(text)) {
@@ -266,7 +336,8 @@ function checkGamblersFallacy(text, inject) {
 module.exports = {
   checkGamblersFallacy,
   __internals: () => ({
-    STREAK_ZH, STREAK_DAILY_ZH, DUE_ZH, DUE_DAILY_ZH, STREAK_EN, DUE_EN,
+    STREAK_ZH, STREAK_DAILY_ZH, STREAK_COUNT_ZH, DUE_ZH, DUE_DAILY_ZH, TURN_ZH,
+    STREAK_EN, STREAK_COUNT_EN, DUE_EN, TURN_EN,
     LLN_ZH, LLN_EN, CHASE_ZH, CHASE_EN,
     META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT,
   }),

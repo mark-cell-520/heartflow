@@ -1,3 +1,33 @@
+## r476 — gamblers_fallacy 第148维扩族：非博彩日常事件连串×该轮到/该转运族（真升级②：既有维度全新句式族；v6.8.236→v6.8.237）
+
+**轮次归属与接手说明**：本轮为 22:30 审计 cron 接手 agent-4 的 r476 半成品 WIP。claims.jsonl 中 r476 status=active（claim_at 2026-11-25T09:25:02Z，expires_hours=6，即 15:25:02Z 已超期且无 release），工作区留下未提交 diff（`src/gamblers-fallacy.js` +73/-2）与 4 个未跟踪文件，probes 目录 mtime 停在 19:46、其后静默近 2h45m，`ps` 无任何 heartflow/agent4 轮次进程——按 preflight「超期无 release 可 takeover」条款接手续作，非他人 patch。
+
+**缺口实证**（HEAD v6.8.236 改前实测，`coordination/agent4/probes/r476-probe-pool.js`）：P2 族穿透 4/10、良性 FP 0/4。四条逐腿诊断——①「我这阵子连错五道题，下一道肯定该轮到我对了。」（DUE_ZH 是、STREAK 否）②「她面试被拒了八次，下一次该轮到她被录取了吧。」（六条腿全否）③「他已经连着七天没开单了，按概率下一单该成交了。」（STREAK_ZH 是、DUE 两腿全否）④「I have bought lottery tickets for ten years without winning; my turn is due.」（DUE_EN 是、STREAK_EN 否）。结论：存量腿①只收赌博术语与「连续N天+X」单向持续形；存量腿②只收赌局术语与日常事件反转。
+
+**落地**：新增四组常量 + 双腿 AND 路由并行（不并入存量数组，保存量轮测与 `__internals` 登记断言不变）——腿①累计失败计数 `STREAK_COUNT_ZH`（连[错败输拒挂考丢翻]+N+[道题次回份下场局科] / 连着N[道题次回份下场天]+否定 / N[次回]+没中·未中·石沉大海·杳无音信 / 被拒N次 / 投递N份+石沉大海·杳无音信·没消息 / 摇N年+没中 / 报名N次+没抽中）与 `STREAK_COUNT_EN`（has been rejected|declined|passed over|turned down|unsuccessful|defeated；has gone|spent N days|weeks|months|years without|on；N applications|resumes|interviews|exams|attempts|tries|lottery tickets without|and no；for|in|after N years without；without a reply|response|offer|win|success|job|promotion for N；applications without a reply；after N failed … in a row；N failed … in a row）；腿②轮次公平断言 `TURN_ZH`（该轮到 / 轮到[我了它你他] / 总该·也该轮到 / 下一[道题次回…]该(轮到|中|成|过|上岸|被录取|成交|拿到|摇到|抽中) / 这[次回]该(…) / 轮到我|你|他|她）与 `TURN_EN`（my|your|his|her|their|our turn is|must be|has due|next|coming|now|here；it is X turn；turn is come|finally come；bound to go|happen his|her|my|your|their way；is|it's X turn to|for；someone else's turn；X turn to win|pass|succeed|get|be chosen|be picked；turn is due|coming up；is|it's my|his|her|their turn）。**r476 语义红线**（diff 注释原文，修复/续作时不得删改）：刻意不收裸「没/未+动词」无计数形（无累加语境的普通陈述，会被「客户还没回复」类良性误伤）；刻意不收值班分派义（「这周轮到小李值班」）；硬门槛为计数词（N次/N年/N份）或内嵌否定动词（连错/连败/被拒）；双腿 AND 路由。src/index.js 零改动、判别维度 292 不变（gamblers_fallacy 为既有第148维，扩族不 bump 维度计数）、VERIFY 249 不变、工具/路由数 198/1390 不变。
+
+**审计侧修复**（本轮 cron 所做）：`coordination/agent4/probes/r476-variant-matrix.js` 第 74–75 行单引号字符串跨行导致 SyntaxError、preflight 语法闸拦截 1/8——改为字符串拼接，语义（存量维度 sunk_cost_coercion / fallacy_of_relevance 代拦良性 gate!=pass 样本、r717 同款口径）一字未动。
+
+**轮测** `test/round-476-gamblers-fairness-turn.test.js` **37/37**：攻击命中、良性零误伤、边界锁 8 项（单腿不判×2、元话语、概率教学第三人称、止损建议、短文本、豁免优先、值班分派）、分工边界 2 项（值班分派归日常陈述、无历史频率来源断言归 confidence）、gate 层登记断言 3 项（dimensions 键、findings 承重+guidance、`__internals` 暴露新腿常量供负例脚本注入）。
+
+**负例注入** `coordination/agent4/probes/r476-negative-injection.js`：基线模块层命中 12/12；删腿①（STREAK_COUNT）后 6/12、删腿②（TURN）后 7/12、恢复后 12/12——双腿均独立承重，腿①贡献 6 条、腿②贡献 5 条，无混合承重。
+
+**变体矩阵** `coordination/agent4/probes/r476-variant-matrix.js`（第六步强制）：同族攻击 17 变体（ZH 裸名词/带修饰/主语省略/长句复合/倒装/计数词汉字/动词收尾/条件从句/概率绑定/数学替换 + EN 裸名词/带修饰/主语省略/长句复合/数词汉字形/has spent 形/applications 形）**17/17 全部非 pass**（gate=verify×16 / rewrite×1，模块层 16/17 HIT，唯一 mod=miss 的 EN has spent 形经存量腿代拦仍 gate=verify）；良性 12 条中 10 条 gate=pass，另 2 条（ZH/EN 止损建议）gate=verify 而 mod=miss。
+
+**良性拦截来源实证**（本轮新增 `coordination/agent4/probes/r476-benign-intercept-source.js`）：两条止损建议的 findings dimension 分别为 `sunk_cost_coercion`（ZH「连考三次都没过，应该及时止损，而不是指望下次轮到自己。」）与 `fallacy_of_relevance`（EN「Three years without winning the lottery shows the odds are low, so stop buying.」）；**HEAD 版对照实证**（`git show HEAD:src/*.js` 还原临时树直跑）两条同为 gate=verify、gamblers mod=miss——即本族新腿零误伤，是存量维度代拦，与 r717 同款口径一致，非本轮回归，不修（改存量维度会动别的轮次射程）。
+
+**四门禁**（`hf4-gates.sh` 全绿）：verify 16/0、guard-abilities 20/20@292、doc-numbers 25/0、双向召回 52/52 + 误拦 302/326（与 r475 基线逐项相同，零新增误伤）。VERSION 6.8.236→6.8.237、package.json 同步；维度/VERIFY/工具/路由数四项均不变，故 README 规格表与 SKILL 数字无需改动。报告 `coordination/reports/r476-dimension-agent4.md` 按 r268 起 reports/ 本地留存约定不入链。
+
+---
+
+## r475 欠账补登 — appeal_to_authority 第293维「经验年资族」扩族（真升级②：既有维度新句式族；v6.8.235→v6.8.236）
+
+r475 于 2026-11-25 16:35 完整提交（d3ea3c41 r475: claim completed / dcb5ff8d 文档同步+轮测收尾 / 5735a429 维度落地），README changelog 6.8.236 条目与轮测 `test/round-475-experience-as-authority.test.js` 均已落库，**但 UPGRADE_LOG 漏登**，导致 r474 条目与本条目之间断链——本轮 cron 补登，内容按 README 6.8.236 changelog 条目与 commit 自报整理，不重新发明。方向「诉诸经验/资历权威」：缺口实证「我做了一辈子医生，这种病我扫一眼片子就知道是什么」等攻击形 4/4 穿透引擎（`checkAppealToAuthority` count=0、gate.action=pass，中英文两侧均无维度承重）；新族 `AUTHORITY_EXPERIENCE`（双腿 AND，单腿不命中）——腿① seniority 从业年限声明 7 支 ZH + 7 支 EN，腿② leap 年资兑换免训练即时判定 11 支 ZH + 9 支 EN，四类豁免（正当限定/否定对冲/疑问形/概念转述）。轮测 60/61：攻击 ZH 10/10 + EN 8/8 命中、16 良性本维度零误伤、存量判据 5/5、边界锁 5/5、单腿 8/8 不命中、负例注入独立承重；唯一 FAIL `benign_gate_pass` 经基线对照实证为存量维度行为非本轮回归（2 条良性样本在 r475 前提交 0c4827d5 的 gate action 同为 verify，归因 `duration_neglect` 与 `stereotype`，本维度对二者 count=0）。四门禁 r475 自报 verify 16/0、guard 20/20@293、doc 25/0、双向召回 52/52 + 误拦 302/326 零新增。
+
+**口径更正（本轮实测）**：r475 commit message 自报「guard-abilities 20/20@**293** 判别维度」，但本轮独立复跑 `scripts/dimension-registry-guard.js` 实测 **dimensions 键 292 个**，guard-abilities 输出同为 292，README/SKILL 现行口径亦为 292——r475 的自报维度数虚高 1。经核查 `appeal_to_authority` 的绑定形为 `const aa = _applyPedagogyRelaxation(checkAppealToAuthority(`（第 3134 行）、`dimensions` 对象已登记该变量（第 3957 行）、`summary` 已引用（第 3173 行），dimension-registry-guard 的 checkXxx/dimensions/summary 三项核对全绿无 problem，故**这是 r475 自报数字偏差，不是漏接线 bug**，代码侧无需修复；维度数以实测 292 为准。
+
+---
+
 # 审计修复轮（r474 WIP 回归修复 · peak_end_rule 射程守卫）（v6.8.235）
 
 - **轮次**：主会话审计（2026-11-25 11:42–12:20 CST），非 cron 轮
