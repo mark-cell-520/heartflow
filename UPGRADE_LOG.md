@@ -1,3 +1,135 @@
+# 审计修复轮（r474 WIP 回归修复 · peak_end_rule 射程守卫）（v6.8.235）
+
+- **轮次**：主会话审计（2026-11-25 11:42–12:20 CST），非 cron 轮
+- **VERSION**：6.8.234 → **6.8.235**（r473 漏登 changelog 与本轮审计修复合成一个发布号；维度 292 不变、VERIFY 249 不变、工具/路由数 198/1390 不变）
+- **类型**：真升级 ② 的回归修复 + 文档口径补齐（无新增可计数维度）
+- **前置状态**：HEAD `97d1c788`（r473），工作区有 r474 未提交 WIP（`src/peak-end-rule.js` +224/-1、`test/round-474-peak-end-sacrifice.test.js` 新增），四门禁全绿
+
+## 起点：四门禁全绿，但 r474 自己的轮测 6 项红
+
+按每日审计 prompt 的阶段零先跑 `bash /root/hermes1/scripts/hf-preflight.sh`：exit 0，工作区语法干净。
+随后 `node test/round-474-peak-end-sacrifice.test.js` 报 **122 通过 / 6 失败**，失败项全是
+`存量攻击回归失败`——r474 新族把 r245/r310/r319 的老攻击样本打丢了。
+
+## 根因①：`findSignatures` 的 `return sigs;` 被覆盖（一次数据丢失级回归）
+
+扩查三个存量轮测，全在红：
+
+| 测试文件 | r474 patch 后 | 基线（`git worktree add --detach /tmp/hf-baseline HEAD`） | 新增回归 |
+|---|---|---|---|
+| `test/peak-end-rule.test.js` | 10 通过 / 6 失败 | 16 / 0 | **+6** |
+| `test/round-310-peak-end-event-day-verdicts.test.js` | 9 / 9 | 17 / 1 | **+8** |
+| `test/round-319-bnpl-process-sell-margin-significance.test.js` | 97 / 36 | 127 / 6 | **+30** |
+
+合计 **44 项新增回归**。逐 hunk 定位：`git diff -U0` 显示 r474 的插入点
+`@@ -374,0 +502,69 @@ function findSignatures(text, R)`——69 行新代码被插进了
+`findSignatures` **函数体内部**，且把函数结尾的
+
+```js
+  }
+  return sigs;
+}
+```
+
+换成了
+
+```js
+  ];
+  return findSacrificeSignatures(text, R);
+}
+```
+
+存量三腿签名在 L470–501 老老实实算进 `sigs`，然后**整个数组被丢弃**，函数返回的只有新族签名。
+注释里写着「抽为独立函数 findSacrificeSignatures 是为不把配对逻辑复制进 detect」，而同一段注释
+下面恰恰复制了一份 `langs4`（L507–520）——这份 `langs4` 是**死代码**，
+`findSacrificeSignatures`（L529）内部 L532–545 有一份一模一样的。
+
+**修复**：删掉插进 `findSignatures` 的死代码块，恢复 `return sigs;`，并就地留下注释说明这行为什么
+不能被覆盖（防下一个人再犯）。修后三项测试回到 15/1、15/3、119/14——大幅好转但未归零。
+
+## 根因②：本族豁免无条件劫持存量路径
+
+`peak-end-rule.test.js` 剩余 1 项：`负例注入：概念讨论豁免删除后豁免句变红（承重证明）: 删概念讨论ZH`。
+该断言对 `EXEMPT_CONCEPT[0]`（「心理学教材在讲峰终定律：全程都挺无聊的，就结尾特别惊艳，我觉得这趟旅行值了
+——经典案例。」）注入 `{CONCEPT_ZH: /(?!)/}`，期望翻红。r474 把 `DEFINITION_ZH4` / `BALANCED_ZH4`
+两道本族豁免**无条件放在函数最前面 `return hit:false`**，而这句同时命中 `DEFINITION_ZH4`
+（教材/心理学/经典案例）——删掉 `CONCEPT_ZH` 也不再翻红，承重证明失效。
+
+**修复**：本族豁免只门本族——移入 `sigs4.length > 0` 分支内部，仅当新族三腿齐备时才生效。
+未命中新族的句子行为回到 r474 之前。这样也保住了 r474 的初衷（「按峰终定律…可以牺牲」这类
+引用定律的攻击句不会被存量 `CONCEPT_ZH` 兜杀）：新族命中时压根走不到存量豁免链。
+
+## 根因③：新族与存量族射程重叠，负例注入失去判别力
+
+`round-310` 剩 2 项、`round-319` 剩 8 项，全是同一形态：负例注入删掉存量裁定词后攻击**仍然命中**。
+例：删 `WHOLE_VERDICT_ZH3[0]`（只要结局…就算成功）后
+「过程再怎么折腾都无所谓，只要结局足够惊艳就算成功」仍被擒——擒它的不是存量路径，
+而是 `SACRIFICE_ZH4` 的「过程再X都无所谓 / 中间X不重要 / 只要结局…就算成功」形。
+
+这与 r474 文档声明的分界直接矛盾：文档说两族「射程不同、裁定结构不同（**本族句中无整体正面裁定**）」。
+实现没兑现这句话。探针实测（`/tmp/hf-probe/probe-guard.js`）：6 条存量专属句当前全部被新族误擒。
+
+**修复**：新增射程守卫 `VERDICT_GUARD_ZH4` / `VERDICT_GUARD_EN4`——句中出现存量「整体正面裁定」
+（算成功/就够了/值了/没白费/给满分/封神；EN worth it / worthwhile / full marks / 10/10…）时，
+新族让位、交回存量三腿路径裁定。守卫口径从紧，只收存量裁定词，**不收**「给好评 / 整体评价自然就好」
+这类本族攻击句里也出现的评价词。实测：r474 攻击 28 条 **0 命中**、良性 32 条 **0 命中**、
+存量回归攻击 7 条中 4 条命中（走存量路径，正确）。
+
+守卫刻意**不做成可注入常量参与存量注入**——它必须在删掉存量裁定词之后依然在场，负例注入才重新
+变得有判别力（两条路都走不通 → 攻击失配 → 常量承重证明恢复）。
+
+## 修复后验证（四个 peak-end 轮测逐项回到基线）
+
+| 测试文件 | 修复后 | 基线 | 判定 |
+|---|---|---|---|
+| `test/peak-end-rule.test.js` | **16 / 0** | 16 / 0 | ✅ 归零 |
+| `test/round-310-peak-end-event-day-verdicts.test.js` | **17 / 1** | 17 / 1 | ✅ 一致 |
+| `test/round-319-bnpl-process-sell-margin-significance.test.js` | **127 / 6** | 127 / 6 | ✅ 6 项失败与基线逐字相同 |
+| `test/round-474-peak-end-sacrifice.test.js` | **128 / 0** | —（本轮新增） | ✅ 全绿 |
+
+r319 残留的 6 项**全部是基线既存问题**，与本轮无关，逐条核对：
+① `D 存量回归：test/round-310-…` / `test/round-314-…` 两项 `Command failed`——该测试 spawn 的是
+`/root/.hermes/node/bin/node`，实测该二进制存在且是 v22.22.2（`/root/.local/bin/node` 是指向它的
+符号链接），失败原因在测试自身的 spawn 环境，非代码；
+② `D 存量回归：r311 恰好 2 条存量红` + `E SPEND_EN2=[]` + `F SPEND_EN2 元素 2`——`present_bias`
+的 `SPEND_EN2` 存量红，r311 起就存在；③ `H 接线在位：维度计数仍 254` 与
+`H 登记纪律：VERSION 未被本轮改动（6.8.179）`——两条**陈旧断言**（写死在 254 维 / 6.8.179 的年代），
+属测试腐化，需另轮处理，不改断言迁就代码。
+
+## 四门禁（修复后）
+
+- `bin/verify.js`：**16 passed / 0 failed**
+- `scripts/guard-abilities.js`：**20/20 通过 @292 维**（dimensions 键 292、summary 引用 154）
+- `test/doc-numbers-accuracy.test.js`：**25 通过 / 0 失败**
+- `scripts/bidirectional-guard.js`：召回 **52/52**、误拦 **302/326**——与基线逐项相同、零新增误伤
+
+## 文档口径
+
+- `README.md`：**重写开头介绍**——砍掉「judges whether…」与「does not generate text…」两段的冗余，
+  把「对文本只能做三件事：block / rewrite / flag」写实；数字横幅逐字节保留（doc-numbers 的横幅
+  正则按字段校验维度/管线/模块/工具/路由/测试数六项）。`Verified metrics` 版本戳 v6.8.234→v6.8.235。
+- `README.md` Version history：**补 6.8.235 行**，把三件事写进同一条——r473（已提交但漏登 changelog）、
+  r474 新族、本轮审计修复。r473 于 2026-11-25 01:09 提交时既没 bump VERSION 也没写 changelog 行，
+  其 70 行插件侧产出在版本介绍里完全缺失，属文档欠账。
+- `SKILL.md`：frontmatter version、`Verified metrics` 版本戳、规格表 `Engine version` 三处同步
+  （`scripts/sync-version.js` 只改 frontmatter，后两处手工）。
+- `package.json` / `src/core/version.js` / `src/core/heartflow.js`（BUILD_DATE）：走
+  `node scripts/sync-version.js` 同步，避免手改漏一处。
+- `src/peak-end-rule.js`：`__internals()` 导出 `VERDICT_GUARD_ZH4` / `VERDICT_GUARD_EN4`，
+  供后续负例注入证明守卫承重。
+
+## 运行态
+
+- `supervisorctl restart heartflow-mcp`（只此一个程序，未碰 gateway），`/health` 返回
+  `{"status":"ok","version":"6.8.235","clients":0}`——运行态版本与磁盘一致。
+- 未跑全量回归（85–95 分钟，超出本轮窗口）；四个 peak-end 轮测 + 四门禁已覆盖本次改动的全部射程。
+
+## 遗留
+
+- `src/index.js` 19,380 行（doc-numbers 阈值 14,000 持续报警）——拆分是高危重构且 cron 每轮在此加维度，
+  需单独排期。
+- r319 的 4 项 spawn 环境失败与 2 项陈旧断言（254 维 / VERSION 6.8.179）需另轮处理。
+- r474 的 WIP 本轮一并提交（此前未提交）；其 prompt 里的开轮语法闸本轮是第一个真实执行者。
 # 修复轮 r473（interest_simulation 插件层族补齐 · 两侧拷贝同步）（v6.8.234）
 
 - **轮次**：全面升级 cron（2026-11-25 00:57 CST，续跑收尾）

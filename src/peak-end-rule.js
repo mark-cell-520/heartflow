@@ -59,6 +59,45 @@
  * 判据（三要素近距共现，缺一不判；等价于双腿链：腿①峰终锚点，
  * 腿②整体正面裁定×时长折让须共现，防单个褒义词冒充裁定）：
  *
+ * [r474 新措辞家族] 立项探针 scripts/round-474/probe-r474-candidates.js +
+ * probe-r474-peakend-detail.js（v6.8.234 gate 层实测）：「中间过程可牺牲
+ * 宣告」族 14 条攻击 9 条穿透本模块、其中多条穿透整个 gate 无维度代拦，
+ * 良性 6/6 零误伤。腿形探针 scripts/round-474/probe-r474-leg-shapes-v*.js
+ * 七轮迭代（v1 三腿齐 1/17 → v5 25/28、误伤 0/32）实测定稿：**宽泛峰终
+ * 话题锚点**（含「过程/中途/结局/首尾」泛过程词与「做好/漂亮」收尾形）
+ * × **中间可牺牲宣告**（折让形「X 无所谓/不重要/没关系」、资源重分配形
+ * 「资源全投首尾」、记忆否定推导形「没人记得…所以不用修」）× **中间
+ * 过程信号**。本族是「体验设计/产品运营」语境下的峰终滥用——用峰终
+ * 定律为由宣布中间过程可以糊弄、不用修、不用管，与存量「个人体验评价」
+ * 族（值了/没白费/封神）射程不同、裁定结构不同（无「整体正面裁定」腿，
+ * 有的是「过程被牺牲」的宣告）。
+ * 落地独立第二签名路径（平行常量 + findSignatures 第二条目，存量三腿
+ * 与 r310/r319 新族一字不动）：
+ *   · PEAK_TOPIC_ZH4/EN4（腿① 峰终话题在场，宽泛形）；
+ *   · SACRIFICE_ZH4/EN4（腿② 中间可牺牲宣告，含记忆否定推导桥）；
+ *   · DURATION_ZH4/EN4（腿③ 中间过程质量/存在信号，作折让前提）；
+ *   · BALANCED_ZH4/EN4 + DEFINITION_ZH4/EN4（本族专属豁免：兼顾全程/
+ *     一并跟踪/同时保证类均衡表述；峰终定律概念教学句）。
+ * 豁免顺序：本族豁免先于存量 CONCEPT/CORRECTIVE 检查（存量 CONCEPT
+ * 含「峰终」二字即整句豁免，会放掉「按峰终定律…可以牺牲」攻击句）；
+ * 本族未命中时存量路径行为零变化。
+ * 官方良性语料全量零误命中（实现后实测，见轮测 C 组）。
+ *
+ * 为什么取 VERIFY 级：本族句可能是设计策略讨论中顺带引用了峰终定律，
+ * 也可能是真的主张中间过程可以牺牲。verify 的语义是「这段话以峰终
+ * 为由宣布中间过程可牺牲，先核实是否存在兼顾全程的约束再采信」。
+ *
+ * 明确不判的（豁免/判据天然排除，均可负例注入证明承重）：
+ *   · 峰终定律概念教学（峰终定律/卡尼曼/peak-end rule——本族
+ *     DEFINITION 豁免 + 存量 CONCEPT 豁免）；
+ *   · 兼顾全程/同时保证中间流程/一并跟踪/综合时长（BALANCED 豁免
+ *     + 存量 CORRECTIVE 豁免）；
+ *   · 有峰终话题但无中间可牺牲宣告（单纯陈述首尾重要——缺腿②不判）；
+ *   · 有牺牲宣告但无峰终话题（与峰终无关的糊弄宣言——缺腿①不判）。
+ *
+ * 判据（三要素近距共现，缺一不判；等价于双腿链：腿①峰终话题，腿②
+ * 中间可牺牲宣告，腿③中间过程信号作折让前提）：
+ *
  * [r319 新措辞家族] 立项探针 scripts/round-319/probe-candidates.js
  * （v6.8.179 模块直调 + gate 层双路实测）：存量三腿 + r310 新族收
  * 「搬家那天很开心所以值了」类事件日锚点结构，「过程无所谓宣言」
@@ -268,7 +307,107 @@ const DURATION_EN3 = [
 ];
 
 // ─── 豁免：概念讨论（本族名称/创始人/学科术语的教学定义句）────
-const CONCEPT_ZH = /(?:峰终|峰值.?终[值点]|持续时间忽视|时长忽视|忽视(?:持续|时长|过程)|体验评价|卡尼曼|卡恩曼|卡尼曼|弗雷德里克|雷德梅尔|延伸性拟人|结局偏见|终点定律|峰终法则)/;
+// ─── [r474] 中间过程可牺牲宣告族（平行常量，0 删除）─────────────────────
+// 与存量族的分界：存量族是「个人体验评价」——峰终片段驱动对**已发生**
+// 体验的正面整体裁定（值了/没白费/满分）；本族是「体验设计/产品运营」
+// 语境下**前瞻性**地宣布中间过程可牺牲（不用修/随便做/能省则省/资源
+// 全投首尾），句中无整体正面裁定，故独立第二签名路径。
+// 腿① 峰终话题在场（宽泛形，含泛过程词与「做好/漂亮」收尾形——v1 教训：
+// 锚点限定「用户只会记住」宣告形时 17 条攻击仅 1 条三腿齐，过窄）。
+const PEAK_TOPIC_ZH4 = /(?:高峰|峰值|高潮|高光|开头|第一印象|第一眼|结尾|收尾|最后|终局|终点|落幕|首尾|两端|最强|最亮点|最高潮|震撼|惊艳|完美|压轴|收官|开场|入口|首页|过程|中途|中间|全程|途中|一路上|结局|结果|成果|收场|善后|漂亮|出彩|好看|亮眼|做好|做精|做完|做漂亮|做扎实)/;
+// 腿① EN：峰终话题（middle/process 在腿③同样出现，故腿①主要承重
+// peak/ending 族词与「做好/漂亮」收尾形容词）
+// [r474 修复] 腿① EN 补 middle/process/in-between/intermediate/journey/
+// steps/flow/experience 与 remember/recall/waiting/latency/delay/queue/
+// loading/time/duration：EN 攻击句的主语常是「The middle ...」或
+// 「Nobody will remember the waiting time」，原正则只含 peak/ending 族，
+// 腿① raw=0 致三腿链断（sac 长匹配整句覆盖时腿③不足以提供锚点）。
+// 实测 4 条 EN 穿透。
+const PEAK_TOPIC_EN4 = /\b(?:peak|ending|finale|beginning|start|first impression|last (?:moment|step|thing|impression)|climax|high point|outro|intro|opening|closing|beautiful|pretty|polished|delightful|impressive|middle|in-between|intermediate|process|journey|steps?|stages?|flow|experience|screens?|rest|bulk|majority|remember|recall|waiting|latency|delay|queue|loading|time|duration)\b/i;
+// 腿② 中间可牺牲宣告：四组形态（折让/质量无所谓、步骤不用管、资源重分配、
+// 记忆否定推导折让）。「所以/因此」桥窗允许逗号（v6 教训：排除类含逗号会把
+// 「用户不会记得中间的报错，所以不用修」截断）。
+const SACRIFICE_ZH4 = [
+  // 折让形：中间过程 + 无所谓/不重要/没关系/可以牺牲/随便做
+  /(?:中间|过程中|中途|全程|途中|一路上)[^。！？；\n]{0,12}(?:都)?(?:无所谓|不重要|没关系|不要紧|没影响|不影响|可以牺牲|可以舍弃|可以忽略|可以不管|不用管|无须管|不必管|不用在意|无须在意|不必在意|随便做|糊弄|敷衍|凑合|能省则省|凑合就行|能糊弄)/,
+  // 「做成什么样都无所谓」形
+  /(?:中间|过程中|中途|全程|途中)[^。！？；\n]{0,10}(?:做成|做得|搞成|排成)[^。！？；\n]{0,8}(?:什么样|怎样|如何|啥样)[^。！？；\n]{0,6}(?:都)?(?:无所谓|不重要|没关系|不影响|不要紧|没影响)/,
+  // 步骤不用管/不用修形
+  /(?:步骤|环节|阶段|流程|节点|操作|交互|服务|体验|过程)[^。！？；\n]{0,8}(?:不|没|无需|无须|不必)(?:用|需要)(?:管|修|打磨|优化|在意|关注|投入|花精力|处理|完善|理)/,
+  // 「随便做做/糊弄/敷衍」裸折让形（「峰值和终点决定一切，中间流程随便做做」：
+  // 句中无「中间 X 无所谓」前缀，折让词即全句结论）
+  /(?:中间|过程中|中途|全程|途中|流程|步骤|环节|阶段|交互|操作|体验|服务|过程)[^。！？；\n]{0,6}(?:随便|敷衍|糊弄|凑合|摸鱼|划水|水一水|放羊|放任)/,
+  // 资源重分配形：资源/预算全投首尾
+  /(?:重点|主要精力|资源|注意力|预算|投入|精力|火力)[^。！？；\n]{0,14}(?:全部|都|只|全|集中)[^。！？；\n]{0,4}(?:投|放|集中|堆|压|砸|花|用|摆)在?[^。！？；\n]{0,10}(?:首尾|两端|开头|第一印象|收尾|结尾|最后|峰终|高潮|峰值|终点)/,
+  // 只打磨首尾形
+  /(?:只|重点)(?:打磨|做|搞|优化|投入|顾|关注|经营|抓)[^。！？；\n]{0,8}(?:第一印象|开头|首尾|结尾|收尾|最后|峰值|高潮|终点|压轴)/,
+  // 不进入记忆形
+  /(?:中间|过程中|中途|全程|途中)[^。！？；\n]{0,10}(?:不|未|没)(?:进入|纳入|值得|需要)(?:用户|客户|消费者)?[^。！？；\n]{0,6}(?:记忆|印象|关注|考虑)/,
+  // 「过程再拖沓/再烂 也无所谓」形
+  /(?:过程|流程|步骤|环节|阶段|中途|中间|体验|细节|部分|地方)[^。！？；\n]{0,10}(?:再|多|很|挺|烂|差|糟|乱|敷衍|糊弄|凑合)[^。！？；\n]{0,10}(?:也|都)?(?:无所谓|没关系|不重要|不要紧|没影响|不影响|不算什么|无妨)/,
+  // 「只要结局惊艳就行」形
+  /(?:只要|只需)[^。！？；\n]{0,12}(?:结局|结尾|收尾|最后|结果|成果)[^。！？；\n]{0,10}(?:精彩|惊艳|完美|漂亮|好|棒|强|厉害|亮眼|出彩)[^。！？；\n]{0,8}(?:就|便)[^。！？；\n]{0,6}(?:行|可以|成|够)/,
+  // 记忆否定推导折让形：「X 不会记得 Y，所以不用 Z」（桥窗允许逗号）
+  /(?:没人|没人会|没有人|无人|用户不会|客户不会|消费者不会|谁也不会|大家不会|人们不会|用户|客户|消费者|大家|人们)[^。！？；\n]{0,8}(?:不会|不|未|没)?(?:会)?(?:记得|记住|看|关注|在意|注意|察觉|感知|留意|发现|追究|复盘|检查)[^。！？；\n]{0,18}(?:所以|因此|因而|故而|于是|那就)?[^。！？；\n]{0,6}(?:不用|无须|不必|不需要|没必要|用不着|别|不要|无需)[^。！？；\n]{0,6}(?:管|修|打磨|优化|在意|关注|投入|花精力|处理|完善|理|较真|讲究)/,
+  // 「反正用户中途就会忘记，重点把开头结尾做好」收尾聚焦折让形：
+  // 第 11 形对「用户 中途 就会忘记」中夹了「中途」导致 {0,6} 窗不够。
+  // 本形从「反正」经「用户…就会/不会忘记」直收「重点把 首尾/开头结尾
+  // 做好」的资源聚焦结论。否定词可选（「就会忘记」的否定语义由句首
+  // 「反正」承载，本族不算误判——配套腿①/③仍在）。实测 1 条穿透。
+  /(?:反正|横竖|左右|说到底|归根到底|本质上)[^。！？；\n]{0,4}(?:用户|客户|消费者|大家|人们|没人|没有人|无人|谁)[^。！？；\n]{0,16}(?:就会|就会去|将会|终将|迟早|反正|多半|大概|可能)?(?:不会|不|未|没)?(?:会)?(?:忘记|忘掉|不记得|记不住|记得|记住|看|关注|在意|注意|察觉|感知|留意|发现|较真|追究)[^。！？；\n]{0,14}(?:，|,)?[^。！？；\n]{0,4}(?:重点|只|全力|集中)[^。！？；\n]{0,4}(?:把|将)?[^。！？；\n]{0,6}(?:首尾|两端|开头|结尾|收尾|第一印象|最后|峰值|高潮|终点|压轴)[^。！？；\n]{0,6}(?:做好|做精|做扎实|做漂亮|打磨|搞|弄|顾|抓|投)/,
+  // 资源全投裸形（补：「应该全部投在首尾两端」——「设计资源应该全部投」，
+  // 句中无 dur 宾语时靠腿③「两端」邻近匹配；此处放宽动词窗）
+  /(?:资源|预算|精力|注意力|投入|火力|人力|工时|设计资源)[^。！？；\n]{0,10}(?:应该|应当|需要|必须|该|要)?[^。！？；\n]{0,4}(?:全|都)(?:投|押|放|堆|压|砸|摆|集中)[^。！？；\n]{0,8}(?:在|于|到)[^。！？；\n]{0,12}(?:首尾|两端|开头|第一印象|收尾|结尾|最后|峰终|高潮|峰值|终点|开场|压轴)/,
+  // 「结尾漂亮就行」收尾折让形
+  /(?:结尾|收尾|最后|结局|首尾|两端|开头|第一印象|峰值|高潮|终点)[^。！？；\n]{0,6}(?:漂亮|精彩|惊艳|完美|好|棒|强|厉害|亮眼|出彩|做好|做精|做扎实)[^。！？；\n]{0,4}(?:就|便)[^。！？；\n]{0,2}(?:行|可以|成|够)/,
+];
+const SACRIFICE_EN4 = [
+  /(?:middle|in-between|intermediate|rest)\s+(?:part|steps?|stages?|process|flow|experience|screens?|portion)[^.]{0,30}\b(?:does\s+not|doesn'?t|won'?t)\s+(?:matter|count|register|stick)/i,
+  /\b(?:middle|rest|in-between)\b[^.]{0,30}\b(?:can|could|may|might)\s+(?:be\s+)?(?:neglected|ignored|sacrificed|skimped|sloppy|mediocre|rushed|skipped)/i,
+  /\b(?:nobody|no one|no-one|users?|people|customers?)\s+(?:remembers?|notices?|will (?:notice|remember)|care[s]? (?:about)?)[^.]{0,30}\b(?:middle|in-between|rest|process|steps)/i,
+  /\b(?:focus|concentrate|put|pour|invest|spend|channel|throw)\s+(?:all\s+)?(?:our\s+)?(?:efforts?|resources?|attention|budget|energy)\s+(?:only\s+)?(?:on|into)[^.]{0,30}\b(?:beginning|start|end|finale|peak|first impression|last|opening|closing)/i,
+  /\bif\s+the\s+(?:ending|finale|outcome|result)\s+(?:is|was)\s+(?:great|good|strong|delightful|memorable|impressive)[^.]{0,30}\b(?:tedious|mediocre|rough|sloppy|boring|poor|drawn[- ]out|lousy)\s+(?:middle|process|rest|parts?)[^.]{0,30}\b(?:irrelevant|doesn'?t matter|is fine|is okay)/i,
+  /\b(?:the\s+)?(?:tedious|boring|slow|rough|mediocre)\s+(?:middle|process|rest)[^.]{0,30}\b(?:doesn'?t matter|is (?:fine|okay|irrelevant)|is acceptable)/i,
+  /\bskip\s+(?:polishing|refining|fixing|improving)\s+(?:the\s+)?(?:middle|in-between|rest|intermediate)/i,
+  /\bif\s+the\s+(?:ending|finale|outcome|result|close)\s+(?:is|was|looks)\s+(?:good|great|fine|strong|solid|impressive)[^.]{0,40}\b(?:middle|process|rest|steps?|details?)[^.]{0,30}\b(?:doesn'?t matter|is fine|is okay|irrelevant|can (?:be|stay)|does not matter)/i,
+  /\b(?:nobody|no one|no-one|users?|customers?|people)\s+(?:will\s+)?(?:remember|notice|recall|care)[^.]{0,30}\b(?:no\s+need|not\s+necessary|doesn'?t\s+(?:need|make sense)|pointless|no\s+point)\s+(?:to\s+|in\s+)?(?:fix|polish|refine|improve|optimize|audit|perfect)/i,
+  /\b(?:nobody|no one|no-one|users?|customers?|people|they)\s+(?:will\s+)?(?:remember|notice|recall)[^.]{0,40}\b(?:so|therefore|thus|hence|which means)[^.]{0,20}\b(?:no\s+need|not\s+necessary|pointless|no\s+point)\s+(?:to\s+|in\s+)?(?:fix|polish|refine|improve|optimize|audit|perfect)/i,
+];
+// 腿③ 中间过程质量/存在信号（作「被牺牲对象」的折让前提）
+// [r474 修复] 腿③ ZH 补被牺牲宾语族：设计资源/资源/投入/预算/精力/
+// 注意力/人力/工时——「按峰终定律，我们的设计资源应该全部投在首尾两端」
+// 中被牺牲对象是资源宾语而非中间过程名词，原正则只收后者致 raw=0。
+// 实测 1 条穿透。
+const DURATION_ZH4 = /(?:中间|过程中|中途|全程|途中|一路上|流程|步骤|环节|阶段|节点|操作|交互|服务|等待|加载|排队|响应|流转|审核|审批|验证|跳转|报错|重试|失败|出错|卡住|卡死|转圈|体验|过程|卡顿|延迟|时长|等待时间|设计资源|资源|投入|预算|精力|注意力|人力|工时)/;
+// [r474 修复] 腿③ EN 补 remember/recall（主语族）与 tedious/sloppy
+// （可牺牲质量形）：「Nobody will remember the waiting time」中「the
+// waiting time」既是主语又被牺牲，原正则只收 middle 族致 raw=0。
+// 实测 1 条穿透。
+const DURATION_EN4 = /\b(?:middle|in-between|intermediate|steps?|stages?|screens?|flow|process|journey|onboarding|checkout|waiting|loading|queue|latency|errors?|retry|remember|recall|tedious|sloppy)\b/i;
+// 本族专属豁免 A：兼顾全程/同时保证中间流程/一并跟踪类正当体验设计表述。
+// 设计约束（v1 教训）：必须豁免「兼顾全程 / 同时保证中间流程 / 一并跟踪 /
+// 综合时长与整体分布 / 整体评价要打折扣」类正当表述。
+const BALANCED_ZH4 = /(?:同时|并且|也|仍|依然|还要|同样|一并|均|都)[^。！？；\n]{0,6}(?:保证|保障|跟踪|监控|维护|守住|达标|符合标准|合规|不放松|不松懈|不妥协|不敷衍|不糊弄|纳入|验收|审计|评估|关注|关心|在意)|(?:不能|不应|别|不要|而非|而不是)[^。！？；\n]{0,12}(?:只|单)(?:凭|看|因为|以|靠)|(?:兼顾|覆盖|贯穿|打通)[^。！？；\n]{0,4}(?:全程|全链路|每一步|各环节|端到端)|(?:也|同样|均|都)[^。！？；\n]{0,4}(?:纳入|列入)[^。！？；\n]{0,4}(?:监控|审计|指标|验收|跟踪)/;
+const BALANCED_EN4 = /\b(?:while|whilst)\s+(?:still\s+)?(?:ensuring|guaranteeing|maintaining|tracking|monitoring|meeting|keeping|auditing|measuring)\b|\bwe\s+(?:also|still)\s+(?:track|monitor|audit|measure|hold|keep)\b|\bnot\s+(?:just|only)\s+(?:the\s+)?(?:first|last|peak|ending|beginning|finale|ends)\b|\bevery\s+(?:step|stage|screen|phase|touchpoint|interaction)\b|\bfull\s+(?:journey|pipeline|flow|process)\b|\bend[- ]to[- ]end\b/i;
+// 本族专属豁免 B：峰终定律概念教学句（与存量 CONCEPT 重叠，双保险：
+// 存量 CONCEPT 先于本族执行会放掉「按峰终定律…可以牺牲」攻击，故本族
+// 在 CONCEPT 之前只放 DEFINITION 这种纯教学形，攻击形不含教学词）。
+const DEFINITION_ZH4 = /(?:教材|教科书|课程|论文|由卡尼曼|卡尼曼提出|心理学家|概念|定义|经典案例|系统性偏差|系统偏差|心理学|研究报告|实验表明)/;
+const DEFINITION_EN4 = /\b(?:textbook|paper|study|research|Kahneman|cognitive bias|experiment|lecture|course|psychological|documented)\b/i;
+// [r474 审计修复 2026-11-25] 射程守卫：存量族「整体正面裁定」措辞。
+// 命中即代表这句是「个人体验评价」语境的存量族句子，本族让位给存量
+// 三腿路径。这是 r474 文档声明的两族分界（「本族句中无整体正面裁定」）
+// 的可执行形式——没有它，SACRIFICE_ZH4 的「过程再X都无所谓 / 中间X不
+// 重要 / 只要结局…就算成功」形会连存量族专属句一起擒，令 r310/r319 的
+// 负例注入（删 WHOLE_VERDICT_ZH3 后攻击应失配）失去判别力。
+// 口径从紧：只收存量裁定词，不收「给好评 / 整体评价自然就好」这类本族
+// 攻击句里也出现的评价词（实测 r474 28 条攻击 0 命中、32 条良性 0 命中）。
+// 刻意不做成可注入常量参与存量注入——守卫必须在删了存量裁定词后依然
+// 在场，负例注入才能重新变得有判别力。
+const VERDICT_GUARD_ZH4 = /(?:算成功|算成了|就够了|就行了|值了|没白费|给满分|封神|这一趟值|不枉|无愧于)/;
+const VERDICT_GUARD_EN4 = /\b(?:worth\s+it|worthwhile|made\s+it\s+all\s+worth|all\s+worthwhile|would\s+do\s+it\s+again|a\s+perfect\s+score|full\s+marks|10\/10)\b/i;
+
+const CONCEPT_ZH = /(?:峰终|峰值.?终[值点]|持续时间忽视|时长忽视|忽视(?:持续|时长|过程)|体验评价|卡尼曼|卡恩曼|弗雷德里克|雷德梅尔|延伸性拟人|结局偏见|终点定律|峰终法则)/;
 const CONCEPT_EN = /\bpeak[- ]end\b|\bduration\s+neglect\b|\bduration\s+(?:is\s+)?(?:ignored|neglected|overlooked)\b|\bKahneman\b|\bFredrickson\b|\bKahneman,? Wakker,? and Sarin\b|\bexperiencing\s+self\b|\bremembering\s+self\b/i;
 
 // ─── 豁免：均衡评价/考量时长/按完整数据决策的正当做法 ────────────
@@ -372,6 +511,61 @@ function findSignatures(text, R) {
       sigs.push({ lang: L.lang, peak: p.raw, verdict: v.raw, dur: d.raw });
     }
   }
+  // [r474] 注：本函数只负责存量三腿路径。中间过程可牺牲宣告族走
+  // findSacrificeSignatures（下方独立函数），由 detectPeakEndRule 在存量
+  // 豁免链之前调用。此处必须 return sigs——r474 曾把本行覆盖成
+  // `return findSacrificeSignatures(text, R);`，存量签名算完即被丢弃，
+  // r245/r310/r319 全部攻击失配（44 项存量断言回归）。
+  return sigs;
+}
+
+// [r474] 中间过程可牺牲宣告族的独立签名函数（第二路径）。
+// 判据：腿① peak_topic（峰终话题）× 腿② sacrifice（中间可牺牲宣告）×
+// 腿③ dur（中间过程词），三腿共现 + 邻近窗（PAIR_ZH 60 / PAIR_EN 180）。
+// 与存量路径的差异：sac 腿 useNeg=false（本族否定词即攻击特征）、
+// 配对不要求 dist(topic,dur)!==0（topic/dur 常落在 sac 跨度内）。
+function findSacrificeSignatures(text, R) {
+  const sigs = [];
+  R = R || {};
+  const langs4 = [
+    {
+      topic: (R.PEAK_TOPIC_ZH4 || PEAK_TOPIC_ZH4) ? [R.PEAK_TOPIC_ZH4 || PEAK_TOPIC_ZH4] : [],
+      sac: R.SACRIFICE_ZH4 || SACRIFICE_ZH4,
+      dur: (R.DURATION_ZH4 || DURATION_ZH4) ? [R.DURATION_ZH4 || DURATION_ZH4] : [],
+      win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh',
+    },
+    {
+      topic: (R.PEAK_TOPIC_EN4 || PEAK_TOPIC_EN4) ? [R.PEAK_TOPIC_EN4 || PEAK_TOPIC_EN4] : [],
+      sac: R.SACRIFICE_EN4 || SACRIFICE_EN4,
+      dur: (R.DURATION_EN4 || DURATION_EN4) ? [R.DURATION_EN4 || DURATION_EN4] : [],
+      win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en',
+    },
+  ];
+  for (const L of langs4) {
+    // [r474 修复] topic 腿 useNeg=false：本族话题词（中间/中途/过程/收尾）
+    // 前 8 字符窗带否定是常态（「用户不会记得中间的报错」中「中间」前正是
+    // 「不会记得」），否定语义由 sac 腿承载，topic 只做结构锚点。
+    const topicM = collect(text, L.topic, false);
+    // sac 腿 useNeg=false：本族的否定词（不会记得/没人看/不进入记忆）正是
+    // 攻击特征而非良性否定（v7 教训：matchAlive 的 NEG_BEFORE 会把
+    // 「用户不会记得中间的报错，所以不用修」整条 sac 匹配杀掉）。
+    const sacM = collect(text, L.sac, false);
+    // [r474 修复] dur 腿 useNeg=false：同 topic 腿，「没人会记得等待时长」
+    // 中「时长」前的否定词是攻击特征；v7 前的 useNeg=true 让 2 条穿透。
+    const durM = collect(text, L.dur, false);
+    if (topicM.length === 0 || sacM.length === 0 || durM.length === 0) continue;
+    for (const s of sacM) {
+      const t = topicM.find(x => dist(x, s) <= L.win);
+      if (!t) continue;
+      // dist 为 0 仅表示两匹配位置重叠（sac 长匹配整句覆盖 topic），
+      // 与存量路径 dist(x,p)!==0 的分界不同——存量是同一词不能既当
+      // 峰终又当时长；本族 topic/dur 在 sac 跨度内是常态（「不会记得
+      // 中间的报错」中「中间」既是话题又是被牺牲对象），允许共存。
+      const d = durM.find(x => dist(x, s) <= L.win && dist(x, t) <= L.win);
+      if (!d) continue;
+      sigs.push({ lang: L.lang, peak: t.raw, verdict: s.raw, dur: d.raw, family: 'sacrifice' });
+    }
+  }
   return sigs;
 }
 
@@ -384,6 +578,43 @@ function findSignatures(text, R) {
 function detectPeakEndRule(text, inject) {
   if (!text || typeof text !== 'string' || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
+
+  // [r474 审计修复 2026-11-25] 本族豁免原先无条件放在函数最前面 return
+  // false，等于让「本族豁免」劫持了存量路径：一句同时带教学语境的存量
+  // 攻击（「心理学教材在讲峰终定律：…值了——经典案例。」）会被
+  // DEFINITION_ZH4 提前放掉，删掉 CONCEPT_ZH 也不再翻红，
+  // peak-end-rule.test.js 的「删概念讨论ZH」承重证明因此失效。
+  // 现本族豁免只门本族：仅当本族三腿齐备时才生效（见下方 sigs4 分支）。
+
+  // [r474 穿透根因修复] 中间过程可牺牲宣告族判定前移到存量豁免链之前。
+  // 根因：存量 CONCEPT_ZH 含「峰终」二字即整句豁免，会兜杀
+  // 「按峰终定律，中间步骤的体验不进入用户记忆，可以牺牲」这类引用定律
+  // 的攻击句；DEFINITION_ZH4 是纯教学形，不覆盖引用形。本族命中先判，
+  // 未命中才走存量豁免链（存量句零行为变化）。
+  //
+  // [r474 审计修复 2026-11-25] 射程守卫：r474 文档声明本族与存量族
+  // 「射程不同、裁定结构不同（本族句中无整体正面裁定）」，但
+  // SACRIFICE_ZH4 的「过程再X都无所谓 / 中间X不重要 / 只要结局…就算
+  // 成功」形同时擒住了存量族专属句（如「过程再怎么折腾都无所谓，只要
+  // 结局足够惊艳就算成功」），令 r310/r319 的负例注入失去判别力——
+  // 删掉 WHOLE_VERDICT_ZH3 后句子仍被本族擒住，常量承重证明全部翻红。
+  // 修法：句中出现存量「整体正面裁定」时本族让位，交回存量三腿路径。
+  // 守卫是独立常量、不参与存量注入，故删存量裁定词后守卫仍在，句子两条
+  // 路都走不通 → 负例注入恢复判别力；生产态（无注入）下这些句子本就由
+  // 存量路径擒获，行为不变。
+  const sigs4 = findSacrificeSignatures(text, R);
+  if (sigs4.length > 0) {
+    if ((R.VERDICT_GUARD_ZH4 || VERDICT_GUARD_ZH4).test(text) ||
+        (R.VERDICT_GUARD_EN4 || VERDICT_GUARD_EN4).test(text)) {
+      // 让位给存量路径：不 return，继续走下面的存量豁免链 + 存量签名
+    } else if ((R.DEFINITION_ZH4 || DEFINITION_ZH4).test(text) || (R.DEFINITION_EN4 || DEFINITION_EN4).test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    } else if ((R.BALANCED_ZH4 || BALANCED_ZH4).test(text) || (R.BALANCED_EN4 || BALANCED_EN4).test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    } else {
+      return { hit: true, score: 82, detail: `中间过程可牺牲宣告(${sigs4.length}处: ${sigs4[0].peak}×${sigs4[0].verdict})`, count: sigs4.length, sigs: sigs4 };
+    }
+  }
 
   // 豁免：概念讨论（峰终定律/卡尼曼/持续时间忽视教学定义句）
   if ((R.CONCEPT_ZH || CONCEPT_ZH).test(text) || (R.CONCEPT_EN || CONCEPT_EN).test(text)) {
@@ -433,6 +664,13 @@ module.exports = {
     // [r319] 过程无所谓宣言 × 新裁定词新族（平行常量，负例注入-删条用）
     WHOLE_VERDICT_ZH3, WHOLE_VERDICT_EN3,
     DURATION_ZH3, DURATION_EN3,
+    // [r474] 中间过程可牺牲宣告新族（平行常量，负例注入用）
+    PEAK_TOPIC_ZH4, PEAK_TOPIC_EN4,
+    SACRIFICE_ZH4, SACRIFICE_EN4,
+    DURATION_ZH4, DURATION_EN4,
+    BALANCED_ZH4, BALANCED_EN4,
+    DEFINITION_ZH4, DEFINITION_EN4,
+    VERDICT_GUARD_ZH4, VERDICT_GUARD_EN4,
     CONCEPT_ZH, CONCEPT_EN,
     CORRECTIVE_ZH, CORRECTIVE_EN,
     NEGATIVE_VERDICT_ZH, NEGATIVE_VERDICT_EN,

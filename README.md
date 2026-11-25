@@ -11,10 +11,11 @@
 
 **AGI Layer 1 — the Discriminator.**
 
-A pure rule engine — no LLM, no network, no embeddings — that judges whether a
-statement or an action is right, wrong, safe, or dangerous, **before it reaches a
+A pure rule engine — no LLM, no network, no embeddings — that decides whether a
+statement or an action is right, wrong, safe, or dangerous **before it reaches a
 human or an LLM**. It answers one question and nothing else: *is this okay to let
-through?*
+through?* It never generates, answers, or converses — the only three things it can
+do to text are **block**, **rewrite**, and **flag**.
 
 ```
 292 discrimination dimensions  ×  11-layer pipeline  ×  169 modules  ×  198 MCP tools  ×  1,390 dispatch routes  ×  21,158 passing tests  ×  2 npm dependencies
@@ -26,10 +27,8 @@ Every number above is measured by `node bin/verify.js` and the doc-numbers gate
 (`test/doc-numbers-accuracy.test.js`) on this repository — none of them are
 targets, aspirations, or marketing.
 
-HeartFlow does not generate text, does not answer questions, and does not compete
-with an LLM. It sits between the model and the human, like a pain receptor that
-says "no" when something is wrong — it can only block, rewrite, or flag what the
-generating layer already produced.
+HeartFlow sits between the model and the human like a pain receptor: it says "no"
+when something is wrong, and it produces nothing else.
 
 Three entry points, one job each:
 
@@ -218,7 +217,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.234**. Not marketing copy.
+Measured on this repository at **v6.8.235**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -394,6 +393,7 @@ margins, and why every prior dimension missed — lives in **`UPGRADE_LOG.md`** 
 This table exists so a reader can see the shape of the line in ten seconds, not to
 duplicate the log.
 
+| 6.8.235 | 2026-11-25 | **r473 插件侧 sycophancy 族补齐 + r474 `peak_end_rule` 中间过程可牺牲宣告新族 + 审计修复（真升级②：既有维度新句式族）** — 三件事合成一个发布号。**① r473**（v6.8.234 期间已提交、漏登 changelog）：`src/plugins/sycophancy-check/index.js` +70 行补齐 `interest_simulation` 插件层与 gate 路径的差距——第二人称共享宣告腿、加好友行动族、太巧收尾腿组 3c，插件层 ZH 3/7→6/7、EN 4/4、良性 0/11 零误伤，轮测 24/24。**② r474**：`src/peak-end-rule.js` 新增「中间过程可牺牲宣告」独立第二签名路径（平行常量 `PEAK_TOPIC_*4` / `SACRIFICE_*4` / `DURATION_*4` + 本族专属豁免 `BALANCED_*4` / `DEFINITION_*4`，存量三腿与 r310/r319 族一字未动、`src/index.js` 零改动）——射程是「用峰终定律为由宣布中间过程可以糊弄、不用修、不用管」的体验设计/产品运营语境滥用，与存量「个人体验评价」族（值了/没白费/满分）裁定结构不同。轮测 `test/round-474-peak-end-sacrifice.test.js` 攻击 28/28、良性 32/32 零误伤、存量回归 12/12。**③ 审计修复**（主会话，详见 UPGRADE_LOG）：r474 的 WIP 把 `findSignatures` 的 `return sigs;` 覆盖成了 `return findSacrificeSignatures(text, R);`，存量三腿签名算完即被丢弃——r245/r310/r319 全部攻击失配，三个存量轮测新增 44 项回归，**而四门禁全绿**（双向召回 52/52、误拦 302/326 与基线逐项相同），说明生产门禁根本没覆盖这 44 条。另修两处结构性错位：本族豁免原先无条件 `return false` 于函数最前，劫持了存量路径（一句带教学语境的存量攻击被 `DEFINITION_ZH4` 提前放掉，「删概念讨论ZH」承重证明失效）；新族与存量族射程重叠，`SACRIFICE_ZH4` 连存量专属句一起擒，令 r310/r319 的负例注入失去判别力——新增射程守卫 `VERDICT_GUARD_*4`（句中出现存量整体正面裁定即让位给存量路径），这正是 r474 文档声明的两族分界。修后四个 peak-end 轮测逐项回到基线（16/0、17/1、127/6、r474 128/0）。维度 292 不变、VERIFY 249 不变、工具/路由数不变（198/1390）。四门禁：verify 16/0、guard-abilities 20/20@292、doc-numbers 25/0、双向召回 52/52 + 误拦 302/326 零新增。VERSION 6.8.234→6.8.235。 |
 | 6.8.234 | 2026-11-24 | **r472-audit 每日审计修复轮：ikea_effect 腿②品质形容词虚高断言族补形（真升级②：既有维度补腿）** — 22:30 审计 cron 亲测发现 r471 新族 `ikea_effect` 存在漏判缺口：官方矩阵 A6 句式「每棵苗都是他亲手栽的，因此他觉得自家菜比超市的新鲜」在模块层直测 `detectIkeaEffect` hit=false。逐腿诊断：腿① `LABOR_SELF_ZH` 命中「亲手栽」，腿②三条全 miss——`QUALITY_ZH` 要求比较对象命中购买词族（现成/工厂/开源/商店…，A6 的比较对象是「超市」）、`QUALITY_CLAIM_ZH` 要求质量名词（质量/品质/性能…）或强度词+断言、`VALUE_ZH`/`VALUE_TOIL_ZH` 要求「值钱/心血」价值族。该句与 A1「比工厂流水线产的更结实」语义同族（劳动投入 × 品质虚高），仅比较对象域不同。修复：`src/ikea-effect.js` 新增腿②族 `QUALITY_ADJ_ZH`（①「比/赛过/胜过/不输/不亚于… + 比较对象」+ 品质形容词 新鲜/水灵/饱满/甜/香/好吃/好看/大/圆/匀称/地道/正宗 比较断言形；② 强度断言形 肯定/一定/必然/显然/就是/格外… + 更新鲜/更甜/更好吃/更大——**固定要求比较结构或强度词在场**，不收裸形容词陈述防中性描述误伤）与 `QUALITY_ADJ_EN`（tastier/fresher/sweeter/prettier/nicer/better… + than + store-bought/supermarket/grocery/commercial/ready-made/factory…），分别接入 `QUALITY_ZH_GROUPS` / `QUALITY_EN_GROUPS` 与 `__internals` 导出。轮测 `test/round-471-ikea-effect.test.js` **43 → 50 passed**：`LEG_KEYS.leg2_zh/leg2_en` 补登两新族常量名（修「删整组腿②」负例注入漏删——测试清单硬编码腿族名的固有问题）、攻击表 +3（A6 原句 / 强度断言形 / EN-A6）、良性表 +4（中性无比较 / ZH 疑问守卫 / ZH 否定守卫 / EN 疑问守卫），未改任何既有断言。修复后验证：4 条攻击 `detectIkeaEffect.hit=true`（原 0）且 gate 全非 pass（verify×2 / rewrite×1 / verify-EN×1），4 条良性 hit=false 且 gate=pass 零误伤；官方矩阵 `scripts/round-471/probe-r471-matrix.js` 仍攻击 **10/10**、良性 **8/8** 零回归；双向门禁召回 **52/52**、误拦 **302/326** 与基线完全一致；四门禁 verify **16/16**、guard-abilities **20/20**、doc-numbers **25/25** 全绿。审计范围：24h 内 15 commit（r463–r472）与 UPGRADE_LOG 一一对应无虚构；实测口径 292 维（BLOCK 11 / REWRITE 19 / VERIFY 249）/ 169 模块 / 198 工具 / 1390 路由与文档一致；运行态 MCP v6.8.233 running=true modules=169 与磁盘一致；fresh fetch 后 HEAD == heartflow/main 待推 0（昨夜 22:45 脚本兜底成功）。VERSION 6.8.233→6.8.234，维度 292 不变、VERIFY 249 不变、工具/路由数不变（198/1390）。 |
 | 6.8.233 | 2026-11-24 | **r471 `ikea_effect` 宜家效应（劳动投入高估）接为 econ 聚合族新子族 + anchoring_effect 补腿固化** — 方向「行为经济学谬误检测」。r470 WIP 核实：`src/anchoring-effect.js` +59 行补腿（ANCHOR_ZH 空格分隔形/档位名词形、DEAL_ZH 划算裸形、ANCHOR_EN 档位名词参照形）已随 `src/index.js` +25 行六处接线为第 292 维度（变量 `anc`，verify 级），本轮固化。新族 `src/ikea-effect.js`（374 行）双腿判据（缺一不判）：腿① LABOR 劳动自指（亲手/自己/DIY/一针一线/亲手栽的/assembled themselves/on his own…，含裸名词形）→ 邻近窗 ZH 60 / EN 160 字内腿② QUALITY/VALUE 虚高断言（更好/更值/格外珍贵/better than ready-made/more valuable…），四组豁免（概念教学/推理否定/基准在先/疑问句守卫 QUESTION_ZH）+ 强否定守卫（本轮补「并不|也不|也不并」族，修复「但并不比现成的工厂货好多少」误命中）；射程分工：`effort_justification`（r234）判努力辩护承诺一致、`endowment_effect`（r241）判禀赋所有权溢价、本族落点是「劳动投入导致对自有产出的虚高估值」；经缺口探针定拨（6 候选族中 ikea 穿透率最高 6/8，存量 47 子族对同批攻击形仅 6/8，插件层零族命中、良性 4/4 零误伤）定为 `src/econ-reasoning-gate.js` FAMILIES 第 48 子族（引擎聚合层现 43 族，不含 ad_hominem / incentive_blind_spot 等 5 族）。外部来源：Norton, Mochon & Ariely (2012) "The IKEA effect: When labor leads to love"（JCR）。矩阵探针 `scripts/round-471/probe-r471-matrix.js` 攻击 **10/10 命中**（ZH/EN × 裸名词/带修饰/长句）、良性 **8/8 零误伤**（唯一 gate 非 pass 良性为沉没成本句归 sunk_cost_coercion 领地，不计本族误伤）；轮测 `test/round-471-ikea-effect.test.js` **43/43**（攻击 16、良性 12、逐腿族代表句式命中、整腿①/整②删除注入全失配、四组豁免逐条承重、邻近窗注入、FAMILIES 注册断言、邻居射程边界）。维度 291→292、VERIFY 249→249（聚合子族不增可计数维度）、工具/路由数不变（198/1390）。VERSION 6.8.232→6.8.233。四门禁：verify 16/0、guard-abilities 20/20@292、双向召回 52/52 + 误拦 302/326 零新增；doc-numbers 21/25——剩余 4 项中 3 项为 AGENTS.md cron 写保护 BLOCKED（L15 横幅 291→292、L113 标题、Verify 列举口径），1 项为本条 changelog 补齐后即消除。
 
