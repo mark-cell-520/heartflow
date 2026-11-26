@@ -1281,3 +1281,33 @@ VERSION 6.8.221→6.8.222（VERSION / package.json / src/core/version.js 兜底 
 
 VERSION 6.8.238 → 6.8.239。
 
+
+
+## r482 — 第296维 status_quo_stability（现状稳定论证/维持现状规避风险）（真升级①：新判别维度）
+
+**候选来源**：`coordination/agent4/probes/r482-probe-pool.js`（pool1）+ `r482-probe-pool2.js`（pool2 深度探针，v6.8.240 gate() 口径）实测四家族同池定拨。穿透 = `gate.action==='pass'` 零维度承重：
+
+| 族 | 池 | 穿透 | 判定 |
+|---|---|---|---|
+| A 现状偏见核心（免评估断言） | pool2 | 9/13 | 落选留库 |
+| B 纯粹暴露（熟悉度当质量） | pool2 | 2/7 | 落选留库 |
+| **C 现状稳定论证（现状在场×变更风险）** | pool2 | **4/4** | **定选** |
+| D 默认即权威 | pool2 | 2/4 | 落选留库 |
+
+pool1 参照：A 4/9、B 2/5、C 1/2、D 2/2、benignFP 1/9。良性基线 12 条：本族零误伤（2 条被存量维度 contradiction / law_of_small_numbers 代拦，逐项登记与本族无关）。
+
+**存量核查**：`src/` 无任何维度以「维持现状以规避风险」语义承重（`src/index.js` grep `status_quo|statusQuo` 零命中）。`src/normalization-of-deviance.js:90 EXEMPTION_ZH` 含「维持现状/照旧/按往常/惯例/常规/睁一只眼/下不为例/网开一面/通融」等**豁免短语**——那是豁免不是攻击腿，本维度实现以「变更评估在场豁免」显式承接同一语义，不与之冲突。loss-aversion（r251）曾把「现状偏好」列为落选留库项，本族判据不同（双腿 AND + 量化豁免 + 变更评估豁免），故不算重复实现。
+
+**心虫裁决**：`heartflow_philosophy_decision` → **accelerate**，confidence 0.7，priority 40，trigger optimal_conditions，fallback hold，psychologySnapshot healthScore 0.98 / cognitiveLoad 0 / status healthy，ts 1795695866219。
+
+**实现**：`src/status-quo-stability.js`（245 行）双腿 AND——腿① STATUS 现状在场（现有/当前/老系统/旧X/默认/沿用/the current/the existing/the legacy） × 腿② RISK 变更风险断言（风险太大/谁说得准/出乱子/别重构/不值得赌/风险谁来兜底/too risky/cannot control/unknown risk），同窗共现 ZH 60 / EN 160，方向不限、零重叠配对（防自证），三组豁免（量化证据在场/变更评估在场/概念评析）+ 紧邻否定守卫。
+
+**接线形态**：`src/plugins/status-quo-stability-check/index.js`（PluginLoader 自动扫描 → `init(hf, ctx)` 挂 `postprocess.think` hook pri 220 → 写 `result._discrimination.statusQuoStability`，并导出 `analyze()` 供后续 MCP 只读工具）。`src/index.js` 零改动、判别维度计数 292 不变（provisional 第296维 status_quo_stability 待 1 号按接线顺序登记 dimMap/allDims/VERIFY_DIMS 与 think-pipeline `_confidencePenalty` 消费点）。
+
+**轮测** `test/round-482-status-quo-stability.test.js` **16/16**：A 模块层攻击 ZH 10/10 + EN 8/8；B 良性 12/12 零命中；C 缺腿不判 ×2；D 量化豁免 3/3；E 否定守卫 3/3；F 变体矩阵 6/6（含裸名词形「现有。新方案。风险太大。」、长句形、倒装形、EN 四形）；G 边缘良性 6/6 不误伤（含「新旧方案各有风险，按概率和影响面分别打分后择优」「维持现状也有风险，技术债累积本身就是一种成本」）；H 空/短文本安全返回 + internals 可注入；I 负例注入 ×3（腿①全摘 / 腿②全摘 / 豁免全摘后量化样本转命中，证明豁免承重）；J 插件层 hook 端到端（生产 HookBus + 真 PluginLoader，J1 攻击 18 条全部写入 `_discrimination.statusQuoStability`，J2 良性 18 条零写入）。
+
+**四门禁**：verify 16/0 ✅、guard-abilities 20/20@292 ✅、双向召回 52/52 + 误拦 302/326 ✅、doc-numbers **22/25（3 FAIL）** ⚠️。doc-numbers 3 个 FAIL 与 r481 基线逐项相同，**全部是文档口径陈旧，非本轮引入**：README 规格表口径戳停在 v6.8.237、SKILL.md:80 同、README changelog 缺 6.8.238-240 记录。README.md / SKILL.md 在 agent4 禁碰清单，**点名上报 1 号**：需把 README:220 与 SKILL.md:80 的口径戳更新到 v6.8.241、README changelog 补 6.8.238/6.8.239/6.8.240/6.8.241 四条。
+
+**欠账移交**：r481 UPGRADE_LOG 条目仍缺（r481 主写轮遗漏 release entry，由 research 轮补记 claims release 但未补本文件），提请 1 号或后续轮次补写。
+
+VERSION 6.8.240 → 6.8.241。commit 932f1a4f（dimension）+ f1e35877（version bump），已 push 并校验 `HEAD == heartflow/main`。
