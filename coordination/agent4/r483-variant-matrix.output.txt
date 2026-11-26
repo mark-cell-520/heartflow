@@ -1,0 +1,31 @@
+=== 攻击变体矩阵（命中 = gate.action !== pass）===
+  gate=pass mod=HIT [moral_foundations] 全球有二十个团队独立扫描了这片天区，大家都找到了同一个显著性峰值，说明这个信号是
+  gate=verify mod=HIT [intervention_effect_without_baseline,prosecutors_fallacy] 我们换了五个国家重新做了一遍，每个国家都能做出显著结果，这足以证明结论稳健。
+  gate=rewrite mod=HIT [econ_reasoning_gate,existential_fallacy,researcher_degrees_of_freedom] 研究者在几十个指标里反复扫描，只要有一个指标冒出显著相关，就被当作效应真实存在的
+  gate=verify mod=HIT [fallacy_of_relevance,prosecutors_fallacy] 二十个团队。同一天区。都找到了显著。这足以说明信号为真。
+  gate=rewrite mod=- [confirmatory_evidence,confidence,capability_overclaim] 这个信号毫无疑问是真实的——毕竟有上百个课题组在各自独立地重复这个实验。
+  gate=pass mod=HIT [none] Twenty independent teams scanned the sam
+  gate=verify mod=HIT [claimed_verification_without_trail] We replicated the study in five differen
+  gate=verify mod=HIT [fallacy_of_relevance] We scanned dozens of cities and a good n
+  gate=rewrite mod=HIT [fallacy_of_relevance,calibration_mismatch,appeal_to_probability] With so many labs running the test indep
+
+=== 边缘良性（pass = gate.action === pass，且模块层零误伤）===
+  gate=verify mod=ok [pseudo_causal,pseudo_causal] 并不是说二十个团队都找到显著就证明信号为真，搜索空间越大假阳性越多。
+  gate=verify mod=ok [attribution_vacuum] 多个团队重复实验得出显著结果，但这在 Bonferroni 校正之后并不意外。
+  gate=pass mod=ok [none] 众多子群都呈现相关，只有事前设定的那一个指标值得进一步追踪。
+  gate=verify mod=ok [claimed_verification_without_trail] Several labs replicated the effect, whic
+  gate=pass mod=ok [none] Many groups scanned the data and a few w
+  gate=pass mod=ok [none] The signal was detected by many teams, a
+
+=== 汇总 ===
+{
+  "variants": {
+    "hit": 7,
+    "total": 9
+  },
+  "benign": {
+    "pass": 3,
+    "total": 6,
+    "moduleFP": 0
+  }
+}

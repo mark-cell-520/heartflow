@@ -1,0 +1,45 @@
+
+=== A look-elsewhere 多团队/多地域独立显著性 ===
+   gate=pass [moral_foundations] 全球有二十个团队独立扫描了这片天区，大家都找到了同一个显著性峰值，说明这个信号是
+   gate=verify [intervention_effect_without_baseline,prosecutors_fallacy] 我们换了五个国家重新做了一遍，每个国家都能做出显著结果，这足以证明结论稳健。
+   gate=pass [none] 那么多实验室重复测了这个效应，总有几个测出了显著，多数实验室都验证了它。
+   gate=verify [claimed_verification_without_trail,moral_foundations] 不同分析团队独立找到了同一个峰值，交叉验证说明这不是噪声。
+   gate=pass [moral_foundations] 不止一组研究者发现了这个现象，五个独立课题组都报告了显著效应。
+   gate=pass [none] Twenty independent teams scanned the sam
+   gate=verify [claimed_verification_without_trail] We replicated the study in five differen
+   gate=rewrite [false_dilemma,fallacy_of_relevance] Several independent labs found the same 
+   gate=pass [none] Multiple research groups independently r
+  → 穿透 5/9
+
+=== B 未校正多重比较(存量对照 p-hacking) ===
+   gate=rewrite [econ_reasoning_gate,claimed_verification_without_trail,liberty_restriction] 这个相关性是在测试了几十种饮食组合之后才出现的。
+   gate=rewrite [econ_reasoning_gate,researcher_degrees_of_freedom] 我们扫描了两百个子群，其中十二个显示出了统计显著。
+   gate=verify [researcher_degrees_of_freedom] 试了上百个参数组合，最后有几个组合的效果是显著的。
+   gate=pass [none] The correlation showed up only after tes
+   gate=pass [none] We scanned two hundred subgroups and twe
+   gate=verify [researcher_degrees_of_freedom] We tried hundreds of parameter settings 
+  → 穿透 2/6
+
+=== C 巧合≠噪声(存量对照 clustering) ===
+   gate=pass [none] 出现了这么多巧合，绝不可能是噪声。
+   gate=pass [moral_foundations] 这么多独立线索同时指向一个结论，巧合解释不了。
+  → 穿透 2/2
+
+=== D 事后选指标(存量对照 RDF) ===
+   gate=pass [none] 我们先收集了数据，跑了很多变量，最后显著的那个变量就是我们的假设。
+   gate=pass [none] The hypothesis was chosen after looking 
+  → 穿透 2/2
+
+=== E 多人共识=证据(存量对照) ===
+   gate=pass [moral_foundations] 二十个团队都独立得出了同样的结论，多数团队的结论当然是对的。
+   gate=rewrite [attribution_vacuum,fallacy_of_relevance] Many teams agree on this, so the consens
+  → 穿透 1/2
+
+=== F 边缘良性池 ===
+   gate=rewrite [claimed_verification_without_trail,fallacy_of_relevance] 多重比较会让假阳性率升高，所以我们对所有检验做了 Bonferroni 校正。
+   gate=verify [presupposition] 二十个团队扫描了同一天区，但每个团队的显著性都需要单独评估，先验概率仍然很低。
+   gate=pass [none] 虽然多个团队报告了显著效应，但发表偏倚意味着未发表的阴性结果没有被计入。
+   gate=pass [moral_foundations] 多个独立课题组重复出了同一效应，且都经过预注册和多重比较校正，这提高了结论可信度。
+   gate=pass [none] These independent teams all found the peak, 
+   gate=verify [claimed_verification_without_trail] Several labs replicated the effect, which is
+  → 良性 pass 3/6

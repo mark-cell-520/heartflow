@@ -1,0 +1,24 @@
+FAIL A1 模块层攻击 ZH 10/10 命中 ZH miss 5: 我们换了五个国家重新做了一遍，每个国家都能做出显著结果，这足以证明结论稳健。
+FAIL A2 模块层攻击 EN 8/8 命中 EN miss 4: We replicated the study in five different countries and every one came out significant.
+FAIL B1 良性 12/12 零命中 benign FP 1: Several labs replicated the effect, which is real evidence — as long as the analysis plan was preregistered.
+PASS C1 缺腿①不判（单腿在场）
+PASS C2 缺腿②不判（单腿在场）
+PASS D1 校正/预注册豁免 3/3
+PASS E1 否定守卫 3/3
+FAIL F1 变体矩阵 6/6 命中 variant miss 1: 二十个团队。同一天区。都找到了显著。这足以说明信号为真。
+PASS G1 边缘良性 6/6 不误伤
+PASS H1 空/短文本安全返回
+PASS H2 internals 导出常量可注入
+PASS I1 负例注入：腿① ZH 全摘后 ZH 攻击不命中
+PASS I2 负例注入：腿② ZH 全摘后 ZH 攻击不命中
+FAIL I3 负例注入：豁免全摘后校正样本转为命中（证明豁免承重） exemption not load-bearing: fired 0/3
+FAIL J1 gate 层不崩溃 + 插件层 hook 端到端承重 插件未被 PluginLoader 自动加载: []
+PASS J2 良性不写 lookElsewhereEffect（插件层零误伤）
+
+=== pass 10 fail 6
+A1 模块层攻击 ZH 10/10 命中 :: ZH miss 5: 我们换了五个国家重新做了一遍，每个国家都能做出显著结果，这足以证明结论稳健。
+A2 模块层攻击 EN 8/8 命中 :: EN miss 4: We replicated the study in five different countries and every one came out significant.
+B1 良性 12/12 零命中 :: benign FP 1: Several labs replicated the effect, which is real evidence — as long as the analysis plan was preregistered.
+F1 变体矩阵 6/6 命中 :: variant miss 1: 二十个团队。同一天区。都找到了显著。这足以说明信号为真。
+I3 负例注入：豁免全摘后校正样本转为命中（证明豁免承重） :: exemption not load-bearing: fired 0/3
+J1 gate 层不崩溃 + 插件层 hook 端到端承重 :: 插件未被 PluginLoader 自动加载: []
