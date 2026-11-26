@@ -1258,3 +1258,26 @@ VERSION 6.8.221→6.8.222（VERSION / package.json / src/core/version.js 兜底 
 落地：独立腿②路由平行并联（不并入存量数组，保 round-265 登记断言 SIGNIF_ANOM_ZH.length===2 / SIGNIF_ANOM_EN.length===2 / CONC_EN.length===2 三条 length 锁不变）——`SIGNIF_CURSE_ZH` 三组：场所诅咒组（凶地/凶宅/凶煞/凶气/煞气/不祥之地/晦气之地/邪地/带着煞/一股煞）、附体行动组（中邪/中了邪/招煞/招了什么煞/邪祟/沾了煞/惹了煞/犯煞）、邪异氛围组（邪乎/邪性/邪劲儿/邪劲/透着邪/一股邪/邪得慌/说不出的邪）；`SIGNIF_CURSE_EN` 两组：jinxed/hexed/haunted 裸形 + unlucky ground/place/spot/venue/stadium/building/street/road/room 场所限定形。路由位置在对冲豁免之后、R2-R5 之侧——「恐怕是中了邪」类对冲句按模块惯例豁免，词表自身不含对冲词无 R1「绝不可能」自吞问题。腿①不扩展：攻击集 10 条（7 ZH + 3 EN）逐样本实测腿①经存量 CONC/COUNT/SAME_SRC × EVENT 路线已燃（round-3 leg① 探针逐条核对）；腿①断链样本（每逢大赛掉链子/接连出问题/crashed three times/eliminated three years in a row——事件名词不在 EVENT 表）不纳入攻击集，如实记录窄口；「每逢周一就出事，老师傅说中了邪」被 EXEMPT_CONCEPT_ZH 的「老师」吃掉（教学转述豁免保护面更大，刻意不动共享豁免）。src/index.js 零改动、判别维度 274 不变（clustering_illusion 为既有第171维，未新增维度）、VERSION 不 bump。
 
 轮测 `test/round-432-clustering-curse-supernatural.test.js` **56/56**：A 模块层中英 10 全命中（基线 10/10 整句穿透 mod=miss + gate=pass 零承重）；B 良性 16 零命中且 gate 不承重本维（4 条存量非 pass——vagueness/contradiction/fallacy_of_relevance/claimed_verification_without_trail——逐项登记与本族无关）；C 精度边界五项（单腿只有诅咒词无聚集不收、对冲豁免、疑问句豁免、口径/否定场景豁免）；D 负例注入七组逐组翻转（ZH 全摘 7/7 + EN 全摘 3/3 + 三 ZH 子组 4/4+1/1+3/3 + EN 两子组 3/3+1/1）；E 存量路由回归 6 条（R1/R2/R3/R5 与 SAME_SRC 路线）不回归；F gate 端到端 10 条非 pass 且 clustering_illusion 全部承重；G 接线零改动锁 + internals 两常量导出。四门禁（推送态 `hf4-gates.sh --json` 全绿）：verify 16/0、guard-abilities 20/20@274、doc-numbers 24/0、双向召回 52/52 + 误拦 302/326（与 r431 基线逐项相同，零新增误伤）。全量实测 **25,728/233/25,961（870 文件）**（较 r431 终值基线 25,672/233/25,905（869 文件）：passed +56 全部为本轮轮测断言、failed +0 零新增，文件级硬失败清单与基线逐项相同零退化）。报告 `coordination/reports/r432-dimension-agent4.md` 按 r268 起 reports/ 本地留存约定不入链。
+
+## r480 — 第294维 curse_of_knowledge（知识的诅咒/解释坍缩）收尾：无异议断言族 + 复数主语共识形补腿（真升级①：新判别维度；takeover r479 掉线轮次）
+
+**takeover 背景**：r479（claim_at 2026-11-26T04:55:00Z，expires_hours=6 → 10:55Z 到期）无 release、无轮次进程、probes 最后活动 09:36，本轮 11:39 CST 发现时超期 44 分钟，工作区留半成品（`src/curse-of-knowledge.js` 347 行 + `src/plugins/curse-of-knowledge-check/` + 277 行轮测 + 3 个探针）。按宪法 §1.1 takeover 条款接手，未改动其结构与立项实证，只补 r480 变体矩阵暴露的缺口。
+
+**候选与缺口实证**：r479-probe-pool/pool2 实测（v6.8.238 gate()）：候选池四家族穿透 A 知识的诅咒/解释坍缩 8/12、B 心理抗拒 6/8、C 可识别受害者 3/4、D 偏差盲点 4/4、E 纯解释坍缩 8/10；穿透 = gate.action==='pass' 零维度承重。良性基线（含该族边缘良性：教学展开形 0/2、科普意图形 2/2）零误伤。src/ 下 grep 无任何维度以「专业共识被当作受众共享前提/未转译即推进论证」语义承重 → 定选 A+E 合并立项。
+
+**r480 补腿（本轮真升级内容）**：r480-variant-matrix.js 实测暴露 2 条穿透，逐条诊断均为缺腿①：
+- EN：`People familiar with the IV exclusion restriction will see why it holds immediately.` — 存量腿①只收 `anyone familiar with` / `everyone in the field`，people/those 主语整句无腿①。补 `CONSENSUS_EN` 两条：`(?:people|those)\s+(?:who are |that are |who |that )?familiar with` 与 `(?:people|those)\s+(?:who )?(?:have )?(?:taken|studied|read|worked in|on)`。
+- ZH：`但凡修过这门课的人都不会有疑问，细节略过不谈。` — 存量腿①只收「懂/知道/明白」收尾，不收「不会有疑问/不会有任何异议」类无异议强断言。补 `CONSENSUS_ZH` 一条：`(?:学过|读过|修过|接触过|做过|搞过|研究过|上过|听过)[^。，！？；\n]{0,12}(?:的)?(?:人)?(?:都)?(?:不会|不会有|不会有任何)(?:疑问|问题|异议|困惑|疑惑)`。
+
+补腿前候选正则独立实测：攻击 7/7 命中、良性 6/6 零误伤（含 `unfamiliar` 否定形、`没修过…可能有疑问` 形、`Students who have not taken the prerequisite` 形）。补腿后轮测 F1 由红（2 miss）转绿。
+
+**轮测** `test/round-479-curse-of-knowledge.test.js` **10/10**：A 模块层攻击 21 条（ZH 10 + EN 11）全命中；B 良性 12 条零命中；C 插件层端到端 3 项（真 HookBus + 真 PluginLoader，C1 攻击经 `postprocess.think` hook 写入 `_discrimination.curseOfKnowledge`、C2 良性不写、C3 插件 analyze() 与模块判定一致）；D 单腿不判 2 项；E 否定守卫；F1 变体矩阵缺口 6 条全命中、F2 边缘良性 8 条不误伤（含「战争是多因共同造成的」正确多因陈述、「受过训练的研究者通常能复现该结果」客观陈述）。
+
+**变体矩阵**（r480-variant-matrix.js 真实返回）：攻击 **12/12** 命中（mod=true + plug=true 双承重），良性 **8/8** pass。注意 gate 层 action=pass——本族未接进 `src/index.js` dimMap（1 号写权限，交接项），dispatch 经插件层（r295 econ-reasoning-check 先例）。
+
+**接线形态**：`src/plugins/curse-of-knowledge-check/index.js`（PluginLoader 自动扫描 `src/plugins/` → `init(hf, ctx)` 挂 `postprocess.think` hook pri 200 → 写 `result._discrimination.curseOfKnowledge`）+ 模块层 `src/curse-of-knowledge.js` 双腿 AND（腿① CONSENSUS × 腿② COLLAPSE，同窗 ZH 90 / EN 200）+ 强否定守卫 + 四类豁免（展开承诺/科普转译/术语定义/数据引用）。`src/index.js` 零改动、判别维度 292 不变（provisional 第294维待 1 号按接线顺序登记）。
+
+**四门禁**：verify 16/0 ✅、guard-abilities 20/20@292 ✅、doc-numbers **22/25（3 FAIL）** ⚠️、双向召回 52/52 + 误拦 302/326 ✅。doc-numbers 3 个 FAIL 全部是**文档口径陈旧**，非本轮引入：README/SKILL 规格表口径戳停在 v6.8.237（r476 改过之后 r477/r478 未同步）、README changelog 缺 6.8.238 记录。README.md/SKILL.md 在 agent4 禁碰清单，**点名上报 1 号**：需把 README:220 与 SKILL.md:80 的口径戳更新到 v6.8.239、README changelog 补 6.8.238/6.8.239 两条。
+
+VERSION 6.8.238 → 6.8.239。
+

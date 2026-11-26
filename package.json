@@ -1,7 +1,7 @@
 {
   "name": "@yun520-1/heartflow",
-  "version": "6.8.238",
-  "description": "HeartFlow (\u5fc3\u866b) \u2014 AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 292 discrimination dimensions, 11-layer pipeline, 169 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 198 MCP tools, 1,390 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
+  "version": "6.8.239",
+  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 292 discrimination dimensions, 11-layer pipeline, 169 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 198 MCP tools, 1,390 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
   "main": "src/gate.js",
   "bin": {
     "heartflow": "src/mcp-server.js"
@@ -9,7 +9,7 @@
   "scripts": {
     "prepublishOnly": "node scripts/sync-version.js",
     "start": "node bin/cli.js chat",
-    "status": "curl -sS --noproxy '*' --max-time 8 -f http://127.0.0.1:8588/health | node -e \"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{let j;try{j=JSON.parse(s)}catch(e){console.error('heartflow status: /health \u8fd4\u56de\u975e JSON\uff08\u670d\u52a1\u53ef\u80fd\u5df2\u574f\uff09');process.exit(1)}if(j.status!=='ok'){console.error('heartflow status: /health \u62a5 status='+j.status+'\uff0c\u670d\u52a1\u4e0d\u5065\u5eb7');process.exit(1)}console.log(JSON.stringify({status:'ok',version:j.version,clients:j.clients,source:'http://127.0.0.1:8588/health'},null,2))})\" || { echo 'heartflow status: \u8bfb\u4e0d\u5230 127.0.0.1:8588/health\uff08\u7aef\u53e3\u672a\u76d1\u542c / \u670d\u52a1\u672a\u8fd0\u884c / \u5df2\u6302\u6b7b\uff09\uff1b\u542f\u52a8\u7528 npm start'; exit 1; }",
+    "status": "curl -sS --noproxy '*' --max-time 8 -f http://127.0.0.1:8588/health | node -e \"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{let j;try{j=JSON.parse(s)}catch(e){console.error('heartflow status: /health 返回非 JSON（服务可能已坏）');process.exit(1)}if(j.status!=='ok'){console.error('heartflow status: /health 报 status='+j.status+'，服务不健康');process.exit(1)}console.log(JSON.stringify({status:'ok',version:j.version,clients:j.clients,source:'http://127.0.0.1:8588/health'},null,2))})\" || { echo 'heartflow status: 读不到 127.0.0.1:8588/health（端口未监听 / 服务未运行 / 已挂死）；启动用 npm start'; exit 1; }",
     "test": "node test/run-all.js",
     "test:integration": "node test/integration.test.js",
     "test:unit": "node test/core/path-guard.test.js && node test/code-verifier.test.js",
@@ -46,7 +46,7 @@
     "emotion-analysis",
     "ai-psychology",
     "heartflow",
-    "\u5fc3\u866b",
+    "心虫",
     "agi",
     "agi-layer-1",
     "discrimination-gate",
