@@ -1311,3 +1311,25 @@ pool1 参照：A 4/9、B 2/5、C 1/2、D 2/2、benignFP 1/9。良性基线 12 �
 **欠账移交**：r481 UPGRADE_LOG 条目仍缺（r481 主写轮遗漏 release entry，由 research 轮补记 claims release 但未补本文件），提请 1 号或后续轮次补写。
 
 VERSION 6.8.240 → 6.8.241。commit 932f1a4f（dimension）+ f1e35877（version bump），已 push 并校验 `HEAD == heartflow/main`。
+
+## r483 — look-elsewhere effect（多重搜索下的显著性误读）
+
+**候选来源**：scout arXiv 15 条中第 7 条「The Look-Elsewhere Effect in Searches for New Physics: from Classical Methods to Machine Learning」驱动定选。候选池穿透实测 `coordination/agent4/probes/r483-probe-pool.output.txt`（v6.8.241 gate() 口径）：A look-elsewhere 多团队/多地域/多指标独立显著性**穿透 5/9**；B 未校正多重比较（存量 p-hacking 对照）2/6；C 巧合≠噪声（存量 clustering 对照）2/2；D 事后选指标（存量 RDF 对照）2/2；E 多人共识=证据（存量对照）1/2。良性基线 6 条：本族零误伤（3 条被存量维度代拦，逐项登记与本族无关）。A 与存量语义独立，定选。
+
+**存量核查**（为什么现有维度拦不住）：p-hacking 腿①要求「流程被结果反向决定」（事后选指标/采到显著为止）且腿② WINNER 是挑选标记×显著性同窗——本族是**多方独立搜索、无任何流程污染标记**；cherry-picking 腿① SELECT 选择性取证 × 腿② SEAL 确定性封装——本族无选择性取证；clustering_illusion 腿①聚集陈述 × 腿②显著性归因（巧合/蹊跷）——本族不依赖聚集语义，而是**搜索空间宽度被忽视**；researcher_degrees_of_freedom 管分析流程被结果反向决定，本族管的是**多次独立搜索下假阳性率升高被忽视**（搜索者之间甚至互不知晓）。
+
+**心虫裁决**：`heartflow_philosophy_decision` → **accelerate**，confidence 0.7，priority 40，fallback hold，psychologySnapshot healthScore 0.98 / status healthy，ts 1795711782525（裁决时间 2026-11-26T16:43Z）。
+
+**实现**：`src/look-elsewhere-effect.js`（300+ 行）双腿 AND——腿① SEARCH 搜索空间宽度陈述（N 个团队/机构/实验室/课题组/研究者/小组 + 独立/分别/各自 + 搜索动词；N 个国家/城市/地区；N 个指标/子群/参数/组合/变量；N 次重复实验；「这么/那么多 X」概数族；EN 同构含 independently scanned / multiple groups independently / dozens of cities） × 腿② SIGNIF 显著性当验证断言（信号为真/不是噪声/交叉验证/足以证明结论稳健/报告了显著/扫出了显著/came out significant/reported significance/were significant/confirmed），同窗共现 ZH 80 / EN 220，方向不限、零重叠配对（防自证），三组豁免（校正纪律在场 Bonferroni/FDR/多重比较校正/trials factor/preregistered / 阴性收敛在场 / 概念评析 META）+ 紧邻否定守卫。负例注入用 `in` 语义（`||` 会让注入空串回退真值，豁免显成不承重——r483 实现期实测抓到并修复）。
+
+**接线形态**：`src/plugins/look-elsewhere-effect-check/index.js`（PluginLoader 自动扫描 → `init(hf, ctx)` 挂 `postprocess.think` hook pri 230 → 写 `result._discrimination.lookElsewhereEffect`，并导出 `analyze()` 供后续 MCP 只读工具）。`src/index.js` 零改动、判别维度计数 292 不变（provisional 第297维 look_elsewhere_effect 待 1 号按接线顺序登记 dimMap/allDims/VERIFY_DIMS 与 think-pipeline `_confidencePenalty` 消费点）。
+
+**轮测** `test/round-483-look-elsewhere-effect.test.js` **16/16**：A 模块层攻击 ZH 10/10 + EN 8/8；B 良性 12/12 零命中；C 缺腿不判 ×2；D 校正/预注册豁免 3/3；E 否定守卫 3/3；F 变体矩阵 6/6（含裸名词短句形「二十个团队。同一天区。都找到了显著。这足以说明信号为真。」、长句形、倒装形、EN 四形）；G 边缘良性 6/6 不误伤；H 空/短文本安全返回 + internals 可注入；I 负例注入 ×3（腿①全摘 / 腿②全摘 / 豁免全摘后校正样本转命中，证明豁免承重）；J 插件层 hook 端到端（生产 HookBus + 真 PluginLoader，J1 攻击 18 条全部写入 `_discrimination.lookElsewhereEffect`，J2 良性 18 条零写入）。
+
+**变体矩阵**（gate 端穿透口径，`coordination/agent4/probes/r483-variant-matrix.js`，输出 `.output.txt`）：攻击 9 条中 gate 层 7 条被存量维度代拦（verify/rewrite），2 条穿透存量（ZH「全球有二十个团队…」pass[moral_foundations]、EN「Twenty independent teams…」pass[none]）——这 2 条**模块层新维度自身 HIT**，正是本维度要补的缺口；边缘良性 6 条中 3 条存量 verify（维度 pseudo_causal/attribution_vacuum/claimed_verification_without_trail 全为存量 r232/r400/r436，非本轮新增）、3 条 pass，**模块层零误伤 0/6**。
+
+**五门禁**：verify 16/0 ✅、guard-abilities 20/20@292 ✅、双向召回 52/52 + 误拦 302/326 ✅（零回归）、doc-numbers **22/25（3 FAIL）** ⚠️。doc-numbers 3 个 FAIL 与 r482 基线逐项相同且全部是文档口径陈旧，非本轮引入：README 规格表口径戳停在旧版本（要求 at v6.8.242）、SKILL.md:80 同、README changelog 缺 6.8.242 记录。README.md / SKILL.md 在 agent4 禁碰清单，**点名上报 1 号**：需把 README:220 与 SKILL.md:80 的口径戳更新到 v6.8.242、README changelog 补 6.8.242（并追溯补齐 6.8.238-241）。
+
+**欠账移交**：r481 UPGRADE_LOG 条目仍缺（r481 主写轮遗漏 release entry），提请 1 号或后续轮次补写。
+
+VERSION 6.8.241 → 6.8.242。
