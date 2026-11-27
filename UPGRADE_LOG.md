@@ -1333,3 +1333,30 @@ VERSION 6.8.240 → 6.8.241。commit 932f1a4f（dimension）+ f1e35877（version
 **欠账移交**：r481 UPGRADE_LOG 条目仍缺（r481 主写轮遗漏 release entry），提请 1 号或后续轮次补写。
 
 VERSION 6.8.241 → 6.8.242。
+
+## r485 — takeover r484 掉线 WIP + information_aversion 裸名词短句族补腿（真升级②：已有维度的全新措辞家族）
+
+**takeover 背景**：r484（claim_at 2026-11-26T20:59:00Z，expires_hours=6 → 2026-11-27 02:59Z 到期）无 release、工作区留未提交 WIP（`src/information-aversion.js` + `src/plugins/information-aversion-check/` + 轮测 31/31 + 变体矩阵 15/15/17/17 + 3 探针），上一轮 05:14 CST 迭代预算耗尽止步第七步门禁前，无 commit。本轮 09:18 CST 启动时该认领已超期 6.3 小时，按宪法 §1.1 takeover 条款接手。
+
+**本轮真升级内容**：接管 WIP 后按纪律先独立复验（不信任自报），跑后缀剥离自查探针 `coordination/agent4/probes/r485-takeover-verify.js`，暴露 **4/10 裸名词短句穿透**——存量 AVAIL/AVOID 词表只收带修饰/从句/完整谓语的形，裸名词短句族整族漏。逐条诊断定位六处缺口并补腿：
+
+- 腿① AVAIL_ZH「h 组待揭示信息在场」：动词枚举扩「告知/告诉/透露/通报」；时间词族放行「时间名词前缀（明天/今晚/稍后/下周…）+ 时间词连用（马上就要/就要）」
+- 腿① AVAIL_EN：在场名词族扩 `file`（「The file is on my desk」族 + 「The file is ready」族）
+- 腿② AVOID_ZH 新增族：`(?:拒绝|选择|不肯|拒不|谢绝)(?:去)?不?(?:知道|了解|清楚|看|查|读|面对|听|打听|探听|问起|过问|细究)` 与 `(?:拒绝|选择|不肯|拒不)(?:被)?不?(?:告诉|告知|透露|通报|公示)`——「拒绝知道/选择不知道/选择不打听/拒绝被通报」
+- 腿② AVOID_EN 新增族：`(?:do|did|does) not (?:show|give|share|tell) (?:me|us) … yet`、`would rather (?:stay|remain|be kept) (?:in the dark|ignorant|uninformed|in ignorance)`、`(?:choose|decide|elect|opt) not to (?:read|look|open|check|see|know|examine)`
+
+**实现期实测抓到的两个真 bug**：① 新腿②首版漏「选择+不+知道」形（正则写死动词紧跟，中间一个「不」即断链，TDD 红实证）；② h 组时间词只允许单次，「马上就要」连用形整句穿透（矩阵红实证后放行连用）。
+
+**轮测** `test/round-485-information-aversion-bare-noun.test.js` **19/19**：A 中文裸名词短句 4/4、B 英文裸名词短句 4/4、C 边缘良性 6/6 零误伤（含「战争是多因共同造成的」正确多因陈述）、D 存量攻击不回归 2/2、E 单腿/无在场不判 3/3（含「I would rather stay ignorant on this.」无显式在场 → 诚实不判）。r484 存量轮测 31/31 零回归。
+
+**变体矩阵**（`coordination/agent4/probes/r485-variant-matrix.js` 真实返回）：攻击 **17/17** 命中（中文裸名词 5 + 带修饰 2 + 倒装 2 + 长句 2 + 英文裸名词 3 + 带修饰 1 + 倒装 1 + 长句 1），良性 **16/16** pass（含边缘良性：正确信息纪律 3、成本权衡/数据未到期 3、委托信任 2、已知风险登记 2、客观陈述 2、拒绝回避的正确陈述 2、等待合适时机 2）。接管复验探针：后缀剥离 9/9 命中、边缘良性 0/10 误伤、无在场裸回避 0/2 误判，PROBE GREEN。
+
+**心虫裁决**：`heartflow_philosophy_decision` → **accelerate**（confidence 0.7，priority 40，trigger optimal_conditions，fallback hold），psychologySnapshot healthScore 0.98 / status healthy。
+
+**五门禁**（本轮实测）：verify 16/0 ✅、guard-abilities 20/20@292 ✅、双向召回 52/52 + 误拦 302/326 ✅（零回归）、doc-numbers **22/25（3 FAIL）** ⚠️。doc-numbers 3 个 FAIL 与 r480 起基线逐项相同、**全部是禁碰文档口径陈旧，非本轮引入**：README 规格表口径版本戳应为 at v6.8.243、SKILL.md:80 同、README changelog 缺 v6.8.243（并追溯缺 6.8.238-242）记录。README.md / SKILL.md 在 agent-4 禁碰清单，**点名上报 1 号**：需把 README:220 与 SKILL.md:80 的口径戳更新到 v6.8.243、README changelog 补 6.8.238/239/240/241/242/243 六条。
+
+**接线形态**：`src/plugins/information-aversion-check/index.js`（PluginLoader 自动扫描 → `init(hf, ctx)` 挂 `postprocess.think` hook pri 240 → 写 `result._discrimination.informationAversion`，`analyze()` 导出）+ 模块层 `src/information-aversion.js` 双腿 AND（AVAIL × AVOID，同窗 ZH 60 / EN 160）+ 三类豁免 + 否定守卫。`src/index.js` 零改动、判别维度计数 292 不变（provisional 第298维 information_aversion 待 1 号按接线顺序登记 dimMap/allDims/VERIFY_DIMS 与 think-pipeline `_confidencePenalty` 消费点）。
+
+**欠账移交**：r481 UPGRADE_LOG 条目仍缺（r481 主写轮遗漏 release entry），提请 1 号或后续轮次补写。
+
+VERSION 6.8.242 → 6.8.243。
