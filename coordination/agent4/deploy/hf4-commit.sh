@@ -104,7 +104,13 @@ else
 fi
 
 if [ "$FOREIGN_DIRTY" = "1" ]; then
-  if git stash push -m "hf4-commit foreign-work guard $(utcnow) round=$round" "${EXCLUDE_ARGS[@]}" >/dev/null 2>&1; then
+  # [r493 修 2] pathspec 陷阱：当排除集覆盖了全部已跟踪改动时，
+  # `git stash push -- ':(exclude)A' ':(exclude)B'` 会以
+  # "fatal: empty string is not a valid pathspec" 失败——git 把
+  # 纯排除 pathspec 视为空。修法：追加一个兜底 pathspec '.'，让
+  # 「排除这些之后的所有」仍有匹配目标。注意 '.' 必须在排除项之后，
+  # 否则顺序无关但可读性差。
+  if git stash push -m "hf4-commit foreign-work guard $(utcnow) round=$round" "${EXCLUDE_ARGS[@]}" . >/dev/null 2>&1; then
     FOREIGN_STASH=1
     FOREIGN_STASH_REF=$(git rev-parse --short 'stash@{0}')
     log "r278: 已 stash 他人未提交改动（$FOREIGN_STASH_REF），commit 后恢复"

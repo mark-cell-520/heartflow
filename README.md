@@ -217,7 +217,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.237**. Not marketing copy.
+Measured on this repository at **v6.8.244**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
