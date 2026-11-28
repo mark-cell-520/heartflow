@@ -36,7 +36,10 @@ function _ARG_MAP() {
  * dispatch(route, ...args) — unified router
  */
 function dispatch(hf, route, ...args) {
-  if (!hf.started) throw new Error('HeartFlow not started');
+  // [r646 修] 原实现 `if (!hf.started)`：hf=null/undefined 时读属性前抛 TypeError，
+  // 调用栈拿到的是无信息 TypeError 而非既定的 'HeartFlow not started'。
+  // 修法：先判对象形态再读 started。
+  if (!hf || typeof hf !== 'object' || !hf.started) throw new Error('HeartFlow not started');
 
   const _perfStart = _perf._enabled ? performance.now() : 0;
 

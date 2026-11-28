@@ -95,7 +95,10 @@ class SemanticClusterer {
    * @returns {Array} 聚类结果 [{groupId, concepts, strength}]
    */
   cluster(concepts, context = {}) {
-    if (!concepts || concepts.length === 0) return [];
+    // [r646 修] 原 guard `!concepts || concepts.length === 0`：非数组输入（{}/"text"/42）
+    // 的 .length 是 undefined 而非 0，穿过 guard 后 concepts.forEach 抛 TypeError。
+    // 修法：显式 Array.isArray 判定（B1: concepts 语义上必须是概念列表）。
+    if (!Array.isArray(concepts) || concepts.length === 0) return [];
     
     // 1. 更新频率统计
     concepts.forEach(c => {
