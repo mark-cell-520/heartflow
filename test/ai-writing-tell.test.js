@@ -37,8 +37,10 @@ module.exports = function ({ test, assertTrue, assertEqual, assertDefined }) {
   test('discriminate: ai_writing_tell 维度出现在 findings', () => {
     const { discriminate } = require(path.join(HF_DIR, 'src/index.js'));
     const r = discriminate('Certainly! In the rapidly evolving world of AI, synergy is paramount.', []);
-    const top = r.findings?.[0];
-    assertDefined(top, 'findings must exist');
-    assertEqual(top.dimension, 'ai_writing_tell');
+    // [r421 存量修复] calibration_mismatch（第 274 维）接线后按 score 排到 findings
+    // 首位，本维度退居第二——排序是引擎行为不是缺陷，断言改为「维度在场」。
+    const dims = (r.findings || []).map(f => f.dimension);
+    assertTrue(dims.includes('ai_writing_tell'),
+      'ai_writing_tell 应出现在 findings，实际: ' + JSON.stringify(dims));
   });
 };
