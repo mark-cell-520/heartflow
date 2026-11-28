@@ -126,6 +126,49 @@ mount 形态测试（`module.exports = function ({test,...})`）直接 `node <fi
 - issue #4 **仍未关闭**：等 D6（6.8.142 记录核对）与 D7（3 号存量清单）收口，且全量回归确认无新增失败后由 1 号统一回填关闭
 - AGENTS.md 的 `remaining 13→14` 修改曾被 BLOCK（受保护指令文件需用户批准）；本轮已证实 AGENTS.md 列举本就完整、无需改动，阻塞自然消解
 
+## 2026-11-28（第四轮）— r176 良性样本误拦根因修复（`5381d339` / `2b93cf2f`）
+
+**问题**：`test/round-176-common-cause.js` 停在 26/27，唯一失败为 gate 层良性变体矩阵：
+`✗ gate 层变体矩阵：良性全 pass 且零 common_cause — 误拦: 冰淇淋销量与溺水死亡同因于气温，二者相关只是因为共同原因 -> verify monocausal_attribution`
+
+### 定位（探针逐层实证，未猜）
+| 层 | 探针 | 结论 |
+|---|---|---|
+| gate | `probe-gate176.js`：`gate(良性句)` | `verdict 需验证` / `action verify` / `overallScore 0.67`，findings 仅 `monocausal_attribution:75`，其余维度全 0 → **唯一入口** |
+| 腿 | `probe-leg.js`：`detectMonocausal(良性句)` | `score 0.75`，`legs{compress:0, enumerateDismiss:0, contradiction:1}` → **只走 L3 腿**，severity 75 = `l3.length*0.75` 吻合 |
+| 支 | `probe-split.js`：从源码提取 COMPRESS_ZH 全数组逐支 `.test()` | **命中源是「只因」支**（原 `/只因(?:为)?/`），不是 L85 主支 |
+
+### 根因
+两支正则的负向排除 `(?!共同|同一个|同样|同源|同一)` 都写在懒惰量词**之前**。量词从 0 扩张时，前瞻检查点依次落在「因为共」→「同原因」，负向词表无「同原」故放行——「共同原因」的「共」字被量词吞掉，负向排除形同虚设。
+
+### 修复（两支同改，名词后置 lookbehind）
+- L85 主支第二路径：`(?!共同|...)` → `(?<!共同|同一个|同样|同源|同一|共同的|同一个的|同样的|同源的|同一的)` 置于归因名词后；窗口 `{0,10}?`→`{0,12}?`（覆盖「只是…这/那一个原因」名词前最长 9 字）
+- 「只因」支：同样改为名词后置 lookbehind，窗口 `{0,6}`→`{0,8}?`，负向表保留二者/两者/大家/众人等多因措辞
+- 「只因为/只由于」第一支保持前置负向前查（无中间窗口，原式本就正确，不动）
+- Node v22.22.2 原生支持变宽 lookbehind，未引入额外过滤层
+
+### 证伪并回滚的方案（记录以防重犯）
+**additive 豁免路线彻底无效**：曾给 `MULTI_ZH` 加「同因于/共同原因」族（使 `multiHere=true` 以图前置排除）+ 给 `COMPRESS_ZH` 加「只因」族与「一个|单一|唯一」族。实测 r176 仍 26/27 且失败文本逐字相同——因为 L3 腿门控恰是 `!hedged && multiHere && !NEGATED_MULTI && (COMPRESS 命中)`，`multiHere` 变真反而**启用** L3，未改的 COMPRESS 支继续命中。已从最终 commit 中移除，`MULTI_ZH` 保持 HEAD 原状。
+
+### 回归（stash 前后对照实证）
+| 文件 | patch 前 | patch 后 | 归属 |
+|---|---|---|---|
+| `round-176-common-cause.js` | 26/27 | **27/27** | 本 patch 修复 |
+| `round-267-monocausal-attribution.test.js` | 15/15 | 15/15（注入 4 个：4 个变红） | 零回归 |
+| `round-161-monocause.js` | 19/20 | 19/20 | **存量**：`登记-dimensions 计数 161 :: 维度计数 = 292`，`git stash` 后干净 HEAD 同样失败，实证为口径漂移（引擎运行期维度 292 vs 测试硬编码 161），非本次引入 |
+| round-366 / 374 / 377 / 401 / 402 / 734 | 47/3、44/2、33/1、0/1、0/1、3/17 | 逐字相同 | 存量，零回归 |
+| framing-effect-synonym / 421 / 463 | 空跑、12/12、47/47 | 同 | 存量 |
+
+### 顺带发现并处置：并发写入事故（重要坑）
+跑回归期间发现 `src/core/` 4 个文件被回退到 HEAD 之前的状态（删 r646 健壮性 guard、VERSION 6.8.246→6.8.245），`src/dev-exemptions.js` 的 r191 补丁也被删。查证为**另一进程 PID 2282518 `node test/run-all.js`（已跑 72 分钟）及其 r191 子探针仍在活跃写同一仓库**——run-all 的突变回滚机制会把 `src/` 还原到 git HEAD。已 kill 该进程树，`git checkout --` 恢复 5 个被破坏文件，确认 monocausal patch 完好后重跑三件套复绿。
+**教训**：`src/core/version.js` L95 注释早已警告「跑全量测试期间勿并发编辑 src/」，本轮实证其机制是还原整个 src/，会连带删掉别人的已提交内容。跑全量前必须确认无其他 run-all 存活。
+
+### 文档
+`2b93cf2f`：README/SKILL 规格表口径戳 6.8.245→6.8.246（与 VERSION/HEAD 一致；口径戳只标记「数字测于哪个版本」，指标数字本身未动）。
+
+### CI
+推送后 `gates` / `audit-test` / `HeartFlow Security Audit` 三个 workflow 均于 2b93cf2f 触发（run 46160700185 / 46160700201 / 46160700282）。
+
 ## 台账规则（来自 heartflow-github-outreach-ledger SOP）
 
 1. 评论/开 issue/开 PR 前，先在本文件检索是否已对同一线程做过动作——做过就不再重复。
