@@ -57,8 +57,36 @@ r493（v6.8.245）提交时只改了 VERSION/package.json/src 层，`scripts/syn
 ### 未处理 / 交接
 
 - `src/completion-evidence.js:54` regex exec 循环 lint violation（非门禁，按 r266 约定不阻塞）
-- issue #4 的 8 处口径漂移为 3 号 2026-11-05 巡检记录，其中「文档与 1 号轮次 commit 撞」属 1 号工作区事务，本轮仅修了导致 CI 红的两项 + changelog 缺口；#4 未关闭（留待逐项对账）
 - PR #5（3 号巡检报告留档）与 PR #3（四门禁 CI）已合入效果由 gates.yml 存在可证，未重复动作
+
+## 2026-11-28（第二轮）— issue #4 口径漂移清偿 5/8 + 回填评论
+
+**动作**：把 issue #4（3 号 2026-11-05 巡检的 8 处文档口径漂移）逐项实测后修复可修的 5 处。
+
+### 实测方法（不猜）
+脚本 `drift-audit`（scratch）：读 `src/index.js` 三层集合 `BLOCK_DIMS`/`REWRITE_DIMS`/`VERIFY_DIMS`，对 AGENTS.md / SKILL.md 的 `**Block-level (N):**` 等三段列举，剥离 `//` 注释后按名比对。引擎实测：BLOCK 11 / REWRITE 19 / VERIFY 249，合计 **279**，剩余 13（292−279）。
+
+### 已修 5 处（`0fe3528f`）
+| # | 位置 | 漂移 | 修复 |
+|---|------|------|------|
+| D1 | AGENTS Block 列举 | 缺 `pzombie_claim`（计数 11 对、列举漏名） | 补入 |
+| D2 | AGENTS Rewrite 列举 | 缺 8 名（tool_deflection / loyalty_by_omission / paternalistic_decide / crisis_exceptionalism / shame_compliance / moral_licensing / favor_ledger / turing_mimicry） | 补入 |
+| D3 | SKILL Verify 列举 | 幽灵名 `soft_defection`，引擎真名 `soft_deflection` | 改名 |
+| D4 | SKILL.md:238 | `discriminate(208 dims)` 与 README badge / 章节标题 292 不一致 | 改 292 |
+| D5 | SKILL:287 / AGENTS:117 | `add up to 194` / `275`，实际 279 | 统一 279，`remaining 12→13` |
+| D8 | README:496 | 6.8.143 行自报 `doc 22/22`，实际 24 | 改 `doc 24/24` |
+
+### 未修 2 处（不属 CI 红，留待对账）
+- **D6**：6.8.142 原轮次记录需人工核对（该版本号在 README changelog 检索不到对应行，记录可能已重组）
+- **D7**：3 号巡检存量清单其余条目
+
+### 回填
+- issue #4 评论：[issuecomment-7239772769](https://github.com/mark-cell-520/heartflow/issues/4#issuecomment-7239772769) —— 逐项对照表 + 修复提交号 + 四门禁实测结果 + 未修说明
+- issue #4 **未关闭**：等 D6/D7 收口后由 1 号统一关闭
+
+### CI 验证（真实 run）
+- `gates #314` 0fe3528f → **success**；`HeartFlow Security Audit #937` → success；`audit-test #950` 复跑中
+- 本地四门禁：verify 16/0、abilities 20/20@292、双向 52/52+302/326、doc-numbers 25/25
 
 ## 台账规则（来自 heartflow-github-outreach-ledger SOP）
 
