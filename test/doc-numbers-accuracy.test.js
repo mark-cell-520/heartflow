@@ -568,5 +568,214 @@ t('src/index.js 规模未超阈值（不拆分，只报警）', () => {
   assert.ok(true, '规模守卫只报告不判红');
 });
 
+// ============================================================
+// [r493 补强] issue #4「doc 守卫 5 条盲区」清偿
+// 来源：coordination/reports/2026-11-05-drift-agent3.md —— 3 号巡检实测
+// 证明 doc-numbers 的 25 条断言只查「横幅六字段 / 规格表四行 /
+// badge+锚+README 标题 / README action-tier 三兄弟 / AGENTS 三层计数 /
+// 版本戳 / changelog 版本行」，而以下五类位置**从未被任何断言量过**：
+//   ① SKILL.md 章节标题 `## The N dimensions`
+//   ② SKILL.md 的 `Verify-level (N)`（原断言只读 AGENTS.md）
+//   ③ 两份文档的 "tiers add up to N / remaining N" 合计行
+//       —— r493 实测抓到：三层 279 正确，但 remaining 写 13、实测 14
+//          （ai_writing_tell / capability_overclaim / counterfactual /
+//           dogwhistle / evidence / factual_consistency / goal_misalignment /
+//           meta_cognition / moral_foundations / overclaim / privacy_boundary /
+//           sarcasm / social_norm / theory_of_mind 共 14 个在 dimensions
+//           对象登记、参与 scored，但不在任何 action-forcing 集合）
+//   ④ 逐名比对列举完整性（原断言只断言行存在与计数，D7 因此漏网）
+//   ⑤ SKILL.md 行内 `(N dimensions)` 引用与幽灵维度名
+// 补强原则：只加断言、不改引擎；断言口径与上方 measure() 同源。
+// ============================================================
+
+/**
+ * 从引擎源码提取三集合成员名单。
+ * [r493 修正] 旧写法用非贪婪正则 `new Set\(\[([\s\S]*?)\]\)`，在数组内部
+ * 第一个 `]`（注释后的换行 + 数组嵌套）就提前收口，返回空名单——导致
+ * 盲区④把 279 个维度全判成「文档缺失」。改为定位起点后**括号配平**，
+ * 与 scripts/measure-claimed-numbers.js 的口径一致。
+ */
+function engineTierNames(label) {
+  const idx = fs.readFileSync(path.join(HF, 'src/index.js'), 'utf8');
+  const re = new RegExp(`const\\s+${label}\\s*=\\s*new Set\\(\\[`);
+  const m = re.exec(idx);
+  if (!m) return [];
+  let i = m.index + m[0].length;
+  let depth = 1;
+  const start = i;
+  while (i < idx.length && depth > 0) {
+    const c = idx[i];
+    if (c === '[') depth++;
+    else if (c === ']') depth--;
+    i++;
+  }
+  const body = idx.slice(start, i - 1);
+  // 剥 // 行注释后取字符串字面量（注释里出现维度名不得计入）
+  return (body.replace(/\/\/[^\n]*/g, '').match(/['"][a-z_]+['"]/g) || [])
+    .map(s => s.slice(1, -1));
+}
+
+/**
+ * 取「dimensions 章节」全文（从 `## The N dimensions` 到下一个 `## `）。
+ * [r493 修正] 曾用「Xxx-level (N) 起、到空行/下一个 ## 为止」的
+ * 行边界解析提取单层名单，在 SKILL.md 上翻车：该文件 Verify 名单是
+ * 4951 字符单行 + 后续缩进补充名单行，粗体星号与重复行让名字数在
+ * 249/270 之间抖动，anchoring_effect（行尾带粗体星号）被反复误判为
+ * 「缺失」。列举完整性的本意是「每个引擎维度名都在文档出现过」，
+ * 与行边界无关——所以改为章节全文 token 集合比对，一次判定同时覆盖
+ * 三层，不受换行/粗体/缩进影响。
+ * [r493 修正2] 又曾用 indexOf('## The ') 定位章节起点，结果抓到
+ * SKILL.md 里更早出现的 `## The 9-layer check pipeline`（该章节一个
+ * 维度名都没有）→ 279 个维度全判缺失。改为按 `## The <数字> dimensions`
+ * 精确匹配起点。
+ */
+function dimensionsSection(txt) {
+  const m = txt.match(/^##\s+The\s+\d+\s+dimensions\s*$/m);
+  if (!m) return '';
+  const rest = txt.slice(m.index + m[0].length);
+  const j = rest.indexOf('\n## ');
+  return j < 0 ? rest : rest.slice(0, j);
+}
+
+/** 章节全文里出现过的名字 token（单字词或 snake_case 维度名，如 vagueness / anchoring_effect） */
+function sectionTokens(txt) {
+  const s = new Set();
+  // [r493 修正3] 旧正则 `[a-z][a-z0-9]+(?:_[a-z0-9]+)+` 强制至少一个下划线，
+  // 把 vagueness / dehumanization / confidence / fallacies / stereotype /
+  // clickbait / anecdotal 等**单词形**维度名全排除了，误报「缺 20 个」。
+  // 改为：连续小写字母数字串（允许内部下划线），再靠上方 known 集合过滤噪声。
+  for (const m of txt.matchAll(/\b([a-z][a-z0-9]*(?:_[a-z0-9]+)*)\b/g)) {
+    if (m[1].length >= 4) s.add(m[1]);
+  }
+  return s;
+}
+
+// ① SKILL.md 章节标题 `## The N dimensions` 必须等于实测 dimensions
+t('SKILL.md 维度章节标题数与实测一致（盲区①）', () => {
+  const src = fs.readFileSync(SKILL, 'utf8');
+  const m = src.match(/^##\s*The\s+(\d+)\s+dimensions\s*$/m);
+  assert.ok(m, 'SKILL.md 找不到 "## The N dimensions" 章节标题');
+  assert.strictEqual(parseInt(m[1], 10), M.dimensions,
+    `SKILL.md 章节标题说 ${m[1]} dimensions，实测 ${M.dimensions}`);
+});
+
+// ② SKILL.md 的 `Verify-level (N)` / Block / Rewrite 计数必须等于三集合
+//    （原断言只读 AGENTS.md，SKILL 这份没人量过）
+for (const [label, key] of [['Block-level', 'block'], ['Rewrite-level', 'rewrite'], ['Verify-level', 'verify']]) {
+  t(`SKILL.md ${label} (N) 与引擎集合一致（盲区②）`, () => {
+    const src = fs.readFileSync(SKILL, 'utf8');
+    const m = src.match(new RegExp(`\\*\\*${label}\\s*\\((\\d+)\\)`));
+    assert.ok(m, `SKILL.md 找不到 ${label} (N) 计数`);
+    assert.strictEqual(parseInt(m[1], 10), M[key],
+      `SKILL.md 说 ${label} ${m[1]}，实测 ${key.toUpperCase()}_DIMS = ${M[key]}`);
+  });
+}
+
+// ③ 两份文档的 "add up to N; the remaining N" 合计行
+//    remaining = runtime dimensions - 三层并集（scored 但不强制 gate 的维度）
+t('SKILL.md/AGENTS.md add-up 与 remaining 数均与实测一致（盲区③）', () => {
+  const dimsRuntime = M.dimensions;
+  const forced = M.block + M.rewrite + M.verify;
+  const remaining = dimsRuntime - forced;
+  assert.ok(remaining > 0,
+    `实测 remaining = ${remaining}（dimensions ${dimsRuntime} - forced ${forced}）应为正数`);
+  for (const [label, fp] of [['SKILL.md', SKILL], ['AGENTS.md', AGENTS]]) {
+    const src = fs.readFileSync(fp, 'utf8');
+    const m = src.match(/add up to\s+(\d+)\s*;?\s*the remaining\s+(\d+)\s+dimensions/i);
+    assert.ok(m, `${label} 找不到 "add up to N; the remaining N dimensions" 合计行`);
+    assert.strictEqual(parseInt(m[1], 10), forced,
+      `${label} 说三层合计 ${m[1]}，实测 block+rewrite+verify = ${forced}`);
+    assert.strictEqual(parseInt(m[2], 10), remaining,
+      `${label} 说 remaining ${m[2]}，实测 dimensions(${dimsRuntime}) - forced(${forced}) = ${remaining}` +
+      '（这是 2026-11-05 issue #4 盲区③的实锤漂移：三层对、remaining 错）');
+  }
+});
+
+// [r493] 盲区⑤的 runtime 名单缓存由下方 measure 阶段生成——放在断言后补写，
+// 保证本文件单跑时先有缓存再被读（首次运行生成，后续复用）。
+// 说明：discriminate() 冷启动约 4s，与 measure() 内的 dimsRuntime 同源；
+// 若缓存缺失则本次现场生成（不静默跳过——静默跳过正是盲区的成因）。
+t('runtime dimensions 名单缓存可用（盲区⑤依赖）', () => {
+  const cachePath = path.join(HF, 'data/doc-numbers-runtime-dims.json');
+  if (!fs.existsSync(cachePath)) {
+    const dr = cp.spawnSync('node', ['-e', `
+      const {discriminate}=require(${JSON.stringify(path.join(HF, 'src/index.js').replace(/\\\\/g, '/'))});
+      const d=discriminate('neutral baseline text');
+      console.log(JSON.stringify(Object.keys(d.dimensions||{})));
+    `], { encoding: 'utf8', timeout: 90000 });
+    const keys = JSON.parse((dr.stdout || '[]').trim().split('\n').pop() || '[]');
+    assert.ok(Array.isArray(keys) && keys.length > 0, 'runtime dimensions 名单采集失败');
+    fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+    fs.writeFileSync(cachePath, JSON.stringify(keys));
+  }
+  const keys = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+  assert.ok(Array.isArray(keys) && keys.length === M.dimensions,
+    `runtime 名单缓存 ${keys.length} 个，与实测 dimensions ${M.dimensions} 不一致（缓存过期需重生成）`);
+});
+
+// ④ 列举完整性：每个引擎维度名都必须在文档 dimensions 章节出现过。
+//    口径为「章节全文 token 集合包含引擎三集合并集」——不依赖行边界，
+//    因此 SKILL.md 那种 4951 字符单行 + 缩进补充行的写法也能正确判定。
+//    同时反向扫幽灵名：章节里出现但引擎三层都没有的 token 要报出来
+//    （2026-11-05 的 soft_defection 幽灵名就是这条漏网后才被 3 号抓到的）。
+t('SKILL.md/AGENTS.md dimensions 章节列举完整且无幽灵名（盲区④）', () => {
+  const engine = new Set([
+    ...engineTierNames('BLOCK_DIMS'),
+    ...engineTierNames('REWRITE_DIMS'),
+    ...engineTierNames('VERIFY_DIMS'),
+  ]);
+  // A. scored-but-not-forcing：**动态计算** runtime − 三层并集。
+  //    硬编码名单会随 cron 每轮加维度而过期（这正是盲区的成因），
+  //    故从 runtime 名单缓存现算，保证永不过期。
+  const runtimeNames = JSON.parse(fs.readFileSync(path.join(HF, 'data/doc-numbers-runtime-dims.json'), 'utf8'));
+  const forced = new Set([
+    ...engineTierNames('BLOCK_DIMS'),
+    ...engineTierNames('REWRITE_DIMS'),
+    ...engineTierNames('VERIFY_DIMS'),
+  ]);
+  const scoredNotForcing = runtimeNames.filter(n => !forced.has(n));
+  const LEGIT_NON_DIM = new Set([
+    ...scoredNotForcing,
+    // B. sycophancy 插件信号族（不在 gate 路径，故不占维度）
+    'uniqueness_flattery', 'unconditional_deference', 'echo_validation',
+    'deference_to_expertise', 'enthusiastic_escalation', 'apology_concession',
+    'praise_disguised_as_criticism', 'preemptive_flattery', 'interest_simulation',
+    // C. `fallacies` 的子族 tag（AGENTS.md L175-178 说明：在 fallacies 内计分）
+    'sunk_cost_fallacy', 'sunk_cost_nullified',
+  ]);
+  for (const [label, fp] of [['SKILL.md', SKILL], ['AGENTS.md', AGENTS]]) {
+    const src = fs.readFileSync(fp, 'utf8');
+    const sec = dimensionsSection(src);
+    assert.ok(sec, `${label} 找不到 dimensions 章节（## The N dimensions）`);
+    const doc = sectionTokens(sec);
+    const missing = [...engine].filter(n => !doc.has(n));
+    assert.strictEqual(missing.length, 0,
+      `${label} dimensions 章节缺 ${missing.length} 个引擎维度: ${missing.join(', ')}`);
+    // 幽灵名只扫 snake_case 形（≥2 段下划线名）：历史上两个幽灵
+    // （soft_defection、multi_turn_escalation）都是这个形态，而普通英文
+    // 散文词不该被当成维度名误报。
+    const ghosts = [...doc].filter(n =>
+      /_/.test(n) && !engine.has(n) && !LEGIT_NON_DIM.has(n) && !/^heartflow_/.test(n));
+    assert.strictEqual(ghosts.length, 0,
+      `${label} dimensions 章节有 ${ghosts.length} 个引擎不存在的幽灵维度名: ${ghosts.join(', ')}`);
+  }
+});
+
+// ⑤ SKILL.md 行内 `(N dimensions)` 引用（如 changelog 外的正文描述）。
+//    幽灵维度名扫描不在本条做——④已用「引擎三集合并集」对两份文档的
+//    dimensions 章节做了双向（缺失+幽灵）判定，在此重复实现只会因口径
+//    不同（runtime 292 vs 三层 279）产生互相矛盾的误报。
+t('SKILL.md 行内 (N dimensions) 引用与实测一致（盲区⑤）', () => {
+  const src = fs.readFileSync(SKILL, 'utf8');
+  const cut = src.search(/##\s*(Version history|Changelog)/i);
+  const body = cut > 0 ? src.slice(0, cut) : src;
+  const refs = [...body.matchAll(/\((\d+)\s+dimensions\)/g)];
+  for (const m of refs) {
+    assert.strictEqual(parseInt(m[1], 10), M.dimensions,
+      `SKILL.md 正文有行内 "(${m[1]} dimensions)" 引用，实测 ${M.dimensions}`);
+  }
+  assert.ok(refs.length > 0, 'SKILL.md 正文应至少有一处 "(N dimensions)" 行内引用');
+});
+
 console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 process.exit(fail > 0 ? 1 : 0);
