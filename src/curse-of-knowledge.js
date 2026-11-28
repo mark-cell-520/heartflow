@@ -27,6 +27,17 @@
  * 论证失去可被独立检验的资格；正当的专家表述应当把推导、
  * 数据与依据显式给出，或明确标注依赖的前置知识并补足定义）。
  *
+ * [r490 扩族] 另辨三个全新共识断言族（真升级②，探针实测 32/32
+ * 穿透后补腿）：A 学界裁定/同行认可形（这是专业共识/学界早有
+ * 定论/同行评议早就认可/内行看门道/干过这行的都门儿清）、
+ * B 组织内部共享形（我们内部都懂/团队里心知肚明/不言而喻/
+ * 组内共识已经形成/老员工都门儿清）、C 受众素养足够形（以对方
+ * 的水平/读者都是专家/目标受众本就熟悉/科普段落纯属多余/评审
+ * 专家了如指掌）、D 英文 consensus-omission（established
+ * consensus in the field / common knowledge among peers / the
+ * audience is expert enough / the readership is specialist /
+ * practitioners take this for granted）。四族均须与坍缩腿共现。
+ *
  * 辨别的族：知识的诅咒/解释坍缩——**专业共识断言**（腿①：黑话
  * 术语在场或以术语为宾语 + 认定受众与作者同专业：学过…的人都
  * 懂 / 做这行的都熟悉 / 圈内人不需要 / 行家一看就懂 / 看论文的
@@ -152,6 +163,177 @@ const COLLAPSE_ZH = [
   /(?:略过|跳过|省去|省略)(?:不|未|没)?(?:谈|讲|说|提)/,                                     // 细节略过不谈
 ];
 
+
+// ─── [r491] 腿② 全新省略坍缩族（真升级②，takeover r490 WIP）──────
+// r490 实测缺口（/tmp/hf-r490-probe-cok.js + 轮测 miss 诊断）：存量
+// COLLAPSE_ZH 只收「不用展开/不赘述/我就跳过了/这还需要解释」类**显式
+// 坍缩动词**，而四新共识族（A 学界裁定/B 内部共享/C 受众素养/D EN）
+// 实际语料的坍缩形是**内容处置/冗余定性**——把背景章节整段砍掉、
+// 判为纯属多余、一个字都不写、全省铺垫，EN 对应 skip the background
+// entirely / leaves it unstated / adds nothing / is omitted /
+// I removed the derivation / left the recap out / would be redundant。
+// 该类形把「不展开」写成对内容本身的处置与定性，语义上仍是解释义务
+// 的豁免（同族坍缩），须与共识腿共现才判。
+const COLLAPSE_ZH2 = [
+  // 科普/铺垫类名词入坍缩宾语（不需要我再科普一遍/不用铺垫）
+  /(?:不用|不需要|无须|无需|不必|没必要|犯不着)(?:我)?(?:再)?(?:科普|铺垫|介绍|入门|背景|展开|讲)/, // 不需要我再科普一遍
+  // 内容处置动词：砍掉/删掉/删除/去掉/拿掉 + 宾语（基础章节/段落/推导）
+  /(?:砍掉|砍了|删掉|删了|删除|去掉|拿掉|抹掉|剔掉|切除)(?:了)?(?:基础|入门|背景|铺垫|介绍|推导|过程|细节|章节|段落|部分|内容|理论|概念)/, // 培训材料砍掉了基础章节
+  // 整段/全部/通通 + 删除/略过（省略范围断言）
+  /(?:整段|整段地|全部|统统|通通|全都|一概)(?:删除|删掉|略过|省略|去掉|砍掉|舍弃|抹去)/, // 背景部分全部删除
+  // [r492 补形] r491 矩阵 miss 实证：「相关背景我全部删除，不再重复」——
+  // 上条要求范围副词与删除动词紧邻，真实语料常插入主语（我全部删除/
+  // 已整段删除）。范围副词 + 主语 + 删除动词形。
+  /(?:整段|整段地|全部|统统|通通|全都|一概|完全)(?:都|也|就)?(?:我|我们|被|已|已经|将|要|给)?(?:删除|删掉|略过|省略|去掉|砍掉|舍弃|抹去|砍去)/, // 相关背景我全部删除
+  // 免了/省掉/省去 + 铺垫/背景/介绍（口语豁免）
+  /(?:就)?(?:免了|免谈|省掉|省去|去掉|略掉)(?:铺垫|背景|介绍|说明|解释|展开|入门)/, // 这块背景交代就免了/我省掉了铺垫
+  // [r491 补形] 「我省掉了铺垫」——动词 + 了 + 宾语（省掉了/免去了），
+  // 上条是「省掉铺垫」无「了」插入形。
+  /(?:省掉|省去|免去|略去|省略|去掉|删掉|砍掉)(?:了)?(?:铺垫|背景|介绍|说明|解释|入门|推导|过程)/, // 我省掉了铺垫
+  // [r491 补形] 宾语前置形：「背景交代就免了/铺垫就此省掉」——上条是
+  // 免了 + 宾语后置，真实语料常把宾语提到句首，免了收尾。
+  /(?:背景|铺垫|介绍|说明|解释|入门|推导|过程)(?:交代|说明|阐述|交代)?(?:就)?(?:免了|免谈|省掉|省去|略掉|略去|省略)/, // 背景交代就免了
+  /(?:背景|铺垫|介绍)(?:就此|就此|就|全)?(?:免了|省掉|省略|略过)/, // 背景就此免了
+  // [r491 补形] r490 轮测 A3 miss 实证：「内部沟通过程高度默契，很多
+  // 前提默认大家都知道」——坍缩以「默认受众已知」表述（缺省值设定），
+  // 不含任何删节动词。默认 + 知道/明白/清楚 与共识腿同构。
+  /(?:默认|默认为|想当然|想当然地|理所当然)(?:地)?(?:认为|以为|觉得|当)?(?:对方|受众|听众|读者|用户|客户|大家|所有人|每个人|诸位|各位)?(?:都)?(?:知道|明白|清楚|熟悉|了解|懂|掌握)/, // 默认大家都知道
+  // [r491 补形] 「写出来反而见外/说出来就见外」——坍缩以社交规范表述：
+  // 把「显式写出/说出」本身判为不当（见外/生分/多此一举）。
+  /(?:写|讲|说)(?:出来|出来)?(?:反而|反倒|倒)?(?:显得)?(?:见外|生分|生疏|别扭|尴尬|不妥|不合适)/, // 写出来反而见外
+  // 不再重复/不复述/不再赘述（重复义务豁免）
+  /(?:不再|再不|从不|绝不)(?:重复|复述|赘述|累述|说明|解释|展开)/, // 方案说明里不再重复理由
+  // 极简/极简短/一笔带过/不着一字（篇幅处置定性）
+  /(?:写得|讲得|说得|处理得|整理得)?(?:极简|极简短|极简练|一笔带过|一掠而过|不着一字|只字不提)/, // 对外说明书写得极简
+  // 冗余定性：纯属多余/毫无必要/多此一举/浪费时间/画蛇添足
+  /(?:纯属|完全|简直|实在)?(?:多余|毫无必要|多此一举|浪费时间|白费功夫|画蛇添足|徒劳无益)/, // 科普段落纯属多余
+  // 全省/全省略/全省掉（范围全免）
+  /(?:全省|全省略|全省掉|全省去|尽省|全免)/, // 背景回顾全省
+  // 一个字都不写/一字不提/只字不写（零展开断言）
+  /(?:一个字|一个字儿|一字|只字|半句)?(?:都)?(?:不|没)(?:写|讲|说|提|提|解释)/, // 基础概念我一个字都不写
+  // 侮辱智商/看不起受众（r480 已收「再解释就是侮辱」；此处收
+  // 「讲一遍就是侮辱智商」的完整宾语形，兼容「我要是再讲一遍」）
+  /(?:再)?(?:讲|说|解释|展开|科普)(?:一遍|一次)?(?:就)?(?:是)?(?:侮辱|侮辱智商|看不起|贬低)/, // 再讲一遍就是侮辱智商
+  // [r491 补形] r490 轮测 A1 miss 实证：「我解释起来反而显得啰嗦」——
+  // 坍缩以「解释行为本身被判为冗余」表述（反而显得/纯属多余形），
+  // 不含任何删节动词，存量坍缩词表整体漏该形。
+  /(?:解释|讲|说|展开|说明)(?:起来|下来)?(?:反而|倒显得|反而显得|反倒|反而)?(?:显得)?(?:啰嗦|冗长|多余|累赘|费劲|吃力|没必要)/, // 解释起来反而显得啰嗦
+  /(?:再)?(?:解释|讲|说明|展开)(?:就)?(?:显得|反而|倒)(?:啰嗦|冗长|多余|累赘)/, // 再解释就显得多余
+];
+
+// ─── [r491] 腿② EN 全新省略坍缩族（真升级② D 族配套）────────────
+// 存量 COLLAPSE_EN 只收 skip the derivation / no explanation needed
+// / leave … unstated 等显式形；r490 EN 探针穿透形为：
+// skip the background entirely / the memo leaves it unstated /
+// the introductory chapter adds nothing / the recap is omitted /
+// I removed the derivation / I left the recap out / would be
+// redundant——同样把省略写成内容处置与冗余定性。
+const COLLAPSE_EN2 = [
+  // skip/omit/drop + 泛内容宾语（background/primer/recap/intro/overview）
+  /\b(?:skip|skips|skipped|skipping|omit|omits|omitted|omitting|drop|drops|dropped|dropping|leave\s+out|left\s+out|cut|cuts)\s+(?:the\s+|these\s+|those\s+|all\s+|any\s+)?(?:background|primer|intro|introduction|recap|overview|preliminaries|context|backstory)\b/i, // skip the background entirely
+  // 内容被动省略：the recap is omitted / the derivation was left out
+  /\b(?:background|primer|intro|introduction|recap|overview|preliminaries|context|derivation|proof|details?|explanation|walkthrough)\s+(?:is|are|was|were|been|be)\s+(?:omitted|left\s+out|withheld|excluded|dropped|removed|stripped|not\s+(?:given|shown|stated|included))\b/i, // the recap is omitted
+  // 主动处置：I removed/omitted/stripped the derivation
+  /\b(?:I|we)\s+(?:removed|omitted|stripped|dropped|deleted|cut)\s+(?:the\s+|all\s+|any\s+)?(?:background|primer|intro|recap|derivation|proof|details?|explanation|overview|preliminaries)\b/i, // I removed the derivation
+  // 冗余定性：adds nothing / would be redundant / is unnecessary
+  /\b(?:adds?|added|adding|contributes?|provides?)\s+(?:nothing|no\s+(?:value|new\s+information|insight))\b/i, // the introductory chapter adds nothing
+  /\b(?:would|will|could)\s+(?:be|only\s+be|just\s+be)\s+(?:redundant|unnecessary|superfluous|pointless|a\s+waste)\b/i, // would be redundant
+  /\b(?:is|are)\s+(?:redundant|unnecessary|superfluous|pointless|a\s+waste\s+of\s+(?:time|space|paper))\b/i, // the primer is unnecessary
+  // leave … unstated / unsaid（r480 已收 unstated；补 unsaid/unwritten/unspoken）
+  /\bleave[s]?\s+(?:the\s+|these\s+|those\s+|it\s+)?[^.]{0,30}\s+(?:unstated|unsaid|unwritten|unspoken|unexplained)\b/i, // leaves it unsaid
+  // [r491 补形] r490 轮测 A4 miss 实证：「I left the recap out」——
+  // 动词后置形：left <宾语> out，存量只有 leave <宾语> unstated（形容词收尾），
+  // 而真实语料是 left out 分置。补 left/skip <宾语> out 形。
+  /\b(?:left|leave|leaves|leaving|left)\s+(?:the\s+|these\s+|those\s+|all\s+|any\s+)?(?:background|primer|intro|introduction|recap|overview|preliminaries|context|derivation|proof|details?|explanation|walkthrough)\s+(?:out|off)\b/i, // I left the recap out
+  /\b(?:I|we)\s+(?:left|leave)\s+(?:it|this|that)\s+out\b/i, // I left it out
+  // [r491 补形] no elaboration is required —— r490 轮测 A2 miss：
+  // 存量收 no further details are needed / no need to spell out，
+  // 但 no elaboration is required（elaboration 入宾语 + required 系动词）未收。
+  /\bno\s+(?:elaboration|explanation|justification|detail|details|derivation|discussion)\s+(?:is|are)\s+(?:required|needed|necessary)\b/i, // no elaboration is required
+  /\b(?:requires?|needs?)\s+no\s+(?:further\s+)?(?:elaboration|explanation|justification|derivation|discussion)\b/i, // requires no elaboration
+];
+
+// [r492 补形] r491 变体矩阵 miss 实证：「the background is left
+// unstated」——COLLAPSE_EN2 的 leave/unstated 形全部是主动语态（leave X
+// unstated / left the recap out），被动形（X is left unstated / was
+// omitted）整体漏判。独立常量供负例注入（D3 摘除证明承重）。
+const COLLAPSE_EN3 = [
+  /\b(?:background|primer|intro|introduction|recap|overview|preliminaries|context|derivation|proof|details?|explanation|walkthrough)\s+(?:is|are|was|were)\s+(?:left\s+)?(?:unstated|unsaid|unexplained|omitted|unaddressed|uncovered|unmentioned)\b/i, // the background is left unstated
+  /\b(?:has|have|had)\s+been\s+(?:left\s+)?(?:unstated|unsaid|out|omitted|removed|deleted)\b/i, // has been left out / has been omitted
+  /\b(?:was|were)\s+(?:omitted|removed|deleted|dropped|cut|excised)\s+(?:as|because|since)\s+(?:redundant|unnecessary|obvious|familiar)\b/i, // was omitted as redundant
+];
+
+// r490 探针实测（/tmp/hf-r490-probe-cok.js，v6.8.244 模块层）：四组
+// 各 8 条独立样本攻击 32/32 穿透（hit 全 false）、良性 0/10 误伤。
+// 存量 CONSENSUS_ZH（r479/r480 六轮补形）只覆盖「受众同专业认定 +
+// 术语在场」形（学过…的人都懂/做这行的都熟悉/圈内人不需要），
+// 以下三族以**裁定的来源**（学界/同行/组织内部/受众素养）替代
+// 「受众身份 + 术语」结构，整族穿透：
+//   A 专业共识断言族：学界早有定论/同行评议认可/内行看门道/
+//     干过这行的都门儿清——共识以学界裁定或同行认可断言。
+const CONSENSUS_ZH3 = [
+  /(?:这|那)(?:是|属于|就是|可谓)(?:专业|学界|行业|学术)(?:共识|定论|公论)/,           // 这是专业共识/这是学界定论
+  /(?:在)?(?:学界|学术界|理论界|同行)(?:早|已|就)?(?:已|早有|早有|已有)(?:有)?(?:定论|公论|共识)/, // 学界早有定论
+  /(?:同行|业内)(?:评议|评审|审查)(?:早就|已|早|均|都)?(?:认可|通过|接受|肯定)/,        // 同行评议早就认可
+  /(?:内行|行家|懂行)(?:看|一?看)(?:门道|就懂|就明白)/,                              // 内行看门道
+  /(?:干过|做过|搞过|混过)(?:这行|这一行|这行当|这圈子)(?:的)?(?:人)?(?:都)?(?:门儿清|门清|清楚|明白|懂)/, // 干过这行的都门儿清
+  /(?:结论|观点|说法|机制|原理)(?:在)?(?:学界|学术界|理论界)(?:早|已|早已|早就)?(?:有)?(?:定论|共识|公论)/, // 结论在学界早有定论
+  // [r492 补形] r491 矩阵 miss 实证：「在理论界这个问题早有定论」——上两条
+  // 要求领域词与「早有定论」紧邻，真实语料常插入话题短语（这个问题/
+  // 这一现象/该机制）。领域词 + 话题插入 + 早有定论形。
+  /(?:在)?(?:学界|学术界|理论界|业内|同行)(?:这|那|该|此)?(?:个|一项|一类|一件)?(?:问题|现象|议题|话题|机制|原理|结论|观点|说法)?(?:早|已|早已|早就|早就)(?:已|就)?(?:有)?(?:定论|共识|公论)/, // 在理论界这个问题早有定论
+];
+//   B 内部共识省略族：内部都懂/心知肚明/不言而喻/省掉铺垫——
+//     共识以组织内部共享状态断言（腿②是省略/免去/不重复）。
+const CONSENSUS_ZH4 = [
+  /(?:我们|咱们|自己|内部)(?:内部|团队|组里|部门|公司|这边|的人|人)?(?:都|全|人人)?(?:懂|清楚|明白|知道|熟悉|心知肚明|门儿清)/, // 我们内部都懂/团队里都清楚
+  /(?:团队|组里|部门|公司|内部)(?:里|内|中)?(?:的)?(?:人)?(?:都|人人|彼此)?(?:心知肚明|门儿清|清楚|明白|懂|有默契)/, // 团队里大家都心知肚明
+  // [r491 补形] r490 轮测 miss 实证：上条要求「都/人人/彼此」紧贴心知肚明，
+  // 而真实语料是「团队里大家心知肚明」——「大家」不在量词枚举里。
+  /(?:团队|组里|部门|公司|内部|班子里)(?:里|内|中)?(?:大家|大伙|各位|所有人|每个人)?(?:心知肚明|心照不宣|门儿清|心领神会)/, // 团队里大家心知肚明
+  // [r491 补形] 「团队里大家都心知肚明」——「都」后置于集合词（大家都/
+  // 大伙都/人人都），上两条只收「都」紧贴形容词或省略形。
+  /(?:团队|组里|部门|公司|内部|班子里)(?:里|内|中)?(?:大家|大伙|人人|每个人|所有人)(?:都|全|也)?(?:心知肚明|心照不宣|门儿清|清楚|明白|懂|有默契)/, // 团队里大家都心知肚明
+  // [r491 补形] 「内部沟通过程高度默契」——默契作表语形容词，无「都/形成」结构
+  /(?:沟通|协作|合作|交流|配合)(?:过程|方式|机制|状态|上)?(?:高度|非常|十分|相当|特别)?(?:默契|顺畅|无需说明|不用多说)/, // 内部沟通过程高度默契
+  // [r491 补形] 省略主语形：「这层意思不言而喻」/「个中缘由不言而喻」——
+  // 存量条要求 (?:这层)?(?:意思|道理|事理)(?:在)?(?:我们|咱|内部|团队)(?:是)?，
+  // 真实语料常省掉「在我们」直接以「不言而喻」收尾。
+  /(?:不言而喻|不言自明|心照不宣|显而易见|自不待言|无庸赘述|毋庸赘述)/, // 不言而喻（主语省略形）
+  /(?:内部|组内|部门内|团队)(?:的)?(?:共识|默契|默契度)(?:已经|早已|早就|已)?(?:形成|达成|存在)/, // 组内共识已经形成
+  /(?:老员工|老人|资深同事|老同事)(?:都|人人)?(?:门儿清|门清|清楚|明白|熟悉|懂)/, // 老员工都门儿清
+  /(?:部门|组内|团队|公司)(?:内|里)?(?:人人|每个人|大伙)(?:都)?(?:熟悉|清楚|明白|懂)(?:这个|这套|该)/, // 部门内人人都熟悉这个口径
+];
+//   C 听众无需知悉族：以对方的水平/读者都是专家/科普段落纯属多余/
+//     入门介绍是浪费时间——共识以受众素养足够断言（受众形在场）。
+const CONSENSUS_ZH5 = [
+  /(?:以|按|凭)(?:对方|受众|听众|读者|用户|客户)(?:的)?(?:水平|素养|水准|程度|资质|身份)/, // 以对方的水平
+  // [r491 补形] r490 轮测 A5 miss 实证：「听众的素养足够高，入门介绍是
+  // 浪费时间」——受众素养以「素养/水平 + 足够高/绰绰有余」表语断言，
+  // 存量条只收「以对方的水平」状语形，不含表语形。
+  /(?:受众|听众|读者|用户|客户|评审|专家|同行)(?:的)?(?:素养|水平|水准|程度|储备|基础)(?:足够|绰绰有余|完全|早已|早就)?(?:高|扎实|深厚|足够|到位)/, // 听众的素养足够高
+  /(?:读者|听众|受众|用户|客户|评审|专家|同行)(?:都)?(?:是)?(?:专家|内行|行家|专业|资深)/, // 读者都是专家
+  /(?:目标|这些|该|此)(?:受众|听众|读者|用户|客户)(?:本就|本来|本就|本身)?(?:熟悉|了解|精通|懂)/, // 目标受众本就熟悉
+  /(?:他们|受众|读者)(?:圈子|圈层|领域)(?:的)?(?:常识|通识|共识)/,                    // 他们圈子的常识
+  /(?:评审|审核|评议)(?:专家|人|组|委)(?:对)?(?:此|这套|该|这种方法)(?:了如指掌|非常熟悉|烂熟)/, // 评审专家对这套方法了如指掌
+  /(?:专业|资深|目标)(?:读者|听众|受众)(?:不需要|用不着|无须|无需)(?:铺垫|背景|入门|介绍)/, // 专业读者不需要铺垫
+  // [r491 补形] r490 轮测 A5 miss 实证：「给同行评审看的，行业常识部分
+  // 全部删除」——受众身份以「给…看的/面向…」状语前置，存量条全是
+  // 「受众 + 是专家」的主语断言形，不含前置状语形。
+  /(?:给|面向|针对|对)(?:同行|评审|专家|内行|专业人士|资深|专业)(?:评审|审核|专家|读者|受众|听众|用户|客户)?(?:看的|看|阅读|呈现|展示|展示的)?/, // 给同行评审看的
+  /(?:同行|评审|专家|内行)(?:评审|审核|专家)?(?:看的|阅读|审阅)(?:东西|材料|文档|报告|稿子|版本)?/, // 同行评审看的材料
+];
+
+// [r492 补形] r491 变体矩阵 miss 实证：「心知肚明，一个字都不写。」——
+// 共识腿存量条全部要求集合词前缀（团队里/我们/彼此…），真实语料常直接
+// 以共识形容词开头（心知肚明/心照不宣/不言而喻/彼此默契）。裸名词形。
+// 注意：这组只描述「共识存在」，仍须与坍缩腿同窗共现才判（双腿 AND）。
+const CONSENSUS_ZH6 = [
+  /^(?:心知肚明|心照不宣|不言而喻|心领神会)/, // 句首共识断言（裸形）
+  /(?:^|[。，；！？\s])(?:心知肚明|心照不宣|不言而喻|心领神会)(?=[，。；！？、]|$)/, // 句中/句尾共识断言
+  /(?:^|[。，；！？\s])(?:彼此|双方|大家|彼此之间)?(?:默契|有默契|心照不宣)/, // 彼此默契（裸形）
+];
+
 // ─── 腿①/腿② 英文 ─────────────────────────────────────────────
 const CONSENSUS_EN = [
   /\banyone\s+(?:who|that)\s+(?:has\s+)?(?:taken|studied|read|worked\s+(?:in|on)|done)\b[^.]{0,60}\bknows?\b/i, // anyone who has taken stochastic processes knows this
@@ -219,6 +401,49 @@ const COLLAPSE_EN = [
   // [r480 补形] 当场自明形：「will see why it holds immediately」——
   // 与 K_EN10「you can see it immediately」同族，主语扩展为任意受众。
   /\bwill\s+(?:see|understand|grasp)\s+(?:why|how|that|it)\b[^.]{0,40}\b(?:immediately|right\s+away|at\s+a\s+glance|instantly)\b/i, // will see why it holds immediately
+];
+
+// ─── [r490] 腿① 英文 consensus-omission 族（真升级② D 族）───
+// 存量 CONSENSUS_EN（r479/r480）只收 anyone familiar with /
+// everyone in this field knows / obvious to practitioners 形；
+// 本族以 established consensus / common knowledge / 受众素养
+// 足够（the audience is expert enough / the readership is
+// specialist / practitioners take this for granted）断言共识，
+// r490 探针 EN 8/8 穿透（良性 0/5）。
+const CONSENSUS_EN3 = [  // [r490 补形] EN consensus-omission 族（与 A/B/C 同构，英文形）：
+  // 共识以 established consensus / common knowledge / 受众素养足够
+  // （the audience is expert enough / the readership is specialist /
+  // practitioners take this for granted）断言。存量 anyone familiar
+  // with / everyone in the field knows 形不覆盖，r490 探针 EN 8/8 穿透。
+  /\b(?:established|settled|widely\s+accepted|accepted)\s+(?:consensus|science|wisdom|view)\s+(?:in|within|among)\b/i, // established consensus in the field
+  /\b(?:common|shared|general)\s+knowledge\s+(?:in|among|within|to)\b/i,            // common knowledge among peers
+  /\bthe\s+(?:audience|readership|readers|listeners|committee|panel)\s+(?:is|are)\s+(?:expert|specialist|familiar|professional|knowledgeable|sophisticated)\s+enough\b/i, // the audience is expert enough
+  /\bthe\s+(?:audience|readership)\s+is\s+(?:specialist|expert|professional|technical)\b/i, // the readership is specialist
+  /\b(?:practitioners?|insiders?|experts?|professionals?|specialists?)\s+(?:take|takes)\s+(?:this|it|that)\s+for\s+granted\b/i, // practitioners take this for granted
+  /\b(?:audience|readership|readers|committee)\s+(?:already\s+)?(?:knows?|understand|understands|is\s+familiar\s+with)\b/i, // the committee already knows the method
+  // [r491 补形] r490 轮测 A4 miss 实证：「Our team shares this
+  // understanding implicitly」——共识以「共享理解 + 隐式」断言，
+  // 存量表只有 take for granted / already knows 形，不含 shares
+  // this understanding 形。补 share/hold/carry the understanding
+  // + implicitly/tacitly 修饰（与 ZH4 心照不宣同构）。
+  /\b(?:our|the)\s+(?:team|group|committee|staff|crew|colleagues?|organization|org)\s+(?:already\s+)?(?:shares?|share|holds?|hold|carries|carry|takes?\s+for\s+granted)\s+(?:this|that|the)\s+(?:understanding|view|reading|interpretation|assumption)\b/i, // our team shares this understanding
+  /\b(?:shared|common|tacit|implicit|unspoken|mutual)\s+(?:understanding|assumption|knowledge|view)\b/i, // a shared understanding
+  /\b(?:implicitly|tacitly|silently|unspokenly|without\s+saying\s+(?:it|anything))\s+(?:understood|known|agreed|assumed|shared)\b/i, // implicitly understood
+
+];
+
+// [r492 补形] r491 变体矩阵 miss 实证：「Our discipline takes this for
+// granted」——CONSENSUS_EN3 的 take for granted 形只收 practitioners/
+// insiders/experts 等「从业者」主语，真实语料常用「学科/领域/行业」
+// 本身作主语。独立常量供负例注入（D3 摘除证明承重）。
+const CONSENSUS_EN4 = [
+  /\b(?:our|the|this)\s+(?:discipline|field|area|domain|profession|community|literature)\s+(?:already\s+)?(?:takes?|take|took|taken)\s+(?:this|it|that)\s+for\s+granted\b/i, // our discipline takes this for granted
+  /\b(?:within|in|inside)\s+(?:our|the|this)\s+(?:discipline|field|area|domain|profession|community)\s+(?:this|it|that)\s+(?:is\s+)?(?:taken\s+for\s+granted|assumed|given)\b/i, // within our discipline this is taken for granted
+  /\b(?:settled|established|standard)\s+(?:science|practice|doctrine|view|framework)\s+(?:within|inside|in)\s+(?:our|the|this)\s+(?:discipline|field|area|domain|profession|community)\b/i, // settled science within our discipline
+  // [r492 补形] 领域共识裸形：「Within our discipline ...」——存量 take for
+  // granted / this is taken for granted 形都要求 this/it/that 宾语，而真实
+  // 语料常以 within/in our discipline 领域状语开头直接断言学科内共识。
+  /\b(?:within|in|inside)\s+(?:our|the|this)\s+(?:discipline|field|area|domain|profession|community)\b/i, // within our discipline（领域共识状语）
 ];
 
 // ─── 距离窗 ───────────────────────────────────────────────────
@@ -321,9 +546,14 @@ function checkCurseOfKnowledge(text, inject) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
+  // [r490] 新共识腿合入：CONSENSUS_ZH3/4/5（A/B/C 三族）与
+  // CONSENSUS_EN3（D 族）与存量腿并联——inject 未提供时用合并表，
+  // inject 提供时尊重注入（负例脚本按常量摘除）。合并只在未注入侧发生。
+  const ZH_CONS = R.CONSENSUS_ZH || CONSENSUS_ZH.concat(CONSENSUS_ZH3, CONSENSUS_ZH4, CONSENSUS_ZH5, CONSENSUS_ZH6);
+  const EN_CONS = R.CONSENSUS_EN || CONSENSUS_EN.concat(CONSENSUS_EN3, CONSENSUS_EN4);
   const langs = [
-    { consensus: R.CONSENSUS_ZH || CONSENSUS_ZH, collapse: R.COLLAPSE_ZH || COLLAPSE_ZH, win: PAIR_ZH, lang: 'zh' },
-    { consensus: R.CONSENSUS_EN || CONSENSUS_EN, collapse: R.COLLAPSE_EN || COLLAPSE_EN, win: PAIR_EN, lang: 'en' },
+    { consensus: ZH_CONS, collapse: R.COLLAPSE_ZH || COLLAPSE_ZH.concat(COLLAPSE_ZH2), win: PAIR_ZH, lang: 'zh' },
+    { consensus: EN_CONS, collapse: R.COLLAPSE_EN || COLLAPSE_EN.concat(COLLAPSE_EN2, COLLAPSE_EN3), win: PAIR_EN, lang: 'en' },
   ];
   const sigs = [];
   for (const L of langs) {
@@ -355,8 +585,10 @@ function checkCurseOfKnowledge(text, inject) {
 module.exports = {
   checkCurseOfKnowledge,
   __internals: () => ({
-    CONSENSUS_ZH, COLLAPSE_ZH,
-    CONSENSUS_EN, COLLAPSE_EN,
+    CONSENSUS_ZH, COLLAPSE_ZH, COLLAPSE_ZH2,
+    CONSENSUS_EN, COLLAPSE_EN, COLLAPSE_EN2, COLLAPSE_EN3,
+    CONSENSUS_ZH3, CONSENSUS_ZH4, CONSENSUS_ZH5, CONSENSUS_ZH6,
+    CONSENSUS_EN3, CONSENSUS_EN4,
     PAIR_ZH, PAIR_EN,
     EXEMPT_ZH, EXEMPT_EN,
   }),

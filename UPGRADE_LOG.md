@@ -1360,3 +1360,41 @@ VERSION 6.8.241 → 6.8.242。
 **欠账移交**：r481 UPGRADE_LOG 条目仍缺（r481 主写轮遗漏 release entry），提请 1 号或后续轮次补写。
 
 VERSION 6.8.242 → 6.8.243。
+
+## r489
+- 时间：2026-11-28T00:00Z 前后（CST 07:40）
+- 类型：合并写轮次（agent-4 兼合并职责，承接 r486/r487/r488 三轮截断丢失的未提交产能）
+- 候选来源：preflight 显示无活跃写轮次（r488 认领 2026-11-27T17:23Z + 6h 已过期）→ 按死认领治理接管工作区未提交产能。技能指定的确定性 scout `/root/.hermes/scripts/heartflow-upgrade-scout.sh` 经实测不存在（/root/.hermes/scripts/ 为空目录，RC=127），按纪律退 SelfScanner；用户上一轮已明确 hf4-scout.sh 只做外部论文扫描不产 [A]/[B]/[C] 候选。候选实证 = r488-takeover-verify.js 探针复跑 + bin/verify.js 实测。
+- 心虫裁决：heartflow_philosophy_decision → accelerate（confidence 0.7，priority 40，trigger optimal_conditions）。
+- 真升级类型：② 已有维度的全新措辞家族 + ③ 接线已注册但被上限静默拒绝 dispatch 的能力恢复。
+- 内容：
+  1) 固化 r486-r488 bait_switch（第299维 provisional）四措辞家族产能：src/bait-switch.js + src/plugins/bait-switch-check/（含显式诱饵词族/裸名词族/名词化诱饵族/俗语口语族+被动无主语族），轮测 52/52 全绿（r486 21/21、r487 8+8、r488 10/10 + hookbus 5/5）。
+  2) 修真实回归：HookBus MAX_HANDLERS_PER_EVENT=10 被 11 个 postprocess.think 插件击穿 → 第 11 个 sycophancy-check 的 init 整体抛错中断（PluginLoader 记 failed，三个 sycophancy analyzer 句柄未挂载，think() 谄媚辨别静默失效）。改为默认 24 + per-event 可配（maxHandlers 数字或对象）+ 硬顶 256，保留 fail-closed 抛错语义。修复后引擎层实测 PluginLoader 11 loaded 0 failed，sycophancy-check 恢复注册。
+  3) r489 俗语 EN 族补腿：giveaway 名词形诱饵（a/the giveaway、giveaway to win…）+ turn into/becomes a lock-in|paywall 名词化变更断言（含 the moment you depend on it 依赖时点形）。
+- 变体矩阵：攻击 17/17 命中（俗语 ZH 6 + EN 5、被动 ZH 4 + EN 2，含中英/裸名词/带修饰/倒装/长句），良性 0/15 误伤（含边缘良性「战争是多因共同造成的」）。
+- 五门禁：verify 16/0、guard-abilities 20/20@292、双向召回 52/52 + 误拦 302/326；doc-numbers 22/25（3 FAIL = README 规格表口径戳 v6.8.237→v6.8.243 + SKILL.md 同 + README changelog 缺 6.8.238-244 记录，均属禁碰文档遗留债，交 1 号处理——r481/r482/r483 三轮同型）。
+- 遗留：bait_switch 的 dimMap/allDims/VERIFY_DIMS 接入属 src/index.js 写权限（1 号独占），本轮未动；模块层 11/11、gate 穿透 9/11（存量维度不拦，待 1 号接入后闭环）。
+- VERSION：6.8.243 → 6.8.244（VERSION + package.json 双 bump）。
+
+## r493
+- 时间：2026-11-28T10:44Z 前后（CST 18:44）
+- 类型：合并写轮次（agent-4 兼合并职责，接管 r490/r491 两条已过期写认领留下的未提交 WIP）
+- 候选来源：preflight 显示 claims.jsonl 有两条 active 写认领但均已过期（r490 claim_at 2026-11-28T02:09:15Z +6h=08:09Z 已死 2h35m；r491 claim_at 2026-11-28T04:20:17Z +6h=10:20Z 已死 24m），按死认领治理接管。技能指定的确定性 scout `/root/.hermes/scripts/heartflow-upgrade-scout.sh` 经实测不存在（/root/.hermes/scripts/ 为空目录，RC=127），退 SelfScanner；`bash /root/hermes1/deploy-agent4/scripts/hf4-scout.sh` 实测只做外部论文扫描（gh-rules / hn-fallacy / hn-uq），不产 [A]/[B]/[C] 候选，与 r489 同型。候选实证 = 工作区未提交 diff 逐行审查 + r490/r491 轮测复跑 + r491 变体矩阵复跑。
+- 心虫裁决：heartflow_philosophy_decision → accelerate（confidence 0.7，priority 40，trigger optimal_conditions）。
+- 真升级类型：② 已有维度的全新措辞家族（curse_of_knowledge 第294维 provisional，四条全新措辞族）。
+- 内容：
+  1) 接管并固化 r490/r491 WIP 的四条新措辞族（src/curse-of-knowledge.js，+326 行常量与接线，src/index.js 零改动）：
+     - 腿①共识族 A 专业共识断言（CONSENSUS_ZH3）：这是专业共识/学界早有定论（含「在理论界这个问题早有定论」话题插入形）/同行评议早就认可/内行看门道/干过这行的都门儿清——共识以**学界裁定或同行认可**断言，替代存量「受众同专业认定 + 术语在场」结构。
+     - 腿①共识族 B 内部共识省略（CONSENSUS_ZH4 + CONSENSUS_ZH6）：我们内部都懂/团队里大家都心知肚明（含「大家」「人人」后置量词形）/内部沟通过程高度默契/不言而喻（主语省略形）/组内共识已经形成/老员工都门儿清；ZH6 收句首裸名词共识断言（「心知肚明，一个字都不写。」）。
+     - 腿①共识族 C 受众素养足够（CONSENSUS_ZH5）：以对方的水平/听众的素养足够高（表语断言形）/读者都是专家/目标受众本就熟悉/评审专家对这套方法了如指掌/专业读者不需要铺垫/给同行评审看的（前置状语形）。
+     - 腿①共识族 D EN consensus-omission（CONSENSUS_EN3 + CONSENSUS_EN4）：established consensus in the field / common knowledge among peers / the audience is expert enough / the readership is specialist / practitioners take this for granted / our team shares this understanding implicitly / a shared understanding / implicitly understood / our discipline takes this for granted / within our discipline this is taken for granted / settled science within our discipline。
+     - 腿②省略坍缩族 ZH（COLLAPSE_ZH2）：不需要我再科普一遍/砍掉基础章节/整段删除（含「相关背景我全部删除」主语插入形）/背景交代就免了（宾语前置形）/我省掉了铺垫/默认大家都知道/写出来反而见外/不再重复/写得极简/纯属多余/背景回顾全省/一个字都不写/再讲一遍就是侮辱智商/解释起来反而显得啰嗦。
+     - 腿②省略坍缩族 EN（COLLAPSE_EN2 + COLLAPSE_EN3）：skip the background entirely / the recap is omitted / I removed the derivation / the introductory chapter adds nothing / would be redundant / leaves it unsaid / I left the recap out / no elaboration is required / requires no elaboration；COLLAPSE_EN3 收被动省略形 the background is left unstated / has been left out / was omitted as redundant。
+  2) 双腿 AND 契约不变：新共识腿 × 新坍缩腿同在场（ZH 窗 90 字 / EN 窗 200 字符）才判，缺一不判；负例注入逐常量摘除证明承重（D2 摘共识腿全失配、D3 摘坍缩腿全失配）。
+  3) 修复 r492 测试文件扩展名错误：`test/round-492-curse-of-knowledge-bare-noun-passive.js` → `.test.js`（run-all 收集器只收 `*.test.js`，原文件永不被加载，等于测试没写）。
+  4) 补 r489 提交遗漏：`src/core/hook-bus.js` 的 MAX_HANDLERS 修复本体（r489 commit 0493ba9b 只提交了 test/round-488-hookbus-max-handlers.test.js 与 bait-switch 产能，hook-bus.js 修复留在工作区未提交）。上限 10 → 默认 24 + per-event 可配（数字或对象）+ 硬顶 256，保留 fail-closed 抛错语义。r488 轮测 5/5 现已对本体验证通过。
+  5) 清理上一轮调试残渣 probes/tmp-diag*.js（3 个）。
+- 变体矩阵（coordination/agent4/probes/r491-variant-matrix.js 复跑）：同族 21 变体（ZH 裸名词 4 / 带修饰 4 / 倒装 2 / 长句 2，EN 裸名词 4 / 带修饰 2 / 倒装 1 / 长句 2，覆盖中英双语、裸名词、带修饰、倒装、长句）**模块层命中 21/21**；良性 10/10（含边缘良性「战争是多因共同造成的，不能简化为单一因素」/「很多团队会省略背景，但省略是否合理要看受众」/「The appendix retains the full derivation」/「Because the audience is mixed, we keep the primer section」）**模块层零误伤**。轮测：round-490 274 行 + round-492 140 行共 21/21 PASS。gate 端非 pass 8/21 为存量维度代拦（fallacy_of_relevance / reasoning_coherence / sorites_fallacy / perfect_error / theory_of_mind / moral_foundations），curse_of_knowledge 的 dimMap/allDims/VERIFY_DIMS 接入属 src/index.js（1 号独占写权限），待接入后闭环。
+- 五门禁：verify 16/0、guard-abilities 20/20@292、双向召回 52/52 + 误拦 302/326；doc-numbers **22/25（3 FAIL）**——README 规格表口径戳仍为 v6.8.237（应 6.8.244）、SKILL.md 同、README Version history 缺 6.8.238-6.8.244 记录。三处均在禁碰清单（README.md / SKILL.md），本轮按纪律未改，点名交 1 号处理（r481/r482/r483/r489 四轮同型遗留债）。
+- 遗留：bait_switch（第299维）与 curse_of_knowledge（第294维）的 dimMap/allDims/VERIFY_DIMS 接入属 src/index.js 写权限（1 号独占），本轮未动。
+- VERSION：6.8.244 → 6.8.245（VERSION + package.json 双 bump）。

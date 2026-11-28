@@ -13,18 +13,64 @@
 
 const DEFAULT_TIMEOUT_MS = 100;
 const MAX_TIMEOUT_MS = 500;
-const MAX_HANDLERS_PER_EVENT = 10;
+// r489：原 MAX_HANDLERS_PER_EVENT=10 被 11 个 postprocess.think 插件击穿，
+// 第 11 个（字母序 sycophancy-check）在 plugin.init 的 hookBus.on() 抛错 →
+// PluginLoader 记 failed → 整个插件 init 中断（三个 sycophancy analyzer
+// 句柄未挂载），think() 的谄媚辨别在该宿主上静默失效。
+// 上限是 fail-closed 守卫，不应成为「已注册能力被静默拒绝 dispatch」的瓶颈：
+// 默认提至 24（覆盖现有 11 个 + 增长余量），保留 per-event 覆盖与超限抛错语义。
+const MAX_HANDLERS_PER_EVENT = 24;
+// 单事件处理器的绝对硬顶（防止误配 maxHandlers 造成无界增长）。
+const HARD_MAX_HANDLERS_PER_EVENT = 256;
 
 class HookBus {
-  constructor() {
+  /**
+   * @param {{maxHandlers?: number|Object<string, number>}} opts
+   *   - maxHandlers 为数字：所有事件的默认上限
+   *   - maxHandlers 为对象：按事件名覆盖默认上限（{ 'postprocess.think': 32 }）
+   */
+  constructor(opts = {}) {
     /** @type {Map<string, Array<{id: string, handler: Function, priority: number, timeout: number, enabled: boolean}>>} */
     this._handlers = new Map();
+
+    // r489：per-event 上限覆盖（默认 24，硬顶 256）。
+    this._maxHandlers = this._resolveMaxHandlers(opts.maxHandlers);
 
     /** @type {Map<string, {slow: number, timeout: number, errors: number}>} */
     this._metrics = new Map();
 
     /** @type {Function|null} */
     this._auditLogger = null;
+  }
+
+  /**
+   * r489：解析 maxHandlers 配置——数字（全局默认）或 per-event 对象。
+   * 非法值回退默认上限；per-event 值钳制在 [1, HARD_MAX_HANDLERS_PER_EVENT]。
+   * @private
+   */
+  _resolveMaxHandlers(cfg) {
+    const map = new Map();
+    if (typeof cfg === 'number' && Number.isFinite(cfg)) {
+      const v = Math.max(1, Math.min(HARD_MAX_HANDLERS_PER_EVENT, Math.floor(cfg)));
+      map.set('*', v);
+    } else if (cfg && typeof cfg === 'object') {
+      for (const [event, v] of Object.entries(cfg)) {
+        if (typeof v === 'number' && Number.isFinite(v) && event) {
+          map.set(event, Math.max(1, Math.min(HARD_MAX_HANDLERS_PER_EVENT, Math.floor(v))));
+        }
+      }
+    }
+    return map;
+  }
+
+  /**
+   * r489：取某事件的有效上限——per-event 覆盖优先，其次全局覆盖，最后默认值。
+   * @private
+   */
+  _capFor(event) {
+    if (this._maxHandlers.has(event)) return this._maxHandlers.get(event);
+    if (this._maxHandlers.has('*')) return this._maxHandlers.get('*');
+    return MAX_HANDLERS_PER_EVENT;
   }
 
   /**
@@ -61,8 +107,9 @@ class HookBus {
     }
 
     const list = this._handlers.get(event);
-    if (list.length >= MAX_HANDLERS_PER_EVENT) {
-      throw new Error(`HookBus: max handlers (${MAX_HANDLERS_PER_EVENT}) reached for event "${event}"`);
+    const cap = this._capFor(event);
+    if (list.length >= cap) {
+      throw new Error(`HookBus: max handlers (${cap}) reached for event "${event}"`);
     }
 
     const entry = { id, handler, priority, timeout, enabled };

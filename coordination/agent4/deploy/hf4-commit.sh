@@ -46,22 +46,73 @@ ENGINE_DIRS=(
   "src/"
 )
 
-# ===== [r278 修] 保护 1 号未提交改动 =====
+# [r493 修] 版本戳必须在 stash 前读：stash 会把工作区 VERSION 一并收走，
+# 之后 `cat VERSION` 读到的是 HEAD 的旧值，commit message 版本戳因此比实际
+# bump 落后一个版本（r489/r493 两轮都戳成 v6.8.243）。故此处提前到 stash 前读。
+ver_pre=$(cat VERSION 2>/dev/null || echo '?')
+
+# ===== [r493 修] 保护 1 号未提交改动 =====
 # 本机（hermes1）上 4 号与 1 号共用同一工作区。1 号正在修 bug 时 4 号若直接
 # git add src/，会把 1 号未提交的修复卷进 4 号的 commit——修复「消失」在别人的
 # 轮次里，1 号工作区显示干净，下一轮误判修复丢失（r267/完美错误/post-hoc 曾踩坑）。
 # 修法：commit 前 stash（带时间戳），commit 后立即 pop。pop 失败 = 本轮失败并
 # 明确告知 stash 位置，绝不静默继续。
+#
+# [r493 缺陷修复] 原实现把工作区全部已跟踪改动一律当"他人改动"stash，导致本轮
+# 自己的核心产能（src/ 新维度模块、UPGRADE_LOG、VERSION、package.json、
+# claims.jsonl）被一起 stash 掉，commit 只剩未跟踪的新文件——r489 的
+# hook-bus.js 修复本体就是这样丢的（commit 0493ba9b 只有测试没有实现）。
+# 修法：stash 前先记录本轮自己的产出集（下面 build_own_paths 生成），
+# stash 只针对"本轮产出集之外"的他人改动；若无他人改动则完全不 stash。
+# 判定：git stash push -- <排除本轮产出的 pathspec>。
 FOREIGN_STASH=0
 FOREIGN_STASH_REF=""
-if [ -n "$(git status --porcelain | grep -v '^??')" ]; then
-  if git stash push -m "hf4-commit foreign-work guard $(utcnow) round=$round" >/dev/null 2>&1; then
+
+# 本轮自己的产出路径（相对仓库根）。调用方（升级轮）在跑本脚本前用环境变量
+# HF_OWN_PATHS 传入，逗号分隔；未提供时退化为「只保护新文件，不 stash 任何
+# 已跟踪改动」的保守策略（宁可漏保护，不可吞自己产能）。
+OWN_PATHS="${HF_OWN_PATHS:-}"
+
+# 把 OWN_PATHS 转成 pathspec 排除参数：':(exclude)<path>' 每条一个
+EXCLUDE_ARGS=()
+if [ -n "$OWN_PATHS" ]; then
+  IFS=',' read -ra _own <<< "$OWN_PATHS"
+  for p in "${_own[@]}"; do
+    p="${p// /}"
+    [ -z "$p" ] && continue
+    EXCLUDE_ARGS+=(":(exclude)$p")
+  done
+fi
+
+# 他人改动 = 已跟踪改动中排除本轮产出的部分。空 = 无需 stash。
+FOREIGN_DIRTY=0
+if [ ${#EXCLUDE_ARGS[@]} -gt 0 ]; then
+  foreign=$(git status --porcelain | grep -v '^??' | while IFS= read -r f; do
+    f="${f:3}"; f="${f##* -> }"
+    own=0
+    for p in "${_own[@]}"; do
+      p="${p// /}"; [ -z "$p" ] && continue
+      case "$f" in "$p"*) own=1; break ;; esac
+    done
+    [ $own -eq 1 ] || echo "$f"
+  done)
+  [ -n "$foreign" ] && FOREIGN_DIRTY=1
+else
+  # 未声明本轮产出：把所有已跟踪改动当他人改动（原行为），但这会让 commit 只剩
+  # 新文件——调用方应始终传 HF_OWN_PATHS。
+  [ -n "$(git status --porcelain | grep -v '^??')" ] && FOREIGN_DIRTY=1
+fi
+
+if [ "$FOREIGN_DIRTY" = "1" ]; then
+  if git stash push -m "hf4-commit foreign-work guard $(utcnow) round=$round" "${EXCLUDE_ARGS[@]}" >/dev/null 2>&1; then
     FOREIGN_STASH=1
     FOREIGN_STASH_REF=$(git rev-parse --short 'stash@{0}')
-    log "r278: 已 stash 1 号/他人未提交改动（$FOREIGN_STASH_REF），commit 后恢复"
+    log "r278: 已 stash 他人未提交改动（$FOREIGN_STASH_REF），commit 后恢复"
   else
     die "r278: stash 失败，为保护他人未提交改动，本轮拒绝提交（改动无损，现场保留）"
   fi
+else
+  log "r493: 无他人未提交改动（或已被 HF_OWN_PATHS 排除），跳过 stash 保护"
 fi
 
 restore_foreign() {
@@ -152,7 +203,7 @@ if ! privacy_scan staged; then
   die "隐私闸命中，已 unstage，拒绝提交"
 fi
 
-ver=$(cat VERSION 2>/dev/null || echo '?')
+ver="${ver_pre:-$(cat VERSION 2>/dev/null || echo '?')}"
 full_msg=$(printf '%s: %s by %s (v%s)\n\n%s' "$round" "$ctype" "$HF_AGENT" "$ver" "$msg")
 git commit -m "$full_msg"
 rc=$?
