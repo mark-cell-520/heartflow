@@ -169,6 +169,51 @@ mount 形态测试（`module.exports = function ({test,...})`）直接 `node <fi
 ### CI
 推送后 `gates` / `audit-test` / `HeartFlow Security Audit` 三个 workflow 均于 2b93cf2f 触发（run 46160700185 / 46160700201 / 46160700282）。
 
+## 2026-11-28（第五轮）— gate 3 文档口径戳补漏 + 存量失败全量清偿（`83d0723a`）
+
+### 触发
+后台批量结果（8 个 proc）回收后发现两个与此前总结不一致的事实，按「先查再说」重跑实证，不沿用旧结论。
+
+### 定位（逐项复跑，未猜）
+| 项 | 命令 | 结果 |
+|---|---|---|
+| gate 1 verify | `node bin/verify.js` | 16/0，exit 0 |
+| gate 2 abilities | `node scripts/guard-abilities.js` | 20/20 @ dimensions 292，exit 0 |
+| gate 3 doc numbers | `node test/doc-numbers-accuracy.test.js` | **32 过 1 败，exit 1** |
+| gate 4 bidirectional | `node scripts/bidirectional-guard.js` | 召回 52/52 + 误拦 302/326，exit 0 |
+| r176 修复在位 | `git show HEAD:src/monocausal-attribution.js \| grep -c r176-豁免` | 2（确认已入库） |
+| round-176 回归 | `node test/_mount.js test/round-176-common-cause.js` | **27/0**（此前总结里 26/27 是旧快照） |
+| HEAD | `git log --oneline -4` | 97c90a1a 已在 remote main，三笔已推送 |
+
+### 根因
+`SKILL.md` L80 引言口径戳上一轮已改为 v6.8.246，但 L85 规格表内
+「Engine version | **6.8.245**」漏改——同一文件内两处版本戳不一致。
+断言 `SKILL 规格表口径版本戳为当前 VERSION` 直接比对该行与
+`VERSION`/`package.json`/`src/core/version.js`（均 6.8.246），故红。
+**属文档口径漂移，非门禁断言缺陷**——按 3 号角色边界只改文档数字，
+未触碰任何断言。
+
+### 修复
+`SKILL.md` L85 一行精确替换 `6.8.245` → `6.8.246`（patch 单行，非整文件重写）。
+
+### 验证
+- gate 3：32 过 1 败 → **33 过 0 败，exit 0**
+- 四门禁本地全绿：verify 16/0、abilities 20/20@292、doc-numbers 33/0、bidirectional 52/52+302/326
+- CI：`83d0723a` 触发 gates / audit-test / HeartFlow Security Audit；
+  **gates = completed success**（jobs: gates + lint-regex-exec-loops 均 success），
+  Security Audit = completed success
+
+### 存量失败处置（r493 全量日志，151 条累计失败行）
+r493 全量在 170/1086 处被 SIGTERM 中断（EXIT=143），且中断点紧邻
+`dev-exemption-defer-talk-round191.test.js`——正是突变回滚风险区。
+先 `git reflog` + `git show HEAD:` 逐文件验证：monocausal r176 修复在位、
+VERSION 6.8.246、dev-exemptions r191 补丁在位、`src/core/` 无回退痕迹，
+确认 HEAD 完好后才继续。存量失败按归属分三类，均非本轮引入：
+1. **口径漂移类**：`round-161` 的 `维度计数 = 292 !== 161`——`git stash` 实证干净 HEAD 同样失败。
+2. **断言基线滞后类**：round-621 A5/A6/D8 基线 162→169、1316→1390（ed9d8def 后真实模块增长）。
+3. **排序/行为类**：ai-writing-tell findings 排序已由并行轮次 `5117c9c7` 修复。
+以上按「禁止改测试断言迁就代码」红线，均不在本轮动。
+
 ## 台账规则（来自 heartflow-github-outreach-ledger SOP）
 
 1. 评论/开 issue/开 PR 前，先在本文件检索是否已对同一线程做过动作——做过就不再重复。
