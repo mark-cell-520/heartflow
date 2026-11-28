@@ -88,6 +88,44 @@ r493（v6.8.245）提交时只改了 VERSION/package.json/src 层，`scripts/syn
 - `gates #314` 0fe3528f → **success**；`HeartFlow Security Audit #937` → success；`audit-test #950` 复跑中
 - 本地四门禁：verify 16/0、abilities 20/20@292、双向 52/52+302/326、doc-numbers 25/25
 
+## 2026-11-28（第三轮）— issue #4 门禁盲区补强 + 存量失败清偿（`a9c4ea84` / `5117c9c7`）
+
+**动作**：把 issue #4「doc-guard 守卫不住」的盲区逐条补成断言，并清偿全量回归暴露的存量测试破损。
+
+### 盲区补强（`test/doc-numbers-accuracy.test.js` 25→33 断言）
+| 项 | 内容 |
+|---|------|
+| 盲区① | SKILL 章节标题 `N dimensions` 与 runtime 实际维度数比对 |
+| 盲区② | SKILL 三层 Block/Rewrite/Verify `(N)` 计数与引擎真集合比对 |
+| 盲区③ | SKILL/AGENTS 的 `add up to N` + `remaining N` 合计行（此前仅比对列举，合计行可单独漂移） |
+| 盲区④ | 两份文档 dimensions 章节**逐名**比对（缺失 + 幽灵双向；下划线形 token 纳入幽灵扫描） |
+| 盲区⑤ | SKILL 行内 `(N dimensions)` 引用 |
+| [r413] | `src/index.js` 规模守卫 MAX_LINES=14000（只报警不断言） |
+
+守卫自身 4 个 bug 一并修掉（否则新断言全是假绿）：`engineTierNames` 非贪婪正则截断→括号配平；`dimensionsSection` `indexOf('## The ')` 抓错章节→精确匹配 `^## The N dimensions`；`sectionTokens` 强制下划线排除单词形维度名→允许 + `length>=4` 靠 known 滤噪；盲区⑤删与④重复且口径冲突的幽灵扫描。引擎真值白名单从 runtime 缓存动态计算，不随 cron 加维度过期。
+
+### 存量失败清偿
+| 文件 | 现象 | 定性 | 修法 |
+|---|------|------|------|
+| `test/test-completion-evidence.js` | 2 处断言期望旧 score 极性 | r274 score 极性改为「命中强度，0=干净」 | Test 2 期望 1→0，Test 3 期望 0.3→0.7（5/5 绿） |
+| `test/ai-writing-tell.test.js` | `discriminate` findings[0] 是 `calibration_mismatch` 而非 `ai_writing_tell` | **r421（第 274 维度）接线后按 score 排首位，本维度退居第二**；测试最后改动 `693f3e49`（6.8.62 快照）早于 r421，属存量破损，非本轮引入 | 断言从「排第一」放宽为「维度在场」，实测 `findings=['calibration_mismatch','ai_writing_tell']`（4/4 绿） |
+| `test/anchoring-effect.test.js` | run-all 中报 1 失败 | 单跑 14/14 全绿，属并发池顺序噪音 | 不改 |
+
+### 验证（真实退出码）
+- `node test/_mount.js test/doc-numbers-accuracy.test.js` → **33 通过 0 失败**
+- `node test/_mount.js test/test-completion-evidence.js` → **5 通过 0 失败**
+- `node test/_mount.js test/ai-writing-tell.test.js` → **4 通过 0 失败**
+- `node test/_mount.js test/anchoring-effect.test.js` → **14 通过 0 失败**
+- 文档零改动：`git status` 确认 SKILL.md / AGENTS.md / README.md 未被本轮触碰（D1-D8 已由 `0fe3528f` 修完）
+- 全量回归（1086 个文件）后台跑，进度见 scratch/runall-r493.log
+
+### 坑（复用价值）
+mount 形态测试（`module.exports = function ({test,...})`）直接 `node <file>` 会零输出且 exit 0——**假绿**，必须走 `node test/_mount.js <file>`。
+
+### 未处理 / 交接
+- issue #4 **仍未关闭**：等 D6（6.8.142 记录核对）与 D7（3 号存量清单）收口，且全量回归确认无新增失败后由 1 号统一回填关闭
+- AGENTS.md 的 `remaining 13→14` 修改曾被 BLOCK（受保护指令文件需用户批准）；本轮已证实 AGENTS.md 列举本就完整、无需改动，阻塞自然消解
+
 ## 台账规则（来自 heartflow-github-outreach-ledger SOP）
 
 1. 评论/开 issue/开 PR 前，先在本文件检索是否已对同一线程做过动作——做过就不再重复。
